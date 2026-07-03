@@ -685,6 +685,67 @@ describe('encoding/json override', () => {
     expect(target.value?.get('a')).toEqual({ Name: 'Ada' })
   })
 
+  it('decodes a top-level pointer-to-struct var as an unmarked struct pointee', () => {
+    // `var p *test.Property; json.Unmarshal(data, &p)`: &p's own Go type is
+    // **test.Property (one star from p already being a pointer, one from
+    // &p); unmarshalTargetGoType strips only the outermost address-of star,
+    // leaving *test.Property, so this must go through the same Pointer
+    // handling as a pointer-typed field/element (see decodeValueForType's
+    // Pointer branch) rather than falling through to the untyped decode.
+    const target = $.varRef<Property | null>(null)
+    target.__goType = '**test.Property'
+
+    const err = Unmarshal($.stringToBytes('{"type":"string"}'), target)
+    expect(err).toBeNull()
+    expect(target.value?._fields.Type.value).toBe('string')
+
+    const propertyType = $.getTypeByName('test.Property') as $.TypeInfo
+    const propertyPointerType: $.TypeInfo = {
+      kind: $.TypeKind.Pointer,
+      elemType: propertyType,
+    }
+    expect($.is(target.value, propertyPointerType)).toBe(true)
+    expect($.is(target.value, propertyType)).toBe(false)
+  })
+
+  it('honors disallowUnknownFields on anonymous struct targets', () => {
+    const target = $.varRef<{ Name: string }>({ Name: '' })
+    target.__goType = '*struct{Name string "json:\\"name\\""}'
+
+    const strictReader = bytes.NewBufferString('{"name":"Ada","extra":true}')!
+    const strictDecoder = NewDecoder(strictReader)
+    strictDecoder.DisallowUnknownFields()
+
+    expect(strictDecoder.Decode(target)?.Error()).toBe(
+      'json: unknown field "extra"',
+    )
+  })
+
+  it('constructs a by-value named-struct field inside an anonymous struct target', () => {
+    // An anonymous struct's own fields start unset (the target object
+    // starts as {}), unlike a registered struct's fields, which are
+    // pre-initialized to a zero-value instance. A by-value named-struct
+    // field (Inner test.Property, no pointer) therefore has no pre-existing
+    // instance for the generic decode path to populate into and must be
+    // constructed directly.
+    const target = $.varRef<{ Inner: Property | undefined }>({
+      Inner: undefined,
+    })
+    target.__goType = '*struct{Inner test.Property "json:\\"inner\\""}'
+
+    const err = Unmarshal(
+      $.stringToBytes('{"inner":{"type":"string"}}'),
+      target,
+    )
+    expect(err).toBeNull()
+    expect(target.value.Inner).toBeInstanceOf(Property)
+    expect(target.value.Inner?._fields.Type.value).toBe('string')
+
+    const propertyType = $.getTypeByName('test.Property') as $.TypeInfo
+    // A by-value struct field must match Property (value), not *Property.
+    expect($.is(target.value.Inner, propertyType)).toBe(true)
+  })
+
   it('decodes json.RawMessage as a map and slice element type', () => {
     // The runtime boxes Unmarshal's `any` target with its Go type spelling
     // (__goType) at the call site; simulate that here the way $.interfaceValue

@@ -1041,7 +1041,15 @@ function assignDecodedValue(
       if (info !== null) {
         if (
           ($.isSliceTypeInfo(info) && Array.isArray(decoded)) ||
-          ($.isMapTypeInfo(info) && isPlainObject(decoded))
+          ($.isMapTypeInfo(info) && isPlainObject(decoded)) ||
+          // A top-level *Struct var (e.g. `var p *pkg.T`) needs the same
+          // type-driven Pointer handling as a pointer-typed struct field or
+          // map/slice element (see decodeValueForType's Pointer branch):
+          // without it, decoding falls through to decodeInterfaceValue
+          // below and produces a Map/plain object instead of a real
+          // (unmarked) struct instance, breaking *T type assertions and
+          // pointer-receiver method-set checks on the decoded result.
+          ($.isPointerTypeInfo(info) && isPlainObject(decoded))
         ) {
           target.value = decodeValueForType(decoded, desc, opts)
           return
@@ -1476,8 +1484,8 @@ function anonymousStructFields(desc: unknown): fieldMetadata[] | null {
 
 // assignAnonymousStructFields populates an anonymous-struct value (a plain
 // JS object keyed by Go field name, the runtime's representation of an
-// inline struct) from decoded JSON, honoring json tags and field types via
-// the same per-field decode named-struct fields get
+// inline struct) from decoded JSON, honoring json tags, disallowUnknownFields,
+// and field types via the same per-field decode named-struct fields get
 // (assignDecodedFieldValue).
 function assignAnonymousStructFields(
   target: Record<string, unknown>,
@@ -1485,6 +1493,20 @@ function assignAnonymousStructFields(
   fields: fieldMetadata[],
   opts: decodeOptions,
 ): void {
+  if (opts.disallowUnknownFields) {
+    const knownNames = new Set<string>()
+    for (const field of fields) {
+      const jsonName = jsonFieldName(field.name, field.tag)
+      if (jsonName !== '') {
+        knownNames.add(jsonName)
+      }
+    }
+    for (const key of Object.keys(decoded)) {
+      if (!knownNames.has(key)) {
+        throw $.newError(`json: unknown field "${key}"`)
+      }
+    }
+  }
   for (const field of fields) {
     const jsonName = jsonFieldName(field.name, field.tag)
     if (
@@ -1493,8 +1515,29 @@ function assignAnonymousStructFields(
     ) {
       continue
     }
+    // An anonymous struct's own fields start unset (the target object
+    // starts as {}), so a by-value named-struct field (e.g.
+    // `Inner SomeStruct`) has no pre-existing instance for
+    // assignDecodedFieldValue's generic path to populate into, unlike a
+    // registered struct's fields (pre-initialized to a zero-value instance
+    // at construction). Construct it directly via the type-driven decoder
+    // whenever the field's type resolves to a real, ctor-bearing struct
+    // type (a bare type-name spelling resolved through $.getTypeByName);
+    // an inline TypeInfo with no ctor keeps the existing generic path
+    // unchanged below.
+    const fieldValue = decoded[jsonName]
+    const fieldTypeInfo = resolveTypeInfo(field.type)
+    if (
+      fieldTypeInfo !== null &&
+      $.isStructTypeInfo(fieldTypeInfo) &&
+      typeof fieldTypeInfo.ctor === 'function' &&
+      isPlainObject(fieldValue)
+    ) {
+      target[field.name] = decodeValueForType(fieldValue, fieldTypeInfo, opts)
+      continue
+    }
     const ref = $.varRef(target[field.name])
-    assignDecodedFieldValue(ref, decoded[jsonName], opts, field.type)
+    assignDecodedFieldValue(ref, fieldValue, opts, field.type)
     target[field.name] = ref.value
   }
 }
