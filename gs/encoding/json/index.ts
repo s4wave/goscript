@@ -882,9 +882,7 @@ function marshalValue(v: unknown): unknown {
   // before serializing; otherwise the wrapper object itself leaks into the
   // output instead of the underlying primitive/map/slice it holds.
   if (
-    typeof v === 'object' &&
-    v !== null &&
-    '__goValue' in v &&
+    $.isNamedValueBox(v) &&
     !isStructValue(v)
   ) {
     return marshalValue((v as { __goValue: unknown }).__goValue)

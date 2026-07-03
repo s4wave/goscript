@@ -244,6 +244,16 @@ describe('encoding/json override', () => {
     expect($.bytesToString(holderData)).toBe('{"FullName":"active"}')
   })
 
+  it('does not mistake an ordinary object with a __goValue key for a box', () => {
+    // Only the runtime's actual boxed shape (string __goType plus __goValue,
+    // see isNamedValueBox in gs/builtin/type.ts) may be unwrapped. A plain JS
+    // object that merely has a __goValue property is legal Marshal input and
+    // must serialize as-is.
+    const [data, err] = Marshal({ __goValue: 5 })
+    expect(err).toBeNull()
+    expect($.bytesToString(data)).toBe('{"__goValue":5}')
+  })
+
   it('rejects unsupported values and invalid unmarshal targets', () => {
     const [nanData, nanErr] = Marshal(Number.NaN)
     expect(nanData).toBeNull()
