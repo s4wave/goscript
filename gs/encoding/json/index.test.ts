@@ -527,6 +527,58 @@ describe('encoding/json override', () => {
     )
   })
 
+  it('decodes pointer-to-struct values as unmarked pointees, matching *Struct not Struct by value', () => {
+    const target = $.varRef(new Schema())
+    const err = Unmarshal(
+      $.stringToBytes(
+        '{"properties":{"width":{"type":"number"}},"items":{"type":"string"}}',
+      ),
+      target,
+    )
+    expect(err).toBeNull()
+
+    const propertyType = $.getTypeByName('test.Property') as $.TypeInfo
+    const propertyPointerType: $.TypeInfo = {
+      kind: $.TypeKind.Pointer,
+      elemType: propertyType,
+    }
+
+    // A *Property field/map-value must match *Property (pointer), not
+    // Property (value): the runtime distinguishes pointer vs. value structs
+    // with a marker, and getting this wrong breaks Go type
+    // assertions/switches and pointer-receiver method-set checks on
+    // JSON-decoded values.
+    const items = target.value._fields.Items.value
+    expect($.is(items, propertyPointerType)).toBe(true)
+    expect($.is(items, propertyType)).toBe(false)
+
+    const width = target.value._fields.Properties.value?.get('width')
+    expect($.is(width, propertyPointerType)).toBe(true)
+    expect($.is(width, propertyType)).toBe(false)
+  })
+
+  it('preserves pointer element types when parsing a top-level __goType spelling', () => {
+    // Regression: parsing a __goType spelling used to strip every leading
+    // '*' while recursing into nested element types, collapsing
+    // map[string]*test.Property's element type down to test.Property and
+    // losing pointer-vs-value semantics for the decoded elements.
+    const target = $.varRef<Map<string, Property | null> | null>(new Map())
+    target.__goType = '*map[string]*test.Property'
+    expect(
+      Unmarshal($.stringToBytes('{"width":{"type":"number"}}'), target),
+    ).toBeNull()
+
+    const propertyType = $.getTypeByName('test.Property') as $.TypeInfo
+    const propertyPointerType: $.TypeInfo = {
+      kind: $.TypeKind.Pointer,
+      elemType: propertyType,
+    }
+    const width = target.value?.get('width')
+    expect(width?._fields.Type.value).toBe('number')
+    expect($.is(width, propertyPointerType)).toBe(true)
+    expect($.is(width, propertyType)).toBe(false)
+  })
+
   it('decodes json.RawMessage as a map and slice element type', () => {
     // The runtime boxes Unmarshal's `any` target with its Go type spelling
     // (__goType) at the call site; simulate that here the way $.interfaceValue

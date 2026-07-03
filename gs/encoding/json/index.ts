@@ -1108,12 +1108,15 @@ function assignDecodedFieldValue(
     }
     // Pointer-to-struct fields (e.g. Items *ItemsSpec) start as nil, so the
     // generic path below has no zero-value instance to populate — construct
-    // the pointee via the type-driven decoder. Pointer-to-basic fields keep
-    // the generic path (their representation is not a struct instance).
+    // the pointee via the type-driven decoder. Decode with the Pointer
+    // TypeInfo itself (not its elemType) so decodeValueForType's Pointer
+    // branch handles the pointer-vs-value marking correctly; see its
+    // comment. Pointer-to-basic fields keep the generic path (their
+    // representation is not a struct instance).
     if ($.isPointerTypeInfo(info) && isPlainObject(decoded)) {
       const pointee = resolveTypeInfo(info.elemType)
       if (pointee !== null && $.isStructTypeInfo(pointee)) {
-        target.value = decodeValueForType(decoded, info.elemType, opts)
+        target.value = decodeValueForType(decoded, info, opts)
         return
       }
     }
@@ -1174,6 +1177,26 @@ function decodeValueForType(
     return decodeInterfaceValue(decoded)
   }
   if ($.isPointerTypeInfo(info)) {
+    // A *Struct pointee must be constructed directly here, NOT by recursing
+    // into the Struct branch below: that branch always marks its result via
+    // $.markAsStructValue, but the runtime's pointer matching
+    // (matchesPointerType in gs/builtin/type.ts) requires struct pointees to
+    // stay UNMARKED — only a genuine non-pointer struct value is marked.
+    // Getting this wrong breaks *Struct type assertions/switches and
+    // pointer-receiver method-set checks on decoded values.
+    const pointee = resolveTypeInfo(info.elemType)
+    if (pointee !== null && $.isStructTypeInfo(pointee)) {
+      if (!isPlainObject(decoded) || typeof pointee.ctor !== 'function') {
+        return decoded
+      }
+      const inst = new pointee.ctor()
+      if (isStructValue(inst)) {
+        assignStructFields(inst, decoded, opts)
+      }
+      return inst
+    }
+    // Non-struct pointee (e.g. *string): decode as the pointee's own
+    // representation, which carries no pointer-vs-value marking.
     return decodeValueForType(decoded, info.elemType, opts)
   }
   if ($.isStructTypeInfo(info)) {
@@ -1252,15 +1275,27 @@ function unmarshalTargetGoType(target: unknown): string | null {
 
 // goTypeDescriptor parses a Go type spelling (from __goType, see above) into
 // a decode descriptor consumable by decodeValueForType / resolveTypeInfo:
+//   - {kind: Pointer, elemType}   for *T (e.g. a map[string]*T element
+//                                 spelling) — NOT stripped, so
+//                                 decodeValueForType's Pointer branch can
+//                                 apply the correct pointer-vs-value marking
+//                                 (see its comment). Only the single
+//                                 outermost star representing the Unmarshal
+//                                 target's own address-of is stripped, by
+//                                 unmarshalTargetGoType above, before this
+//                                 function ever runs.
 //   - 'json.RawMessage'          RawMessage marker (isRawMessageType)
 //   - {kind: Slice|Map, elemType} for []T / map[K]V
 //   - the spelling itself         for named types ($.getTypeByName resolves)
 //   - null                        for interface{} and unparseable spellings
 //                                 (shape-driven decode, same as before)
 function goTypeDescriptor(spelling: string): unknown {
-  let s = spelling.trim()
-  while (s.startsWith('*')) {
-    s = s.slice(1).trim()
+  const s = spelling.trim()
+  if (s.startsWith('*')) {
+    return {
+      kind: $.TypeKind.Pointer,
+      elemType: goTypeDescriptor(s.slice(1).trim()),
+    }
   }
   if (s === 'json.RawMessage' || s === 'encoding/json.RawMessage') {
     return 'json.RawMessage'
