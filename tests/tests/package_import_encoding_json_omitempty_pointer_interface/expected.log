@@ -1,0 +1,7 @@
+ptr emitted: true
+ifaceZero emitted: true
+ifaceFalse emitted: true
+ifaceEmptyString emitted: true
+ifaceEmptySlice emitted: true
+ifaceEmptyMap emitted: true
+ptrBool emitted: true
