@@ -85,6 +85,44 @@ class FieldAlias {
   )
 }
 
+class OmitEmptyStruct {
+  public _fields = {
+    Name: $.varRef(''),
+    Age: $.varRef(0),
+    Tags: $.varRef<string[]>([]),
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.OmitEmptyStruct',
+    new OmitEmptyStruct(),
+    [],
+    OmitEmptyStruct,
+    [
+      {
+        name: 'Name',
+        key: 'Name',
+        type: { kind: $.TypeKind.Basic, name: 'string' },
+        tag: 'json:"name,omitempty"',
+      },
+      {
+        name: 'Age',
+        key: 'Age',
+        type: { kind: $.TypeKind.Basic, name: 'int' },
+        tag: 'json:"age,omitempty"',
+      },
+      {
+        name: 'Tags',
+        key: 'Tags',
+        type: {
+          kind: $.TypeKind.Slice,
+          elemType: { kind: $.TypeKind.Basic, name: 'string' },
+        },
+        tag: 'json:"tags,omitempty"',
+      },
+    ],
+  )
+}
+
 describe('encoding/json override', () => {
   it('registers the Unmarshaler interface shape', () => {
     class CustomMarshaler implements Marshaler {
@@ -155,6 +193,42 @@ describe('encoding/json override', () => {
       Unmarshal($.stringToBytes('{"FullName":"Grace"}'), target),
     ).toBeNull()
     expect(target.value._fields.Name.value).toBe('Grace')
+  })
+
+  it('omits zero-valued fields tagged omitempty on marshal', () => {
+    const zero = new OmitEmptyStruct()
+    const [zeroData, zeroErr] = Marshal(zero)
+    expect(zeroErr).toBeNull()
+    expect($.bytesToString(zeroData)).toBe('{}')
+
+    const filled = new OmitEmptyStruct()
+    filled._fields.Name.value = 'Ada'
+    filled._fields.Age.value = 30
+    filled._fields.Tags.value = ['x']
+    const [data, err] = Marshal(filled)
+    expect(err).toBeNull()
+    expect($.bytesToString(data)).toBe('{"name":"Ada","age":30,"tags":["x"]}')
+  })
+
+  it('unwraps a boxed interface{} value before marshaling instead of leaking its wrapper', () => {
+    // A value of a named/defined type stored in an interface{} is boxed by
+    // the runtime as { __goType, __goValue, ... } so it can carry methods.
+    // Marshal must serialize the underlying value, not the wrapper.
+    const namedInt = $.namedValueInterfaceValue<unknown>(42, 'test.Status', {})
+    const [data, err] = Marshal(namedInt)
+    expect(err).toBeNull()
+    expect($.bytesToString(data)).toBe('42')
+
+    const namedString = $.namedValueInterfaceValue<unknown>(
+      'active',
+      'test.Status',
+      {},
+    )
+    const holder = new FieldAlias()
+    holder._fields.Name.value = namedString as unknown as string
+    const [holderData, holderErr] = Marshal(holder)
+    expect(holderErr).toBeNull()
+    expect($.bytesToString(holderData)).toBe('{"FullName":"active"}')
   })
 
   it('rejects unsupported values and invalid unmarshal targets', () => {

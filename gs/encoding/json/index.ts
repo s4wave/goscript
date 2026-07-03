@@ -877,6 +877,18 @@ function marshalValue(v: unknown): unknown {
   if ($.isVarRef(v)) {
     return marshalValue(v.value)
   }
+  // Unwrap a boxed interface{} value (a named/defined type's value, boxed by
+  // the runtime as { __goType, __goValue, ... } so it can carry methods)
+  // before serializing; otherwise the wrapper object itself leaks into the
+  // output instead of the underlying primitive/map/slice it holds.
+  if (
+    typeof v === 'object' &&
+    v !== null &&
+    '__goValue' in v &&
+    !isStructValue(v)
+  ) {
+    return marshalValue((v as { __goValue: unknown }).__goValue)
+  }
   if (v === null || v === undefined) {
     return null
   }
@@ -916,9 +928,53 @@ function marshalValue(v: unknown): unknown {
     if (jsonName === '') {
       continue
     }
+    if (jsonOmitEmpty(field.tag) && isEmptyValue(ref.value)) {
+      continue
+    }
     out[jsonName] = marshalFieldValue(ref.value, field.type)
   }
   return out
+}
+
+// jsonOmitEmpty reports whether the struct tag carries the `,omitempty` option.
+function jsonOmitEmpty(tag: string | undefined): boolean {
+  if (tag === undefined || !tag.startsWith('json:"')) {
+    return false
+  }
+  const end = tag.indexOf('"', 'json:"'.length)
+  if (end < 0) {
+    return false
+  }
+  return tag
+    .slice('json:"'.length, end)
+    .split(',')
+    .slice(1)
+    .includes('omitempty')
+}
+
+// isEmptyValue mirrors Go encoding/json: zero numbers/strings/bools, empty
+// slices/maps/arrays, and nil pointers/interfaces are "empty".
+function isEmptyValue(v: unknown): boolean {
+  const t = $.isVarRef(v) ? (v as $.VarRef<unknown>).value : v
+  if (t === null || t === undefined) {
+    return true
+  }
+  if (typeof t === 'number') {
+    return t === 0
+  }
+  if (typeof t === 'string') {
+    return t === ''
+  }
+  if (typeof t === 'boolean') {
+    return t === false
+  }
+  if (Array.isArray(t)) {
+    return t.length === 0
+  }
+  if (t instanceof Map) {
+    return t.size === 0
+  }
+  return false
 }
 
 function marshalFieldValue(value: unknown, fieldType: unknown): unknown {
