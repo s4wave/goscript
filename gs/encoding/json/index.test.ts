@@ -85,6 +85,164 @@ class FieldAlias {
   )
 }
 
+class Ref {
+  public _fields = {
+    Name: $.varRef(''),
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.Ref',
+    new Ref(),
+    [],
+    Ref,
+    [
+      {
+        name: 'Name',
+        key: 'Name',
+        type: { kind: $.TypeKind.Basic, name: 'string' },
+        tag: 'json:"name"',
+      },
+    ],
+  )
+}
+
+class Container {
+  public _fields = {
+    Contexts: $.varRef<Map<string, Ref[]> | null>(null),
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.Container',
+    new Container(),
+    [],
+    Container,
+    [
+      {
+        name: 'Contexts',
+        key: 'Contexts',
+        type: {
+          kind: $.TypeKind.Map,
+          elemType: { kind: $.TypeKind.Slice, elemType: 'test.Ref' },
+        },
+        tag: 'json:"contexts"',
+      },
+    ],
+  )
+}
+
+class Property {
+  public _fields = {
+    Type: $.varRef(''),
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.Property',
+    new Property(),
+    [],
+    Property,
+    [
+      {
+        name: 'Type',
+        key: 'Type',
+        type: { kind: $.TypeKind.Basic, name: 'string' },
+        tag: 'json:"type"',
+      },
+    ],
+  )
+}
+
+class Schema {
+  public _fields = {
+    Properties: $.varRef<Map<string, Property | null> | null>(null),
+    Items: $.varRef<Property | null>(null),
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.Schema',
+    new Schema(),
+    [],
+    Schema,
+    [
+      {
+        name: 'Properties',
+        key: 'Properties',
+        type: {
+          kind: $.TypeKind.Map,
+          elemType: { kind: $.TypeKind.Pointer, elemType: 'test.Property' },
+        },
+        tag: 'json:"properties"',
+      },
+      {
+        name: 'Items',
+        key: 'Items',
+        type: { kind: $.TypeKind.Pointer, elemType: 'test.Property' },
+        tag: 'json:"items"',
+      },
+    ],
+  )
+}
+
+class HookPointee {
+  public _fields = {}
+  public Text = ''
+  public Marker = ''
+
+  UnmarshalJSON(data: $.Slice<number>): $.GoError {
+    this.Text = $.bytesToString(data)
+    return null
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.HookPointee',
+    new HookPointee(),
+    [],
+    HookPointee,
+    [],
+  )
+}
+
+class HookHolder {
+  public _fields = {
+    Hook: $.varRef<HookPointee | null>(null),
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.HookHolder',
+    new HookHolder(),
+    [],
+    HookHolder,
+    [
+      {
+        name: 'Hook',
+        key: 'Hook',
+        type: { kind: $.TypeKind.Pointer, elemType: 'test.HookPointee' },
+        tag: 'json:"hook"',
+      },
+    ],
+  )
+}
+
+class Holder {
+  public _fields = {
+    Value: $.varRef<unknown>(null),
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.Holder',
+    new Holder(),
+    [],
+    Holder,
+    [
+      {
+        name: 'Value',
+        key: 'Value',
+        type: { kind: $.TypeKind.Interface, methods: [] },
+        tag: 'json:"value"',
+      },
+    ],
+  )
+}
+
 describe('encoding/json override', () => {
   it('registers the Unmarshaler interface shape', () => {
     class CustomMarshaler implements Marshaler {
@@ -359,6 +517,153 @@ describe('encoding/json override', () => {
     expect(mapRef.value?.get('name')).toBe('Carol')
     expect(mapRef.value?.get('age')).toBe(22)
     expect(mapRef.value?.get('active')).toBe(true)
+  })
+
+  it('decodes a map[string][]Struct field into real struct instances, not plain objects/arrays', () => {
+    const target = $.varRef(new Container())
+    const err = Unmarshal(
+      $.stringToBytes('{"contexts":{"a":[{"name":"x"},{"name":"y"}]}}'),
+      target,
+    )
+
+    expect(err).toBeNull()
+    const contexts = target.value._fields.Contexts.value
+    expect(contexts).toBeInstanceOf(Map)
+    const refs = contexts?.get('a')
+    expect(refs).toHaveLength(2)
+    expect(refs?.[0]._fields.Name.value).toBe('x')
+    expect(refs?.[1]._fields.Name.value).toBe('y')
+  })
+
+  it('decodes array elements inside an interface{}-typed field into Maps, not plain objects', () => {
+    const target = $.varRef(new Holder())
+    const err = Unmarshal(
+      $.stringToBytes('{"value":[{"x":1},{"y":2}]}'),
+      target,
+    )
+
+    expect(err).toBeNull()
+    const value = target.value._fields.Value.value as unknown[]
+    expect(Array.isArray(value)).toBe(true)
+    expect(value[0]).toBeInstanceOf(Map)
+    expect((value[0] as Map<string, unknown>).get('x')).toBe(1)
+    expect((value[1] as Map<string, unknown>).get('y')).toBe(2)
+  })
+
+  it('decodes pointer-to-struct map values and fields into real struct instances', () => {
+    const target = $.varRef(new Schema())
+    const err = Unmarshal(
+      $.stringToBytes(
+        '{"properties":{"width":{"type":"number"}},"items":{"type":"string"}}',
+      ),
+      target,
+    )
+
+    expect(err).toBeNull()
+    const properties = target.value._fields.Properties.value
+    expect(properties?.get('width')?._fields.Type.value).toBe('number')
+    expect(target.value._fields.Items.value?._fields.Type.value).toBe(
+      'string',
+    )
+  })
+
+  it('allocates a nil pointer-to-struct field and invokes UnmarshalJSON on it, instead of decoding it field-by-field', () => {
+    const target = $.varRef(new HookHolder())
+    const err = Unmarshal($.stringToBytes('{"hook":{"nested":true}}'), target)
+
+    expect(err).toBeNull()
+    expect(target.value._fields.Hook.value).toBeInstanceOf(HookPointee)
+    expect(target.value._fields.Hook.value?.Text).toBe('{"nested":true}')
+  })
+
+  it('invokes UnmarshalJSON on a non-nil pointer-to-struct field in place, instead of replacing it with a freshly decoded instance', () => {
+    const holder = new HookHolder()
+    const existing = new HookPointee()
+    existing.Marker = 'orig'
+    holder._fields.Hook.value = existing
+
+    const target = $.varRef(holder)
+    const err = Unmarshal($.stringToBytes('{"hook":{"nested":true}}'), target)
+
+    expect(err).toBeNull()
+    // Go's encoding/json decodes into the existing pointee via its
+    // UnmarshalJSON hook, it never discards it for a fresh replacement.
+    expect(target.value._fields.Hook.value).toBe(existing)
+    expect(target.value._fields.Hook.value?.Marker).toBe('orig')
+    expect(target.value._fields.Hook.value?.Text).toBe('{"nested":true}')
+  })
+
+  it('decodes pointer-to-struct values as unmarked pointees, matching *Struct not Struct by value', () => {
+    const target = $.varRef(new Schema())
+    const err = Unmarshal(
+      $.stringToBytes(
+        '{"properties":{"width":{"type":"number"}},"items":{"type":"string"}}',
+      ),
+      target,
+    )
+    expect(err).toBeNull()
+
+    const propertyType = $.getTypeByName('test.Property') as $.TypeInfo
+    const propertyPointerType: $.TypeInfo = {
+      kind: $.TypeKind.Pointer,
+      elemType: propertyType,
+    }
+
+    // A *Property field/map-value must match *Property (pointer), not
+    // Property (value): the runtime distinguishes pointer vs. value structs
+    // with a marker, and getting this wrong breaks Go type
+    // assertions/switches and pointer-receiver method-set checks on
+    // JSON-decoded values.
+    const items = target.value._fields.Items.value
+    expect($.is(items, propertyPointerType)).toBe(true)
+    expect($.is(items, propertyType)).toBe(false)
+
+    const width = target.value._fields.Properties.value?.get('width')
+    expect($.is(width, propertyPointerType)).toBe(true)
+    expect($.is(width, propertyType)).toBe(false)
+  })
+
+  it('preserves pointer element types when parsing a top-level __goType spelling', () => {
+    // Regression: parsing a __goType spelling used to strip every leading
+    // '*' while recursing into nested element types, collapsing
+    // map[string]*test.Property's element type down to test.Property and
+    // losing pointer-vs-value semantics for the decoded elements.
+    const target = $.varRef<Map<string, Property | null> | null>(new Map())
+    target.__goType = '*map[string]*test.Property'
+    expect(
+      Unmarshal($.stringToBytes('{"width":{"type":"number"}}'), target),
+    ).toBeNull()
+
+    const propertyType = $.getTypeByName('test.Property') as $.TypeInfo
+    const propertyPointerType: $.TypeInfo = {
+      kind: $.TypeKind.Pointer,
+      elemType: propertyType,
+    }
+    const width = target.value?.get('width')
+    expect(width?._fields.Type.value).toBe('number')
+    expect($.is(width, propertyPointerType)).toBe(true)
+    expect($.is(width, propertyType)).toBe(false)
+  })
+
+  it('decodes json.RawMessage as a map and slice element type', () => {
+    // The runtime boxes Unmarshal's `any` target with its Go type spelling
+    // (__goType) at the call site; simulate that here the way $.interfaceValue
+    // would for `var m map[string]json.RawMessage; json.Unmarshal(data, &m)`.
+    const mapTarget = $.varRef<Map<string, Uint8Array> | null>(new Map())
+    mapTarget.__goType = '*map[string]json.RawMessage'
+    expect(
+      Unmarshal($.stringToBytes('{"a":{"x":1},"b":[1,2,3]}'), mapTarget),
+    ).toBeNull()
+    expect($.bytesToString(mapTarget.value!.get('a')!)).toBe('{"x":1}')
+    expect($.bytesToString(mapTarget.value!.get('b')!)).toBe('[1,2,3]')
+
+    const sliceTarget = $.varRef<Uint8Array[]>([])
+    sliceTarget.__goType = '*[]json.RawMessage'
+    expect(
+      Unmarshal($.stringToBytes('[{"x":1},"raw"]'), sliceTarget),
+    ).toBeNull()
+    expect($.bytesToString(sliceTarget.value[0])).toBe('{"x":1}')
+    expect($.bytesToString(sliceTarget.value[1])).toBe('"raw"')
   })
 
   it('encodes JSON to an io.Writer with newline, indentation, and HTML escaping', () => {

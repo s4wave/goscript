@@ -1013,8 +1013,29 @@ function assignDecodedValue(
       target.value = base64Decode(decoded)
       return
     }
-    if (isPlainObject(decoded)) {
-      target.value = objectToMap(decoded)
+    // A top-level map/slice var carries its Go type spelling (including its
+    // element type) via __goType, which the runtime boxes onto Unmarshal's
+    // `any` target (see unmarshalTargetGoType/goTypeDescriptor below).
+    // Decoding per that spelling, instead of the shape-driven decode below,
+    // is what makes e.g. `var m map[string]json.RawMessage` or
+    // `var m map[string]*Property` populate real typed elements instead of
+    // plain JS objects/strings.
+    const spelling = unmarshalTargetGoType(target)
+    if (spelling !== null) {
+      const desc = goTypeDescriptor(spelling)
+      const info = resolveTypeInfo(desc)
+      if (info !== null) {
+        if (
+          ($.isSliceTypeInfo(info) && Array.isArray(decoded)) ||
+          ($.isMapTypeInfo(info) && isPlainObject(decoded))
+        ) {
+          target.value = decodeValueForType(decoded, desc, opts)
+          return
+        }
+      }
+    }
+    if (isPlainObject(decoded) || Array.isArray(decoded)) {
+      target.value = decodeInterfaceValue(decoded)
       return
     }
     target.value = decoded
@@ -1070,15 +1091,273 @@ function assignDecodedFieldValue(
     target.value = $.stringToBytes(JSON.stringify(decoded))
     return
   }
+  // Decode Map/Slice-typed fields (including nested combinations, e.g.
+  // map[string][]Struct) through the type-driven decoder below. Gated on the
+  // decoded JSON shape actually matching (array for Slice, object for Map) so
+  // every other field shape (basic types, []byte-as-base64-string, etc.)
+  // falls through to the untouched generic path exactly as before.
+  const info = resolveTypeInfo(fieldType)
+  if (info !== null) {
+    if ($.isSliceTypeInfo(info) && Array.isArray(decoded)) {
+      target.value = decodeValueForType(decoded, info, opts)
+      return
+    }
+    if ($.isMapTypeInfo(info) && isPlainObject(decoded)) {
+      target.value = decodeValueForType(decoded, info, opts)
+      return
+    }
+    // Pointer-to-struct fields (e.g. Items *ItemsSpec) start as nil, so the
+    // generic path below has no zero-value instance to populate — construct
+    // the pointee via the type-driven decoder. Decode with the Pointer
+    // TypeInfo itself (not its elemType) so decodeValueForType's Pointer
+    // branch handles the pointer-vs-value marking correctly; see its
+    // comment. Pointer-to-basic fields keep the generic path (their
+    // representation is not a struct instance).
+    if ($.isPointerTypeInfo(info) && isPlainObject(decoded)) {
+      const pointee = resolveTypeInfo(info.elemType)
+      if (pointee !== null && $.isStructTypeInfo(pointee)) {
+        // A field that already holds a non-nil pointer whose pointee
+        // implements UnmarshalJSON must still go through that hook: Go's
+        // encoding/json always prefers a custom decoder over field-by-field
+        // population, even when the field is pre-populated rather than nil.
+        // The type-driven constructor below only sees a fresh instance it
+        // allocates itself, so it cannot see this pre-existing target.
+        if (unmarshalJSONTarget(target.value) !== null) {
+          assignDecodedValue(target, decoded, opts)
+          return
+        }
+        target.value = decodeValueForType(decoded, info, opts)
+        return
+      }
+    }
+  }
   assignDecodedValue(target, decoded, opts)
 }
 
-function objectToMap(decoded: Record<string, unknown>): Map<string, unknown> {
-  const out = new Map<string, unknown>()
-  for (const [key, value] of Object.entries(decoded)) {
-    out.set(key, isPlainObject(value) ? objectToMap(value) : value)
+// resolveTypeInfo normalizes a type descriptor (an inline TypeInfo object, or
+// a qualified type-name string like "pkg.MyStruct") into a TypeInfo, looking
+// up named types via $.getTypeByName. Returns null when the descriptor is
+// missing or names a type the runtime has no registration for (e.g. a basic
+// type name like "uint8" — those are handled as plain values).
+function resolveTypeInfo(t: unknown): $.TypeInfo | null {
+  if (typeof t === 'string') {
+    return ($.getTypeByName(t) as $.TypeInfo | undefined) ?? null
   }
-  return out
+  if (typeof t === 'object' && t !== null && 'kind' in t) {
+    return t as $.TypeInfo
+  }
+  return null
+}
+
+// decodeValueForType recursively decodes a raw JSON-parsed JS value into a
+// properly-typed Go value per `typeInfo`:
+//   - Struct: construct the registered ctor and populate its fields.
+//   - Slice: decode each element per the slice's elemType (struct elements
+//     become real struct instances instead of leaking plain objects).
+//   - Map: build a real Map (this override's Go-map representation) whose
+//     values are decoded per the map's elemType — this is what fixes
+//     map[string]T struct/slice-of-struct fields (e.g. a
+//     `Contexts map[string][]Ref` field): a struct- or slice-valued MAP
+//     field previously fell through to the shape-driven interface{} decode
+//     below and silently produced a Map of plain JS objects/arrays instead
+//     of real struct instances, so Go field access on the decoded values
+//     (e.g. `contexts.Foo`) read back empty/undefined.
+//   - json.RawMessage element: captures the raw JSON fragment as bytes,
+//     mirroring the direct-struct-field RawMessage path in
+//     assignDecodedFieldValue above.
+//   - Pointer element: decodes as its pointee (the runtime represents a
+//     *Struct value as the struct instance itself for field access) —
+//     without this, map/slice elements typed e.g. map[string]*Property
+//     leaked plain objects whose Go field reads came back undefined.
+//   - Missing type info / interface{} elements: shape-driven decode via
+//     decodeInterfaceValue, mirroring Go's json.Unmarshal-into-any.
+function decodeValueForType(
+  decoded: unknown,
+  typeInfo: unknown,
+  opts: decodeOptions,
+): unknown {
+  if (isRawMessageType(typeInfo) && decoded !== undefined) {
+    return $.stringToBytes(JSON.stringify(decoded))
+  }
+  if (decoded === null || decoded === undefined) {
+    return decoded
+  }
+  const info = resolveTypeInfo(typeInfo)
+  if (info === null || $.isInterfaceTypeInfo(info)) {
+    return decodeInterfaceValue(decoded)
+  }
+  if ($.isPointerTypeInfo(info)) {
+    // A *Struct pointee must be constructed directly here, NOT by recursing
+    // into the Struct branch below: that branch always marks its result via
+    // $.markAsStructValue, but the runtime's pointer matching
+    // (matchesPointerType in gs/builtin/type.ts) requires struct pointees to
+    // stay UNMARKED — only a genuine non-pointer struct value is marked.
+    // Getting this wrong breaks *Struct type assertions/switches and
+    // pointer-receiver method-set checks on decoded values.
+    const pointee = resolveTypeInfo(info.elemType)
+    if (pointee !== null && $.isStructTypeInfo(pointee)) {
+      if (!isPlainObject(decoded) || typeof pointee.ctor !== 'function') {
+        return decoded
+      }
+      const inst = new pointee.ctor()
+      // A freshly-allocated pointee that implements UnmarshalJSON must be
+      // decoded through that hook rather than field-by-field, mirroring Go:
+      // encoding/json always prefers a custom decoder over the default
+      // struct decode, including for a pointer field/element it allocates
+      // itself.
+      const unmarshaler = unmarshalJSONTarget(inst)
+      if (unmarshaler !== null) {
+        const err = unmarshaler.UnmarshalJSON(
+          $.stringToBytes(JSON.stringify(decoded)),
+        )
+        if (err !== null) {
+          throw err
+        }
+        return inst
+      }
+      if (isStructValue(inst)) {
+        assignStructFields(inst, decoded, opts)
+      }
+      return inst
+    }
+    // Non-struct pointee (e.g. *string): decode as the pointee's own
+    // representation, which carries no pointer-vs-value marking.
+    return decodeValueForType(decoded, info.elemType, opts)
+  }
+  if ($.isStructTypeInfo(info)) {
+    if (!isPlainObject(decoded) || typeof info.ctor !== 'function') {
+      return decoded
+    }
+    const inst = new info.ctor()
+    if (isStructValue(inst)) {
+      assignStructFields(inst, decoded, opts)
+    }
+    return $.markAsStructValue(inst)
+  }
+  if ($.isSliceTypeInfo(info)) {
+    if (!Array.isArray(decoded)) {
+      return decoded
+    }
+    return decoded.map((el) => decodeValueForType(el, info.elemType, opts))
+  }
+  if ($.isMapTypeInfo(info)) {
+    if (!isPlainObject(decoded)) {
+      return decoded
+    }
+    const out = new Map<string, unknown>()
+    for (const [key, value] of Object.entries(decoded)) {
+      out.set(key, decodeValueForType(value, info.elemType, opts))
+    }
+    return out
+  }
+  // Basic / other kinds: passthrough (RawMessage and []byte-as-base64 are
+  // handled by the caller before reaching the generic decoder).
+  return decoded
+}
+
+// decodeInterfaceValue recursively decodes a raw JSON-parsed JS value the way
+// Go's json.Unmarshal decodes into interface{}: objects become Maps (this
+// override's Go-map representation) and arrays are decoded element-wise, so
+// nested objects INSIDE arrays also become Maps, not just direct object
+// values — both recursively, all the way down. Primitives pass through
+// unchanged.
+//
+// Supersedes objectToMap, which only recursed into direct object VALUES, not
+// array elements: an interface{}-typed array of objects (e.g. a Go []any
+// holding map[string]any elements) left its element objects as raw plain JS
+// objects instead of Maps. Go-side code that then type-switches on
+// `case map[string]any:` and calls Map-only methods like .entries() on those
+// elements panics with "entries is not a function".
+function decodeInterfaceValue(decoded: unknown): unknown {
+  if (Array.isArray(decoded)) {
+    return decoded.map((el) => decodeInterfaceValue(el))
+  }
+  if (isPlainObject(decoded)) {
+    const out = new Map<string, unknown>()
+    for (const [key, value] of Object.entries(decoded)) {
+      out.set(key, decodeInterfaceValue(value))
+    }
+    return out
+  }
+  return decoded
+}
+
+// unmarshalTargetGoType returns the Go type spelling the runtime's
+// $.interfaceValue boxes onto an Unmarshal target as __goType (e.g.
+// `*map[string]json.RawMessage`), without the leading pointer star. Null
+// when the target carries none (e.g. it was never passed through an `any`
+// parameter, so there is no spelling to decode against).
+function unmarshalTargetGoType(target: unknown): string | null {
+  if (target === null || typeof target !== 'object') {
+    return null
+  }
+  const t = Reflect.get(target, '__goType')
+  if (typeof t !== 'string' || t === '') {
+    return null
+  }
+  return t.startsWith('*') ? t.slice(1) : t
+}
+
+// goTypeDescriptor parses a Go type spelling (from __goType, see above) into
+// a decode descriptor consumable by decodeValueForType / resolveTypeInfo:
+//   - {kind: Pointer, elemType}   for *T (e.g. a map[string]*T element
+//                                 spelling) — NOT stripped, so
+//                                 decodeValueForType's Pointer branch can
+//                                 apply the correct pointer-vs-value marking
+//                                 (see its comment). Only the single
+//                                 outermost star representing the Unmarshal
+//                                 target's own address-of is stripped, by
+//                                 unmarshalTargetGoType above, before this
+//                                 function ever runs.
+//   - 'json.RawMessage'          RawMessage marker (isRawMessageType)
+//   - {kind: Slice|Map, elemType} for []T / map[K]V
+//   - the spelling itself         for named types ($.getTypeByName resolves)
+//   - null                        for interface{} and unparseable spellings
+//                                 (shape-driven decode, same as before)
+function goTypeDescriptor(spelling: string): unknown {
+  const s = spelling.trim()
+  if (s.startsWith('*')) {
+    return {
+      kind: $.TypeKind.Pointer,
+      elemType: goTypeDescriptor(s.slice(1).trim()),
+    }
+  }
+  if (s === 'json.RawMessage' || s === 'encoding/json.RawMessage') {
+    return 'json.RawMessage'
+  }
+  if (s === 'any' || s === 'interface{}' || s === 'interface {}') {
+    return null
+  }
+  if (s.startsWith('[]')) {
+    return { kind: $.TypeKind.Slice, elemType: goTypeDescriptor(s.slice(2)) }
+  }
+  if (s.startsWith('map[')) {
+    const keyEnd = matchingBracketIndex(s, 'map['.length - 1)
+    if (keyEnd < 0) {
+      return null
+    }
+    return {
+      kind: $.TypeKind.Map,
+      elemType: goTypeDescriptor(s.slice(keyEnd + 1)),
+    }
+  }
+  return s
+}
+
+// matchingBracketIndex returns the index of the ']' matching the '[' at
+// `open`, or -1. Tracks nesting only — Go map key spellings carry no strings
+// or further brackets in the shapes goTypeDescriptor parses (map keys are
+// always basic types).
+function matchingBracketIndex(s: string, open: number): number {
+  let depth = 0
+  for (let i = open; i < s.length; i++) {
+    if (s[i] === '[') depth++
+    else if (s[i] === ']') {
+      depth--
+      if (depth === 0) return i
+    }
+  }
+  return -1
 }
 
 function isStructValue(
