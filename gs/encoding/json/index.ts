@@ -1536,10 +1536,43 @@ function assignAnonymousStructFields(
       target[field.name] = decodeValueForType(fieldValue, fieldTypeInfo, opts)
       continue
     }
+    // A field whose own type is itself an inline struct{...} or
+    // *struct{...} (e.g. `Inner struct{ Name string "json:\"name\"" }`) has
+    // no registered TypeInfo of its own — resolveTypeInfo(field.type) is
+    // null for it, same as it is for a missing type. Left on the generic
+    // path below, it decodes as a plain interface{} value (a Map keyed by
+    // JSON tag) instead of the anonymous struct representation (a plain
+    // object keyed by Go field name). Route it through decodeValueForType
+    // directly, which recurses into assignAnonymousStructFields (or, for
+    // *struct{...}, its Pointer branch, which falls through to the same
+    // anonymous decode for a non-struct-typeinfo pointee) and so honors the
+    // field's own parsed json tags and disallowUnknownFields.
+    if (isAnonymousStructType(field.type) && isPlainObject(fieldValue)) {
+      target[field.name] = decodeValueForType(fieldValue, field.type, opts)
+      continue
+    }
     const ref = $.varRef(target[field.name])
     assignDecodedFieldValue(ref, fieldValue, opts, field.type)
     target[field.name] = ref.value
   }
+}
+
+// isAnonymousStructType reports whether `t` (a field's parsed type
+// descriptor, from parseAnonymousStructFields) denotes struct{...} or
+// *struct{...} — the shapes decodeValueForType constructs via
+// assignAnonymousStructFields rather than a registered struct's ctor, and
+// so must not be left on the generic assignDecodedFieldValue path.
+function isAnonymousStructType(t: unknown): boolean {
+  if (anonymousStructFields(t) !== null) {
+    return true
+  }
+  if (typeof t === 'object' && t !== null && 'kind' in t) {
+    const info = t as $.TypeInfo
+    if ($.isPointerTypeInfo(info)) {
+      return isAnonymousStructType(info.elemType)
+    }
+  }
+  return false
 }
 
 // matchingBracketIndex returns the index of the ']' matching the '[' at

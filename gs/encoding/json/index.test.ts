@@ -746,6 +746,68 @@ describe('encoding/json override', () => {
     expect($.is(target.value.Inner, propertyType)).toBe(true)
   })
 
+  it('decodes a nested anonymous struct field, not a generic Map', () => {
+    // A field whose own type is itself an inline struct{...} (e.g.
+    //   struct {
+    //       Inner struct {
+    //           Name string `json:"name"`
+    //       } `json:"inner"`
+    //   }
+    // ) has no registered TypeInfo of its own: resolveTypeInfo(field.type)
+    // returns null for it, same as any other anonymous struct descriptor.
+    // Without routing it through decodeValueForType, it fell through to the
+    // generic interface{} decode and came back as a Map keyed by the JSON
+    // tag ("name") instead of the anonymous struct representation keyed by
+    // the Go field name ("Name").
+    const target = $.varRef<{ Inner: { Name: string } | undefined }>({
+      Inner: undefined,
+    })
+    target.__goType =
+      '*struct{Inner struct{Name string "json:\\"name\\""} "json:\\"inner\\""}'
+
+    const err = Unmarshal(
+      $.stringToBytes('{"inner":{"name":"Ada"}}'),
+      target,
+    )
+    expect(err).toBeNull()
+    expect(target.value.Inner).toEqual({ Name: 'Ada' })
+  })
+
+  it('decodes a pointer-to-anonymous-struct field, not a generic Map', () => {
+    // Same gap as above, one level of indirection further: a
+    // *struct{...} field.
+    const target = $.varRef<{ Inner: { Name: string } | null | undefined }>({
+      Inner: undefined,
+    })
+    target.__goType =
+      '*struct{Inner *struct{Name string "json:\\"name\\""} "json:\\"inner\\""}'
+
+    const err = Unmarshal(
+      $.stringToBytes('{"inner":{"name":"Ada"}}'),
+      target,
+    )
+    expect(err).toBeNull()
+    expect(target.value.Inner).toEqual({ Name: 'Ada' })
+  })
+
+  it('honors disallowUnknownFields on a nested anonymous struct field', () => {
+    const target = $.varRef<{ Inner: { Name: string } | undefined }>({
+      Inner: undefined,
+    })
+    target.__goType =
+      '*struct{Inner struct{Name string "json:\\"name\\""} "json:\\"inner\\""}'
+
+    const strictReader = bytes.NewBufferString(
+      '{"inner":{"name":"Ada","extra":true}}',
+    )!
+    const strictDecoder = NewDecoder(strictReader)
+    strictDecoder.DisallowUnknownFields()
+
+    expect(strictDecoder.Decode(target)?.Error()).toBe(
+      'json: unknown field "extra"',
+    )
+  })
+
   it('decodes json.RawMessage as a map and slice element type', () => {
     // The runtime boxes Unmarshal's `any` target with its Go type spelling
     // (__goType) at the call site; simulate that here the way $.interfaceValue
