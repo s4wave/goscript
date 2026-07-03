@@ -8,6 +8,10 @@
 
 ### Project-Specific Rules
 
+- When creating git commits when explicitly asked do not add co-author attribution lines. Always use git commit -s to sign-off.
+- NEVER use emdash `--` anywhere.
+- When creating PRs, match the target repo's existing PR description style. For repos with minimal/plain text PR descriptions, do NOT use markdown headers (## Summary, ## Test plan, etc.) or bullet lists. Use plain prose matching the commit message style.
+
 - DO NOT maintain backwards compatibility - this is an experimental project
 - Remove any "for backwards compatibility" comments and fallback logic
 - NEVER hardcode things: examples include function names, builtins, etc.
