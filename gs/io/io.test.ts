@@ -1,24 +1,39 @@
 import * as $ from '@goscript/builtin/index.js'
 import {
+  Copy,
+  CopyBuffer,
+  CopyN,
+  Discard,
   EOF,
+  ErrShortWrite,
+  ErrUnexpectedEOF,
   LimitedReader,
+  MultiReader,
   MultiWriter,
   NewSectionReader,
   NopCloser,
   Pipe,
   ReadAll,
+  ReadFull,
   TeeReader,
+  WriteString,
 } from './index.js'
 import { describe, expect, test } from 'vitest'
 
 class sliceReader {
+  public requestedSizes: number[] = []
+
   constructor(private data: Uint8Array) {}
 
   Read(p: $.Bytes): [number, $.GoError] {
+    this.requestedSizes.push($.len(p))
+    if (this.data.length === 0) {
+      return [0, EOF]
+    }
     const n = Math.min($.len(p), this.data.length)
     p!.set(this.data.subarray(0, n), 0)
     this.data = this.data.subarray(n)
-    return [n, n === 0 ? (new Error('EOF') as $.GoError) : null]
+    return [n, null]
   }
 }
 
@@ -188,6 +203,133 @@ describe('io override', () => {
     expect(readErr).toBeNull()
     expect(readBytes).toBe(5)
     expect(Buffer.from(buf).toString('utf8')).toBe('later')
+  })
+
+  test('Copy copies bytes until EOF and reports nil error', async () => {
+    const writer = new captureWriter()
+
+    const [written, err] = await Copy(
+      writer,
+      new sliceReader($.stringToBytes('hello world')),
+    )
+
+    expect(err).toBeNull()
+    expect(written).toBe(11n)
+    expect(Buffer.from(writer.chunks).toString('utf8')).toBe('hello world')
+  })
+
+  test('CopyBuffer stages reads through the provided buffer', async () => {
+    const reader = new sliceReader($.stringToBytes('abcdefghij'))
+    const writer = new captureWriter()
+
+    const [written, err] = await CopyBuffer(writer, reader, new Uint8Array(4))
+
+    expect(err).toBeNull()
+    expect(written).toBe(10n)
+    expect(Buffer.from(writer.chunks).toString('utf8')).toBe('abcdefghij')
+    expect(reader.requestedSizes).toEqual([4, 4, 4, 4])
+  })
+
+  test('Copy reports ErrShortWrite when the writer accepts too few bytes', async () => {
+    const shortWriter = {
+      chunks: [] as number[],
+      Write(p: $.Bytes): [number, $.GoError] {
+        const accepted = Math.max(0, $.len(p) - 1)
+        this.chunks.push(...Array.from((p ?? []).subarray(0, accepted)))
+        return [accepted, null]
+      },
+    }
+
+    const [written, err] = await Copy(
+      shortWriter,
+      new sliceReader($.stringToBytes('abc')),
+    )
+
+    expect(err).toBe(ErrShortWrite)
+    expect(written).toBe(2n)
+    expect(Buffer.from(shortWriter.chunks).toString('utf8')).toBe('ab')
+  })
+
+  test('CopyN copies exactly n bytes and reports EOF when the source is short', async () => {
+    const exactSource = new sliceReader($.stringToBytes('abcdef'))
+    const exactWriter = new captureWriter()
+
+    const [written, err] = await CopyN(exactWriter, exactSource, 4n)
+
+    expect(err).toBeNull()
+    expect(written).toBe(4n)
+    expect(Buffer.from(exactWriter.chunks).toString('utf8')).toBe('abcd')
+
+    const remaining = new Uint8Array(4)
+    const [remainingBytes, remainingErr] = exactSource.Read(remaining)
+    expect(remainingErr).toBeNull()
+    expect(remainingBytes).toBe(2)
+    expect(Buffer.from(remaining.subarray(0, remainingBytes)).toString('utf8')).toBe(
+      'ef',
+    )
+
+    const shortWriter = new captureWriter()
+    const [shortWritten, shortErr] = await CopyN(
+      shortWriter,
+      new sliceReader($.stringToBytes('xy')),
+      4n,
+    )
+
+    expect(shortErr).toBe(EOF)
+    expect(shortWritten).toBe(2n)
+    expect(Buffer.from(shortWriter.chunks).toString('utf8')).toBe('xy')
+  })
+
+  test('MultiReader concatenates readers and suppresses intermediate EOF', async () => {
+    const reader = MultiReader(
+      new sliceReader($.stringToBytes('ab')),
+      new sliceReader(new Uint8Array(0)),
+      new sliceReader($.stringToBytes('cd')),
+    )
+
+    const [out, err] = await ReadAll(reader)
+
+    expect(err).toBeNull()
+    expect($.bytesToString(out)).toBe('abcd')
+  })
+
+  test('ReadFull fills the buffer and reports unexpected EOF on short input', async () => {
+    const full = new Uint8Array(4)
+    const [n, err] = await ReadFull(new sliceReader($.stringToBytes('abcd')), full)
+
+    expect(err).toBeNull()
+    expect(n).toBe(4)
+    expect($.bytesToString(full)).toBe('abcd')
+
+    const short = new Uint8Array(4)
+    const [shortN, shortErr] = await ReadFull(
+      new sliceReader($.stringToBytes('xy')),
+      short,
+    )
+
+    expect(shortErr).toBe(ErrUnexpectedEOF)
+    expect(shortN).toBe(2)
+    expect($.bytesToString($.goSlice(short, 0, shortN))).toBe('xy')
+  })
+
+  test('WriteString writes encoded bytes and returns the byte count', async () => {
+    const writer = new captureWriter()
+
+    const [written, err] = await WriteString(writer, 'hé')
+
+    expect(err).toBeNull()
+    expect(written).toBe(3)
+    expect(Buffer.from(writer.chunks).toString('utf8')).toBe('hé')
+  })
+
+  test('Discard accepts copied bytes and preserves the copy count', async () => {
+    const [written, err] = await Copy(
+      Discard,
+      new sliceReader($.stringToBytes('discard me')),
+    )
+
+    expect(err).toBeNull()
+    expect(written).toBe(10n)
   })
 
   test('ReadAll returns the bytes already read with a non-EOF error', async () => {
