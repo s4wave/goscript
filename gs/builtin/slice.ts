@@ -36,6 +36,15 @@ function isGoStringValue(value: unknown): value is GoStringValue {
   return typeof value === 'string' || value instanceof GoBinaryString
 }
 
+// Shared codec instances: goStringBytes/goStringFromBytes run on the hot
+// path for every Go string byte-conversion (==, len(), slicing), so
+// constructing a fresh TextEncoder/TextDecoder per call is measurably
+// wasteful. Encoders/decoders are stateless per call (no streaming state
+// carried across encode/decode calls here), so a single shared instance is
+// safe to reuse.
+const sharedTextEncoder = new TextEncoder()
+const sharedTextDecoder = new TextDecoder('utf-8', { fatal: true })
+
 function goStringBytes(str: GoStringValue): Uint8Array {
   if (str instanceof GoBinaryString) {
     return str.bytes.slice()
@@ -43,7 +52,7 @@ function goStringBytes(str: GoStringValue): Uint8Array {
   if (str.startsWith(goBinaryStringPrefix)) {
     return binaryStringToBytes(str.slice(goBinaryStringPrefix.length))
   }
-  return new TextEncoder().encode(str)
+  return sharedTextEncoder.encode(str)
 }
 
 function goStringComparableBytes(value: GoStringBytes): Uint8Array {
@@ -61,7 +70,7 @@ function goStringComparableBytes(value: GoStringBytes): Uint8Array {
 
 function goStringFromBytes(bytes: Uint8Array): string {
   try {
-    return new TextDecoder('utf-8', { fatal: true }).decode(bytes)
+    return sharedTextDecoder.decode(bytes)
   } catch {
     return goBinaryStringPrefix + bytesToBinaryString(bytes)
   }
@@ -1399,9 +1408,15 @@ export function index<T>(
     runtimePanic('runtime error: index on nil or undefined collection')
   }
 
-  if (isGoStringValue(collection)) {
-    return indexString(collection, index) // Use the existing indexString for byte access
-  } else if (collection instanceof Uint8Array) {
+  // Slice/array checks run before the string check: they are mutually
+  // exclusive with GoStringValue (a SliceProxy or plain array can never
+  // also be a string or GoBinaryString), so this reorder cannot change
+  // which branch handles any given value — only how fast the common
+  // "index into a slice" case gets there. isGoStringValue's `instanceof
+  // GoBinaryString` check forces a full [[GetPrototypeOf]] walk when
+  // `collection` is a Proxy-wrapped SliceProxy (always false for those),
+  // which is wasted work on every slice-typed call when checked first.
+  if (collection instanceof Uint8Array) {
     if (index < 0 || index >= collection.length) {
       outOfRangeIndex(index, collection.length)
     }
@@ -1416,6 +1431,8 @@ export function index<T>(
       outOfRangeIndex(index, collection.length)
     }
     return collection[index]
+  } else if (isGoStringValue(collection)) {
+    return indexString(collection, index) // Use the existing indexString for byte access
   }
   runtimePanic('runtime error: index on unsupported type')
 }
@@ -1840,12 +1857,11 @@ export const stringToRunes = (str: string): number[] => {
  * @returns Index/rune pairs matching Go's `for i, r := range str`.
  */
 export const rangeString = (str: string): Array<[number, number]> => {
-  const encoder = new TextEncoder()
   const pairs: Array<[number, number]> = []
   let offset = 0
   for (const char of str) {
     pairs.push([offset, char.codePointAt(0) || 0])
-    offset += encoder.encode(char).length
+    offset += sharedTextEncoder.encode(char).length
   }
   return pairs
 }
@@ -2017,6 +2033,13 @@ export function stringEqual(
   left: GoStringBytes,
   right: GoStringBytes,
 ): boolean {
+  // Fast path: two plain JS strings compare correctly with `===` (the only
+  // case where a JS string's "true" Go bytes diverge from its own encoding
+  // is the GoBinaryString wrapper, which is excluded from this branch by
+  // the typeof check), avoiding the byte round-trip below entirely.
+  if (typeof left === 'string' && typeof right === 'string') {
+    return left === right
+  }
   const leftBytes = goStringComparableBytes(left)
   const rightBytes = goStringComparableBytes(right)
   if (leftBytes.length !== rightBytes.length) {
