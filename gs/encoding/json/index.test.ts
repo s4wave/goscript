@@ -182,6 +182,46 @@ class Schema {
   )
 }
 
+class HookPointee {
+  public _fields = {}
+  public Text = ''
+  public Marker = ''
+
+  UnmarshalJSON(data: $.Slice<number>): $.GoError {
+    this.Text = $.bytesToString(data)
+    return null
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.HookPointee',
+    new HookPointee(),
+    [],
+    HookPointee,
+    [],
+  )
+}
+
+class HookHolder {
+  public _fields = {
+    Hook: $.varRef<HookPointee | null>(null),
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.HookHolder',
+    new HookHolder(),
+    [],
+    HookHolder,
+    [
+      {
+        name: 'Hook',
+        key: 'Hook',
+        type: { kind: $.TypeKind.Pointer, elemType: 'test.HookPointee' },
+        tag: 'json:"hook"',
+      },
+    ],
+  )
+}
+
 class Holder {
   public _fields = {
     Value: $.varRef<unknown>(null),
@@ -525,6 +565,32 @@ describe('encoding/json override', () => {
     expect(target.value._fields.Items.value?._fields.Type.value).toBe(
       'string',
     )
+  })
+
+  it('allocates a nil pointer-to-struct field and invokes UnmarshalJSON on it, instead of decoding it field-by-field', () => {
+    const target = $.varRef(new HookHolder())
+    const err = Unmarshal($.stringToBytes('{"hook":{"nested":true}}'), target)
+
+    expect(err).toBeNull()
+    expect(target.value._fields.Hook.value).toBeInstanceOf(HookPointee)
+    expect(target.value._fields.Hook.value?.Text).toBe('{"nested":true}')
+  })
+
+  it('invokes UnmarshalJSON on a non-nil pointer-to-struct field in place, instead of replacing it with a freshly decoded instance', () => {
+    const holder = new HookHolder()
+    const existing = new HookPointee()
+    existing.Marker = 'orig'
+    holder._fields.Hook.value = existing
+
+    const target = $.varRef(holder)
+    const err = Unmarshal($.stringToBytes('{"hook":{"nested":true}}'), target)
+
+    expect(err).toBeNull()
+    // Go's encoding/json decodes into the existing pointee via its
+    // UnmarshalJSON hook, it never discards it for a fresh replacement.
+    expect(target.value._fields.Hook.value).toBe(existing)
+    expect(target.value._fields.Hook.value?.Marker).toBe('orig')
+    expect(target.value._fields.Hook.value?.Text).toBe('{"nested":true}')
   })
 
   it('decodes pointer-to-struct values as unmarked pointees, matching *Struct not Struct by value', () => {

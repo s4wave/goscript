@@ -1116,6 +1116,16 @@ function assignDecodedFieldValue(
     if ($.isPointerTypeInfo(info) && isPlainObject(decoded)) {
       const pointee = resolveTypeInfo(info.elemType)
       if (pointee !== null && $.isStructTypeInfo(pointee)) {
+        // A field that already holds a non-nil pointer whose pointee
+        // implements UnmarshalJSON must still go through that hook: Go's
+        // encoding/json always prefers a custom decoder over field-by-field
+        // population, even when the field is pre-populated rather than nil.
+        // The type-driven constructor below only sees a fresh instance it
+        // allocates itself, so it cannot see this pre-existing target.
+        if (unmarshalJSONTarget(target.value) !== null) {
+          assignDecodedValue(target, decoded, opts)
+          return
+        }
         target.value = decodeValueForType(decoded, info, opts)
         return
       }
@@ -1190,6 +1200,21 @@ function decodeValueForType(
         return decoded
       }
       const inst = new pointee.ctor()
+      // A freshly-allocated pointee that implements UnmarshalJSON must be
+      // decoded through that hook rather than field-by-field, mirroring Go:
+      // encoding/json always prefers a custom decoder over the default
+      // struct decode, including for a pointer field/element it allocates
+      // itself.
+      const unmarshaler = unmarshalJSONTarget(inst)
+      if (unmarshaler !== null) {
+        const err = unmarshaler.UnmarshalJSON(
+          $.stringToBytes(JSON.stringify(decoded)),
+        )
+        if (err !== null) {
+          throw err
+        }
+        return inst
+      }
       if (isStructValue(inst)) {
         assignStructFields(inst, decoded, opts)
       }
