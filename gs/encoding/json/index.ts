@@ -968,7 +968,7 @@ function isEmptyValue(v: unknown): boolean {
   if (typeof t === 'boolean') {
     return t === false
   }
-  if (Array.isArray(t)) {
+  if (Array.isArray(t) || t instanceof Uint8Array) {
     return t.length === 0
   }
   if (t instanceof Map) {

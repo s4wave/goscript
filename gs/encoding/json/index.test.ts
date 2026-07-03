@@ -90,6 +90,7 @@ class OmitEmptyStruct {
     Name: $.varRef(''),
     Age: $.varRef(0),
     Tags: $.varRef<string[]>([]),
+    Data: $.varRef<Uint8Array>(new Uint8Array(0)),
   }
 
   static __typeInfo = $.registerStructType(
@@ -118,6 +119,15 @@ class OmitEmptyStruct {
           elemType: { kind: $.TypeKind.Basic, name: 'string' },
         },
         tag: 'json:"tags,omitempty"',
+      },
+      {
+        name: 'Data',
+        key: 'Data',
+        type: {
+          kind: $.TypeKind.Slice,
+          elemType: { kind: $.TypeKind.Basic, name: 'uint8' },
+        },
+        tag: 'json:"data,omitempty"',
       },
     ],
   )
@@ -205,9 +215,12 @@ describe('encoding/json override', () => {
     filled._fields.Name.value = 'Ada'
     filled._fields.Age.value = 30
     filled._fields.Tags.value = ['x']
+    filled._fields.Data.value = $.stringToBytes('x')
     const [data, err] = Marshal(filled)
     expect(err).toBeNull()
-    expect($.bytesToString(data)).toBe('{"name":"Ada","age":30,"tags":["x"]}')
+    expect($.bytesToString(data)).toBe(
+      '{"name":"Ada","age":30,"tags":["x"],"data":"eA=="}',
+    )
   })
 
   it('unwraps a boxed interface{} value before marshaling instead of leaking its wrapper', () => {
@@ -225,7 +238,7 @@ describe('encoding/json override', () => {
       {},
     )
     const holder = new FieldAlias()
-    holder._fields.Name.value = namedString as unknown as string
+    ;(holder._fields.Name as $.VarRef<unknown>).value = namedString
     const [holderData, holderErr] = Marshal(holder)
     expect(holderErr).toBeNull()
     expect($.bytesToString(holderData)).toBe('{"FullName":"active"}')
