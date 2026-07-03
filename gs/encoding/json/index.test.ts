@@ -133,6 +133,44 @@ class OmitEmptyStruct {
   )
 }
 
+class OmitEmptyRefStruct {
+  public _fields = {
+    Ptr: $.varRef<unknown>(null),
+    Any: $.varRef<unknown>(null),
+    Count: $.varRef<bigint>(0n),
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.OmitEmptyRefStruct',
+    new OmitEmptyRefStruct(),
+    [],
+    OmitEmptyRefStruct,
+    [
+      {
+        name: 'Ptr',
+        key: 'Ptr',
+        type: {
+          kind: $.TypeKind.Pointer,
+          elemType: { kind: $.TypeKind.Basic, name: 'int' },
+        },
+        tag: 'json:"ptr,omitempty"',
+      },
+      {
+        name: 'Any',
+        key: 'Any',
+        type: { kind: $.TypeKind.Interface },
+        tag: 'json:"any,omitempty"',
+      },
+      {
+        name: 'Count',
+        key: 'Count',
+        type: { kind: $.TypeKind.Basic, name: 'int64' },
+        tag: 'json:"count,omitempty"',
+      },
+    ],
+  )
+}
+
 describe('encoding/json override', () => {
   it('registers the Unmarshaler interface shape', () => {
     class CustomMarshaler implements Marshaler {
@@ -221,6 +259,42 @@ describe('encoding/json override', () => {
     expect($.bytesToString(data)).toBe(
       '{"name":"Ada","age":30,"tags":["x"],"data":"eA=="}',
     )
+  })
+
+  it('omits nil pointers/interfaces but keeps non-nil ones holding a zero value', () => {
+    const zero = new OmitEmptyRefStruct()
+    const [zeroData, zeroErr] = Marshal(zero)
+    expect(zeroErr).toBeNull()
+    expect($.bytesToString(zeroData)).toBe('{}')
+
+    // A non-nil pointer to 0 and a non-nil interface holding 0 are not empty:
+    // only the pointer/interface itself being nil is empty, not its contents.
+    const filled = new OmitEmptyRefStruct()
+    filled._fields.Ptr.value = $.varRef(0)
+    filled._fields.Any.value = 0
+    const [data, err] = Marshal(filled)
+    expect(err).toBeNull()
+    expect($.bytesToString(data)).toBe('{"ptr":0,"any":0}')
+  })
+
+  it('treats a zero bigint as empty for omitempty', () => {
+    const zero = new OmitEmptyRefStruct()
+    const [zeroData, zeroErr] = Marshal(zero)
+    expect(zeroErr).toBeNull()
+    expect($.bytesToString(zeroData)).toBe('{}')
+
+    const nonZero = new OmitEmptyRefStruct()
+    nonZero._fields.Count.value = 5n
+    const [data, err] = Marshal(nonZero)
+    expect(err).toBeNull()
+    expect($.bytesToString(data)).toBe('{"count":5}')
+
+    // A non-nil interface holding a zero bigint is still non-empty.
+    const boxedZero = new OmitEmptyRefStruct()
+    boxedZero._fields.Any.value = 0n
+    const [boxedData, boxedErr] = Marshal(boxedZero)
+    expect(boxedErr).toBeNull()
+    expect($.bytesToString(boxedData)).toBe('{"any":0}')
   })
 
   it('unwraps a boxed interface{} value before marshaling instead of leaking its wrapper', () => {

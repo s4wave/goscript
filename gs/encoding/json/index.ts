@@ -926,7 +926,7 @@ function marshalValue(v: unknown): unknown {
     if (jsonName === '') {
       continue
     }
-    if (jsonOmitEmpty(field.tag) && isEmptyValue(ref.value)) {
+    if (jsonOmitEmpty(field.tag) && isEmptyValue(ref.value, field.type)) {
       continue
     }
     out[jsonName] = marshalFieldValue(ref.value, field.type)
@@ -951,14 +951,23 @@ function jsonOmitEmpty(tag: string | undefined): boolean {
 }
 
 // isEmptyValue mirrors Go encoding/json: zero numbers/strings/bools, empty
-// slices/maps/arrays, and nil pointers/interfaces are "empty".
-function isEmptyValue(v: unknown): boolean {
+// slices/maps/arrays, and nil pointers/interfaces are "empty". Pointer and
+// interface fields are only empty when the pointer/interface itself is nil;
+// a non-nil pointer or interface is never empty, even when it points to or
+// holds a zero value, so those field types must not be unwrapped further.
+function isEmptyValue(v: unknown, fieldType?: unknown): boolean {
   const t = $.isVarRef(v) ? (v as $.VarRef<unknown>).value : v
+  if (isPointerOrInterfaceFieldType(fieldType)) {
+    return t === null || t === undefined
+  }
   if (t === null || t === undefined) {
     return true
   }
   if (typeof t === 'number') {
     return t === 0
+  }
+  if (typeof t === 'bigint') {
+    return t === 0n
   }
   if (typeof t === 'string') {
     return t === ''
@@ -973,6 +982,14 @@ function isEmptyValue(v: unknown): boolean {
     return t.size === 0
   }
   return false
+}
+
+function isPointerOrInterfaceFieldType(fieldType: unknown): boolean {
+  if (fieldType === null || typeof fieldType !== 'object') {
+    return false
+  }
+  const kind = Reflect.get(fieldType, 'kind')
+  return kind === $.TypeKind.Pointer || kind === $.TypeKind.Interface
 }
 
 function marshalFieldValue(value: unknown, fieldType: unknown): unknown {
