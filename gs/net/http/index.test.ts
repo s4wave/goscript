@@ -19,6 +19,7 @@ import {
   DetectContentType,
   ErrNotSupported,
   ErrServerClosed,
+  Error as HTTPError,
   File,
   FileServer,
   FileServerFS,
@@ -176,6 +177,23 @@ describe('net/http override', () => {
     expect(TimeFormat).toBe('Mon, 02 Jan 2006 15:04:05 GMT')
     expect(TrailerPrefix).toBe('Trailer:')
     expect(ErrServerClosed.Error()).toBe('http: Server closed')
+  })
+
+  it('Error writes Go response status, plain-text body, and safety headers', () => {
+    const writer = new testResponseWriter()
+
+    HTTPError(writer, 'access denied', StatusForbidden)
+
+    expect(writer.Code).toBe(StatusForbidden)
+    expect(Buffer.from(writer.Body.Bytes()).toString('utf8')).toBe(
+      'access denied\n',
+    )
+    expect(Header_Get(writer.Header(), 'Content-Type')).toBe(
+      'text/plain; charset=utf-8',
+    )
+    expect(Header_Get(writer.Header(), 'X-Content-Type-Options')).toBe(
+      'nosniff',
+    )
   })
 
   it('parses HTTP/1 request and response wire format like Go', async () => {

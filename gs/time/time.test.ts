@@ -1,8 +1,10 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import * as $ from '@goscript/builtin/index.js'
 
 import {
+  After,
+  AfterFunc,
   ANSIC,
   Date,
   Duration_Abs,
@@ -29,22 +31,29 @@ import {
   NewTicker,
   NewTimer,
   Now,
+  ParseDuration,
   Since,
   RFC1123,
   RFC3339,
   RFC3339Nano,
   Saturday,
   Second,
+  Sleep,
   StampMicro,
   Sunday,
   May,
   Time,
   Tick,
   UTC,
+  Unix,
   UnixMicro,
   UnixMilli,
 } from './time.js'
 import type { Month } from './time.js'
+
+afterEach(() => {
+  vi.useRealTimers()
+})
 
 describe('time.Duration_String', () => {
   it('formats common durations', () => {
@@ -80,6 +89,23 @@ describe('time.Duration methods', () => {
   it('returns absolute values', () => {
     expect(Duration_Abs(2n * Second)).toBe(2n * Second)
     expect(Duration_Abs(-2n * Second)).toBe(2n * Second)
+  })
+})
+
+describe('time.ParseDuration', () => {
+  it('parses signed fractional durations across Go units', () => {
+    expect(ParseDuration('1.5h')).toEqual([90n * Minute, null])
+    expect(ParseDuration('-250ms')).toEqual([-250n * Millisecond, null])
+    expect(ParseDuration('12µs')).toEqual([12n * Microsecond, null])
+    expect(ParseDuration('7us')).toEqual([7n * Microsecond, null])
+    expect(ParseDuration('42ns')).toEqual([42n, null])
+  })
+
+  it('reports invalid duration text instead of guessing units', () => {
+    const [value, err] = ParseDuration('10')
+
+    expect(value).toBe(0n)
+    expect(err?.Error()).toBe('time: invalid duration "10"')
   })
 })
 
@@ -124,6 +150,55 @@ describe('time constants and timers', () => {
 
     expect(value.Unix()).toBeGreaterThan(0)
   })
+
+  it('After delivers only after its duration has elapsed', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new globalThis.Date('2000-01-01T00:00:00Z'))
+    const received = After(Millisecond).receive()
+    let delivered = false
+    const observed = received.then((value) => {
+      delivered = true
+      return value
+    })
+
+    await vi.advanceTimersByTimeAsync(0)
+    expect(delivered).toBe(false)
+
+    await vi.advanceTimersByTimeAsync(1)
+    const value = await observed
+    expect(delivered).toBe(true)
+    expect(value.Unix()).toBe(946684800n)
+  })
+
+  it('AfterFunc invokes its callback after the requested duration', async () => {
+    vi.useFakeTimers()
+    let calls = 0
+    const timer = AfterFunc(2n * Millisecond, () => {
+      calls++
+    })
+
+    await vi.advanceTimersByTimeAsync(1)
+    expect(calls).toBe(0)
+
+    await vi.advanceTimersByTimeAsync(1)
+    expect(calls).toBe(1)
+    timer.Stop()
+  })
+
+  it('Sleep resolves after the requested duration', async () => {
+    vi.useFakeTimers()
+    let resolved = false
+    const slept = Sleep(Millisecond).then(() => {
+      resolved = true
+    })
+
+    await vi.advanceTimersByTimeAsync(0)
+    expect(resolved).toBe(false)
+
+    await vi.advanceTimersByTimeAsync(1)
+    await slept
+    expect(resolved).toBe(true)
+  })
 })
 
 describe('time.Time.In', () => {
@@ -153,6 +228,16 @@ describe('time.Time calendar and binary helpers', () => {
     expect(millis.Unix()).toBe(1234567890n)
     expect(micros.UnixMicro()).toBe(1234567890123456n)
     expect(micros.Unix()).toBe(1234567890n)
+  })
+
+  it('constructs Unix times with normalized nanoseconds', () => {
+    const fractional = Unix(1234567890n, 987654321n)
+    const normalized = Unix(1234567890n, 1500000000n)
+
+    expect(fractional.Unix()).toBe(1234567890n)
+    expect(fractional.UnixNano()).toBe(1234567890987654321n)
+    expect(normalized.Unix()).toBe(1234567891n)
+    expect(normalized.UnixNano()).toBe(1234567891500000000n)
   })
 
   it('appends formatted text to byte slices', () => {

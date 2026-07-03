@@ -2249,6 +2249,15 @@ export function Error(
   error: string,
   code: number,
 ): void {
+  const header = w?.Header()
+  if (
+    header != null &&
+    typeof (header as Promise<Header>).then !== 'function'
+  ) {
+    Header_Del(header as Header, 'Content-Length')
+    Header_Set(header as Header, 'Content-Type', 'text/plain; charset=utf-8')
+    Header_Set(header as Header, 'X-Content-Type-Options', 'nosniff')
+  }
   w?.WriteHeader(code)
   w?.Write($.stringToBytes(error + '\n'))
 }

@@ -7,10 +7,12 @@ import {
   Div,
   Div32,
   Div64,
+  LeadingZeros,
   LeadingZeros16,
   LeadingZeros32,
   LeadingZeros64,
   LeadingZeros8,
+  Len,
   Len16,
   Len32,
   Len64,
@@ -78,6 +80,15 @@ describe('math/bits override', () => {
     expect(Len8(0xff)).toBe(8)
     expect(LeadingZeros16(1)).toBe(15)
     expect(Len16(0x8000)).toBe(16)
+  })
+
+  it('LeadingZeros and Len use Go uint width boundaries', () => {
+    expect(LeadingZeros(0n)).toBe(64)
+    expect(LeadingZeros(1n)).toBe(63)
+    expect(LeadingZeros(0x8000000000000000n)).toBe(0)
+    expect(Len(0n)).toBe(0)
+    expect(Len(1n)).toBe(1)
+    expect(Len(0x8000000000000000n)).toBe(64)
   })
 
   it('returns remainders from double-word division helpers', () => {

@@ -118,7 +118,13 @@ func protobufTypeScriptBindingInSourceRoot(sourceRoot, sourcePath string) bool {
 	if err != nil {
 		return false
 	}
-	return rel == "." || !strings.HasPrefix(rel, ".."+string(filepath.Separator)) && rel != ".." && !filepath.IsAbs(rel)
+	if rel == "." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) || rel == ".." || filepath.IsAbs(rel) {
+		return false
+	}
+	if rel == "vendor" || strings.HasPrefix(rel, "vendor"+string(filepath.Separator)) {
+		return false
+	}
+	return true
 }
 
 func protobufTypeScriptBindingImportSource(outputPath, pkgPath, tsPath string) (string, error) {

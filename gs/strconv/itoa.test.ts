@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { Itoa } from './itoa.gs.js'
+import { FormatInt, Itoa } from './itoa.gs.js'
 
 describe('strconv.Itoa', () => {
   // GoScript represents a Go int as a runtime bigint, so Itoa must accept a
@@ -18,5 +18,16 @@ describe('strconv.Itoa', () => {
     expect(Itoa(0)).toBe('0')
     expect(Itoa(42)).toBe('42')
     expect(Itoa(-7)).toBe('-7')
+  })
+})
+
+describe('strconv.FormatInt', () => {
+  it('formats signed integers in Go bases and rejects illegal bases', () => {
+    expect(FormatInt(255n, 16)).toBe('ff')
+    expect(FormatInt(-255n, 16)).toBe('-ff')
+    expect(FormatInt(35n, 36)).toBe('z')
+
+    expect(() => FormatInt(10n, 1)).toThrow('FormatInt: illegal base')
+    expect(() => FormatInt(10n, 37)).toThrow('FormatInt: illegal base')
   })
 })

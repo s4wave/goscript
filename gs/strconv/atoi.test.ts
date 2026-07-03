@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { ErrRange, ErrSyntax, NumError, ParseInt, ParseUint } from './atoi.gs.js'
+import {
+  Atoi,
+  ErrRange,
+  ErrSyntax,
+  NumError,
+  ParseInt,
+  ParseUint,
+} from './atoi.gs.js'
 
 // Ground truth captured from go1.26.4 strconv.ParseUint / ParseInt.
 describe('strconv.ParseUint (Go base + validation)', () => {
@@ -44,6 +51,19 @@ describe('strconv.ParseInt (Go sign + range)', () => {
 
   it('rejects trailing junk', () => {
     const [, err] = ParseInt('12x', 10, 64)
+    expect((err as NumError).Err).toBe(ErrSyntax)
+  })
+})
+
+describe('strconv.Atoi', () => {
+  it('parses signed decimal ints and reports NumError on syntax failures', () => {
+    expect(Atoi('0')).toEqual([0, null])
+    expect(Atoi('-42')).toEqual([-42, null])
+
+    const [value, err] = Atoi('12x')
+    expect(value).toBe(0)
+    expect((err as NumError).Func).toBe('ParseInt')
+    expect((err as NumError).Num).toBe('12x')
     expect((err as NumError).Err).toBe(ErrSyntax)
   })
 })

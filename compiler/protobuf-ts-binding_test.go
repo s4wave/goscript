@@ -483,6 +483,37 @@ func TestProtobufTypeScriptBindingSkipsFilesOutsideSourceRoot(t *testing.T) {
 	}
 }
 
+func TestProtobufTypeScriptBindingSkipsVendoredDependencies(t *testing.T) {
+	dir := t.TempDir()
+	vendorRel := filepath.Join("vendor", "example.test", "dependency", "dep.pb.go")
+	vendored := filepath.Join(dir, vendorRel)
+	writeTestFile(t, dir, "go.mod", "module example.test/root\n\ngo 1.25\n")
+	writeTestFile(t, dir, vendorRel, `package dependency
+
+type Dep struct{}
+`)
+
+	semPkg := &semanticPackage{
+		pkgPath: "example.test/dependency",
+		source: &packages.Package{
+			CompiledGoFiles: []string{vendored},
+			GoFiles:         []string{vendored},
+			Syntax:          make([]*ast.File, 1),
+		},
+	}
+	bindings, diagnostics := protobufTypeScriptBindings(semPkg, LoweringOptions{
+		SourceRoot:                dir,
+		OutputPath:                filepath.Join(dir, "out"),
+		ProtobufTypeScriptBinding: true,
+	})
+	if len(diagnostics) != 0 {
+		t.Fatalf("vendored protobuf diagnostics = %#v", diagnostics)
+	}
+	if len(bindings) != 0 {
+		t.Fatalf("vendored protobuf bindings = %#v", bindings)
+	}
+}
+
 func TestProtobufTypeScriptBindingRootFindsParentModule(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, dir, "go.mod", "module example.test/root\n\ngo 1.25\n")

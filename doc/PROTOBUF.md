@@ -95,8 +95,8 @@ example/
 `thing.pb.go` is discovered by package loading. `thing.pb.ts` is found by
 replacing the `.go` suffix with `.ts`.
 
-If binding mode is enabled and a `.pb.go` file under the module root has no
-sibling `.pb.ts`, compilation fails with:
+If binding mode is enabled and a source-owned `.pb.go` file under the module
+root has no sibling `.pb.ts`, compilation fails with:
 
 ```text
 goscript/protobuf-ts-binding:missing
@@ -104,9 +104,10 @@ protobuf TypeScript binding is missing sibling .pb.ts
 ```
 
 The binding search is intentionally limited to the Go module root found from
-the compiler request directory. Files outside that source root are ignored, so
-temporary build directories or external package cache paths do not accidentally
-require local `.pb.ts` siblings.
+the compiler request directory, excluding `vendor/` dependency sources. Files
+outside that source root, vendored packages, temporary build directories, and
+external package cache paths do not accidentally require local `.pb.ts`
+siblings.
 
 ## Where it hooks into the compiler
 
