@@ -645,6 +645,46 @@ describe('encoding/json override', () => {
     expect($.is(width, propertyType)).toBe(false)
   })
 
+  it('honors json tags on anonymous (inline, unnamed) struct targets', () => {
+    // The runtime boxes an Unmarshal target with no struct-field metadata of
+    // its own (an inline, unnamed struct type) with its type spelling via
+    // __goType, e.g. for:
+    //   var loose struct {
+    //       Name string `json:"name"`
+    //       Age  int    `json:"age"`
+    //   }
+    //   json.Unmarshal(data, &loose)
+    const target = $.varRef<{ Name: string; Age: number }>({
+      Name: '',
+      Age: 0,
+    })
+    target.__goType =
+      '*struct{Name string "json:\\"name\\""; Age int "json:\\"age\\""}'
+
+    const err = Unmarshal($.stringToBytes('{"name":"Ada","age":30}'), target)
+    expect(err).toBeNull()
+    expect(target.value.Name).toBe('Ada')
+    expect(target.value.Age).toBe(30)
+  })
+
+  it('honors json tags on an anonymous struct used as a map element type', () => {
+    // Same mechanism as the top-level case above, reached through
+    // decodeValueForType for a map[string]struct{...} spelling, e.g.:
+    //   var loose map[string]struct {
+    //       Name string `json:"name"`
+    //   }
+    //   json.Unmarshal(data, &loose)
+    const target = $.varRef<Map<string, { Name: string }> | null>(null)
+    target.__goType = '*map[string]struct{Name string "json:\\"name\\""}'
+
+    const err = Unmarshal(
+      $.stringToBytes('{"a":{"name":"Ada"}}'),
+      target,
+    )
+    expect(err).toBeNull()
+    expect(target.value?.get('a')).toEqual({ Name: 'Ada' })
+  })
+
   it('decodes json.RawMessage as a map and slice element type', () => {
     // The runtime boxes Unmarshal's `any` target with its Go type spelling
     // (__goType) at the call site; simulate that here the way $.interfaceValue

@@ -1023,6 +1023,20 @@ function assignDecodedValue(
     const spelling = unmarshalTargetGoType(target)
     if (spelling !== null) {
       const desc = goTypeDescriptor(spelling)
+      // An anonymous (inline, unnamed) struct target, e.g. `var loose
+      // struct{ Name string "json:\"name\"" }`, carries no _fields/registered
+      // type metadata of its own to decode against, so it needs its json
+      // tags read from the parsed __goType spelling instead. See
+      // assignAnonymousStructFields below.
+      const anonFields = anonymousStructFields(desc)
+      if (
+        anonFields !== null &&
+        isPlainObject(decoded) &&
+        isPlainObject(target.value)
+      ) {
+        assignAnonymousStructFields(target.value, decoded, anonFields, opts)
+        return
+      }
       const info = resolveTypeInfo(desc)
       if (info !== null) {
         if (
@@ -1169,6 +1183,10 @@ function resolveTypeInfo(t: unknown): $.TypeInfo | null {
 //     *Struct value as the struct instance itself for field access) —
 //     without this, map/slice elements typed e.g. map[string]*Property
 //     leaked plain objects whose Go field reads came back undefined.
+//   - Anonymous struct element: decodes to a plain object keyed by Go field
+//     name, honoring the field's own json tags (see
+//     assignAnonymousStructFields below) — the runtime's representation of
+//     an inline struct{...} value.
 //   - Missing type info / interface{} elements: shape-driven decode via
 //     decodeInterfaceValue, mirroring Go's json.Unmarshal-into-any.
 function decodeValueForType(
@@ -1181,6 +1199,15 @@ function decodeValueForType(
   }
   if (decoded === null || decoded === undefined) {
     return decoded
+  }
+  const anonFields = anonymousStructFields(typeInfo)
+  if (anonFields !== null) {
+    if (!isPlainObject(decoded)) {
+      return decoded
+    }
+    const out: Record<string, unknown> = {}
+    assignAnonymousStructFields(out, decoded, anonFields, opts)
+    return out
   }
   const info = resolveTypeInfo(typeInfo)
   if (info === null || $.isInterfaceTypeInfo(info)) {
@@ -1311,6 +1338,7 @@ function unmarshalTargetGoType(target: unknown): string | null {
 //                                 function ever runs.
 //   - 'json.RawMessage'          RawMessage marker (isRawMessageType)
 //   - {kind: Slice|Map, elemType} for []T / map[K]V
+//   - {anonymousStructFields}     for inline struct{...} types
 //   - the spelling itself         for named types ($.getTypeByName resolves)
 //   - null                        for interface{} and unparseable spellings
 //                                 (shape-driven decode, same as before)
@@ -1341,7 +1369,134 @@ function goTypeDescriptor(spelling: string): unknown {
       elemType: goTypeDescriptor(s.slice(keyEnd + 1)),
     }
   }
+  if (s.startsWith('struct{') && s.endsWith('}')) {
+    return {
+      anonymousStructFields: parseAnonymousStructFields(
+        s.slice('struct{'.length, -1),
+      ),
+    }
+  }
   return s
+}
+
+// parseAnonymousStructFields parses the field list of an inline struct type
+// spelling ("Name Type" or "Name Type \"tag\"" decls separated by ';') into
+// fieldMetadata. Embedded fields (no explicit name) are skipped: there is no
+// way to address their promoted keys from this spelling alone.
+function parseAnonymousStructFields(body: string): fieldMetadata[] {
+  const fields: fieldMetadata[] = []
+  for (const decl of splitGoFieldDecls(body)) {
+    const [spec, tag] = splitGoFieldTag(decl.trim())
+    const space = spec.indexOf(' ')
+    if (space < 0) {
+      continue
+    }
+    const name = spec.slice(0, space)
+    fields.push({
+      key: name,
+      name,
+      type: goTypeDescriptor(spec.slice(space + 1).trim()),
+      ...(tag !== undefined ? { tag } : {}),
+    })
+  }
+  return fields
+}
+
+// splitGoFieldDecls splits a struct-type field list on ';' at nesting depth
+// zero, skipping string literals (tags) so a ';' inside a tag cannot split.
+function splitGoFieldDecls(body: string): string[] {
+  const decls: string[] = []
+  let depth = 0
+  let inStr = false
+  let start = 0
+  for (let i = 0; i < body.length; i++) {
+    const c = body[i]
+    if (inStr) {
+      if (c === '\\') {
+        i++
+      } else if (c === '"') {
+        inStr = false
+      }
+      continue
+    }
+    if (c === '"') {
+      inStr = true
+    } else if (c === '{' || c === '[') {
+      depth++
+    } else if (c === '}' || c === ']') {
+      depth--
+    } else if (c === ';' && depth === 0) {
+      decls.push(body.slice(start, i))
+      start = i + 1
+    }
+  }
+  decls.push(body.slice(start))
+  return decls
+}
+
+// splitGoFieldTag splits one field decl into [name+type, unquoted tag?]. The
+// tag is the trailing Go-quoted literal at depth zero (a nested inline struct
+// type keeps its own tags inside its braces, at depth > 0).
+function splitGoFieldTag(decl: string): [string, string | undefined] {
+  let depth = 0
+  for (let i = 0; i < decl.length; i++) {
+    const c = decl[i]
+    if (c === '{' || c === '[') {
+      depth++
+    } else if (c === '}' || c === ']') {
+      depth--
+    } else if (c === '"' && depth === 0) {
+      return [decl.slice(0, i).trim(), unquoteGoString(decl.slice(i).trim())]
+    }
+  }
+  return [decl, undefined]
+}
+
+// unquoteGoString unquotes a Go double-quoted string literal. strconv.Quote
+// output is JSON-compatible for the escapes tags use (\" and \\); anything
+// exotic falls back to a plain backslash strip.
+function unquoteGoString(lit: string): string {
+  try {
+    return JSON.parse(lit) as string
+  } catch {
+    return lit.slice(1, -1).replace(/\\(.)/g, '$1')
+  }
+}
+
+// anonymousStructFields returns the parsed field list when the descriptor
+// came from an inline struct{...} spelling, else null.
+function anonymousStructFields(desc: unknown): fieldMetadata[] | null {
+  if (desc === null || typeof desc !== 'object') {
+    return null
+  }
+  const fields = (desc as { anonymousStructFields?: unknown })
+    .anonymousStructFields
+  return Array.isArray(fields) ? (fields as fieldMetadata[]) : null
+}
+
+// assignAnonymousStructFields populates an anonymous-struct value (a plain
+// JS object keyed by Go field name, the runtime's representation of an
+// inline struct) from decoded JSON, honoring json tags and field types via
+// the same per-field decode named-struct fields get
+// (assignDecodedFieldValue).
+function assignAnonymousStructFields(
+  target: Record<string, unknown>,
+  decoded: Record<string, unknown>,
+  fields: fieldMetadata[],
+  opts: decodeOptions,
+): void {
+  for (const field of fields) {
+    const jsonName = jsonFieldName(field.name, field.tag)
+    if (
+      jsonName === '' ||
+      !Object.prototype.hasOwnProperty.call(decoded, jsonName)
+    ) {
+      continue
+    }
+    const ref = $.varRef(target[field.name])
+    assignDecodedFieldValue(ref, decoded[jsonName], opts, field.type)
+    target[field.name] = ref.value
+  }
 }
 
 // matchingBracketIndex returns the index of the ']' matching the '[' at
