@@ -85,6 +85,124 @@ class FieldAlias {
   )
 }
 
+class Ref {
+  public _fields = {
+    Name: $.varRef(''),
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.Ref',
+    new Ref(),
+    [],
+    Ref,
+    [
+      {
+        name: 'Name',
+        key: 'Name',
+        type: { kind: $.TypeKind.Basic, name: 'string' },
+        tag: 'json:"name"',
+      },
+    ],
+  )
+}
+
+class Container {
+  public _fields = {
+    Contexts: $.varRef<Map<string, Ref[]> | null>(null),
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.Container',
+    new Container(),
+    [],
+    Container,
+    [
+      {
+        name: 'Contexts',
+        key: 'Contexts',
+        type: {
+          kind: $.TypeKind.Map,
+          elemType: { kind: $.TypeKind.Slice, elemType: 'test.Ref' },
+        },
+        tag: 'json:"contexts"',
+      },
+    ],
+  )
+}
+
+class Property {
+  public _fields = {
+    Type: $.varRef(''),
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.Property',
+    new Property(),
+    [],
+    Property,
+    [
+      {
+        name: 'Type',
+        key: 'Type',
+        type: { kind: $.TypeKind.Basic, name: 'string' },
+        tag: 'json:"type"',
+      },
+    ],
+  )
+}
+
+class Schema {
+  public _fields = {
+    Properties: $.varRef<Map<string, Property | null> | null>(null),
+    Items: $.varRef<Property | null>(null),
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.Schema',
+    new Schema(),
+    [],
+    Schema,
+    [
+      {
+        name: 'Properties',
+        key: 'Properties',
+        type: {
+          kind: $.TypeKind.Map,
+          elemType: { kind: $.TypeKind.Pointer, elemType: 'test.Property' },
+        },
+        tag: 'json:"properties"',
+      },
+      {
+        name: 'Items',
+        key: 'Items',
+        type: { kind: $.TypeKind.Pointer, elemType: 'test.Property' },
+        tag: 'json:"items"',
+      },
+    ],
+  )
+}
+
+class Holder {
+  public _fields = {
+    Value: $.varRef<unknown>(null),
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.Holder',
+    new Holder(),
+    [],
+    Holder,
+    [
+      {
+        name: 'Value',
+        key: 'Value',
+        type: { kind: $.TypeKind.Interface, methods: [] },
+        tag: 'json:"value"',
+      },
+    ],
+  )
+}
+
 describe('encoding/json override', () => {
   it('registers the Unmarshaler interface shape', () => {
     class CustomMarshaler implements Marshaler {
@@ -359,6 +477,75 @@ describe('encoding/json override', () => {
     expect(mapRef.value?.get('name')).toBe('Carol')
     expect(mapRef.value?.get('age')).toBe(22)
     expect(mapRef.value?.get('active')).toBe(true)
+  })
+
+  it('decodes a map[string][]Struct field into real struct instances, not plain objects/arrays', () => {
+    const target = $.varRef(new Container())
+    const err = Unmarshal(
+      $.stringToBytes('{"contexts":{"a":[{"name":"x"},{"name":"y"}]}}'),
+      target,
+    )
+
+    expect(err).toBeNull()
+    const contexts = target.value._fields.Contexts.value
+    expect(contexts).toBeInstanceOf(Map)
+    const refs = contexts?.get('a')
+    expect(refs).toHaveLength(2)
+    expect(refs?.[0]._fields.Name.value).toBe('x')
+    expect(refs?.[1]._fields.Name.value).toBe('y')
+  })
+
+  it('decodes array elements inside an interface{}-typed field into Maps, not plain objects', () => {
+    const target = $.varRef(new Holder())
+    const err = Unmarshal(
+      $.stringToBytes('{"value":[{"x":1},{"y":2}]}'),
+      target,
+    )
+
+    expect(err).toBeNull()
+    const value = target.value._fields.Value.value as unknown[]
+    expect(Array.isArray(value)).toBe(true)
+    expect(value[0]).toBeInstanceOf(Map)
+    expect((value[0] as Map<string, unknown>).get('x')).toBe(1)
+    expect((value[1] as Map<string, unknown>).get('y')).toBe(2)
+  })
+
+  it('decodes pointer-to-struct map values and fields into real struct instances', () => {
+    const target = $.varRef(new Schema())
+    const err = Unmarshal(
+      $.stringToBytes(
+        '{"properties":{"width":{"type":"number"}},"items":{"type":"string"}}',
+      ),
+      target,
+    )
+
+    expect(err).toBeNull()
+    const properties = target.value._fields.Properties.value
+    expect(properties?.get('width')?._fields.Type.value).toBe('number')
+    expect(target.value._fields.Items.value?._fields.Type.value).toBe(
+      'string',
+    )
+  })
+
+  it('decodes json.RawMessage as a map and slice element type', () => {
+    // The runtime boxes Unmarshal's `any` target with its Go type spelling
+    // (__goType) at the call site; simulate that here the way $.interfaceValue
+    // would for `var m map[string]json.RawMessage; json.Unmarshal(data, &m)`.
+    const mapTarget = $.varRef<Map<string, Uint8Array> | null>(new Map())
+    mapTarget.__goType = '*map[string]json.RawMessage'
+    expect(
+      Unmarshal($.stringToBytes('{"a":{"x":1},"b":[1,2,3]}'), mapTarget),
+    ).toBeNull()
+    expect($.bytesToString(mapTarget.value!.get('a')!)).toBe('{"x":1}')
+    expect($.bytesToString(mapTarget.value!.get('b')!)).toBe('[1,2,3]')
+
+    const sliceTarget = $.varRef<Uint8Array[]>([])
+    sliceTarget.__goType = '*[]json.RawMessage'
+    expect(
+      Unmarshal($.stringToBytes('[{"x":1},"raw"]'), sliceTarget),
+    ).toBeNull()
+    expect($.bytesToString(sliceTarget.value[0])).toBe('{"x":1}')
+    expect($.bytesToString(sliceTarget.value[1])).toBe('"raw"')
   })
 
   it('encodes JSON to an io.Writer with newline, indentation, and HTML escaping', () => {
