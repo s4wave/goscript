@@ -42,6 +42,12 @@ describe('a Go slice is never a map (structural type matching)', () => {
     expect(value).toEqual([1, 2, 3])
   })
 
+  it('a Uint8Array (the runtime byte-slice representation) does not match map[string]any', () => {
+    const bytes = new Uint8Array([1, 2, 3])
+    expect(is(bytes, mapStringAny)).toBe(false)
+    expect(typeAssert(bytes, mapStringAny).ok).toBe(false)
+  })
+
   it('typeSwitch(): an []any value takes the slice case, not an earlier map[string]any case', () => {
     // Mirrors a Go type switch that lists `case map[string]any:` before
     // `case []any:` — the ordering that exposed the bug, since the map
@@ -57,10 +63,12 @@ describe('a Go slice is never a map (structural type matching)', () => {
     expect(result).toBe('slice')
   })
 
-  it('an empty array does not vacuously match an empty-map fast path', () => {
+  it('an empty array (or Uint8Array) does not vacuously match an empty-map fast path', () => {
     // matchesMapType/typeAssert's map branch special-cases zero entries as
-    // "matches any map type"; an empty slice must not hit that path.
+    // "matches any map type"; an empty slice/byte-slice must not hit that
+    // path either — Object.entries() of an empty Uint8Array is also empty.
     expect(is([], mapStringAny)).toBe(false)
     expect(is([], sliceAny)).toBe(true)
+    expect(is(new Uint8Array(0), mapStringAny)).toBe(false)
   })
 })
