@@ -4,4 +4,5 @@ ifaceFalse emitted: true
 ifaceEmptyString emitted: true
 ifaceEmptySlice emitted: true
 ifaceEmptyMap emitted: true
+ptrNilIface emitted as null: true
 ptrBool emitted: true

@@ -55,6 +55,13 @@ export class Payload {
 		this._fields.IfaceEmptyMap.value = value
 	}
 
+	public get PtrNilIface(): $.VarRef<any> | null {
+		return this._fields.PtrNilIface.value
+	}
+	public set PtrNilIface(value: $.VarRef<any> | null) {
+		this._fields.PtrNilIface.value = value
+	}
+
 	public get PtrBool(): $.VarRef<boolean> | null {
 		return this._fields.PtrBool.value
 	}
@@ -69,10 +76,11 @@ export class Payload {
 		IfaceEmptyString: $.VarRef<any>
 		IfaceEmptySlice: $.VarRef<any>
 		IfaceEmptyMap: $.VarRef<any>
+		PtrNilIface: $.VarRef<$.VarRef<any> | null>
 		PtrBool: $.VarRef<$.VarRef<boolean> | null>
 	}
 
-	constructor(init?: Partial<{Ptr?: $.VarRef<number> | null, IfaceZero?: any, IfaceFalse?: any, IfaceEmptyString?: any, IfaceEmptySlice?: any, IfaceEmptyMap?: any, PtrBool?: $.VarRef<boolean> | null}>) {
+	constructor(init?: Partial<{Ptr?: $.VarRef<number> | null, IfaceZero?: any, IfaceFalse?: any, IfaceEmptyString?: any, IfaceEmptySlice?: any, IfaceEmptyMap?: any, PtrNilIface?: $.VarRef<any> | null, PtrBool?: $.VarRef<boolean> | null}>) {
 		this._fields = {
 			Ptr: $.varRef(init?.Ptr ?? (null as $.VarRef<number> | null)),
 			IfaceZero: $.varRef(init?.IfaceZero ?? (null as any)),
@@ -80,6 +88,7 @@ export class Payload {
 			IfaceEmptyString: $.varRef(init?.IfaceEmptyString ?? (null as any)),
 			IfaceEmptySlice: $.varRef(init?.IfaceEmptySlice ?? (null as any)),
 			IfaceEmptyMap: $.varRef(init?.IfaceEmptyMap ?? (null as any)),
+			PtrNilIface: $.varRef(init?.PtrNilIface ?? (null as $.VarRef<any> | null)),
 			PtrBool: $.varRef(init?.PtrBool ?? (null as $.VarRef<boolean> | null))
 		}
 	}
@@ -93,6 +102,7 @@ export class Payload {
 			IfaceEmptyString: $.varRef(this._fields.IfaceEmptyString.value),
 			IfaceEmptySlice: $.varRef(this._fields.IfaceEmptySlice.value),
 			IfaceEmptyMap: $.varRef(this._fields.IfaceEmptyMap.value),
+			PtrNilIface: $.varRef(this._fields.PtrNilIface.value),
 			PtrBool: $.varRef(this._fields.PtrBool.value)
 		}
 		return $.markAsStructValue(cloned)
@@ -103,14 +113,15 @@ export class Payload {
 		() => new Payload(),
 		[],
 		Payload,
-		[{ name: "Ptr", key: "Ptr", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "int" } }, tag: "json:\"ptr,omitempty\"" }, { name: "IfaceZero", key: "IfaceZero", type: { kind: $.TypeKind.Interface, methods: [] }, tag: "json:\"ifaceZero,omitempty\"" }, { name: "IfaceFalse", key: "IfaceFalse", type: { kind: $.TypeKind.Interface, methods: [] }, tag: "json:\"ifaceFalse,omitempty\"" }, { name: "IfaceEmptyString", key: "IfaceEmptyString", type: { kind: $.TypeKind.Interface, methods: [] }, tag: "json:\"ifaceEmptyString,omitempty\"" }, { name: "IfaceEmptySlice", key: "IfaceEmptySlice", type: { kind: $.TypeKind.Interface, methods: [] }, tag: "json:\"ifaceEmptySlice,omitempty\"" }, { name: "IfaceEmptyMap", key: "IfaceEmptyMap", type: { kind: $.TypeKind.Interface, methods: [] }, tag: "json:\"ifaceEmptyMap,omitempty\"" }, { name: "PtrBool", key: "PtrBool", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "bool" } }, tag: "json:\"ptrBool,omitempty\"" }]
+		[{ name: "Ptr", key: "Ptr", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "int" } }, tag: "json:\"ptr,omitempty\"" }, { name: "IfaceZero", key: "IfaceZero", type: { kind: $.TypeKind.Interface, methods: [] }, tag: "json:\"ifaceZero,omitempty\"" }, { name: "IfaceFalse", key: "IfaceFalse", type: { kind: $.TypeKind.Interface, methods: [] }, tag: "json:\"ifaceFalse,omitempty\"" }, { name: "IfaceEmptyString", key: "IfaceEmptyString", type: { kind: $.TypeKind.Interface, methods: [] }, tag: "json:\"ifaceEmptyString,omitempty\"" }, { name: "IfaceEmptySlice", key: "IfaceEmptySlice", type: { kind: $.TypeKind.Interface, methods: [] }, tag: "json:\"ifaceEmptySlice,omitempty\"" }, { name: "IfaceEmptyMap", key: "IfaceEmptyMap", type: { kind: $.TypeKind.Interface, methods: [] }, tag: "json:\"ifaceEmptyMap,omitempty\"" }, { name: "PtrNilIface", key: "PtrNilIface", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } }, tag: "json:\"ptrNilIface,omitempty\"" }, { name: "PtrBool", key: "PtrBool", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "bool" } }, tag: "json:\"ptrBool,omitempty\"" }]
 	)
 }
 
 export async function main(): globalThis.Promise<void> {
 	let zero = $.varRef(0)
 	let falseValue = $.varRef(false)
-	let __goscriptTuple0: any = json.Marshal($.interfaceValue<any>($.markAsStructValue(new Payload({Ptr: zero, IfaceZero: $.namedValueInterfaceValue<any>(0, "int", {}, { kind: $.TypeKind.Basic, name: "int" }), IfaceFalse: false, IfaceEmptyString: "", IfaceEmptySlice: $.interfaceValue<any>($.arrayToSlice<number>([]), "[]int"), IfaceEmptyMap: $.interfaceValue<any>(new globalThis.Map<string, number>([]), "map[string]int"), PtrBool: falseValue})), "main.Payload"))
+	let nilIface: $.VarRef<any> = $.varRef(null as any)
+	let __goscriptTuple0: any = json.Marshal($.interfaceValue<any>($.markAsStructValue(new Payload({Ptr: zero, IfaceZero: $.namedValueInterfaceValue<any>(0, "int", {}, { kind: $.TypeKind.Basic, name: "int" }), IfaceFalse: false, IfaceEmptyString: "", IfaceEmptySlice: $.interfaceValue<any>($.arrayToSlice<number>([]), "[]int"), IfaceEmptyMap: $.interfaceValue<any>(new globalThis.Map<string, number>([]), "map[string]int"), PtrNilIface: nilIface, PtrBool: falseValue})), "main.Payload"))
 	let out: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
@@ -124,6 +135,7 @@ export async function main(): globalThis.Promise<void> {
 	fmt.Println("ifaceEmptyString emitted:", strings.Contains(text, "\"ifaceEmptyString\":"))
 	fmt.Println("ifaceEmptySlice emitted:", strings.Contains(text, "\"ifaceEmptySlice\":"))
 	fmt.Println("ifaceEmptyMap emitted:", strings.Contains(text, "\"ifaceEmptyMap\":"))
+	fmt.Println("ptrNilIface emitted as null:", strings.Contains(text, "\"ptrNilIface\":null"))
 	fmt.Println("ptrBool emitted:", strings.Contains(text, "\"ptrBool\":"))
 }
 
