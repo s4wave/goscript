@@ -882,6 +882,10 @@ function methodSignaturesMatch(
  */
 function matchesMapType(value: any, info: TypeInfo): boolean {
   if (typeof value !== 'object' || value === null) return false
+  // A Go slice/array is never a map, even though Object.entries() of a
+  // plain JS array yields string-indexed pairs that would otherwise pass
+  // the key/elem sampling below.
+  if (Array.isArray(value) || value instanceof Uint8Array) return false
   if (!isMapTypeInfo(info)) return false
 
   if (info.keyType || info.elemType) {
@@ -1440,7 +1444,10 @@ export function typeAssert<T>(
   if (
     isMapTypeInfo(normalizedType) &&
     typeof value === 'object' &&
-    value !== null
+    value !== null &&
+    // A Go slice/array is never a map; see matchesMapType above.
+    !Array.isArray(value) &&
+    !(value instanceof Uint8Array)
   ) {
     if (normalizedType.keyType || normalizedType.elemType) {
       const entries =
