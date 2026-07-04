@@ -877,6 +877,16 @@ function marshalValue(v: unknown): unknown {
   if ($.isVarRef(v)) {
     return marshalValue(v.value)
   }
+  // Unwrap a boxed interface{} value (a named/defined type's value, boxed by
+  // the runtime as { __goType, __goValue, ... } so it can carry methods)
+  // before serializing; otherwise the wrapper object itself leaks into the
+  // output instead of the underlying primitive/map/slice it holds.
+  if (
+    $.isNamedValueBox(v) &&
+    !isStructValue(v)
+  ) {
+    return marshalValue((v as { __goValue: unknown }).__goValue)
+  }
   if (v === null || v === undefined) {
     return null
   }
@@ -916,9 +926,70 @@ function marshalValue(v: unknown): unknown {
     if (jsonName === '') {
       continue
     }
+    if (jsonOmitEmpty(field.tag) && isEmptyValue(ref.value, field.type)) {
+      continue
+    }
     out[jsonName] = marshalFieldValue(ref.value, field.type)
   }
   return out
+}
+
+// jsonOmitEmpty reports whether the struct tag carries the `,omitempty` option.
+function jsonOmitEmpty(tag: string | undefined): boolean {
+  if (tag === undefined || !tag.startsWith('json:"')) {
+    return false
+  }
+  const end = tag.indexOf('"', 'json:"'.length)
+  if (end < 0) {
+    return false
+  }
+  return tag
+    .slice('json:"'.length, end)
+    .split(',')
+    .slice(1)
+    .includes('omitempty')
+}
+
+// isEmptyValue mirrors Go encoding/json: zero numbers/strings/bools, empty
+// slices/maps/arrays, and nil pointers/interfaces are "empty". Pointer and
+// interface fields are only empty when the pointer/interface itself is nil;
+// a non-nil pointer or interface is never empty, even when it points to or
+// holds a zero value, so those field types must not be unwrapped further.
+function isEmptyValue(v: unknown, fieldType?: unknown): boolean {
+  if (isPointerOrInterfaceFieldType(fieldType)) {
+    return v === null || v === undefined
+  }
+  const t = $.isVarRef(v) ? (v as $.VarRef<unknown>).value : v
+  if (t === null || t === undefined) {
+    return true
+  }
+  if (typeof t === 'number') {
+    return t === 0
+  }
+  if (typeof t === 'bigint') {
+    return t === 0n
+  }
+  if (typeof t === 'string') {
+    return t === ''
+  }
+  if (typeof t === 'boolean') {
+    return t === false
+  }
+  if (Array.isArray(t) || t instanceof Uint8Array) {
+    return t.length === 0
+  }
+  if (t instanceof Map) {
+    return t.size === 0
+  }
+  return false
+}
+
+function isPointerOrInterfaceFieldType(fieldType: unknown): boolean {
+  if (fieldType === null || typeof fieldType !== 'object') {
+    return false
+  }
+  const kind = Reflect.get(fieldType, 'kind')
+  return kind === $.TypeKind.Pointer || kind === $.TypeKind.Interface
 }
 
 function marshalFieldValue(value: unknown, fieldType: unknown): unknown {
@@ -1023,11 +1094,33 @@ function assignDecodedValue(
     const spelling = unmarshalTargetGoType(target)
     if (spelling !== null) {
       const desc = goTypeDescriptor(spelling)
+      // An anonymous (inline, unnamed) struct target, e.g. `var loose
+      // struct{ Name string "json:\"name\"" }`, carries no _fields/registered
+      // type metadata of its own to decode against, so it needs its json
+      // tags read from the parsed __goType spelling instead. See
+      // assignAnonymousStructFields below.
+      const anonFields = anonymousStructFields(desc)
+      if (
+        anonFields !== null &&
+        isPlainObject(decoded) &&
+        isPlainObject(target.value)
+      ) {
+        assignAnonymousStructFields(target.value, decoded, anonFields, opts)
+        return
+      }
       const info = resolveTypeInfo(desc)
       if (info !== null) {
         if (
           ($.isSliceTypeInfo(info) && Array.isArray(decoded)) ||
-          ($.isMapTypeInfo(info) && isPlainObject(decoded))
+          ($.isMapTypeInfo(info) && isPlainObject(decoded)) ||
+          // A top-level *Struct var (e.g. `var p *pkg.T`) needs the same
+          // type-driven Pointer handling as a pointer-typed struct field or
+          // map/slice element (see decodeValueForType's Pointer branch):
+          // without it, decoding falls through to decodeInterfaceValue
+          // below and produces a Map/plain object instead of a real
+          // (unmarked) struct instance, breaking *T type assertions and
+          // pointer-receiver method-set checks on the decoded result.
+          ($.isPointerTypeInfo(info) && isPlainObject(decoded))
         ) {
           target.value = decodeValueForType(decoded, desc, opts)
           return
@@ -1169,6 +1262,10 @@ function resolveTypeInfo(t: unknown): $.TypeInfo | null {
 //     *Struct value as the struct instance itself for field access) —
 //     without this, map/slice elements typed e.g. map[string]*Property
 //     leaked plain objects whose Go field reads came back undefined.
+//   - Anonymous struct element: decodes to a plain object keyed by Go field
+//     name, honoring the field's own json tags (see
+//     assignAnonymousStructFields below) — the runtime's representation of
+//     an inline struct{...} value.
 //   - Missing type info / interface{} elements: shape-driven decode via
 //     decodeInterfaceValue, mirroring Go's json.Unmarshal-into-any.
 function decodeValueForType(
@@ -1181,6 +1278,15 @@ function decodeValueForType(
   }
   if (decoded === null || decoded === undefined) {
     return decoded
+  }
+  const anonFields = anonymousStructFields(typeInfo)
+  if (anonFields !== null) {
+    if (!isPlainObject(decoded)) {
+      return decoded
+    }
+    const out: Record<string, unknown> = {}
+    assignAnonymousStructFields(out, decoded, anonFields, opts)
+    return out
   }
   const info = resolveTypeInfo(typeInfo)
   if (info === null || $.isInterfaceTypeInfo(info)) {
@@ -1311,6 +1417,7 @@ function unmarshalTargetGoType(target: unknown): string | null {
 //                                 function ever runs.
 //   - 'json.RawMessage'          RawMessage marker (isRawMessageType)
 //   - {kind: Slice|Map, elemType} for []T / map[K]V
+//   - {anonymousStructFields}     for inline struct{...} types
 //   - the spelling itself         for named types ($.getTypeByName resolves)
 //   - null                        for interface{} and unparseable spellings
 //                                 (shape-driven decode, same as before)
@@ -1341,9 +1448,208 @@ function goTypeDescriptor(spelling: string): unknown {
       elemType: goTypeDescriptor(s.slice(keyEnd + 1)),
     }
   }
+  if (s.startsWith('struct{') && s.endsWith('}')) {
+    return {
+      anonymousStructFields: parseAnonymousStructFields(
+        s.slice('struct{'.length, -1),
+      ),
+    }
+  }
   return s
 }
 
+// parseAnonymousStructFields parses the field list of an inline struct type
+// spelling ("Name Type" or "Name Type \"tag\"" decls separated by ';') into
+// fieldMetadata. Embedded and unexported fields are skipped because
+// encoding/json cannot address promoted fields from this spelling alone and
+// ignores unexported fields even when they carry json tags.
+function parseAnonymousStructFields(body: string): fieldMetadata[] {
+  const fields: fieldMetadata[] = []
+  for (const decl of splitGoFieldDecls(body)) {
+    const [spec, tag] = splitGoFieldTag(decl.trim())
+    const space = spec.indexOf(' ')
+    if (space < 0) {
+      continue
+    }
+    const name = spec.slice(0, space)
+    const first = name[0] ?? ''
+    if (first.toUpperCase() !== first || first.toLowerCase() === first) {
+      continue
+    }
+    fields.push({
+      key: name,
+      name,
+      type: goTypeDescriptor(spec.slice(space + 1).trim()),
+      ...(tag !== undefined ? { tag } : {}),
+    })
+  }
+  return fields
+}
+
+// splitGoFieldDecls splits a struct-type field list on ';' at nesting depth
+// zero, skipping string literals (tags) so a ';' inside a tag cannot split.
+function splitGoFieldDecls(body: string): string[] {
+  const decls: string[] = []
+  let depth = 0
+  let inStr = false
+  let start = 0
+  for (let i = 0; i < body.length; i++) {
+    const c = body[i]
+    if (inStr) {
+      if (c === '\\') {
+        i++
+      } else if (c === '"') {
+        inStr = false
+      }
+      continue
+    }
+    if (c === '"') {
+      inStr = true
+    } else if (c === '{' || c === '[') {
+      depth++
+    } else if (c === '}' || c === ']') {
+      depth--
+    } else if (c === ';' && depth === 0) {
+      decls.push(body.slice(start, i))
+      start = i + 1
+    }
+  }
+  decls.push(body.slice(start))
+  return decls
+}
+
+// splitGoFieldTag splits one field decl into [name+type, unquoted tag?]. The
+// tag is the trailing Go-quoted literal at depth zero (a nested inline struct
+// type keeps its own tags inside its braces, at depth > 0).
+function splitGoFieldTag(decl: string): [string, string | undefined] {
+  let depth = 0
+  for (let i = 0; i < decl.length; i++) {
+    const c = decl[i]
+    if (c === '{' || c === '[') {
+      depth++
+    } else if (c === '}' || c === ']') {
+      depth--
+    } else if (c === '"' && depth === 0) {
+      return [decl.slice(0, i).trim(), unquoteGoString(decl.slice(i).trim())]
+    }
+  }
+  return [decl, undefined]
+}
+
+// unquoteGoString unquotes a Go double-quoted string literal. strconv.Quote
+// output is JSON-compatible for the escapes tags use (\" and \\); anything
+// exotic falls back to a plain backslash strip.
+function unquoteGoString(lit: string): string {
+  try {
+    return JSON.parse(lit) as string
+  } catch {
+    return lit.slice(1, -1).replace(/\\(.)/g, '$1')
+  }
+}
+
+// anonymousStructFields returns the parsed field list when the descriptor
+// came from an inline struct{...} spelling, else null.
+function anonymousStructFields(desc: unknown): fieldMetadata[] | null {
+  if (desc === null || typeof desc !== 'object') {
+    return null
+  }
+  const fields = (desc as { anonymousStructFields?: unknown })
+    .anonymousStructFields
+  return Array.isArray(fields) ? (fields as fieldMetadata[]) : null
+}
+
+// assignAnonymousStructFields populates an anonymous-struct value (a plain
+// JS object keyed by Go field name, the runtime's representation of an
+// inline struct) from decoded JSON, honoring json tags, disallowUnknownFields,
+// and field types via the same per-field decode named-struct fields get
+// (assignDecodedFieldValue).
+function assignAnonymousStructFields(
+  target: Record<string, unknown>,
+  decoded: Record<string, unknown>,
+  fields: fieldMetadata[],
+  opts: decodeOptions,
+): void {
+  if (opts.disallowUnknownFields) {
+    const knownNames = new Set<string>()
+    for (const field of fields) {
+      const jsonName = jsonFieldName(field.name, field.tag)
+      if (jsonName !== '') {
+        knownNames.add(jsonName)
+      }
+    }
+    for (const key of Object.keys(decoded)) {
+      if (!knownNames.has(key)) {
+        throw $.newError(`json: unknown field "${key}"`)
+      }
+    }
+  }
+  for (const field of fields) {
+    const jsonName = jsonFieldName(field.name, field.tag)
+    if (
+      jsonName === '' ||
+      !Object.prototype.hasOwnProperty.call(decoded, jsonName)
+    ) {
+      continue
+    }
+    // An anonymous struct's own fields start unset (the target object
+    // starts as {}), so a by-value named-struct field (e.g.
+    // `Inner SomeStruct`) has no pre-existing instance for
+    // assignDecodedFieldValue's generic path to populate into, unlike a
+    // registered struct's fields (pre-initialized to a zero-value instance
+    // at construction). Construct it directly via the type-driven decoder
+    // whenever the field's type resolves to a real, ctor-bearing struct
+    // type (a bare type-name spelling resolved through $.getTypeByName);
+    // an inline TypeInfo with no ctor keeps the existing generic path
+    // unchanged below.
+    const fieldValue = decoded[jsonName]
+    const fieldTypeInfo = resolveTypeInfo(field.type)
+    if (
+      fieldTypeInfo !== null &&
+      $.isStructTypeInfo(fieldTypeInfo) &&
+      typeof fieldTypeInfo.ctor === 'function' &&
+      isPlainObject(fieldValue)
+    ) {
+      target[field.name] = decodeValueForType(fieldValue, fieldTypeInfo, opts)
+      continue
+    }
+    // A field whose own type is itself an inline struct{...} or
+    // *struct{...} (e.g. `Inner struct{ Name string "json:\"name\"" }`) has
+    // no registered TypeInfo of its own — resolveTypeInfo(field.type) is
+    // null for it, same as it is for a missing type. Left on the generic
+    // path below, it decodes as a plain interface{} value (a Map keyed by
+    // JSON tag) instead of the anonymous struct representation (a plain
+    // object keyed by Go field name). Route it through decodeValueForType
+    // directly, which recurses into assignAnonymousStructFields (or, for
+    // *struct{...}, its Pointer branch, which falls through to the same
+    // anonymous decode for a non-struct-typeinfo pointee) and so honors the
+    // field's own parsed json tags and disallowUnknownFields.
+    if (isAnonymousStructType(field.type) && isPlainObject(fieldValue)) {
+      target[field.name] = decodeValueForType(fieldValue, field.type, opts)
+      continue
+    }
+    const ref = $.varRef(target[field.name])
+    assignDecodedFieldValue(ref, fieldValue, opts, field.type)
+    target[field.name] = ref.value
+  }
+}
+
+// isAnonymousStructType reports whether `t` (a field's parsed type
+// descriptor, from parseAnonymousStructFields) denotes struct{...} or
+// *struct{...} — the shapes decodeValueForType constructs via
+// assignAnonymousStructFields rather than a registered struct's ctor, and
+// so must not be left on the generic assignDecodedFieldValue path.
+function isAnonymousStructType(t: unknown): boolean {
+  if (anonymousStructFields(t) !== null) {
+    return true
+  }
+  if (typeof t === 'object' && t !== null && 'kind' in t) {
+    const info = t as $.TypeInfo
+    if ($.isPointerTypeInfo(info)) {
+      return isAnonymousStructType(info.elemType)
+    }
+  }
+  return false
+}
 // matchingBracketIndex returns the index of the ']' matching the '[' at
 // `open`, or -1. Tracks nesting only — Go map key spellings carry no strings
 // or further brackets in the shapes goTypeDescriptor parses (map keys are

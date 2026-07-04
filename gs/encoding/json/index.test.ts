@@ -85,6 +85,53 @@ class FieldAlias {
   )
 }
 
+class OmitEmptyStruct {
+  public _fields = {
+    Name: $.varRef(''),
+    Age: $.varRef(0),
+    Tags: $.varRef<string[]>([]),
+    Data: $.varRef<Uint8Array>(new Uint8Array(0)),
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.OmitEmptyStruct',
+    new OmitEmptyStruct(),
+    [],
+    OmitEmptyStruct,
+    [
+      {
+        name: 'Name',
+        key: 'Name',
+        type: { kind: $.TypeKind.Basic, name: 'string' },
+        tag: 'json:"name,omitempty"',
+      },
+      {
+        name: 'Age',
+        key: 'Age',
+        type: { kind: $.TypeKind.Basic, name: 'int' },
+        tag: 'json:"age,omitempty"',
+      },
+      {
+        name: 'Tags',
+        key: 'Tags',
+        type: {
+          kind: $.TypeKind.Slice,
+          elemType: { kind: $.TypeKind.Basic, name: 'string' },
+        },
+        tag: 'json:"tags,omitempty"',
+      },
+      {
+        name: 'Data',
+        key: 'Data',
+        type: {
+          kind: $.TypeKind.Slice,
+          elemType: { kind: $.TypeKind.Basic, name: 'uint8' },
+        },
+        tag: 'json:"data,omitempty"',
+      },
+    ],
+  )
+}
 class Ref {
   public _fields = {
     Name: $.varRef(''),
@@ -177,6 +224,54 @@ class Schema {
         key: 'Items',
         type: { kind: $.TypeKind.Pointer, elemType: 'test.Property' },
         tag: 'json:"items"',
+      },
+    ],
+  )
+}
+
+class OmitEmptyRefStruct {
+  public _fields = {
+    Ptr: $.varRef<unknown>(null),
+    PtrNilIface: $.varRef<unknown>(null),
+    Any: $.varRef<unknown>(null),
+    Count: $.varRef<bigint>(0n),
+  }
+
+  static __typeInfo = $.registerStructType(
+    'test.OmitEmptyRefStruct',
+    new OmitEmptyRefStruct(),
+    [],
+    OmitEmptyRefStruct,
+    [
+      {
+        name: 'Ptr',
+        key: 'Ptr',
+        type: {
+          kind: $.TypeKind.Pointer,
+          elemType: { kind: $.TypeKind.Basic, name: 'int' },
+        },
+        tag: 'json:"ptr,omitempty"',
+      },
+      {
+        name: 'PtrNilIface',
+        key: 'PtrNilIface',
+        type: {
+          kind: $.TypeKind.Pointer,
+          elemType: { kind: $.TypeKind.Interface },
+        },
+        tag: 'json:"ptrNilIface,omitempty"',
+      },
+      {
+        name: 'Any',
+        key: 'Any',
+        type: { kind: $.TypeKind.Interface },
+        tag: 'json:"any,omitempty"',
+      },
+      {
+        name: 'Count',
+        key: 'Count',
+        type: { kind: $.TypeKind.Basic, name: 'int64' },
+        tag: 'json:"count,omitempty"',
       },
     ],
   )
@@ -313,6 +408,92 @@ describe('encoding/json override', () => {
       Unmarshal($.stringToBytes('{"FullName":"Grace"}'), target),
     ).toBeNull()
     expect(target.value._fields.Name.value).toBe('Grace')
+  })
+
+  it('omits zero-valued fields tagged omitempty on marshal', () => {
+    const zero = new OmitEmptyStruct()
+    const [zeroData, zeroErr] = Marshal(zero)
+    expect(zeroErr).toBeNull()
+    expect($.bytesToString(zeroData)).toBe('{}')
+
+    const filled = new OmitEmptyStruct()
+    filled._fields.Name.value = 'Ada'
+    filled._fields.Age.value = 30
+    filled._fields.Tags.value = ['x']
+    filled._fields.Data.value = $.stringToBytes('x')
+    const [data, err] = Marshal(filled)
+    expect(err).toBeNull()
+    expect($.bytesToString(data)).toBe(
+      '{"name":"Ada","age":30,"tags":["x"],"data":"eA=="}',
+    )
+  })
+
+  it('omits nil pointers/interfaces but keeps non-nil ones holding a zero value', () => {
+    const zero = new OmitEmptyRefStruct()
+    const [zeroData, zeroErr] = Marshal(zero)
+    expect(zeroErr).toBeNull()
+    expect($.bytesToString(zeroData)).toBe('{}')
+
+    // Non-nil wrappers are not empty: omit only when the pointer/interface
+    // itself is nil, not when the pointed or dynamic value is zero or nil.
+    const filled = new OmitEmptyRefStruct()
+    filled._fields.Ptr.value = $.varRef(0)
+    filled._fields.PtrNilIface.value = $.varRef(null)
+    filled._fields.Any.value = 0
+    const [data, err] = Marshal(filled)
+    expect(err).toBeNull()
+    expect($.bytesToString(data)).toBe('{"ptr":0,"ptrNilIface":null,"any":0}')
+  })
+
+  it('treats a zero bigint as empty for omitempty', () => {
+    const zero = new OmitEmptyRefStruct()
+    const [zeroData, zeroErr] = Marshal(zero)
+    expect(zeroErr).toBeNull()
+    expect($.bytesToString(zeroData)).toBe('{}')
+
+    const nonZero = new OmitEmptyRefStruct()
+    nonZero._fields.Count.value = 5n
+    const [data, err] = Marshal(nonZero)
+    expect(err).toBeNull()
+    expect($.bytesToString(data)).toBe('{"count":5}')
+
+    // A non-nil interface holding a zero bigint is still non-empty.
+    const boxedZero = new OmitEmptyRefStruct()
+    boxedZero._fields.Any.value = 0n
+    const [boxedData, boxedErr] = Marshal(boxedZero)
+    expect(boxedErr).toBeNull()
+    expect($.bytesToString(boxedData)).toBe('{"any":0}')
+  })
+
+  it('unwraps a boxed interface{} value before marshaling instead of leaking its wrapper', () => {
+    // A value of a named/defined type stored in an interface{} is boxed by
+    // the runtime as { __goType, __goValue, ... } so it can carry methods.
+    // Marshal must serialize the underlying value, not the wrapper.
+    const namedInt = $.namedValueInterfaceValue<unknown>(42, 'test.Status', {})
+    const [data, err] = Marshal(namedInt)
+    expect(err).toBeNull()
+    expect($.bytesToString(data)).toBe('42')
+
+    const namedString = $.namedValueInterfaceValue<unknown>(
+      'active',
+      'test.Status',
+      {},
+    )
+    const holder = new FieldAlias()
+    ;(holder._fields.Name as $.VarRef<unknown>).value = namedString
+    const [holderData, holderErr] = Marshal(holder)
+    expect(holderErr).toBeNull()
+    expect($.bytesToString(holderData)).toBe('{"FullName":"active"}')
+  })
+
+  it('does not mistake an ordinary object with a __goValue key for a box', () => {
+    // Only the runtime's actual boxed shape (string __goType plus __goValue,
+    // see isNamedValueBox in gs/builtin/type.ts) may be unwrapped. A plain JS
+    // object that merely has a __goValue property is legal Marshal input and
+    // must serialize as-is.
+    const [data, err] = Marshal({ __goValue: 5 })
+    expect(err).toBeNull()
+    expect($.bytesToString(data)).toBe('{"__goValue":5}')
   })
 
   it('rejects unsupported values and invalid unmarshal targets', () => {
@@ -645,6 +826,198 @@ describe('encoding/json override', () => {
     expect($.is(width, propertyType)).toBe(false)
   })
 
+  it('honors json tags on anonymous (inline, unnamed) struct targets', () => {
+    // The runtime boxes an Unmarshal target with no struct-field metadata of
+    // its own (an inline, unnamed struct type) with its type spelling via
+    // __goType, e.g. for:
+    //   var loose struct {
+    //       Name string `json:"name"`
+    //       Age  int    `json:"age"`
+    //   }
+    //   json.Unmarshal(data, &loose)
+    const target = $.varRef<{ Name: string; Age: number }>({
+      Name: '',
+      Age: 0,
+    })
+    target.__goType =
+      '*struct{Name string "json:\\"name\\""; Age int "json:\\"age\\""}'
+
+    const err = Unmarshal($.stringToBytes('{"name":"Ada","age":30}'), target)
+    expect(err).toBeNull()
+    expect(target.value.Name).toBe('Ada')
+    expect(target.value.Age).toBe(30)
+  })
+
+  it('ignores unexported fields on anonymous struct targets even with json tags', () => {
+    const target = $.varRef<{ name: string; Age: number }>({
+      name: 'keep',
+      Age: 0,
+    })
+    target.__goType =
+      '*struct{name string "json:\\"name\\""; Age int "json:\\"age\\""}'
+
+    const err = Unmarshal($.stringToBytes('{"name":"Ada","age":30}'), target)
+    expect(err).toBeNull()
+    expect(target.value).toEqual({ name: 'keep', Age: 30 })
+  })
+
+  it('rejects unknown fields that only match unexported anonymous struct fields', () => {
+    const target = $.varRef<{ name: string; Age: number }>({
+      name: 'keep',
+      Age: 0,
+    })
+    target.__goType =
+      '*struct{name string "json:\\"name\\""; Age int "json:\\"age\\""}'
+
+    const strictReader = bytes.NewBufferString('{"name":"Ada","age":30}')!
+    const strictDecoder = NewDecoder(strictReader)
+    strictDecoder.DisallowUnknownFields()
+
+    expect(strictDecoder.Decode(target)?.Error()).toBe(
+      'json: unknown field "name"',
+    )
+  })
+
+  it('honors json tags on an anonymous struct used as a map element type', () => {
+    // Same mechanism as the top-level case above, reached through
+    // decodeValueForType for a map[string]struct{...} spelling, e.g.:
+    //   var loose map[string]struct {
+    //       Name string `json:"name"`
+    //   }
+    //   json.Unmarshal(data, &loose)
+    const target = $.varRef<Map<string, { Name: string }> | null>(null)
+    target.__goType = '*map[string]struct{Name string "json:\\"name\\""}'
+
+    const err = Unmarshal(
+      $.stringToBytes('{"a":{"name":"Ada"}}'),
+      target,
+    )
+    expect(err).toBeNull()
+    expect(target.value?.get('a')).toEqual({ Name: 'Ada' })
+  })
+
+  it('decodes a top-level pointer-to-struct var as an unmarked struct pointee', () => {
+    // `var p *test.Property; json.Unmarshal(data, &p)`: &p's own Go type is
+    // **test.Property (one star from p already being a pointer, one from
+    // &p); unmarshalTargetGoType strips only the outermost address-of star,
+    // leaving *test.Property, so this must go through the same Pointer
+    // handling as a pointer-typed field/element (see decodeValueForType's
+    // Pointer branch) rather than falling through to the untyped decode.
+    const target = $.varRef<Property | null>(null)
+    target.__goType = '**test.Property'
+
+    const err = Unmarshal($.stringToBytes('{"type":"string"}'), target)
+    expect(err).toBeNull()
+    expect(target.value?._fields.Type.value).toBe('string')
+
+    const propertyType = $.getTypeByName('test.Property') as $.TypeInfo
+    const propertyPointerType: $.TypeInfo = {
+      kind: $.TypeKind.Pointer,
+      elemType: propertyType,
+    }
+    expect($.is(target.value, propertyPointerType)).toBe(true)
+    expect($.is(target.value, propertyType)).toBe(false)
+  })
+
+  it('honors disallowUnknownFields on anonymous struct targets', () => {
+    const target = $.varRef<{ Name: string }>({ Name: '' })
+    target.__goType = '*struct{Name string "json:\\"name\\""}'
+
+    const strictReader = bytes.NewBufferString('{"name":"Ada","extra":true}')!
+    const strictDecoder = NewDecoder(strictReader)
+    strictDecoder.DisallowUnknownFields()
+
+    expect(strictDecoder.Decode(target)?.Error()).toBe(
+      'json: unknown field "extra"',
+    )
+  })
+
+  it('constructs a by-value named-struct field inside an anonymous struct target', () => {
+    // An anonymous struct's own fields start unset (the target object
+    // starts as {}), unlike a registered struct's fields, which are
+    // pre-initialized to a zero-value instance. A by-value named-struct
+    // field (Inner test.Property, no pointer) therefore has no pre-existing
+    // instance for the generic decode path to populate into and must be
+    // constructed directly.
+    const target = $.varRef<{ Inner: Property | undefined }>({
+      Inner: undefined,
+    })
+    target.__goType = '*struct{Inner test.Property "json:\\"inner\\""}'
+
+    const err = Unmarshal(
+      $.stringToBytes('{"inner":{"type":"string"}}'),
+      target,
+    )
+    expect(err).toBeNull()
+    expect(target.value.Inner).toBeInstanceOf(Property)
+    expect(target.value.Inner?._fields.Type.value).toBe('string')
+
+    const propertyType = $.getTypeByName('test.Property') as $.TypeInfo
+    // A by-value struct field must match Property (value), not *Property.
+    expect($.is(target.value.Inner, propertyType)).toBe(true)
+  })
+
+  it('decodes a nested anonymous struct field, not a generic Map', () => {
+    // A field whose own type is itself an inline struct{...} (e.g.
+    //   struct {
+    //       Inner struct {
+    //           Name string `json:"name"`
+    //       } `json:"inner"`
+    //   }
+    // ) has no registered TypeInfo of its own: resolveTypeInfo(field.type)
+    // returns null for it, same as any other anonymous struct descriptor.
+    // Without routing it through decodeValueForType, it fell through to the
+    // generic interface{} decode and came back as a Map keyed by the JSON
+    // tag ("name") instead of the anonymous struct representation keyed by
+    // the Go field name ("Name").
+    const target = $.varRef<{ Inner: { Name: string } | undefined }>({
+      Inner: undefined,
+    })
+    target.__goType =
+      '*struct{Inner struct{Name string "json:\\"name\\""} "json:\\"inner\\""}'
+
+    const err = Unmarshal(
+      $.stringToBytes('{"inner":{"name":"Ada"}}'),
+      target,
+    )
+    expect(err).toBeNull()
+    expect(target.value.Inner).toEqual({ Name: 'Ada' })
+  })
+
+  it('decodes a pointer-to-anonymous-struct field, not a generic Map', () => {
+    // Same gap as above, one level of indirection further: a
+    // *struct{...} field.
+    const target = $.varRef<{ Inner: { Name: string } | null | undefined }>({
+      Inner: undefined,
+    })
+    target.__goType =
+      '*struct{Inner *struct{Name string "json:\\"name\\""} "json:\\"inner\\""}'
+
+    const err = Unmarshal(
+      $.stringToBytes('{"inner":{"name":"Ada"}}'),
+      target,
+    )
+    expect(err).toBeNull()
+    expect(target.value.Inner).toEqual({ Name: 'Ada' })
+  })
+
+  it('honors disallowUnknownFields on a nested anonymous struct field', () => {
+    const target = $.varRef<{ Inner: { Name: string } | undefined }>({
+      Inner: undefined,
+    })
+    target.__goType =
+      '*struct{Inner struct{Name string "json:\\"name\\""} "json:\\"inner\\""}'
+
+    const strictReader = bytes.NewBufferString(
+      '{"inner":{"name":"Ada","extra":true}}',
+    )!
+    const strictDecoder = NewDecoder(strictReader)
+    strictDecoder.DisallowUnknownFields()
+
+    expect(strictDecoder.Decode(target)?.Error()).toBe(
+      'json: unknown field "extra"',
+    )
+  })
   it('decodes json.RawMessage as a map and slice element type', () => {
     // The runtime boxes Unmarshal's `any` target with its Go type spelling
     // (__goType) at the call site; simulate that here the way $.interfaceValue

@@ -1692,6 +1692,23 @@ export function namedValueInterfaceValue<T>(
   return boxed as T
 }
 
+/**
+ * Reports whether a value is a boxed named-type interface value produced by
+ * namedValueInterfaceValue. Both markers are required: an ordinary JS object
+ * that merely happens to have a `__goValue` property (legal input elsewhere,
+ * e.g. through json.Marshal) is not a box.
+ */
+export function isNamedValueBox(
+  v: unknown,
+): v is { __goType: string; __goValue: unknown } {
+  return (
+    typeof v === 'object' &&
+    v !== null &&
+    '__goValue' in v &&
+    typeof (v as { __goType?: unknown }).__goType === 'string'
+  )
+}
+
 function wrapperMethodSignatureFromTypeInfo(
   name: string,
   typeInfo?: TypeInfo | string,
