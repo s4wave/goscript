@@ -29,9 +29,10 @@ func main() {
 	println("keyed:", k)
 	println("keyed len:", len(k))
 
-	// A non-constant element keeps its runtime byte truncation while the
-	// constant element folds to a plain literal.
-	n := 258
+	// A non-constant element is emitted bare: new Uint8Array truncates it to
+	// uint8 on construction, so 300 folds to 44 without a runtime $.uint wrap,
+	// while the constant element folds to a plain literal.
+	n := 300
 	m := []byte{byte(n), 2}
 	println("mixed:", m)
 	println("mixed index:", m[0], m[1])

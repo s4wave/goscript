@@ -68,7 +68,7 @@ export class handler {
 				}
 				total = total + ($.len(srpc.RawMessage.prototype.GetData.call(msg)))
 			}
-			return [true, await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage(new Uint8Array([$.uint($.uint(total, 8), 8)]) as $.Slice<number>, false), "*srpc.RawMessage"))]
+			return [true, await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage(new Uint8Array([$.uint(total, 8)]) as $.Slice<number>, false), "*srpc.RawMessage"))]
 		}
 		if (strm == null) {
 			return [true, null]
@@ -584,7 +584,7 @@ export async function openHeldStreams(ctx: context.Context | null, client: srpc.
 		queueMicrotask(async () => { await (async (idx: number): globalThis.Promise<void> => {
 			let [strm, err] = await $.pointerValue<Exclude<srpc.Client, null>>(client).NewStream(ctx, "svc", "hold", null)
 			if (err == null) {
-				err = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage(new Uint8Array([$.uint($.uint(idx, 8), 8)]) as $.Slice<number>, false), "*srpc.RawMessage"))
+				err = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage(new Uint8Array([$.uint(idx, 8)]) as $.Slice<number>, false), "*srpc.RawMessage"))
 			}
 			await $.chanSend(resultCh, $.markAsStructValue(new streamOpenResult({stream: strm, err: err})))
 		})(i) })
@@ -704,13 +704,13 @@ export async function probeStream(ctx: context.Context | null, client: srpc.Clie
 		return [0, err]
 	}
 	{
-		let __goscriptShadow0 = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage(new Uint8Array([$.uint(a, 8)]) as $.Slice<number>, false), "*srpc.RawMessage"))
+		let __goscriptShadow0 = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage(new Uint8Array([a]) as $.Slice<number>, false), "*srpc.RawMessage"))
 		if (__goscriptShadow0 != null) {
 			return [0, __goscriptShadow0]
 		}
 	}
 	{
-		let __goscriptShadow1 = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage(new Uint8Array([$.uint(b, 8)]) as $.Slice<number>, false), "*srpc.RawMessage"))
+		let __goscriptShadow1 = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage(new Uint8Array([b]) as $.Slice<number>, false), "*srpc.RawMessage"))
 		if (__goscriptShadow1 != null) {
 			return [0, __goscriptShadow1]
 		}

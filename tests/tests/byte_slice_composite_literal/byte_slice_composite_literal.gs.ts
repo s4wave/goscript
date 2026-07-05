@@ -63,10 +63,11 @@ export async function main(): globalThis.Promise<void> {
 	$.println("keyed:", k)
 	$.println("keyed len:", $.len(k))
 
-	// A non-constant element keeps its runtime byte truncation while the
-	// constant element folds to a plain literal.
-	let n = 258
-	let m: $.Slice<number> = new Uint8Array([$.uint($.uint(n, 8), 8), 2]) as $.Slice<number>
+	// A non-constant element is emitted bare: new Uint8Array truncates it to
+	// uint8 on construction, so 300 folds to 44 without a runtime $.uint wrap,
+	// while the constant element folds to a plain literal.
+	let n = 300
+	let m: $.Slice<number> = new Uint8Array([$.uint(n, 8), 2]) as $.Slice<number>
 	$.println("mixed:", m)
 	$.println("mixed index:", $.uint($.arrayIndex(m!, 0), 8), $.uint($.arrayIndex(m!, 1), 8))
 }

@@ -10752,7 +10752,16 @@ func (o *LoweringOwner) lowerSliceCompositeLit(
 		}
 		value, valueDiagnostics := o.lowerExpr(ctx, valueExpr)
 		diagnostics = append(diagnostics, valueDiagnostics...)
-		values[index] = o.lowerValueForTarget(ctx, valueExpr, slice.Elem(), value)
+		if isByte {
+			// new Uint8Array([...]) applies ToUint8 (mod-256 two's-complement
+			// truncation) to every element on construction, identical to Go's
+			// byte conversion, so a non-constant element needs no $.uint(x, 8)
+			// wrap here. This invariant must hold for any future change away
+			// from the Uint8Array byte backing.
+			values[index] = value
+		} else {
+			values[index] = o.lowerValueForTarget(ctx, valueExpr, slice.Elem(), value)
+		}
 		nextIndex = index + 1
 	}
 	// Byte specialization is a property of the Go element type, not the backing
