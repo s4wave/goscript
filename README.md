@@ -2,8 +2,7 @@
   <h3>GoScript: Go packages as TypeScript</h3>
 
   <p>
-    Compile real Go packages into readable TypeScript for apps that need one
-    implementation across Go, Bun, browsers, and modern bundlers.
+    Compile Go to readable TypeScript for Node, Bun, and modern browsers.
   </p>
 
   <p>
