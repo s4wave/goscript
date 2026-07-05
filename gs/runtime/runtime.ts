@@ -44,10 +44,15 @@ export function GC(): void {
 }
 
 // Gosched yields the processor, allowing other goroutines to run.
-// In JavaScript, we can use setTimeout(0) or queueMicrotask for similar effect
+//
+// This must cross a real task boundary via queueTask, not queueMicrotask. A
+// microtask runs before the event loop turns, so it never lets I/O, timers, or
+// rendering make progress; a busy-wait loop that only advances through the
+// underlying JS scheduler would then livelock, and pending I/O/timers would
+// starve. queueTask yields one event-loop turn so that other work runs.
 export function Gosched(): Promise<void> {
   return new Promise((resolve) => {
-    queueMicrotask(resolve)
+    $.queueTask(resolve)
   })
 }
 

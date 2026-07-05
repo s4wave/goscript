@@ -1,3 +1,5 @@
+import { queueTask } from './scheduler.js'
+
 /**
  * Represents the result of a channel receive operation with 'ok' value
  */
@@ -19,8 +21,9 @@ function scheduleClosedChannelWake(wake: () => void): void {
   // Closed-channel wakeups represent goroutine scheduling, not an immediate
   // Promise continuation. Keep them on a task boundary so goroutine work queued
   // around the close can observe state published before the blocked receiver
-  // resumes.
-  setTimeout(wake, 0)
+  // resumes. queueTask (not setTimeout) so close-heavy paths that wake many
+  // blocked goroutines in sequence never hit setTimeout's 4ms nesting clamp.
+  queueTask(wake)
 }
 
 function completeUnbufferedReceive<T>(

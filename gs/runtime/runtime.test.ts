@@ -5,6 +5,7 @@ import * as $ from '@goscript/builtin/index.js'
 import {
   Compiler,
   FuncForPC,
+  Gosched,
   MemStats,
   ReadMemStats,
   ReadTrace,
@@ -40,5 +41,17 @@ describe('runtime override', () => {
     expect(stats.HeapInuse).toBe(stats.Alloc)
     expect(stats.StackInuse).toBe(0)
     expect(stats.StackSys).toBe(0)
+  })
+
+  it('Gosched yields past an already-pending task boundary', async () => {
+    // A task boundary queued before Gosched must run before Gosched resolves. A
+    // microtask-based yield would resolve during the microtask drain, ahead of
+    // that pending task; queueTask keeps Gosched on the same task queue so the
+    // earlier work runs first.
+    const order: string[] = []
+    $.queueTask(() => order.push('pending-task'))
+    await Gosched()
+    order.push('after-gosched')
+    expect(order).toEqual(['pending-task', 'after-gosched'])
   })
 })
