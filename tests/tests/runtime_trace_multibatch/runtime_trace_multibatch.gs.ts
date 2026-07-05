@@ -45,7 +45,7 @@ export class byteSink {
 
 	public Write(p: $.Slice<number>): [number, $.GoError] {
 		let s: byteSink | $.VarRef<byteSink> | null = this
-		$.pointerValue<byteSink>(s).data = $.appendSlice($.pointerValue<byteSink>(s).data, p)
+		$.pointerValue<byteSink>(s).data = $.appendSlice($.pointerValue<byteSink>(s).data, p, $.byteSliceHint)
 		return [$.len(p), null]
 	}
 
