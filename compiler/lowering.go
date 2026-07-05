@@ -8790,6 +8790,8 @@ func (o *LoweringOwner) lowerWideIntegerBinaryExpr(ctx lowerFileContext, expr *a
 	}
 	signed := isFixedSignedWideIntegerType(resultType) ||
 		isFixedSignedWideIntegerType(ctx.semPkg.source.TypesInfo.TypeOf(expr.X))
+	left = lowerWideIntegerOperand(ctx, expr.X, left)
+	right = lowerWideIntegerOperand(ctx, expr.Y, right)
 	wrap := func(call string) string {
 		return coerceWideHelperResult(o.runtimeOwner, resultType, call)
 	}
@@ -8851,6 +8853,14 @@ func (o *LoweringOwner) lowerWideIntegerBinaryExpr(ctx lowerFileContext, expr *a
 	default:
 		return "", false
 	}
+}
+
+func lowerWideIntegerOperand(ctx lowerFileContext, expr ast.Expr, fallback string) string {
+	value := ctx.semPkg.source.TypesInfo.Types[unwrapParenExpr(expr)].Value
+	if value == nil || value.Kind() != constant.Int || constant.BitLen(value) <= 53 {
+		return fallback
+	}
+	return value.ExactString() + "n"
 }
 
 func wideIntegerHelper(signed bool, unsigned RuntimeHelper, signedHelper RuntimeHelper) RuntimeHelper {

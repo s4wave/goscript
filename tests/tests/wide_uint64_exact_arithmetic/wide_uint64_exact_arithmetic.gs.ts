@@ -1,0 +1,24 @@
+// Generated file based on wide_uint64_exact_arithmetic.go
+// Updated when compliance tests are re-run, DO NOT EDIT!
+
+import * as $ from "@goscript/builtin/index.js"
+
+export async function main(): globalThis.Promise<void> {
+	let acc: bigint = 1n
+	acc = $.uint64Add(($.uint64Mul(acc, 6364136223846793005n)), 1442695040888963407n)
+	acc = $.uint64Xor(acc, $.uint64Shr(acc, 33))
+	$.println("lcg-xor:", acc)
+
+	let large: bigint = 9007199254740993n
+	$.println("mul-over-2^53:", $.uint64Mul(large, 3))
+
+	let max: bigint = 18446744073709551615n
+	$.println("wrap-add:", $.uint64Add(max, 2))
+
+	let mixed = 6n
+	$.println("mixed-add-shift-mod:", mixed)
+}
+
+if ($.isMainScript(import.meta)) {
+	await main()
+}

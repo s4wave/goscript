@@ -29,16 +29,21 @@ export interface State {
 // (0x/0X/0 base prefix) and +/space sign flags. The sign precedes the prefix,
 // matching fmt's "%+#x" ordering.
 function formatInt(
-  value: any,
+  value: unknown,
   radix: number,
   flags: string,
   upper: boolean,
 ): string {
-  const big = typeof value === 'bigint'
-  const neg = big ? (value as bigint) < 0n : Number(value) < 0
-  let digits = big
-    ? (neg ? -(value as bigint) : (value as bigint)).toString(radix)
-    : Math.abs(Math.trunc(Number(value))).toString(radix)
+  let primitive = value
+  if (value !== null && typeof value === 'object' && '__goValue' in value) {
+    primitive = value.__goValue
+  }
+  const neg =
+    typeof primitive === 'bigint' ? primitive < 0n : Number(primitive) < 0
+  let digits =
+    typeof primitive === 'bigint' ?
+      (neg ? -primitive : primitive).toString(radix)
+    : Math.abs(Math.trunc(Number(primitive))).toString(radix)
   if (upper) {
     digits = digits.toUpperCase()
   }
@@ -60,7 +65,6 @@ function formatInt(
   }
   return sign + prefix + digits
 }
-
 // Simple printf-style formatting implementation
 function formatValue(value: any, verb: string, flags = ''): string {
   if (value === null || value === undefined) {
@@ -192,8 +196,9 @@ function defaultFormat(value: any): string {
 function defaultFormatMaybe(value: any): MaybeString {
   if (value === null || value === undefined) return '<nil>'
   if (typeof value === 'boolean') return value ? 'true' : 'false'
-  if (typeof value === 'number') return value.toString()
-  if (typeof value === 'string') return value
+  if (typeof value === 'number' || typeof value === 'bigint') {
+    return value.toString()
+  }
   if (Array.isArray(value))
     return joinMaybe(value.map(defaultFormatMaybe), ' ', '[', ']')
   if (typeof value === 'object') {

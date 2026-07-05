@@ -81,6 +81,28 @@ describe('fmt basic value formatting', () => {
     expect(fmt.Sprintf('%d', -42.9)).toBe('-42')
   })
 
+  it('formats full-width bigint integer values exactly', () => {
+    const value = 7165182398461461145n
+    const exact = '7165182398461461145'
+
+    expect(fmt.Sprintf('%d', value)).toBe(exact)
+    expect(fmt.Sprintf('%v', value)).toBe(exact)
+  })
+
+  it('formats interface-boxed named uint64 bigint values exactly', () => {
+    const value = 7165182398461461145n
+    const exact = '7165182398461461145'
+    const boxed = $.namedValueInterfaceValue<unknown>(
+      value,
+      'uint64',
+      {},
+      { kind: $.TypeKind.Basic, name: 'uint64' },
+    )
+
+    expect(fmt.Sprintf('%d', boxed)).toBe(exact)
+    expect(fmt.Sprintf('%v', boxed)).toBe(exact)
+  })
+
   it('%q quoted string and rune', () => {
     expect(fmt.Sprintf('%q', 'hello')).toBe(JSON.stringify('hello'))
     // rune-like number

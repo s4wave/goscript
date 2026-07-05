@@ -24,11 +24,11 @@ export function combineHighLow(v: bigint, low: bigint): bigint {
 }
 
 export function maxUint64Divisor(d: bigint): bigint {
-	return $.uint64Div(math.MaxUint64, d)
+	return $.uint64Div(18446744073709551615n, d)
 }
 
 export function maxUint64Remainder(d: bigint): bigint {
-	return $.uint64Mod(math.MaxUint64, d)
+	return $.uint64Mod(18446744073709551615n, d)
 }
 
 export function setHighBit(idx: bigint): boolean {
