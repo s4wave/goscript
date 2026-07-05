@@ -108,5 +108,5 @@ export class uint128 {
 }
 
 export function mask6(n: number): uint128 {
-	return $.markAsStructValue(new uint128({hi: $.uint64Xor(($.uint64Shr($.uint64Xor(0n, -1n), n)), -1n), lo: $.uint64Shl($.uint64Xor(0n, -1n), (128 - n))}))
+	return $.markAsStructValue(new uint128({hi: $.uint64Xor(($.uint64Shr(18446744073709551615n, n)), -1n), lo: $.uint64Shl(18446744073709551615n, (128 - n))}))
 }

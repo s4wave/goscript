@@ -129,7 +129,7 @@ export function ParseUint(s: string, base: number, bitSize: number): [bigint, $.
 		}
 		default:
 		{
-			cutoff = $.uint64Add(($.uint64Div(18446744073709551615, $.uint64(base))), 1)
+			cutoff = $.uint64Add(($.uint64Div(18446744073709551615n, $.uint64(base))), 1)
 			break
 		}
 	}

@@ -129,7 +129,7 @@ export class fdMutex {
 					old = $.uint64Sub(old, 8388608n)
 					runtime_Semrelease($.pointerValue<fdMutex>(mu)._fields.rsema)
 				}
-				while (($.uint64And(old, 9223363240761753600)) != 0n) {
+				while (($.uint64And(old, 9223363240761753600n)) != 0n) {
 					old = $.uint64Sub(old, 8796093022208n)
 					runtime_Semrelease($.pointerValue<fdMutex>(mu)._fields.wsema)
 				}

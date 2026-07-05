@@ -708,7 +708,7 @@ export function fmtX(dst: $.Slice<number>, prec: number, fmt: number, neg: boole
 
 	// Shift digits so leading 1 (if any) is at bit 1<<60.
 	mant = $.uint64Shl(mant, $.uint64($.uint($.uint64Sub(60, $.pointerValue<floatInfo>(flt).mantbits), 64)))
-	while ((mant != 0n) && (($.uint64And(mant, (1152921504606846976))) == 0n)) {
+	while ((mant != 0n) && (($.uint64And(mant, 1152921504606846976n)) == 0n)) {
 		mant = $.uint64Shl(mant, 1n)
 		exp--
 	}
@@ -716,13 +716,13 @@ export function fmtX(dst: $.Slice<number>, prec: number, fmt: number, neg: boole
 	// Round if requested.
 	if ((prec >= 0) && (prec < 15)) {
 		let shift = $.uint(prec * 4, 64)
-		let extra = $.uint64And(($.uint64Shl(mant, shift)), (1152921504606846975))
+		let extra = $.uint64And(($.uint64Shl(mant, shift)), 1152921504606846975n)
 		mant = $.uint64Shr(mant, $.uint64($.uint($.uint64Sub(60, shift), 64)))
 		if (($.uint64Or(extra, ($.uint64And(mant, 1)))) > 576460752303423488n) {
 			mant++
 		}
 		mant = $.uint64Shl(mant, $.uint64($.uint($.uint64Sub(60, shift), 64)))
-		if (($.uint64And(mant, (2305843009213693952))) != 0n) {
+		if (($.uint64And(mant, 2305843009213693952n)) != 0n) {
 			// Wrapped around.
 			mant = $.uint64Shr(mant, 1n)
 			exp++
