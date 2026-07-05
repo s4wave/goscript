@@ -2,3 +2,4 @@ clone: true true
 clone-slice: true
 equal: true
 equal-slice-implicit: true
+stringer: "running"

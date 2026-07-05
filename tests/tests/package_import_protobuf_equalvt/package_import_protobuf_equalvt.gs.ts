@@ -4,7 +4,12 @@
 import * as $ from "@goscript/builtin/index.js"
 
 import * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
+
+import * as strings from "@goscript/strings/index.js"
 import "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
+import "@goscript/strings/index.js"
+
+export type state = number
 
 export class msg {
 	public get v(): number {
@@ -83,6 +88,22 @@ export class msg {
 	)
 }
 
+export function state_String(s: state): string {
+	switch (s) {
+		case 1:
+		{
+			return "running"
+			break
+		}
+		default:
+		{
+			return "idle"
+			break
+		}
+	}
+	throw new globalThis.Error("goscript: unreachable return")
+}
+
 export async function main(): globalThis.Promise<void> {
 	let original: msg | $.VarRef<msg> | null = new msg({v: 7})
 	let cloned: msg | $.VarRef<msg> | null = (protobuf_go_lite.CloneVTValue({T: { type: { kind: $.TypeKind.Pointer, elemType: "main.msg" }, zero: () => null }}, original) as msg | $.VarRef<msg> | null)
@@ -92,6 +113,9 @@ export async function main(): globalThis.Promise<void> {
 	$.println("equal-slice-implicit:", protobuf_go_lite.EqualVTSliceImplicit($.arrayToSlice<msg | $.VarRef<msg> | null>([null, original]), $.arrayToSlice<msg | $.VarRef<msg> | null>([new msg(), new msg({v: 7})]), $.functionValue((): msg | $.VarRef<msg> | null => {
 		return new msg()
 	}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Pointer, elemType: "main.msg" }] } as $.FunctionTypeInfo))))
+	let sb: $.VarRef<protobuf_go_lite.TextBuilder> = $.varRef($.markAsStructValue(new strings.Builder()))
+	protobuf_go_lite.TextWriteStringer(sb, $.namedValueInterfaceValue<any>(1, "main.state", {String: (receiver: any, ...args: any[]) => (state_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "int32", typeName: "main.state" }))
+	$.println("stringer:", sb.value.String())
 }
 
 if ($.isMainScript(import.meta)) {

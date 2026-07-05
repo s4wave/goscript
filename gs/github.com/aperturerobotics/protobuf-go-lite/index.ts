@@ -1757,20 +1757,11 @@ export function TextWriteBytes(sb: TextBuilderArg, v: $.Bytes | null): void {
 
 export function TextWriteStringer(
   sb: TextBuilderArg,
-  v: { String(): string } | number | bigint | string | null,
+  v: { String(): string } | null,
 ): void {
   const b = textBuilder(sb)
-  const text =
-    (
-      v != null &&
-      typeof v === 'object' &&
-      'String' in v &&
-      typeof v.String === 'function'
-    ) ?
-      v.String()
-    : String(v)
   b.WriteString('"')
-  b.WriteString(text)
+  b.WriteString(v!.String())
   b.WriteString('"')
 }
 

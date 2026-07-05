@@ -888,10 +888,6 @@ describe('protobuf-go-lite text helpers', () => {
     TextWriteStringer(sb, { String: () => 'ID' })
     expect(sb.String()).toBe('"ID"')
 
-    const nb = new Builder()
-    TextWriteStringer(nb, 7)
-    expect(nb.String()).toBe('"7"')
-
     const mb = new Builder()
     TextWriteTextMarshaler(mb, { MarshalProtoText: () => 'inner {}' })
     expect(mb.String()).toBe('inner {}')

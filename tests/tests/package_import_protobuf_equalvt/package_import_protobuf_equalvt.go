@@ -2,6 +2,17 @@ package main
 
 import protobuf_go_lite "github.com/aperturerobotics/protobuf-go-lite"
 
+type state int32
+
+func (s state) String() string {
+	switch s {
+	case 1:
+		return "running"
+	default:
+		return "idle"
+	}
+}
+
 type msg struct {
 	v int
 }
@@ -46,4 +57,7 @@ func main() {
 	println("clone-slice:", protobuf_go_lite.CloneVTSlice([]*msg{original})[0] != original)
 	println("equal:", protobuf_go_lite.IsEqualVT[*msg](original, &msg{v: 7}))
 	println("equal-slice-implicit:", protobuf_go_lite.EqualVTSliceImplicit([]*msg{nil, original}, []*msg{{}, {v: 7}}, func() *msg { return &msg{} }))
+	var sb protobuf_go_lite.TextBuilder
+	protobuf_go_lite.TextWriteStringer(&sb, state(1))
+	println("stringer:", sb.String())
 }

@@ -8114,6 +8114,9 @@ func (o *LoweringOwner) lowerCallArgs(
 	if args, diagnostics, ok := o.lowerTupleCallArgs(ctx, expr, signature, overrideCall); ok {
 		return args, diagnostics
 	}
+	if overrideCall && isProtobufTextWriteStringerCall(ctx, expr.Fun) {
+		return o.lowerProtobufTextWriteStringerArgs(ctx, expr, signature, allowAsyncOverrideCallback)
+	}
 	if signature != nil && signature.Variadic() && overrideCall && !isBuiltinCallTarget(ctx, expr.Fun) {
 		params := signature.Params()
 		if params == nil || params.Len() == 0 {
@@ -8254,6 +8257,51 @@ func (o *LoweringOwner) tupleTypeForParams(ctx lowerFileContext, params *types.T
 		parts = append(parts, o.tsTypeFor(ctx, v.Type()))
 	}
 	return "[" + strings.Join(parts, ", ") + "]"
+}
+
+func (o *LoweringOwner) lowerProtobufTextWriteStringerArgs(
+	ctx lowerFileContext,
+	expr *ast.CallExpr,
+	signature *types.Signature,
+	allowAsyncOverrideCallback bool,
+) ([]string, []Diagnostic) {
+	var params *types.Tuple
+	if signature != nil {
+		params = signature.Params()
+	}
+	args := make([]string, 0, len(expr.Args))
+	var diagnostics []Diagnostic
+	for idx, arg := range expr.Args {
+		var targetType types.Type
+		if params != nil && idx < params.Len() {
+			targetType = params.At(idx).Type()
+		}
+		if idx == 1 {
+			if sourceSignature := sourceFunctionSignatureForCall(ctx, expr.Fun); sourceSignature != nil && sourceSignature.Params() != nil && sourceSignature.Params().Len() > idx {
+				if constraint := typeParamInterfaceConstraint(sourceSignature.Params().At(idx).Type()); constraint != nil {
+					targetType = constraint
+				}
+			}
+		}
+		lowered, argDiagnostics := o.lowerCallArgExpr(ctx, arg, targetType, allowAsyncOverrideCallback)
+		diagnostics = append(diagnostics, argDiagnostics...)
+		if targetType != nil {
+			lowered = o.lowerCallArgForTarget(ctx, arg, targetType, lowered, true)
+		}
+		args = append(args, lowered)
+	}
+	return args, diagnostics
+}
+
+func isProtobufTextWriteStringerCall(ctx lowerFileContext, fun ast.Expr) bool {
+	if ctx.semPkg == nil || ctx.semPkg.source == nil {
+		return false
+	}
+	fn := calledFunction(ctx.semPkg.source, fun)
+	return fn != nil &&
+		fn.Pkg() != nil &&
+		fn.Pkg().Path() == "github.com/aperturerobotics/protobuf-go-lite" &&
+		fn.Name() == "TextWriteStringer"
 }
 
 func (o *LoweringOwner) lowerFixedCallArgs(
