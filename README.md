@@ -10,9 +10,6 @@
     <a href="https://godoc.org/github.com/s4wave/goscript">
       <img src="https://godoc.org/github.com/s4wave/goscript?status.svg" alt="GoDoc" />
     </a>
-    <a href="https://goreportcard.com/report/github.com/s4wave/goscript">
-      <img src="https://goreportcard.com/badge/github.com/s4wave/goscript" alt="Go Report Card" />
-    </a>
     <a href="https://deepwiki.com/s4wave/goscript">
       <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" />
     </a>
