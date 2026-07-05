@@ -1280,7 +1280,7 @@ export function Clone(b: $.Bytes): $.Bytes {
 	if (b === null) {
 		return null
 	}
-	return new Uint8Array($.bytesToArray(b))
+	return $.bytesToUint8Array(b).slice()
 }
 
 // CutPrefix returns s without the provided leading prefix byte slice

@@ -341,5 +341,11 @@ function isWebCryptoBlock(block: Block): block is WebCryptoBlock {
 }
 
 function appendBytes(dst: $.Bytes, bytes: Uint8Array): $.Bytes {
-  return $.append(dst as any, ...bytes) as $.Bytes
+  if (bytes.length === 0) {
+    return dst
+  }
+  if (dst === null || $.cap(dst) === 0) {
+    return bytes
+  }
+  return $.appendSlice(dst, bytes, $.byteSliceHint)
 }

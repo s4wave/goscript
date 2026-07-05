@@ -75,6 +75,46 @@ describe('crypto/aes WebCrypto override', () => {
     )
   })
 
+  test('GCM Seal and Open append to reusable byte destinations', async () => {
+    const [block, blockErr] = NewCipher(
+      hex('0000000000000000000000000000000000000000000000000000000000000000'),
+    )
+    expect(blockErr).toBeNull()
+    if (block === null) {
+      throw new Error('NewCipher returned nil block')
+    }
+
+    const [aead, aeadErr] = cipher.NewGCM(block)
+    expect(aeadErr).toBeNull()
+    if (aead === null) {
+      throw new Error('NewGCM returned nil AEAD')
+    }
+
+    const nonce = hex('000000000000000000000001')
+    const aad = $.stringToBytes('aad')
+    const plaintext = $.stringToBytes('hello')
+
+    const sealDst = byteSliceWithPrefix('seal:', 64)
+    const sealed = await aead.Seal(sealDst, nonce, plaintext, aad)
+    expect($.cap(sealed)).toBe($.cap(sealDst))
+    expect($.bytesToString($.goSlice(sealed, 0, $.len(sealDst)))).toBe('seal:')
+    expect($.bytesToString(sealDst)).toBe('seal:')
+
+    const ciphertext = $.goSlice(sealed, $.len(sealDst))
+    expect($.len(ciphertext)).toBe($.len(plaintext) + aead.Overhead())
+
+    const openDst = byteSliceWithPrefix('open:', 64)
+    const [opened, openErr] = await aead.Open(openDst, nonce, ciphertext, aad)
+    expect(openErr).toBeNull()
+    if (opened === null) {
+      throw new Error('Open returned nil plaintext')
+    }
+
+    expect($.cap(opened)).toBe($.cap(openDst))
+    expect($.bytesToString(opened)).toBe('open:hello')
+    expect($.bytesToString(openDst)).toBe('open:')
+  })
+
   test('rejects tampered ciphertext', async () => {
     const [block] = NewCipher(
       hex('0000000000000000000000000000000000000000000000000000000000000000'),
@@ -110,6 +150,16 @@ function hex(input: string): Uint8Array {
   for (let idx = 0; idx < out.length; idx++) {
     out[idx] = Number.parseInt(input.slice(idx * 2, idx * 2 + 2), 16)
   }
+  return out
+}
+
+function byteSliceWithPrefix(
+  prefix: string,
+  capacity: number,
+): $.Slice<number> {
+  const prefixBytes = $.stringToBytes(prefix)
+  const out = $.makeSlice<number>(prefixBytes.length, capacity, 'byte')
+  $.bytesToUint8Array(out).set(prefixBytes)
   return out
 }
 
