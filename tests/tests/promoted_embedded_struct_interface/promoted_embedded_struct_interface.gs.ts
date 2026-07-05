@@ -3,6 +3,16 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+export type closer = {
+	Close(): string
+}
+
+$.registerInterfaceType(
+	"main.closer",
+	null,
+	[{ name: "Close", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+);
+
 export class stream {
 	public get name(): string {
 		return this._fields.name.value
@@ -120,16 +130,6 @@ export class pointerStopStream {
 		[{ name: "stream", key: "stream", type: { kind: $.TypeKind.Pointer, elemType: "main.stream" }, anonymous: true }]
 	)
 }
-
-export type closer = {
-	Close(): string
-}
-
-$.registerInterfaceType(
-	"main.closer",
-	null,
-	[{ name: "Close", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
-);
 
 export async function closeIt(c: closer | null): globalThis.Promise<void> {
 	$.println(await $.pointerValue<Exclude<closer, null>>(c).Close())

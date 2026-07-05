@@ -45,6 +45,8 @@ import "./reader.gs.ts"
 import "./register.gs.ts"
 import "./struct.gs.ts"
 
+export type writeBuf = $.Slice<number>
+
 export class Writer {
 	public get cw(): countWriter | $.VarRef<countWriter> | null {
 		return this._fields.cw.value
@@ -1089,8 +1091,6 @@ export async function writeHeader(w: io.Writer | null, h: header | $.VarRef<head
 	let [, err] = await $.pointerValue<Exclude<io.Writer, null>>(w).Write($.pointerValue<__goscript_struct.FileHeader>($.pointerValue<header>(h).FileHeader).Extra)
 	return err
 }
-
-export type writeBuf = $.Slice<number>
 
 export function writeBuf_uint8(b: $.VarRef<writeBuf> | null, v: number): void {
 	($.pointerValue<writeBuf>(b))![0] = $.uint(v, 8)

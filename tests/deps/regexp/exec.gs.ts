@@ -21,6 +21,8 @@ import "./backtrack.gs.ts"
 import "./onepass.gs.ts"
 import "./regexp.gs.ts"
 
+export type lazyFlag = bigint
+
 export class queue {
 	public get sparse(): $.Slice<number> {
 		return this._fields.sparse.value
@@ -697,8 +699,6 @@ export class onePassMachine {
 		[{ name: "inputs", key: "inputs", type: "regexp.inputs" }, { name: "matchcap", key: "matchcap", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } } }]
 	)
 }
-
-export type lazyFlag = bigint
 
 export function newLazyFlag(r1: number, r2: number): lazyFlag {
 	return $.uint64($.uint64Add(($.uint64Mul(r1, (2 ** 32))), $.uint64($.uint(r2, 32))))

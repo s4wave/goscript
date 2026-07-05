@@ -79,6 +79,8 @@ import "./tcpsock_posix.gs.ts"
 import "./udpsock.gs.ts"
 import "./udpsock_posix.gs.ts"
 
+export type addrList = $.Slice<__goscript_net.Addr | null>
+
 export class ipStackCapabilities {
 	public get Once(): sync.Once {
 		return this._fields.Once.value
@@ -247,8 +249,6 @@ export async function supportsIPv4map(): globalThis.Promise<boolean> {
 	await ipStackCaps.value.Once.Do($.functionValue(((__receiver) => () => __receiver.probe())(ipStackCaps.value), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	return ipStackCaps.value.ipv4MappedIPv6Enabled
 }
-
-export type addrList = $.Slice<__goscript_net.Addr | null>
 
 export function isIPv4(addr: __goscript_net.Addr | null): boolean {
 	{

@@ -9,6 +9,8 @@ import * as __goscript_crc32 from "./crc32.gs.ts"
 import "@goscript/internal/byteorder/index.js"
 import "./crc32.gs.ts"
 
+export type slicing8Table = __goscript_crc32.Table[]
+
 export const slicing8Cutoff: number = 16
 
 export function simpleMakeTable(poly: number): $.VarRef<__goscript_crc32.Table> | null {
@@ -39,8 +41,6 @@ export function simpleUpdate(crc: number, tab: $.VarRef<__goscript_crc32.Table> 
 	}
 	return $.uint($.uint(~crc, 32), 32)
 }
-
-export type slicing8Table = __goscript_crc32.Table[]
 
 export function slicingMakeTable(poly: number): $.VarRef<slicing8Table> | null {
 	let t: $.VarRef<slicing8Table> | null = $.varRef<slicing8Table>(Array.from({ length: 8 }, () => Array.from({ length: 256 }, () => 0)))

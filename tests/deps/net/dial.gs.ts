@@ -125,6 +125,10 @@ import "./udpsock_posix.gs.ts"
 import "./unixsock.gs.ts"
 import "./unixsock_posix.gs.ts"
 
+export type mptcpStatusDial = number
+
+export type mptcpStatusListen = number
+
 export class Dialer {
 	// Timeout is the maximum amount of time a dial will wait for
 	// a connect to complete. If Deadline is also set, it may fail
@@ -1617,8 +1621,6 @@ export function __goscript_set_multipathtcp(__goscriptValue: godebug.Setting | $
 	multipathtcp = __goscriptValue
 }
 
-export type mptcpStatusDial = number
-
 export function mptcpStatusDial__get(m: $.VarRef<mptcpStatusDial> | null): boolean {
 	switch ($.pointerValue<mptcpStatusDial>(m)) {
 		case 1:
@@ -1650,8 +1652,6 @@ export function mptcpStatusDial__set(m: $.VarRef<mptcpStatusDial> | null, use: b
 		m!.value = $.uint(2, 8)
 	}
 }
-
-export type mptcpStatusListen = number
 
 export function mptcpStatusListen__get(m: $.VarRef<mptcpStatusListen> | null): boolean {
 	switch ($.pointerValue<mptcpStatusListen>(m)) {

@@ -14,22 +14,22 @@ export class Wrapped {
 		this._fields.Value.value = value
 	}
 
-	public get Hidden(): any {
+	public get Hidden(): dep.hidden {
 		return this._fields.Hidden.value
 	}
-	public set Hidden(value: any) {
+	public set Hidden(value: dep.hidden) {
 		this._fields.Hidden.value = value
 	}
 
 	public _fields: {
 		Value: $.VarRef<string>
-		Hidden: $.VarRef<any>
+		Hidden: $.VarRef<dep.hidden>
 	}
 
-	constructor(init?: Partial<{Value?: string, Hidden?: any}>) {
+	constructor(init?: Partial<{Value?: string, Hidden?: dep.hidden}>) {
 		this._fields = {
 			Value: $.varRef(init?.Value ?? ("" as string)),
-			Hidden: $.varRef(init?.Hidden ?? (undefined as any as any))
+			Hidden: $.varRef(init?.Hidden ? $.markAsStructValue($.cloneStructValue(init.Hidden)) : $.markAsStructValue(new dep.hidden()))
 		}
 	}
 
@@ -37,7 +37,7 @@ export class Wrapped {
 		const cloned = new Wrapped()
 		cloned._fields = {
 			Value: $.varRef(this._fields.Value.value),
-			Hidden: $.varRef(this._fields.Hidden.value)
+			Hidden: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.Hidden.value)))
 		}
 		return $.markAsStructValue(cloned)
 	}

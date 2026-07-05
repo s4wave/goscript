@@ -2896,9 +2896,7 @@ func (o *LoweringOwner) lowerTypeSpec(ctx lowerFileContext, spec *ast.TypeSpec) 
 		typeIndexExport := ""
 		if ctx.topLevel {
 			code = "export " + code
-			if ast.IsExported(obj.Name()) {
-				typeIndexExport = obj.Name()
-			}
+			typeIndexExport = obj.Name()
 		}
 		return loweredDecl{code: code, typeIndexExport: typeIndexExport}, nil
 	}
@@ -2926,9 +2924,7 @@ func (o *LoweringOwner) lowerTypeSpec(ctx lowerFileContext, spec *ast.TypeSpec) 
 	typeIndexExport := ""
 	if ctx.topLevel {
 		code = "export " + code
-		if ast.IsExported(semType.name) {
-			typeIndexExport = typeName
-		}
+		typeIndexExport = typeName
 	}
 	return loweredDecl{code: code, typeIndexExport: typeIndexExport}, nil
 }
@@ -2940,9 +2936,7 @@ func (o *LoweringOwner) lowerInterfaceType(ctx lowerFileContext, semType *semant
 	typeIndexExport := ""
 	if ctx.topLevel {
 		code = "export " + code
-		if ast.IsExported(semType.name) {
-			typeIndexExport = typeName
-		}
+		typeIndexExport = typeName
 	}
 	methodSignatures := o.runtimeMethodSignatures(iface)
 	if ctx.trimTypeInfo {
@@ -3127,8 +3121,14 @@ func (o *LoweringOwner) runtimeMethodAssertReturns(ctx lowerFileContext, tuple *
 
 func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticType) (*loweredStruct, []Diagnostic) {
 	lowered := &loweredStruct{
-		exported:             ctx.topLevel,
-		indexExported:        ctx.topLevel && ast.IsExported(semType.name),
+		exported: ctx.topLevel,
+		// Re-export every top-level named type from the package barrel, not just
+		// Go-exported ones. GoScript emits all types (an unexported type still
+		// becomes `export type`/`export class` in its file module), and a
+		// cross-package caller must be able to spell them: an exported function
+		// can take or return an unexported type, as with variadic functional
+		// options (func New(opts ...option)).
+		indexExported:        ctx.topLevel,
 		protobufPreserveJSON: ctx.protobufTSAdapter && o.protobufTypeScriptAdapterPreserveJSON(ctx, semType, make(map[*types.Named]bool)),
 		name:                 safeIdentifier(semType.name),
 		typeName:             runtimeNamedTypeName(semType.named),
@@ -3137,7 +3137,7 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 	}
 	for idx, field := range semType.fields {
 		structValue := isStructValueType(field.typ)
-		if named := namedStructType(field.typ); named != nil && crossPackageUnexportedNamedType(ctx, named) {
+		if named := namedStructType(field.typ); named != nil && !o.canSpellNamedType(ctx, named) {
 			structValue = false
 		}
 		fieldName := tsStructFieldName(field.name, idx)
@@ -9010,6 +9010,10 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 			return call, diagnostics, true
 		}
 	}
+	// A cross-package unexported receiver keeps a dynamic dispatch: never import
+	// the foreign package's prototype for an unexported type, even though its
+	// barrel re-exports the type name. The imported class identity must not leak
+	// across the package boundary, so dispatch through the runtime value helper.
 	if crossPackageUnexportedNamedType(ctx, receiver) {
 		call := o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) +
 			"<any>(" + receiverExpr + ")." + methodMemberName(selector.Sel.Name) +
@@ -11104,7 +11108,7 @@ func (o *LoweringOwner) lowerZeroValueExpr(typ types.Type) string {
 
 func (o *LoweringOwner) lowerZeroValueExprFor(ctx lowerFileContext, typ types.Type) string {
 	if named := namedStructType(typ); named != nil && isStructValueType(typ) {
-		if crossPackageUnexportedNamedType(ctx, named) {
+		if !o.canSpellNamedType(ctx, named) {
 			return "undefined as any"
 		}
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue) + "(new " + o.namedTypeExpr(ctx, named) + "())"
@@ -11701,10 +11705,7 @@ func (o *LoweringOwner) tsTypeFor(ctx lowerFileContext, typ types.Type) string {
 		return "any"
 	}
 	if named, ok := types.Unalias(typ).(*types.Named); ok {
-		if crossPackageUnexportedNamedType(ctx, named) {
-			return "any"
-		}
-		if !ctx.canReferenceNamedType(named) {
+		if !o.canSpellNamedType(ctx, named) {
 			return "any"
 		}
 		name := o.namedTypeExpr(ctx, named)
@@ -11759,10 +11760,7 @@ func (o *LoweringOwner) tsTypeFor(ctx lowerFileContext, typ types.Type) string {
 			return "any"
 		}
 		if named := namedNonStructType(typed.Elem()); named != nil {
-			if crossPackageUnexportedNamedType(ctx, named) {
-				return "any"
-			}
-			if !ctx.canReferenceNamedType(named) {
+			if !o.canSpellNamedType(ctx, named) {
 				return "any"
 			}
 			if _, ok := named.Underlying().(*types.Interface); ok {
@@ -11774,10 +11772,7 @@ func (o *LoweringOwner) tsTypeFor(ctx lowerFileContext, typ types.Type) string {
 			return "$.VarRef<" + o.namedTypeExpr(ctx, named) + "> | null"
 		}
 		if named := namedStructType(typed.Elem()); named != nil {
-			if crossPackageUnexportedNamedType(ctx, named) {
-				return "any"
-			}
-			if !ctx.canReferenceNamedType(named) {
+			if !o.canSpellNamedType(ctx, named) {
 				return "any"
 			}
 			name := o.namedTypeExpr(ctx, named)
@@ -11813,11 +11808,8 @@ func (o *LoweringOwner) tsNonNilTypeFor(ctx lowerFileContext, typ types.Type) st
 		return "Exclude<$.GoError, null>"
 	}
 	if named, ok := types.Unalias(typ).(*types.Named); ok {
-		if crossPackageUnexportedNamedType(ctx, named) {
-			return "any"
-		}
 		if _, ok := named.Underlying().(*types.Interface); ok {
-			if !ctx.canReferenceNamedType(named) {
+			if !o.canSpellNamedType(ctx, named) {
 				return "any"
 			}
 			return "Exclude<" + o.namedTypeExpr(ctx, named) + ", null>"
@@ -11845,11 +11837,32 @@ func (o *LoweringOwner) aliasTypeExpr(ctx lowerFileContext, alias *types.Alias) 
 	return baseName
 }
 
+// crossPackageUnexportedNamedType reports whether named is an unexported type
+// defined in a different package than ctx's file.
 func crossPackageUnexportedNamedType(ctx lowerFileContext, named *types.Named) bool {
 	if named == nil || named.Obj() == nil || named.Obj().Pkg() == nil || ctx.semPkg == nil {
 		return false
 	}
 	return named.Obj().Pkg().Path() != ctx.semPkg.pkgPath && !ast.IsExported(named.Obj().Name())
+}
+
+// canSpellNamedType reports whether named can be written by name in the
+// generated TypeScript for ctx's file. It combines import visibility with the
+// barrel-export rule: a generated package barrel re-exports every named type, so
+// even an unexported type is spellable through it, but a hand-written override
+// package barrel exports only the Go-exported API, so an unexported type from an
+// override package stays unspellable and must lower to any.
+func (o *LoweringOwner) canSpellNamedType(ctx lowerFileContext, named *types.Named) bool {
+	if !ctx.canReferenceNamedType(named) {
+		return false
+	}
+	if named == nil || named.Obj() == nil {
+		return true
+	}
+	if !ast.IsExported(named.Obj().Name()) && o.typeUsesOverride(named) {
+		return false
+	}
+	return true
 }
 
 func tsArrayType(elem string) string {

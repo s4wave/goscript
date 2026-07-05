@@ -3,6 +3,16 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+export type dumper = {
+	Dump(): string
+}
+
+$.registerInterfaceType(
+	"main.dumper",
+	null,
+	[{ name: "Dump", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+);
+
 export class item {
 	public _fields: {
 	}
@@ -31,16 +41,6 @@ export class item {
 		[]
 	)
 }
-
-export type dumper = {
-	Dump(): string
-}
-
-$.registerInterfaceType(
-	"main.dumper",
-	null,
-	[{ name: "Dump", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
-);
 
 export async function use(v: any): globalThis.Promise<string> {
 	let __goscriptTuple0: any = $.typeAssertTuple<dumper | null>(v, "main.dumper")

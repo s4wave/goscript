@@ -40,6 +40,8 @@ $.registerInterfaceType(
 	[{ name: "HasService", args: [{ name: "serviceID", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "HasServiceMethod", args: [{ name: "serviceID", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "methodID", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "InvokeMethod", args: [{ name: "serviceID", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "methodID", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "strm", type: "srpc.Stream" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "_r1", type: "error" }] }, { name: "Register", args: [{ name: "handler", type: "srpc.Handler" }], returns: [{ name: "_r0", type: "error" }] }]
 );
 
+export type muxMethods = globalThis.Map<string, __goscript_handler.Handler | null> | null
+
 export class mux {
 	// fallback is the list of fallback invokers
 	// if the mux doesn't match the service, calls the invokers.
@@ -196,8 +198,6 @@ export class mux {
 		[{ name: "fallback", key: "fallback", type: { kind: $.TypeKind.Slice, elemType: "srpc.Invoker" }, pkgPath: "github.com/aperturerobotics/starpc/srpc", index: [0], offset: 0, exported: false }, { name: "rmtx", key: "rmtx", type: "sync.RWMutex", pkgPath: "github.com/aperturerobotics/starpc/srpc", index: [1], offset: 24, exported: false }, { name: "services", key: "services", type: { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: "srpc.muxMethods" }, pkgPath: "github.com/aperturerobotics/starpc/srpc", index: [2], offset: 48, exported: false }]
 	)
 }
-
-export type muxMethods = globalThis.Map<string, __goscript_handler.Handler | null> | null
 
 export function NewMux(fallbackInvokers: $.Slice<__goscript_invoker.Invoker | null>): Mux | null {
 	return $.interfaceValue<Mux | null>(new mux({fallback: fallbackInvokers, services: $.makeMap<string, muxMethods>()}), "*srpc.mux")

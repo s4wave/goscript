@@ -131,9 +131,39 @@ $.registerInterfaceType(
 	[{ name: "Error", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Temporary", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Timeout", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }]
 );
 
+export type timeout = {
+	Timeout(): boolean | globalThis.Promise<boolean>
+}
+
+$.registerInterfaceType(
+	"net.timeout",
+	null,
+	[{ name: "Timeout", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }]
+);
+
+export type temporary = {
+	Temporary(): boolean | globalThis.Promise<boolean>
+}
+
+$.registerInterfaceType(
+	"net.temporary",
+	null,
+	[{ name: "Temporary", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }]
+);
+
 export type UnknownNetworkError = string
 
 export type InvalidAddrError = string
+
+export type buffersWriter = {
+	writeBuffers(_p0: $.VarRef<Buffers> | null): [bigint, $.GoError]
+}
+
+$.registerInterfaceType(
+	"net.buffersWriter",
+	null,
+	[{ name: "writeBuffers", args: [{ name: "_p0", type: { kind: $.TypeKind.Pointer, elemType: "net.Buffers" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int64" } }, { name: "_r1", type: "error" }] }]
+);
 
 export type Buffers = $.Slice<$.Slice<number>>
 
@@ -1375,26 +1405,6 @@ export function __goscript_set_noCancel(__goscriptValue: $.Channel<{}> | null): 
 	noCancel = __goscriptValue
 }
 
-export type timeout = {
-	Timeout(): boolean | globalThis.Promise<boolean>
-}
-
-$.registerInterfaceType(
-	"net.timeout",
-	null,
-	[{ name: "Timeout", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }]
-);
-
-export type temporary = {
-	Temporary(): boolean | globalThis.Promise<boolean>
-}
-
-$.registerInterfaceType(
-	"net.temporary",
-	null,
-	[{ name: "Temporary", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }]
-);
-
 export function UnknownNetworkError_Error(e: UnknownNetworkError): string {
 	return "unknown network " + e
 }
@@ -1463,9 +1473,9 @@ export async function newDNSError(err: $.GoError, name: string, server: string):
 	return (() => { const __goscriptLiteralField0 = $.pointerValue<Exclude<$.GoError, null>>(err).Error(); return new DNSError({UnwrapErr: unwrapErr, Err: __goscriptLiteralField0, Name: name, Server: server, IsTimeout: isTimeout, IsTemporary: isTemporary, IsNotFound: isNotFound}) })()
 }
 
-export let errClosed: any = $.markAsStructValue($.cloneStructValue($.pointerValue<any>(poll.ErrNetClosing)))
+export let errClosed: poll.errNetClosing = $.markAsStructValue($.cloneStructValue($.pointerValue<poll.errNetClosing>(poll.ErrNetClosing)))
 
-export function __goscript_set_errClosed(__goscriptValue: any): void {
+export function __goscript_set_errClosed(__goscriptValue: poll.errNetClosing): void {
 	errClosed = __goscriptValue
 }
 
@@ -1534,16 +1544,6 @@ export async function acquireThread(ctx: context.Context | null): globalThis.Pro
 export async function releaseThread(): globalThis.Promise<void> {
 	await $.chanRecv(threadLimit)
 }
-
-export type buffersWriter = {
-	writeBuffers(_p0: $.VarRef<Buffers> | null): [bigint, $.GoError]
-}
-
-$.registerInterfaceType(
-	"net.buffersWriter",
-	null,
-	[{ name: "writeBuffers", args: [{ name: "_p0", type: { kind: $.TypeKind.Pointer, elemType: "net.Buffers" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int64" } }, { name: "_r1", type: "error" }] }]
-);
 
 export async function Buffers_WriteTo(v: $.VarRef<Buffers> | null, w: io.Writer | null): globalThis.Promise<[bigint, $.GoError]> {
 	let n: bigint = 0n

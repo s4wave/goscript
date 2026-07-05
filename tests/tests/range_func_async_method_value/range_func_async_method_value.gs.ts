@@ -3,6 +3,16 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+export type provider = {
+	Items(): $.Slice<Group | $.VarRef<Group> | null>
+}
+
+$.registerInterfaceType(
+	"main.provider",
+	null,
+	[{ name: "Items", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.Group" } } }] }]
+);
+
 export class listProvider {
 	public get items(): $.Slice<Group | $.VarRef<Group> | null> {
 		return this._fields.items.value
@@ -111,16 +121,6 @@ export class Group {
 		[{ name: "provider", key: "provider", type: "main.provider" }, { name: "seen", key: "seen", type: { kind: $.TypeKind.Basic, name: "bool" } }]
 	)
 }
-
-export type provider = {
-	Items(): $.Slice<Group | $.VarRef<Group> | null>
-}
-
-$.registerInterfaceType(
-	"main.provider",
-	null,
-	[{ name: "Items", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.Group" } } }] }]
-);
 
 export async function main(): globalThis.Promise<void> {
 	let child: Group | $.VarRef<Group> | null = new Group()

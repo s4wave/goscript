@@ -3,6 +3,16 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+export type clonable = {
+	CloneVT(): any
+}
+
+$.registerInterfaceType(
+	"main.clonable",
+	null,
+	[{ name: "CloneVT", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }]
+);
+
 export class item {
 	public get value(): string {
 		return this._fields.value.value
@@ -45,16 +55,6 @@ export class item {
 		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "string" } }]
 	)
 }
-
-export type clonable = {
-	CloneVT(): any
-}
-
-$.registerInterfaceType(
-	"main.clonable",
-	null,
-	[{ name: "CloneVT", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }]
-);
 
 export async function cloneSlice<T>(__typeArgs: $.GenericTypeArgs | undefined, items: $.Slice<T>): globalThis.Promise<$.Slice<T>> {
 	let cloned: $.Slice<T> = $.makeSlice<T>(0, $.len(items))

@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+export type token = number
+
 export const lengthShift: number = 22
 
 export const offsetMask: number = 4194303
@@ -24,8 +26,6 @@ export let offsetCodes: number[] = [$.uint(0, 32), $.uint(1, 32), $.uint(2, 32),
 export function __goscript_set_offsetCodes(__goscriptValue: number[]): void {
 	offsetCodes = __goscriptValue
 }
-
-export type token = number
 
 export function literalToken(literal: number): token {
 	return $.uint($.uint(0 + literal, 32), 32)

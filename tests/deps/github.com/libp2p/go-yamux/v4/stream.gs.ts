@@ -50,6 +50,10 @@ import "./ping.gs.ts"
 import "./session.gs.ts"
 import "./util.gs.ts"
 
+export type streamState = number
+
+export type halfStreamState = number
+
 export class Stream {
 	public get sendWindow(): number {
 		return this._fields.sendWindow.value
@@ -816,10 +820,6 @@ export const halfOpen: halfStreamState = 0
 export const halfClosed: halfStreamState = 1
 
 export const halfReset: halfStreamState = 2
-
-export type streamState = number
-
-export type halfStreamState = number
 
 export function newStream(session: __goscript_session.Session | $.VarRef<__goscript_session.Session> | null, id: number, state: streamState, initialWindow: number, memorySpan: __goscript_session.MemoryManager | null): Stream | $.VarRef<Stream> | null {
 	let s: Stream | $.VarRef<Stream> | null = (() => { const __goscriptLiteralField0 = $.markAsStructValue($.cloneStructValue(__goscript_deadline.makePipeDeadline())); const __goscriptLiteralField1 = $.markAsStructValue($.cloneStructValue(__goscript_deadline.makePipeDeadline())); const __goscriptLiteralField2 = $.markAsStructValue($.cloneStructValue(__goscript_util.newSegmentedBuffer($.uint(initialWindow, 32)))); const __goscriptLiteralField3 = $.markAsStructValue($.cloneStructValue(time.Now())); return new Stream({id: $.uint(id, 32), session: session, state: state, sendWindow: $.uint(262144, 32), readDeadline: __goscriptLiteralField0, writeDeadline: __goscriptLiteralField1, memorySpan: memorySpan, recvBuf: __goscriptLiteralField2, recvWindow: $.uint($.pointerValue<__goscript_mux.Config>($.pointerValue<__goscript_session.Session>(session).config).InitialStreamWindowSize, 32), epochStart: __goscriptLiteralField3, recvNotifyCh: $.makeChannel<{}>(1, {}, "both"), sendNotifyCh: $.makeChannel<{}>(1, {}, "both")}) })()

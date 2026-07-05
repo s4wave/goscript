@@ -9,6 +9,16 @@ import * as sync from "@goscript/sync/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/sync/index.js"
 
+export type scanner = {
+	Scan(_p0: ((_p0: number) => $.GoError | globalThis.Promise<$.GoError>) | null): $.GoError | globalThis.Promise<$.GoError>
+}
+
+$.registerInterfaceType(
+	"main.scanner",
+	null,
+	[{ name: "Scan", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }]
+);
+
 export class listScanner {
 	public _fields: {
 	}
@@ -37,16 +47,6 @@ export class listScanner {
 		[]
 	)
 }
-
-export type scanner = {
-	Scan(_p0: ((_p0: number) => $.GoError | globalThis.Promise<$.GoError>) | null): $.GoError | globalThis.Promise<$.GoError>
-}
-
-$.registerInterfaceType(
-	"main.scanner",
-	null,
-	[{ name: "Scan", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }]
-);
 
 export async function run(s: scanner | null): globalThis.Promise<$.GoError> {
 	return $.pointerValue<Exclude<scanner, null>>(s).Scan($.functionValue((v: number): $.GoError => {

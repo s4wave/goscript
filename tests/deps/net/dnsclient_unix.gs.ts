@@ -94,6 +94,8 @@ import "./lookup.gs.ts"
 import "./net.gs.ts"
 import "./parse.gs.ts"
 
+export type hostLookupOrder = number
+
 export class resolverConfig {
 	public get initOnce(): sync.Once {
 		return this._fields.initOnce.value
@@ -578,8 +580,6 @@ export function avoidDNS(name: string): boolean {
 	name = stringslite.TrimSuffix(name, ".")
 	return __goscript_parse.stringsHasSuffixFold(name, ".onion")
 }
-
-export type hostLookupOrder = number
 
 export let lookupOrderName: globalThis.Map<hostLookupOrder, string> | null = new globalThis.Map<hostLookupOrder, string>([[0, "cgo"], [1, "files,dns"], [2, "dns,files"], [3, "files"], [4, "dns"]])
 

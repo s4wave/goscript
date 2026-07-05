@@ -3,11 +3,11 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+export type blockType = number
+
 export const blockTypeRaw: blockType = 0
 
 export const blockTypeRLE: blockType = 1
-
-export type blockType = number
 
 export async function main(): globalThis.Promise<void> {
 	let __goscriptShadow0 = $.uint(1, 8)

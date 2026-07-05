@@ -3,6 +3,16 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+export type reader = {
+	Read(): number
+}
+
+$.registerInterfaceType(
+	"main.reader",
+	null,
+	[{ name: "Read", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }]
+);
+
 export class concrete {
 	public _fields: {
 	}
@@ -31,16 +41,6 @@ export class concrete {
 		[]
 	)
 }
-
-export type reader = {
-	Read(): number
-}
-
-$.registerInterfaceType(
-	"main.reader",
-	null,
-	[{ name: "Read", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }]
-);
 
 export function makeReader(): [concrete | $.VarRef<concrete> | null, $.GoError] {
 	return [new concrete(), null]

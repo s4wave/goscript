@@ -33,6 +33,16 @@ import "@goscript/github.com/aperturerobotics/protobuf-go-lite/json/index.js"
 import "./errors.gs.ts"
 import "./packet.gs.ts"
 
+export type isPacket_Body = {
+	isPacket_Body(): void
+}
+
+$.registerInterfaceType(
+	"srpc.isPacket_Body",
+	null,
+	[{ name: "isPacket_Body", args: [], returns: [] }]
+);
+
 export class Packet {
 	public get unknownFields(): $.Slice<number> {
 		return this._fields.unknownFields.value
@@ -2126,13 +2136,3 @@ export class CallData {
 		[{ name: "unknownFields", key: "unknownFields", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, pkgPath: "github.com/aperturerobotics/starpc/srpc", index: [0], offset: 0, exported: false }, { name: "Data", key: "Data", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, tag: "protobuf:\"bytes,1,opt,name=data,proto3\" json:\"data,omitempty\"", index: [1], offset: 24, exported: true }, { name: "DataIsZero", key: "DataIsZero", type: { kind: $.TypeKind.Basic, name: "bool" }, tag: "protobuf:\"varint,2,opt,name=data_is_zero,json=dataIsZero,proto3\" json:\"dataIsZero,omitempty\"", index: [2], offset: 48, exported: true }, { name: "Complete", key: "Complete", type: { kind: $.TypeKind.Basic, name: "bool" }, tag: "protobuf:\"varint,3,opt,name=complete,proto3\" json:\"complete,omitempty\"", index: [3], offset: 49, exported: true }, { name: "Error", key: "Error", type: { kind: $.TypeKind.Basic, name: "string" }, tag: "protobuf:\"bytes,4,opt,name=error,proto3\" json:\"error,omitempty\"", index: [4], offset: 56, exported: true }]
 	)
 }
-
-export type isPacket_Body = {
-	isPacket_Body(): void
-}
-
-$.registerInterfaceType(
-	"srpc.isPacket_Body",
-	null,
-	[{ name: "isPacket_Body", args: [], returns: [] }]
-);

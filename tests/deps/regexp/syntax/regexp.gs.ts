@@ -26,6 +26,8 @@ import "./simplify.gs.ts"
 
 export type Op = number
 
+export type printFlags = number
+
 export class Regexp {
 	public get Op(): Op {
 		return this._fields.Op.value
@@ -418,8 +420,6 @@ export const flagPrec: printFlags = 16
 export const negShift: number = 5
 
 export const meta: string = "\\.+*?()|[]{}^$"
-
-export type printFlags = number
 
 export function addSpan(start: Regexp | $.VarRef<Regexp> | null, last: Regexp | $.VarRef<Regexp> | null, f: printFlags, flags: $.VarRef<globalThis.Map<Regexp | $.VarRef<Regexp> | null, printFlags> | null> | null): void {
 	if ($.pointerValue<globalThis.Map<Regexp | $.VarRef<Regexp> | null, printFlags> | null>(flags) == null) {

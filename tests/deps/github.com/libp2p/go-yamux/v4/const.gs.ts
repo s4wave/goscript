@@ -9,6 +9,8 @@ import * as fmt from "@goscript/fmt/index.js"
 import "@goscript/encoding/binary/index.js"
 import "@goscript/fmt/index.js"
 
+export type header = Uint8Array
+
 export class Error {
 	public get msg(): string {
 		return this._fields.msg.value
@@ -196,8 +198,6 @@ export let ErrKeepAliveTimeout: Error | $.VarRef<Error> | null = new Error({msg:
 export function __goscript_set_ErrKeepAliveTimeout(__goscriptValue: Error | $.VarRef<Error> | null): void {
 	ErrKeepAliveTimeout = __goscriptValue
 }
-
-export type header = Uint8Array
 
 export function header_Version(h: header): number {
 	return $.uint($.arrayIndex(h, 0), 8)

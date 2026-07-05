@@ -107,10 +107,10 @@ export class yamuxConn {
 		this._fields.pingID.value = value
 	}
 
-	public get activePing(): any {
+	public get activePing(): yamux2.ping | $.VarRef<yamux2.ping> | null {
 		return this._fields.activePing.value
 	}
-	public set activePing(value: any) {
+	public set activePing(value: yamux2.ping | $.VarRef<yamux2.ping> | null) {
 		this._fields.activePing.value = value
 	}
 
@@ -259,7 +259,7 @@ export class yamuxConn {
 		newMemoryManager: $.VarRef<(() => [yamux2.MemoryManager | null, $.GoError] | globalThis.Promise<[yamux2.MemoryManager | null, $.GoError]>) | null>
 		pingLock: $.VarRef<sync.Mutex>
 		pingID: $.VarRef<number>
-		activePing: $.VarRef<any>
+		activePing: $.VarRef<yamux2.ping | $.VarRef<yamux2.ping> | null>
 		numIncomingStreams: $.VarRef<number>
 		streams: $.VarRef<globalThis.Map<number, yamux2.Stream | $.VarRef<yamux2.Stream> | null> | null>
 		inflight: $.VarRef<globalThis.Map<number, {}> | null>
@@ -281,7 +281,7 @@ export class yamuxConn {
 		keepaliveActive: $.VarRef<boolean>
 	}
 
-	constructor(init?: Partial<{rtt?: bigint, remoteGoAway?: number, localGoAway?: number, nextStreamID?: number, config?: yamux2.Config | $.VarRef<yamux2.Config> | null, logger?: log.Logger | $.VarRef<log.Logger> | null, conn?: net.Conn | null, reader?: io.Reader | null, newMemoryManager?: (() => [yamux2.MemoryManager | null, $.GoError] | globalThis.Promise<[yamux2.MemoryManager | null, $.GoError]>) | null, pingLock?: sync.Mutex, pingID?: number, activePing?: any, numIncomingStreams?: number, streams?: globalThis.Map<number, yamux2.Stream | $.VarRef<yamux2.Stream> | null> | null, inflight?: globalThis.Map<number, {}> | null, streamLock?: sync.Mutex, synCh?: $.Channel<{}> | null, acceptCh?: $.Channel<yamux2.Stream | $.VarRef<yamux2.Stream> | null> | null, sendCh?: $.Channel<$.Slice<number>> | null, pongCh?: $.Channel<number> | null, pingCh?: $.Channel<number> | null, recvDoneCh?: $.Channel<{}> | null, sendDoneCh?: $.Channel<{}> | null, client?: boolean, shutdown?: boolean, shutdownErr?: $.GoError, shutdownCh?: $.Channel<{}> | null, shutdownLock?: sync.Mutex, keepaliveLock?: sync.Mutex, keepaliveTimer?: time.Timer | $.VarRef<time.Timer> | null, keepaliveActive?: boolean}>) {
+	constructor(init?: Partial<{rtt?: bigint, remoteGoAway?: number, localGoAway?: number, nextStreamID?: number, config?: yamux2.Config | $.VarRef<yamux2.Config> | null, logger?: log.Logger | $.VarRef<log.Logger> | null, conn?: net.Conn | null, reader?: io.Reader | null, newMemoryManager?: (() => [yamux2.MemoryManager | null, $.GoError] | globalThis.Promise<[yamux2.MemoryManager | null, $.GoError]>) | null, pingLock?: sync.Mutex, pingID?: number, activePing?: yamux2.ping | $.VarRef<yamux2.ping> | null, numIncomingStreams?: number, streams?: globalThis.Map<number, yamux2.Stream | $.VarRef<yamux2.Stream> | null> | null, inflight?: globalThis.Map<number, {}> | null, streamLock?: sync.Mutex, synCh?: $.Channel<{}> | null, acceptCh?: $.Channel<yamux2.Stream | $.VarRef<yamux2.Stream> | null> | null, sendCh?: $.Channel<$.Slice<number>> | null, pongCh?: $.Channel<number> | null, pingCh?: $.Channel<number> | null, recvDoneCh?: $.Channel<{}> | null, sendDoneCh?: $.Channel<{}> | null, client?: boolean, shutdown?: boolean, shutdownErr?: $.GoError, shutdownCh?: $.Channel<{}> | null, shutdownLock?: sync.Mutex, keepaliveLock?: sync.Mutex, keepaliveTimer?: time.Timer | $.VarRef<time.Timer> | null, keepaliveActive?: boolean}>) {
 		this._fields = {
 			rtt: $.varRef(init?.rtt ?? (0n as bigint)),
 			remoteGoAway: $.varRef(init?.remoteGoAway ?? (0 as number)),
@@ -294,7 +294,7 @@ export class yamuxConn {
 			newMemoryManager: $.varRef(init?.newMemoryManager ?? (null as (() => [yamux2.MemoryManager | null, $.GoError] | globalThis.Promise<[yamux2.MemoryManager | null, $.GoError]>) | null)),
 			pingLock: $.varRef(init?.pingLock ? $.markAsStructValue($.cloneStructValue(init.pingLock)) : $.markAsStructValue(new sync.Mutex())),
 			pingID: $.varRef(init?.pingID ?? (0 as number)),
-			activePing: $.varRef(init?.activePing ?? (null as any)),
+			activePing: $.varRef(init?.activePing ?? (null as yamux2.ping | $.VarRef<yamux2.ping> | null)),
 			numIncomingStreams: $.varRef(init?.numIncomingStreams ?? (0 as number)),
 			streams: $.varRef(init?.streams ?? (null as globalThis.Map<number, yamux2.Stream | $.VarRef<yamux2.Stream> | null> | null)),
 			inflight: $.varRef(init?.inflight ?? (null as globalThis.Map<number, {}> | null)),

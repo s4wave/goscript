@@ -15,6 +15,10 @@ import "@goscript/math/bits/index.js"
 import "@goscript/sort/index.js"
 import "./inflate.gs.ts"
 
+export type byLiteral = $.Slice<literalNode>
+
+export type byFreq = $.Slice<literalNode>
+
 export class hcode {
 	public get code(): number {
 		return this._fields.code.value
@@ -539,8 +543,6 @@ export function __goscript_set_fixedOffsetEncoding(__goscriptValue: huffmanEncod
 	fixedOffsetEncoding = __goscriptValue
 }
 
-export type byLiteral = $.Slice<literalNode>
-
 export async function byLiteral_sort(s: $.VarRef<byLiteral> | null, a: $.Slice<literalNode>): globalThis.Promise<void> {
 	s!.value = ((a as byLiteral) as byLiteral)
 	await sort2.Sort($.pointerValueOrNil($.namedValueInterfaceValue<sort2.Interface | null>(s, "*flate.byLiteral", {Len: (receiver: any, ...args: any[]) => (byLiteral_Len as any)($.pointerValue(receiver), ...args), Less: (receiver: any, ...args: any[]) => (byLiteral_Less as any)($.pointerValue(receiver), ...args), Swap: (receiver: any, ...args: any[]) => (byLiteral_Swap as any)($.pointerValue(receiver), ...args), sort: (receiver: any, ...args: any[]) => (byLiteral_sort as any)(receiver, ...args)}, { kind: $.TypeKind.Pointer, elemType: "flate.byLiteral" }))!)
@@ -560,8 +562,6 @@ export function byLiteral_Swap(s: byLiteral, i: number, j: number): void {
 	s![i] = __goscriptAssign0_0
 	s![j] = __goscriptAssign0_1
 }
-
-export type byFreq = $.Slice<literalNode>
 
 export async function byFreq_sort(s: $.VarRef<byFreq> | null, a: $.Slice<literalNode>): globalThis.Promise<void> {
 	s!.value = ((a as byFreq) as byFreq)

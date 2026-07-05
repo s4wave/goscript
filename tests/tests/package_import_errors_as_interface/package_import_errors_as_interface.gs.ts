@@ -6,6 +6,17 @@ import * as $ from "@goscript/builtin/index.js"
 import * as errors from "@goscript/errors/index.js"
 import "@goscript/errors/index.js"
 
+export type healthError = {
+	Error(): string
+	Health(): string
+}
+
+$.registerInterfaceType(
+	"main.healthError",
+	null,
+	[{ name: "Error", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Health", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+);
+
 export class wrappedHealthError {
 	public get err(): $.GoError {
 		return this._fields.err.value
@@ -55,17 +66,6 @@ export class wrappedHealthError {
 		[{ name: "err", key: "err", type: "error" }]
 	)
 }
-
-export type healthError = {
-	Error(): string
-	Health(): string
-}
-
-$.registerInterfaceType(
-	"main.healthError",
-	null,
-	[{ name: "Error", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Health", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
-);
 
 export async function main(): globalThis.Promise<void> {
 	let err: wrappedHealthError | $.VarRef<wrappedHealthError> | null = (() => { const __goscriptLiteralField0 = errors.New("root"); return new wrappedHealthError({err: __goscriptLiteralField0}) })()

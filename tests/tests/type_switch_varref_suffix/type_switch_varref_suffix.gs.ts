@@ -3,6 +3,16 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+export type node = {
+	value(): number
+}
+
+$.registerInterfaceType(
+	"main.node",
+	null,
+	[{ name: "value", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }]
+);
+
 export class branch {
 	public get n(): number {
 		return this._fields.n.value
@@ -42,16 +52,6 @@ export class branch {
 		[{ name: "n", key: "n", type: { kind: $.TypeKind.Basic, name: "int" } }]
 	)
 }
-
-export type node = {
-	value(): number
-}
-
-$.registerInterfaceType(
-	"main.node",
-	null,
-	[{ name: "value", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }]
-);
 
 export function accept(b: branch | $.VarRef<branch> | null): number {
 	return $.pointerValue<branch>(b).n

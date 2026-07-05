@@ -9,6 +9,8 @@ import * as sort2 from "@goscript/sort/index.js"
 import "@goscript/slices/index.js"
 import "@goscript/sort/index.js"
 
+export type byFreq = $.Slice<number>
+
 export class descending {
 	public get values(): $.Slice<number> {
 		return this._fields.values.value
@@ -61,8 +63,6 @@ export class descending {
 		[{ name: "values", key: "values", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } } }]
 	)
 }
-
-export type byFreq = $.Slice<number>
 
 export async function byFreq_sort(s: $.VarRef<byFreq> | null, a: $.Slice<number>): globalThis.Promise<void> {
 	s!.value = ((a as byFreq) as byFreq)

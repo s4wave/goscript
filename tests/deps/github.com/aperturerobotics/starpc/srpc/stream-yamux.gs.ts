@@ -65,24 +65,24 @@ export class yamuxStream {
 		this._fields.epochStart.value = value
 	}
 
-	public get state(): any {
+	public get state(): yamux2.streamState {
 		return this._fields.state.value
 	}
-	public set state(value: any) {
+	public set state(value: yamux2.streamState) {
 		this._fields.state.value = value
 	}
 
-	public get writeState(): any {
+	public get writeState(): yamux2.halfStreamState {
 		return this._fields.writeState.value
 	}
-	public set writeState(value: any) {
+	public set writeState(value: yamux2.halfStreamState) {
 		this._fields.writeState.value = value
 	}
 
-	public get readState(): any {
+	public get readState(): yamux2.halfStreamState {
 		return this._fields.readState.value
 	}
-	public set readState(value: any) {
+	public set readState(value: yamux2.halfStreamState) {
 		this._fields.readState.value = value
 	}
 
@@ -93,10 +93,10 @@ export class yamuxStream {
 		this._fields.stateLock.value = value
 	}
 
-	public get recvBuf(): any {
+	public get recvBuf(): yamux2.segmentedBuffer {
 		return this._fields.recvBuf.value
 	}
-	public set recvBuf(value: any) {
+	public set recvBuf(value: yamux2.segmentedBuffer) {
 		this._fields.recvBuf.value = value
 	}
 
@@ -114,17 +114,17 @@ export class yamuxStream {
 		this._fields.sendNotifyCh.value = value
 	}
 
-	public get readDeadline(): any {
+	public get readDeadline(): yamux2.pipeDeadline {
 		return this._fields.readDeadline.value
 	}
-	public set readDeadline(value: any) {
+	public set readDeadline(value: yamux2.pipeDeadline) {
 		this._fields.readDeadline.value = value
 	}
 
-	public get writeDeadline(): any {
+	public get writeDeadline(): yamux2.pipeDeadline {
 		return this._fields.writeDeadline.value
 	}
-	public set writeDeadline(value: any) {
+	public set writeDeadline(value: yamux2.pipeDeadline) {
 		this._fields.writeDeadline.value = value
 	}
 
@@ -135,18 +135,18 @@ export class yamuxStream {
 		session: $.VarRef<yamux2.Session | $.VarRef<yamux2.Session> | null>
 		recvWindow: $.VarRef<number>
 		epochStart: $.VarRef<time.Time>
-		state: $.VarRef<any>
-		writeState: $.VarRef<any>
-		readState: $.VarRef<any>
+		state: $.VarRef<yamux2.streamState>
+		writeState: $.VarRef<yamux2.halfStreamState>
+		readState: $.VarRef<yamux2.halfStreamState>
 		stateLock: $.VarRef<sync.Mutex>
-		recvBuf: $.VarRef<any>
+		recvBuf: $.VarRef<yamux2.segmentedBuffer>
 		recvNotifyCh: $.VarRef<$.Channel<{}> | null>
 		sendNotifyCh: $.VarRef<$.Channel<{}> | null>
-		readDeadline: $.VarRef<any>
-		writeDeadline: $.VarRef<any>
+		readDeadline: $.VarRef<yamux2.pipeDeadline>
+		writeDeadline: $.VarRef<yamux2.pipeDeadline>
 	}
 
-	constructor(init?: Partial<{sendWindow?: number, memorySpan?: yamux2.MemoryManager | null, id?: number, session?: yamux2.Session | $.VarRef<yamux2.Session> | null, recvWindow?: number, epochStart?: time.Time, state?: any, writeState?: any, readState?: any, stateLock?: sync.Mutex, recvBuf?: any, recvNotifyCh?: $.Channel<{}> | null, sendNotifyCh?: $.Channel<{}> | null, readDeadline?: any, writeDeadline?: any}>) {
+	constructor(init?: Partial<{sendWindow?: number, memorySpan?: yamux2.MemoryManager | null, id?: number, session?: yamux2.Session | $.VarRef<yamux2.Session> | null, recvWindow?: number, epochStart?: time.Time, state?: yamux2.streamState, writeState?: yamux2.halfStreamState, readState?: yamux2.halfStreamState, stateLock?: sync.Mutex, recvBuf?: yamux2.segmentedBuffer, recvNotifyCh?: $.Channel<{}> | null, sendNotifyCh?: $.Channel<{}> | null, readDeadline?: yamux2.pipeDeadline, writeDeadline?: yamux2.pipeDeadline}>) {
 		this._fields = {
 			sendWindow: $.varRef(init?.sendWindow ?? (0 as number)),
 			memorySpan: $.varRef(init?.memorySpan ?? (null as yamux2.MemoryManager | null)),
@@ -154,15 +154,15 @@ export class yamuxStream {
 			session: $.varRef(init?.session ?? (null as yamux2.Session | $.VarRef<yamux2.Session> | null)),
 			recvWindow: $.varRef(init?.recvWindow ?? (0 as number)),
 			epochStart: $.varRef(init?.epochStart ? $.markAsStructValue($.cloneStructValue(init.epochStart)) : $.markAsStructValue(new time.Time())),
-			state: $.varRef(init?.state ?? (0 as any)),
-			writeState: $.varRef(init?.writeState ?? (0 as any)),
-			readState: $.varRef(init?.readState ?? (0 as any)),
+			state: $.varRef(init?.state ?? (0 as yamux2.streamState)),
+			writeState: $.varRef(init?.writeState ?? (0 as yamux2.halfStreamState)),
+			readState: $.varRef(init?.readState ?? (0 as yamux2.halfStreamState)),
 			stateLock: $.varRef(init?.stateLock ? $.markAsStructValue($.cloneStructValue(init.stateLock)) : $.markAsStructValue(new sync.Mutex())),
-			recvBuf: $.varRef(init?.recvBuf ?? (undefined as any as any)),
+			recvBuf: $.varRef(init?.recvBuf ? $.markAsStructValue($.cloneStructValue(init.recvBuf)) : $.markAsStructValue(new yamux2.segmentedBuffer())),
 			recvNotifyCh: $.varRef(init?.recvNotifyCh ?? (null as $.Channel<{}> | null)),
 			sendNotifyCh: $.varRef(init?.sendNotifyCh ?? (null as $.Channel<{}> | null)),
-			readDeadline: $.varRef(init?.readDeadline ?? (undefined as any as any)),
-			writeDeadline: $.varRef(init?.writeDeadline ?? (undefined as any as any))
+			readDeadline: $.varRef(init?.readDeadline ? $.markAsStructValue($.cloneStructValue(init.readDeadline)) : $.markAsStructValue(new yamux2.pipeDeadline())),
+			writeDeadline: $.varRef(init?.writeDeadline ? $.markAsStructValue($.cloneStructValue(init.writeDeadline)) : $.markAsStructValue(new yamux2.pipeDeadline()))
 		}
 	}
 
@@ -179,11 +179,11 @@ export class yamuxStream {
 			writeState: $.varRef(this._fields.writeState.value),
 			readState: $.varRef(this._fields.readState.value),
 			stateLock: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.stateLock.value))),
-			recvBuf: $.varRef(this._fields.recvBuf.value),
+			recvBuf: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.recvBuf.value))),
 			recvNotifyCh: $.varRef(this._fields.recvNotifyCh.value),
 			sendNotifyCh: $.varRef(this._fields.sendNotifyCh.value),
-			readDeadline: $.varRef(this._fields.readDeadline.value),
-			writeDeadline: $.varRef(this._fields.writeDeadline.value)
+			readDeadline: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.readDeadline.value))),
+			writeDeadline: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.writeDeadline.value)))
 		}
 		return $.markAsStructValue(cloned)
 	}

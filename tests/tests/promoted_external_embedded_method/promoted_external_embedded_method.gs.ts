@@ -6,6 +6,16 @@ import * as $ from "@goscript/builtin/index.js"
 import * as sync from "@goscript/sync/index.js"
 import "@goscript/sync/index.js"
 
+export type runner = {
+	Run(): string
+}
+
+$.registerInterfaceType(
+	"main.runner",
+	null,
+	[{ name: "Run", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+);
+
 export class raw {
 	public get Mutex(): sync.Mutex {
 		return this._fields.Mutex.value
@@ -332,16 +342,6 @@ export class runnable {
 		[]
 	)
 }
-
-export type runner = {
-	Run(): string
-}
-
-$.registerInterfaceType(
-	"main.runner",
-	null,
-	[{ name: "Run", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
-);
 
 export async function main(): globalThis.Promise<void> {
 	let o: $.VarRef<outer> = $.varRef($.markAsStructValue(new outer()))

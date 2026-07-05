@@ -27,6 +27,10 @@ import "./ip.gs.ts"
 import "./mac.gs.ts"
 import "./net.gs.ts"
 
+export type byPriorityWeight = $.Slice<SRV | $.VarRef<SRV> | null>
+
+export type byPref = $.Slice<MX | $.VarRef<MX> | null>
+
 export class SRV {
 	public get Target(): string {
 		return this._fields.Target.value
@@ -304,8 +308,6 @@ export function absDomainName(s: string): string {
 	return s
 }
 
-export type byPriorityWeight = $.Slice<SRV | $.VarRef<SRV> | null>
-
 export function byPriorityWeight_shuffleByWeight(addrs: byPriorityWeight): void {
 	let sum = 0
 	for (let __goscriptRangeTarget0 = addrs, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
@@ -351,8 +353,6 @@ export async function byPriorityWeight_sort(addrs: byPriorityWeight): globalThis
 	}
 	byPriorityWeight_shuffleByWeight($.goSlice(addrs, i, undefined))
 }
-
-export type byPref = $.Slice<MX | $.VarRef<MX> | null>
 
 export async function byPref_sort(s: byPref): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget2 = s, i = 0; i < $.len(__goscriptRangeTarget2); i++) {

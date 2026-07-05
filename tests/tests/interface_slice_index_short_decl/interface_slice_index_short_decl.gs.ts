@@ -6,6 +6,8 @@ import * as $ from "@goscript/builtin/index.js"
 import * as dep from "@goscript/github.com/s4wave/goscript/tests/tests/interface_slice_index_short_decl/dep/index.js"
 import "@goscript/github.com/s4wave/goscript/tests/tests/interface_slice_index_short_decl/dep/index.js"
 
+export type value = Uint8Array
+
 export type Fixed = $.Slice<dep.Ref | null>
 
 export type Shape = {
@@ -75,8 +77,6 @@ export class Action {
 		[{ name: "Result", key: "Result", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "Filter", key: "Filter", type: { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "int" }, elemType: "dep.Ref" } }]
 	)
 }
-
-export type value = Uint8Array
 
 export function value_Key(v: value): any {
 	return $.namedValueInterfaceValue<any>(v, "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, "main.value")

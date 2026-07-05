@@ -3,6 +3,16 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+export type blankInterface = {
+	Value(): number
+}
+
+$.registerInterfaceType(
+	"main.blankInterface",
+	null,
+	[{ name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }]
+);
+
 export class blankImpl {
 	public get value(): number {
 		return this._fields.value.value
@@ -71,16 +81,6 @@ export class Packer {
 		[]
 	)
 }
-
-export type blankInterface = {
-	Value(): number
-}
-
-$.registerInterfaceType(
-	"main.blankInterface",
-	null,
-	[{ name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }]
-);
 
 export function blanks(_p0: number, _p1: string): number {
 	return 7

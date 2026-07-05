@@ -43,6 +43,17 @@ import "./session.gs.ts"
 import "./stream.gs.ts"
 import "./util.gs.ts"
 
+export type hasAddr = {
+	LocalAddr(): net.Addr | null | globalThis.Promise<net.Addr | null>
+	RemoteAddr(): net.Addr | null | globalThis.Promise<net.Addr | null>
+}
+
+$.registerInterfaceType(
+	"yamux.hasAddr",
+	null,
+	[{ name: "LocalAddr", args: [], returns: [{ name: "_r0", type: "net.Addr" }] }, { name: "RemoteAddr", args: [], returns: [{ name: "_r0", type: "net.Addr" }] }]
+);
+
 export class yamuxAddr {
 	public get Addr(): string {
 		return this._fields.Addr.value
@@ -86,14 +97,3 @@ export class yamuxAddr {
 		[{ name: "Addr", key: "Addr", type: { kind: $.TypeKind.Basic, name: "string" }, index: [0], offset: 0, exported: true }]
 	)
 }
-
-export type hasAddr = {
-	LocalAddr(): net.Addr | null | globalThis.Promise<net.Addr | null>
-	RemoteAddr(): net.Addr | null | globalThis.Promise<net.Addr | null>
-}
-
-$.registerInterfaceType(
-	"yamux.hasAddr",
-	null,
-	[{ name: "LocalAddr", args: [], returns: [{ name: "_r0", type: "net.Addr" }] }, { name: "RemoteAddr", args: [], returns: [{ name: "_r0", type: "net.Addr" }] }]
-);

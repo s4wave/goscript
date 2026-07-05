@@ -3,6 +3,16 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+export type named = {
+	Name(): string
+}
+
+$.registerInterfaceType(
+	"main.named",
+	null,
+	[{ name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+);
+
 export class lateType {
 	public _fields: {
 	}
@@ -31,16 +41,6 @@ export class lateType {
 		[]
 	)
 }
-
-export type named = {
-	Name(): string
-}
-
-$.registerInterfaceType(
-	"main.named",
-	null,
-	[{ name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
-);
 
 export let defaultNamed: named | null = $.interfaceValue<named | null>(new lateType(), "*main.lateType")
 

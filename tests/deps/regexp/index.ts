@@ -1,2 +1,7 @@
-export { Compile, CompilePOSIX, Match, MatchReader, MatchString, MustCompile, MustCompilePOSIX, QuoteMeta, Regexp } from "./regexp.gs.ts"
+export type { input } from "./regexp.gs.ts"
+export type { lazyFlag } from "./exec.gs.ts"
+export { Compile, CompilePOSIX, Match, MatchReader, MatchString, MustCompile, MustCompilePOSIX, QuoteMeta, Regexp, inputBytes, inputReader, inputString } from "./regexp.gs.ts"
+export { bitState, job } from "./backtrack.gs.ts"
+export { entry, inputs, machine, onePassMachine, queue, thread } from "./exec.gs.ts"
+export { onePassInst, onePassProg, queueOnePass } from "./onepass.gs.ts"
 import "./regexp.gs.ts"

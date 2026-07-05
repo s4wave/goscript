@@ -60,6 +60,25 @@ import "./register.gs.ts"
 import "./struct.gs.ts"
 import "./writer.gs.ts"
 
+export type readBuf = $.Slice<number>
+
+export type fileInfoDirEntry = {
+	Info(): [fs.FileInfo | null, $.GoError]
+	IsDir(): boolean
+	ModTime(): time.Time
+	Mode(): fs.FileMode
+	Name(): string
+	Size(): bigint
+	Sys(): any
+	Type(): fs.FileMode
+}
+
+$.registerInterfaceType(
+	"zip.fileInfoDirEntry",
+	null,
+	[{ name: "Info", args: [], returns: [{ type: "fs.FileInfo" }, { type: "error" }] }, { name: "IsDir", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "ModTime", args: [], returns: [{ type: "time.Time" }] }, { name: "Mode", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint32", typeName: "fs.FileMode" } }] }, { name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Size", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int64" } }] }, { name: "Sys", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Type", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint32", typeName: "fs.FileMode" } }] }]
+);
+
 export class Reader {
 	public get r(): io.ReaderAt | null {
 		return this._fields.r.value
@@ -1551,8 +1570,6 @@ export function findSignatureInBlock(b: $.Slice<number>): number {
 	return -1
 }
 
-export type readBuf = $.Slice<number>
-
 export function readBuf_uint8(b: $.VarRef<readBuf> | null): number {
 	let v = $.uint($.arrayIndex(($.pointerValue<readBuf>(b))!, 0), 8)
 	b!.value = ($.goSlice(($.pointerValue<readBuf>(b)), 1, undefined) as readBuf)
@@ -1582,23 +1599,6 @@ export function readBuf_sub(b: $.VarRef<readBuf> | null, n: number): readBuf {
 	b!.value = ($.goSlice(($.pointerValue<readBuf>(b)), n, undefined) as readBuf)
 	return (b2 as readBuf)
 }
-
-export type fileInfoDirEntry = {
-	Info(): [fs.FileInfo | null, $.GoError]
-	IsDir(): boolean
-	ModTime(): time.Time
-	Mode(): fs.FileMode
-	Name(): string
-	Size(): bigint
-	Sys(): any
-	Type(): fs.FileMode
-}
-
-$.registerInterfaceType(
-	"zip.fileInfoDirEntry",
-	null,
-	[{ name: "Info", args: [], returns: [{ type: "fs.FileInfo" }, { type: "error" }] }, { name: "IsDir", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "ModTime", args: [], returns: [{ type: "time.Time" }] }, { name: "Mode", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint32", typeName: "fs.FileMode" } }] }, { name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Size", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int64" } }] }, { name: "Sys", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Type", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint32", typeName: "fs.FileMode" } }] }]
-);
 
 export function toValidName(name: string): string {
 	name = strings.ReplaceAll(name, "\\", "/")

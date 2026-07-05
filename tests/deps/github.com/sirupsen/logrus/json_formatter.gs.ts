@@ -50,6 +50,8 @@ import "./logger.gs.ts"
 import "./logrus.gs.ts"
 import "./writer.gs.ts"
 
+export type fieldKey = string
+
 export type FieldMap = globalThis.Map<fieldKey, string> | null
 
 export class JSONFormatter {
@@ -253,8 +255,6 @@ export class JSONFormatter {
 		[{ name: "TimestampFormat", key: "TimestampFormat", type: { kind: $.TypeKind.Basic, name: "string" }, index: [0], offset: 0, exported: true }, { name: "DisableTimestamp", key: "DisableTimestamp", type: { kind: $.TypeKind.Basic, name: "bool" }, index: [1], offset: 16, exported: true }, { name: "DisableHTMLEscape", key: "DisableHTMLEscape", type: { kind: $.TypeKind.Basic, name: "bool" }, index: [2], offset: 17, exported: true }, { name: "DataKey", key: "DataKey", type: { kind: $.TypeKind.Basic, name: "string" }, index: [3], offset: 24, exported: true }, { name: "FieldMap", key: "FieldMap", type: "logrus.FieldMap", index: [4], offset: 40, exported: true }, { name: "CallerPrettyfier", key: "CallerPrettyfier", type: ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "runtime.Frame" }], results: [{ kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo), index: [5], offset: 48, exported: true }, { name: "PrettyPrint", key: "PrettyPrint", type: { kind: $.TypeKind.Basic, name: "bool" }, index: [6], offset: 56, exported: true }]
 	)
 }
-
-export type fieldKey = string
 
 export function FieldMap_resolve(f: FieldMap, key: fieldKey): string {
 	{

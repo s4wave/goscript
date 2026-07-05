@@ -1,1 +1,1 @@
-export { LinkedList, NewLinkedList } from "./linkedlist.gs.ts"
+export { LinkedList, NewLinkedList, linkedListElem } from "./linkedlist.gs.ts"

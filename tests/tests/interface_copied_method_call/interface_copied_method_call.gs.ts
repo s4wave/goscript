@@ -3,6 +3,16 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+export type runner = {
+	Run(): void
+}
+
+$.registerInterfaceType(
+	"main.runner",
+	null,
+	[{ name: "Run", args: [], returns: [] }]
+);
+
 export class task {
 	public _fields: {
 	}
@@ -31,16 +41,6 @@ export class task {
 		[]
 	)
 }
-
-export type runner = {
-	Run(): void
-}
-
-$.registerInterfaceType(
-	"main.runner",
-	null,
-	[{ name: "Run", args: [], returns: [] }]
-);
 
 export async function callCopied(r: runner | null): globalThis.Promise<void> {
 	let curr: runner | null = null as runner | null

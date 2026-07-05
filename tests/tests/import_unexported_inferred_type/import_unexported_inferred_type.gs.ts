@@ -6,9 +6,9 @@ import * as $ from "@goscript/builtin/index.js"
 import * as dep from "@goscript/github.com/s4wave/goscript/tests/tests/import_unexported_inferred_type/dep/index.js"
 import "@goscript/github.com/s4wave/goscript/tests/tests/import_unexported_inferred_type/dep/index.js"
 
-export let closed: any = $.markAsStructValue($.cloneStructValue($.pointerValue<any>(dep.ErrClosed)))
+export let closed: dep.hiddenError = $.markAsStructValue($.cloneStructValue($.pointerValue<dep.hiddenError>(dep.ErrClosed)))
 
-export function __goscript_set_closed(__goscriptValue: any): void {
+export function __goscript_set_closed(__goscriptValue: dep.hiddenError): void {
 	closed = __goscriptValue
 }
 

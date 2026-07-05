@@ -54,6 +54,8 @@ import "@goscript/github.com/aperturerobotics/go-websocket/internal/wsjs/index.j
 import "./errors.gs.ts"
 import "./stringer.gs.ts"
 
+export type opcode = number
+
 export type StatusCode = number
 
 export type CompressionMode = number
@@ -1081,8 +1083,6 @@ export const CompressionDisabled: CompressionMode = 2
 export const MessageText: MessageType = 1
 
 export const MessageBinary: MessageType = 2
-
-export type opcode = number
 
 export async function Dial(ctx: context.Context | null, url: string, opts: DialOptions | $.VarRef<DialOptions> | null): globalThis.Promise<[Conn | $.VarRef<Conn> | null, $.VarRef<{}> | null, $.GoError]> {
 	let __goscriptTuple3: any = await dial(ctx, url, opts)

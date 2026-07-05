@@ -1,1 +1,1 @@
-export { Group, Result } from "./singleflight.gs.ts"
+export { Group, Result, call } from "./singleflight.gs.ts"

@@ -27,6 +27,16 @@ import "@goscript/strings/index.js"
 import "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
 import "@goscript/github.com/aperturerobotics/protobuf-go-lite/json/index.js"
 
+export type isRpcStreamPacket_Body = {
+	isRpcStreamPacket_Body(): void
+}
+
+$.registerInterfaceType(
+	"rpcstream.isRpcStreamPacket_Body",
+	null,
+	[{ name: "isRpcStreamPacket_Body", args: [], returns: [] }]
+);
+
 export class RpcStreamPacket {
 	public get unknownFields(): $.Slice<number> {
 		return this._fields.unknownFields.value
@@ -1594,13 +1604,3 @@ export class RpcAck {
 		[{ name: "unknownFields", key: "unknownFields", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, pkgPath: "github.com/aperturerobotics/starpc/rpcstream", index: [0], offset: 0, exported: false }, { name: "Error", key: "Error", type: { kind: $.TypeKind.Basic, name: "string" }, tag: "protobuf:\"bytes,1,opt,name=error,proto3\" json:\"error,omitempty\"", index: [1], offset: 24, exported: true }]
 	)
 }
-
-export type isRpcStreamPacket_Body = {
-	isRpcStreamPacket_Body(): void
-}
-
-$.registerInterfaceType(
-	"rpcstream.isRpcStreamPacket_Body",
-	null,
-	[{ name: "isRpcStreamPacket_Body", args: [], returns: [] }]
-);

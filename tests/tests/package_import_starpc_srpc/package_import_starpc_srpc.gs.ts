@@ -389,7 +389,7 @@ export class memoryRpcStream {
 		if (err != null) {
 			return err
 		}
-		return memoryRpcStream.prototype.Send.call(m, new rpcstream.RpcStreamPacket({Body: $.interfaceValue<any>(new rpcstream.RpcStreamPacket_Data({Data: data}), "*rpcstream.RpcStreamPacket_Data")}))
+		return memoryRpcStream.prototype.Send.call(m, new rpcstream.RpcStreamPacket({Body: $.interfaceValue<rpcstream.isRpcStreamPacket_Body | null>(new rpcstream.RpcStreamPacket_Data({Data: data}), "*rpcstream.RpcStreamPacket_Data")}))
 	}
 
 	public async Recv(): globalThis.Promise<[rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null, $.GoError]> {
@@ -877,7 +877,7 @@ export async function exerciseRpcStreamHandle(): globalThis.Promise<boolean> {
 	})() })
 
 	{
-		let err = await memoryRpcStream.prototype.Send.call(client, new rpcstream.RpcStreamPacket({Body: $.interfaceValue<any>(new rpcstream.RpcStreamPacket_Init({Init: new rpcstream.RpcStreamInit({ComponentId: "component-a"})}), "*rpcstream.RpcStreamPacket_Init")}))
+		let err = await memoryRpcStream.prototype.Send.call(client, new rpcstream.RpcStreamPacket({Body: $.interfaceValue<rpcstream.isRpcStreamPacket_Body | null>(new rpcstream.RpcStreamPacket_Init({Init: new rpcstream.RpcStreamInit({ComponentId: "component-a"})}), "*rpcstream.RpcStreamPacket_Init")}))
 		if (err != null) {
 			$.println("rpcstream init send error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return false
@@ -904,7 +904,7 @@ export async function exerciseRpcStreamHandle(): globalThis.Promise<boolean> {
 		return false
 	}
 	{
-		let __goscriptShadow4 = await memoryRpcStream.prototype.Send.call(client, new rpcstream.RpcStreamPacket({Body: $.interfaceValue<any>(new rpcstream.RpcStreamPacket_Data({Data: start}), "*rpcstream.RpcStreamPacket_Data")}))
+		let __goscriptShadow4 = await memoryRpcStream.prototype.Send.call(client, new rpcstream.RpcStreamPacket({Body: $.interfaceValue<rpcstream.isRpcStreamPacket_Body | null>(new rpcstream.RpcStreamPacket_Data({Data: start}), "*rpcstream.RpcStreamPacket_Data")}))
 		if (__goscriptShadow4 != null) {
 			$.println("rpcstream call start send error:", $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow4).Error())
 			return false

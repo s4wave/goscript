@@ -1,6 +1,7 @@
 export type { RpcProxyGetter } from "./proxy.gs.ts"
 export type { RpcRawGetter } from "./raw-stream.gs.ts"
 export type { RpcStream, RpcStreamCaller, RpcStreamGetter } from "./rpcstream.gs.ts"
+export type { isRpcStreamPacket_Body } from "./rpcstream.pb.gs.ts"
 export { ErrNoServerForComponent, ErrUnexpectedPacket, __goscript_set_ErrNoServerForComponent, __goscript_set_ErrUnexpectedPacket } from "./errors.gs.ts"
 export { HandleProxyRpcStream } from "./proxy.gs.ts"
 export { HandleRawRpcStream } from "./raw-stream.gs.ts"

@@ -36,6 +36,20 @@ import "./backtrack.gs.ts"
 import "./exec.gs.ts"
 import "./onepass.gs.ts"
 
+export type input = {
+	canCheckPrefix(): boolean
+	context(pos: number): __goscript_exec.lazyFlag
+	hasPrefix(re: Regexp | $.VarRef<Regexp> | null): boolean
+	index(re: Regexp | $.VarRef<Regexp> | null, pos: number): number
+	step(pos: number): [number, number] | globalThis.Promise<[number, number]>
+}
+
+$.registerInterfaceType(
+	"regexp.input",
+	null,
+	[{ name: "canCheckPrefix", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "context", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint64", typeName: "regexp.lazyFlag" } }] }, { name: "hasPrefix", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "index", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "step", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int32" } }, { type: { kind: $.TypeKind.Basic, name: "int" } }] }]
+);
+
 export class Regexp {
 	public get expr(): string {
 		return this._fields.expr.value
@@ -1751,20 +1765,6 @@ export function quote(s: string): string {
 	}
 	return strconv.Quote(s)
 }
-
-export type input = {
-	canCheckPrefix(): boolean
-	context(pos: number): __goscript_exec.lazyFlag
-	hasPrefix(re: Regexp | $.VarRef<Regexp> | null): boolean
-	index(re: Regexp | $.VarRef<Regexp> | null, pos: number): number
-	step(pos: number): [number, number] | globalThis.Promise<[number, number]>
-}
-
-$.registerInterfaceType(
-	"regexp.input",
-	null,
-	[{ name: "canCheckPrefix", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "context", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint64", typeName: "regexp.lazyFlag" } }] }, { name: "hasPrefix", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "index", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "step", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int32" } }, { type: { kind: $.TypeKind.Basic, name: "int" } }] }]
-);
 
 export async function MatchReader(pattern: string, r: io.RuneReader | null): globalThis.Promise<[boolean, $.GoError]> {
 	let matched: boolean = false

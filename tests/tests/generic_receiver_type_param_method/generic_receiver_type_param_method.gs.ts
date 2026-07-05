@@ -3,6 +3,16 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+export type nistPoint = {
+	Add(_p0: any, _p1: any): any | globalThis.Promise<any>
+}
+
+$.registerInterfaceType(
+	"main.nistPoint",
+	null,
+	[{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }]
+);
+
 export class nistCurve {
 	public _fields: {
 	}
@@ -78,16 +88,6 @@ export class point {
 		[{ name: "N", key: "N", type: { kind: $.TypeKind.Basic, name: "int" } }]
 	)
 }
-
-export type nistPoint = {
-	Add(_p0: any, _p1: any): any | globalThis.Promise<any>
-}
-
-$.registerInterfaceType(
-	"main.nistPoint",
-	null,
-	[{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }]
-);
 
 export let curve: nistCurve | $.VarRef<nistCurve> | null = new nistCurve()
 

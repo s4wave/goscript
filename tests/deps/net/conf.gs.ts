@@ -84,6 +84,8 @@ import "./netgo_off.gs.ts"
 import "./nss.gs.ts"
 import "./parse.gs.ts"
 
+export type mdnsTest = number
+
 export class conf {
 	public get netGo(): boolean {
 		return this._fields.netGo.value
@@ -520,8 +522,6 @@ export const mdnsFromSystem: mdnsTest = 0
 export const mdnsAssumeExists: mdnsTest = 1
 
 export const mdnsAssumeDoesNotExist: mdnsTest = 2
-
-export type mdnsTest = number
 
 export let confOnce: $.VarRef<sync.Once> = $.varRef($.markAsStructValue(new sync.Once()))
 

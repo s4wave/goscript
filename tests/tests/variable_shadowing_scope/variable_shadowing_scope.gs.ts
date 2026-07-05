@@ -3,6 +3,16 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+export type named = {
+	Name(): string
+}
+
+$.registerInterfaceType(
+	"main.named",
+	null,
+	[{ name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+);
+
 export class item {
 	public _fields: {
 	}
@@ -43,16 +53,6 @@ export function secondFunc(x: number): number {
 	}
 	return 99
 }
-
-export type named = {
-	Name(): string
-}
-
-$.registerInterfaceType(
-	"main.named",
-	null,
-	[{ name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
-);
 
 export async function describe(value: any): globalThis.Promise<void> {
 	let __goscriptShadow0 = value

@@ -3,6 +3,16 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+export type hidden = {
+	Ping(): string
+}
+
+$.registerInterfaceType(
+	"dep.hidden",
+	null,
+	[{ name: "Ping", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+);
+
 export class impl {
 	public _fields: {
 	}
@@ -66,16 +76,6 @@ export class Holder {
 		[{ name: "Hidden", key: "Hidden", type: "dep.hidden" }]
 	)
 }
-
-export type hidden = {
-	Ping(): string
-}
-
-$.registerInterfaceType(
-	"dep.hidden",
-	null,
-	[{ name: "Ping", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
-);
 
 export function NewHolder(): Holder {
 	return $.markAsStructValue(new Holder({Hidden: $.interfaceValue<hidden | null>($.markAsStructValue(new impl()), "dep.impl")}))
