@@ -330,7 +330,7 @@ describe('os stdio', () => {
     const [n, err] = await io.Copy(writer, file)
 
     expect(err).toBeNull()
-    expect(n).toBe(3)
+    expect(n).toBe(3n)
     expect(Buffer.from(chunks).toString('utf8')).toBe('ABC')
   })
 
@@ -357,7 +357,7 @@ describe('os stdio', () => {
     const [n, err] = await io.Copy(file, reader)
 
     expect(err).toBeNull()
-    expect(n).toBe(3)
+    expect(n).toBe(3n)
     expect(Buffer.from(writes).toString('utf8')).toBe('XYZ')
   })
 })

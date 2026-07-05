@@ -1192,7 +1192,7 @@ describe('encoding/json override', () => {
     expect(decoder.Decode(target)).toBeNull()
     expect(target.value._fields.Name.value).toBe('Dana')
     expect(target.value._fields.Age.value).toBe(28)
-    expect(decoder.InputOffset()).toBeGreaterThan(0)
+    expect(decoder.InputOffset()).toBeGreaterThan(0n)
 
     const raw = $.stringToBytes('{"raw":true}')
     const [marshaled, marshalErr] = RawMessage_MarshalJSON(raw)

@@ -121,6 +121,16 @@ export async function main(): globalThis.Promise<void> {
 	n = __goscriptTuple1[0]
 	let err = __goscriptTuple1[1]
 	$.println("Reader ReadAt", n, "bytes:", $.bytesToString($.goSlice(at, undefined, n)), "err:", err == null)
+	let __goscriptTuple2: any = bytes.Reader.prototype.Seek.call($.pointerValue<bytes.Reader>(reader), off, io.SeekStart)
+	let pos = __goscriptTuple2[0]
+	err = __goscriptTuple2[1]
+	$.println("Reader Seek", pos, "err:", err == null)
+	$.println("Reader Size", bytes.Reader.prototype.Size.call($.pointerValue<bytes.Reader>(reader)))
+	let writeDst: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
+	let __goscriptTuple3: any = await bytes.Reader.prototype.WriteTo.call($.pointerValue<bytes.Reader>(reader), $.pointerValueOrNil($.interfaceValue<io.Writer | null>(writeDst, "*bytes.Buffer"))!)
+	let n64 = __goscriptTuple3[0]
+	err = __goscriptTuple3[1]
+	$.println("Reader WriteTo", n64, "bytes:", writeDst.value.String(), "err:", err == null)
 
 	$.println("test finished")
 }

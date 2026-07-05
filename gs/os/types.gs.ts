@@ -57,8 +57,8 @@ export class File {
 		return [0, ErrUnimplemented]
 	}
 
-	public ReadFrom(r: io.Reader): [number, $.GoError] {
-		return [0, ErrUnimplemented]
+	public ReadFrom(r: io.Reader): [bigint, $.GoError] {
+		return [0n, ErrUnimplemented]
 	}
 
 	public Write(b: $.Bytes): [number, $.GoError] {
@@ -69,8 +69,8 @@ export class File {
 		return [0, ErrUnimplemented]
 	}
 
-	public WriteTo(w: io.Writer): [number, $.GoError] {
-		return [0, ErrUnimplemented]
+	public WriteTo(w: io.Writer): [bigint, $.GoError] {
+		return [0n, ErrUnimplemented]
 	}
 
 	public Seek(offset: bigint, whence: number): [bigint, $.GoError] {

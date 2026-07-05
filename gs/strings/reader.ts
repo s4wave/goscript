@@ -66,9 +66,9 @@ export class Reader {
   // Size is the number of bytes available for reading via [Reader.ReadAt].
   // The returned value is always the same and is not affected by calls
   // to any other method.
-  public Size(): number {
+  public Size(): bigint {
     const r = this
-    return $.len(r!.s) as number
+    return BigInt($.len(r!.s) as number)
   }
 
   // Read implements the [io.Reader] interface.
@@ -189,11 +189,11 @@ export class Reader {
   }
 
   // WriteTo implements the [io.WriterTo] interface.
-  public async WriteTo(w: io.Writer): Promise<[number, $.GoError]> {
+  public async WriteTo(w: io.Writer): Promise<[bigint, $.GoError]> {
     const r = this
     r!.prevRune = -1
     if (r!.i >= ($.len(r!.s) as number)) {
-      return [0, null]
+      return [0n, null]
     }
     let s = $.sliceString(r!.s, r!.i, undefined)
     let m: number
@@ -203,7 +203,7 @@ export class Reader {
       $.panic('strings.Reader.WriteTo: invalid WriteString count')
     }
     r!.i += m as number
-    let n = m as number
+    let n = BigInt(m as number)
     if (m != $.len(s) && err == null) {
       err = io.ErrShortWrite
     }
@@ -231,7 +231,7 @@ export class Reader {
       {
         name: 'Size',
         args: [],
-        returns: [{ type: { kind: $.TypeKind.Basic, name: 'number' } }],
+        returns: [{ type: { kind: $.TypeKind.Basic, name: 'int64' } }],
       },
       {
         name: 'Read',
@@ -384,11 +384,11 @@ export class Reader {
       {
         name: 'Seek',
         args: [
-          { name: 'offset', type: { kind: $.TypeKind.Basic, name: 'number' } },
+          { name: 'offset', type: { kind: $.TypeKind.Basic, name: 'int64' } },
           { name: 'whence', type: { kind: $.TypeKind.Basic, name: 'number' } },
         ],
         returns: [
-          { type: { kind: $.TypeKind.Basic, name: 'number' } },
+          { type: { kind: $.TypeKind.Basic, name: 'int64' } },
           {
             type: {
               kind: $.TypeKind.Interface,
@@ -410,7 +410,7 @@ export class Reader {
         name: 'WriteTo',
         args: [{ name: 'w', type: 'Writer' }],
         returns: [
-          { type: { kind: $.TypeKind.Basic, name: 'number' } },
+          { type: { kind: $.TypeKind.Basic, name: 'int64' } },
           {
             type: {
               kind: $.TypeKind.Interface,

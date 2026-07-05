@@ -8,7 +8,7 @@ describe('strings/Reader', () => {
       const r = NewReader('hello world')
       expect(r).not.toBeNull()
       if (r) {
-        expect(r.Size()).toBe(11)
+        expect(r.Size()).toBe(11n)
         expect(r.Len()).toBe(11)
       }
     })
@@ -178,7 +178,7 @@ describe('strings/Reader', () => {
       }
 
       const [n, err] = await r.WriteTo(writer)
-      expect(n).toBe(10) // remaining bytes
+      expect(n).toBe(10n) // remaining bytes
       expect(err).toBeNull()
       expect(r.Len()).toBe(0)
     })
@@ -189,7 +189,7 @@ describe('strings/Reader', () => {
       expect(r.Len()).toBe(4)
 
       r.Reset('world')
-      expect(r.Size()).toBe(5)
+      expect(r.Size()).toBe(5n)
       expect(r.Len()).toBe(5)
       expect(r.s).toBe('world')
     })

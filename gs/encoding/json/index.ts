@@ -220,8 +220,8 @@ export class Decoder {
     this.disallowUnknownFields = true
   }
 
-  public InputOffset(): number {
-    return this.inputOffset
+  public InputOffset(): bigint {
+    return BigInt(this.inputOffset)
   }
 
   public More(): boolean {

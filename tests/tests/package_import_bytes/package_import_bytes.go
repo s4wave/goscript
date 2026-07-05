@@ -114,6 +114,12 @@ func main() {
 	var off int64 = 2
 	n, err := reader.ReadAt(at, off)
 	println("Reader ReadAt", n, "bytes:", string(at[:n]), "err:", err == nil)
+	pos, err := reader.Seek(off, io.SeekStart)
+	println("Reader Seek", pos, "err:", err == nil)
+	println("Reader Size", reader.Size())
+	var writeDst bytes.Buffer
+	n64, err := reader.WriteTo(&writeDst)
+	println("Reader WriteTo", n64, "bytes:", writeDst.String(), "err:", err == nil)
 
 	println("test finished")
 }
