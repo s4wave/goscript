@@ -161,8 +161,8 @@ class TestCloneValue
     return new TestCloneValue(this.cloneValue)
   }
 
-  EqualVT(other: TestCloneValue): boolean {
-    return this.cloneValue === other.cloneValue
+  EqualVT(other: TestCloneValue | $.VarRef<TestCloneValue> | null): boolean {
+    return this.cloneValue === $.pointerValueOrNil(other)?.cloneValue
   }
 }
 
@@ -600,11 +600,9 @@ describe('protobuf-go-lite wire helpers', () => {
       10,
       null,
     ])
-    expect(DecodeVarintInt64(AppendVarint([], 0x7fffffffffffffffn), 0)).toEqual([
-      0x7fffffffffffffffn,
-      9,
-      null,
-    ])
+    expect(DecodeVarintInt64(AppendVarint([], 0x7fffffffffffffffn), 0)).toEqual(
+      [0x7fffffffffffffffn, 9, null],
+    )
     expect(DecodeVarintInt64(AppendVarint([], -1n), 0)).toEqual([-1n, 10, null])
     expect(
       DecodeVarintInt64(AppendVarint([], -0x8000000000000000n), 0),
@@ -889,6 +887,10 @@ describe('protobuf-go-lite text helpers', () => {
     const sb = new Builder()
     TextWriteStringer(sb, { String: () => 'ID' })
     expect(sb.String()).toBe('"ID"')
+
+    const nb = new Builder()
+    TextWriteStringer(nb, 7)
+    expect(nb.String()).toBe('"7"')
 
     const mb = new Builder()
     TextWriteTextMarshaler(mb, { MarshalProtoText: () => 'inner {}' })

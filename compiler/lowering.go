@@ -8304,12 +8304,33 @@ func (o *LoweringOwner) lowerCallArgForTarget(
 	value string,
 	overrideCall bool,
 ) string {
+	if overrideCall {
+		if constraint := typeParamInterfaceConstraint(targetType); constraint != nil {
+			targetType = constraint
+		}
+	}
 	value = o.lowerValueForTarget(ctx, expr, targetType, value)
 	sourceType := ctx.semPkg.source.TypesInfo.TypeOf(expr)
 	if overrideCall && isNonEmptyInterfaceType(targetType) && (isInterfaceType(sourceType) || isNilableType(sourceType)) {
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValueOrNil) + "(" + value + ")!"
 	}
 	return value
+}
+
+func typeParamInterfaceConstraint(typ types.Type) types.Type {
+	typeParam, ok := types.Unalias(typ).(*types.TypeParam)
+	if !ok {
+		return nil
+	}
+	iface, ok := types.Unalias(typeParam.Constraint()).Underlying().(*types.Interface)
+	if !ok {
+		return nil
+	}
+	iface.Complete()
+	if iface.NumMethods() == 0 {
+		return nil
+	}
+	return iface
 }
 
 func (o *LoweringOwner) lowerExprList(ctx lowerFileContext, exprs []ast.Expr) ([]string, []Diagnostic) {

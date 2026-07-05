@@ -59,7 +59,7 @@ $.registerInterfaceType('protobuf_go_lite.CloneMessage', null, [
 ])
 
 export interface CloneVT<T> extends CloneMessage {
-  CloneVT(): T
+  CloneVT(): T | $.VarRef<T> | null
 }
 
 export function ClonePtr<T>(v: T | $.VarRef<T> | null): $.VarRef<T> | null {
@@ -117,14 +117,34 @@ export function CloneBytesMap<K, V extends $.Slice<number> | null>(
 
 export function CloneVTValue<T extends CloneVT<T>>(
   v: T | $.VarRef<T> | null,
-): T | null {
-  const value = $.pointerValueOrNil(v)
+): T | $.VarRef<T> | null
+export function CloneVTValue<T extends CloneVT<T>>(
+  _typeArgs: unknown,
+  v: T | $.VarRef<T> | null,
+): T | $.VarRef<T> | null
+export function CloneVTValue<T extends CloneVT<T>>(
+  arg0: unknown,
+  arg1?: T | $.VarRef<T> | null,
+): T | $.VarRef<T> | null {
+  const value = $.pointerValueOrNil(
+    arg1 === undefined ? (arg0 as T | $.VarRef<T> | null) : arg1,
+  )
   return value == null ? null : value.CloneVT()
 }
 
 export function CloneVTSlice<T extends CloneVT<T>>(
   s: $.Slice<T | $.VarRef<T> | null> | null,
-): $.Slice<T | null> | null {
+): $.Slice<T | $.VarRef<T> | null> | null
+export function CloneVTSlice<T extends CloneVT<T>>(
+  _typeArgs: unknown,
+  s: $.Slice<T | $.VarRef<T> | null> | null,
+): $.Slice<T | $.VarRef<T> | null> | null
+export function CloneVTSlice<T extends CloneVT<T>>(
+  arg0: unknown,
+  arg1?: $.Slice<T | $.VarRef<T> | null> | null,
+): $.Slice<T | $.VarRef<T> | null> | null {
+  const s =
+    arg1 === undefined ? (arg0 as $.Slice<T | $.VarRef<T> | null> | null) : arg1
   if (s == null) {
     return null
   }
@@ -133,11 +153,21 @@ export function CloneVTSlice<T extends CloneVT<T>>(
 
 export function CloneVTMap<K, V extends CloneVT<V>>(
   m: Map<K, V | $.VarRef<V> | null> | null,
-): Map<K, V | null> | null {
+): Map<K, V | $.VarRef<V> | null> | null
+export function CloneVTMap<K, V extends CloneVT<V>>(
+  _typeArgs: unknown,
+  m: Map<K, V | $.VarRef<V> | null> | null,
+): Map<K, V | $.VarRef<V> | null> | null
+export function CloneVTMap<K, V extends CloneVT<V>>(
+  arg0: unknown,
+  arg1?: Map<K, V | $.VarRef<V> | null> | null,
+): Map<K, V | $.VarRef<V> | null> | null {
+  const m =
+    arg1 === undefined ? (arg0 as Map<K, V | $.VarRef<V> | null> | null) : arg1
   if (m == null) {
     return null
   }
-  const out = new Map<K, V | null>()
+  const out = new Map<K, V | $.VarRef<V> | null>()
   for (const [k, v] of m.entries()) {
     out.set(k, CloneVTValue(v))
   }
@@ -145,7 +175,7 @@ export function CloneVTMap<K, V extends CloneVT<V>>(
 }
 
 export interface EqualVT<T> {
-  EqualVT(other: T): boolean
+  EqualVT(other: T | $.VarRef<T> | null): boolean
 }
 
 export function CompareComparable<T>(): (t1: T, t2: T) => boolean {
@@ -311,7 +341,7 @@ export function EqualBytesMap<K>(
 export function EqualVTImplicit<T extends EqualVT<T>>(
   a: T | $.VarRef<T> | null,
   b: T | $.VarRef<T> | null,
-  empty: () => T,
+  empty: () => T | $.VarRef<T> | null,
 ): boolean {
   let av = $.pointerValueOrNil(a)
   let bv = $.pointerValueOrNil(b)
@@ -319,18 +349,18 @@ export function EqualVTImplicit<T extends EqualVT<T>>(
     return true
   }
   if (av == null) {
-    av = empty()
+    av = $.pointerValueOrNil(empty())
   }
   if (bv == null) {
-    bv = empty()
+    bv = $.pointerValueOrNil(empty())
   }
-  return av.EqualVT(bv)
+  return av != null && av.EqualVT(bv)
 }
 
 export function EqualVTSliceImplicit<T extends EqualVT<T>>(
   a: $.Slice<T | $.VarRef<T> | null> | null,
   b: $.Slice<T | $.VarRef<T> | null> | null,
-  empty: () => T,
+  empty: () => T | $.VarRef<T> | null,
 ): boolean {
   if ($.len(a) !== $.len(b)) {
     return false
@@ -348,7 +378,7 @@ export function EqualVTSliceImplicit<T extends EqualVT<T>>(
 export function EqualVTMapImplicit<K, V extends EqualVT<V>>(
   a: Map<K, V | $.VarRef<V> | null> | null,
   b: Map<K, V | $.VarRef<V> | null> | null,
-  empty: () => V,
+  empty: () => V | $.VarRef<V> | null,
 ): boolean {
   if ($.len(a) !== $.len(b)) {
     return false
@@ -1727,11 +1757,20 @@ export function TextWriteBytes(sb: TextBuilderArg, v: $.Bytes | null): void {
 
 export function TextWriteStringer(
   sb: TextBuilderArg,
-  v: { String(): string } | null,
+  v: { String(): string } | number | bigint | string | null,
 ): void {
   const b = textBuilder(sb)
+  const text =
+    (
+      v != null &&
+      typeof v === 'object' &&
+      'String' in v &&
+      typeof v.String === 'function'
+    ) ?
+      v.String()
+    : String(v)
   b.WriteString('"')
-  b.WriteString(v!.String())
+  b.WriteString(text)
   b.WriteString('"')
 }
 
