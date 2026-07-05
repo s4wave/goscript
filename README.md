@@ -5,6 +5,11 @@
     Compile Go to readable TypeScript for Node, Bun, and modern browsers.
   </p>
 
+
+  <div align="center">
+    <img src="./docs/assets/readme-transpile-demo.svg?cachebuster=4" alt="GoScript side-by-side Go source and generated TypeScript output showing a channel send, goroutine scheduling, and awaited channel receive." />
+  </div>
+
   <p>
     <a href="https://godoc.org/github.com/s4wave/goscript">
       <img src="https://godoc.org/github.com/s4wave/goscript?status.svg" alt="GoDoc" />
@@ -13,10 +18,7 @@
       <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" />
     </a>
   </p>
-</div>
 
-<div align="center">
-  <img src="./docs/assets/readme-transpile-demo.svg?cachebuster=4" alt="GoScript side-by-side Go source and generated TypeScript output showing a channel send, goroutine scheduling, and awaited channel receive." />
 </div>
 
 ## Overview
