@@ -85,15 +85,16 @@ export class Reader {
   }
 
   // ReadAt implements the [io.ReaderAt] interface.
-  public ReadAt(b: Uint8Array, off: number): [number, $.GoError] {
+  public ReadAt(b: Uint8Array, off: bigint): [number, $.GoError] {
     const r = this
-    if (off < 0) {
+    const offset = Number(off)
+    if (offset < 0) {
       return [0, $.newError('strings.Reader.ReadAt: negative offset')]
     }
-    if (off >= ($.len(r!.s) as number)) {
+    if (offset >= ($.len(r!.s) as number)) {
       return [0, io.EOF]
     }
-    let n = $.copy(b, $.sliceString(r!.s, off, undefined))
+    let n = $.copy(b, $.sliceString(r!.s, offset, undefined))
     let err: $.GoError = null
     if (n < $.len(b)) {
       err = io.EOF
@@ -272,7 +273,7 @@ export class Reader {
               elemType: { kind: $.TypeKind.Basic, name: 'number' },
             },
           },
-          { name: 'off', type: { kind: $.TypeKind.Basic, name: 'number' } },
+          { name: 'off', type: { kind: $.TypeKind.Basic, name: 'int64' } },
         ],
         returns: [
           { type: { kind: $.TypeKind.Basic, name: 'number' } },

@@ -30,7 +30,7 @@ describe('strings/Reader', () => {
       const r = new Reader({ s: 'hello world' })
       const buf = new Uint8Array(5)
 
-      const [n, err] = r.ReadAt(buf, 6)
+      const [n, err] = r.ReadAt(buf, 6n)
       expect(n).toBe(5)
       expect(err).toBeNull()
       expect(new TextDecoder().decode(buf)).toBe('world')
@@ -40,7 +40,7 @@ describe('strings/Reader', () => {
       const r = new Reader({ s: 'hello' })
       const buf = new Uint8Array(10)
 
-      const [n, err] = r.ReadAt(buf, 2)
+      const [n, err] = r.ReadAt(buf, 2n)
       expect(n).toBe(3)
       expect(err).toBe(io.EOF)
       expect(new TextDecoder().decode(buf.subarray(0, n))).toBe('llo')
@@ -50,7 +50,7 @@ describe('strings/Reader', () => {
       const r = new Reader({ s: 'hello' })
       const buf = new Uint8Array(5)
 
-      const [n, err] = r.ReadAt(buf, -1)
+      const [n, err] = r.ReadAt(buf, -1n)
       expect(n).toBe(0)
       expect(err).not.toBeNull()
     })

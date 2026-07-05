@@ -109,5 +109,11 @@ func main() {
 	n, _ = multi.Read(data)
 	println("MultiReader read", n, "bytes:", string(data[:n]))
 
+	reader := bytes.NewReader([]byte("reader"))
+	at := make([]byte, 3)
+	var off int64 = 2
+	n, err := reader.ReadAt(at, off)
+	println("Reader ReadAt", n, "bytes:", string(at[:n]), "err:", err == nil)
+
 	println("test finished")
 }

@@ -114,6 +114,14 @@ export async function main(): globalThis.Promise<void> {
 	n = __goscriptTuple0[0]
 	$.println("MultiReader read", n, "bytes:", $.bytesToString($.goSlice(data, undefined, n)))
 
+	let reader: bytes.Reader | $.VarRef<bytes.Reader> | null = bytes.NewReader(new Uint8Array([114, 101, 97, 100, 101, 114]))
+	let at: $.Slice<number> = $.makeSlice<number>(3, undefined, "byte")
+	let off: bigint = 2n
+	let __goscriptTuple1: any = bytes.Reader.prototype.ReadAt.call($.pointerValue<bytes.Reader>(reader), at, off)
+	n = __goscriptTuple1[0]
+	let err = __goscriptTuple1[1]
+	$.println("Reader ReadAt", n, "bytes:", $.bytesToString($.goSlice(at, undefined, n)), "err:", err == null)
+
 	$.println("test finished")
 }
 

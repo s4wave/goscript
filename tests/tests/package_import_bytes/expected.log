@@ -20,4 +20,5 @@ Read 5 bytes: Hello
 Buffer after reset, length: 0
 Pointer buffer content: ptr
 MultiReader read 3 bytes: abc
+Reader ReadAt 3 bytes: ade err: true
 test finished
