@@ -1,5 +1,5 @@
 <div align="center">
-  <h3>GoScript: Go packages as TypeScript</h3>
+  <h3>GoScript: Go to TypeScript Compiler</h3>
 
   <p>
     Compile Go to readable TypeScript for Node, Bun, and modern browsers.
