@@ -1500,7 +1500,7 @@ export class packetQueue {
 		}
 
 		let p: packet | $.VarRef<packet> | null = $.mustTypeAssert<packet | $.VarRef<packet> | null>(await packetPool.value.Get(), { kind: $.TypeKind.Pointer, elemType: "net.packet" })
-		$.pointerValue<packet>(p).buf = $.appendSlice($.goSlice($.pointerValue<packet>(p).buf, undefined, 0), b)
+		$.pointerValue<packet>(p).buf = $.appendSlice($.goSlice($.pointerValue<packet>(p).buf, undefined, 0), b, $.byteSliceHint)
 		$.pointerValue<packet>(p)._from = _from
 
 		if (q.head == null) {

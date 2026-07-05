@@ -17,16 +17,16 @@ export function AppendComplex(dst: $.Slice<number>, c: $.Complex, fmt: number, p
 	}
 	bitSize = bitSize >> (1)
 
-	dst = $.append(dst, $.uint(40, 8))
+	dst = $.append(dst, $.uint(40, 8), $.byteSliceHint)
 	dst = __goscript_ftoa.AppendFloat(dst, $.real(c), $.uint(fmt, 8), prec, bitSize)
 	let i = $.len(dst)
 	dst = __goscript_ftoa.AppendFloat(dst, $.imag(c), $.uint(fmt, 8), prec, bitSize)
 	// Check if imaginary part has a sign. If not, add one.
 	if (($.uint($.arrayIndex(dst!, i), 8) != $.uint(43, 8)) && ($.uint($.arrayIndex(dst!, i), 8) != $.uint(45, 8))) {
-		dst = $.append(dst, $.uint(0, 8))
+		dst = $.append(dst, $.uint(0, 8), $.byteSliceHint)
 		$.copy($.goSlice(dst, i + 1, undefined), $.goSlice(dst, i, undefined))
 		dst![i] = $.uint(43, 8)
 	}
-	dst = $.appendSlice(dst, $.stringToBytes("i)"))
+	dst = $.appendSlice(dst, $.stringToBytes("i)"), $.byteSliceHint)
 	return dst
 }

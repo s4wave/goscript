@@ -580,7 +580,7 @@ export class Packet {
 					if ((iNdEx + skippy) > l) {
 						return io.ErrUnexpectedEOF
 					}
-					$.pointerValue<Packet>(m).unknownFields = $.appendSlice($.pointerValue<Packet>(m).unknownFields, $.goSlice(dAtA, iNdEx, iNdEx + skippy))
+					$.pointerValue<Packet>(m).unknownFields = $.appendSlice($.pointerValue<Packet>(m).unknownFields, $.goSlice(dAtA, iNdEx, iNdEx + skippy), $.byteSliceHint)
 					iNdEx = iNdEx + (skippy)
 					break
 				}
@@ -1504,7 +1504,7 @@ export class CallStart {
 					if (postIndex > l) {
 						return io.ErrUnexpectedEOF
 					}
-					$.pointerValue<CallStart>(m).Data = $.appendSlice($.goSlice($.pointerValue<CallStart>(m).Data, undefined, 0), $.goSlice(dAtA, iNdEx, postIndex))
+					$.pointerValue<CallStart>(m).Data = $.appendSlice($.goSlice($.pointerValue<CallStart>(m).Data, undefined, 0), $.goSlice(dAtA, iNdEx, postIndex), $.byteSliceHint)
 					if ($.pointerValue<CallStart>(m).Data == null) {
 						$.pointerValue<CallStart>(m).Data = $.arrayToSlice<number>([])
 					}
@@ -1542,7 +1542,7 @@ export class CallStart {
 					if ((iNdEx + skippy) > l) {
 						return io.ErrUnexpectedEOF
 					}
-					$.pointerValue<CallStart>(m).unknownFields = $.appendSlice($.pointerValue<CallStart>(m).unknownFields, $.goSlice(dAtA, iNdEx, iNdEx + skippy))
+					$.pointerValue<CallStart>(m).unknownFields = $.appendSlice($.pointerValue<CallStart>(m).unknownFields, $.goSlice(dAtA, iNdEx, iNdEx + skippy), $.byteSliceHint)
 					iNdEx = iNdEx + (skippy)
 					break
 				}
@@ -2023,7 +2023,7 @@ export class CallData {
 					if (postIndex > l) {
 						return io.ErrUnexpectedEOF
 					}
-					$.pointerValue<CallData>(m).Data = $.appendSlice($.goSlice($.pointerValue<CallData>(m).Data, undefined, 0), $.goSlice(dAtA, iNdEx, postIndex))
+					$.pointerValue<CallData>(m).Data = $.appendSlice($.goSlice($.pointerValue<CallData>(m).Data, undefined, 0), $.goSlice(dAtA, iNdEx, postIndex), $.byteSliceHint)
 					if ($.pointerValue<CallData>(m).Data == null) {
 						$.pointerValue<CallData>(m).Data = $.arrayToSlice<number>([])
 					}
@@ -2107,7 +2107,7 @@ export class CallData {
 					if ((iNdEx + skippy) > l) {
 						return io.ErrUnexpectedEOF
 					}
-					$.pointerValue<CallData>(m).unknownFields = $.appendSlice($.pointerValue<CallData>(m).unknownFields, $.goSlice(dAtA, iNdEx, iNdEx + skippy))
+					$.pointerValue<CallData>(m).unknownFields = $.appendSlice($.pointerValue<CallData>(m).unknownFields, $.goSlice(dAtA, iNdEx, iNdEx + skippy), $.byteSliceHint)
 					iNdEx = iNdEx + (skippy)
 					break
 				}

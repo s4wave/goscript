@@ -55,7 +55,7 @@ export function Itoa(i: number): string {
 export function AppendInt(dst: $.Slice<number>, i: bigint, base: number): $.Slice<number> {
 	let u = $.uint64(i)
 	if (i < 0n) {
-		dst = $.append(dst, $.uint(45, 8))
+		dst = $.append(dst, $.uint(45, 8), $.byteSliceHint)
 		u = -u
 	}
 	return AppendUint(dst, u, base)
@@ -64,11 +64,11 @@ export function AppendInt(dst: $.Slice<number>, i: bigint, base: number): $.Slic
 export function AppendUint(dst: $.Slice<number>, i: bigint, base: number): $.Slice<number> {
 	if (base == 10) {
 		if (i < 100n) {
-			return $.appendSlice(dst, $.stringToBytes(small($.int(i))))
+			return $.appendSlice(dst, $.stringToBytes(small($.int(i))), $.byteSliceHint)
 		}
 		let a: Uint8Array = new Uint8Array(24)
 		let j = formatBase10($.goSlice(a, undefined, undefined), i)
-		return $.appendSlice(dst, $.goSlice(a, j, undefined))
+		return $.appendSlice(dst, $.goSlice(a, j, undefined), $.byteSliceHint)
 	}
 	let __goscriptTuple0: any = formatBits(dst, i, base, false, true)
 	dst = __goscriptTuple0[0]
@@ -129,7 +129,7 @@ export function formatBits(dst: $.Slice<number>, u: bigint, base: number, neg: b
 	}
 
 	if (append_) {
-		d = $.appendSlice(dst, $.goSlice(a, i, undefined))
+		d = $.appendSlice(dst, $.goSlice(a, i, undefined), $.byteSliceHint)
 		return [d, s]
 	}
 	s = $.bytesToString($.goSlice(a, i, undefined))

@@ -338,7 +338,7 @@ export class RwcConn {
 						// Buffer the remaining bytes for the next Read call.
 						// Explicitly copy so the pool buffer is not aliased.
 						await $.pointerValue<RwcConn>(p).pendingMu.Lock()
-						$.pointerValue<RwcConn>(p).pending = $.appendSlice($.goSlice($.pointerValue<RwcConn>(p).pending, undefined, 0), $.goSlice(pkt, n, undefined))
+						$.pointerValue<RwcConn>(p).pending = $.appendSlice($.goSlice($.pointerValue<RwcConn>(p).pending, undefined, 0), $.goSlice(pkt, n, undefined), $.byteSliceHint)
 						$.pointerValue<RwcConn>(p).pendingMu.Unlock()
 					}
 					await bufPool.prototype.put.call($.pointerValue<RwcConn>(p).pool, pkt)

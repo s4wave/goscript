@@ -583,7 +583,7 @@ export class RpcStreamPacket {
 					if ((iNdEx + skippy) > l) {
 						return io.ErrUnexpectedEOF
 					}
-					$.pointerValue<RpcStreamPacket>(m).unknownFields = $.appendSlice($.pointerValue<RpcStreamPacket>(m).unknownFields, $.goSlice(dAtA, iNdEx, iNdEx + skippy))
+					$.pointerValue<RpcStreamPacket>(m).unknownFields = $.appendSlice($.pointerValue<RpcStreamPacket>(m).unknownFields, $.goSlice(dAtA, iNdEx, iNdEx + skippy), $.byteSliceHint)
 					iNdEx = iNdEx + (skippy)
 					break
 				}
@@ -1268,7 +1268,7 @@ export class RpcStreamInit {
 					if ((iNdEx + skippy) > l) {
 						return io.ErrUnexpectedEOF
 					}
-					$.pointerValue<RpcStreamInit>(m).unknownFields = $.appendSlice($.pointerValue<RpcStreamInit>(m).unknownFields, $.goSlice(dAtA, iNdEx, iNdEx + skippy))
+					$.pointerValue<RpcStreamInit>(m).unknownFields = $.appendSlice($.pointerValue<RpcStreamInit>(m).unknownFields, $.goSlice(dAtA, iNdEx, iNdEx + skippy), $.byteSliceHint)
 					iNdEx = iNdEx + (skippy)
 					break
 				}
@@ -1583,7 +1583,7 @@ export class RpcAck {
 					if ((iNdEx + skippy) > l) {
 						return io.ErrUnexpectedEOF
 					}
-					$.pointerValue<RpcAck>(m).unknownFields = $.appendSlice($.pointerValue<RpcAck>(m).unknownFields, $.goSlice(dAtA, iNdEx, iNdEx + skippy))
+					$.pointerValue<RpcAck>(m).unknownFields = $.appendSlice($.pointerValue<RpcAck>(m).unknownFields, $.goSlice(dAtA, iNdEx, iNdEx + skippy), $.byteSliceHint)
 					iNdEx = iNdEx + (skippy)
 					break
 				}

@@ -222,7 +222,7 @@ export function genericFtoa(dst: $.Slice<number>, val: number, fmt: number, prec
 					break
 				}
 			}
-			return $.appendSlice(dst, $.stringToBytes(s))
+			return $.appendSlice(dst, $.stringToBytes(s), $.byteSliceHint)
 			break
 		}
 		case 0:
@@ -432,7 +432,7 @@ export function formatDigits(dst: $.Slice<number>, shortest: boolean, neg: boole
 	}
 
 	// unknown format
-	return $.append(dst, $.uint(37, 8), $.uint(fmt, 8))
+	return $.append(dst, $.uint(37, 8), $.uint(fmt, 8), $.byteSliceHint)
 }
 
 export function roundShortest(d: __goscript_decimal.decimal | $.VarRef<__goscript_decimal.decimal> | null, mant: bigint, exp: number, flt: floatInfo | $.VarRef<floatInfo> | null): void {
@@ -584,7 +584,7 @@ export function roundShortest(d: __goscript_decimal.decimal | $.VarRef<__goscrip
 export function fmtE(dst: $.Slice<number>, neg: boolean, d: decimalSlice, prec: number, fmt: number): $.Slice<number> {
 	// sign
 	if (neg) {
-		dst = $.append(dst, $.uint(45, 8))
+		dst = $.append(dst, $.uint(45, 8), $.byteSliceHint)
 	}
 
 	// first digit
@@ -592,24 +592,24 @@ export function fmtE(dst: $.Slice<number>, neg: boolean, d: decimalSlice, prec: 
 	if (d.nd != 0) {
 		ch = $.uint($.arrayIndex(d.d!, 0), 8)
 	}
-	dst = $.append(dst, $.uint(ch, 8))
+	dst = $.append(dst, $.uint(ch, 8), $.byteSliceHint)
 
 	// .moredigits
 	if (prec > 0) {
-		dst = $.append(dst, $.uint(46, 8))
+		dst = $.append(dst, $.uint(46, 8), $.byteSliceHint)
 		let i = 1
 		let m = $.min(d.nd, prec + 1)
 		if (i < m) {
-			dst = $.appendSlice(dst, $.goSlice(d.d, i, m))
+			dst = $.appendSlice(dst, $.goSlice(d.d, i, m), $.byteSliceHint)
 			i = m
 		}
 		for (; i <= prec; i++) {
-			dst = $.append(dst, $.uint(48, 8))
+			dst = $.append(dst, $.uint(48, 8), $.byteSliceHint)
 		}
 	}
 
 	// e±
-	dst = $.append(dst, $.uint(fmt, 8))
+	dst = $.append(dst, $.uint(fmt, 8), $.byteSliceHint)
 	let exp = d.dp - 1
 	if (d.nd == 0) {
 		exp = 0
@@ -620,23 +620,23 @@ export function fmtE(dst: $.Slice<number>, neg: boolean, d: decimalSlice, prec: 
 	} else {
 		ch = $.uint(43, 8)
 	}
-	dst = $.append(dst, $.uint(ch, 8))
+	dst = $.append(dst, $.uint(ch, 8), $.byteSliceHint)
 
 	// dd or ddd
 	switch (true) {
 		case exp < 10:
 		{
-			dst = $.append(dst, $.uint(48, 8), $.uint($.uint(exp, 8) + 48, 8))
+			dst = $.append(dst, $.uint(48, 8), $.uint($.uint(exp, 8) + 48, 8), $.byteSliceHint)
 			break
 		}
 		case exp < 100:
 		{
-			dst = $.append(dst, $.uint($.uint(Math.trunc(exp / 10), 8) + 48, 8), $.uint($.uint(exp % 10, 8) + 48, 8))
+			dst = $.append(dst, $.uint($.uint(Math.trunc(exp / 10), 8) + 48, 8), $.uint($.uint(exp % 10, 8) + 48, 8), $.byteSliceHint)
 			break
 		}
 		default:
 		{
-			dst = $.append(dst, $.uint($.uint(Math.trunc(exp / 100), 8) + 48, 8), $.uint(($.uint(Math.trunc(exp / 10), 8) % 10) + 48, 8), $.uint($.uint(exp % 10, 8) + 48, 8))
+			dst = $.append(dst, $.uint($.uint(Math.trunc(exp / 100), 8) + 48, 8), $.uint(($.uint(Math.trunc(exp / 10), 8) % 10) + 48, 8), $.uint($.uint(exp % 10, 8) + 48, 8), $.byteSliceHint)
 			break
 		}
 	}
@@ -647,23 +647,23 @@ export function fmtE(dst: $.Slice<number>, neg: boolean, d: decimalSlice, prec: 
 export function fmtF(dst: $.Slice<number>, neg: boolean, d: decimalSlice, prec: number): $.Slice<number> {
 	// sign
 	if (neg) {
-		dst = $.append(dst, $.uint(45, 8))
+		dst = $.append(dst, $.uint(45, 8), $.byteSliceHint)
 	}
 
 	// integer, padded with zeros as needed.
 	if (d.dp > 0) {
 		let m = $.min(d.nd, d.dp)
-		dst = $.appendSlice(dst, $.goSlice(d.d, undefined, m))
+		dst = $.appendSlice(dst, $.goSlice(d.d, undefined, m), $.byteSliceHint)
 		for (; m < d.dp; m++) {
-			dst = $.append(dst, $.uint(48, 8))
+			dst = $.append(dst, $.uint(48, 8), $.byteSliceHint)
 		}
 	} else {
-		dst = $.append(dst, $.uint(48, 8))
+		dst = $.append(dst, $.uint(48, 8), $.byteSliceHint)
 	}
 
 	// fraction
 	if (prec > 0) {
-		dst = $.append(dst, $.uint(46, 8))
+		dst = $.append(dst, $.uint(46, 8), $.byteSliceHint)
 		for (let i = 0; i < prec; i++) {
 			let ch = $.uint($.uint(48, 8), 8)
 			{
@@ -672,7 +672,7 @@ export function fmtF(dst: $.Slice<number>, neg: boolean, d: decimalSlice, prec: 
 					ch = $.uint($.arrayIndex(d.d!, j), 8)
 				}
 			}
-			dst = $.append(dst, $.uint(ch, 8))
+			dst = $.append(dst, $.uint(ch, 8), $.byteSliceHint)
 		}
 	}
 
@@ -682,19 +682,19 @@ export function fmtF(dst: $.Slice<number>, neg: boolean, d: decimalSlice, prec: 
 export function fmtB(dst: $.Slice<number>, neg: boolean, mant: bigint, exp: number, flt: floatInfo | $.VarRef<floatInfo> | null): $.Slice<number> {
 	// sign
 	if (neg) {
-		dst = $.append(dst, $.uint(45, 8))
+		dst = $.append(dst, $.uint(45, 8), $.byteSliceHint)
 	}
 
 	// mantissa
 	dst = __goscript_itoa.AppendUint(dst, mant, 10)
 
 	// p
-	dst = $.append(dst, $.uint(112, 8))
+	dst = $.append(dst, $.uint(112, 8), $.byteSliceHint)
 
 	// ±exponent
 	exp = exp - ($.int($.pointerValue<floatInfo>(flt).mantbits))
 	if (exp >= 0) {
-		dst = $.append(dst, $.uint(43, 8))
+		dst = $.append(dst, $.uint(43, 8), $.byteSliceHint)
 	}
 	dst = __goscript_itoa.AppendInt(dst, $.int64(exp), 10)
 
@@ -736,23 +736,23 @@ export function fmtX(dst: $.Slice<number>, prec: number, fmt: number, neg: boole
 
 	// sign, 0x, leading digit
 	if (neg) {
-		dst = $.append(dst, $.uint(45, 8))
+		dst = $.append(dst, $.uint(45, 8), $.byteSliceHint)
 	}
-	dst = $.append(dst, $.uint(48, 8), $.uint(fmt, 8), $.uint(48 + $.uint($.uint64And(($.uint64Shr(mant, 60)), 1), 8), 8))
+	dst = $.append(dst, $.uint(48, 8), $.uint(fmt, 8), $.uint(48 + $.uint($.uint64And(($.uint64Shr(mant, 60)), 1), 8), 8), $.byteSliceHint)
 
 	// .fraction
 	mant = $.uint64Shl(mant, 4n)
 	if ((prec < 0) && (mant != 0n)) {
-		dst = $.append(dst, $.uint(46, 8))
+		dst = $.append(dst, $.uint(46, 8), $.byteSliceHint)
 		while (mant != 0n) {
-			dst = $.append(dst, $.uint($.indexStringOrBytes(hex, Number($.uint64And(($.uint64Shr(mant, 60)), 15))), 8))
+			dst = $.append(dst, $.uint($.indexStringOrBytes(hex, Number($.uint64And(($.uint64Shr(mant, 60)), 15))), 8), $.byteSliceHint)
 			mant = $.uint64Shl(mant, 4n)
 		}
 	} else {
 		if (prec > 0) {
-			dst = $.append(dst, $.uint(46, 8))
+			dst = $.append(dst, $.uint(46, 8), $.byteSliceHint)
 			for (let i = 0; i < prec; i++) {
-				dst = $.append(dst, $.uint($.indexStringOrBytes(hex, Number($.uint64And(($.uint64Shr(mant, 60)), 15))), 8))
+				dst = $.append(dst, $.uint($.indexStringOrBytes(hex, Number($.uint64And(($.uint64Shr(mant, 60)), 15))), 8), $.byteSliceHint)
 				mant = $.uint64Shl(mant, 4n)
 			}
 		}
@@ -763,30 +763,30 @@ export function fmtX(dst: $.Slice<number>, prec: number, fmt: number, neg: boole
 	if ($.uint(fmt, 8) == $.uint(__goscript_atoi.lower($.uint(fmt, 8)), 8)) {
 		ch = $.uint(112, 8)
 	}
-	dst = $.append(dst, $.uint(ch, 8))
+	dst = $.append(dst, $.uint(ch, 8), $.byteSliceHint)
 	if (exp < 0) {
 		ch = $.uint(45, 8)
 		exp = -exp
 	} else {
 		ch = $.uint(43, 8)
 	}
-	dst = $.append(dst, $.uint(ch, 8))
+	dst = $.append(dst, $.uint(ch, 8), $.byteSliceHint)
 
 	// dd or ddd or dddd
 	switch (true) {
 		case exp < 100:
 		{
-			dst = $.append(dst, $.uint($.uint(Math.trunc(exp / 10), 8) + 48, 8), $.uint($.uint(exp % 10, 8) + 48, 8))
+			dst = $.append(dst, $.uint($.uint(Math.trunc(exp / 10), 8) + 48, 8), $.uint($.uint(exp % 10, 8) + 48, 8), $.byteSliceHint)
 			break
 		}
 		case exp < 1000:
 		{
-			dst = $.append(dst, $.uint($.uint(Math.trunc(exp / 100), 8) + 48, 8), $.uint($.uint((Math.trunc(exp / 10)) % 10, 8) + 48, 8), $.uint($.uint(exp % 10, 8) + 48, 8))
+			dst = $.append(dst, $.uint($.uint(Math.trunc(exp / 100), 8) + 48, 8), $.uint($.uint((Math.trunc(exp / 10)) % 10, 8) + 48, 8), $.uint($.uint(exp % 10, 8) + 48, 8), $.byteSliceHint)
 			break
 		}
 		default:
 		{
-			dst = $.append(dst, $.uint($.uint(Math.trunc(exp / 1000), 8) + 48, 8), $.uint(($.uint(Math.trunc(exp / 100), 8) % 10) + 48, 8), $.uint($.uint((Math.trunc(exp / 10)) % 10, 8) + 48, 8), $.uint($.uint(exp % 10, 8) + 48, 8))
+			dst = $.append(dst, $.uint($.uint(Math.trunc(exp / 1000), 8) + 48, 8), $.uint(($.uint(Math.trunc(exp / 100), 8) % 10) + 48, 8), $.uint($.uint((Math.trunc(exp / 10)) % 10, 8) + 48, 8), $.uint($.uint(exp % 10, 8) + 48, 8), $.byteSliceHint)
 			break
 		}
 	}

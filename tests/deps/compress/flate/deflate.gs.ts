@@ -1144,7 +1144,7 @@ export async function NewWriterDict(w: io.Writer | null, level: number, dict: $.
 		return [null, err]
 	}
 	await $.pointerValue<Writer>(zw).d.fillWindow(dict)
-	$.pointerValue<Writer>(zw).dict = $.appendSlice($.pointerValue<Writer>(zw).dict, dict)
+	$.pointerValue<Writer>(zw).dict = $.appendSlice($.pointerValue<Writer>(zw).dict, dict, $.byteSliceHint)
 	return [zw, null]
 }
 

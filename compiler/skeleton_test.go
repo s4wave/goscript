@@ -3426,7 +3426,7 @@ func TestCompilePackagesAwaitsFmtWriterOverrides(t *testing.T) {
 	for _, want := range []string{
 		"export async function Use",
 		"await fmt.Fprintf(",
-		"$.pointerValue<writer>(w).buf = $.appendSlice($.pointerValue<writer>(w).buf, p)",
+		"$.pointerValue<writer>(w).buf = $.appendSlice($.pointerValue<writer>(w).buf, p, $.byteSliceHint)",
 		"return err",
 	} {
 		if !strings.Contains(text, want) {

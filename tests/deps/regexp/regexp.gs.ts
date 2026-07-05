@@ -230,7 +230,7 @@ export class Regexp {
 
 	public AppendText(b: $.Slice<number>): [$.Slice<number>, $.GoError] {
 		const re: Regexp | $.VarRef<Regexp> | null = this
-		return [$.appendSlice(b, $.stringToBytes(Regexp.prototype.String.call(re))), null]
+		return [$.appendSlice(b, $.stringToBytes(Regexp.prototype.String.call(re)), $.byteSliceHint), null]
 	}
 
 	public Copy(): Regexp | $.VarRef<Regexp> | null {
@@ -534,21 +534,21 @@ export class Regexp {
 	public async ReplaceAllFunc(src: $.Slice<number>, repl: ((_p0: $.Slice<number>) => $.Slice<number> | globalThis.Promise<$.Slice<number>>) | null): globalThis.Promise<$.Slice<number>> {
 		const re: Regexp | $.VarRef<Regexp> | null = this
 		return Regexp.prototype.replaceAll.call(re, src, "", 2, $.functionValue(async (dst: $.Slice<number>, match: $.Slice<number>): globalThis.Promise<$.Slice<number>> => {
-			return $.appendSlice(dst, await repl!($.goSlice(src, $.arrayIndex(match!, 0), $.arrayIndex(match!, 1))))
+			return $.appendSlice(dst, await repl!($.goSlice(src, $.arrayIndex(match!, 0), $.arrayIndex(match!, 1))), $.byteSliceHint)
 		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }], results: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }] } as $.FunctionTypeInfo)))
 	}
 
 	public async ReplaceAllLiteral(src: $.Slice<number>, repl: $.Slice<number>): globalThis.Promise<$.Slice<number>> {
 		const re: Regexp | $.VarRef<Regexp> | null = this
 		return Regexp.prototype.replaceAll.call(re, src, "", 2, $.functionValue((dst: $.Slice<number>, match: $.Slice<number>): $.Slice<number> => {
-			return $.appendSlice(dst, repl)
+			return $.appendSlice(dst, repl, $.byteSliceHint)
 		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }], results: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }] } as $.FunctionTypeInfo)))
 	}
 
 	public async ReplaceAllLiteralString(src: string, repl: string): globalThis.Promise<string> {
 		const re: Regexp | $.VarRef<Regexp> | null = this
 		return $.bytesToString(await Regexp.prototype.replaceAll.call(re, null, src, 2, $.functionValue((dst: $.Slice<number>, match: $.Slice<number>): $.Slice<number> => {
-			return $.appendSlice(dst, $.stringToBytes(repl))
+			return $.appendSlice(dst, $.stringToBytes(repl), $.byteSliceHint)
 		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }], results: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }] } as $.FunctionTypeInfo))))
 	}
 
@@ -567,7 +567,7 @@ export class Regexp {
 	public async ReplaceAllStringFunc(src: string, repl: ((_p0: string) => string | globalThis.Promise<string>) | null): globalThis.Promise<string> {
 		const re: Regexp | $.VarRef<Regexp> | null = this
 		let b: $.Slice<number> = await Regexp.prototype.replaceAll.call(re, null, src, 2, $.functionValue(async (dst: $.Slice<number>, match: $.Slice<number>): globalThis.Promise<$.Slice<number>> => {
-			return $.appendSlice(dst, $.stringToBytes(await repl!($.sliceStringOrBytes(src, $.arrayIndex(match!, 0), $.arrayIndex(match!, 1)))))
+			return $.appendSlice(dst, $.stringToBytes(await repl!($.sliceStringOrBytes(src, $.arrayIndex(match!, 0), $.arrayIndex(match!, 1)))), $.byteSliceHint)
 		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }], results: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }] } as $.FunctionTypeInfo)))
 		return $.bytesToString(b)
 	}
@@ -958,11 +958,11 @@ export class Regexp {
 			if (!ok) {
 				break
 			}
-			dst = $.appendSlice(dst, $.stringToBytes(before))
+			dst = $.appendSlice(dst, $.stringToBytes(before), $.byteSliceHint)
 			template = after
 			if ((!$.stringEqual(template, "")) && ($.uint($.indexStringOrBytes(template, 0), 8) == $.uint(36, 8))) {
 				// Treat $$ as $.
-				dst = $.append(dst, $.uint(36, 8))
+				dst = $.append(dst, $.uint(36, 8), $.byteSliceHint)
 				template = $.sliceStringOrBytes(template, 1, undefined)
 				continue
 			}
@@ -973,16 +973,16 @@ export class Regexp {
 			ok = __goscriptTuple9[3]
 			if (!ok) {
 				// Malformed; treat $ as raw text.
-				dst = $.append(dst, $.uint(36, 8))
+				dst = $.append(dst, $.uint(36, 8), $.byteSliceHint)
 				continue
 			}
 			template = rest
 			if (num >= 0) {
 				if ((((2 * num) + 1) < $.len(match)) && ($.arrayIndex(match!, 2 * num) >= 0)) {
 					if (bsrc != null) {
-						dst = $.appendSlice(dst, $.goSlice(bsrc, $.arrayIndex(match!, 2 * num), $.arrayIndex(match!, (2 * num) + 1)))
+						dst = $.appendSlice(dst, $.goSlice(bsrc, $.arrayIndex(match!, 2 * num), $.arrayIndex(match!, (2 * num) + 1)), $.byteSliceHint)
 					} else {
-						dst = $.appendSlice(dst, $.stringToBytes($.sliceStringOrBytes(src, $.arrayIndex(match!, 2 * num), $.arrayIndex(match!, (2 * num) + 1))))
+						dst = $.appendSlice(dst, $.stringToBytes($.sliceStringOrBytes(src, $.arrayIndex(match!, 2 * num), $.arrayIndex(match!, (2 * num) + 1))), $.byteSliceHint)
 					}
 				}
 			} else {
@@ -990,16 +990,16 @@ export class Regexp {
 					let namei = __goscriptRangeTarget7![i]
 					if ((($.stringEqual(name, namei)) && (((2 * i) + 1) < $.len(match))) && ($.arrayIndex(match!, 2 * i) >= 0)) {
 						if (bsrc != null) {
-							dst = $.appendSlice(dst, $.goSlice(bsrc, $.arrayIndex(match!, 2 * i), $.arrayIndex(match!, (2 * i) + 1)))
+							dst = $.appendSlice(dst, $.goSlice(bsrc, $.arrayIndex(match!, 2 * i), $.arrayIndex(match!, (2 * i) + 1)), $.byteSliceHint)
 						} else {
-							dst = $.appendSlice(dst, $.stringToBytes($.sliceStringOrBytes(src, $.arrayIndex(match!, 2 * i), $.arrayIndex(match!, (2 * i) + 1))))
+							dst = $.appendSlice(dst, $.stringToBytes($.sliceStringOrBytes(src, $.arrayIndex(match!, 2 * i), $.arrayIndex(match!, (2 * i) + 1))), $.byteSliceHint)
 						}
 						break
 					}
 				}
 			}
 		}
-		dst = $.appendSlice(dst, $.stringToBytes(template))
+		dst = $.appendSlice(dst, $.stringToBytes(template), $.byteSliceHint)
 		return dst
 	}
 
@@ -1079,9 +1079,9 @@ export class Regexp {
 
 			// Copy the unmatched characters before this match.
 			if (bsrc != null) {
-				buf = $.appendSlice(buf, $.goSlice(bsrc, lastMatchEnd, $.arrayIndex(a!, 0)))
+				buf = $.appendSlice(buf, $.goSlice(bsrc, lastMatchEnd, $.arrayIndex(a!, 0)), $.byteSliceHint)
 			} else {
-				buf = $.appendSlice(buf, $.stringToBytes($.sliceStringOrBytes(src, lastMatchEnd, $.arrayIndex(a!, 0))))
+				buf = $.appendSlice(buf, $.stringToBytes($.sliceStringOrBytes(src, lastMatchEnd, $.arrayIndex(a!, 0))), $.byteSliceHint)
 			}
 
 			// Now insert a copy of the replacement string, but not for a
@@ -1117,9 +1117,9 @@ export class Regexp {
 
 		// Copy the unmatched characters after the last match.
 		if (bsrc != null) {
-			buf = $.appendSlice(buf, $.goSlice(bsrc, lastMatchEnd, undefined))
+			buf = $.appendSlice(buf, $.goSlice(bsrc, lastMatchEnd, undefined), $.byteSliceHint)
 		} else {
-			buf = $.appendSlice(buf, $.stringToBytes($.sliceStringOrBytes(src, lastMatchEnd, undefined)))
+			buf = $.appendSlice(buf, $.stringToBytes($.sliceStringOrBytes(src, lastMatchEnd, undefined)), $.byteSliceHint)
 		}
 
 		return buf

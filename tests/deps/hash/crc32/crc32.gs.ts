@@ -64,7 +64,7 @@ export class digest {
 
 	public async AppendBinary(b: $.Slice<number>): globalThis.Promise<[$.Slice<number>, $.GoError]> {
 		const d: digest | $.VarRef<digest> | null = this
-		b = $.appendSlice(b, $.stringToBytes("crc\x01"))
+		b = $.appendSlice(b, $.stringToBytes("crc\x01"), $.byteSliceHint)
 		b = byteorder.BEAppendUint32(b, $.uint(await tableSum($.pointerValue<digest>(d).tab), 32))
 		b = byteorder.BEAppendUint32(b, $.uint($.pointerValue<digest>(d).crc, 32))
 		return [b, null]
@@ -99,7 +99,7 @@ export class digest {
 	public Sum(_in: $.Slice<number>): $.Slice<number> {
 		const d: digest | $.VarRef<digest> | null = this
 		let s = $.uint(digest.prototype.Sum32.call(d), 32)
-		return $.append(_in, $.uint($.uint($.uintShr(s, 24, 32), 8), 8), $.uint($.uint($.uintShr(s, 16, 32), 8), 8), $.uint($.uint($.uintShr(s, 8, 32), 8), 8), $.uint($.uint(s, 8), 8))
+		return $.append(_in, $.uint($.uint($.uintShr(s, 24, 32), 8), 8), $.uint($.uint($.uintShr(s, 16, 32), 8), 8), $.uint($.uint($.uintShr(s, 8, 32), 8), 8), $.uint($.uint(s, 8), 8), $.byteSliceHint)
 	}
 
 	public Sum32(): number {

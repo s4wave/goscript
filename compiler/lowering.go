@@ -7962,6 +7962,13 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 						appendHelper += "<" + o.tsTypeFor(ctx, slice.Elem()) + ">"
 					}
 				}
+				// Byte specialization is destination-independent: emit a trailing
+				// byte element-type hint (mirroring make([]byte,...)) so the runtime
+				// keeps a Uint8Array representation even when the append destination
+				// is nil, empty, or a generically-backed array.
+				if slice, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(expr)).Underlying().(*types.Slice); ok && isByteType(slice.Elem()) {
+					args = append(args, o.runtimeOwner.QualifiedHelper(RuntimeHelperByteSliceHint))
+				}
 				return appendHelper + "(" + strings.Join(args, ", ") + ")", diagnostics
 			case "cap":
 				if len(expr.Args) == 1 {

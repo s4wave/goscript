@@ -232,7 +232,7 @@ export class Writer {
 				writeBuf_uint64(eb, $.pointerValue<__goscript_struct.FileHeader>($.pointerValue<header>(h).FileHeader).UncompressedSize64)
 				writeBuf_uint64(eb, $.pointerValue<__goscript_struct.FileHeader>($.pointerValue<header>(h).FileHeader).CompressedSize64)
 				writeBuf_uint64(eb, $.pointerValue<header>(h).offset)
-				$.pointerValue<__goscript_struct.FileHeader>($.pointerValue<header>(h).FileHeader).Extra = $.appendSlice($.pointerValue<__goscript_struct.FileHeader>($.pointerValue<header>(h).FileHeader).Extra, $.goSlice(__goscriptShadow0, undefined, undefined))
+				$.pointerValue<__goscript_struct.FileHeader>($.pointerValue<header>(h).FileHeader).Extra = $.appendSlice($.pointerValue<__goscript_struct.FileHeader>($.pointerValue<header>(h).FileHeader).Extra, $.goSlice(__goscriptShadow0, undefined, undefined), $.byteSliceHint)
 			} else {
 				writeBuf_uint32(b, $.uint($.pointerValue<__goscript_struct.FileHeader>($.pointerValue<header>(h).FileHeader).CompressedSize, 32))
 				writeBuf_uint32(b, $.uint($.pointerValue<__goscript_struct.FileHeader>($.pointerValue<header>(h).FileHeader).UncompressedSize, 32))
@@ -444,7 +444,7 @@ export class Writer {
 			writeBuf_uint16(eb, $.uint(5, 16))
 			writeBuf_uint8(eb, $.uint(1, 8))
 			writeBuf_uint32(eb, $.uint(mt, 32))
-			$.pointerValue<__goscript_struct.FileHeader>(fh).Extra = $.appendSlice($.pointerValue<__goscript_struct.FileHeader>(fh).Extra, $.goSlice(mbuf, undefined, undefined))
+			$.pointerValue<__goscript_struct.FileHeader>(fh).Extra = $.appendSlice($.pointerValue<__goscript_struct.FileHeader>(fh).Extra, $.goSlice(mbuf, undefined, undefined), $.byteSliceHint)
 		}
 
 		let ow: io.Writer | null = null as io.Writer | null

@@ -969,6 +969,31 @@ export const cap = <T>(
   return 0
 }
 
+// byteSliceHint marks an append/appendSlice call whose result element type is
+// Go byte (uint8). The compiler emits it as a trailing argument, mirroring the
+// makeSlice byte hint, so the runtime can byte-specialize even when the
+// destination carries no representation of its own. A unique Symbol, not the
+// string "byte", is used because append's element list is variadic: a plain
+// string would collide with a genuine string element (append([]string, "byte"))
+// and be silently consumed, whereas no Go value ever produces this Symbol.
+export const byteSliceHint: unique symbol = Symbol('goscript.byteSliceHint')
+
+// byteSliceFromSlice materializes a Uint8Array holding a slice's current byte
+// values. The byte hint routes nil, empty, or generically-backed []byte
+// destinations through here so append keeps a Uint8Array representation
+// regardless of how the destination happened to be stored.
+function byteSliceFromSlice(
+  slice: Slice<number> | null | undefined,
+): Uint8Array {
+  if (slice === null || slice === undefined) {
+    return new Uint8Array(0)
+  }
+  if (slice instanceof Uint8Array) {
+    return slice
+  }
+  return Uint8Array.from(asArray(slice) as number[])
+}
+
 /**
  * Appends elements to a slice.
  * Note: In Go, append can return a new slice if the underlying array is reallocated.
@@ -986,14 +1011,15 @@ export function append<T>(
   slice: Slice<T> | Uint8Array | null,
   ...elements: any[]
 ): Slice<T> {
-  // 1. Flatten all elements from the varargs `...elements` into `varargsElements`.
-  // Determine if the result should be a Uint8Array.
-  const inputIsUint8Array = slice instanceof Uint8Array
-  const produceUint8Array = inputIsUint8Array
-
-  // If producing Uint8Array, all elements must be numbers and potentially flattened from other Uint8Arrays/number slices.
-  if (produceUint8Array) {
-    return appendByteSlice(slice as Uint8Array, elements) as any
+  // Byte specialization is destination-independent: a Go []byte value keeps a
+  // Uint8Array representation across append even when the destination was nil,
+  // empty, or a generically-backed array. The compiler signals byte element
+  // type with a trailing byteSliceHint, which is stripped here before the
+  // remaining elements are appended.
+  let byteHinted = false
+  if (elements.length > 0 && elements[elements.length - 1] === byteSliceHint) {
+    byteHinted = true
+    elements.pop()
   }
 
   // Handle generic Slice<T> (non-Uint8Array result).
@@ -1003,6 +1029,16 @@ export function append<T>(
 
   if (numAdded === 0) {
     return slice as any
+  }
+
+  // Produce a Uint8Array whenever the destination already is one or the byte
+  // hint is present; byteSliceFromSlice reallocates nil/empty/generic
+  // destinations into a Uint8Array before appending.
+  if (slice instanceof Uint8Array || byteHinted) {
+    return appendByteSlice(
+      byteSliceFromSlice(slice as Slice<number>),
+      elements,
+    ) as any
   }
 
   let originalElements: T[] | undefined
@@ -1084,26 +1120,35 @@ export function append<T>(
 export function appendSlice(
   slice: Uint8Array,
   elements: Uint8Array | Slice<number> | string | null | undefined,
+  elementHint?: typeof byteSliceHint,
 ): Uint8Array
 export function appendSlice<T>(
   slice: null,
   elements: Slice<T> | null | undefined,
+  elementHint?: typeof byteSliceHint,
 ): Slice<T>
 export function appendSlice<T>(
   slice: Slice<T>,
   elements: Slice<T> | null | undefined,
+  elementHint?: typeof byteSliceHint,
 ): Slice<T>
 export function appendSlice<T>(
   slice: Slice<T> | Uint8Array | null,
   elements: Slice<T> | Uint8Array | string | null | undefined,
+  elementHint?: typeof byteSliceHint,
 ): Slice<T> | Uint8Array {
   if (elements == null) {
     return slice as any
   }
-  if (slice instanceof Uint8Array) {
+  // Byte specialization is destination-independent: the byte hint keeps a
+  // Uint8Array representation across the spread append form even when the
+  // destination is nil, empty, or a generically-backed array.
+  if (slice instanceof Uint8Array || elementHint === byteSliceHint) {
     const source =
       typeof elements === 'string' ? stringToBytes(elements) : elements
-    return appendByteSlice(slice, [source]) as any
+    return appendByteSlice(byteSliceFromSlice(slice as Slice<number>), [
+      source,
+    ]) as any
   }
   const count = len(elements as Slice<T>)
   if (count === 0) {

@@ -21,10 +21,10 @@ export function HardwareAddr_String(a: HardwareAddr): string {
 	for (let __goscriptRangeTarget0 = a, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
 		let b = __goscriptRangeTarget0![i]
 		if (i > 0) {
-			buf = $.append(buf, $.uint(58, 8))
+			buf = $.append(buf, $.uint(58, 8), $.byteSliceHint)
 		}
-		buf = $.append(buf, $.uint($.indexStringOrBytes("0123456789abcdef", $.uintShr(b, 4, 8)), 8))
-		buf = $.append(buf, $.uint($.indexStringOrBytes("0123456789abcdef", b & 0xF), 8))
+		buf = $.append(buf, $.uint($.indexStringOrBytes("0123456789abcdef", $.uintShr(b, 4, 8)), 8), $.byteSliceHint)
+		buf = $.append(buf, $.uint($.indexStringOrBytes("0123456789abcdef", b & 0xF), 8), $.byteSliceHint)
 	}
 	return $.bytesToString(buf)
 }

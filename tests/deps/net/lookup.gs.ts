@@ -1132,7 +1132,7 @@ export class Resolver {
 			let txtJoin: $.Slice<number> = $.makeSlice<number>(0, n, "byte")
 			for (let __goscriptRangeTarget12 = txt.TXT, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget12); __rangeIndex++) {
 				let s = __goscriptRangeTarget12![__rangeIndex]
-				txtJoin = $.appendSlice(txtJoin, $.stringToBytes(s))
+				txtJoin = $.appendSlice(txtJoin, $.stringToBytes(s), $.byteSliceHint)
 			}
 			if ($.len(txts) == 0) {
 				txts = $.makeSlice<string>(0, 1, "string")

@@ -71,16 +71,16 @@ const (
 	RuntimeHelperInt64Or      RuntimeHelper = "builtin.int64Or"
 	RuntimeHelperInt64Xor     RuntimeHelper = "builtin.int64Xor"
 
-	RuntimeHelperAssignStruct      RuntimeHelper = "value.assignStruct"
-	RuntimeHelperMarkAsStructValue RuntimeHelper = "value.markAsStructValue"
-	RuntimeHelperCloneStructValue  RuntimeHelper = "value.cloneStructValue"
-	RuntimeHelperCloneArrayValue   RuntimeHelper = "value.cloneArrayValue"
-	RuntimeHelperPointerValue      RuntimeHelper = "value.pointerValue"
-	RuntimeHelperPointerValueOrNil RuntimeHelper = "value.pointerValueOrNil"
-	RuntimeHelperArrayEqual        RuntimeHelper = "value.arrayEqual"
+	RuntimeHelperAssignStruct          RuntimeHelper = "value.assignStruct"
+	RuntimeHelperMarkAsStructValue     RuntimeHelper = "value.markAsStructValue"
+	RuntimeHelperCloneStructValue      RuntimeHelper = "value.cloneStructValue"
+	RuntimeHelperCloneArrayValue       RuntimeHelper = "value.cloneArrayValue"
+	RuntimeHelperPointerValue          RuntimeHelper = "value.pointerValue"
+	RuntimeHelperPointerValueOrNil     RuntimeHelper = "value.pointerValueOrNil"
+	RuntimeHelperArrayEqual            RuntimeHelper = "value.arrayEqual"
 	RuntimeHelperNamedStructConversion RuntimeHelper = "value.namedStructConversion"
 	RuntimeHelperUnsafePointerCast     RuntimeHelper = "value.unsafePointerCast"
-	RuntimeHelperComparableEqual   RuntimeHelper = "value.comparableEqual"
+	RuntimeHelperComparableEqual       RuntimeHelper = "value.comparableEqual"
 
 	RuntimeHelperVarRef                RuntimeHelper = "varref.varRef"
 	RuntimeHelperFieldRef              RuntimeHelper = "varref.fieldRef"
@@ -96,6 +96,7 @@ const (
 	RuntimeHelperSliceToArrayPointer          RuntimeHelper = "slice.sliceToArrayPointer"
 	RuntimeHelperAppend                       RuntimeHelper = "slice.append"
 	RuntimeHelperAppendSlice                  RuntimeHelper = "slice.appendSlice"
+	RuntimeHelperByteSliceHint                RuntimeHelper = "slice.byteSliceHint"
 	RuntimeHelperCopy                         RuntimeHelper = "slice.copy"
 	RuntimeHelperAsArray                      RuntimeHelper = "slice.asArray"
 	RuntimeHelperStringToRunes                RuntimeHelper = "slice.stringToRunes"
@@ -335,6 +336,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperSliceToArrayPointer, "sliceToArrayPointer", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperAppend, "append", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperAppendSlice, "appendSlice", RuntimeHelperCategorySlice),
+		runtimeHelper(RuntimeHelperByteSliceHint, "byteSliceHint", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperCopy, "copy", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperAsArray, "asArray", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperStringToRunes, "stringToRunes", RuntimeHelperCategorySlice),

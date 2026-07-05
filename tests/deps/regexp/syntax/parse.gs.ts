@@ -2486,7 +2486,7 @@ export function canonicalName(name: string): string {
 		if ($.uint(c, 8) == $.uint(32, 8)) {
 			continue
 		}
-		b = $.append(b, $.uint(c, 8))
+		b = $.append(b, $.uint(c, 8), $.byteSliceHint)
 	}
 	if (b == null) {
 		return name

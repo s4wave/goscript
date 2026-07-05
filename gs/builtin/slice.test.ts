@@ -2,11 +2,15 @@ import { describe, expect, it } from 'vitest'
 
 import { makeMap, mapGet, mapSet } from './map.js'
 import {
+  append,
   appendSlice,
+  arrayToSlice,
+  byteSliceHint,
   bytesToString,
   copy,
   indexString,
   len,
+  makeSlice,
   runeToString,
   runesToString,
   sliceString,
@@ -33,6 +37,54 @@ describe('rune to string encoding (Go string(rune) semantics)', () => {
   it('encodes a rune slice with astral planes intact', () => {
     expect(runesToString([0x48, 0x69, 0x1f600] as never)).toBe('Hi😀')
     expect(runesToString([] as never)).toBe('')
+  })
+})
+
+describe('destination-independent byte specialization', () => {
+  it('byte-specializes appendSlice onto a nil []byte via the hint', () => {
+    const src = new Uint8Array([10, 20, 30])
+    const out = appendSlice(null, src, byteSliceHint)
+    expect(out).toBeInstanceOf(Uint8Array)
+    expect(Array.from(out as Uint8Array)).toEqual([10, 20, 30])
+  })
+
+  it('byte-specializes a Slice<number> source appended onto nil', () => {
+    const src = arrayToSlice<number>([1, 2, 3])
+    const out = appendSlice(null, src, byteSliceHint)
+    expect(out).toBeInstanceOf(Uint8Array)
+    expect(Array.from(out as Uint8Array)).toEqual([1, 2, 3])
+  })
+
+  it('byte-specializes the dAtA[i:j] sub-slice idiom onto nil', () => {
+    const dAtA = new Uint8Array([10, 20, 30, 40, 50])
+    const out = appendSlice(null, dAtA.subarray(1, 4), byteSliceHint)
+    expect(out).toBeInstanceOf(Uint8Array)
+    expect(Array.from(out as Uint8Array)).toEqual([20, 30, 40])
+  })
+
+  it('byte-specializes the variadic append form onto nil', () => {
+    const out = append(null, 65, 66, 67, byteSliceHint)
+    expect(out).toBeInstanceOf(Uint8Array)
+    expect(Array.from(out as Uint8Array)).toEqual([65, 66, 67])
+  })
+
+  it('reallocates an empty generic array destination into a Uint8Array', () => {
+    const out = append([] as number[], 7, 8, byteSliceHint)
+    expect(out).toBeInstanceOf(Uint8Array)
+    expect(Array.from(out as Uint8Array)).toEqual([7, 8])
+  })
+
+  it('keeps a pre-made byte buffer specialized across [:0] reuse', () => {
+    const buf = makeSlice<number>(0, 2, 'byte')
+    const out = appendSlice(buf, new Uint8Array([1, 2, 3, 4]), byteSliceHint)
+    expect(out).toBeInstanceOf(Uint8Array)
+    expect(Array.from(out as Uint8Array)).toEqual([1, 2, 3, 4])
+  })
+
+  it('leaves non-byte appends generic and hint-free', () => {
+    const out = append([] as string[], 'a', 'b')
+    expect(out).not.toBeInstanceOf(Uint8Array)
+    expect(Array.from(out as string[])).toEqual(['a', 'b'])
   })
 })
 

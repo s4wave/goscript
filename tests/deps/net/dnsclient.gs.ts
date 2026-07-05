@@ -203,10 +203,10 @@ export function reverseaddr(addr: string): [string, $.GoError] {
 	// Add it, in reverse, to the buffer
 	for (let i = $.len((ip as __goscript_ip.IP)) - 1; i >= 0; i--) {
 		let v = $.uint($.arrayIndex(ip!, i), 8)
-		buf = $.append(buf, $.uint($.indexStringOrBytes("0123456789abcdef", v & 0xF), 8), $.uint(46, 8), $.uint($.indexStringOrBytes("0123456789abcdef", $.uintShr(v, 4, 8)), 8), $.uint(46, 8))
+		buf = $.append(buf, $.uint($.indexStringOrBytes("0123456789abcdef", v & 0xF), 8), $.uint(46, 8), $.uint($.indexStringOrBytes("0123456789abcdef", $.uintShr(v, 4, 8)), 8), $.uint(46, 8), $.byteSliceHint)
 	}
 	// Append "ip6.arpa." and return (buf already has the final .)
-	buf = $.appendSlice(buf, $.stringToBytes("ip6.arpa."))
+	buf = $.appendSlice(buf, $.stringToBytes("ip6.arpa."), $.byteSliceHint)
 	return [$.bytesToString(buf), null]
 }
 
