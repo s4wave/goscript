@@ -48,11 +48,11 @@ export async function main(): globalThis.Promise<void> {
 	// === Test cases that might trigger "unhandled string conversion" ===
 
 	// string([]byte) conversion
-	let bytes: $.Slice<number> = $.byteSliceLiteral([$.uint(72, 8), $.uint(101, 8), $.uint(108, 8), $.uint(108, 8), $.uint(111, 8)])
+	let bytes: $.Slice<number> = new Uint8Array([72, 101, 108, 108, 111]) as $.Slice<number>
 	let bytesString = $.bytesToString(bytes)
 	$.println(bytesString)
-	$.println($.stringEqual($.bytesToString($.byteSliceLiteral([$.uint(0xea, 8), $.uint(0x08, 8), $.uint(0x00, 8)])), $.bytesToString(new Uint8Array([234, 8, 0]))))
-	$.println($.stringEqual($.bytesToString($.byteSliceLiteral([$.uint(0xc3, 8), $.uint(0xa9, 8)])), "é"))
+	$.println($.stringEqual($.bytesToString(new Uint8Array([234, 8, 0]) as $.Slice<number>), $.bytesToString(new Uint8Array([234, 8, 0]))))
+	$.println($.stringEqual($.bytesToString(new Uint8Array([195, 169]) as $.Slice<number>), "é"))
 	const magic: string = $.bytesToString(new Uint8Array([255, 6, 0, 0, 83, 50, 115, 84, 119, 79]))
 	$.println((10 as number) == 10)
 	let magicBytes: $.Slice<number> = new Uint8Array([255, 6, 0, 0, 83, 50, 115, 84, 119, 79])

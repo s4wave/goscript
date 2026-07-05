@@ -10714,6 +10714,7 @@ func (o *LoweringOwner) lowerSliceCompositeLit(
 	lit *ast.CompositeLit,
 	slice *types.Slice,
 ) (string, []Diagnostic) {
+	isByte := isByteType(slice.Elem())
 	values := make([]string, 0, len(lit.Elts))
 	nextIndex := 0
 	var diagnostics []Diagnostic
@@ -10738,21 +10739,32 @@ func (o *LoweringOwner) lowerSliceCompositeLit(
 		for len(values) <= index {
 			values = append(values, o.lowerZeroValueExprFor(ctx, slice.Elem()))
 		}
+		// A constant byte element folds to its plain numeric literal: the Go
+		// type checker already proved it fits uint8, so a runtime $.uint(k, 8)
+		// truncation is dead work. Non-constant elements keep the runtime
+		// truncation that lowerValueForTarget applies for the byte target.
+		if isByte {
+			if folded, ok := foldByteConstant(ctx, valueExpr); ok {
+				values[index] = folded
+				nextIndex = index + 1
+				continue
+			}
+		}
 		value, valueDiagnostics := o.lowerExpr(ctx, valueExpr)
 		diagnostics = append(diagnostics, valueDiagnostics...)
 		values[index] = o.lowerValueForTarget(ctx, valueExpr, slice.Elem(), value)
 		nextIndex = index + 1
 	}
-	// Byte specialization is a property of the Go element type, not the
-	// backing representation: a []byte literal keeps the Uint8Array
-	// representation shared by the make, conversion, and array-literal paths.
-	// byteSliceLiteral returns the wider Slice<number> type so the value flows
-	// into generic Slice<unknown> parameters and clear() without narrowing to a
-	// bare Uint8Array. Keyed/sparse literals route here too and are already
+	// Byte specialization is a property of the Go element type, not the backing
+	// representation: a []byte literal keeps the Uint8Array representation
+	// shared by the make, conversion, and array-literal paths. The literal is
+	// asserted to the wider Slice<number> type so it still flows into generic
+	// Slice<unknown> parameters and clear(); a bare Uint8Array narrows too
+	// tightly at those call sites. Keyed/sparse literals route here too and are
 	// zero-filled in values, so the same construction covers them.
-	if isByteType(slice.Elem()) {
-		return o.runtimeOwner.QualifiedHelper(RuntimeHelperByteSliceLiteral) +
-			"([" + strings.Join(values, ", ") + "])", diagnostics
+	if isByte {
+		return "new Uint8Array([" + strings.Join(values, ", ") + "]) as $.Slice<" +
+			o.tsSliceElemTypeFor(ctx, slice.Elem()) + ">", diagnostics
 	}
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayToSlice) +
 		"<" + o.tsSliceElemTypeFor(ctx, slice.Elem()) + ">([" + strings.Join(values, ", ") + "])", diagnostics
@@ -11558,6 +11570,23 @@ func constIntExpr(ctx lowerFileContext, expr ast.Expr) (int, bool) {
 		return 0, false
 	}
 	return int(value), true
+}
+
+// foldByteConstant folds a compile-time constant byte element to its plain
+// numeric TypeScript literal. The Go type checker has already validated the
+// value is representable as uint8, so the folded literal needs no runtime
+// $.uint(x, 8) truncation. Non-constant elements return ok=false so the caller
+// keeps the runtime truncation wrapping.
+func foldByteConstant(ctx lowerFileContext, expr ast.Expr) (string, bool) {
+	tv, ok := ctx.semPkg.source.TypesInfo.Types[expr]
+	if !ok || tv.Value == nil {
+		return "", false
+	}
+	value, ok := constant.Uint64Val(constant.ToInt(tv.Value))
+	if !ok {
+		return "", false
+	}
+	return strconv.FormatUint(value&0xff, 10), true
 }
 
 func (o *LoweringOwner) tsSignatureParamsFor(ctx lowerFileContext, signature *types.Signature, asyncCompatibleFunctionParams bool) string {

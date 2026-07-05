@@ -19,10 +19,10 @@ export function parenIndexValue(x: $.Slice<number>, i: number): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let buf: $.Slice<number> = $.byteSliceLiteral([$.uint(1, 8), $.uint(2, 8), $.uint(3, 8), $.uint(4, 8)])
+	let buf: $.Slice<number> = new Uint8Array([1, 2, 3, 4]) as $.Slice<number>
 	let left: $.Slice<number> = $.goSlice(buf, 1, 3)
 	let right: $.Slice<number> = $.goSlice(buf, 2, 4)
-	let other: $.Slice<number> = $.byteSliceLiteral([$.uint(8, 8), $.uint(9, 8)])
+	let other: $.Slice<number> = new Uint8Array([8, 9]) as $.Slice<number>
 
 	$.println("overlap:", anyOverlap(left, right))
 	$.println("separate:", anyOverlap(left, other))

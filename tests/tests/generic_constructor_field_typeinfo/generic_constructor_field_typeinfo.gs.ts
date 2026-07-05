@@ -86,7 +86,7 @@ export class sampleBlock {
 	}
 
 	public MarshalBlock(): [$.Slice<number>, $.GoError] {
-		return [$.byteSliceLiteral([$.uint(1, 8), $.uint(2, 8), $.uint(3, 8)]), null]
+		return [new Uint8Array([1, 2, 3]) as $.Slice<number>, null]
 	}
 
 	public UnmarshalBlock(_p0: $.Slice<number>): $.GoError {

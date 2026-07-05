@@ -28,4 +28,11 @@ func main() {
 	k := []byte{5: 1}
 	println("keyed:", k)
 	println("keyed len:", len(k))
+
+	// A non-constant element keeps its runtime byte truncation while the
+	// constant element folds to a plain literal.
+	n := 258
+	m := []byte{byte(n), 2}
+	println("mixed:", m)
+	println("mixed index:", m[0], m[1])
 }

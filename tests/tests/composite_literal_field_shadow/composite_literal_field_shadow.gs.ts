@@ -44,7 +44,7 @@ export function newBuffer(data: $.Slice<number>): buffer | $.VarRef<buffer> | nu
 }
 
 export async function main(): globalThis.Promise<void> {
-	let buf: buffer | $.VarRef<buffer> | null = newBuffer($.byteSliceLiteral([$.uint(7, 8)]))
+	let buf: buffer | $.VarRef<buffer> | null = newBuffer(new Uint8Array([7]) as $.Slice<number>)
 	$.println($.uint($.arrayIndex($.pointerValue<buffer>(buf).buf!, 0), 8))
 }
 

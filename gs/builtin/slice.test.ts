@@ -6,7 +6,6 @@ import {
   appendSlice,
   arrayToSlice,
   byteSliceHint,
-  byteSliceLiteral,
   bytesToString,
   copy,
   indexString,
@@ -86,19 +85,6 @@ describe('destination-independent byte specialization', () => {
     const out = append([] as string[], 'a', 'b')
     expect(out).not.toBeInstanceOf(Uint8Array)
     expect(Array.from(out as string[])).toEqual(['a', 'b'])
-  })
-
-  it('builds a Uint8Array-backed []byte literal via byteSliceLiteral', () => {
-    const out = byteSliceLiteral([1, 2, 3])
-    expect(out).toBeInstanceOf(Uint8Array)
-    expect(len(out)).toBe(3)
-    expect(Array.from(out as Uint8Array)).toEqual([1, 2, 3])
-  })
-
-  it('builds an empty non-nil Uint8Array for an empty []byte literal', () => {
-    const out = byteSliceLiteral([])
-    expect(out).toBeInstanceOf(Uint8Array)
-    expect(len(out)).toBe(0)
   })
 })
 

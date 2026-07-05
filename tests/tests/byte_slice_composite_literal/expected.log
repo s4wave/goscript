@@ -7,3 +7,5 @@ empty: Uint8Array(0) []
 empty len: 0
 keyed: Uint8Array(6) [ 0, 0, 0, 0, 0, 1 ]
 keyed len: 6
+mixed: Uint8Array(2) [ 2, 2 ]
+mixed index: 2 2

@@ -350,7 +350,7 @@ export async function main(): globalThis.Promise<void> {
 	n64 = __goscriptTuple6[0]
 	err = __goscriptTuple6[1]
 	$.println("Copy bytes WriteTo async writer - bytes:", n64, "err:", err == null)
-	let viewBacking: $.Slice<number> = $.byteSliceLiteral([$.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(99, 8)])
+	let viewBacking: $.Slice<number> = new Uint8Array([0, 0, 0, 0, 99]) as $.Slice<number>
 	let __goscriptTuple7: any = bytes.Buffer.prototype.Read.call($.pointerValue<bytes.Buffer>(bytes.NewBuffer(new Uint8Array([118, 105, 101, 119]))), $.goSlice(viewBacking, undefined, 4))
 	n = __goscriptTuple7[0]
 	err = __goscriptTuple7[1]

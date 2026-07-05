@@ -133,7 +133,7 @@ export function IPv4(a: number, b: number, c: number, d: number): IP {
 	return (p as IP)
 }
 
-export let v4InV6Prefix: $.Slice<number> = $.byteSliceLiteral([$.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0xff, 8), $.uint(0xff, 8)])
+export let v4InV6Prefix: $.Slice<number> = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255]) as $.Slice<number>
 
 export function __goscript_set_v4InV6Prefix(__goscriptValue: $.Slice<number>): void {
 	v4InV6Prefix = __goscriptValue
@@ -194,37 +194,37 @@ export function __goscript_set_IPv4zero(__goscriptValue: IP): void {
 	IPv4zero = __goscriptValue
 }
 
-export let IPv6zero: IP = ($.byteSliceLiteral([$.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8)]) as IP)
+export let IPv6zero: IP = (new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) as $.Slice<number> as IP)
 
 export function __goscript_set_IPv6zero(__goscriptValue: IP): void {
 	IPv6zero = __goscriptValue
 }
 
-export let IPv6unspecified: IP = ($.byteSliceLiteral([$.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8)]) as IP)
+export let IPv6unspecified: IP = (new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) as $.Slice<number> as IP)
 
 export function __goscript_set_IPv6unspecified(__goscriptValue: IP): void {
 	IPv6unspecified = __goscriptValue
 }
 
-export let IPv6loopback: IP = ($.byteSliceLiteral([$.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(1, 8)]) as IP)
+export let IPv6loopback: IP = (new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]) as $.Slice<number> as IP)
 
 export function __goscript_set_IPv6loopback(__goscriptValue: IP): void {
 	IPv6loopback = __goscriptValue
 }
 
-export let IPv6interfacelocalallnodes: IP = ($.byteSliceLiteral([$.uint(0xff, 8), $.uint(0x01, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0x01, 8)]) as IP)
+export let IPv6interfacelocalallnodes: IP = (new Uint8Array([255, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]) as $.Slice<number> as IP)
 
 export function __goscript_set_IPv6interfacelocalallnodes(__goscriptValue: IP): void {
 	IPv6interfacelocalallnodes = __goscriptValue
 }
 
-export let IPv6linklocalallnodes: IP = ($.byteSliceLiteral([$.uint(0xff, 8), $.uint(0x02, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0x01, 8)]) as IP)
+export let IPv6linklocalallnodes: IP = (new Uint8Array([255, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]) as $.Slice<number> as IP)
 
 export function __goscript_set_IPv6linklocalallnodes(__goscriptValue: IP): void {
 	IPv6linklocalallnodes = __goscriptValue
 }
 
-export let IPv6linklocalallrouters: IP = ($.byteSliceLiteral([$.uint(0xff, 8), $.uint(0x02, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0, 8), $.uint(0x02, 8)]) as IP)
+export let IPv6linklocalallrouters: IP = (new Uint8Array([255, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2]) as $.Slice<number> as IP)
 
 export function __goscript_set_IPv6linklocalallrouters(__goscriptValue: IP): void {
 	IPv6linklocalallrouters = __goscriptValue

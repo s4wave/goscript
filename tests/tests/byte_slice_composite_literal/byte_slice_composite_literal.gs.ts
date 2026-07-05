@@ -42,26 +42,33 @@ export async function main(): globalThis.Promise<void> {
 	// A non-empty []byte composite literal must keep the Uint8Array
 	// representation shared by the make, conversion, and array-literal
 	// paths, rather than degrading to a generic Array<number> backing.
-	let b: $.Slice<number> = $.byteSliceLiteral([$.uint(1, 8), $.uint(2, 8), $.uint(3, 8)])
+	let b: $.Slice<number> = new Uint8Array([1, 2, 3]) as $.Slice<number>
 	$.println("non-empty:", b)
 	$.println("index:", $.uint($.arrayIndex(b!, 0), 8), $.uint($.arrayIndex(b!, 1), 8), $.uint($.arrayIndex(b!, 2), 8))
 	$.println("len:", $.len(b))
 
 	// Storing the literal in a struct field and reading it back must
 	// preserve the Uint8Array backing without any append repairing it.
-	let h = $.markAsStructValue(new holder({data: $.byteSliceLiteral([$.uint(9, 8), $.uint(8, 8), $.uint(7, 8)])}))
+	let h = $.markAsStructValue(new holder({data: new Uint8Array([9, 8, 7]) as $.Slice<number>}))
 	$.println("stored:", h.data)
 	$.println("stored index:", $.uint($.arrayIndex(h.data!, 1), 8))
 
 	// An empty non-nil []byte literal stays a Uint8Array.
-	let e: $.Slice<number> = $.byteSliceLiteral([])
+	let e: $.Slice<number> = new Uint8Array([]) as $.Slice<number>
 	$.println("empty:", e)
 	$.println("empty len:", $.len(e))
 
 	// A keyed/sparse []byte literal is zero-filled and stays a Uint8Array.
-	let k: $.Slice<number> = $.byteSliceLiteral([0, 0, 0, 0, 0, $.uint(1, 8)])
+	let k: $.Slice<number> = new Uint8Array([0, 0, 0, 0, 0, 1]) as $.Slice<number>
 	$.println("keyed:", k)
 	$.println("keyed len:", $.len(k))
+
+	// A non-constant element keeps its runtime byte truncation while the
+	// constant element folds to a plain literal.
+	let n = 258
+	let m: $.Slice<number> = new Uint8Array([$.uint($.uint(n, 8), 8), 2]) as $.Slice<number>
+	$.println("mixed:", m)
+	$.println("mixed index:", $.uint($.arrayIndex(m!, 0), 8), $.uint($.arrayIndex(m!, 1), 8))
 }
 
 if ($.isMainScript(import.meta)) {

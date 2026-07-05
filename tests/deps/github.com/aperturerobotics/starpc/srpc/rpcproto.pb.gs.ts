@@ -1506,7 +1506,7 @@ export class CallStart {
 					}
 					$.pointerValue<CallStart>(m).Data = $.appendSlice($.goSlice($.pointerValue<CallStart>(m).Data, undefined, 0), $.goSlice(dAtA, iNdEx, postIndex), $.byteSliceHint)
 					if ($.pointerValue<CallStart>(m).Data == null) {
-						$.pointerValue<CallStart>(m).Data = $.byteSliceLiteral([])
+						$.pointerValue<CallStart>(m).Data = new Uint8Array([]) as $.Slice<number>
 					}
 					iNdEx = postIndex
 					break
@@ -2025,7 +2025,7 @@ export class CallData {
 					}
 					$.pointerValue<CallData>(m).Data = $.appendSlice($.goSlice($.pointerValue<CallData>(m).Data, undefined, 0), $.goSlice(dAtA, iNdEx, postIndex), $.byteSliceHint)
 					if ($.pointerValue<CallData>(m).Data == null) {
-						$.pointerValue<CallData>(m).Data = $.byteSliceLiteral([])
+						$.pointerValue<CallData>(m).Data = new Uint8Array([]) as $.Slice<number>
 					}
 					iNdEx = postIndex
 					break

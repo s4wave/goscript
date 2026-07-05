@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let dAtA: $.Slice<number> = $.byteSliceLiteral([$.uint(10, 8), $.uint(20, 8), $.uint(30, 8), $.uint(40, 8), $.uint(50, 8)])
+	let dAtA: $.Slice<number> = new Uint8Array([10, 20, 30, 40, 50]) as $.Slice<number>
 
 	// Protobuf idiom: append a sub-slice onto a truncated nil []byte. The
 	// result must stay byte-specialized regardless of the nil destination.

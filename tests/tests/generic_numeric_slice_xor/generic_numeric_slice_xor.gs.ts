@@ -12,8 +12,8 @@ export function xorLoop<T>(__typeArgs: $.GenericTypeArgs | undefined, dst: $.Sli
 }
 
 export async function main(): globalThis.Promise<void> {
-	let dst: $.Slice<number> = $.byteSliceLiteral([$.uint(0, 8), $.uint(0, 8)])
-	xorLoop({T: { type: { kind: $.TypeKind.Basic, name: "uint8" }, zero: () => 0 }}, dst, $.byteSliceLiteral([$.uint(1, 8), $.uint(3, 8)]), $.byteSliceLiteral([$.uint(2, 8), $.uint(1, 8)]))
+	let dst: $.Slice<number> = new Uint8Array([0, 0]) as $.Slice<number>
+	xorLoop({T: { type: { kind: $.TypeKind.Basic, name: "uint8" }, zero: () => 0 }}, dst, new Uint8Array([1, 3]) as $.Slice<number>, new Uint8Array([2, 1]) as $.Slice<number>)
 	$.println($.uint($.arrayIndex(dst!, 0), 8), $.uint($.arrayIndex(dst!, 1), 8))
 }
 

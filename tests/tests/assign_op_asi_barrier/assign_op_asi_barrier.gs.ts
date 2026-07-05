@@ -17,7 +17,7 @@ export function consume(v: $.VarRef<$.Slice<$.Slice<number>>> | null, n: bigint)
 }
 
 export async function main(): globalThis.Promise<void> {
-	let values: $.VarRef<$.Slice<$.Slice<number>>> = $.varRef($.arrayToSlice<$.Slice<number>>([$.byteSliceLiteral([$.uint(1, 8), $.uint(2, 8)]), $.byteSliceLiteral([$.uint(3, 8)])]))
+	let values: $.VarRef<$.Slice<$.Slice<number>>> = $.varRef($.arrayToSlice<$.Slice<number>>([new Uint8Array([1, 2]) as $.Slice<number>, new Uint8Array([3]) as $.Slice<number>]))
 	consume(values, 2n)
 	$.println($.len(values.value), $.arrayIndex(values.value!, 0) == null)
 }
