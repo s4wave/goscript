@@ -402,7 +402,7 @@ export class Addr {
 
 	public MarshalText(): [$.Slice<number>, $.GoError] {
 		const ip = this
-		let buf: $.Slice<number> = $.arrayToSlice<number>([])
+		let buf: $.Slice<number> = $.byteSliceLiteral([])
 		switch (ip.z) {
 			case z0:
 			{
@@ -1005,7 +1005,7 @@ export class AddrPort {
 
 	public MarshalText(): [$.Slice<number>, $.GoError] {
 		const p = this
-		let buf: $.Slice<number> = $.arrayToSlice<number>([])
+		let buf: $.Slice<number> = $.byteSliceLiteral([])
 		switch (p.ip.z) {
 			case z0:
 			{
@@ -1267,7 +1267,7 @@ export class Prefix {
 
 	public MarshalText(): [$.Slice<number>, $.GoError] {
 		const p = this
-		let buf: $.Slice<number> = $.arrayToSlice<number>([])
+		let buf: $.Slice<number> = $.byteSliceLiteral([])
 		switch (p.ip.z) {
 			case z0:
 			{

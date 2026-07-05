@@ -287,10 +287,10 @@ export async function main(): globalThis.Promise<void> {
 	$.println("Chan size:", $.uint(await $.pointerValue<Exclude<reflect.Type, null>>(chanType).Size(), 64))
 
 	// Test Value.Pointer on addressable slice elements.
-	let pointerBuf: $.Slice<number> = $.arrayToSlice<number>([$.uint(1, 8), $.uint(2, 8), $.uint(3, 8), $.uint(4, 8)])
+	let pointerBuf: $.Slice<number> = $.byteSliceLiteral([$.uint(1, 8), $.uint(2, 8), $.uint(3, 8), $.uint(4, 8)])
 	let pointerLeft: $.Slice<number> = $.goSlice(pointerBuf, 1, 3)
 	let pointerRight: $.Slice<number> = $.goSlice(pointerBuf, 2, 4)
-	let pointerOther: $.Slice<number> = $.arrayToSlice<number>([$.uint(8, 8), $.uint(9, 8)])
+	let pointerOther: $.Slice<number> = $.byteSliceLiteral([$.uint(8, 8), $.uint(9, 8)])
 	$.println("Pointer overlap:", reflectOverlap(pointerLeft, pointerRight))
 	$.println("Pointer separate:", reflectOverlap(pointerLeft, pointerOther))
 	$.println("Pointer same:", reflectSameStart(pointerLeft, $.goSlice(pointerBuf, 1, undefined)))

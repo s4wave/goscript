@@ -121,7 +121,7 @@ export function uint64Len(g: $.Slice<bigint>): number {
 
 export async function main(): globalThis.Promise<void> {
 	let g: $.Slice<bigint> = $.arrayToSlice<bigint>([7n, 11n, 22n, 33n])
-	let data: $.Slice<number> = $.arrayToSlice<number>([$.uint(1, 8), $.uint(2, 8), $.uint(3, 8), $.uint(0, 8), $.uint(1, 8), $.uint(2, 8), $.uint(3, 8), $.uint(0, 8), $.uint(1, 8), $.uint(2, 8), $.uint(3, 8), $.uint(0, 8)])
+	let data: $.Slice<number> = $.byteSliceLiteral([$.uint(1, 8), $.uint(2, 8), $.uint(3, 8), $.uint(0, 8), $.uint(1, 8), $.uint(2, 8), $.uint(3, 8), $.uint(0, 8), $.uint(1, 8), $.uint(2, 8), $.uint(3, 8), $.uint(0, 8)])
 	$.println("algo", algorithm(data, $.len(data), g, 3n, 1n, 0, 3))
 
 	let c: chunker | $.VarRef<chunker> | null = new chunker()

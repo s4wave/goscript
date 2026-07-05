@@ -68,7 +68,7 @@ export class handler {
 				}
 				total = total + ($.len(srpc.RawMessage.prototype.GetData.call(msg)))
 			}
-			return [true, await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage($.arrayToSlice<number>([$.uint($.uint(total, 8), 8)]), false), "*srpc.RawMessage"))]
+			return [true, await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage($.byteSliceLiteral([$.uint($.uint(total, 8), 8)]), false), "*srpc.RawMessage"))]
 		}
 		if (strm == null) {
 			return [true, null]
@@ -584,7 +584,7 @@ export async function openHeldStreams(ctx: context.Context | null, client: srpc.
 		queueMicrotask(async () => { await (async (idx: number): globalThis.Promise<void> => {
 			let [strm, err] = await $.pointerValue<Exclude<srpc.Client, null>>(client).NewStream(ctx, "svc", "hold", null)
 			if (err == null) {
-				err = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage($.arrayToSlice<number>([$.uint($.uint(idx, 8), 8)]), false), "*srpc.RawMessage"))
+				err = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage($.byteSliceLiteral([$.uint($.uint(idx, 8), 8)]), false), "*srpc.RawMessage"))
 			}
 			await $.chanSend(resultCh, $.markAsStructValue(new streamOpenResult({stream: strm, err: err})))
 		})(i) })
@@ -704,13 +704,13 @@ export async function probeStream(ctx: context.Context | null, client: srpc.Clie
 		return [0, err]
 	}
 	{
-		let __goscriptShadow0 = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage($.arrayToSlice<number>([$.uint(a, 8)]), false), "*srpc.RawMessage"))
+		let __goscriptShadow0 = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage($.byteSliceLiteral([$.uint(a, 8)]), false), "*srpc.RawMessage"))
 		if (__goscriptShadow0 != null) {
 			return [0, __goscriptShadow0]
 		}
 	}
 	{
-		let __goscriptShadow1 = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage($.arrayToSlice<number>([$.uint(b, 8)]), false), "*srpc.RawMessage"))
+		let __goscriptShadow1 = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage($.byteSliceLiteral([$.uint(b, 8)]), false), "*srpc.RawMessage"))
 		if (__goscriptShadow1 != null) {
 			return [0, __goscriptShadow1]
 		}
@@ -1003,7 +1003,7 @@ export async function exercisePushablePacketWriter(): globalThis.Promise<boolean
 
 	let writer: srpc.PushablePacketWriter | $.VarRef<srpc.PushablePacketWriter> | null = srpc.NewPushablePacketWriter($.markAsStructValue($.cloneStructValue(js.ValueOf($.interfaceValue<any>(new globalThis.Map<string, any>([["push", $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(pushFn)), "js.Func")], ["end", $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(endFn)), "js.Func")]]), "map[string]any")))))
 	{
-		let err = await srpc.PushablePacketWriter.prototype.WritePacket.call(writer, srpc.NewCallStartPacket("svc", "push", $.arrayToSlice<number>([$.uint(7, 8), $.uint(8, 8), $.uint(9, 8)]), false))
+		let err = await srpc.PushablePacketWriter.prototype.WritePacket.call(writer, srpc.NewCallStartPacket("svc", "push", $.byteSliceLiteral([$.uint(7, 8), $.uint(8, 8), $.uint(9, 8)]), false))
 		if (err != null) {
 			$.println("pushable call-start error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return false
@@ -1038,7 +1038,7 @@ export async function exercisePushablePacketWriter(): globalThis.Promise<boolean
 		if (start == null) {
 			return io.ErrUnexpectedEOF
 		}
-		sawStart = (($.stringEqual(srpc.CallStart.prototype.GetRpcService.call(start), "svc")) && ($.stringEqual(srpc.CallStart.prototype.GetRpcMethod.call(start), "push"))) && ($.stringEqual($.bytesToString(srpc.CallStart.prototype.GetData.call(start)), $.bytesToString($.arrayToSlice<number>([$.uint(7, 8), $.uint(8, 8), $.uint(9, 8)]))))
+		sawStart = (($.stringEqual(srpc.CallStart.prototype.GetRpcService.call(start), "svc")) && ($.stringEqual(srpc.CallStart.prototype.GetRpcMethod.call(start), "push"))) && ($.stringEqual($.bytesToString(srpc.CallStart.prototype.GetData.call(start)), $.bytesToString($.byteSliceLiteral([$.uint(7, 8), $.uint(8, 8), $.uint(9, 8)]))))
 		return null
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "srpc.Packet" }], results: ["error"] } as $.FunctionTypeInfo)))
 	{
@@ -1083,7 +1083,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.pointerValue<Exclude<srpc.Mux, null>>(mux).InvokeMethod("svc", "method", null)
 	closeEmbedded
 	$.functionValue(async (strm: srpc.StreamRecv | null): globalThis.Promise<$.GoError> => await recvOne({T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, strm), ({ kind: $.TypeKind.Function, params: ["srpc.StreamRecv"], results: ["error"] } as $.FunctionTypeInfo))
-	srpc.NewRawMessage($.arrayToSlice<number>([$.uint(1, 8), $.uint(2, 8), $.uint(3, 8)]), true)
+	srpc.NewRawMessage($.byteSliceLiteral([$.uint(1, 8), $.uint(2, 8), $.uint(3, 8)]), true)
 	let server: srpc.Server | $.VarRef<srpc.Server> | null = srpc.NewServer((mux as srpc.Invoker | null))
 	let client = srpc.NewClient(srpc.NewServerPipe(server))
 	let unaryResp: srpc.RawMessage | $.VarRef<srpc.RawMessage> | null = srpc.NewRawMessage(null, false)
@@ -1100,8 +1100,8 @@ export async function main(): globalThis.Promise<void> {
 		$.println("stream open error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
 	}
-	await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage($.arrayToSlice<number>([$.uint(1, 8), $.uint(2, 8), $.uint(3, 8)]), false), "*srpc.RawMessage"))
-	await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage($.arrayToSlice<number>([$.uint(4, 8), $.uint(5, 8)]), false), "*srpc.RawMessage"))
+	await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage($.byteSliceLiteral([$.uint(1, 8), $.uint(2, 8), $.uint(3, 8)]), false), "*srpc.RawMessage"))
+	await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage($.byteSliceLiteral([$.uint(4, 8), $.uint(5, 8)]), false), "*srpc.RawMessage"))
 	await $.pointerValue<Exclude<srpc.Stream, null>>(strm).CloseSend()
 	let resp: srpc.RawMessage | $.VarRef<srpc.RawMessage> | null = srpc.NewRawMessage(null, false)
 	{

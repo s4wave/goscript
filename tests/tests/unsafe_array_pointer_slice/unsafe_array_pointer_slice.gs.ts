@@ -9,7 +9,7 @@ import "@goscript/unsafe/index.js"
 export type shadow = Uint8Array
 
 export async function main(): globalThis.Promise<void> {
-	let buf: $.Slice<number> = $.arrayToSlice<number>([$.uint(9, 8), $.uint(1, 8), $.uint(2, 8), $.uint(3, 8), $.uint(4, 8)])
+	let buf: $.Slice<number> = $.byteSliceLiteral([$.uint(9, 8), $.uint(1, 8), $.uint(2, 8), $.uint(3, 8), $.uint(4, 8)])
 	let ptr: $.VarRef<Uint8Array> | null = $.unsafePointerCast<$.VarRef<Uint8Array> | null>($.arrayPointerFromIndexRef<number>($.indexRef(buf!, 1), 4, 1, 1))
 	let view: $.Slice<number> = $.goSlice($.pointerValue<Uint8Array>(ptr), undefined, undefined)
 	$.println($.len(view), $.uint($.arrayIndex(view!, 0), 8), $.uint($.arrayIndex(view!, 3), 8))

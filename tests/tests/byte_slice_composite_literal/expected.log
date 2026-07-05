@@ -1,0 +1,9 @@
+non-empty: Uint8Array(3) [ 1, 2, 3 ]
+index: 1 2 3
+len: 3
+stored: Uint8Array(3) [ 9, 8, 7 ]
+stored index: 8
+empty: Uint8Array(0) []
+empty len: 0
+keyed: Uint8Array(6) [ 0, 0, 0, 0, 0, 1 ]
+keyed len: 6

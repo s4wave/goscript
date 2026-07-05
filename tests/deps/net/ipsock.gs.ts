@@ -451,5 +451,5 @@ export function loopbackIP(net: string): __goscript_ip.IP {
 	if ((!$.stringEqual(net, "")) && ($.uint($.indexStringOrBytes(net, $.len(net) - 1), 8) == $.uint(54, 8))) {
 		return (__goscript_ip.IPv6loopback as __goscript_ip.IP)
 	}
-	return ($.arrayToSlice<number>([$.uint(127, 8), $.uint(0, 8), $.uint(0, 8), $.uint(1, 8)]) as __goscript_ip.IP)
+	return ($.byteSliceLiteral([$.uint(127, 8), $.uint(0, 8), $.uint(0, 8), $.uint(1, 8)]) as __goscript_ip.IP)
 }

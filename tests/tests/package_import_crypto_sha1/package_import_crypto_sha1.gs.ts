@@ -25,7 +25,7 @@ export async function main(): globalThis.Promise<void> {
 	n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
 	$.println("write bc", n, err == null)
-	let stream: $.Slice<number> = await $.pointerValue<Exclude<hash.Hash, null>>(h).Sum($.arrayToSlice<number>([$.uint(1, 8), $.uint(2, 8)]))
+	let stream: $.Slice<number> = await $.pointerValue<Exclude<hash.Hash, null>>(h).Sum($.byteSliceLiteral([$.uint(1, 8), $.uint(2, 8)]))
 	$.println("stream len", $.len(stream))
 	$.println("stream prefix", $.uint($.arrayIndex(stream!, 0), 8), $.uint($.arrayIndex(stream!, 1), 8))
 	$.println("stream digest", $.uint($.arrayIndex(stream!, 2), 8), $.uint($.arrayIndex(stream!, 21), 8))

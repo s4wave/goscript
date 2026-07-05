@@ -67,7 +67,7 @@ export async function main(): globalThis.Promise<void> {
 }
 
 export function buildNamedItems(): [$.Slice<namedItem>, boolean] {
-	return [$.arrayToSlice<namedItem>([$.markAsStructValue(new namedItem({key: "skip", data: $.arrayToSlice<number>([$.uint(0, 8)])})), $.markAsStructValue(new namedItem({key: "keep", data: $.arrayToSlice<number>([$.uint(1, 8), $.uint(2, 8), $.uint(3, 8)])}))]), true]
+	return [$.arrayToSlice<namedItem>([$.markAsStructValue(new namedItem({key: "skip", data: $.byteSliceLiteral([$.uint(0, 8)])})), $.markAsStructValue(new namedItem({key: "keep", data: $.byteSliceLiteral([$.uint(1, 8), $.uint(2, 8), $.uint(3, 8)])}))]), true]
 }
 
 if ($.isMainScript(import.meta)) {

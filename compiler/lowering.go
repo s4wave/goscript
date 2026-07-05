@@ -10743,6 +10743,17 @@ func (o *LoweringOwner) lowerSliceCompositeLit(
 		values[index] = o.lowerValueForTarget(ctx, valueExpr, slice.Elem(), value)
 		nextIndex = index + 1
 	}
+	// Byte specialization is a property of the Go element type, not the
+	// backing representation: a []byte literal keeps the Uint8Array
+	// representation shared by the make, conversion, and array-literal paths.
+	// byteSliceLiteral returns the wider Slice<number> type so the value flows
+	// into generic Slice<unknown> parameters and clear() without narrowing to a
+	// bare Uint8Array. Keyed/sparse literals route here too and are already
+	// zero-filled in values, so the same construction covers them.
+	if isByteType(slice.Elem()) {
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperByteSliceLiteral) +
+			"([" + strings.Join(values, ", ") + "])", diagnostics
+	}
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayToSlice) +
 		"<" + o.tsSliceElemTypeFor(ctx, slice.Elem()) + ">([" + strings.Join(values, ", ") + "])", diagnostics
 }

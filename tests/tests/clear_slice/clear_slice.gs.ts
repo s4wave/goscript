@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let buf: $.Slice<number> = $.arrayToSlice<number>([$.uint(1, 8), $.uint(2, 8), $.uint(3, 8)])
+	let buf: $.Slice<number> = $.byteSliceLiteral([$.uint(1, 8), $.uint(2, 8), $.uint(3, 8)])
 	$.clear(buf)
 	$.println("bytes:", $.uint($.arrayIndex(buf!, 0), 8), $.uint($.arrayIndex(buf!, 1), 8), $.uint($.arrayIndex(buf!, 2), 8))
 

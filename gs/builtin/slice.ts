@@ -978,6 +978,18 @@ export const cap = <T>(
 // and be silently consumed, whereas no Go value ever produces this Symbol.
 export const byteSliceHint: unique symbol = Symbol('goscript.byteSliceHint')
 
+// byteSliceLiteral builds a Uint8Array-backed []byte slice from a composite
+// literal's element values. The compiler emits it for []byte{...} literals so
+// the byte representation matches the make, conversion, and array-literal
+// paths instead of degrading to a generic Array<number>. The declared return
+// type is the wider Slice<number>, not the narrower Uint8Array, so the literal
+// flows into generic Slice<unknown> parameters and clear() the same way the
+// makeSlice byte path does; control-flow narrowing to a bare Uint8Array would
+// otherwise reject those call sites.
+export function byteSliceLiteral(values: number[]): Slice<number> {
+  return new Uint8Array(values)
+}
+
 // byteSliceFromSlice materializes a Uint8Array holding a slice's current byte
 // values. The byte hint routes nil, empty, or generically-backed []byte
 // destinations through here so append keeps a Uint8Array representation

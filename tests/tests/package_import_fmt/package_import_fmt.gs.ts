@@ -39,7 +39,7 @@ export class byteFormatter {
 
 	public async Format(state: fmt.State | null, verb: number): globalThis.Promise<void> {
 		const b = this
-		let buf: $.Slice<number> = $.appendSlice($.arrayToSlice<number>([]), b.prefix, $.byteSliceHint)
+		let buf: $.Slice<number> = $.appendSlice($.byteSliceLiteral([]), b.prefix, $.byteSliceHint)
 		buf = $.append(buf, $.uint($.uint(verb, 8), 8), $.byteSliceHint)
 		await $.pointerValue<Exclude<fmt.State, null>>(state).Write(buf)
 	}

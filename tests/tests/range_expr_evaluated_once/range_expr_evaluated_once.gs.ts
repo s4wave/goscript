@@ -11,7 +11,7 @@ export function __goscript_set_calls(__goscriptValue: number): void {
 
 export function values(): $.Slice<number> {
 	calls++
-	return $.arrayToSlice<number>([$.uint(1, 8), $.uint(4, 8), $.uint(5, 8)])
+	return $.byteSliceLiteral([$.uint(1, 8), $.uint(4, 8), $.uint(5, 8)])
 }
 
 export async function main(): globalThis.Promise<void> {
