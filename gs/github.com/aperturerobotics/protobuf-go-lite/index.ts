@@ -873,23 +873,7 @@ export function AppendVarint(
 }
 
 export function ConsumeVarint(b: $.Slice<number>): [bigint, number] {
-  let v = 0n
-  let shift = 0n
-  for (let i = 0; i < 10; i++) {
-    if (i >= $.len(b)) {
-      return [0n, -1]
-    }
-    const value = byteSliceValue(b, i)
-    if (shift === 63n && value > 1) {
-      return [0n, -2]
-    }
-    v += BigInt(value & 0x7f) << shift
-    if (value < 0x80) {
-      return [varintResult(v), i + 1]
-    }
-    shift += 7n
-  }
-  return [0n, -2]
+  return consumeVarintAt(b, 0)
 }
 
 export function SizeOfVarint(x: number | bigint): number {
@@ -1164,7 +1148,7 @@ export function DecodeVarint(
   b: $.Slice<number>,
   idx: number,
 ): [bigint, number, $.GoError] {
-  const [v, n] = ConsumeVarint($.goSlice(b, idx, undefined))
+  const [v, n] = consumeVarintAt(b, idx)
   if (n < 0) {
     return [0n, 0, n === -1 ? ioUnexpectedEOF() : ErrIntOverflow]
   }
@@ -1313,6 +1297,19 @@ export function Skip(dAtA: $.Slice<number>): [number, $.GoError] {
 }
 
 function byteSliceValue(b: $.Slice<number>, idx: number): number {
+  if (b instanceof Uint8Array) {
+    if (idx < 0 || idx >= b.length) {
+      return $.indexStringOrBytes(b, idx)
+    }
+    return b[idx]
+  }
+  if (b !== null && $.isSliceProxy(b)) {
+    const meta = b.__meta__
+    if (idx < 0 || idx >= meta.length) {
+      return $.indexStringOrBytes(b, idx)
+    }
+    return Number(meta.backing[meta.offset + idx]) & 0xff
+  }
   return $.indexStringOrBytes(b, idx)
 }
 
@@ -1475,7 +1472,7 @@ export function DecodeVarintBool(
   b: $.Slice<number>,
   idx: number,
 ): [boolean, number, $.GoError] {
-  const [v, n] = ConsumeVarint($.goSlice(b, idx, undefined))
+  const [v, n] = consumeVarintAt(b, idx)
   if (n < 0) {
     return [false, 0, n === -1 ? ioUnexpectedEOF() : ErrIntOverflow]
   }
@@ -1486,7 +1483,7 @@ export function DecodeSint32(
   b: $.Slice<number>,
   idx: number,
 ): [number, number, $.GoError] {
-  const [v, n] = ConsumeVarint($.goSlice(b, idx, undefined))
+  const [v, n] = consumeVarintAt(b, idx)
   if (n < 0) {
     return [0, 0, n === -1 ? ioUnexpectedEOF() : ErrIntOverflow]
   }
@@ -1498,7 +1495,7 @@ export function DecodeSint64(
   b: $.Slice<number>,
   idx: number,
 ): [bigint, number, $.GoError] {
-  const [v, n] = ConsumeVarint($.goSlice(b, idx, undefined))
+  const [v, n] = consumeVarintAt(b, idx)
   if (n < 0) {
     return [0n, 0, n === -1 ? ioUnexpectedEOF() : ErrIntOverflow]
   }
@@ -1561,11 +1558,12 @@ export function DecodeBytes(
     return [null, 0, err]
   }
   if (cp) {
-    const out: number[] = []
-    for (let i = start; i < end; i++) {
-      out.push(byteSliceValue(b, i))
+    const length = end - start
+    const out = new Uint8Array(length)
+    for (let i = 0; i < length; i++) {
+      out[i] = byteSliceValue(b, start + i)
     }
-    return [$.arrayToSlice(out), end, null]
+    return [out, end, null]
   }
   return [$.goSlice(b, start, end), end, null]
 }
@@ -1579,11 +1577,12 @@ export function DecodeBytesAppend(
   if (err != null) {
     return [dst, 0, err]
   }
-  const out: number[] = []
-  for (let i = start; i < end; i++) {
-    out.push(byteSliceValue(b, i))
+  const length = end - start
+  const out = new Uint8Array(length)
+  for (let i = 0; i < length; i++) {
+    out[i] = byteSliceValue(b, start + i)
   }
-  return [$.arrayToSlice(out), end, null]
+  return [out, end, null]
 }
 
 export function DecodeString(
@@ -1815,6 +1814,43 @@ function low32(v: number | bigint): number {
     return Number(BigInt.asUintN(32, v))
   }
   return v >>> 0
+}
+
+function consumeVarintAt(b: $.Slice<number>, idx: number): [bigint, number] {
+  const length = $.len(b)
+  let x = 0
+  let shift = 0
+  const fastEnd = Math.min(length, idx + 7)
+  let i = idx
+  for (; i < fastEnd; i++) {
+    const value = byteSliceValue(b, i)
+    if (value < 0x80) {
+      return [BigInt(x + value * 2 ** shift), i - idx + 1]
+    }
+    x += (value & 0x7f) * 2 ** shift
+    shift += 7
+  }
+  if (i >= length) {
+    return [0n, -1]
+  }
+
+  let v = BigInt(x)
+  let wideShift = 49n
+  for (; i < idx + 10; i++) {
+    if (i >= length) {
+      return [0n, -1]
+    }
+    const value = byteSliceValue(b, i)
+    if (wideShift === 63n && value > 1) {
+      return [0n, -2]
+    }
+    v += BigInt(value & 0x7f) << wideShift
+    if (value < 0x80) {
+      return [varintResult(v), i - idx + 1]
+    }
+    wideShift += 7n
+  }
+  return [0n, -2]
 }
 
 const base64StdAlphabet =

@@ -453,7 +453,7 @@ export function uint64Shr(
   value: number | bigint,
   shift: number | bigint,
 ): bigint {
-  return uint64Result(uint64Value(value) >> BigInt(Math.trunc(Number(shift))))
+  return uint64Value(value) >> BigInt(Math.trunc(Number(shift)))
 }
 
 export function int64Shl(
@@ -625,8 +625,12 @@ export function int64Xor(
   return int64Result(int64Value(left) ^ int64Value(right))
 }
 
+
 function int64Value(value: number | bigint): bigint {
   if (typeof value === 'bigint') {
+    if (value >= -0x8000000000000000n && value <= 0x7fffffffffffffffn) {
+      return value
+    }
     return BigInt.asIntN(64, value)
   }
   if (Number.isFinite(value)) {
@@ -650,6 +654,9 @@ function int64Result(value: bigint): bigint {
 
 function uint64Value(value: number | bigint): bigint {
   if (typeof value === 'bigint') {
+    if (value >= 0n && value <= maxUint64BigInt) {
+      return value
+    }
     return BigInt.asUintN(64, value)
   }
   if (Number.isFinite(value)) {

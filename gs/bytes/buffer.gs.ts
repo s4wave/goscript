@@ -228,19 +228,8 @@ export class Buffer {
 		if (!ok) {
 			m = b.grow($.len(p))
 		}
-		// Copy directly to the buffer at position m
 		const targetSlice = $.goSlice(b.buf, m, m + $.len(p))
-		if (p instanceof Uint8Array) {
-			// Direct Uint8Array copy
-			for (let i = 0; i < $.len(p); i++) {
-				targetSlice![i] = p[i]
-			}
-		} else {
-			// Copy from Slice<number>
-			for (let i = 0; i < $.len(p); i++) {
-				targetSlice![i] = p![i]
-			}
-		}
+		$.copy(targetSlice, p)
 		return [$.len(p), null]
 	}
 
@@ -254,14 +243,9 @@ export class Buffer {
 		if (!ok) {
 			m = b.grow($.len(s))
 		}
-		// Copy string directly to the buffer at position m
 		const targetSlice = $.goSlice(b.buf, m, m + $.len(s))
-		const encoder = new TextEncoder()
-		const encoded = encoder.encode(s)
-		for (let i = 0; i < encoded.length; i++) {
-			targetSlice![i] = encoded[i]
-		}
-		return [encoded.length, null]
+		$.copy(targetSlice, s)
+		return [$.len(s), null]
 	}
 
 	// ReadFrom reads data from r until EOF and appends it to the buffer, growing

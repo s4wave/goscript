@@ -409,7 +409,7 @@ export function Join(s: $.Slice<$.Bytes>, sep: $.Bytes): $.Bytes {
 	// Just return a copy for single element
 	if ($.len(s) === 1) {
 		if (s![0] === null) return new Uint8Array(0)
-		return new Uint8Array($.bytesToArray(s![0]))
+		return $.bytesToUint8Array(s![0]).slice()
 	}
 
 	// Calculate total length needed
@@ -430,21 +430,19 @@ export function Join(s: $.Slice<$.Bytes>, sep: $.Bytes): $.Bytes {
 	// Build result
 	const result = new Uint8Array(totalLen)
 	let pos = 0
+	const sepBytes = sepLen === 0 ? null : $.bytesToUint8Array(sep)
 	
 	for (let i = 0; i < $.len(s); i++) {
-		if (i > 0 && sepLen > 0) {
-			const sepArr = $.bytesToArray(sep)
-			for (let j = 0; j < sepArr.length; j++) {
-				result[pos++] = sepArr[j]
-			}
+		if (i > 0 && sepBytes !== null) {
+			result.set(sepBytes, pos)
+			pos += sepLen
 		}
 		
 		const elem = s![i]
 		if (elem !== null) {
-			const elemArr = $.bytesToArray(elem)
-			for (let j = 0; j < elemArr.length; j++) {
-				result[pos++] = elemArr[j]
-			}
+			const elemBytes = $.bytesToUint8Array(elem)
+			result.set(elemBytes, pos)
+			pos += elemBytes.length
 		}
 	}
 

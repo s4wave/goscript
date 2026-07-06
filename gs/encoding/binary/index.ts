@@ -339,21 +339,41 @@ export function PutUvarint(buf: $.Slice<number>, x: number | bigint): number {
 }
 
 export function Uvarint(buf: $.Slice<number>): [bigint, number] {
-  let x = 0n
-  let s = 0n
-  for (let i = 0; i < $.len(buf); i++) {
-    const b = byteAt(buf, i)
-    if (i === MaxVarintLen64) {
-      return [uint64Result(0n), -(i + 1)]
+  const meta = $.isSliceProxy(buf) ? buf.__meta__ : null
+  const length = meta === null ? $.len(buf) : meta.length
+  const byte = (i: number): number =>
+    meta === null ? byteAt(buf, i) : Number(meta.backing[meta.offset + i]) & 0xff
+
+  let x = 0
+  let s = 0
+  const fastLen = Math.min(length, 7)
+  for (let i = 0; i < fastLen; i++) {
+    const b = byte(i)
+    if (b < 0x80) {
+      return [BigInt(x + b * 2 ** s), i + 1]
     }
+    x += (b & 0x7f) * 2 ** s
+    s += 7
+  }
+  if (length < 7) {
+    return [uint64Result(0n), 0]
+  }
+
+  let wide = BigInt(x)
+  let shift = 49n
+  for (let i = 7; i < Math.min(length, MaxVarintLen64); i++) {
+    const b = byte(i)
     if (b < 0x80) {
       if (i === MaxVarintLen64 - 1 && b > 1) {
         return [uint64Result(0n), -(i + 1)]
       }
-      return [uint64Result(x | (BigInt(b) << s)), i + 1]
+      return [uint64Result(wide | (BigInt(b) << shift)), i + 1]
     }
-    x |= BigInt(b & 0x7f) << s
-    s += 7n
+    wide |= BigInt(b & 0x7f) << shift
+    shift += 7n
+  }
+  if (length > MaxVarintLen64) {
+    return [uint64Result(0n), -(MaxVarintLen64 + 1)]
   }
   return [uint64Result(0n), 0]
 }
