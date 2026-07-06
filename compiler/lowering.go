@@ -6836,6 +6836,12 @@ func stmtsContainLoopJump(stmts []loweredStmt) bool {
 		if stmt.selectStmt != nil && stmtsContainSelectLoopJump(stmt.selectStmt) {
 			return true
 		}
+		if stmt.switchStmt != nil && stmtsContainSwitchLoopJump(stmt.switchStmt) {
+			return true
+		}
+		if stmt.typeSwitch != nil && stmtsContainTypeSwitchLoopJump(stmt.typeSwitch) {
+			return true
+		}
 		if stmtsContainLoopJump(stmt.children) || stmtsContainLoopJump(stmt.elseBody) {
 			return true
 		}
@@ -6848,6 +6854,33 @@ func stmtTextContainsLoopJump(text string) bool {
 		trimmed := strings.TrimSpace(line)
 		if trimmed == "break" || trimmed == "continue" ||
 			strings.HasPrefix(trimmed, "break ") || strings.HasPrefix(trimmed, "continue ") {
+			return true
+		}
+	}
+	return false
+}
+
+func stmtsContainSwitchLoopJump(stmt *loweredSwitch) bool {
+	if stmt == nil {
+		return false
+	}
+	for _, switchCase := range stmt.cases {
+		if stmtsContainLoopJump(switchCase.body) {
+			return true
+		}
+	}
+	return false
+}
+
+func stmtsContainTypeSwitchLoopJump(stmt *loweredTypeSwitch) bool {
+	if stmt == nil {
+		return false
+	}
+	if stmtsContainLoopJump(stmt.defaultBody) {
+		return true
+	}
+	for _, switchCase := range stmt.cases {
+		if stmtsContainLoopJump(switchCase.body) {
 			return true
 		}
 	}
