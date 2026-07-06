@@ -12310,6 +12310,9 @@ func structUnderlyingType(typ types.Type) *types.Struct {
 }
 
 func pointerToArrayType(typ types.Type) *types.Array {
+	if typ == nil {
+		return nil
+	}
 	pointer, ok := types.Unalias(typ).Underlying().(*types.Pointer)
 	if !ok {
 		return nil

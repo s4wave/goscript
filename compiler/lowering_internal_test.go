@@ -16,3 +16,9 @@ func TestIntegerBitHelpersHandleNilTypes(t *testing.T) {
 		t.Fatalf("isRuntimeWideIntegerType(nil) = true; want false")
 	}
 }
+
+func TestPointerToArrayTypeHandlesNilTypes(t *testing.T) {
+	if array := pointerToArrayType(nil); array != nil {
+		t.Fatalf("pointerToArrayType(nil) = %v; want nil", array)
+	}
+}
