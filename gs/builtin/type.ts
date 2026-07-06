@@ -1403,7 +1403,6 @@ export function typeAssert<T>(
 ): TypeAssertResult<T> {
   const normalizedType = normalizeTypeInfo(typeInfo)
 
-  // Handle typed nil pointers (created by typedNil() for conversions like (*T)(nil))
   if (typeof value === 'object' && value !== null && value.__isTypedNil) {
     if (
       isInterfaceTypeInfo(normalizedType) &&
@@ -1411,14 +1410,12 @@ export function typeAssert<T>(
     ) {
       return { value: value as T, ok: true }
     }
-    // For typed nils, we need to compare the stored type with the expected type
-    if (isPointerTypeInfo(normalizedType)) {
-      // Parse the stored type string and compare with expected type
-      const storedTypeStr = value.__goType as string
-      if (compareTypeStringWithTypeInfo(storedTypeStr, normalizedType)) {
-        return { value: null as T, ok: true }
-      }
-      return { value: null as T, ok: false }
+
+    // Go permits asserting a typed-nil interface value to its identical
+    // concrete type; the assertion succeeds and yields that type's nil.
+    const storedTypeStr = value.__goType as string
+    if (compareTypeStringWithTypeInfo(storedTypeStr, normalizedType)) {
+      return { value: null as T, ok: true }
     }
     return { value: null as T, ok: false }
   }
