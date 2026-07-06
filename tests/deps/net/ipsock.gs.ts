@@ -11,6 +11,8 @@ import * as runtime from "@goscript/runtime/index.js"
 
 import * as sync from "@goscript/sync/index.js"
 
+import "@goscript/unsafe/index.js"
+
 import * as poll from "@goscript/internal/poll/index.js"
 
 import * as netip from "@goscript/net/netip/index.js"

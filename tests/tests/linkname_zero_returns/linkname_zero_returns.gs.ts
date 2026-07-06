@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+import "@goscript/unsafe/index.js"
+
 export function externalVoid(): void {
 }
 

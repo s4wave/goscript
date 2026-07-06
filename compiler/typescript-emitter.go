@@ -173,6 +173,12 @@ func (o *TypeScriptEmitOwner) renderLoweredFile(pkg *loweredPackage, file *lower
 		if idx != 0 {
 			b.WriteString("\n")
 		}
+		if imp.bare {
+			b.WriteString("import \"")
+			b.WriteString(imp.source)
+			b.WriteString("\"\n")
+			continue
+		}
 		b.WriteString("import ")
 		if imp.typeOnly {
 			b.WriteString("type ")
@@ -185,7 +191,7 @@ func (o *TypeScriptEmitOwner) renderLoweredFile(pkg *loweredPackage, file *lower
 	}
 	sideEffectImports := make(map[string]bool)
 	for _, imp := range file.imports {
-		if imp.typeOnly || !imp.sideEffect || sideEffectImports[imp.source] {
+		if imp.bare || imp.typeOnly || !imp.sideEffect || sideEffectImports[imp.source] {
 			continue
 		}
 		sideEffectImports[imp.source] = true

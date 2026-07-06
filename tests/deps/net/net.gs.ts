@@ -19,6 +19,8 @@ import * as syscall from "@goscript/syscall/index.js"
 
 import * as time from "@goscript/time/index.js"
 
+import "@goscript/unsafe/index.js"
+
 import * as atomic from "@goscript/sync/atomic/index.js"
 
 import * as __goscript_error_unix from "./error_unix.gs.ts"

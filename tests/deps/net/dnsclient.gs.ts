@@ -11,6 +11,8 @@ import * as strconv from "@goscript/internal/strconv/index.js"
 
 import * as slices from "@goscript/slices/index.js"
 
+import "@goscript/unsafe/index.js"
+
 import * as dnsmessage from "@goscript/vendor/golang.org/x/net/dns/dnsmessage/index.js"
 
 import * as __goscript_ip from "./ip.gs.ts"

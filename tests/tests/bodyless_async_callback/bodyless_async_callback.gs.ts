@@ -4,6 +4,8 @@
 import * as $ from "@goscript/builtin/index.js"
 
 import * as sync from "@goscript/sync/index.js"
+
+import "@goscript/unsafe/index.js"
 import "@goscript/sync/index.js"
 
 export class Setting {

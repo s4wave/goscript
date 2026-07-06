@@ -35,6 +35,8 @@ import * as atomic from "@goscript/sync/atomic/index.js"
 
 import * as dnsmessage from "@goscript/vendor/golang.org/x/net/dns/dnsmessage/index.js"
 
+import "@goscript/unsafe/index.js"
+
 import * as singleflight from "@goscript/internal/singleflight/index.js"
 
 import * as poll from "@goscript/internal/poll/index.js"

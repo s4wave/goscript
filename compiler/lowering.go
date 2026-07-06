@@ -249,6 +249,7 @@ func (o *LoweringOwner) lowerFile(
 	localRefs := o.analyzeLocalFileReferences(semPkg, file, sourcePath, associatedMethods, declFiles, outputNames, runtimeMethodSets)
 	reservedImportAliases := localRefs.reservedNames
 	seenImport := make(map[string]bool)
+	namedImportPaths := make(map[string]bool)
 	for idx, importFile := range semPkg.source.Syntax {
 		importSourcePath := sourceFilePath(semPkg, idx, importFile)
 		if !relevantImportFiles[importSourcePath] {
@@ -266,7 +267,44 @@ func (o *LoweringOwner) lowerFile(
 			if importSpec.Name != nil {
 				name = importSpec.Name.Name
 			}
-			if name == "." || name == "_" {
+			if name != "." && name != "_" {
+				namedImportPaths[pkgName.Imported().Path()] = true
+			}
+		}
+	}
+	for idx, importFile := range semPkg.source.Syntax {
+		importSourcePath := sourceFilePath(semPkg, idx, importFile)
+		if !relevantImportFiles[importSourcePath] {
+			continue
+		}
+		for _, importSpec := range importFile.Imports {
+			pkgName, _ := semPkg.source.TypesInfo.Implicits[importSpec].(*types.PkgName)
+			if importSpec.Name != nil {
+				pkgName, _ = semPkg.source.TypesInfo.Defs[importSpec.Name].(*types.PkgName)
+			}
+			if pkgName == nil || pkgName.Imported() == nil {
+				continue
+			}
+			name := pkgName.Name()
+			if importSpec.Name != nil {
+				name = importSpec.Name.Name
+			}
+			if name == "." {
+				// Dot imports do not have a namespace owner in generated modules.
+				continue
+			}
+			if name == "_" {
+				// Blank imports preserve init registration through a bare module edge.
+				source := "@goscript/" + pkgName.Imported().Path() + "/index.js"
+				importKey := "\x00" + source
+				if namedImportPaths[pkgName.Imported().Path()] || seenImport[importKey] {
+					continue
+				}
+				seenImport[importKey] = true
+				loweredFile.imports = append(loweredFile.imports, loweredImport{
+					source: source,
+					bare:   true,
+				})
 				continue
 			}
 			alias := uniqueImportAlias(safeIdentifier(name), pkgName.Imported().Path(), importAliases, reservedImportAliases)
@@ -397,6 +435,7 @@ func (o *LoweringOwner) lowerFile(
 		}
 	}
 	for _, call := range packageInitCalls {
+		loweredFile.sideEffect = true
 		loweredFile.decls = append(loweredFile.decls, loweredDecl{code: "await " + call})
 	}
 	for _, decl := range loweredFile.decls {
@@ -407,6 +446,7 @@ func (o *LoweringOwner) lowerFile(
 		if decl.function.async {
 			call = "await " + call
 		}
+		loweredFile.sideEffect = true
 		loweredFile.decls = append(loweredFile.decls, loweredDecl{code: call})
 	}
 	return loweredFile, diagnostics

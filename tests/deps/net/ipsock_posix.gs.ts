@@ -13,6 +13,8 @@ import * as runtime from "@goscript/runtime/index.js"
 
 import * as syscall from "@goscript/syscall/index.js"
 
+import "@goscript/unsafe/index.js"
+
 import type * as os from "@goscript/os/index.js"
 
 import * as sync from "@goscript/sync/index.js"

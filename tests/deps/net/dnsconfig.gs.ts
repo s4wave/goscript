@@ -29,6 +29,8 @@ import * as time from "@goscript/time/index.js"
 
 import * as dnsmessage from "@goscript/vendor/golang.org/x/net/dns/dnsmessage/index.js"
 
+import "@goscript/unsafe/index.js"
+
 import type * as singleflight from "@goscript/internal/singleflight/index.js"
 
 import type * as fs from "@goscript/io/fs/index.js"

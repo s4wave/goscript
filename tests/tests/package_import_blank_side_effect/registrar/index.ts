@@ -1,0 +1,1 @@
+import "./registrar.gs.ts"

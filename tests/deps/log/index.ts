@@ -1,1 +1,2 @@
 export { Default, Fatal, Fatalf, Fatalln, Flags, LUTC, Ldate, Llongfile, Lmicroseconds, Lmsgprefix, Logger, Lshortfile, LstdFlags, Ltime, New, Output, Panic, Panicf, Panicln, Prefix, Print, Printf, Println, SetFlags, SetOutput, SetPrefix, Writer } from "./log.gs.ts"
+import "./log.gs.ts"

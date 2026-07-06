@@ -11,6 +11,8 @@ import * as sync from "@goscript/sync/index.js"
 
 import * as time from "@goscript/time/index.js"
 
+import "@goscript/unsafe/index.js"
+
 import * as __goscript_interface_stub from "./interface_stub.gs.ts"
 
 import * as __goscript_mac from "./mac.gs.ts"

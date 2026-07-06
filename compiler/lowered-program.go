@@ -26,6 +26,7 @@ type loweredFile struct {
 type loweredImport struct {
 	alias      string
 	source     string
+	bare       bool
 	sideEffect bool
 	typeOnly   bool
 }

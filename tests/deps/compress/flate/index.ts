@@ -7,4 +7,5 @@ export { byFreq_Len, byFreq_Less, byFreq_Swap, byLiteral_Len, byLiteral_Less, by
 export { deflateFast, tableEntry } from "./deflatefast.gs.ts"
 export { dictDecoder } from "./dict_decoder.gs.ts"
 export { huffmanBitWriter } from "./huffman_bit_writer.gs.ts"
+import "./huffman_bit_writer.gs.ts"
 import "./inflate.gs.ts"

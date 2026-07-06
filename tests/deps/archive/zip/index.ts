@@ -6,3 +6,4 @@ export { ErrAlgorithm, ErrChecksum, ErrFormat, ErrInsecurePath, File, NewReader,
 export { NewWriter, Writer, countWriter, dirWriter, fileWriter, header, nopCloser } from "./writer.gs.ts"
 export { RegisterCompressor, RegisterDecompressor, pooledFlateReader, pooledFlateWriter } from "./register.gs.ts"
 import "./reader.gs.ts"
+import "./register.gs.ts"

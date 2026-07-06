@@ -4,6 +4,8 @@
 import * as $ from "@goscript/builtin/index.js"
 
 import * as syscall from "@goscript/syscall/index.js"
+
+import "@goscript/unsafe/index.js"
 import "@goscript/syscall/index.js"
 
 export function RecvfromInet4(fd: number, p: $.Slice<number>, flags: number, _from: syscall.SockaddrInet4 | $.VarRef<syscall.SockaddrInet4> | null): [number, $.GoError] {
