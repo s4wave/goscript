@@ -7539,6 +7539,71 @@ func (o *LoweringOwner) lowerStringOrderOperand(
 	return o.lowerExpr(ctx, call.Args[0])
 }
 
+func (o *LoweringOwner) lowerMinMaxBuiltin(ctx lowerFileContext, expr *ast.CallExpr, args []string, maxValue bool) string {
+	if len(args) == 0 {
+		return "undefined"
+	}
+	if len(args) == 1 {
+		return args[0]
+	}
+	if isStringType(ctx.semPkg.source.TypesInfo.TypeOf(expr)) {
+		return o.lowerStringMinMaxBuiltin(ctx, args, maxValue)
+	}
+	helper := RuntimeHelperMin
+	if maxValue {
+		helper = RuntimeHelperMax
+	}
+	return o.lowerNumericMinMaxBuiltin(ctx, args, helper)
+}
+
+func (o *LoweringOwner) lowerNumericMinMaxBuiltin(ctx lowerFileContext, args []string, helper RuntimeHelper) string {
+	call := o.runtimeOwner.QualifiedHelper(helper)
+	if len(args) == 2 {
+		return call + "(" + args[0] + ", " + args[1] + ")"
+	}
+	names, body, best := minMaxTemps(ctx, args)
+	for _, name := range names[1:] {
+		body = append(body, best+" = "+call+"("+best+", "+name+")")
+	}
+	body = append(body, "return "+best)
+	return minMaxIIFE(body)
+}
+
+func (o *LoweringOwner) lowerStringMinMaxBuiltin(ctx lowerFileContext, args []string, maxValue bool) string {
+	names, body, best := minMaxTemps(ctx, args)
+	op := " <= 0"
+	if maxValue {
+		op = " >= 0"
+	}
+	compare := o.runtimeOwner.QualifiedHelper(RuntimeHelperStringCompare)
+	for _, name := range names[1:] {
+		body = append(body, best+" = "+compare+"("+best+", "+name+")"+op+" ? "+best+" : "+name)
+	}
+	body = append(body, "return "+best)
+	return minMaxIIFE(body)
+}
+
+func minMaxTemps(ctx lowerFileContext, args []string) ([]string, []string, string) {
+	names := make([]string, 0, len(args))
+	body := make([]string, 0, len(args)*2)
+	for _, arg := range args {
+		name := ctx.tempName("MinMax")
+		names = append(names, name)
+		body = append(body, "const "+name+" = "+arg)
+	}
+	best := ctx.tempName("MinMax")
+	body = append(body, "let "+best+" = "+names[0])
+	return names, body, best
+}
+
+func minMaxIIFE(body []string) string {
+	code := strings.Join(body, "; ")
+	if strings.Contains(code, "await ") {
+		return "(await (async () => { " + code + " })())"
+	}
+	return "(() => { " + code + " })()"
+}
+
 func binaryOperandUsesTypeParam(ctx lowerFileContext, expr ast.Expr) bool {
 	typ := ctx.semPkg.source.TypesInfo.TypeOf(expr)
 	_, ok := types.Unalias(typ).(*types.TypeParam)
@@ -8140,9 +8205,9 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 				}
 				return o.runtimeOwner.QualifiedHelper(RuntimeHelperLen) + "(" + strings.Join(args, ", ") + ")", diagnostics
 			case "max":
-				return o.runtimeOwner.QualifiedHelper(RuntimeHelperMax) + "(" + strings.Join(args, ", ") + ")", diagnostics
+				return o.lowerMinMaxBuiltin(ctx, expr, args, true), diagnostics
 			case "min":
-				return o.runtimeOwner.QualifiedHelper(RuntimeHelperMin) + "(" + strings.Join(args, ", ") + ")", diagnostics
+				return o.lowerMinMaxBuiltin(ctx, expr, args, false), diagnostics
 			case "complex":
 				return o.runtimeOwner.QualifiedHelper(RuntimeHelperComplex) + "(" + strings.Join(args, ", ") + ")", diagnostics
 			case "real":

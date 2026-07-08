@@ -1,0 +1,6 @@
+loop: A 1
+two-arg: alpha beta
+multi-arg: alpha delta
+middle-wins: aardvark zoo
+nan: true true
+zero: true false
