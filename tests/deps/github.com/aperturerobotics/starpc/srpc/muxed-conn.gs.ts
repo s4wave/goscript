@@ -59,7 +59,7 @@ import "./rwc-conn.gs.ts"
 
 export function NewYamuxConfig(): yamux.Config | $.VarRef<yamux.Config> | null {
 	let config: yamux.Config | $.VarRef<yamux.Config> | null = yamux.DefaultConfig()
-	$.pointerValue<yamux.Config>(config).MaxStreamWindowSize = $.uint((16 * 1024) * 1024, 32)
+	$.pointerValue<yamux.Config>(config).MaxStreamWindowSize = $.uint(Math.imul((16 * 1024), 1024) >>> 0, 32)
 	$.pointerValue<yamux.Config>(config).LogOutput = io.Discard
 	$.pointerValue<yamux.Config>(config).ReadBufSize = 0
 	$.pointerValue<yamux.Config>(config).MaxIncomingStreams = $.uint(math.MaxUint32, 32)

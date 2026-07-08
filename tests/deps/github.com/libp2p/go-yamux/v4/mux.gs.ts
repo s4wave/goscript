@@ -233,7 +233,7 @@ export class Config {
 }
 
 export function DefaultConfig(): Config | $.VarRef<Config> | null {
-	return new Config({AcceptBacklog: 256, PingBacklog: 32, EnableKeepAlive: true, KeepAliveInterval: 30000000000n, MeasureRTTInterval: 30000000000n, ConnectionWriteTimeout: 10000000000n, MaxIncomingStreams: $.uint(1000, 32), InitialStreamWindowSize: $.uint(262144, 32), MaxStreamWindowSize: $.uint(16777216, 32), LogOutput: $.interfaceValue<io.Writer | null>(os.Stderr, "*os.File"), ReadBufSize: 4096, MaxMessageSize: $.uint(64 * 1024, 32), WriteCoalesceDelay: 100000n})
+	return new Config({AcceptBacklog: 256, PingBacklog: 32, EnableKeepAlive: true, KeepAliveInterval: 30000000000n, MeasureRTTInterval: 30000000000n, ConnectionWriteTimeout: 10000000000n, MaxIncomingStreams: $.uint(1000, 32), InitialStreamWindowSize: $.uint(262144, 32), MaxStreamWindowSize: $.uint(16777216, 32), LogOutput: $.interfaceValue<io.Writer | null>(os.Stderr, "*os.File"), ReadBufSize: 4096, MaxMessageSize: $.uint(Math.imul(64, 1024) >>> 0, 32), WriteCoalesceDelay: 100000n})
 }
 
 export function VerifyConfig(config: Config | $.VarRef<Config> | null): $.GoError {

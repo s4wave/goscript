@@ -33,7 +33,7 @@ export function parsePort(service: string): [number, boolean] {
 			n = $.uint(4294967295, 32)
 			break
 		}
-		n = n * ($.uint(10, 32))
+		n = Math.imul(n, $.uint(10, 32)) >>> 0
 		let nn = $.uint(n + $.uint(d, 32), 32)
 		if (($.uint(nn, 32) < $.uint(n, 32)) || ($.uint(nn, 32) > $.uint(4294967295, 32))) {
 			n = $.uint(4294967295, 32)

@@ -169,7 +169,7 @@ export function formatBase10(a: $.Slice<number>, u: bigint): number {
 		for (let __rangeIndex = 0; __rangeIndex < 4; __rangeIndex++) {
 			let dd: number = 0
 			let __goscriptAssign1_0: number = $.uint(Math.trunc(lo / 100), 32)
-			let __goscriptAssign1_1: number = $.uint((lo % 100) * 2, 32)
+			let __goscriptAssign1_1: number = $.uint(Math.imul((lo % 100), 2) >>> 0, 32)
 			lo = __goscriptAssign1_0
 			dd = __goscriptAssign1_1
 			i = i - (2)
@@ -179,7 +179,7 @@ export function formatBase10(a: $.Slice<number>, u: bigint): number {
 			a![i + 1] = __goscriptAssign2_1
 		}
 		i--
-		a![i] = $.uint($.indexStringOrBytes("00010203040506070809101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899", (lo * 2) + 1), 8)
+		a![i] = $.uint($.indexStringOrBytes("00010203040506070809101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899", (Math.imul(lo, 2) >>> 0) + 1), 8)
 
 		// If we'd been using u >= 1e9 then we would be guaranteed that u/1e9 > 0,
 		// but since we used u>>29 != 0, u/1e9 might be 0, so we might be done.
@@ -195,7 +195,7 @@ export function formatBase10(a: $.Slice<number>, u: bigint): number {
 	while ($.uint(lo, 32) >= $.uint(100, 32)) {
 		let dd: number = 0
 		let __goscriptAssign3_0: number = $.uint(Math.trunc(lo / 100), 32)
-		let __goscriptAssign3_1: number = $.uint((lo % 100) * 2, 32)
+		let __goscriptAssign3_1: number = $.uint(Math.imul((lo % 100), 2) >>> 0, 32)
 		lo = __goscriptAssign3_0
 		dd = __goscriptAssign3_1
 		i = i - (2)
@@ -205,7 +205,7 @@ export function formatBase10(a: $.Slice<number>, u: bigint): number {
 		a![i + 1] = __goscriptAssign4_1
 	}
 	i--
-	let dd = $.uint(lo * 2, 32)
+	let dd = $.uint(Math.imul(lo, 2) >>> 0, 32)
 	a![i] = $.uint($.indexStringOrBytes("00010203040506070809101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899", dd + 1), 8)
 	if ($.uint(lo, 32) >= $.uint(10, 32)) {
 		i--

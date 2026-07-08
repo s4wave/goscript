@@ -198,7 +198,7 @@ export class huffmanEncoder {
 		}
 
 		// We need a total of 2*n - 2 items at top level and have already generated 2.
-		$.arrayIndex(levels, maxBits).needed = $.int((2 * n) - 4, 32)
+		$.arrayIndex(levels, maxBits).needed = $.int((Math.imul(2, n)) - 4, 32)
 
 		let level = $.int(maxBits, 32)
 		while (true) {

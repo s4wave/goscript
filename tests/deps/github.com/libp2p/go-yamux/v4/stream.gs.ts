@@ -678,7 +678,7 @@ export class Stream {
 				if ($.uint($.pointerValue<Stream>(s).recvWindow, 32) > $.uint((Math.trunc(math.MaxUint32 / 2)), 32)) {
 					recvWindow = $.uint(__goscript_util.min($.arrayToSlice<number>([$.uint(math.MaxUint32, 32), $.uint($.pointerValue<__goscript_mux.Config>($.pointerValue<__goscript_session.Session>($.pointerValue<Stream>(s).session).config).MaxStreamWindowSize, 32)])), 32)
 				} else {
-					recvWindow = $.uint(__goscript_util.min($.arrayToSlice<number>([$.uint($.pointerValue<Stream>(s).recvWindow * 2, 32), $.uint($.pointerValue<__goscript_mux.Config>($.pointerValue<__goscript_session.Session>($.pointerValue<Stream>(s).session).config).MaxStreamWindowSize, 32)])), 32)
+					recvWindow = $.uint(__goscript_util.min($.arrayToSlice<number>([$.uint(Math.imul($.pointerValue<Stream>(s).recvWindow, 2) >>> 0, 32), $.uint($.pointerValue<__goscript_mux.Config>($.pointerValue<__goscript_session.Session>($.pointerValue<Stream>(s).session).config).MaxStreamWindowSize, 32)])), 32)
 				}
 				if ($.uint(recvWindow, 32) > $.uint($.pointerValue<Stream>(s).recvWindow, 32)) {
 					let grow = $.uint(recvWindow - $.pointerValue<Stream>(s).recvWindow, 32)

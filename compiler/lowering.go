@@ -5111,6 +5111,11 @@ func lowerCompoundAssignValue(
 	if helper, ok := wideIntegerAssignHelper(targetType, tok); ok {
 		return coerceWideHelperResult(runtimeOwner, targetType, runtimeOwner.QualifiedHelper(helper)+"("+left+", "+right+")")
 	}
+	if tok == token.MUL_ASSIGN {
+		if value, ok := lower32BitIntegerMultiplicationValue(targetType, left, right); ok {
+			return value
+		}
+	}
 	if value, ok := integerQuotientAssignValueExpr(targetType, left, right, tok); ok {
 		return value
 	}
@@ -5213,6 +5218,24 @@ func integerQuotientAssignValueExpr(targetType types.Type, left string, right st
 		return "(" + left + " / " + right + ") >>> 0", true
 	}
 	return "Math.trunc(" + left + " / " + right + ")", true
+}
+
+func lower32BitIntegerMultiplicationValue(targetType types.Type, left string, right string) (string, bool) {
+	if targetType == nil {
+		return "", false
+	}
+	basic, ok := types.Unalias(targetType).Underlying().(*types.Basic)
+	if !ok {
+		return "", false
+	}
+	switch basic.Kind() {
+	case types.Uint32:
+		return "Math.imul(" + left + ", " + right + ") >>> 0", true
+	case types.Int32:
+		return "Math.imul(" + left + ", " + right + ")", true
+	default:
+		return "", false
+	}
 }
 
 func wideIntegerAssignHelper(targetType types.Type, tok token.Token) (RuntimeHelper, bool) {
@@ -7586,6 +7609,11 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 			left, right = o.lowerEqualityOperands(ctx, typed, left, right)
 		} else if isRelationalOperator(typed.Op) {
 			left, right = o.lowerNumericComparisonOperands(ctx, typed, left, right)
+		}
+		if typed.Op == token.MUL {
+			if value, ok := lower32BitIntegerMultiplicationValue(ctx.semPkg.source.TypesInfo.TypeOf(typed), left, right); ok {
+				return value, append(leftDiagnostics, rightDiagnostics...)
+			}
 		}
 		if value, ok := o.lowerWideIntegerBinaryExpr(ctx, typed, left, right); ok {
 			return value, append(leftDiagnostics, rightDiagnostics...)

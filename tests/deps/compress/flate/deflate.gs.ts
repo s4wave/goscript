@@ -1096,7 +1096,7 @@ export function __goscript_set_levels(__goscriptValue: $.Slice<compressionLevel>
 }
 
 export function hash4(b: $.Slice<number>): number {
-	return $.uint($.uintShr((((($.uint($.arrayIndex(b!, 3), 32) | ($.uint($.arrayIndex(b!, 2), 32) << 8)) | ($.uint($.arrayIndex(b!, 1), 32) << 16)) | ($.uint($.arrayIndex(b!, 0), 32) << 24)) * 506832829), (32 - 17), 32), 32)
+	return $.uint($.uintShr((Math.imul(((($.uint($.arrayIndex(b!, 3), 32) | ($.uint($.arrayIndex(b!, 2), 32) << 8)) | ($.uint($.arrayIndex(b!, 1), 32) << 16)) | ($.uint($.arrayIndex(b!, 0), 32) << 24)), 506832829) >>> 0), (32 - 17), 32), 32)
 }
 
 export function bulkHash4(b: $.Slice<number>, dst: $.Slice<number>): void {
@@ -1104,11 +1104,11 @@ export function bulkHash4(b: $.Slice<number>, dst: $.Slice<number>): void {
 		return
 	}
 	let hb = $.uint((($.uint($.arrayIndex(b!, 3), 32) | ($.uint($.arrayIndex(b!, 2), 32) << 8)) | ($.uint($.arrayIndex(b!, 1), 32) << 16)) | ($.uint($.arrayIndex(b!, 0), 32) << 24), 32)
-	dst![0] = $.uint($.uintShr((hb * 506832829), (32 - 17), 32), 32)
+	dst![0] = $.uint($.uintShr((Math.imul(hb, 506832829) >>> 0), (32 - 17), 32), 32)
 	let end = ($.len(b) - 4) + 1
 	for (let i = 1; i < end; i++) {
 		hb = $.uint((hb << 8) | $.uint($.arrayIndex(b!, i + 3), 32), 32)
-		dst![i] = $.uint($.uintShr((hb * 506832829), (32 - 17), 32), 32)
+		dst![i] = $.uint($.uintShr((Math.imul(hb, 506832829) >>> 0), (32 - 17), 32), 32)
 	}
 }
 

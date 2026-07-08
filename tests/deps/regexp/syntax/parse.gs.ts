@@ -952,7 +952,7 @@ export class parser {
 						if ((($.stringEqual(t, "")) || ($.uint($.indexStringOrBytes(t, 0), 8) < $.uint(48, 8))) || ($.uint($.indexStringOrBytes(t, 0), 8) > $.uint(55, 8))) {
 							break
 						}
-						r = $.int(((r * 8) + $.int($.indexStringOrBytes(t, 0), 32)) - 48, 32)
+						r = $.int(((Math.imul(r, 8)) + $.int($.indexStringOrBytes(t, 0), 32)) - 48, 32)
 						t = $.sliceStringOrBytes(t, 1, undefined)
 					}
 					return [$.int(r, 32), t, null]
@@ -999,7 +999,7 @@ export class parser {
 							if ($.int(v, 32) < $.int(0, 32)) {
 								break Switch
 							}
-							r = $.int((r * 16) + v, 32)
+							r = $.int((Math.imul(r, 16)) + v, 32)
 							if ($.int(r, 32) > $.int(unicode.MaxRune, 32)) {
 								break Switch
 							}
@@ -1026,7 +1026,7 @@ export class parser {
 					if (($.int(x, 32) < $.int(0, 32)) || ($.int(y, 32) < $.int(0, 32))) {
 						break
 					}
-					return [$.int((x * 16) + y, 32), t, null]
+					return [$.int((Math.imul(x, 16)) + y, 32), t, null]
 					break
 				}
 				case 97:

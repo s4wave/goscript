@@ -77,7 +77,7 @@ export function dboxFtoa64(d: __goscript_ftoa.decimalSlice | $.VarRef<__goscript
 			return
 		}
 		s--
-		r = $.uint(100 * 10, 32)
+		r = $.uint(Math.imul(100, 10) >>> 0, 32)
 	} else {
 		if ($.uint(r, 32) == $.uint(_u3b4i, 32)) {
 			let [parity, __goscriptShadow4] = dboxParity64($.uint64(BigInt.asUintN(64, (BigInt.asUintN(64, mant * 2n)) - 1n)), $.markAsStructValue($.cloneStructValue(_u3c6)), _u3b2)
@@ -118,7 +118,7 @@ export function dboxFtoa32(d: __goscript_ftoa.decimalSlice | $.VarRef<__goscript
 			xi++
 		}
 		let q = $.uint(Math.trunc(zi / 10), 32)
-		if ($.uint(xi, 32) <= $.uint((q * 10), 32)) {
+		if ($.uint(xi, 32) <= $.uint((Math.imul(q, 10) >>> 0), 32)) {
 			let __goscriptShadow8 = q
 			let __goscriptTuple4: any = __goscript_math.trimZeros($.uint64(__goscriptShadow8))
 			let __goscriptShadow9 = __goscriptTuple4[0]
@@ -146,7 +146,7 @@ export function dboxFtoa32(d: __goscript_ftoa.decimalSlice | $.VarRef<__goscript
 	// Algorithm 5.2 (page 15).
 	let k0 = -__goscript_math.mulLog10_2(exp)
 	let [_u3c6, _u3b2] = dboxPow32(1 + k0, exp)
-	let __goscriptTuple5: any = dboxMulPow32($.uint($.uint((mant * 2) + 1, 32) << _u3b2, 32), _u3c6)
+	let __goscriptTuple5: any = dboxMulPow32($.uint($.uint((Math.imul(mant, 2) >>> 0) + 1, 32) << _u3b2, 32), _u3c6)
 	let zi = $.uint(__goscriptTuple5[0], 32)
 	let exact = __goscriptTuple5[1]
 	let s = $.uint(Math.trunc(zi / 100), 32)
@@ -163,10 +163,10 @@ export function dboxFtoa32(d: __goscript_ftoa.decimalSlice | $.VarRef<__goscript
 			return
 		}
 		s--
-		r = $.uint(10 * 10, 32)
+		r = $.uint(Math.imul(10, 10) >>> 0, 32)
 	} else {
 		if ($.uint(r, 32) == $.uint(_u3b4i, 32)) {
-			let [parity, __goscriptShadow12] = dboxParity32($.uint($.uint((mant * 2) - 1, 32), 32), _u3c6, _u3b2)
+			let [parity, __goscriptShadow12] = dboxParity32($.uint($.uint((Math.imul(mant, 2) >>> 0) - 1, 32), 32), _u3c6, _u3b2)
 			if (parity || (__goscriptShadow12 && ($.uint((mant % 2), 32) == $.uint(0, 32)))) {
 				let __goscriptShadow13 = s
 				let __goscriptTuple7: any = __goscript_math.trimZeros($.uint64(__goscriptShadow13))
@@ -182,9 +182,9 @@ export function dboxFtoa32(d: __goscript_ftoa.decimalSlice | $.VarRef<__goscript
 	let D = $.uint((r + (Math.trunc(10 / 2))) - (Math.trunc(_u3b4i / 2)), 32)
 	let t = $.uint(Math.trunc(D / 10), 32)
 	let _u3c1 = $.uint(D % 10, 32)
-	let yru = $.uint((10 * s) + $.uint(t, 32), 32)
+	let yru = $.uint((Math.imul(10, s) >>> 0) + $.uint(t, 32), 32)
 	if ($.uint(_u3c1, 32) == $.uint(0, 32)) {
-		let [parity, __goscriptShadow15] = dboxParity32($.uint(mant * 2, 32), _u3c6, _u3b2)
+		let [parity, __goscriptShadow15] = dboxParity32($.uint(Math.imul(mant, 2) >>> 0, 32), _u3c6, _u3b2)
 		if ((parity != ($.uint(((D - (Math.trunc(10 / 2))) % 2), 32) != $.uint(0, 32))) || (__goscriptShadow15 && ($.uint((yru % 2), 32) != $.uint(0, 32)))) {
 			yru--
 		}

@@ -366,7 +366,7 @@ export function load64(b: $.Slice<number>, i: number): bigint {
 }
 
 export function hash(u: number): number {
-	return $.uint($.uintShr((u * 0x1e35a7bd), 18, 32), 32)
+	return $.uint($.uintShr((Math.imul(u, 0x1e35a7bd) >>> 0), 18, 32), 32)
 }
 
 export function newDeflateFast(): deflateFast | $.VarRef<deflateFast> | null {
