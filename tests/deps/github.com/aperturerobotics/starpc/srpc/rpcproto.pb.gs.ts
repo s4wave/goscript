@@ -439,8 +439,8 @@ export class Packet {
 			if (err != null) {
 				return err
 			}
-			let fieldNum = $.int($.int($.uint64Shr(wire, 3), 32), 32)
-			let wireType = $.int($.uint64And(wire, 0x7))
+			let fieldNum = $.int($.int(wire >> 3n, 32), 32)
+			let wireType = $.int(wire & 7n)
 			if (wireType == 4) {
 				return fmt.Errorf("proto: Packet: wiretype end group for non-group")
 			}
@@ -1414,8 +1414,8 @@ export class CallStart {
 			if (err != null) {
 				return err
 			}
-			let fieldNum = $.int($.int($.uint64Shr(wire, 3), 32), 32)
-			let wireType = $.int($.uint64And(wire, 0x7))
+			let fieldNum = $.int($.int(wire >> 3n, 32), 32)
+			let wireType = $.int(wire & 7n)
 			if (wireType == 4) {
 				return fmt.Errorf("proto: CallStart: wiretype end group for non-group")
 			}
@@ -1989,8 +1989,8 @@ export class CallData {
 			if (err != null) {
 				return err
 			}
-			let fieldNum = $.int($.int($.uint64Shr(wire, 3), 32), 32)
-			let wireType = $.int($.uint64And(wire, 0x7))
+			let fieldNum = $.int($.int(wire >> 3n, 32), 32)
+			let wireType = $.int(wire & 7n)
 			if (wireType == 4) {
 				return fmt.Errorf("proto: CallData: wiretype end group for non-group")
 			}

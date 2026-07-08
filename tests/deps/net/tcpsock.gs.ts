@@ -875,5 +875,5 @@ export async function ListenTCP(network: string, laddr: TCPAddr | $.VarRef<TCPAd
 }
 
 export function roundDurationUp(d: time.Duration, to: time.Duration): time.Duration {
-	return $.int64Div(($.int64Sub(($.int64Add(d, to)), 1)), to)
+	return $.int64Div((BigInt.asIntN(64, (BigInt.asIntN(64, d + to)) - 1n)), to)
 }

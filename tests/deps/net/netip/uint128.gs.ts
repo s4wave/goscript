@@ -47,12 +47,12 @@ export class uint128 {
 		let __goscriptTuple0: any = bits.Add64(u.lo, 1n, 0n)
 		let lo = __goscriptTuple0[0]
 		let carry = __goscriptTuple0[1]
-		return $.markAsStructValue(new uint128({hi: $.uint64Add(u.hi, carry), lo: lo}))
+		return $.markAsStructValue(new uint128({hi: BigInt.asUintN(64, u.hi + carry), lo: lo}))
 	}
 
 	public and(m: uint128): uint128 {
 		const u = this
-		return $.markAsStructValue(new uint128({hi: $.uint64And(u.hi, m.hi), lo: $.uint64And(u.lo, m.lo)}))
+		return $.markAsStructValue(new uint128({hi: u.hi & m.hi, lo: u.lo & m.lo}))
 	}
 
 	public bitsClearedFrom(bit: number): uint128 {
@@ -72,7 +72,7 @@ export class uint128 {
 
 	public isZero(): boolean {
 		const u = this
-		return ($.uint64Or(u.hi, u.lo)) == 0n
+		return (u.hi | u.lo) == 0n
 	}
 
 	public not(): uint128 {
@@ -82,7 +82,7 @@ export class uint128 {
 
 	public or(m: uint128): uint128 {
 		const u = this
-		return $.markAsStructValue(new uint128({hi: $.uint64Or(u.hi, m.hi), lo: $.uint64Or(u.lo, m.lo)}))
+		return $.markAsStructValue(new uint128({hi: u.hi | m.hi, lo: u.lo | m.lo}))
 	}
 
 	public subOne(): uint128 {
@@ -90,12 +90,12 @@ export class uint128 {
 		let __goscriptTuple1: any = bits.Sub64(u.lo, 1n, 0n)
 		let lo = __goscriptTuple1[0]
 		let borrow = __goscriptTuple1[1]
-		return $.markAsStructValue(new uint128({hi: $.uint64Sub(u.hi, borrow), lo: lo}))
+		return $.markAsStructValue(new uint128({hi: BigInt.asUintN(64, u.hi - borrow), lo: lo}))
 	}
 
 	public xor(m: uint128): uint128 {
 		const u = this
-		return $.markAsStructValue(new uint128({hi: $.uint64Xor(u.hi, m.hi), lo: $.uint64Xor(u.lo, m.lo)}))
+		return $.markAsStructValue(new uint128({hi: u.hi ^ m.hi, lo: u.lo ^ m.lo}))
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -1247,7 +1247,7 @@ export class Session {
 		}
 		if (!atomic.CompareAndSwapInt64($.pointerValue<Session>(s)._fields.rtt, 0n, time.Duration_Nanoseconds(rtt))) {
 			let prev = atomic.LoadInt64($.pointerValue<Session>(s)._fields.rtt)
-			let smoothedRTT = $.int64Add(($.int64Div(prev, 2)), ($.int64Div(time.Duration_Nanoseconds(rtt), 2)))
+			let smoothedRTT = BigInt.asIntN(64, ($.int64Div(prev, 2n)) + ($.int64Div(time.Duration_Nanoseconds(rtt), 2n)))
 			atomic.StoreInt64($.pointerValue<Session>(s)._fields.rtt, smoothedRTT)
 		}
 	}
@@ -1371,7 +1371,7 @@ export class Session {
 			let extendWriteDeadline: (() => $.GoError | globalThis.Promise<$.GoError>) | null = $.functionValue(async (): globalThis.Promise<$.GoError> => {
 				let now = $.markAsStructValue($.cloneStructValue(time.Now()))
 				// If over half of the deadline has elapsed, extend it.
-				if ($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(now)).Add($.int64Div($.pointerValue<__goscript_mux.Config>($.pointerValue<Session>(s).config).ConnectionWriteTimeout, 2)))).After($.markAsStructValue($.cloneStructValue(lastWriteDeadline)))) {
+				if ($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(now)).Add($.int64Div($.pointerValue<__goscript_mux.Config>($.pointerValue<Session>(s).config).ConnectionWriteTimeout, 2n)))).After($.markAsStructValue($.cloneStructValue(lastWriteDeadline)))) {
 					lastWriteDeadline = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(now)).Add($.pointerValue<__goscript_mux.Config>($.pointerValue<Session>(s).config).ConnectionWriteTimeout)))
 					return $.pointerValue<Exclude<net.Conn, null>>($.pointerValue<Session>(s).conn).SetWriteDeadline($.markAsStructValue($.cloneStructValue(lastWriteDeadline)))
 				}

@@ -220,7 +220,7 @@ export class deflateFast {
 
 					let offset = $.int(s - (candidate.offset - $.pointerValue<deflateFast>(e).cur), 32)
 					if (($.int(offset, 32) > $.int(32768, 32)) || ($.uint($.uint(x, 32), 32) != $.uint(candidate.val, 32))) {
-						cv = $.uint($.uint($.uint64Shr(x, 8), 32), 32)
+						cv = $.uint($.uint(x >> 8n, 32), 32)
 						nextHash = $.uint(hash($.uint(cv, 32)), 32)
 						s++
 						break
@@ -362,7 +362,7 @@ export function load32(b: $.Slice<number>, i: number): number {
 
 export function load64(b: $.Slice<number>, i: number): bigint {
 	b = $.goSlice(b, i, i + 8, $.len(b))
-	return $.uint64Or(($.uint64Or(($.uint64Or(($.uint64Or(($.uint64Or(($.uint64Or(($.uint64Or($.uint64($.arrayIndex(b!, 0)), ($.uint64Shl($.uint64($.arrayIndex(b!, 1)), 8)))), ($.uint64Shl($.uint64($.arrayIndex(b!, 2)), 16)))), ($.uint64Shl($.uint64($.arrayIndex(b!, 3)), 24)))), ($.uint64Mul($.uint64($.arrayIndex(b!, 4)), (2 ** 32))))), ($.uint64Mul($.uint64($.arrayIndex(b!, 5)), (2 ** 40))))), ($.uint64Mul($.uint64($.arrayIndex(b!, 6)), (2 ** 48))))), ($.uint64Mul($.uint64($.arrayIndex(b!, 7)), (2 ** 56))))
+	return (((((($.uint64($.arrayIndex(b!, 0)) | ($.uint64Shl($.uint64($.arrayIndex(b!, 1)), 8n))) | ($.uint64Shl($.uint64($.arrayIndex(b!, 2)), 16n))) | ($.uint64Shl($.uint64($.arrayIndex(b!, 3)), 24n))) | ($.uint64Mul($.uint64($.arrayIndex(b!, 4)), (2 ** 32)))) | ($.uint64Mul($.uint64($.arrayIndex(b!, 5)), (2 ** 40)))) | ($.uint64Mul($.uint64($.arrayIndex(b!, 6)), (2 ** 48)))) | ($.uint64Mul($.uint64($.arrayIndex(b!, 7)), (2 ** 56)))
 }
 
 export function hash(u: number): number {

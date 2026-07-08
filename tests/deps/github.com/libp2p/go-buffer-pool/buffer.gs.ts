@@ -138,7 +138,7 @@ export class Buffer {
 
 			let [read, err] = await $.pointerValue<Exclude<io.Reader, null>>(r).Read($.goSlice($.pointerValue<Buffer>(b).buf, wOff, undefined))
 			$.pointerValue<Buffer>(b).buf = $.goSlice($.pointerValue<Buffer>(b).buf, undefined, wOff + read)
-			n = $.int64Add(n, $.int64(read))
+			n = BigInt.asIntN(64, n + ($.int64(read)))
 			{
 				let __goscriptSwitch0 = err
 				switch (true) {

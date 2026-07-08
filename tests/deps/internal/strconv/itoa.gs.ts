@@ -96,7 +96,7 @@ export function formatBits(dst: $.Slice<number>, u: bigint, base: number, neg: b
 		// Use shifts and masks instead of / and %.
 		let shift = $.uint(bits.TrailingZeros($.uint(base, 64)), 64)
 		let b = $.uint64(base)
-		let m = $.uint($.uint64Sub($.uint(base, 64), 1), 64)
+		let m = $.uint($.uint64Sub($.uint(base, 64), 1n), 64)
 		while (u >= b) {
 			i--
 			a[i] = $.uint($.indexStringOrBytes("0123456789abcdefghijklmnopqrstuvwxyz", $.uint($.uint64And($.uint(u, 64), m), 64)), 8)
@@ -114,7 +114,7 @@ export function formatBits(dst: $.Slice<number>, u: bigint, base: number, neg: b
 			// since 64bit division and modulo operations
 			// are calculated by runtime functions on 32bit machines.
 			let q = $.uint64Div(u, b)
-			a[i] = $.uint($.indexStringOrBytes("0123456789abcdefghijklmnopqrstuvwxyz", $.uint($.uint64Sub(u, ($.uint64Mul(q, b))), 64)), 8)
+			a[i] = $.uint($.indexStringOrBytes("0123456789abcdefghijklmnopqrstuvwxyz", $.uint(BigInt.asUintN(64, u - (BigInt.asUintN(64, q * b))), 64)), 8)
 			u = q
 		}
 		// u < base
@@ -158,10 +158,10 @@ export function formatBase10(a: $.Slice<number>, u: bigint): number {
 	// so the setup for the comparison u >= 1e9 is usually pure overhead.
 	// Instead, we approximate it by u>>29 != 0, which is usually faster and good enough.
 	let i = $.len(a)
-	while ((true && (($.uint64Shr(u, 29)) != 0n)) || (!true && ($.uint((($.uintShr($.uint(u, 32), 29, 32)) | $.uint($.uint64Shr(u, 32), 32)), 32) != $.uint(0, 32)))) {
+	while ((true && ((u >> 29n) != 0n)) || (!true && ($.uint((($.uintShr($.uint(u, 32), 29, 32)) | $.uint(u >> 32n, 32)), 32) != $.uint(0, 32)))) {
 		let lo: number = 0
-		let __goscriptAssign0_0: bigint = $.uint64Div(u, 1e9)
-		let __goscriptAssign0_1: number = $.uint($.uint($.uint64Mod(u, 1e9), 32), 32)
+		let __goscriptAssign0_0: bigint = $.uint64Div(u, 1000000000n)
+		let __goscriptAssign0_1: number = $.uint($.uint($.uint64Mod(u, 1000000000n), 32), 32)
 		u = __goscriptAssign0_0
 		lo = __goscriptAssign0_1
 

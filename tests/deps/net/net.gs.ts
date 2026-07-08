@@ -1559,7 +1559,7 @@ export async function Buffers_WriteTo(v: $.VarRef<Buffers> | null, w: io.Writer 
 	for (let __goscriptRangeTarget0 = $.pointerValue<Buffers>(v), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let b = __goscriptRangeTarget0![__rangeIndex]
 		let [nb, __goscriptShadow4] = await $.pointerValue<Exclude<io.Writer, null>>(w).Write(b)
-		n = $.int64Add(n, $.int64(nb))
+		n = BigInt.asIntN(64, n + ($.int64(nb)))
 		if (__goscriptShadow4 != null) {
 			Buffers_consume(v, n)
 			return [n, __goscriptShadow4]
@@ -1591,7 +1591,7 @@ export function Buffers_consume(v: $.VarRef<Buffers> | null, n: bigint): void {
 			($.pointerValue<Buffers>(v))![0] = $.goSlice($.arrayIndex(($.pointerValue<Buffers>(v))!, 0), Number(n), undefined)
 			return
 		}
-		n = $.int64Sub(n, ln0);
+		n = BigInt.asIntN(64, n - (ln0));
 		($.pointerValue<Buffers>(v))![0] = null
 		v!.value = ($.goSlice(($.pointerValue<Buffers>(v)), 1, undefined) as Buffers)
 	}

@@ -79,12 +79,12 @@ export class fdMutex {
 		const mu: fdMutex | $.VarRef<fdMutex> | null = this
 		while (true) {
 			let old = atomic.LoadUint64($.pointerValue<fdMutex>(mu)._fields.state)
-			if (($.uint64And(old, 8388600)) == 0n) {
+			if ((old & 8388600n) == 0n) {
 				$.panic("inconsistent poll.fdMutex")
 			}
-			let _new = $.uint64Sub(old, 8)
+			let _new = BigInt.asUintN(64, old - 8n)
 			if (atomic.CompareAndSwapUint64($.pointerValue<fdMutex>(mu)._fields.state, old, _new)) {
-				return ($.uint64And(_new, ($.uint64Or(1, 8388600)))) == 1n
+				return (_new & 8388601n) == 1n
 			}
 		}
 		throw new globalThis.Error("goscript: unreachable return")
@@ -94,11 +94,11 @@ export class fdMutex {
 		const mu: fdMutex | $.VarRef<fdMutex> | null = this
 		while (true) {
 			let old = atomic.LoadUint64($.pointerValue<fdMutex>(mu)._fields.state)
-			if (($.uint64And(old, 1)) != 0n) {
+			if ((old & 1n) != 0n) {
 				return false
 			}
-			let _new = $.uint64Add(old, 8)
-			if (($.uint64And(_new, 8388600)) == 0n) {
+			let _new = BigInt.asUintN(64, old + 8n)
+			if ((_new & 8388600n) == 0n) {
 				$.panic("too many concurrent operations on a single file or socket (max 1048575)")
 			}
 			if (atomic.CompareAndSwapUint64($.pointerValue<fdMutex>(mu)._fields.state, old, _new)) {
@@ -112,25 +112,25 @@ export class fdMutex {
 		const mu: fdMutex | $.VarRef<fdMutex> | null = this
 		while (true) {
 			let old = atomic.LoadUint64($.pointerValue<fdMutex>(mu)._fields.state)
-			if (($.uint64And(old, 1)) != 0n) {
+			if ((old & 1n) != 0n) {
 				return false
 			}
 			// Mark as closed and acquire a reference.
-			let _new = $.uint64Add(($.uint64Or(old, 1)), 8)
-			if (($.uint64And(_new, 8388600)) == 0n) {
+			let _new = BigInt.asUintN(64, (old | 1n) + 8n)
+			if ((_new & 8388600n) == 0n) {
 				$.panic("too many concurrent operations on a single file or socket (max 1048575)")
 			}
 			// Remove all read and write waiters.
-			_new = $.uint64AndNot(_new, 9223372036846387200n)
+			_new = _new & ~(9223372036846387200n)
 			if (atomic.CompareAndSwapUint64($.pointerValue<fdMutex>(mu)._fields.state, old, _new)) {
 				// Wake all read and write waiters,
 				// they will observe closed flag after wakeup.
-				while (($.uint64And(old, 8796084633600)) != 0n) {
-					old = $.uint64Sub(old, 8388608n)
+				while ((old & 8796084633600n) != 0n) {
+					old = BigInt.asUintN(64, old - (8388608n))
 					runtime_Semrelease($.pointerValue<fdMutex>(mu)._fields.rsema)
 				}
-				while (($.uint64And(old, 9223363240761753600n)) != 0n) {
-					old = $.uint64Sub(old, 8796093022208n)
+				while ((old & 9223363240761753600n) != 0n) {
+					old = BigInt.asUintN(64, old - (8796093022208n))
 					runtime_Semrelease($.pointerValue<fdMutex>(mu)._fields.wsema)
 				}
 				return true
@@ -158,25 +158,25 @@ export class fdMutex {
 		}
 		while (true) {
 			let old = atomic.LoadUint64($.pointerValue<fdMutex>(mu)._fields.state)
-			if (($.uint64And(old, 1)) != 0n) {
+			if ((old & 1n) != 0n) {
 				return false
 			}
 			let _new: bigint = 0n
-			if (($.uint64And(old, mutexBit)) == 0n) {
+			if ((old & mutexBit) == 0n) {
 				// Lock is free, acquire it.
-				_new = $.uint64Add(($.uint64Or(old, mutexBit)), 8)
-				if (($.uint64And(_new, 8388600)) == 0n) {
+				_new = BigInt.asUintN(64, (old | mutexBit) + 8n)
+				if ((_new & 8388600n) == 0n) {
 					$.panic("too many concurrent operations on a single file or socket (max 1048575)")
 				}
 			} else {
 				// Wait for lock.
-				_new = $.uint64Add(old, mutexWait)
-				if (($.uint64And(_new, mutexMask)) == 0n) {
+				_new = BigInt.asUintN(64, old + mutexWait)
+				if ((_new & mutexMask) == 0n) {
 					$.panic("too many concurrent operations on a single file or socket (max 1048575)")
 				}
 			}
 			if (atomic.CompareAndSwapUint64($.pointerValue<fdMutex>(mu)._fields.state, old, _new)) {
-				if (($.uint64And(old, mutexBit)) == 0n) {
+				if ((old & mutexBit) == 0n) {
 					return true
 				}
 				runtime_Semacquire(mutexSema)
@@ -204,19 +204,19 @@ export class fdMutex {
 		}
 		while (true) {
 			let old = atomic.LoadUint64($.pointerValue<fdMutex>(mu)._fields.state)
-			if ((($.uint64And(old, mutexBit)) == 0n) || (($.uint64And(old, 8388600)) == 0n)) {
+			if (((old & mutexBit) == 0n) || ((old & 8388600n) == 0n)) {
 				$.panic("inconsistent poll.fdMutex")
 			}
 			// Drop lock, drop reference and wake read waiter if present.
-			let _new = $.uint64Sub(($.uint64AndNot(old, mutexBit)), 8)
-			if (($.uint64And(old, mutexMask)) != 0n) {
-				_new = $.uint64Sub(_new, mutexWait)
+			let _new = BigInt.asUintN(64, (old & ~(mutexBit)) - 8n)
+			if ((old & mutexMask) != 0n) {
+				_new = BigInt.asUintN(64, _new - (mutexWait))
 			}
 			if (atomic.CompareAndSwapUint64($.pointerValue<fdMutex>(mu)._fields.state, old, _new)) {
-				if (($.uint64And(old, mutexMask)) != 0n) {
+				if ((old & mutexMask) != 0n) {
 					runtime_Semrelease(mutexSema)
 				}
-				return ($.uint64And(_new, ($.uint64Or(1, 8388600)))) == 1n
+				return (_new & 8388601n) == 1n
 			}
 		}
 		throw new globalThis.Error("goscript: unreachable return")

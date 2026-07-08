@@ -183,7 +183,7 @@ export function runtime_rand(): bigint {
 }
 
 export function randInt(): number {
-	return $.int($.uint($.uint64Shr($.uint(runtime_rand(), 64), 1), 64))
+	return $.int($.uint($.uint64Shr($.uint(runtime_rand(), 64), 1n), 64))
 }
 
 export function randIntn(n: number): number {

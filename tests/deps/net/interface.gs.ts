@@ -375,7 +375,7 @@ export function Flags_String(f: Flags): string {
 	let s = ""
 	for (let __goscriptRangeTarget0 = flagNames, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
 		let name = __goscriptRangeTarget0![i]
-		if (($.uint($.uint64And(f, ($.uint($.uint64Shl(1, $.uint(i, 64)), 64))), 64)) != 0) {
+		if (($.uint($.uint64And(f, ($.uint($.uint64Shl(1n, $.uint(i, 64)), 64))), 64)) != 0) {
 			if (!$.stringEqual(s, "")) {
 				s = s + ("|")
 			}

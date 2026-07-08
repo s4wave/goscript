@@ -129,12 +129,12 @@ export function ParseUint(s: string, base: number, bitSize: number): [bigint, $.
 		}
 		default:
 		{
-			cutoff = $.uint64Add(($.uint64Div(18446744073709551615n, $.uint64(base))), 1)
+			cutoff = BigInt.asUintN(64, ($.uint64Div(18446744073709551615n, $.uint64(base))) + 1n)
 			break
 		}
 	}
 
-	let maxVal = $.uint64Sub(($.uint64Shl(1n, $.uint(bitSize, 64))), 1)
+	let maxVal = BigInt.asUintN(64, ($.uint64Shl(1n, $.uint(bitSize, 64))) - 1n)
 
 	let underscores = false
 	let n: bigint = 0n
@@ -173,9 +173,9 @@ export function ParseUint(s: string, base: number, bitSize: number): [bigint, $.
 			// n*base overflows
 			return [maxVal, $.namedValueInterfaceValue<$.GoError>(1, "strconv.Error", {"Error": Error_Error}, { kind: $.TypeKind.Basic, name: "int", typeName: "strconv.Error" })]
 		}
-		n = $.uint64Mul(n, $.uint64(base))
+		n = BigInt.asUintN(64, n * ($.uint64(base)))
 
-		let n1 = $.uint64Add(n, $.uint64(d))
+		let n1 = BigInt.asUintN(64, n + $.uint64(d))
 		if ((n1 < n) || (n1 > maxVal)) {
 			// n+d overflows
 			return [maxVal, $.namedValueInterfaceValue<$.GoError>(1, "strconv.Error", {"Error": Error_Error}, { kind: $.TypeKind.Basic, name: "int", typeName: "strconv.Error" })]
@@ -228,9 +228,9 @@ export function ParseInt(s: string, base: number, bitSize: number): [bigint, $.G
 		bitSize = 64
 	}
 
-	let cutoff = $.uint64($.uint64Shl(1, $.uint(bitSize - 1, 64)))
+	let cutoff = $.uint64($.uint64Shl(1n, $.uint(bitSize - 1, 64)))
 	if (!neg && (un >= cutoff)) {
-		return [$.int64($.uint64Sub(cutoff, 1)), $.namedValueInterfaceValue<$.GoError>(1, "strconv.Error", {"Error": Error_Error}, { kind: $.TypeKind.Basic, name: "int", typeName: "strconv.Error" })]
+		return [$.int64(BigInt.asUintN(64, cutoff - 1n)), $.namedValueInterfaceValue<$.GoError>(1, "strconv.Error", {"Error": Error_Error}, { kind: $.TypeKind.Basic, name: "int", typeName: "strconv.Error" })]
 	}
 	if (neg && (un > cutoff)) {
 		return [-$.int64(cutoff), $.namedValueInterfaceValue<$.GoError>(1, "strconv.Error", {"Error": Error_Error}, { kind: $.TypeKind.Basic, name: "int", typeName: "strconv.Error" })]

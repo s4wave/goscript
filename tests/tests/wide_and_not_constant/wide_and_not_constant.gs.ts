@@ -10,15 +10,15 @@ export async function main(): globalThis.Promise<void> {
 	// runtime, so wide AND-NOT must route through the typed helper. 1<<63 is the
 	// exact math/rand/v2 Rand.Int64 pattern (clear the sign bit).
 	let x: bigint = 18446744073709551615n
-	let cleared = $.uint64AndNot(x, 9223372036854775808n)
+	let cleared = x & ~(9223372036854775808n)
 	$.println("cleared:", cleared)
 
 	let y: bigint = 18446744073709551615n
-	y = $.uint64AndNot(y, 4611686018427387904n)
+	y = y & ~(4611686018427387904n)
 	$.println("y:", y)
 
 	let z: bigint = -1n
-	z = $.int64AndNot(z, 4611686018427387904n)
+	z = BigInt.asIntN(64, z & ~(4611686018427387904n))
 	$.println("z:", z)
 }
 

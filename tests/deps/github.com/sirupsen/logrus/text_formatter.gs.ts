@@ -604,7 +604,7 @@ export class TextFormatter {
 			}
 			case !$.pointerValue<TextFormatter>(f).FullTimestamp:
 			{
-				await fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(b, "*bytes.Buffer"))!, "%s[%04d]%s %-44s ", levelText, $.namedValueInterfaceValue<any>($.int($.int64Div($.markAsStructValue($.cloneStructValue($.pointerValue<__goscript_entry.Entry>(entry).Time)).Sub($.markAsStructValue($.cloneStructValue(baseTimestamp))), time.Second)), "int", {}, { kind: $.TypeKind.Basic, name: "int" }), callerText, $.pointerValue<__goscript_entry.Entry>(entry).Message)
+				await fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(b, "*bytes.Buffer"))!, "%s[%04d]%s %-44s ", levelText, $.namedValueInterfaceValue<any>($.int($.int64Div($.markAsStructValue($.cloneStructValue($.pointerValue<__goscript_entry.Entry>(entry).Time)).Sub($.markAsStructValue($.cloneStructValue(baseTimestamp))), 1000000000n)), "int", {}, { kind: $.TypeKind.Basic, name: "int" }), callerText, $.pointerValue<__goscript_entry.Entry>(entry).Message)
 				break
 			}
 			default:

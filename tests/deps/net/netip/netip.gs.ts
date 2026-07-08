@@ -244,7 +244,7 @@ export class Addr {
 
 	public Is4In6(): boolean {
 		const ip = this
-		return ($.markAsStructValue($.cloneStructValue(ip)).Is6() && (ip.addr.hi == 0n)) && (($.uint64Shr(ip.addr.lo, 32)) == 65535n)
+		return ($.markAsStructValue($.cloneStructValue(ip)).Is6() && (ip.addr.hi == 0n)) && ((ip.addr.lo >> 32n) == 65535n)
 	}
 
 	public Is6(): boolean {
@@ -353,7 +353,7 @@ export class Addr {
 		// IP Version 6 Addressing Architecture (2.4 Address Type Identification)
 		// https://datatracker.ietf.org/doc/html/rfc4291#section-2.4
 		if ($.markAsStructValue($.cloneStructValue(ip)).Is6()) {
-			return ($.uint64Shr(ip.addr.hi, (64 - 8))) == 255n
+			return (ip.addr.hi >> 56n) == 255n
 		}
 		return false
 	}
@@ -1239,7 +1239,7 @@ export class Prefix {
 			// the compiler doesn't know that, so mask with 63 to help it.
 			// Now truncate to 32 bits, because this is IPv4.
 			// If all the bits we care about are equal, the result will be zero.
-			return $.uint($.uint($.uint64Shr(($.uint64Xor(ip.addr.lo, p.ip.addr.lo)), ((32 - $.markAsStructValue($.cloneStructValue(p)).Bits()) & 63)), 32), 32) == $.uint(0, 32)
+			return $.uint($.uint($.uint64Shr((ip.addr.lo ^ p.ip.addr.lo), ((32 - $.markAsStructValue($.cloneStructValue(p)).Bits()) & 63)), 32), 32) == $.uint(0, 32)
 		} else {
 			// xor the IP addresses together.
 			// Mask away the bits we don't care about.
@@ -1483,7 +1483,7 @@ export function IPv4Unspecified(): Addr {
 }
 
 export function AddrFrom4(addr: Uint8Array): Addr {
-	return $.markAsStructValue(new Addr({addr: $.markAsStructValue(new __goscript_uint128.uint128({hi: 0n, lo: $.uint64Or(($.uint64Or(($.uint64Or(($.uint64Or(0xffff00000000, ($.uint64Shl($.uint64($.arrayIndex(addr, 0)), 24)))), ($.uint64Shl($.uint64($.arrayIndex(addr, 1)), 16)))), ($.uint64Shl($.uint64($.arrayIndex(addr, 2)), 8)))), $.uint64($.arrayIndex(addr, 3)))})), z: $.markAsStructValue($.cloneStructValue(z4))}))
+	return $.markAsStructValue(new Addr({addr: $.markAsStructValue(new __goscript_uint128.uint128({hi: 0n, lo: (((281470681743360n | ($.uint64Shl($.uint64($.arrayIndex(addr, 0)), 24n))) | ($.uint64Shl($.uint64($.arrayIndex(addr, 1)), 16n))) | ($.uint64Shl($.uint64($.arrayIndex(addr, 2)), 8n))) | $.uint64($.arrayIndex(addr, 3))})), z: $.markAsStructValue($.cloneStructValue(z4))}))
 }
 
 export function AddrFrom16(addr: Uint8Array): Addr {

@@ -5045,6 +5045,10 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 			stmts = append(stmts, loweredStmt{text: declarationKeyword(ctx) + left + o.shortDeclTypeAnnotation(ctx, lhs, stmt.Rhs[idx]) + " = " + right})
 			continue
 		}
+		if value, ok := inlineWideIntegerAssignValue(targetType, left, right, stmt.Tok); ok {
+			stmts = append(stmts, loweredStmt{text: left + " = " + value})
+			continue
+		}
 		if helper, ok := wideIntegerAssignHelper(targetType, stmt.Tok); ok {
 			call := coerceWideHelperResult(o.runtimeOwner, targetType, o.runtimeOwner.QualifiedHelper(helper)+"("+left+", "+right+")")
 			stmts = append(stmts, loweredStmt{text: left + " = " + call})
@@ -5101,6 +5105,9 @@ func lowerCompoundAssignValue(
 	right string,
 	tok token.Token,
 ) string {
+	if value, ok := inlineWideIntegerAssignValue(targetType, left, right, tok); ok {
+		return value
+	}
 	if helper, ok := wideIntegerAssignHelper(targetType, tok); ok {
 		return coerceWideHelperResult(runtimeOwner, targetType, runtimeOwner.QualifiedHelper(helper)+"("+left+", "+right+")")
 	}
@@ -5136,6 +5143,48 @@ func lowerCompoundAssignValue(
 		return left + " & ~(" + right + ")"
 	default:
 		return right
+	}
+}
+
+func inlineWideIntegerAssignValue(targetType types.Type, left string, right string, tok token.Token) (string, bool) {
+	if !isBigIntBackedType(targetType) {
+		return "", false
+	}
+	unsigned := !isFixedSignedWideIntegerType(targetType)
+	normalize := "BigInt.asUintN"
+	if !unsigned {
+		normalize = "BigInt.asIntN"
+	}
+	right = "(" + right + ")"
+	switch tok {
+	case token.ADD_ASSIGN:
+		return normalize + "(64, " + left + " + " + right + ")", true
+	case token.SUB_ASSIGN:
+		return normalize + "(64, " + left + " - " + right + ")", true
+	case token.MUL_ASSIGN:
+		return normalize + "(64, " + left + " * " + right + ")", true
+	case token.AND_ASSIGN:
+		if unsigned {
+			return left + " & " + right, true
+		}
+		return normalize + "(64, " + left + " & " + right + ")", true
+	case token.AND_NOT_ASSIGN:
+		if unsigned {
+			return left + " & ~" + right, true
+		}
+		return normalize + "(64, " + left + " & ~" + right + ")", true
+	case token.OR_ASSIGN:
+		if unsigned {
+			return left + " | " + right, true
+		}
+		return normalize + "(64, " + left + " | " + right + ")", true
+	case token.XOR_ASSIGN:
+		if unsigned {
+			return left + " ^ " + right, true
+		}
+		return normalize + "(64, " + left + " ^ " + right + ")", true
+	default:
+		return "", false
 	}
 }
 
@@ -8865,6 +8914,44 @@ func (o *LoweringOwner) lowerWideIntegerBinaryExpr(ctx lowerFileContext, expr *a
 		isFixedSignedWideIntegerType(ctx.semPkg.source.TypesInfo.TypeOf(expr.X))
 	left = lowerWideIntegerOperand(ctx, expr.X, left)
 	right = lowerWideIntegerOperand(ctx, expr.Y, right)
+	if isBigIntBackedType(resultType) {
+		unsigned := !signed
+		normalize := "BigInt.asUintN"
+		if signed {
+			normalize = "BigInt.asIntN"
+		}
+		inline := func(op string) (string, bool) {
+			return normalize + "(64, " + left + " " + op + " " + right + ")", true
+		}
+		switch expr.Op {
+		case token.MUL:
+			return inline("*")
+		case token.ADD:
+			return inline("+")
+		case token.SUB:
+			return inline("-")
+		case token.AND:
+			if unsigned {
+				return left + " & " + right, true
+			}
+			return inline("&")
+		case token.AND_NOT:
+			if unsigned {
+				return left + " & ~(" + right + ")", true
+			}
+			return normalize + "(64, " + left + " & ~(" + right + "))", true
+		case token.OR:
+			if unsigned {
+				return left + " | " + right, true
+			}
+			return inline("|")
+		case token.XOR:
+			if unsigned {
+				return left + " ^ " + right, true
+			}
+			return inline("^")
+		}
+	}
 	wrap := func(call string) string {
 		return coerceWideHelperResult(o.runtimeOwner, resultType, call)
 	}
@@ -8887,6 +8974,9 @@ func (o *LoweringOwner) lowerWideIntegerBinaryExpr(ctx lowerFileContext, expr *a
 			return helperCall(helper), true
 		}
 		amount, ok := constantShiftAmount(ctx, expr.Y)
+		if isBigIntBackedType(resultType) && !signed && expr.Op == token.SHR {
+			return left + " >> " + right, true
+		}
 		if ok && amount >= 32 && expr.Op == token.SHL && !signed {
 			base := o.lowerWideShiftLeftOperand(ctx, expr.X, left)
 			return wrap(o.runtimeOwner.QualifiedHelper(RuntimeHelperUint64Mul) +
@@ -8930,7 +9020,7 @@ func (o *LoweringOwner) lowerWideIntegerBinaryExpr(ctx lowerFileContext, expr *a
 
 func lowerWideIntegerOperand(ctx lowerFileContext, expr ast.Expr, fallback string) string {
 	value := ctx.semPkg.source.TypesInfo.Types[unwrapParenExpr(expr)].Value
-	if value == nil || value.Kind() != constant.Int || constant.BitLen(value) <= 53 {
+	if value == nil || value.Kind() != constant.Int {
 		return fallback
 	}
 	return value.ExactString() + "n"

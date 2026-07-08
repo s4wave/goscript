@@ -198,7 +198,7 @@ export function genericFtoa(dst: $.Slice<number>, val: number, fmt: number, prec
 
 	let neg = ($.uint64Shr(bits, ($.uint($.uint64Add($.pointerValue<floatInfo>(flt).expbits, $.pointerValue<floatInfo>(flt).mantbits), 64)))) != 0n
 	let exp = $.int($.uint64Shr(bits, $.pointerValue<floatInfo>(flt).mantbits)) & ((1 << $.pointerValue<floatInfo>(flt).expbits) - 1)
-	let mant = $.uint64And(bits, ($.uint64Sub(($.uint64Shl(1n, $.pointerValue<floatInfo>(flt).mantbits)), 1)))
+	let mant = bits & (BigInt.asUintN(64, ($.uint64Shl(1n, $.pointerValue<floatInfo>(flt).mantbits)) - 1n))
 	let denorm = false
 
 	switch (exp) {
@@ -233,7 +233,7 @@ export function genericFtoa(dst: $.Slice<number>, val: number, fmt: number, prec
 		}
 		default:
 		{
-			mant = $.uint64Or(mant, $.uint64Shl(1n, $.pointerValue<floatInfo>(flt).mantbits))
+			mant = mant | ($.uint64Shl(1n, $.pointerValue<floatInfo>(flt).mantbits))
 			break
 		}
 	}
@@ -466,7 +466,7 @@ export function roundShortest(d: __goscript_decimal.decimal | $.VarRef<__goscrip
 	// Next highest floating point number is mant+1 << exp-mantbits.
 	// Our upper bound is halfway between, mant*2+1 << exp-mantbits-1.
 	let upper: __goscript_decimal.decimal | $.VarRef<__goscript_decimal.decimal> | null = new __goscript_decimal.decimal()
-	__goscript_decimal.decimal.prototype.Assign.call(upper, $.uint64Add(($.uint64Mul(mant, 2)), 1))
+	__goscript_decimal.decimal.prototype.Assign.call(upper, BigInt.asUintN(64, (BigInt.asUintN(64, mant * 2n)) + 1n))
 	__goscript_decimal.decimal.prototype.Shift.call(upper, (exp - $.int($.pointerValue<floatInfo>(flt).mantbits)) - 1)
 
 	// d = mant << (exp - mantbits)
@@ -477,21 +477,21 @@ export function roundShortest(d: __goscript_decimal.decimal | $.VarRef<__goscrip
 	// Our lower bound is halfway between, mantlo*2+1 << explo-mantbits-1.
 	let mantlo: bigint = 0n
 	let explo: number = 0
-	if ((mant > ($.uint64Shl(1, $.pointerValue<floatInfo>(flt).mantbits))) || (exp == minexp)) {
-		mantlo = $.uint64Sub(mant, 1)
+	if ((mant > ($.uint64Shl(1n, $.pointerValue<floatInfo>(flt).mantbits))) || (exp == minexp)) {
+		mantlo = BigInt.asUintN(64, mant - 1n)
 		explo = exp
 	} else {
-		mantlo = $.uint64Sub(($.uint64Mul(mant, 2)), 1)
+		mantlo = BigInt.asUintN(64, (BigInt.asUintN(64, mant * 2n)) - 1n)
 		explo = exp - 1
 	}
 	let lower: __goscript_decimal.decimal | $.VarRef<__goscript_decimal.decimal> | null = new __goscript_decimal.decimal()
-	__goscript_decimal.decimal.prototype.Assign.call(lower, $.uint64Add(($.uint64Mul(mantlo, 2)), 1))
+	__goscript_decimal.decimal.prototype.Assign.call(lower, BigInt.asUintN(64, (BigInt.asUintN(64, mantlo * 2n)) + 1n))
 	__goscript_decimal.decimal.prototype.Shift.call(lower, (explo - $.int($.pointerValue<floatInfo>(flt).mantbits)) - 1)
 
 	// The upper and lower bounds are possible outputs only if
 	// the original mantissa is even, so that IEEE round-to-even
 	// would round to the original mantissa and not the neighbors.
-	let inclusive = ($.uint64Mod(mant, 2)) == 0n
+	let inclusive = ($.uint64Mod(mant, 2n)) == 0n
 
 	// As we walk the digits we want to know whether rounding up would fall
 	// within the upper bound. This is tracked by upperdelta:
@@ -707,8 +707,8 @@ export function fmtX(dst: $.Slice<number>, prec: number, fmt: number, neg: boole
 	}
 
 	// Shift digits so leading 1 (if any) is at bit 1<<60.
-	mant = $.uint64Shl(mant, $.uint64($.uint($.uint64Sub(60, $.pointerValue<floatInfo>(flt).mantbits), 64)))
-	while ((mant != 0n) && (($.uint64And(mant, 1152921504606846976n)) == 0n)) {
+	mant = $.uint64Shl(mant, $.uint64($.uint($.uint64Sub(60n, $.pointerValue<floatInfo>(flt).mantbits), 64)))
+	while ((mant != 0n) && ((mant & 1152921504606846976n) == 0n)) {
 		mant = $.uint64Shl(mant, 1n)
 		exp--
 	}
@@ -716,13 +716,13 @@ export function fmtX(dst: $.Slice<number>, prec: number, fmt: number, neg: boole
 	// Round if requested.
 	if ((prec >= 0) && (prec < 15)) {
 		let shift = $.uint(prec * 4, 64)
-		let extra = $.uint64And(($.uint64Shl(mant, shift)), 1152921504606846975n)
-		mant = $.uint64Shr(mant, $.uint64($.uint($.uint64Sub(60, shift), 64)))
-		if (($.uint64Or(extra, ($.uint64And(mant, 1)))) > 576460752303423488n) {
+		let extra = ($.uint64Shl(mant, shift)) & 1152921504606846975n
+		mant = $.uint64Shr(mant, $.uint64($.uint($.uint64Sub(60n, shift), 64)))
+		if ((extra | (mant & 1n)) > 576460752303423488n) {
 			mant++
 		}
-		mant = $.uint64Shl(mant, $.uint64($.uint($.uint64Sub(60, shift), 64)))
-		if (($.uint64And(mant, 2305843009213693952n)) != 0n) {
+		mant = $.uint64Shl(mant, $.uint64($.uint($.uint64Sub(60n, shift), 64)))
+		if ((mant & 2305843009213693952n) != 0n) {
 			// Wrapped around.
 			mant = $.uint64Shr(mant, 1n)
 			exp++
@@ -738,21 +738,21 @@ export function fmtX(dst: $.Slice<number>, prec: number, fmt: number, neg: boole
 	if (neg) {
 		dst = $.append(dst, $.uint(45, 8), $.byteSliceHint)
 	}
-	dst = $.append(dst, $.uint(48, 8), $.uint(fmt, 8), $.uint(48 + $.uint($.uint64And(($.uint64Shr(mant, 60)), 1), 8), 8), $.byteSliceHint)
+	dst = $.append(dst, $.uint(48, 8), $.uint(fmt, 8), $.uint(48 + $.uint((mant >> 60n) & 1n, 8), 8), $.byteSliceHint)
 
 	// .fraction
 	mant = $.uint64Shl(mant, 4n)
 	if ((prec < 0) && (mant != 0n)) {
 		dst = $.append(dst, $.uint(46, 8), $.byteSliceHint)
 		while (mant != 0n) {
-			dst = $.append(dst, $.uint($.indexStringOrBytes(hex, Number($.uint64And(($.uint64Shr(mant, 60)), 15))), 8), $.byteSliceHint)
+			dst = $.append(dst, $.uint($.indexStringOrBytes(hex, Number((mant >> 60n) & 15n)), 8), $.byteSliceHint)
 			mant = $.uint64Shl(mant, 4n)
 		}
 	} else {
 		if (prec > 0) {
 			dst = $.append(dst, $.uint(46, 8), $.byteSliceHint)
 			for (let i = 0; i < prec; i++) {
-				dst = $.append(dst, $.uint($.indexStringOrBytes(hex, Number($.uint64And(($.uint64Shr(mant, 60)), 15))), 8), $.byteSliceHint)
+				dst = $.append(dst, $.uint($.indexStringOrBytes(hex, Number((mant >> 60n) & 15n)), 8), $.byteSliceHint)
 				mant = $.uint64Shl(mant, 4n)
 			}
 		}

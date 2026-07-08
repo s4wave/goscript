@@ -33,8 +33,8 @@ export function dboxFtoa64(d: __goscript_ftoa.decimalSlice | $.VarRef<__goscript
 		if ((exp != 2) && (exp != 3)) {
 			xi++
 		}
-		let q = $.uint64Div(zi, 10)
-		if (xi <= ($.uint64Mul(q, 10))) {
+		let q = $.uint64Div(zi, 10n)
+		if (xi <= (BigInt.asUintN(64, q * 10n))) {
 			let __goscriptShadow0 = q
 			let __goscriptTuple0: any = __goscript_math.trimZeros(__goscriptShadow0)
 			let __goscriptShadow1 = __goscriptTuple0[0]
@@ -43,7 +43,7 @@ export function dboxFtoa64(d: __goscript_ftoa.decimalSlice | $.VarRef<__goscript
 			return
 		}
 		let yru = dboxRoundUp64($.markAsStructValue($.cloneStructValue(_u3c6)), _u3b2)
-		if ((exp == -77) && (($.uint64Mod(yru, 2)) != 0n)) {
+		if ((exp == -77) && (($.uint64Mod(yru, 2n)) != 0n)) {
 			yru--
 		} else {
 			if (yru < xi) {
@@ -62,13 +62,13 @@ export function dboxFtoa64(d: __goscript_ftoa.decimalSlice | $.VarRef<__goscript
 	// Algorithm 5.2 (page 15).
 	let k0 = -__goscript_math.mulLog10_2(exp)
 	let [_u3c6, _u3b2] = dboxPow64(2 + k0, exp)
-	let [zi, exact] = dboxMulPow64($.uint64Shl($.uint64($.uint64Add(($.uint64Mul(mant, 2)), 1)), _u3b2), $.markAsStructValue($.cloneStructValue(_u3c6)))
-	let s = $.uint64Div(zi, 1000)
-	let r = $.uint($.uint($.uint64Mod(zi, 1000), 32), 32)
+	let [zi, exact] = dboxMulPow64($.uint64Shl($.uint64(BigInt.asUintN(64, (BigInt.asUintN(64, mant * 2n)) + 1n)), _u3b2), $.markAsStructValue($.cloneStructValue(_u3c6)))
+	let s = $.uint64Div(zi, 1000n)
+	let r = $.uint($.uint($.uint64Mod(zi, 1000n), 32), 32)
 	let _u3b4i = $.uint(dboxDelta64($.markAsStructValue($.cloneStructValue(_u3c6)), _u3b2), 32)
 
 	if ($.uint(r, 32) < $.uint(_u3b4i, 32)) {
-		if ((($.uint(r, 32) != $.uint(0, 32)) || !exact) || (($.uint64Mod(mant, 2)) == 0n)) {
+		if ((($.uint(r, 32) != $.uint(0, 32)) || !exact) || (($.uint64Mod(mant, 2n)) == 0n)) {
 			let __goscriptShadow2 = s
 			let __goscriptTuple1: any = __goscript_math.trimZeros(__goscriptShadow2)
 			let __goscriptShadow3 = __goscriptTuple1[0]
@@ -80,8 +80,8 @@ export function dboxFtoa64(d: __goscript_ftoa.decimalSlice | $.VarRef<__goscript
 		r = $.uint(100 * 10, 32)
 	} else {
 		if ($.uint(r, 32) == $.uint(_u3b4i, 32)) {
-			let [parity, __goscriptShadow4] = dboxParity64($.uint64($.uint64Sub(($.uint64Mul(mant, 2)), 1)), $.markAsStructValue($.cloneStructValue(_u3c6)), _u3b2)
-			if (parity || (__goscriptShadow4 && (($.uint64Mod(mant, 2)) == 0n))) {
+			let [parity, __goscriptShadow4] = dboxParity64($.uint64(BigInt.asUintN(64, (BigInt.asUintN(64, mant * 2n)) - 1n)), $.markAsStructValue($.cloneStructValue(_u3c6)), _u3b2)
+			if (parity || (__goscriptShadow4 && (($.uint64Mod(mant, 2n)) == 0n))) {
 				let __goscriptShadow5 = s
 				let __goscriptTuple2: any = __goscript_math.trimZeros(__goscriptShadow5)
 				let __goscriptShadow6 = __goscriptTuple2[0]
@@ -96,10 +96,10 @@ export function dboxFtoa64(d: __goscript_ftoa.decimalSlice | $.VarRef<__goscript
 	let D = $.uint((r + (Math.trunc(100 / 2))) - (Math.trunc(_u3b4i / 2)), 32)
 	let t = $.uint(Math.trunc(D / 100), 32)
 	let _u3c1 = $.uint(D % 100, 32)
-	let yru = $.uint64Add(($.uint64Mul(10, s)), $.uint64(t))
+	let yru = BigInt.asUintN(64, (BigInt.asUintN(64, 10n * s)) + $.uint64(t))
 	if ($.uint(_u3c1, 32) == $.uint(0, 32)) {
-		let [parity, __goscriptShadow7] = dboxParity64($.uint64Mul(mant, 2), $.markAsStructValue($.cloneStructValue(_u3c6)), _u3b2)
-		if ((parity != ($.uint(((D - (Math.trunc(100 / 2))) % 2), 32) != $.uint(0, 32))) || (__goscriptShadow7 && (($.uint64Mod(yru, 2)) != 0n))) {
+		let [parity, __goscriptShadow7] = dboxParity64(BigInt.asUintN(64, mant * 2n), $.markAsStructValue($.cloneStructValue(_u3c6)), _u3b2)
+		if ((parity != ($.uint(((D - (Math.trunc(100 / 2))) % 2), 32) != $.uint(0, 32))) || (__goscriptShadow7 && (($.uint64Mod(yru, 2n)) != 0n))) {
 			yru--
 		}
 	}
@@ -200,7 +200,7 @@ export function dboxDigits(d: __goscript_ftoa.decimalSlice | $.VarRef<__goscript
 }
 
 export function uadd128(u: __goscript_math.uint128, n: bigint): __goscript_math.uint128 {
-	let sum = $.uint64($.uint64Add(u.Lo, n))
+	let sum = $.uint64(BigInt.asUintN(64, u.Lo + n))
 	// Check if lo is wrapped around.
 	if (sum < u.Lo) {
 		u.Hi++
@@ -210,27 +210,27 @@ export function uadd128(u: __goscript_math.uint128, n: bigint): __goscript_math.
 }
 
 export function umul64(x: number, y: number): bigint {
-	return $.uint64Mul($.uint64(x), $.uint64(y))
+	return BigInt.asUintN(64, $.uint64(x) * $.uint64(y))
 }
 
 export function umul96Upper64(x: number, y: bigint): bigint {
-	let yh = $.uint($.uint($.uint64Shr(y, 32), 32), 32)
+	let yh = $.uint($.uint(y >> 32n, 32), 32)
 	let yl = $.uint($.uint(y, 32), 32)
 
 	let xyh = umul64($.uint(x, 32), $.uint(yh, 32))
 	let xyl = umul64($.uint(x, 32), $.uint(yl, 32))
 
-	return $.uint64Add(xyh, ($.uint64Shr(xyl, 32)))
+	return BigInt.asUintN(64, xyh + (xyl >> 32n))
 }
 
 export function umul96Lower64(x: number, y: bigint): bigint {
-	return $.uint64($.uint64Mul($.uint64(x), y))
+	return $.uint64(BigInt.asUintN(64, $.uint64(x) * y))
 }
 
 export function umul128Upper64(x: bigint, y: bigint): bigint {
-	let a = $.uint($.uint($.uint64Shr(x, 32), 32), 32)
+	let a = $.uint($.uint(x >> 32n, 32), 32)
 	let b = $.uint($.uint(x, 32), 32)
-	let c = $.uint($.uint($.uint64Shr(y, 32), 32), 32)
+	let c = $.uint($.uint(y >> 32n, 32), 32)
 	let d = $.uint($.uint(y, 32), 32)
 
 	let ac = umul64($.uint(a, 32), $.uint(c, 32))
@@ -238,9 +238,9 @@ export function umul128Upper64(x: bigint, y: bigint): bigint {
 	let ad = umul64($.uint(a, 32), $.uint(d, 32))
 	let bd = umul64($.uint(b, 32), $.uint(d, 32))
 
-	let intermediate = $.uint64Add(($.uint64Add(($.uint64Shr(bd, 32)), $.uint64($.uint(ad, 32)))), $.uint64($.uint(bc, 32)))
+	let intermediate = BigInt.asUintN(64, (BigInt.asUintN(64, (bd >> 32n) + $.uint64($.uint(ad, 32)))) + $.uint64($.uint(bc, 32)))
 
-	return $.uint64Add(($.uint64Add(($.uint64Add(ac, ($.uint64Shr(intermediate, 32)))), ($.uint64Shr(ad, 32)))), ($.uint64Shr(bc, 32)))
+	return BigInt.asUintN(64, (BigInt.asUintN(64, (BigInt.asUintN(64, ac + (intermediate >> 32n))) + (ad >> 32n))) + (bc >> 32n))
 }
 
 export function umul192Upper128(x: bigint, y: __goscript_math.uint128): __goscript_math.uint128 {
@@ -250,9 +250,9 @@ export function umul192Upper128(x: bigint, y: __goscript_math.uint128): __goscri
 }
 
 export function umul192Lower128(x: bigint, y: __goscript_math.uint128): __goscript_math.uint128 {
-	let high = $.uint64Mul(x, y.Hi)
+	let high = BigInt.asUintN(64, x * y.Hi)
 	let highLow = $.markAsStructValue($.cloneStructValue(__goscript_math.umul128(x, y.Lo)))
-	return $.markAsStructValue(new __goscript_math.uint128({Hi: $.uint64($.uint64Add(high, highLow.Hi)), Lo: highLow.Lo}))
+	return $.markAsStructValue(new __goscript_math.uint128({Hi: $.uint64(BigInt.asUintN(64, high + highLow.Hi)), Lo: highLow.Lo}))
 }
 
 export function dboxMulPow64(u: bigint, phi: __goscript_math.uint128): [bigint, boolean] {
@@ -268,7 +268,7 @@ export function dboxMulPow32(u: number, phi: bigint): [number, boolean] {
 	let intPart: number = 0
 	let isInt: boolean = false
 	let r = umul96Upper64($.uint(u, 32), phi)
-	intPart = $.uint($.uint($.uint64Shr(r, 32), 32), 32)
+	intPart = $.uint($.uint(r >> 32n, 32), 32)
 	isInt = $.uint($.uint(r, 32), 32) == $.uint(0, 32)
 	return [intPart, isInt]
 }
@@ -277,8 +277,8 @@ export function dboxParity64(mant2: bigint, phi: __goscript_math.uint128, beta: 
 	let parity: boolean = false
 	let isInt: boolean = false
 	let r = $.markAsStructValue($.cloneStructValue(umul192Lower128(mant2, $.markAsStructValue($.cloneStructValue(phi)))))
-	parity = ($.uint64And(($.uint64Shr(r.Hi, (64 - beta))), 1)) != 0n
-	isInt = ($.uint64Or(($.uint64($.uint64Shl(r.Hi, beta))), ($.uint64Shr(r.Lo, (64 - beta))))) == 0n
+	parity = (($.uint64Shr(r.Hi, (64 - beta))) & 1n) != 0n
+	isInt = (($.uint64($.uint64Shl(r.Hi, beta))) | ($.uint64Shr(r.Lo, (64 - beta)))) == 0n
 	return [parity, isInt]
 }
 
@@ -286,7 +286,7 @@ export function dboxParity32(mant2: number, phi: bigint, beta: number): [boolean
 	let parity: boolean = false
 	let isInt: boolean = false
 	let r = umul96Lower64($.uint(mant2, 32), phi)
-	parity = ($.uint64And(($.uint64Shr(r, (64 - beta))), 1)) != 0n
+	parity = (($.uint64Shr(r, (64 - beta))) & 1n) != 0n
 	isInt = $.uint($.uint($.uint64Shr(r, (32 - beta)), 32), 32) == $.uint(0, 32)
 	return [parity, isInt]
 }
@@ -307,25 +307,25 @@ export function mulLog10_2MinusLog10_4Over3(e: number): number {
 export function dboxRange64(_u3c6: __goscript_math.uint128, _u3b2: number): [bigint, bigint] {
 	let left: bigint = 0n
 	let right: bigint = 0n
-	left = $.uint64Shr(($.uint64Sub(_u3c6.Hi, ($.uint64Shr(_u3c6.Hi, (52 + 2))))), (((64 - 52) - 1) - _u3b2))
-	right = $.uint64Shr(($.uint64Add(_u3c6.Hi, ($.uint64Shr(_u3c6.Hi, (52 + 1))))), (((64 - 52) - 1) - _u3b2))
+	left = $.uint64Shr((BigInt.asUintN(64, _u3c6.Hi - (_u3c6.Hi >> 54n))), (((64 - 52) - 1) - _u3b2))
+	right = $.uint64Shr((BigInt.asUintN(64, _u3c6.Hi + (_u3c6.Hi >> 53n))), (((64 - 52) - 1) - _u3b2))
 	return [left, right]
 }
 
 export function dboxRange32(_u3c6: bigint, _u3b2: number): [number, number] {
 	let left: number = 0
 	let right: number = 0
-	left = $.uint($.uint($.uint64Shr(($.uint64Sub(_u3c6, ($.uint64Shr(_u3c6, (23 + 2))))), (((64 - 23) - 1) - _u3b2)), 32), 32)
-	right = $.uint($.uint($.uint64Shr(($.uint64Add(_u3c6, ($.uint64Shr(_u3c6, (23 + 1))))), (((64 - 23) - 1) - _u3b2)), 32), 32)
+	left = $.uint($.uint($.uint64Shr((BigInt.asUintN(64, _u3c6 - (_u3c6 >> 25n))), (((64 - 23) - 1) - _u3b2)), 32), 32)
+	right = $.uint($.uint($.uint64Shr((BigInt.asUintN(64, _u3c6 + (_u3c6 >> 24n))), (((64 - 23) - 1) - _u3b2)), 32), 32)
 	return [$.uint(left, 32), $.uint(right, 32)]
 }
 
 export function dboxRoundUp64(phi: __goscript_math.uint128, beta: number): bigint {
-	return $.uint64Div(($.uint64Add(($.uint64Shr(phi.Hi, ((((Math.trunc(128 / 2)) - 52) - 2) - beta))), 1)), 2)
+	return $.uint64Div((BigInt.asUintN(64, ($.uint64Shr(phi.Hi, ((((Math.trunc(128 / 2)) - 52) - 2) - beta))) + 1n)), 2n)
 }
 
 export function dboxRoundUp32(phi: bigint, beta: number): number {
-	return $.uint(Math.trunc($.uint($.uint64Add(($.uint64Shr(phi, (((64 - 23) - 2) - beta))), 1), 32) / 2), 32)
+	return $.uint(Math.trunc($.uint(BigInt.asUintN(64, ($.uint64Shr(phi, (((64 - 23) - 2) - beta))) + 1n), 32) / 2), 32)
 }
 
 export function dboxPow64(k: number, e: number): [__goscript_math.uint128, number] {

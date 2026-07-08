@@ -198,12 +198,12 @@ export class Encoding {
 		let n = (Math.trunc($.len(src) / 3)) * 3
 		while (si < n) {
 			// Convert 3x 8bit source bytes into 4 bytes
-			let val = $.uint($.uint64Or(($.uint($.uint64Or(($.uint($.uint64Shl($.uint($.arrayIndex(src!, si + 0), 64), 16), 64)), ($.uint($.uint64Shl($.uint($.arrayIndex(src!, si + 1), 64), 8), 64))), 64)), $.uint($.arrayIndex(src!, si + 2), 64)), 64)
+			let val = $.uint($.uint64Or(($.uint($.uint64Or(($.uint($.uint64Shl($.uint($.arrayIndex(src!, si + 0), 64), 16n), 64)), ($.uint($.uint64Shl($.uint($.arrayIndex(src!, si + 1), 64), 8n), 64))), 64)), $.uint($.arrayIndex(src!, si + 2), 64)), 64)
 
-			dst![di + 0] = $.uint($.arrayIndex($.pointerValue<Encoding>(enc).encode, $.uint($.uint64And(($.uint($.uint64Shr(val, 18), 64)), 0x3F), 64)), 8)
-			dst![di + 1] = $.uint($.arrayIndex($.pointerValue<Encoding>(enc).encode, $.uint($.uint64And(($.uint($.uint64Shr(val, 12), 64)), 0x3F), 64)), 8)
-			dst![di + 2] = $.uint($.arrayIndex($.pointerValue<Encoding>(enc).encode, $.uint($.uint64And(($.uint($.uint64Shr(val, 6), 64)), 0x3F), 64)), 8)
-			dst![di + 3] = $.uint($.arrayIndex($.pointerValue<Encoding>(enc).encode, $.uint($.uint64And(val, 0x3F), 64)), 8)
+			dst![di + 0] = $.uint($.arrayIndex($.pointerValue<Encoding>(enc).encode, $.uint($.uint64And(($.uint($.uint64Shr(val, 18n), 64)), 63n), 64)), 8)
+			dst![di + 1] = $.uint($.arrayIndex($.pointerValue<Encoding>(enc).encode, $.uint($.uint64And(($.uint($.uint64Shr(val, 12n), 64)), 63n), 64)), 8)
+			dst![di + 2] = $.uint($.arrayIndex($.pointerValue<Encoding>(enc).encode, $.uint($.uint64And(($.uint($.uint64Shr(val, 6n), 64)), 63n), 64)), 8)
+			dst![di + 3] = $.uint($.arrayIndex($.pointerValue<Encoding>(enc).encode, $.uint($.uint64And(val, 63n), 64)), 8)
 
 			si = si + (3)
 			di = di + (4)
@@ -214,18 +214,18 @@ export class Encoding {
 			return
 		}
 		// Add the remaining small block
-		let val = $.uint($.uint64Shl($.uint($.arrayIndex(src!, si + 0), 64), 16), 64)
+		let val = $.uint($.uint64Shl($.uint($.arrayIndex(src!, si + 0), 64), 16n), 64)
 		if (remain == 2) {
-			val = $.uint($.uint64Or(val, $.uint($.uint64Shl($.uint($.arrayIndex(src!, si + 1), 64), 8), 64)), 64)
+			val = $.uint($.uint64Or(val, $.uint($.uint64Shl($.uint($.arrayIndex(src!, si + 1), 64), 8n), 64)), 64)
 		}
 
-		dst![di + 0] = $.uint($.arrayIndex($.pointerValue<Encoding>(enc).encode, $.uint($.uint64And(($.uint($.uint64Shr(val, 18), 64)), 0x3F), 64)), 8)
-		dst![di + 1] = $.uint($.arrayIndex($.pointerValue<Encoding>(enc).encode, $.uint($.uint64And(($.uint($.uint64Shr(val, 12), 64)), 0x3F), 64)), 8)
+		dst![di + 0] = $.uint($.arrayIndex($.pointerValue<Encoding>(enc).encode, $.uint($.uint64And(($.uint($.uint64Shr(val, 18n), 64)), 63n), 64)), 8)
+		dst![di + 1] = $.uint($.arrayIndex($.pointerValue<Encoding>(enc).encode, $.uint($.uint64And(($.uint($.uint64Shr(val, 12n), 64)), 63n), 64)), 8)
 
 		switch (remain) {
 			case 2:
 			{
-				dst![di + 2] = $.uint($.arrayIndex($.pointerValue<Encoding>(enc).encode, $.uint($.uint64And(($.uint($.uint64Shr(val, 6), 64)), 0x3F), 64)), 8)
+				dst![di + 2] = $.uint($.arrayIndex($.pointerValue<Encoding>(enc).encode, $.uint($.uint64And(($.uint($.uint64Shr(val, 6n), 64)), 63n), 64)), 8)
 				if ($.int($.pointerValue<Encoding>(enc).padChar, 32) != $.int(-1, 32)) {
 					dst![di + 3] = $.uint($.uint($.pointerValue<Encoding>(enc).padChar, 8), 8)
 				}
@@ -369,10 +369,10 @@ export class Encoding {
 		}
 
 		// Convert 4x 6bit source bytes into 3 bytes
-		let val = $.uint($.uint64Or(($.uint($.uint64Or(($.uint($.uint64Or(($.uint($.uint64Shl($.uint($.arrayIndex(dbuf, 0), 64), 18), 64)), ($.uint($.uint64Shl($.uint($.arrayIndex(dbuf, 1), 64), 12), 64))), 64)), ($.uint($.uint64Shl($.uint($.arrayIndex(dbuf, 2), 64), 6), 64))), 64)), $.uint($.arrayIndex(dbuf, 3), 64)), 64)
-		let __goscriptAssign0_0: number = $.uint($.uint($.uint($.uint64Shr(val, 0), 64), 8), 8)
-		let __goscriptAssign0_1: number = $.uint($.uint($.uint($.uint64Shr(val, 8), 64), 8), 8)
-		let __goscriptAssign0_2: number = $.uint($.uint($.uint($.uint64Shr(val, 16), 64), 8), 8)
+		let val = $.uint($.uint64Or(($.uint($.uint64Or(($.uint($.uint64Or(($.uint($.uint64Shl($.uint($.arrayIndex(dbuf, 0), 64), 18n), 64)), ($.uint($.uint64Shl($.uint($.arrayIndex(dbuf, 1), 64), 12n), 64))), 64)), ($.uint($.uint64Shl($.uint($.arrayIndex(dbuf, 2), 64), 6n), 64))), 64)), $.uint($.arrayIndex(dbuf, 3), 64)), 64)
+		let __goscriptAssign0_0: number = $.uint($.uint($.uint($.uint64Shr(val, 0n), 64), 8), 8)
+		let __goscriptAssign0_1: number = $.uint($.uint($.uint($.uint64Shr(val, 8n), 64), 8), 8)
+		let __goscriptAssign0_2: number = $.uint($.uint($.uint($.uint64Shr(val, 16n), 64), 8), 8)
 		dbuf[2] = __goscriptAssign0_0
 		dbuf[1] = __goscriptAssign0_1
 		dbuf[0] = __goscriptAssign0_2
@@ -898,7 +898,7 @@ export function assemble64(n1: number, n2: number, n3: number, n4: number, n5: n
 	if ($.uint((((((((n1 | n2) | n3) | n4) | n5) | n6) | n7) | n8), 8) == $.uint(0xff, 8)) {
 		return [0n, false]
 	}
-	return [$.uint64Or(($.uint64Or(($.uint64Or(($.uint64Or(($.uint64Or(($.uint64Or(($.uint64Or(($.uint64Mul($.uint64(n1), (2 ** 58))), ($.uint64Mul($.uint64(n2), (2 ** 52))))), ($.uint64Mul($.uint64(n3), (2 ** 46))))), ($.uint64Mul($.uint64(n4), (2 ** 40))))), ($.uint64Mul($.uint64(n5), (2 ** 34))))), ($.uint64Shl($.uint64(n6), 28)))), ($.uint64Shl($.uint64(n7), 22)))), ($.uint64Shl($.uint64(n8), 16))), true]
+	return [((((((($.uint64Mul($.uint64(n1), (2 ** 58))) | ($.uint64Mul($.uint64(n2), (2 ** 52)))) | ($.uint64Mul($.uint64(n3), (2 ** 46)))) | ($.uint64Mul($.uint64(n4), (2 ** 40)))) | ($.uint64Mul($.uint64(n5), (2 ** 34)))) | ($.uint64Shl($.uint64(n6), 28n))) | ($.uint64Shl($.uint64(n7), 22n))) | ($.uint64Shl($.uint64(n8), 16n)), true]
 }
 
 export function NewDecoder(enc: Encoding | $.VarRef<Encoding> | null, r: io.Reader | null): io.Reader | null {

@@ -614,7 +614,7 @@ export function timeZone(offset: time.Duration): time.Location | $.VarRef<time.L
 	if ((offset < -43200000000000n) || (50400000000000n < offset)) {
 		offset = 0n
 	}
-	return time.FixedZone("", $.int($.int64Div(offset, time.Second)))
+	return time.FixedZone("", $.int($.int64Div(offset, 1000000000n)))
 }
 
 export function msDosTimeToTime(dosDate: number, dosTime: number): time.Time {

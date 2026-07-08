@@ -276,7 +276,7 @@ export class Writer {
 		let end = $.pointerValue<countWriter>($.pointerValue<Writer>(w).cw).count
 
 		let records = $.uint64($.len($.pointerValue<Writer>(w).dir))
-		let size = $.uint64($.int64Sub(end, start))
+		let size = $.uint64(BigInt.asIntN(64, end - start))
 		let offset = $.uint64(start)
 
 		{
@@ -946,7 +946,7 @@ export class countWriter {
 	public async Write(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		let w: countWriter | $.VarRef<countWriter> | null = this
 		let [n, err] = await $.pointerValue<Exclude<io.Writer, null>>($.pointerValue<countWriter>(w).w).Write(p)
-		$.pointerValue<countWriter>(w).count = $.int64Add($.pointerValue<countWriter>(w).count, $.int64(n))
+		$.pointerValue<countWriter>(w).count = BigInt.asIntN(64, $.pointerValue<countWriter>(w).count + ($.int64(n)))
 		return [n, err]
 	}
 

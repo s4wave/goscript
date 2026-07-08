@@ -43,8 +43,8 @@ export async function main(): globalThis.Promise<void> {
 	$.println("weekday", time.Weekday_String($.markAsStructValue($.cloneStructValue(setTime)).Weekday()))
 	$.println("location", time.Location.prototype.String.call($.pointerValue<time.Location>($.markAsStructValue($.cloneStructValue(setTime)).Location())))
 	$.println("utc", $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(setTime)).UTC())).Format("2006-01-02T15:04:05Z07:00"))
-	$.println("seconds", time.Duration_Seconds(($.int64Mul(1500, time.Millisecond))))
-	$.println("duration string", time.Duration_String(($.int64Mul(1500, time.Millisecond))))
+	$.println("seconds", time.Duration_Seconds((BigInt.asIntN(64, 1500n * 1000000n))))
+	$.println("duration string", time.Duration_String((BigInt.asIntN(64, 1500n * 1000000n))))
 	$.println("negative duration before", $.markAsStructValue($.cloneStructValue(time.Now())).After($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(time.Now())).Add(-60000000000n)))))
 
 	let [duration, durationErr] = time.ParseDuration("1.5s")
