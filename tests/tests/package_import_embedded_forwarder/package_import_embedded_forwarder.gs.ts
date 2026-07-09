@@ -81,16 +81,16 @@ export function NewVerboseStore(name: string): VerboseStore | $.VarRef<VerboseSt
 	return (() => { const __goscriptLiteralField0 = dep.NewBaseStore(name); return new VerboseStore({BaseStore: __goscriptLiteralField0, name: name}) })()
 }
 
-export async function useStore(store: Store | null): globalThis.Promise<void> {
-	let read: tx.Tx | $.VarRef<tx.Tx> | null = await $.pointerValue<Exclude<Store, null>>(store).NewTransaction(false)
-	let write: tx.Tx | $.VarRef<tx.Tx> | null = await $.pointerValue<Exclude<Store, null>>(store).NewTransaction(true)
-	$.println(await $.pointerValue<Exclude<Store, null>>(store).Execute())
+export function useStore(store: Store | null): void {
+	let read: tx.Tx | $.VarRef<tx.Tx> | null = $.pointerValue<Exclude<Store, null>>(store).NewTransaction(false)
+	let write: tx.Tx | $.VarRef<tx.Tx> | null = $.pointerValue<Exclude<Store, null>>(store).NewTransaction(true)
+	$.println($.pointerValue<Exclude<Store, null>>(store).Execute())
 	$.println($.pointerValue<dep.Tx>(read).Name)
 	$.println($.pointerValue<dep.Tx>(write).Name)
 }
 
 export async function main(): globalThis.Promise<void> {
-	await useStore($.interfaceValue<Store | null>(NewVerboseStore("outer"), "*main.VerboseStore"))
+	useStore($.interfaceValue<Store | null>(NewVerboseStore("outer"), "*main.VerboseStore"))
 }
 
 if ($.isMainScript(import.meta)) {

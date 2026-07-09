@@ -483,17 +483,17 @@ export class Regexp {
 
 	public async Match(b: $.Slice<number>): globalThis.Promise<boolean> {
 		const re: Regexp | $.VarRef<Regexp> | null = this
-		return await Regexp.prototype.doMatch.call(re, null, b, "")
+		return Regexp.prototype.doMatch.call(re, null, b, "")
 	}
 
 	public async MatchReader(r: io.RuneReader | null): globalThis.Promise<boolean> {
 		const re: Regexp | $.VarRef<Regexp> | null = this
-		return await Regexp.prototype.doMatch.call(re, r, null, "")
+		return Regexp.prototype.doMatch.call(re, r, null, "")
 	}
 
 	public async MatchString(s: string): globalThis.Promise<boolean> {
 		const re: Regexp | $.VarRef<Regexp> | null = this
-		return await Regexp.prototype.doMatch.call(re, null, null, s)
+		return Regexp.prototype.doMatch.call(re, null, null, s)
 	}
 
 	public NumSubexp(): number {
@@ -519,14 +519,14 @@ export class Regexp {
 
 	public async ReplaceAllFunc(src: $.Slice<number>, repl: ((_p0: $.Slice<number>) => $.Slice<number> | globalThis.Promise<$.Slice<number>>) | null): globalThis.Promise<$.Slice<number>> {
 		const re: Regexp | $.VarRef<Regexp> | null = this
-		return await Regexp.prototype.replaceAll.call(re, src, "", 2, $.functionValue(async (dst: $.Slice<number>, match: $.Slice<number>): globalThis.Promise<$.Slice<number>> => {
+		return Regexp.prototype.replaceAll.call(re, src, "", 2, $.functionValue(async (dst: $.Slice<number>, match: $.Slice<number>): globalThis.Promise<$.Slice<number>> => {
 			return $.appendSlice(dst, await repl!($.goSlice(src, $.arrayIndex(match!, 0), $.arrayIndex(match!, 1))))
 		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }], results: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }] } as $.FunctionTypeInfo)))
 	}
 
 	public async ReplaceAllLiteral(src: $.Slice<number>, repl: $.Slice<number>): globalThis.Promise<$.Slice<number>> {
 		const re: Regexp | $.VarRef<Regexp> | null = this
-		return await Regexp.prototype.replaceAll.call(re, src, "", 2, $.functionValue((dst: $.Slice<number>, match: $.Slice<number>): $.Slice<number> => {
+		return Regexp.prototype.replaceAll.call(re, src, "", 2, $.functionValue((dst: $.Slice<number>, match: $.Slice<number>): $.Slice<number> => {
 			return $.appendSlice(dst, repl)
 		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }], results: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }] } as $.FunctionTypeInfo)))
 	}
@@ -710,7 +710,7 @@ export class Regexp {
 				for (; (pos <= end) && (width != 0); pos = pos + (width)) {
 					if ($.len($.pointerValue<Regexp>(re).prefix) > 0) {
 
-						let advance = await $.pointerValue<Exclude<input, null>>(i).index(re, pos)
+						let advance = $.pointerValue<Exclude<input, null>>(i).index(re, pos)
 						if (advance < 0) {
 							__goscript_backtrack.freeBitState(b)
 							return null
@@ -749,10 +749,10 @@ export class Regexp {
 		}
 
 		if ($.pointerValue<Regexp>(re).onepass != null) {
-			return await Regexp.prototype.doOnePass.call(re, r, b, s, pos, ncap, dstCap)
+			return Regexp.prototype.doOnePass.call(re, r, b, s, pos, ncap, dstCap)
 		}
 		if ((r == null) && (($.len(b) + $.len(s)) < $.pointerValue<Regexp>(re).maxBitStateLen)) {
-			return await Regexp.prototype.backtrack.call(re, b, s, pos, ncap, dstCap)
+			return Regexp.prototype.backtrack.call(re, b, s, pos, ncap, dstCap)
 		}
 
 		let m: __goscript_exec.machine | $.VarRef<__goscript_exec.machine> | null = await Regexp.prototype.get.call(re)
@@ -811,16 +811,16 @@ export class Regexp {
 		if (pos == 0) {
 			flag = __goscript_exec.newLazyFlag($.int(-1, 32), $.int(r, 32))
 		} else {
-			flag = await $.pointerValue<Exclude<input, null>>(i).context(pos)
+			flag = $.pointerValue<Exclude<input, null>>(i).context(pos)
 		}
 		let pc = $.pointerValue<__goscript_onepass.onePassProg>($.pointerValue<Regexp>(re).onepass).Start
 		let inst: __goscript_onepass.onePassInst | $.VarRef<__goscript_onepass.onePassInst> | null = $.indexRef($.pointerValue<__goscript_onepass.onePassProg>($.pointerValue<Regexp>(re).onepass).Inst!, pc)
 
 		Return: {
 
-			if ((((pos == 0) && __goscript_exec.lazyFlag_match(flag, $.uint($.uint($.pointerValue<__goscript_onepass.onePassInst>(inst).Inst.Arg, 8), 8))) && ($.len($.pointerValue<Regexp>(re).prefix) > 0)) && await $.pointerValue<Exclude<input, null>>(i).canCheckPrefix()) {
+			if ((((pos == 0) && __goscript_exec.lazyFlag_match(flag, $.uint($.uint($.pointerValue<__goscript_onepass.onePassInst>(inst).Inst.Arg, 8), 8))) && ($.len($.pointerValue<Regexp>(re).prefix) > 0)) && $.pointerValue<Exclude<input, null>>(i).canCheckPrefix()) {
 
-				if (!await $.pointerValue<Exclude<input, null>>(i).hasPrefix(re)) {
+				if (!$.pointerValue<Exclude<input, null>>(i).hasPrefix(re)) {
 					break Return
 				}
 				pos = pos + ($.len($.pointerValue<Regexp>(re).prefix))
@@ -830,7 +830,7 @@ export class Regexp {
 				let __goscriptTuple7: any = await $.pointerValue<Exclude<input, null>>(i).step(pos + width)
 				r1 = $.int(__goscriptTuple7[0], 32)
 				width1 = __goscriptTuple7[1]
-				flag = await $.pointerValue<Exclude<input, null>>(i).context(pos)
+				flag = $.pointerValue<Exclude<input, null>>(i).context(pos)
 				pc = $.int($.pointerValue<Regexp>(re).prefixEnd)
 			}
 			while (true) {
@@ -1275,7 +1275,7 @@ export class Regexp {
 							}
 							case syntax.InstEmptyWidth:
 							{
-								let flag = await $.pointerValue<Exclude<input, null>>(i).context(__goscriptShadow2)
+								let flag = $.pointerValue<Exclude<input, null>>(i).context(__goscriptShadow2)
 								if (!__goscript_exec.lazyFlag_match(flag, $.uint($.uint($.pointerValue<syntax.Inst>(inst).Arg, 8), 8))) {
 									continue __goscriptLoop0
 								}
@@ -1588,11 +1588,11 @@ export const endOfText: number = -1
 export const startSize: number = 10
 
 export async function Compile(expr: string): globalThis.Promise<[Regexp | $.VarRef<Regexp> | null, $.GoError]> {
-	return await compile(expr, $.uint(syntax.Perl, 16), false)
+	return compile(expr, $.uint(syntax.Perl, 16), false)
 }
 
 export async function CompilePOSIX(expr: string): globalThis.Promise<[Regexp | $.VarRef<Regexp> | null, $.GoError]> {
-	return await compile(expr, $.uint(syntax.POSIX, 16), true)
+	return compile(expr, $.uint(syntax.POSIX, 16), true)
 }
 
 export async function compile(expr: string, mode: syntax.Flags, longest: boolean): globalThis.Promise<[Regexp | $.VarRef<Regexp> | null, $.GoError]> {

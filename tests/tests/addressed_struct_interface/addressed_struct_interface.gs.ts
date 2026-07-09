@@ -54,13 +54,13 @@ export class Buffer {
 	)
 }
 
-export async function use(w: Writer | null): globalThis.Promise<void> {
-	await $.pointerValue<Exclude<Writer, null>>(w).Write(new Uint8Array([120]))
+export function use(w: Writer | null): void {
+	$.pointerValue<Exclude<Writer, null>>(w).Write(new Uint8Array([120]))
 }
 
 export async function main(): globalThis.Promise<void> {
 	let b: $.VarRef<Buffer> = $.varRef($.markAsStructValue(new Buffer()))
-	await use($.interfaceValue<Writer | null>(b, "*main.Buffer"))
+	use($.interfaceValue<Writer | null>(b, "*main.Buffer"))
 	$.println($.bytesToString(b.value.data))
 }
 

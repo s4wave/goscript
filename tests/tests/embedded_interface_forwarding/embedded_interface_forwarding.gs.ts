@@ -92,14 +92,14 @@ export class Counter {
 	)
 }
 
-export async function call(adder: Adder | null): globalThis.Promise<number> {
-	return await $.pointerValue<Exclude<Adder, null>>(adder).Add(4)
+export function call(adder: Adder | null): number {
+	return $.pointerValue<Exclude<Adder, null>>(adder).Add(4)
 }
 
 export async function main(): globalThis.Promise<void> {
 	let box: Box | $.VarRef<Box> | null = new Box({Adder: $.interfaceValue<Adder | null>(new Counter({base: 3}), "*main.Counter")})
 	$.println($.pointerValue<Exclude<Adder, null>>($.pointerValue<Box>(box).Adder).Add(5))
-	$.println(await call($.interfaceValue<Adder | null>(box, "*main.Box")))
+	$.println(call($.interfaceValue<Adder | null>(box, "*main.Box")))
 }
 
 if ($.isMainScript(import.meta)) {

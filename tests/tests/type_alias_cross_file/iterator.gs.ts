@@ -17,6 +17,6 @@ $.registerInterfaceType(
 	[{ name: "Val", args: [], returns: [{ type: "subpkg.Value" }] }]
 );
 
-export async function Read(r: Reader | null): globalThis.Promise<__goscript_alias.Value> {
-	return (await $.pointerValue<Exclude<Reader, null>>(r).Val() as __goscript_alias.Value)
+export function Read(r: Reader | null): __goscript_alias.Value {
+	return ($.pointerValue<Exclude<Reader, null>>(r).Val() as __goscript_alias.Value)
 }

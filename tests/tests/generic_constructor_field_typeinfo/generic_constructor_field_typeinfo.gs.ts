@@ -111,7 +111,7 @@ export async function main(): globalThis.Promise<void> {
 		return new sampleBlock()
 	}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Pointer, elemType: "main.sampleBlock" }] } as $.FunctionTypeInfo))) as blockType | $.VarRef<blockType> | null)
 	let blk = await blockType.prototype.Constructor.call(bt)
-	let __goscriptTuple0: any = await $.pointerValue<Exclude<Block, null>>(blk).MarshalBlock()
+	let __goscriptTuple0: any = $.pointerValue<Exclude<Block, null>>(blk).MarshalBlock()
 	let data: $.Slice<number> = __goscriptTuple0[0]
 	$.println(blockType.prototype.GetBlockTypeID.call(bt), $.len(data))
 }

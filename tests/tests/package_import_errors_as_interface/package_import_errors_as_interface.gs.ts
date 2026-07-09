@@ -74,7 +74,7 @@ export async function main(): globalThis.Promise<void> {
 	let ok = errors.As($.pointerValueOrNil($.interfaceValue<$.GoError>(err, "*main.wrappedHealthError"))!, $.interfaceValue<any>(target, "*main.healthError"))
 	$.println("matched:", ok)
 	if (ok) {
-		$.println("health:", await $.pointerValue<Exclude<healthError, null>>(target.value).Health())
+		$.println("health:", $.pointerValue<Exclude<healthError, null>>(target.value).Health())
 	}
 }
 

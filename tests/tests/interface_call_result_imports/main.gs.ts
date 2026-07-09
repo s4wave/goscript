@@ -11,7 +11,7 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/interface_call_result_i
 
 export async function main(): globalThis.Promise<void> {
 	let v = dep1.Make()
-	$.println(await $.pointerValue<Exclude<dep2.Value, null>>(v).Value())
+	$.println($.pointerValue<Exclude<dep2.Value, null>>(v).Value())
 }
 
 if ($.isMainScript(import.meta)) {

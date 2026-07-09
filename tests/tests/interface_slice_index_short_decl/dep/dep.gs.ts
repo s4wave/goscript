@@ -13,9 +13,9 @@ $.registerInterfaceType(
 	[{ name: "Key", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }]
 );
 
-export async function ToKey(v: Ref | null): globalThis.Promise<any> {
+export function ToKey(v: Ref | null): any {
 	if (v == null) {
 		return null
 	}
-	return await $.pointerValue<Exclude<Ref, null>>(v).Key()
+	return $.pointerValue<Exclude<Ref, null>>(v).Key()
 }

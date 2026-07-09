@@ -175,7 +175,7 @@ export async function processViaInterface(processor: AsyncProcessor | null, inpu
 	let result = await $.pointerValue<Exclude<AsyncProcessor, null>>(processor).Process(input)
 
 	// This call should NOT be awaited since GetResult is sync
-	let baseResult = await $.pointerValue<Exclude<AsyncProcessor, null>>(processor).GetResult()
+	let baseResult = $.pointerValue<Exclude<AsyncProcessor, null>>(processor).GetResult()
 
 	return result + baseResult
 }

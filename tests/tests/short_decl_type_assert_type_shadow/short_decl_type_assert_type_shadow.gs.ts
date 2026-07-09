@@ -42,18 +42,18 @@ $.registerInterfaceType(
 	[{ name: "Dump", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
 );
 
-export async function use(v: any): globalThis.Promise<string> {
+export function use(v: any): string {
 	let __goscriptTuple0: any = $.typeAssertTuple<dumper | null>(v, "main.dumper")
 	let __goscriptShadow0 = __goscriptTuple0[0]
 	let ok = __goscriptTuple0[1]
 	if (!ok) {
 		return "bad"
 	}
-	return await $.pointerValue<Exclude<dumper, null>>(__goscriptShadow0).Dump()
+	return $.pointerValue<Exclude<dumper, null>>(__goscriptShadow0).Dump()
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println(await use($.interfaceValue<any>($.markAsStructValue(new item()), "main.item")))
+	$.println(use($.interfaceValue<any>($.markAsStructValue(new item()), "main.item")))
 }
 
 if ($.isMainScript(import.meta)) {

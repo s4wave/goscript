@@ -511,7 +511,7 @@ export class machine {
 		if (pos == 0) {
 			flag.value = newLazyFlag($.int(-1, 32), $.int(r, 32))
 		} else {
-			flag.value = await $.pointerValue<Exclude<__goscript_regexp.input, null>>(i).context(pos)
+			flag.value = $.pointerValue<Exclude<__goscript_regexp.input, null>>(i).context(pos)
 		}
 		while (true) {
 			if ($.len($.pointerValue<queue>(runq).dense) == 0) {
@@ -523,9 +523,9 @@ export class machine {
 					// Have match; finished exploring alternatives.
 					break
 				}
-				if ((($.len($.pointerValue<__goscript_regexp.Regexp>($.pointerValue<machine>(m).re).prefix) > 0) && ($.int(r1, 32) != $.int($.pointerValue<__goscript_regexp.Regexp>($.pointerValue<machine>(m).re).prefixRune, 32))) && await $.pointerValue<Exclude<__goscript_regexp.input, null>>(i).canCheckPrefix()) {
+				if ((($.len($.pointerValue<__goscript_regexp.Regexp>($.pointerValue<machine>(m).re).prefix) > 0) && ($.int(r1, 32) != $.int($.pointerValue<__goscript_regexp.Regexp>($.pointerValue<machine>(m).re).prefixRune, 32))) && $.pointerValue<Exclude<__goscript_regexp.input, null>>(i).canCheckPrefix()) {
 					// Match requires literal prefix; fast search for it.
-					let advance = await $.pointerValue<Exclude<__goscript_regexp.input, null>>(i).index($.pointerValue<machine>(m).re, pos)
+					let advance = $.pointerValue<Exclude<__goscript_regexp.input, null>>(i).index($.pointerValue<machine>(m).re, pos)
 					if (advance < 0) {
 						break
 					}

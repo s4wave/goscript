@@ -109,8 +109,8 @@ export async function main(): globalThis.Promise<void> {
 						{
 							let v = $.mapGet<number, dep.Ref | null, dep.Ref | null>(shape.value.Filter, shape.value.Result, null)[0]
 							if (v != null) {
-								await dep.ToKey(v)
-								await dep.ToKey(fv)
+								dep.ToKey(v)
+								dep.ToKey(fv)
 							}
 						}
 						shape.value.SetFilter(2, fv)
@@ -121,7 +121,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let fix: Fixed = ($.arrayIndex(fixed!, 0) as Fixed)
 	let fv = $.arrayIndex(fix!, 0)
-	if (await dep.ToKey(fv) != null) {
+	if (dep.ToKey(fv) != null) {
 		$.println("ok")
 	}
 }

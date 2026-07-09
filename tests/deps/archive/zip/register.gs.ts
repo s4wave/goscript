@@ -215,7 +215,7 @@ export function __goscript_set_flateReaderPool(__goscriptValue: sync.Pool): void
 export async function newFlateReader(r: io.Reader | null): globalThis.Promise<io.ReadCloser | null> {
 	let [fr, ok] = $.typeAssertTuple<io.ReadCloser | null>(await flateReaderPool.value.Get(), "io.ReadCloser")
 	if (ok) {
-		await $.pointerValue<Exclude<flate.Resetter, null>>($.mustTypeAssert<flate.Resetter | null>(fr, "flate.Resetter")).Reset(r, null)
+		$.pointerValue<Exclude<flate.Resetter, null>>($.mustTypeAssert<flate.Resetter | null>(fr, "flate.Resetter")).Reset(r, null)
 	} else {
 		fr = await flate.NewReader(r)
 	}

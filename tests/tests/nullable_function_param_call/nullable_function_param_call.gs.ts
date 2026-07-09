@@ -164,14 +164,14 @@ export async function processWithCallback(input: string, processor: ((data: stri
 	// Test case 3: Function parameter with return values
 	// This should generate: processor!(input)
 	// But currently generates: processor(input) - missing !
-	return await processor!(input)
+	return processor!(input)
 }
 
 export async function maybeProcess(input: string, processor: ((data: string) => [string, $.GoError] | globalThis.Promise<[string, $.GoError]>) | null): globalThis.Promise<[string, $.GoError]> {
 	if (processor == null) {
 		return ["nil processor", null]
 	}
-	return await processor!(input)
+	return processor!(input)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -179,8 +179,8 @@ export async function main(): globalThis.Promise<void> {
 	let fileInfo: MockFileInfo | $.VarRef<MockFileInfo> | null = new MockFileInfo({name: "test.txt", size: 50n, isDir: false})
 
 	// Test the walk function with a callback
-	let walkFunc: ((path: string, info: FileInfo | null, err: $.GoError) => $.GoError | globalThis.Promise<$.GoError>) | null = $.functionValue(async (path: string, info: FileInfo | null, err: $.GoError): globalThis.Promise<$.GoError> => {
-		$.println("Walking:", path, "size:", await $.pointerValue<Exclude<FileInfo, null>>(info).Size())
+	let walkFunc: ((path: string, info: FileInfo | null, err: $.GoError) => $.GoError | globalThis.Promise<$.GoError>) | null = $.functionValue((path: string, info: FileInfo | null, err: $.GoError): $.GoError => {
+		$.println("Walking:", path, "size:", $.pointerValue<Exclude<FileInfo, null>>(info).Size())
 		if (err != null) {
 			$.println("Error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		}

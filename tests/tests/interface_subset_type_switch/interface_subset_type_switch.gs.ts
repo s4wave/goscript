@@ -79,20 +79,20 @@ export class MyStruct {
 	)
 }
 
-export async function processInterface(i: any): globalThis.Promise<void> {
+export function processInterface(i: any): void {
 	{
 		const __goscriptTypeSwitchValue = i
 		switch (true) {
 			case $.typeAssert<MyInterface1 | null>(__goscriptTypeSwitchValue, "main.MyInterface1").ok:
 				{
 					let v: MyInterface1 | null = $.typeAssert<MyInterface1 | null>(__goscriptTypeSwitchValue, "main.MyInterface1").value
-					$.println("MyInterface1:", await $.pointerValue<Exclude<MyInterface1, null>>(v).MyString1(), await $.pointerValue<Exclude<MyInterface1, null>>(v).MyString2())
+					$.println("MyInterface1:", $.pointerValue<Exclude<MyInterface1, null>>(v).MyString1(), $.pointerValue<Exclude<MyInterface1, null>>(v).MyString2())
 				}
 				break
 			case $.typeAssert<MyInterface2 | null>(__goscriptTypeSwitchValue, "main.MyInterface2").ok:
 				{
 					let v: MyInterface2 | null = $.typeAssert<MyInterface2 | null>(__goscriptTypeSwitchValue, "main.MyInterface2").value
-					$.println("MyInterface2:", await $.pointerValue<Exclude<MyInterface2, null>>(v).MyString1())
+					$.println("MyInterface2:", $.pointerValue<Exclude<MyInterface2, null>>(v).MyString1())
 				}
 				break
 			default:
@@ -110,14 +110,14 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test with MyInterface1
 	let i1: MyInterface1 | null = $.interfaceValue<MyInterface1 | null>($.markAsStructValue($.cloneStructValue(s)), "main.MyStruct")
-	await processInterface((i1 as any))
+	processInterface((i1 as any))
 
 	// Test with MyInterface2
 	let i2: MyInterface2 | null = $.interfaceValue<MyInterface2 | null>($.markAsStructValue($.cloneStructValue(s)), "main.MyStruct")
-	await processInterface((i2 as any))
+	processInterface((i2 as any))
 
 	// Test with concrete type
-	await processInterface($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(s)), "main.MyStruct"))
+	processInterface($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(s)), "main.MyStruct"))
 
 	// Type switch with subset casting
 	let i3: any = (i1 as any)
@@ -127,13 +127,13 @@ export async function main(): globalThis.Promise<void> {
 			case $.typeAssert<MyInterface2 | null>(__goscriptTypeSwitchValue, "main.MyInterface2").ok:
 				{
 					let v: MyInterface2 | null = $.typeAssert<MyInterface2 | null>(__goscriptTypeSwitchValue, "main.MyInterface2").value
-					$.println("Matched MyInterface2 from i1:", await $.pointerValue<Exclude<MyInterface2, null>>(v).MyString1())
+					$.println("Matched MyInterface2 from i1:", $.pointerValue<Exclude<MyInterface2, null>>(v).MyString1())
 				}
 				break
 			case $.typeAssert<MyInterface1 | null>(__goscriptTypeSwitchValue, "main.MyInterface1").ok:
 				{
 					let v: MyInterface1 | null = $.typeAssert<MyInterface1 | null>(__goscriptTypeSwitchValue, "main.MyInterface1").value
-					$.println("Matched MyInterface1 from i1:", await $.pointerValue<Exclude<MyInterface1, null>>(v).MyString1(), await $.pointerValue<Exclude<MyInterface1, null>>(v).MyString2())
+					$.println("Matched MyInterface1 from i1:", $.pointerValue<Exclude<MyInterface1, null>>(v).MyString1(), $.pointerValue<Exclude<MyInterface1, null>>(v).MyString2())
 				}
 				break
 			default:
