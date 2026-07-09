@@ -34,17 +34,13 @@ package tests, and a practical standard-library override surface. The generated
 TypeScript stays readable enough to inspect, bundle, and debug like normal
 application code.
 
-GoScript is performance-tuned against
+GoScript is developed and tuned against
 [Spacewave](https://github.com/s4wave/spacewave), a large Go and TypeScript app
-framework with database, sync, plugin, and browser-runtime workloads. That
-dogfooding keeps build speed and runtime compatibility tied to complex
-application code instead of toy examples.
-
-> "Right now goscript looks pretty cool if [your] problem is 'I want this
-> self-sufficient algorithm [to] be available in Go and JS runtimes.'"
->
-> - [nevkontakte](https://gophers.slack.com/archives/C039C0R2T/p1745870396945719),
->   developer of [GopherJS](https://github.com/gopherjs/gopherjs)
+framework. Spacewave compiles its browser core plugin through GoScript,
+including its go-git storage backend and the go-mysql-server SQL engine, and
+runs its core package tests through `goscript test` in CI. That dogfooding keeps
+build speed and runtime compatibility tied to complex application code instead
+of toy examples.
 
 GoScript shares GopherJS's long-term browser goal: make ordinary Go programs
 run in JavaScript environments. The difference is the runtime strategy.
@@ -55,24 +51,22 @@ runtime channel helpers instead of implementing a full goroutine scheduler.
 ### Why GoScript?
 
 Use GoScript when your Go code is the source of truth, but part of your product
-needs to run in a TypeScript runtime. The current target is a useful,
-well-defined Go subset that produces readable TypeScript and avoids unsafe-heavy
-runtime behavior. The long-term goal is to expand that subset until ordinary Go
-programs can run through GoScript, but the first compatibility bar is product
-code that can be tested, bundled, and shipped today.
+needs to run in a TypeScript runtime. GoScript compiles real application code:
+database engines, git implementations, cryptography, and concurrent framework
+code, not just self-contained algorithms.
 
 Good fits today include:
 
 - Sharing validation, formatting, parsing, and business rules between Go services and TypeScript applications
 - Publishing TypeScript packages from Go data structures and algorithms
-- Running selected Go runtime code in Bun, browser demos, and modern bundlers
+- Running Go application and framework code in Bun, browsers, and modern bundlers
 - Moving Go framework code into browser/plugin paths without rewriting it in TypeScript
 - Building package-level test workflows that exercise generated TypeScript instead of handwritten ports
 
-GoScript is not currently a drop-in browser runtime for every valid Go program.
-The project prioritizes clear generated TypeScript, explicit runtime contracts,
-and focused support for Go language features that can be modeled cleanly in
-TypeScript.
+GoScript does not run every valid Go program: code that depends on `unsafe`
+memory operations, cgo, or standard-library packages without an override or
+clean transpilation is unsupported. See [Limitations](#limitations) for the
+precise list.
 
 Useful docs:
 
@@ -85,36 +79,79 @@ Useful docs:
 
 ### Works Today
 
-The package compiler currently supports enough Go to run complex package graphs:
+The compiler runs large real-world package graphs. Each claim below names its
+proof: a compliance fixture under [tests/tests](./tests/tests) (500+ fixtures,
+each a Go program compiled, typechecked, and executed against expected output),
+a runtime test under [gs/](./gs), or a consuming project.
 
-- Go package loading through `go/packages` with `GOOS=js` and `GOARCH=wasm`
-- Go build tags through CLI build flags, including `goscript`-selected code paths
+- Go package loading through `go/packages` with `GOOS=js` and `GOARCH=wasm`,
+  with build tags through CLI build flags (`tests/tests/*`, all fixtures)
 - Structs, methods, interfaces, type assertions, typed nils, and value copying
+  (`struct_*`, `interface_*` fixtures)
 - Pointers and address-taken variables through the `VarRef` runtime model
-- Arrays, slices, maps, strings, named types, complex values, and selected builtins
-- Generics through generated type-argument dictionaries for supported call,
-  method, and descriptor shapes
-- Goroutines, channels, `select`, `defer`, async calls, async function values,
-  async callbacks, async interfaces, and async package tests
-- Package initialization, cross-file imports, package indexes, dependency
-  output, and package-scoped test graph variants
-- Handwritten `gs/` runtime and standard-library override packages for the
-  browser/WASM-oriented subset
-- `goscript test`, which compiles selected Go package tests to TypeScript,
-  typechecks the generated workspace, runs it with Bun, and reports package
-  failures with compiler-stage classifications
+  (`address_of_pointer_deref`, `gs/builtin/varRef.ts`)
+- Arrays, slices, maps, strings, named types, complex values, and builtins
+  (`array_*`, `slice_*`, `map_*` fixtures)
+- Generics through generated type-argument dictionaries (`generic_*` fixtures)
+- Goroutines, channels, `select`, `defer`, and async call propagation, mapped
+  onto JavaScript async/await plus the runtime scheduler
+  (`goroutines*`, `channel_*`, `select_*` fixtures; `gs/builtin/scheduler.ts`)
+- `goto` and labeled statements through state-machine lowering
+  (`forward_goto_statement`)
+- Exact 64-bit integers: `int64` and `uint64` compile to TypeScript `bigint`
+  with Go overflow semantics (`wide_uint64_exact_arithmetic`,
+  `constant_shift_64`, `gs/builtin/wide-int.test.ts`)
+- 32-bit integer multiplication through `Math.imul` (`imul_32bit`), `float32`
+  rounding through `Math.fround` (`float32_rounding`), and bit operations
+  through `Math.clz32` (`gs/math/bits`)
+- A working `reflect` subset covering types, values, struct fields, maps,
+  `MakeFunc`, `FuncOf`, and `DeepEqual` (`reflect_*` fixtures, `gs/reflect/`)
+- Handwritten standard-library overrides under [gs/](./gs), including `crypto`
+  (aes, cipher, ecdh, ed25519, rand, sha1, sha256, sha512), `compress`
+  (gzip, zlib), `encoding` (binary, json), `os` and `syscall/js` filesystem
+  support, `net/http`, `database/sql/driver`, `go/token`, `go/scanner`,
+  `time`, `sync`, `reflect`, and `testing`
+- Third-party package overrides under `gs/github.com/`, including
+  go-git/go-billy, klauspost/compress, zeebo/blake3, mr-tron/base58,
+  pkg/errors, hack-pad/safejs, and protobuf-go-lite
+- `goscript test`, which compiles Go package tests to TypeScript, typechecks
+  the generated workspace, and runs it with Bun or in a Chromium browser
+  (`--browser`), reporting failures with compiler-stage classifications
+- Real application graphs: Spacewave's browser core plugin compiles and boots
+  through GoScript in its end-to-end WASM harness, a package graph that
+  includes go-git and the go-mysql-server SQL engine; Spacewave also runs its
+  core package tests through `goscript test`
+  ([spacewave/package.json](https://github.com/s4wave/spacewave/blob/master/package.json),
+  scripts `test:go:goscript` and `test:go:e2e:wasm:goscript`)
 - Browser/WASM compilation for import-free single-file demos
+  (`compiler/wasm/compile_test.go`, the website playground)
 
-### Intentional Limits
+### Limitations
 
-- CLI, Go API, and Node API inputs are package patterns, not direct `main.go` files.
-- Browser source compilation is import-free only. Imported code should use the package workflow.
-- `unsafe`, pointer arithmetic, cgo, and arbitrary Go runtime behavior are not
-  part of the first supported target.
-- JavaScript `number` is used for numeric output, so it does not preserve every Go integer edge case.
-- Standard-library coverage is practical and override-driven, not complete.
-- Package-test execution intentionally supports a growing GoScript-compatible
-  subset of `testing`, not the complete `go test` flag surface.
+- CLI, Go API, and Node API inputs are package patterns, not direct `main.go`
+  files.
+- Browser source compilation is import-free only; package imports return a
+  structured `goscript/wasm:imports-unsupported` diagnostic
+  (`compiler/wasm/compile_test.go`). Imported code uses the package workflow.
+- `unsafe` type-checks, but most operations (`Alignof`, `Offsetof`, `Sizeof`,
+  pointer conversion) throw at runtime (`gs/unsafe/unsafe.ts`). Pointer
+  arithmetic and cgo are unsupported.
+- Plain `int`, `uint`, `uintptr`, and integers narrower than 64 bits compile
+  to JavaScript `number`; only `int64` and `uint64` are `bigint`. `uint` and
+  `uintptr` arithmetic routes through the 64-bit runtime helpers to preserve
+  full width, but plain `int` does not model 64-bit overflow
+  (`compiler/lowering.go`, `isBigIntBackedType`).
+- Standard-library coverage is override-driven, not complete. A package
+  without a `gs/` override must transpile cleanly or it is unsupported; there
+  are no real sockets, processes, or plugin loading beyond what the JavaScript
+  host provides.
+- The `reflect` override is a subset; remaining parity gaps are tracked in
+  `gs/reflect/parity.json`.
+- `goscript test` supports a GoScript-compatible subset of `testing`, not the
+  complete `go test` flag surface (`cmd/goscript/cmd-test_test.go`).
+- Concurrency lowers to async/await and 64-bit arithmetic uses `bigint`; both
+  cost more than plain synchronous JavaScript with `number`. Benchmarks live
+  under [tests/bench](./tests/bench).
 
 ## Getting Started
 
@@ -206,6 +243,10 @@ Common options:
 - `--dir <dir>`: working directory for module/package loading.
 - `--build-flags <flag>`: Go build flag, repeatable.
 - `--all-dependencies`: compile dependency packages instead of only requested packages.
+- `--gs-path <dir>`: additional GoScript override root containing package-path directories.
+- `--package-blocklist <paths>`: comma-separated Go import paths to reject from the compiled package graph.
+- `--compiler-cache-root <dir>`: explicit compiler package artifact cache root.
+- `--protobuf-ts-binding`: bind `.pb.go` files to sibling `.pb.ts` files instead of emitting `.pb.gs.ts`.
 - `--disable-emit-builtin`: skip copying handwritten `gs/` runtime packages.
 
 Run Go package tests through GoScript:
@@ -221,9 +262,14 @@ the generated workspace, and runs it with Bun. Useful options:
 - `--tags <tags>`: comma-separated Go build tags.
 - `--run <regexp>`: run only matching Go test names.
 - `--count <n>`: run selected tests multiple times.
+- `--short`: report true from `testing.Short`.
 - `--timeout <duration>`: maximum package-test runtime.
 - `--workdir <dir>`: generated test workspace directory.
 - `--output <dir>`: generated TypeScript output root.
+- `-p <n>`: maximum package typecheck/runtime commands to run concurrently.
+- `--browser`: run package runtimes in a Chromium browser instead of Bun.
+- `--runtime-groups`: run package runtimes in grouped Bun worker processes.
+- `--incremental-typecheck`: reuse TypeScript build-info files in the test workdir.
 
 The output is shaped like `go test` where possible and classifies failures that
 occur before the generated tests run.
