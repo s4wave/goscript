@@ -1,4 +1,12 @@
-64
-64
-63
-true 1
+UintSize 64
+Len-all 64
+LeadingZeros-uint-one 63
+Add-carry true 1
+LeadingZeros64 64 63 32 32 1 0 0 0
+TrailingZeros64 64 0 31 0 0 63 60 0
+OnesCount64 0 1 1 32 63 1 4 64
+Mul32-zero 0 0
+Mul32-one-all 0 4294967295
+Mul32-bit31-double 1 0
+Mul32-all-all 4294967294 1
+Mul32-high-high 1073741824 0

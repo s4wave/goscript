@@ -8,6 +8,27 @@ type Word64 = number | bigint
 
 const uint64Mask = (1n << 64n) - 1n
 
+const two32 = 0x100000000
+
+function uint64Lanes(x: Word64): [number, number] {
+  if (typeof x === 'bigint') {
+    const word = x & uint64Mask
+    return [Number((word >> 32n) & 0xffffffffn), Number(word & 0xffffffffn)]
+  }
+
+  const truncated = Math.trunc(x)
+  if (truncated >= 0 && truncated <= Number.MAX_SAFE_INTEGER) {
+    return [Math.floor(truncated / two32) >>> 0, truncated >>> 0]
+  }
+
+  const word = toUint64(truncated)
+  return [Number((word >> 32n) & 0xffffffffn), Number(word & 0xffffffffn)]
+}
+
+function trailingZeros32Nonzero(x: number): number {
+  return 31 - Math.clz32((x & -x) >>> 0)
+}
+
 function toUint64(x: Word64): bigint {
   if (typeof x === 'bigint') {
     return x & uint64Mask
@@ -50,16 +71,8 @@ export function LeadingZeros32(x: number): number {
 }
 
 export function LeadingZeros64(x: Word64): number {
-  // For 64-bit, we need to handle it differently
-  x = toUint64(x)
-  if (x === 0n) return 64
-  let count = 0
-  let mask = 1n << 63n
-  while ((x & mask) === 0n && count < 64) {
-    count++
-    mask >>= 1n
-  }
-  return count
+  const [hi, lo] = uint64Lanes(x)
+  return hi !== 0 ? Math.clz32(hi) : 32 + Math.clz32(lo)
 }
 
 // --- Trailing zeros ---
@@ -88,14 +101,9 @@ export function TrailingZeros32(x: number): number {
 }
 
 export function TrailingZeros64(x: Word64): number {
-  x = toUint64(x)
-  if (x === 0n) return 64
-  let count = 0
-  while ((x & 1n) === 0n && count < 64) {
-    count++
-    x >>= 1n
-  }
-  return count
+  const [hi, lo] = uint64Lanes(x)
+  if (lo !== 0) return trailingZeros32Nonzero(lo)
+  return hi !== 0 ? 32 + trailingZeros32Nonzero(hi) : 64
 }
 
 // --- Ones count ---
@@ -112,24 +120,15 @@ export function OnesCount16(x: number): number {
 }
 
 export function OnesCount32(x: number): number {
-  // Brian Kernighan's algorithm
-  let count = 0
-  x = x >>> 0 // Ensure unsigned
-  while (x) {
-    count++
-    x &= x - 1
-  }
-  return count
+  x = x >>> 0
+  x -= (x >>> 1) & 0x55555555
+  x = (x & 0x33333333) + ((x >>> 2) & 0x33333333)
+  return (((x + (x >>> 4)) & 0x0f0f0f0f) * 0x01010101) >>> 24
 }
 
 export function OnesCount64(x: Word64): number {
-  x = toUint64(x)
-  let count = 0
-  while (x > 0n) {
-    count++
-    x &= x - 1n
-  }
-  return count
+  const [hi, lo] = uint64Lanes(x)
+  return OnesCount32(hi) + OnesCount32(lo)
 }
 
 // --- Rotate left ---
@@ -330,11 +329,22 @@ export function Mul(x: Word64, y: Word64): [Word64, Word64] {
 }
 
 export function Mul32(x: number, y: number): [number, number] {
-  // The product of two uint32 needs 64 bits, beyond the 53-bit mantissa of a
-  // JS number, so multiply exactly via bigint before splitting hi/lo.
-  const product = BigInt(x >>> 0) * BigInt(y >>> 0)
-  const hi = Number((product >> 32n) & 0xffffffffn)
-  const lo = Number(product & 0xffffffffn)
+  x = x >>> 0
+  y = y >>> 0
+
+  const x0 = x & 0xffff
+  const x1 = x >>> 16
+  const y0 = y & 0xffff
+  const y1 = y >>> 16
+
+  const p0 = Math.imul(x0, y0) >>> 0
+  const p1 = Math.imul(x1, y0) >>> 0
+  const p2 = Math.imul(x0, y1) >>> 0
+  const p3 = Math.imul(x1, y1) >>> 0
+
+  const carry = (p0 >>> 16) + (p1 & 0xffff) + (p2 & 0xffff)
+  const lo = ((p0 & 0xffff) | (carry << 16)) >>> 0
+  const hi = (p3 + (p1 >>> 16) + (p2 >>> 16) + (carry >>> 16)) >>> 0
   return [hi, lo]
 }
 
