@@ -36,6 +36,7 @@ const (
 	RuntimeHelperInt64        RuntimeHelper = "builtin.int64"
 	RuntimeHelperUint64       RuntimeHelper = "builtin.uint64"
 	RuntimeHelperByte         RuntimeHelper = "builtin.byte"
+	RuntimeHelperFloat32      RuntimeHelper = "builtin.float32"
 	RuntimeHelperLen          RuntimeHelper = "builtin.len"
 	RuntimeHelperCap          RuntimeHelper = "builtin.cap"
 	RuntimeHelperClear        RuntimeHelper = "builtin.clear"
@@ -45,6 +46,7 @@ const (
 	RuntimeHelperMin          RuntimeHelper = "builtin.min"
 	RuntimeHelperMax          RuntimeHelper = "builtin.max"
 	RuntimeHelperComplex      RuntimeHelper = "builtin.complex"
+	RuntimeHelperComplex64    RuntimeHelper = "builtin.complex64"
 	RuntimeHelperReal         RuntimeHelper = "builtin.real"
 	RuntimeHelperImag         RuntimeHelper = "builtin.imag"
 	RuntimeHelperUint64Shl    RuntimeHelper = "builtin.uint64Shl"
@@ -279,6 +281,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperInt64, "int64", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperUint64, "uint64", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperByte, "byte", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperFloat32, "float32", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperLen, "len", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperCap, "cap", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperClear, "clear", RuntimeHelperCategoryBuiltin),
@@ -288,6 +291,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperMin, "min", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperMax, "max", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperComplex, "complex", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperComplex64, "complex64", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperReal, "real", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperImag, "imag", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperUint64Shl, "uint64Shl", RuntimeHelperCategoryBuiltin),

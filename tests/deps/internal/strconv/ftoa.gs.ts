@@ -179,7 +179,7 @@ export function genericFtoa(dst: $.Slice<number>, val: number, fmt: number, prec
 	switch (bitSize) {
 		case 32:
 		{
-			bits = $.uint64(__goscript_deps.float32bits(val))
+			bits = $.uint64(__goscript_deps.float32bits($.float32(val)))
 			flt = float32info
 			break
 		}

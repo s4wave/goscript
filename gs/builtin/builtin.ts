@@ -293,6 +293,22 @@ export function complex(real: number, imag: number): Complex {
   return { real, imag }
 }
 
+export function float32(value: number | bigint): number {
+  return Math.fround(Number(value))
+}
+
+export function complex64(value: Complex): Complex
+export function complex64(real: number | bigint, imag: number | bigint): Complex
+export function complex64(
+  valueOrReal: Complex | number | bigint,
+  imag: number | bigint = 0,
+): Complex {
+  if (typeof valueOrReal === 'object') {
+    return { real: float32(valueOrReal.real), imag: float32(valueOrReal.imag) }
+  }
+  return { real: float32(valueOrReal), imag: float32(imag) }
+}
+
 export function real(value: number | Complex | null | undefined): number {
   value = unwrapGoValue(value)
   if (typeof value === 'number') {
@@ -375,9 +391,18 @@ export function int(value: number | bigint | string, bits = 0): number {
 
 // uint converts a value to an unsigned Go integer width.
 export function uint(value: number | bigint | string, bits?: number): number
-export function uint(value: number | StringHeaderData, bits?: number): number | StringHeaderData
-export function uint(value: number | bigint | string | StringHeaderData, bits?: number): number | bigint | StringHeaderData
-export function uint(value: number | bigint | string | StringHeaderData, bits = 64): number | bigint | StringHeaderData {
+export function uint(
+  value: number | StringHeaderData,
+  bits?: number,
+): number | StringHeaderData
+export function uint(
+  value: number | bigint | string | StringHeaderData,
+  bits?: number,
+): number | bigint | StringHeaderData
+export function uint(
+  value: number | bigint | string | StringHeaderData,
+  bits = 64,
+): number | bigint | StringHeaderData {
   if (typeof value === 'object') {
     return value
   }
@@ -624,7 +649,6 @@ export function int64Xor(
 ): bigint {
   return int64Result(int64Value(left) ^ int64Value(right))
 }
-
 
 function int64Value(value: number | bigint): bigint {
   if (typeof value === 'bigint') {
@@ -1045,4 +1069,3 @@ export function runeOrStringToString(runeOrString: number | string): string {
   }
   return runeToString(runeOrString)
 }
-

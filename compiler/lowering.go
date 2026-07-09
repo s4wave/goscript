@@ -5122,13 +5122,29 @@ func lowerCompoundAssignValue(
 	right = "(" + right + ")"
 	switch tok {
 	case token.ADD_ASSIGN:
-		return left + " + " + right
+		value := left + " + " + right
+		if isFloat32Type(targetType) {
+			return runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + value + ")"
+		}
+		return value
 	case token.SUB_ASSIGN:
-		return left + " - " + right
+		value := left + " - " + right
+		if isFloat32Type(targetType) {
+			return runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + value + ")"
+		}
+		return value
 	case token.MUL_ASSIGN:
-		return left + " * " + right
+		value := left + " * " + right
+		if isFloat32Type(targetType) {
+			return runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + value + ")"
+		}
+		return value
 	case token.QUO_ASSIGN:
-		return left + " / " + right
+		value := left + " / " + right
+		if isFloat32Type(targetType) {
+			return runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + value + ")"
+		}
+		return value
 	case token.REM_ASSIGN:
 		return left + " % " + right
 	case token.AND_ASSIGN:
@@ -7710,7 +7726,11 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 		if binaryOperandUsesTypeParam(ctx, typed.Y) {
 			right = "(" + right + " as any)"
 		}
-		return left + " " + typed.Op.String() + " " + right, append(leftDiagnostics, rightDiagnostics...)
+		value := left + " " + typed.Op.String() + " " + right
+		if isFloat32Type(ctx.semPkg.source.TypesInfo.TypeOf(typed)) && isFloatBinaryArithmeticOperator(typed.Op) {
+			value = o.runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + value + ")"
+		}
+		return value, append(leftDiagnostics, rightDiagnostics...)
 	case *ast.UnaryExpr:
 		if typed.Op == token.AND {
 			return o.lowerAddressExpr(ctx, typed.X)
@@ -8209,6 +8229,9 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 			case "min":
 				return o.lowerMinMaxBuiltin(ctx, expr, args, false), diagnostics
 			case "complex":
+				if isComplex64Type(ctx.semPkg.source.TypesInfo.TypeOf(expr)) && len(args) == 2 {
+					return o.runtimeOwner.QualifiedHelper(RuntimeHelperComplex64) + "(" + strings.Join(args, ", ") + ")", diagnostics
+				}
 				return o.runtimeOwner.QualifiedHelper(RuntimeHelperComplex) + "(" + strings.Join(args, ", ") + ")", diagnostics
 			case "real":
 				return o.runtimeOwner.QualifiedHelper(RuntimeHelperReal) + "(" + strings.Join(args, ", ") + ")", diagnostics
@@ -8926,6 +8949,17 @@ func (o *LoweringOwner) lowerConversionExpr(
 	if conversion, ok := o.lowerNamedStructConversion(ctx, expr.Args[0], targetType, sourceType, value); ok {
 		return renderNamedStructConversion(conversion), diagnostics
 	}
+	if isComplex64Type(targetType) {
+		if isComplexType(sourceType) {
+			return o.runtimeOwner.QualifiedHelper(RuntimeHelperComplex64) + "(" + value + ")", diagnostics
+		}
+		if isIntegerType(sourceType) || isFloatType(sourceType) {
+			return o.runtimeOwner.QualifiedHelper(RuntimeHelperComplex64) + "(" + value + ", 0)", diagnostics
+		}
+	}
+	if isComplexType(targetType) && (isIntegerType(sourceType) || isFloatType(sourceType)) {
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperComplex) + "(" + value + ", 0)", diagnostics
+	}
 	if isNumericType(targetType) {
 		if constantValue, ok := o.lowerNumericConstantExprForTarget(ctx, expr.Args[0], targetType); ok {
 			return constantValue, diagnostics
@@ -8953,10 +8987,14 @@ func (o *LoweringOwner) lowerConversionExpr(
 	}
 	if isNumericType(targetType) {
 		if isFloatType(targetType) {
+			converted := value
 			if isBigIntBackedType(sourceType) {
-				return "Number(" + value + ")", diagnostics
+				converted = "Number(" + value + ")"
 			}
-			return value, diagnostics
+			if isFloat32Type(targetType) {
+				converted = o.runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + converted + ")"
+			}
+			return converted, diagnostics
 		}
 		if isBigIntBackedType(targetType) {
 			helper := RuntimeHelperInt64
@@ -11192,6 +11230,14 @@ func (o *LoweringOwner) lowerValueForTarget(
 	value string,
 ) string {
 	sourceType := ctx.semPkg.source.TypesInfo.TypeOf(expr)
+	if isComplex64Type(targetType) {
+		if isComplexType(sourceType) {
+			return o.runtimeOwner.QualifiedHelper(RuntimeHelperComplex64) + "(" + value + ")"
+		}
+		if isRealNumericConstantExpr(ctx, expr) {
+			return o.runtimeOwner.QualifiedHelper(RuntimeHelperComplex64) + "(" + value + ", 0)"
+		}
+	}
 	if isComplexType(targetType) {
 		if isComplexType(sourceType) {
 			return value
@@ -11236,6 +11282,11 @@ func (o *LoweringOwner) lowerNumericConstantExprForTarget(ctx lowerFileContext, 
 	}
 	tv, ok := ctx.semPkg.source.TypesInfo.Types[expr]
 	if ok && tv.Value != nil {
+		if isFloat32Type(targetType) {
+			if value, ok := lowerRealNumericConstantExpr(ctx, expr); ok {
+				return o.runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + value + ")", true
+			}
+		}
 		if isBigIntBackedType(targetType) && tv.Value.Kind() == constant.Int {
 			return tv.Value.ExactString() + "n", true
 		}
@@ -12709,6 +12760,23 @@ func isIntegerType(typ types.Type) bool {
 
 func isFloatType(typ types.Type) bool {
 	return basicInfo(typ, types.IsFloat)
+}
+
+func isFloat32Type(typ types.Type) bool {
+	return basicKind(typ, types.Float32)
+}
+
+func isComplex64Type(typ types.Type) bool {
+	return basicKind(typ, types.Complex64)
+}
+
+func isFloatBinaryArithmeticOperator(tok token.Token) bool {
+	switch tok {
+	case token.ADD, token.SUB, token.MUL, token.QUO:
+		return true
+	default:
+		return false
+	}
 }
 
 func unsignedIntegerBits(typ types.Type) (int, bool) {

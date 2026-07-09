@@ -318,7 +318,7 @@ export function atof32exact(mantissa: bigint, exp: number, neg: boolean): [numbe
 	if ((mantissa >> 23n) != 0n) {
 		return [f, ok]
 	}
-	f = Number(mantissa)
+	f = $.float32(Number(mantissa))
 	if (neg) {
 		f = -f
 	}
@@ -331,19 +331,19 @@ export function atof32exact(mantissa: bigint, exp: number, neg: boolean): [numbe
 		case (exp > 0) && (exp <= (7 + 10)):
 		{
 			if (exp > 10) {
-				f = f * ($.arrayIndex(float32pow10!, exp - 10))
+				f = $.float32(f * ($.arrayIndex(float32pow10!, exp - 10)))
 				exp = 10
 			}
 			if ((f > 1e7) || (f < -1e7)) {
 				// the exponent was really too large.
 				return [f, ok]
 			}
-			return [f * $.arrayIndex(float32pow10!, exp), true]
+			return [$.float32(f * $.arrayIndex(float32pow10!, exp)), true]
 			break
 		}
 		case (exp < 0) && (exp >= -10):
 		{
-			return [f / $.arrayIndex(float32pow10!, -exp), true]
+			return [$.float32(f / $.arrayIndex(float32pow10!, -exp)), true]
 			break
 		}
 	}
@@ -422,7 +422,7 @@ export function atof32(s: string): [number, number, $.GoError] {
 	{
 		let [val, __goscriptShadow1, ok] = special(s)
 		if (ok) {
-			return [val, __goscriptShadow1, null]
+			return [$.float32(val), __goscriptShadow1, null]
 		}
 	}
 
@@ -440,7 +440,7 @@ export function atof32(s: string): [number, number, $.GoError] {
 
 	if (hex) {
 		let [__goscriptShadow2, __goscriptShadow3] = atofHex($.sliceStringOrBytes(s, undefined, n), __goscript_ftoa.float32info, mantissa, exp, neg, trunc)
-		return [__goscriptShadow2, n, __goscriptShadow3]
+		return [$.float32(__goscriptShadow2), n, __goscriptShadow3]
 	}
 
 	if (optimize) {

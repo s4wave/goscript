@@ -32,7 +32,17 @@ function formatValue(
     return nested ? JSON.stringify(value) : value
   }
 
-  if (typeof value === 'boolean' || typeof value === 'number') {
+  if (typeof value === 'boolean') {
+    return String(value)
+  }
+
+  if (typeof value === 'number') {
+    if (value === Infinity) {
+      return '+Inf'
+    }
+    if (value === -Infinity) {
+      return '-Inf'
+    }
     return String(value)
   }
 
