@@ -5,7 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let n: bigint = 3n
-	let s = BigInt.asUintN(64, (n & 1n) * 4n)
+	let s = $.uint64Mul(($.uint64And(n, 1n)), 4n)
 
 	let b: number = $.uint(1, 8)
 	b = b + ($.uint(1 << Number(s), 8))

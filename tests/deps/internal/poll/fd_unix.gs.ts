@@ -410,7 +410,7 @@ export class FD {
 			if ($.pointerValue<FD>(fd).IsStream && ((max - nn) > 1073741824)) {
 				max = nn + 1073741824
 			}
-			let [n, err] = syscall.Pwrite($.pointerValue<FD>(fd).Sysfd, $.goSlice(p, nn, max), BigInt.asIntN(64, off + $.int64(nn)))
+			let [n, err] = syscall.Pwrite($.pointerValue<FD>(fd).Sysfd, $.goSlice(p, nn, max), $.int64Add(off, $.int64(nn)))
 			if ($.comparableEqual(err, syscall.EINTR)) {
 				continue
 			}
@@ -1162,7 +1162,7 @@ export class FD {
 
 	public closing(): boolean {
 		const fd: FD | $.VarRef<FD> | null = this
-		return (atomic.LoadUint64($.pointerValue<FD>(fd).fdmu._fields.state) & 1n) != 0n
+		return ($.uint64And(atomic.LoadUint64($.pointerValue<FD>(fd).fdmu._fields.state), 1n)) != 0n
 	}
 
 	public async decref(): globalThis.Promise<$.GoError> {

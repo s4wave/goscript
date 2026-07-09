@@ -898,7 +898,7 @@ export function assemble64(n1: number, n2: number, n3: number, n4: number, n5: n
 	if ($.uint((((((((n1 | n2) | n3) | n4) | n5) | n6) | n7) | n8), 8) == $.uint(0xff, 8)) {
 		return [0n, false]
 	}
-	return [((((((($.uint64Mul($.uint64(n1), (2 ** 58))) | ($.uint64Mul($.uint64(n2), (2 ** 52)))) | ($.uint64Mul($.uint64(n3), (2 ** 46)))) | ($.uint64Mul($.uint64(n4), (2 ** 40)))) | ($.uint64Mul($.uint64(n5), (2 ** 34)))) | ($.uint64Shl($.uint64(n6), 28n))) | ($.uint64Shl($.uint64(n7), 22n))) | ($.uint64Shl($.uint64(n8), 16n)), true]
+	return [$.uint64Or(($.uint64Or(($.uint64Or(($.uint64Or(($.uint64Or(($.uint64Or(($.uint64Or(($.uint64Mul($.uint64(n1), (2 ** 58))), ($.uint64Mul($.uint64(n2), (2 ** 52))))), ($.uint64Mul($.uint64(n3), (2 ** 46))))), ($.uint64Mul($.uint64(n4), (2 ** 40))))), ($.uint64Mul($.uint64(n5), (2 ** 34))))), ($.uint64Shl($.uint64(n6), 28n)))), ($.uint64Shl($.uint64(n7), 22n)))), ($.uint64Shl($.uint64(n8), 16n))), true]
 }
 
 export function NewDecoder(enc: Encoding | $.VarRef<Encoding> | null, r: io.Reader | null): io.Reader | null {

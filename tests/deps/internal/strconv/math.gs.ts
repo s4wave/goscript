@@ -74,7 +74,7 @@ export function umul192(x: bigint, y: uint128): [bigint, bigint, bigint] {
 	let __goscriptTuple2: any = bits.Add64(mid1, mid2, 0n)
 	mid = __goscriptTuple2[0]
 	let carry = __goscriptTuple2[1]
-	return [BigInt.asUintN(64, hi + carry), mid, lo]
+	return [$.uint64Add(hi, carry), mid, lo]
 }
 
 export function pow10(e: number): [uint128, number, boolean] {
@@ -105,7 +105,7 @@ export function bool2uint(b: boolean): number {
 }
 
 export function divisiblePow5(x: bigint, p: number): boolean {
-	return ((1 <= p) && (p <= 22)) && ((BigInt.asUintN(64, x * $.arrayIndex($.arrayIndex(div5Tab, p - 1), 0))) <= $.arrayIndex($.arrayIndex(div5Tab, p - 1), 1))
+	return ((1 <= p) && (p <= 22)) && (($.uint64Mul(x, $.arrayIndex($.arrayIndex(div5Tab, p - 1), 0))) <= $.arrayIndex($.arrayIndex(div5Tab, p - 1), 1))
 }
 
 export let div5Tab: bigint[][] = [[14757395258967641293n, 3689348814741910323n], [10330176681277348905n, 737869762948382064n], [2066035336255469781n, 147573952589676412n], [15170602326218735249n, 29514790517935282n], [6723469279985657373n, 5902958103587056n], [8723391485480952121n, 1180591620717411n], [16502073556063831717n, 236118324143482n], [14368461155438497313n, 47223664828696n], [10252389860571520109n, 9444732965739n], [5739826786856214345n, 1888946593147n], [1147965357371242869n, 377789318629n], [3918941886216158897n, 75557863725n], [11851834821468962749n, 15111572745n], [6059715779035702873n, 3022314549n], [8590640785290961221n, 604462909n], [16475523416025833537n, 120892581n], [14363151127430897677n, 24178516n], [13940676669711910505n, 4835703n], [2788135333942382101n, 967140n], [15315022325756117713n, 193428n], [10441702094635044189n, 38685n], [5777689233668919161n, 7737n]]
@@ -135,26 +135,26 @@ export function trimZeros(x: bigint): [bigint, number] {
 
 	// Cut 8 zeros, then 4, then 2, then 1.
 	let p = 0
-	for (let d = bits.RotateLeft64(BigInt.asUintN(64, x * 14368461155438497313n), -8); d <= 184467440737n; d = bits.RotateLeft64(BigInt.asUintN(64, x * 14368461155438497313n), -8)) {
+	for (let d = bits.RotateLeft64($.uint64Mul(x, 14368461155438497313n), -8); d <= 184467440737n; d = bits.RotateLeft64($.uint64Mul(x, 14368461155438497313n), -8)) {
 		x = d
 		p = p + (8)
 	}
 	{
-		let d = bits.RotateLeft64(BigInt.asUintN(64, x * 15170602326218735249n), -4)
+		let d = bits.RotateLeft64($.uint64Mul(x, 15170602326218735249n), -4)
 		if (d <= 1844674407370955n) {
 			x = d
 			p = p + (4)
 		}
 	}
 	{
-		let d = bits.RotateLeft64(BigInt.asUintN(64, x * 10330176681277348905n), -2)
+		let d = bits.RotateLeft64($.uint64Mul(x, 10330176681277348905n), -2)
 		if (d <= 184467440737095516n) {
 			x = d
 			p = p + (2)
 		}
 	}
 	{
-		let d = bits.RotateLeft64(BigInt.asUintN(64, x * 14757395258967641293n), -1)
+		let d = bits.RotateLeft64($.uint64Mul(x, 14757395258967641293n), -1)
 		if (d <= 1844674407370955161n) {
 			x = d
 			p = p + (1)

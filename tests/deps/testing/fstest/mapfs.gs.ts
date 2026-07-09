@@ -315,7 +315,7 @@ export class openMapFile {
 			return [0, $.interfaceValue<$.GoError>(new fs.PathError({Op: "read", Path: $.pointerValue<openMapFile>(f).path, Err: fs.ErrInvalid}), "*fs.PathError")]
 		}
 		let n = $.copy(b, $.goSlice($.pointerValue<MapFile>($.pointerValue<openMapFile>(f).mapFileInfo.f).Data, Number($.pointerValue<openMapFile>(f).offset), undefined))
-		$.pointerValue<openMapFile>(f).offset = BigInt.asIntN(64, $.pointerValue<openMapFile>(f).offset + ($.int64(n)))
+		$.pointerValue<openMapFile>(f).offset = $.int64Add($.pointerValue<openMapFile>(f).offset, $.int64(n))
 		return [n, null]
 	}
 
@@ -340,12 +340,12 @@ export class openMapFile {
 			}
 			case 1:
 			{
-				offset = BigInt.asIntN(64, offset + ($.pointerValue<openMapFile>(f).offset))
+				offset = $.int64Add(offset, $.pointerValue<openMapFile>(f).offset)
 				break
 			}
 			case 2:
 			{
-				offset = BigInt.asIntN(64, offset + ($.int64($.len($.pointerValue<MapFile>($.pointerValue<openMapFile>(f).mapFileInfo.f).Data))))
+				offset = $.int64Add(offset, $.int64($.len($.pointerValue<MapFile>($.pointerValue<openMapFile>(f).mapFileInfo.f).Data)))
 				break
 			}
 		}

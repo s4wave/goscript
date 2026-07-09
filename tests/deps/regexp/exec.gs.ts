@@ -701,14 +701,14 @@ export class onePassMachine {
 }
 
 export function newLazyFlag(r1: number, r2: number): lazyFlag {
-	return $.uint64(($.uint64Mul(r1, (2 ** 32))) | $.uint64($.uint(r2, 32)))
+	return $.uint64($.uint64Add(($.uint64Mul(r1, (2 ** 32))), $.uint64($.uint(r2, 32))))
 }
 
 export function lazyFlag_match(f: lazyFlag, op: syntax.EmptyOp): boolean {
 	if ($.uint(op, 8) == $.uint(0, 8)) {
 		return true
 	}
-	let r1 = $.int($.int(f >> 32n, 32), 32)
+	let r1 = $.int($.int($.uint64Shr(f, 32n), 32), 32)
 	if ($.uint((op & syntax.EmptyBeginLine), 8) != $.uint(0, 8)) {
 		if (($.int(r1, 32) != $.int(10, 32)) && ($.int(r1, 32) >= $.int(0, 32))) {
 			return false

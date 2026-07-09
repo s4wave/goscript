@@ -303,20 +303,20 @@ export class parser {
 			case 13:
 			case 14:
 			{
-				size = BigInt.asIntN(64, 2n + parser.prototype.calcSize.call(p, $.arrayIndex($.pointerValue<__goscript_regexp.Regexp>(re).Sub!, 0), false))
+				size = $.int64Add(2n, parser.prototype.calcSize.call(p, $.arrayIndex($.pointerValue<__goscript_regexp.Regexp>(re).Sub!, 0), false))
 				break
 			}
 			case 15:
 			case 16:
 			{
-				size = BigInt.asIntN(64, 1n + parser.prototype.calcSize.call(p, $.arrayIndex($.pointerValue<__goscript_regexp.Regexp>(re).Sub!, 0), false))
+				size = $.int64Add(1n, parser.prototype.calcSize.call(p, $.arrayIndex($.pointerValue<__goscript_regexp.Regexp>(re).Sub!, 0), false))
 				break
 			}
 			case 18:
 			{
 				for (let __goscriptRangeTarget1 = $.pointerValue<__goscript_regexp.Regexp>(re).Sub, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
 					let sub = __goscriptRangeTarget1![__rangeIndex]
-					size = BigInt.asIntN(64, size + (parser.prototype.calcSize.call(p, sub, false)))
+					size = $.int64Add(size, parser.prototype.calcSize.call(p, sub, false))
 				}
 				break
 			}
@@ -324,10 +324,10 @@ export class parser {
 			{
 				for (let __goscriptRangeTarget2 = $.pointerValue<__goscript_regexp.Regexp>(re).Sub, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget2); __rangeIndex++) {
 					let sub = __goscriptRangeTarget2![__rangeIndex]
-					size = BigInt.asIntN(64, size + (parser.prototype.calcSize.call(p, sub, false)))
+					size = $.int64Add(size, parser.prototype.calcSize.call(p, sub, false))
 				}
 				if ($.len($.pointerValue<__goscript_regexp.Regexp>(re).Sub) > 1) {
-					size = BigInt.asIntN(64, size + (BigInt.asIntN(64, $.int64($.len($.pointerValue<__goscript_regexp.Regexp>(re).Sub)) - 1n)))
+					size = $.int64Add(size, $.int64Sub($.int64($.len($.pointerValue<__goscript_regexp.Regexp>(re).Sub)), 1n))
 				}
 				break
 			}
@@ -336,14 +336,14 @@ export class parser {
 				let sub = parser.prototype.calcSize.call(p, $.arrayIndex($.pointerValue<__goscript_regexp.Regexp>(re).Sub!, 0), false)
 				if ($.pointerValue<__goscript_regexp.Regexp>(re).Max == -1) {
 					if ($.pointerValue<__goscript_regexp.Regexp>(re).Min == 0) {
-						size = BigInt.asIntN(64, 2n + sub)
+						size = $.int64Add(2n, sub)
 					} else {
-						size = BigInt.asIntN(64, 1n + (BigInt.asIntN(64, $.int64($.pointerValue<__goscript_regexp.Regexp>(re).Min) * sub)))
+						size = $.int64Add(1n, ($.int64Mul($.int64($.pointerValue<__goscript_regexp.Regexp>(re).Min), sub)))
 					}
 					break
 				}
 				// x{2,5} = xx(x(x(x)?)?)?
-				size = BigInt.asIntN(64, (BigInt.asIntN(64, $.int64($.pointerValue<__goscript_regexp.Regexp>(re).Max) * sub)) + $.int64($.pointerValue<__goscript_regexp.Regexp>(re).Max - $.pointerValue<__goscript_regexp.Regexp>(re).Min))
+				size = $.int64Add(($.int64Mul($.int64($.pointerValue<__goscript_regexp.Regexp>(re).Max), sub)), $.int64($.pointerValue<__goscript_regexp.Regexp>(re).Max - $.pointerValue<__goscript_regexp.Regexp>(re).Min))
 				break
 			}
 		}
@@ -401,7 +401,7 @@ export class parser {
 				if ($.int64(n) > ($.int64Div(3355443n, $.pointerValue<parser>(p).repeats))) {
 					$.pointerValue<parser>(p).repeats = 3355443n
 				} else {
-					$.pointerValue<parser>(p).repeats = BigInt.asIntN(64, $.pointerValue<parser>(p).repeats * ($.int64(n)))
+					$.pointerValue<parser>(p).repeats = $.int64Mul($.pointerValue<parser>(p).repeats, $.int64(n))
 				}
 			}
 			if ($.int64($.pointerValue<parser>(p).numRegexp) < ($.int64Div(3355443n, $.pointerValue<parser>(p).repeats))) {

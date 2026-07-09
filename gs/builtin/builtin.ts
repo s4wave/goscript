@@ -467,32 +467,39 @@ export function uint64(value: number | bigint | string): bigint {
   return uint64Result(uint64Value(value))
 }
 
+// wideShiftAmount converts a Go shift count into the JavaScript bigint domain.
+// Only counts below 64 can affect a 64-bit result, so Number preserves every
+// behaviorally relevant count exactly before the bigint shift.
+function wideShiftAmount(shift: number | bigint): bigint {
+  return BigInt(Math.trunc(Number(shift)))
+}
+
 export function uint64Shl(
   value: number | bigint,
   shift: number | bigint,
 ): bigint {
-  return uint64Result(uint64Value(value) << BigInt(Math.trunc(Number(shift))))
+  return uint64Result(uint64Value(value) << wideShiftAmount(shift))
 }
 
 export function uint64Shr(
   value: number | bigint,
   shift: number | bigint,
 ): bigint {
-  return uint64Value(value) >> BigInt(Math.trunc(Number(shift)))
+  return uint64Value(value) >> wideShiftAmount(shift)
 }
 
 export function int64Shl(
   value: number | bigint,
   shift: number | bigint,
 ): bigint {
-  return int64Result(int64Value(value) << BigInt(Math.trunc(Number(shift))))
+  return int64Result(int64Value(value) << wideShiftAmount(shift))
 }
 
 export function int64Shr(
   value: number | bigint,
   shift: number | bigint,
 ): bigint {
-  return int64Result(int64Value(value) >> BigInt(Math.trunc(Number(shift))))
+  return int64Result(int64Value(value) >> wideShiftAmount(shift))
 }
 
 export function uintShr(

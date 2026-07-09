@@ -34,7 +34,7 @@ export class chunker {
 
 	public advance(chunkSize: number): void {
 		let c: chunker | $.VarRef<chunker> | null = this
-		$.pointerValue<chunker>(c).pos = BigInt.asUintN(64, $.pointerValue<chunker>(c).pos + ($.uint64(chunkSize)))
+		$.pointerValue<chunker>(c).pos = $.uint64Add($.pointerValue<chunker>(c).pos, $.uint64(chunkSize))
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -101,9 +101,9 @@ export function algorithm(data: $.Slice<number>, n: number, g: $.Slice<bigint>, 
 	let fp = 0n
 	let i = minSize
 	while (i < n) {
-		fp = BigInt.asUintN(64, ($.uint64Shl(fp, 1n)) + $.arrayIndex(g!, $.arrayIndex(data!, i) % uint64Len(g)))
-		if ((fp & maskJ) == 0n) {
-			if ((fp & maskC) == 0n) {
+		fp = $.uint64Add(($.uint64Shl(fp, 1n)), $.arrayIndex(g!, $.arrayIndex(data!, i) % uint64Len(g)))
+		if (($.uint64And(fp, maskJ)) == 0n) {
+			if (($.uint64And(fp, maskC)) == 0n) {
 				return i
 			}
 			fp = 0n
@@ -134,8 +134,8 @@ export async function main(): globalThis.Promise<void> {
 		let [nr, err] = await $.pointerValue<Exclude<io.Reader, null>>(src).Read(buf)
 		if (nr > 0) {
 			chunker.prototype.advance.call(c, nr)
-			totalSize = BigInt.asUintN(64, totalSize + ($.uint64(nr)))
-			chkStart = BigInt.asUintN(64, chkStart + ($.uint64(nr)))
+			totalSize = $.uint64Add(totalSize, $.uint64(nr))
+			chkStart = $.uint64Add(chkStart, $.uint64(nr))
 		}
 		if ($.comparableEqual(err, io.EOF)) {
 			break

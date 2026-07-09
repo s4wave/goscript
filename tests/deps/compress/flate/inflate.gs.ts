@@ -637,7 +637,7 @@ export class decompressor {
 		}
 
 		let [cnt, err] = await io.ReadFull($.pointerValueOrNil(($.pointerValue<decompressor>(f).r as io.Reader | null))!, buf)
-		$.pointerValue<decompressor>(f).roffset = BigInt.asIntN(64, $.pointerValue<decompressor>(f).roffset + ($.int64(cnt)))
+		$.pointerValue<decompressor>(f).roffset = $.int64Add($.pointerValue<decompressor>(f).roffset, $.int64(cnt))
 		$.pointerValue<decompressor>(f).copyLen = $.pointerValue<decompressor>(f).copyLen - (cnt)
 		$.pointerValue<decompressor>(f).dict.writeMark(cnt)
 		if (err != null) {
@@ -662,7 +662,7 @@ export class decompressor {
 
 		// Length then ones-complement of length.
 		let [nr, err] = await io.ReadFull($.pointerValueOrNil(($.pointerValue<decompressor>(f).r as io.Reader | null))!, $.goSlice($.pointerValue<decompressor>(f).buf, 0, 4))
-		$.pointerValue<decompressor>(f).roffset = BigInt.asIntN(64, $.pointerValue<decompressor>(f).roffset + ($.int64(nr)))
+		$.pointerValue<decompressor>(f).roffset = $.int64Add($.pointerValue<decompressor>(f).roffset, $.int64(nr))
 		if (err != null) {
 			$.pointerValue<decompressor>(f).err = noEOF(err)
 			return

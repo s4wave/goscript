@@ -105,7 +105,7 @@ export function fixedFtoa(d: __goscript_ftoa.decimalSlice | $.VarRef<__goscript_
 		}
 		case (0 <= p) && (p <= 55):
 		{
-			dt = __goscript_math.bool2uint((lo1 | lo0) != 0n)
+			dt = __goscript_math.bool2uint(($.uint64Or(lo1, lo0)) != 0n)
 			break
 		}
 		case ((-22 <= p) && (p < 0)) && __goscript_math.divisiblePow5(mant, -p):
@@ -121,7 +121,7 @@ export function fixedFtoa(d: __goscript_ftoa.decimalSlice | $.VarRef<__goscript_
 	// the "rounding bit" (the first fractional bit) is dm&1,
 	// and the "truncated bit" (have any bits been discarded?) is dt.
 	let shift = -de - 1
-	dt = $.uint($.uint64Or(dt, __goscript_math.bool2uint((dm & (BigInt.asUintN(64, ($.uint64Shl(1n, shift)) - 1n))) != 0n)), 64)
+	dt = $.uint($.uint64Or(dt, __goscript_math.bool2uint(($.uint64And(dm, ($.uint64Sub(($.uint64Shl(1n, shift)), 1n)))) != 0n)), 64)
 	dm = $.uint64Shr(dm, $.uint64(shift))
 
 	// Set decimal point in eventual formatted digits,
@@ -172,9 +172,9 @@ export function fixedFtoa(d: __goscript_ftoa.decimalSlice | $.VarRef<__goscript_
 	// (b) or the fractional part is ≥ 0.5 and the integer part is odd
 	//     (dm&1 != 0 and dm&2 != 0).
 	// The bitwise expression encodes that logic.
-	dm = BigInt.asUintN(64, dm + ($.uint64($.uint($.uint64And(($.uint($.uint64And($.uint(dm, 64), ($.uint($.uint64Or(dt, ($.uint($.uint64Shr($.uint(dm, 64), 1n), 64))), 64))), 64)), 1n), 64))))
+	dm = $.uint64Add(dm, $.uint64($.uint($.uint64And(($.uint($.uint64And($.uint(dm, 64), ($.uint($.uint64Or(dt, ($.uint($.uint64Shr($.uint(dm, 64), 1n), 64))), 64))), 64)), 1n), 64)))
 	dm = $.uint64Shr(dm, 1n)
-	if (dm == (max >> 1n)) {
+	if (dm == ($.uint64Shr(max, 1n))) {
 		// 999... rolled over to 1000...
 		dm = $.arrayIndex(uint64pow10, digits - 1)
 		$.pointerValue<__goscript_ftoa.decimalSlice>(d).dp++

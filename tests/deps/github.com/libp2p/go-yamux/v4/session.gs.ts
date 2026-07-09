@@ -1247,7 +1247,7 @@ export class Session {
 		}
 		if (!atomic.CompareAndSwapInt64($.pointerValue<Session>(s)._fields.rtt, 0n, time.Duration_Nanoseconds(rtt))) {
 			let prev = atomic.LoadInt64($.pointerValue<Session>(s)._fields.rtt)
-			let smoothedRTT = BigInt.asIntN(64, ($.int64Div(prev, 2n)) + ($.int64Div(time.Duration_Nanoseconds(rtt), 2n)))
+			let smoothedRTT = $.int64Add(($.int64Div(prev, 2n)), ($.int64Div(time.Duration_Nanoseconds(rtt), 2n)))
 			atomic.StoreInt64($.pointerValue<Session>(s)._fields.rtt, smoothedRTT)
 		}
 	}

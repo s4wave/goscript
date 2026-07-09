@@ -85,8 +85,8 @@ export class decimal {
 		let n = 0
 		while (v > 0n) {
 			let v1 = $.uint64Div(v, 10n)
-			v = BigInt.asUintN(64, v - (BigInt.asUintN(64, 10n * v1)))
-			buf[n] = $.uint($.uint(BigInt.asUintN(64, v + 48n), 8), 8)
+			v = $.uint64Sub(v, $.uint64Mul(10n, v1))
+			buf[n] = $.uint($.uint($.uint64Add(v, 48n), 8), 8)
 			n++
 			v = v1
 		}
@@ -153,10 +153,10 @@ export class decimal {
 		let i: number = 0
 		let n = 0n
 		for (i = 0; (i < $.pointerValue<decimal>(a).dp) && (i < $.pointerValue<decimal>(a).nd); i++) {
-			n = BigInt.asUintN(64, (BigInt.asUintN(64, n * 10n)) + $.uint64($.arrayIndex($.pointerValue<decimal>(a).d, i) - 48))
+			n = $.uint64Add(($.uint64Mul(n, 10n)), $.uint64($.arrayIndex($.pointerValue<decimal>(a).d, i) - 48))
 		}
 		for (; i < $.pointerValue<decimal>(a).dp; i++) {
-			n = BigInt.asUintN(64, n * (10n))
+			n = $.uint64Mul(n, 10n)
 		}
 		if (shouldRoundUp(a, $.pointerValue<decimal>(a).dp)) {
 			n++
@@ -313,7 +313,7 @@ export class decimal {
 					}
 				}
 
-				if ((mant & ($.uint64Shl(1n, $.pointerValue<__goscript_ftoa.floatInfo>(flt).mantbits))) == 0n) {
+				if (($.uint64And(mant, ($.uint64Shl(1n, $.pointerValue<__goscript_ftoa.floatInfo>(flt).mantbits)))) == 0n) {
 					exp = $.pointerValue<__goscript_ftoa.floatInfo>(flt).bias
 				}
 				break out
@@ -323,10 +323,10 @@ export class decimal {
 			exp = ((1 << $.pointerValue<__goscript_ftoa.floatInfo>(flt).expbits) - 1) + $.pointerValue<__goscript_ftoa.floatInfo>(flt).bias
 			overflow = true
 		}
-		let bits = mant & (BigInt.asUintN(64, ($.uint64Shl(1n, $.pointerValue<__goscript_ftoa.floatInfo>(flt).mantbits)) - 1n))
-		bits = bits | ($.uint64Shl($.uint64((exp - $.pointerValue<__goscript_ftoa.floatInfo>(flt).bias) & ((1 << $.pointerValue<__goscript_ftoa.floatInfo>(flt).expbits) - 1)), $.pointerValue<__goscript_ftoa.floatInfo>(flt).mantbits))
+		let bits = $.uint64And(mant, ($.uint64Sub(($.uint64Shl(1n, $.pointerValue<__goscript_ftoa.floatInfo>(flt).mantbits)), 1n)))
+		bits = $.uint64Or(bits, $.uint64Shl($.uint64((exp - $.pointerValue<__goscript_ftoa.floatInfo>(flt).bias) & ((1 << $.pointerValue<__goscript_ftoa.floatInfo>(flt).expbits) - 1)), $.pointerValue<__goscript_ftoa.floatInfo>(flt).mantbits))
 		if ($.pointerValue<decimal>(d).neg) {
-			bits = bits | ($.uint64Shl(($.uint64Shl(1n, $.pointerValue<__goscript_ftoa.floatInfo>(flt).mantbits)), $.pointerValue<__goscript_ftoa.floatInfo>(flt).expbits))
+			bits = $.uint64Or(bits, $.uint64Shl(($.uint64Shl(1n, $.pointerValue<__goscript_ftoa.floatInfo>(flt).mantbits)), $.pointerValue<__goscript_ftoa.floatInfo>(flt).expbits))
 		}
 		return [bits, overflow]
 	}

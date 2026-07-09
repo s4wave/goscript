@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export async function main(): globalThis.Promise<void> {
 	let value: bigint = 3n
 	let delta = -5
-	value = BigInt.asIntN(64, value + ($.int64(delta)))
+	value = $.int64Add(value, $.int64(delta))
 	$.println("int64-add", value)
 
-	value = BigInt.asIntN(64, value - (-2n))
+	value = $.int64Sub(value, -2n)
 	$.println("int64-sub", value)
 
-	value = BigInt.asIntN(64, value * (-3n))
+	value = $.int64Mul(value, -3n)
 	$.println("int64-mul", value)
 
 	let shifted = -8n

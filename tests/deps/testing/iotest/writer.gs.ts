@@ -57,7 +57,7 @@ export class truncateWriter {
 		let __goscriptTuple0: any = await $.pointerValue<Exclude<io.Writer, null>>($.pointerValue<truncateWriter>(t).w).Write($.goSlice(p, 0, n))
 		n = __goscriptTuple0[0]
 		err = __goscriptTuple0[1]
-		$.pointerValue<truncateWriter>(t).n = BigInt.asIntN(64, $.pointerValue<truncateWriter>(t).n - ($.int64(n)))
+		$.pointerValue<truncateWriter>(t).n = $.int64Sub($.pointerValue<truncateWriter>(t).n, $.int64(n))
 		if (err == null) {
 			n = $.len(p)
 		}

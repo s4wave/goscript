@@ -466,7 +466,7 @@ export class Reader {
 			let [r, ok] = $.typeAssertTuple<io.WriterTo | null>($.pointerValue<Reader>(b).rd, "io.WriterTo")
 			if (ok) {
 				let [m, __goscriptShadow0] = await $.pointerValue<Exclude<io.WriterTo, null>>(r).WriteTo($.pointerValueOrNil(w)!)
-				n = BigInt.asIntN(64, n + (m))
+				n = $.int64Add(n, m)
 				return [n, __goscriptShadow0]
 			}
 		}
@@ -478,7 +478,7 @@ export class Reader {
 			let ok = __goscriptTuple7[1]
 			if (ok) {
 				let [m, __goscriptShadow3] = await $.pointerValue<Exclude<io.ReaderFrom, null>>(__goscriptShadow2).ReadFrom($.pointerValueOrNil($.pointerValue<Reader>(b).rd)!)
-				n = BigInt.asIntN(64, n + (m))
+				n = $.int64Add(n, m)
 				return [n, __goscriptShadow3]
 			}
 		}
@@ -490,7 +490,7 @@ export class Reader {
 		while ($.pointerValue<Reader>(b).r < $.pointerValue<Reader>(b).w) {
 			// b.r < b.w => buffer is not empty
 			let [m, __goscriptShadow4] = await Reader.prototype.writeBuf.call(b, w)
-			n = BigInt.asIntN(64, n + (m))
+			n = $.int64Add(n, m)
 			if (__goscriptShadow4 != null) {
 				return [n, __goscriptShadow4]
 			}
@@ -715,7 +715,7 @@ export class Writer {
 			if (readerFromOK && (Writer.prototype.Buffered.call(b) == 0)) {
 				let [nn, __goscriptShadow5] = await $.pointerValue<Exclude<io.ReaderFrom, null>>(readerFrom).ReadFrom($.pointerValueOrNil(r)!)
 				$.pointerValue<Writer>(b).err = __goscriptShadow5
-				n = BigInt.asIntN(64, n + (nn))
+				n = $.int64Add(n, nn)
 				return [n, __goscriptShadow5]
 			}
 			let nr = 0
@@ -732,7 +732,7 @@ export class Writer {
 				return [n, io.ErrNoProgress]
 			}
 			$.pointerValue<Writer>(b).n = $.pointerValue<Writer>(b).n + (m)
-			n = BigInt.asIntN(64, n + ($.int64(m)))
+			n = $.int64Add(n, $.int64(m))
 			if (err != null) {
 				break
 			}
