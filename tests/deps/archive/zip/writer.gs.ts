@@ -469,7 +469,7 @@ export class Writer {
 		} else {
 			$.pointerValue<__goscript_struct.FileHeader>(fh).Flags = $.pointerValue<__goscript_struct.FileHeader>(fh).Flags | ($.uint(0x8, 16))
 
-			fw = (await (async () => { const __goscriptLiteralField0 = await crc322.NewIEEE(); return new fileWriter({zipw: $.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter"), compCount: new countWriter({w: $.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter")}), crc32: __goscriptLiteralField0}) })())
+			fw = (() => { const __goscriptLiteralField0 = crc322.NewIEEE(); return new fileWriter({zipw: $.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter"), compCount: new countWriter({w: $.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter")}), crc32: __goscriptLiteralField0}) })()
 			let comp = await Writer.prototype.compressor.call(w, $.uint($.pointerValue<__goscript_struct.FileHeader>(fh).Method, 16))
 			if (comp == null) {
 				return [null, __goscript_reader.ErrAlgorithm]

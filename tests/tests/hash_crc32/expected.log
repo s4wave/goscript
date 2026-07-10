@@ -1,0 +1,43 @@
+ieee 0 0
+ieee 1 1281784366
+ieee 7 1957566639
+ieee 8 3659234488
+ieee 9 1617297369
+ieee 15 141177151
+ieee 16 2618164968
+ieee 17 3359913462
+ieee 257 381815670
+castagnoli 0 0
+castagnoli 1 2260154298
+castagnoli 7 171738947
+castagnoli 8 39278963
+castagnoli 9 3269206258
+castagnoli 15 2298653240
+castagnoli 16 2218126845
+castagnoli 17 2693981631
+castagnoli 257 2230023278
+koopman 0 0
+koopman 1 1920733886
+koopman 7 2848839259
+koopman 8 1368054727
+koopman 9 2047961238
+koopman 15 838486769
+koopman 16 2408201292
+koopman 17 2262753145
+koopman 257 1777909871
+custom 0 0
+custom 1 314182153
+custom 7 3694808999
+custom 8 890566272
+custom 9 3294336628
+custom 15 2074379105
+custom 16 1100177991
+custom 17 3680853934
+custom 257 3879530084
+sum 7 22 194 11 118
+state 12 99 114 99 1
+invalid hash/crc32: invalid hash state identifier
+invalid hash/crc32: invalid hash state size
+invalid hash/crc32: tables do not match
+clone 109124693 3974029310
+reset 0 4 1

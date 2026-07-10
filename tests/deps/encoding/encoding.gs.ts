@@ -1,70 +1,64 @@
-import * as $ from "@goscript/builtin/index.ts"
+// Generated file based on encoding.go
+// Updated when compliance tests are re-run, DO NOT EDIT!
 
-export type BinaryAppender = null | {
-	// AppendBinary appends the binary representation of itself to the end of b
-	// (allocating a larger slice if necessary) and returns the updated slice.
-	//
-	// Implementations must not retain b, nor mutate any bytes within b[:len(b)].
-	AppendBinary(b: $.Bytes): [$.Bytes, $.GoError]
+import * as $ from "@goscript/builtin/index.js"
+
+export type BinaryMarshaler = {
+	MarshalBinary(): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>
 }
 
 $.registerInterfaceType(
-  'encoding.BinaryAppender',
-  null, // Zero value for interface is null
-  [{ name: "AppendBinary", args: [{ name: "b", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "byte" } } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "byte" } } }, { type: { kind: $.TypeKind.Interface, name: 'GoError', methods: [{ name: 'Error', args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: 'string' } }] }] } }] }]
+	"encoding.BinaryMarshaler",
+	null,
+	[{ name: "MarshalBinary", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }]
 );
 
-export type BinaryMarshaler = null | {
-	MarshalBinary(): [$.Bytes, $.GoError]
+export type BinaryUnmarshaler = {
+	UnmarshalBinary(data: $.Slice<number>): $.GoError | globalThis.Promise<$.GoError>
 }
 
 $.registerInterfaceType(
-  'encoding.BinaryMarshaler',
-  null, // Zero value for interface is null
-  [{ name: "MarshalBinary", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "byte" } } }, { type: { kind: $.TypeKind.Interface, name: 'GoError', methods: [{ name: 'Error', args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: 'string' } }] }] } }] }]
+	"encoding.BinaryUnmarshaler",
+	null,
+	[{ name: "UnmarshalBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }]
 );
 
-export type BinaryUnmarshaler = null | {
-	UnmarshalBinary(data: $.Bytes): $.GoError
+export type BinaryAppender = {
+	AppendBinary(b: $.Slice<number>): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>
 }
 
 $.registerInterfaceType(
-  'encoding.BinaryUnmarshaler',
-  null, // Zero value for interface is null
-  [{ name: "UnmarshalBinary", args: [{ name: "data", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "byte" } } }], returns: [{ type: { kind: $.TypeKind.Interface, name: 'GoError', methods: [{ name: 'Error', args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: 'string' } }] }] } }] }]
+	"encoding.BinaryAppender",
+	null,
+	[{ name: "AppendBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }]
 );
 
-export type TextAppender = null | {
-	// AppendText appends the textual representation of itself to the end of b
-	// (allocating a larger slice if necessary) and returns the updated slice.
-	//
-	// Implementations must not retain b, nor mutate any bytes within b[:len(b)].
-	AppendText(b: $.Bytes): [$.Bytes, $.GoError]
+export type TextMarshaler = {
+	MarshalText(): [$.Slice<number>, $.GoError]
 }
 
 $.registerInterfaceType(
-  'encoding.TextAppender',
-  null, // Zero value for interface is null
-  [{ name: "AppendText", args: [{ name: "b", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "byte" } } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "byte" } } }, { type: { kind: $.TypeKind.Interface, name: 'GoError', methods: [{ name: 'Error', args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: 'string' } }] }] } }] }]
+	"encoding.TextMarshaler",
+	null,
+	[{ name: "MarshalText", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }]
 );
 
-export type TextMarshaler = null | {
-	MarshalText(): [$.Bytes, $.GoError]
+export type TextUnmarshaler = {
+	UnmarshalText(text: $.Slice<number>): $.GoError
 }
 
 $.registerInterfaceType(
-  'encoding.TextMarshaler',
-  null, // Zero value for interface is null
-  [{ name: "MarshalText", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "byte" } } }, { type: { kind: $.TypeKind.Interface, name: 'GoError', methods: [{ name: 'Error', args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: 'string' } }] }] } }] }]
+	"encoding.TextUnmarshaler",
+	null,
+	[{ name: "UnmarshalText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }]
 );
 
-export type TextUnmarshaler = null | {
-	UnmarshalText(text: $.Bytes): $.GoError
+export type TextAppender = {
+	AppendText(b: $.Slice<number>): [$.Slice<number>, $.GoError]
 }
 
 $.registerInterfaceType(
-  'encoding.TextUnmarshaler',
-  null, // Zero value for interface is null
-  [{ name: "UnmarshalText", args: [{ name: "text", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "byte" } } }], returns: [{ type: { kind: $.TypeKind.Interface, name: 'GoError', methods: [{ name: 'Error', args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: 'string' } }] }] } }] }]
+	"encoding.TextAppender",
+	null,
+	[{ name: "AppendText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }]
 );
-

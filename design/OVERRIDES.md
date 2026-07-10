@@ -6,24 +6,22 @@ GoScript provides a package override system that allows hand-written TypeScript 
 
 ## Directory Structure
 
-Override packages are located in the `gs/` directory with the following structure:
+Override packages are located in the `gs/` directory. The directory path is
+the Go import path, and `index.ts` is the package entrypoint:
 
 ```
 gs/
-├── {package}/
-│   ├── {package}.ts      # Main TypeScript implementation
-│   ├── meta.json         # Metadata file with async methods and dependencies
-│   ├── parity.json       # Optional exported API parity ledger
-│   └── index.ts          # Export file
+└── hash/
+    └── crc32/
+        ├── index.ts       # TypeScript implementation or re-exports
+        ├── index.test.ts  # Package-local behavior tests
+        ├── meta.json      # Optional compiler metadata
+        └── parity.json    # Optional exported API parity ledger
 ```
 
-### Example: sync package
-```
-gs/sync/
-├── sync.ts               # TypeScript implementation of sync primitives
-├── meta.json             # Metadata defining which functions are async
-└── index.ts              # Exports from ./sync.js
-```
+The compiler discovers override packages from `index.ts`. Implementations may
+live directly in that file or be split into sibling modules and re-exported.
+Test files are not copied into compiler output.
 
 ## API Parity Ledgers
 
@@ -62,7 +60,7 @@ The metadata system allows defining which functions/methods are asynchronous, pa
 
 ### Metadata File Format
 
-Each override package includes a `meta.json` file that defines metadata:
+An override package may include a `meta.json` file that defines metadata:
 
 ```json
 {
@@ -214,16 +212,18 @@ import "sync"
 import * as sync from "@goscript/sync"
 ```
 
-### Package Export Structure
+### Package Entrypoint
 
-Each override package must have an `index.ts` file:
+Each override package must have an `index.ts` file. It may contain the
+implementation directly, as `gs/hash/crc32/index.ts` does, or re-export sibling
+modules:
 
 ```typescript
-// gs/sync/index.ts
-export * from "./sync.js"
+export * from './implementation.js'
 ```
 
-This allows the import system to resolve `@goscript/sync` to the TypeScript implementation.
+This allows the import system to resolve `@goscript/<package-path>` to the
+TypeScript implementation.
 
 ## Project Override Roots
 
@@ -251,39 +251,34 @@ code that should not be part of the generated JavaScript graph.
 
 ## Adding New Override Packages
 
-### Step 1: Create Package Directory
+### Step 1: Create the package entrypoint
 
-```bash
-mkdir gs/{package}
-```
+Create `gs/{package-path}/index.ts` and implement the exported Go surface. The
+directory name must match the complete Go import path.
 
-### Step 2: Implement TypeScript
+### Step 2: Add compiler metadata when needed
 
-Create `gs/{package}/{package}.ts` with the TypeScript implementation following the guidelines above.
-
-### Step 3: Create Metadata File
-
-Create `gs/{package}/meta.json`:
+Add `meta.json` only when the override has explicit copy dependencies or async
+function and method metadata:
 
 ```json
 {
   "dependencies": ["other-package-if-needed"],
   "asyncMethods": {
-    "SomeType.AsyncMethod": true,
-    "SomeType.SyncMethod": false
+    "SomeType.AsyncMethod": true
   }
 }
 ```
 
-### Step 4: Create Export File
+Imports from `@goscript/...` are discovered as copy dependencies automatically.
 
-Create `gs/{package}/index.ts`:
+### Step 3: Declare and test API parity
 
-```typescript
-export * from "./{package}.js"
-```
+Add a strict `parity.json` ledger for the package's exported Go symbols and a
+package-local `index.test.ts` behavior test. Add a compliance fixture when the
+contract must also be exercised through compiled Go.
 
-The compiler will automatically detect and use the package when it encounters imports of that package.
+The compiler automatically detects the override when the package is imported.
 
 ## Testing Override Packages
 
@@ -317,20 +312,23 @@ func main() {
 
 ### Running Tests
 
+Run the fixture by its category and directory name:
+
 ```bash
-go test -timeout 30s -run ^TestCompliance/package_import_{package}$ ./compiler
+go test -timeout 60s -run '^TestCompliance/core/hash_crc32$' ./compiler
 ```
 
-## Current Override Packages
+## Representative Override Packages
 
-| Package   | Status         | Description                                          |
-|-----------|----------------|------------------------------------------------------|
-| `sync`    | ✅ Implemented | Synchronization primitives (Mutex, WaitGroup, etc.) |
-| `unicode` | ✅ Implemented | Unicode character classification and conversion      |
-| `time`    | ✅ Implemented | Time and duration handling                           |
-| `errors`  | ✅ Implemented | Error creation and handling                          |
-| `context` | ✅ Implemented | Context for cancellation and timeouts                |
-| `slices`  | ✅ Implemented | Slice utility functions                              |
+| Package      | Description                                          |
+|--------------|------------------------------------------------------|
+| `sync`       | Synchronization primitives                           |
+| `unicode`    | Unicode character classification and conversion      |
+| `time`       | Time and duration handling                           |
+| `errors`     | Error creation and handling                          |
+| `context`    | Context cancellation and timeouts                    |
+| `slices`     | Slice utility functions                              |
+| `hash/crc32` | Typed-array slicing-by-eight CRC-32 implementation    |
 
 ## Benefits of Override System
 

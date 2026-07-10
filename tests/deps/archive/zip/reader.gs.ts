@@ -610,7 +610,7 @@ export class File {
 		if ($.pointerValue<File>(f).FileHeader.hasDataDescriptor()) {
 			desr = $.interfaceValue<io.Reader | null>(io.NewSectionReader($.pointerValueOrNil($.pointerValue<File>(f).zipr)!, $.int64Add(($.int64Add($.pointerValue<File>(f).headerOffset, bodyOffset)), size), 16n), "*io.SectionReader")
 		}
-		rc = $.interfaceValue<io.ReadCloser | null>((await (async () => { const __goscriptLiteralField1 = await crc32.NewIEEE(); return new checksumReader({rc: rc, hash: __goscriptLiteralField1, f: f, desr: desr}) })()), "*zip.checksumReader")
+		rc = $.interfaceValue<io.ReadCloser | null>((() => { const __goscriptLiteralField1 = crc32.NewIEEE(); return new checksumReader({rc: rc, hash: __goscriptLiteralField1, f: f, desr: desr}) })(), "*zip.checksumReader")
 		return [rc, null]
 	}
 
