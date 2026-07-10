@@ -85,14 +85,15 @@ func (r *Runner) Run(ctx context.Context, req *Request) (*Result, error) {
 	}
 
 	testGraphReq := &compiler.CompileRequest{
-		Patterns:            append([]string(nil), norm.Patterns...),
-		Dir:                 norm.Dir,
-		OutputPath:          norm.OutputRoot,
-		BuildFlags:          append([]string(nil), norm.BuildFlags...),
-		OverrideDirs:        append([]string(nil), norm.OverrideDirs...),
-		DependencyMode:      compiler.DependencyModeRequested,
-		RuntimeEmissionMode: compiler.RuntimeEmissionModeEmit,
-		Tests:               true,
+		Patterns:                  append([]string(nil), norm.Patterns...),
+		Dir:                       norm.Dir,
+		OutputPath:                norm.OutputRoot,
+		BuildFlags:                append([]string(nil), norm.BuildFlags...),
+		OverrideDirs:              append([]string(nil), norm.OverrideDirs...),
+		ProtobufTypeScriptBinding: req.ProtobufTypeScriptBinding,
+		DependencyMode:            compiler.DependencyModeRequested,
+		RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
+		Tests:                     true,
 	}
 	testGraph, loadDiagnostics := r.service.PackageGraphOwner().LoadTestGraph(ctx, testGraphReq)
 	result.Diagnostics = append(result.Diagnostics, loadDiagnostics...)
@@ -627,15 +628,16 @@ func (r *Runner) compileTestImports(
 			continue
 		}
 		compileReq := &compiler.CompileRequest{
-			Patterns:            []string{importPath},
-			Dir:                 req.Dir,
-			OutputPath:          outputRoot,
-			BuildFlags:          append([]string(nil), req.BuildFlags...),
-			OverrideDirs:        append([]string(nil), req.OverrideDirs...),
-			DependencyMode:      compiler.DependencyModeAll,
-			RuntimeEmissionMode: compiler.RuntimeEmissionModeEmit,
-			Tests:               false,
-			AllDependencies:     true,
+			Patterns:                  []string{importPath},
+			Dir:                       req.Dir,
+			OutputPath:                outputRoot,
+			BuildFlags:                append([]string(nil), req.BuildFlags...),
+			OverrideDirs:              append([]string(nil), req.OverrideDirs...),
+			ProtobufTypeScriptBinding: req.ProtobufTypeScriptBinding,
+			DependencyMode:            compiler.DependencyModeAll,
+			RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
+			Tests:                     false,
+			AllDependencies:           true,
 		}
 		compileResult, compileErr := r.service.Compile(ctx, compileReq)
 		if compileResult != nil {
@@ -669,15 +671,16 @@ func (r *Runner) compilePackageBatch(ctx context.Context, req *normalizedRequest
 		return true
 	}
 	testCompileReq := &compiler.CompileRequest{
-		Patterns:            packagePaths,
-		Dir:                 req.Dir,
-		OutputPath:          req.OutputRoot,
-		BuildFlags:          append([]string(nil), req.BuildFlags...),
-		OverrideDirs:        append([]string(nil), req.OverrideDirs...),
-		DependencyMode:      compiler.DependencyModeAll,
-		RuntimeEmissionMode: compiler.RuntimeEmissionModeEmit,
-		Tests:               true,
-		AllDependencies:     true,
+		Patterns:                  packagePaths,
+		Dir:                       req.Dir,
+		OutputPath:                req.OutputRoot,
+		BuildFlags:                append([]string(nil), req.BuildFlags...),
+		OverrideDirs:              append([]string(nil), req.OverrideDirs...),
+		ProtobufTypeScriptBinding: req.ProtobufTypeScriptBinding,
+		DependencyMode:            compiler.DependencyModeAll,
+		RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
+		Tests:                     true,
+		AllDependencies:           true,
 	}
 	testCompileResult, testCompileErr := r.service.Compile(ctx, testCompileReq)
 	if testCompileErr != nil {
@@ -705,15 +708,16 @@ func (r *Runner) compilePackageOutputsIndividually(ctx context.Context, req *nor
 		outputRoot := packageOutputRoot(req, idx)
 		outputRoots[idx] = outputRoot
 		compileReq := &compiler.CompileRequest{
-			Patterns:            []string{result.Packages[idx].PackagePath},
-			Dir:                 req.Dir,
-			OutputPath:          outputRoot,
-			BuildFlags:          append([]string(nil), req.BuildFlags...),
-			OverrideDirs:        append([]string(nil), req.OverrideDirs...),
-			DependencyMode:      compiler.DependencyModeAll,
-			RuntimeEmissionMode: compiler.RuntimeEmissionModeEmit,
-			Tests:               false,
-			AllDependencies:     true,
+			Patterns:                  []string{result.Packages[idx].PackagePath},
+			Dir:                       req.Dir,
+			OutputPath:                outputRoot,
+			BuildFlags:                append([]string(nil), req.BuildFlags...),
+			OverrideDirs:              append([]string(nil), req.OverrideDirs...),
+			ProtobufTypeScriptBinding: req.ProtobufTypeScriptBinding,
+			DependencyMode:            compiler.DependencyModeAll,
+			RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
+			Tests:                     false,
+			AllDependencies:           true,
 		}
 		if compileResult, compileErr := r.service.Compile(ctx, compileReq); compileErr != nil {
 			result.Packages[idx].Action = ActionFail
@@ -732,15 +736,16 @@ func (r *Runner) compilePackageOutputsIndividually(ctx context.Context, req *nor
 			continue
 		}
 		testCompileReq := &compiler.CompileRequest{
-			Patterns:            []string{result.Packages[idx].PackagePath},
-			Dir:                 req.Dir,
-			OutputPath:          outputRoot,
-			BuildFlags:          append([]string(nil), req.BuildFlags...),
-			OverrideDirs:        append([]string(nil), req.OverrideDirs...),
-			DependencyMode:      compiler.DependencyModeAll,
-			RuntimeEmissionMode: compiler.RuntimeEmissionModeEmit,
-			Tests:               true,
-			AllDependencies:     true,
+			Patterns:                  []string{result.Packages[idx].PackagePath},
+			Dir:                       req.Dir,
+			OutputPath:                outputRoot,
+			BuildFlags:                append([]string(nil), req.BuildFlags...),
+			OverrideDirs:              append([]string(nil), req.OverrideDirs...),
+			ProtobufTypeScriptBinding: req.ProtobufTypeScriptBinding,
+			DependencyMode:            compiler.DependencyModeAll,
+			RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
+			Tests:                     true,
+			AllDependencies:           true,
 		}
 		if compileResult, compileErr := r.service.Compile(ctx, testCompileReq); compileErr != nil {
 			result.Packages[idx].Action = ActionFail

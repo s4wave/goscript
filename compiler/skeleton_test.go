@@ -748,6 +748,113 @@ func TestCompilePackagesLowersWideIntegerConstantsForUint64Targets(t *testing.T)
 	}
 }
 
+func TestCompilePackagesRoutesUint64BinaryOpsThroughHelpers(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/wideops\n\ngo 1.25.3\n",
+		"main.go": strings.Join([]string{
+			"package main",
+			"type stats struct {",
+			"  heap uint64",
+			"  stack uint64",
+			"}",
+			"func memory(s stats) uint64 {",
+			"  return s.heap + s.stack",
+			"}",
+			"func fold(ret uint64) int32 {",
+			"  ret |= ret >> 32",
+			"  return int32(ret & 1)",
+			"}",
+			"func diff(xVal, yVal uint64) uint64 {",
+			"  return yVal - xVal",
+			"}",
+			"",
+		}, "\n"),
+	})
+	outputDir := filepath.Join(t.TempDir(), "output")
+	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir}, nil, nil)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatal(err.Error())
+	}
+	content, err := os.ReadFile(filepath.Join(outputDir, "@goscript", "example.test", "wideops", "main.gs.ts"))
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	text := string(content)
+	for _, want := range []string{
+		`return $.uint64Add(s.heap, s.stack)`,
+		`ret = $.uint64Or(ret, $.uint64Shr(ret, 32n))`,
+		`return $.int($.int($.uint64And(ret, 1n), 32), 32)`,
+		`return $.uint64Sub(yVal, xVal)`,
+	} {
+		if !strings.Contains(text, want) {
+			t.Fatalf("missing helper-routed wide integer expression %q in generated output:\n%s", want, text)
+		}
+	}
+}
+
+func TestCompilePackagesKeepsGeneratedProtobufVTMethodsSync(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/protosync\n\ngo 1.25.3\n",
+		"message.pb.go": strings.Join([]string{
+			"package protosync",
+			"type isMsg_Value interface {",
+			"  CloneOneofVT() isMsg_Value",
+			"  EqualVT(isMsg_Value) bool",
+			"}",
+			"type Msg struct { Value isMsg_Value }",
+			"func (m *Msg) CloneVT() *Msg {",
+			"  r := &Msg{}",
+			"  if m.Value != nil {",
+			"    r.Value = m.Value.(interface{ CloneOneofVT() isMsg_Value }).CloneOneofVT()",
+			"  }",
+			"  return r",
+			"}",
+			"func (m *Msg) EqualVT(other *Msg) bool {",
+			"  if m.Value != nil {",
+			"    return m.Value.(interface{ EqualVT(isMsg_Value) bool }).EqualVT(other.Value)",
+			"  }",
+			"  return other == nil || other.Value == nil",
+			"}",
+			"type Msg_Int struct { Int int64 }",
+			"func (m *Msg_Int) CloneOneofVT() isMsg_Value { return m.CloneVT() }",
+			"func (m *Msg_Int) CloneVT() *Msg_Int { return &Msg_Int{Int: m.Int} }",
+			"func (m *Msg_Int) EqualVT(other isMsg_Value) bool {",
+			"  o, ok := other.(*Msg_Int)",
+			"  return ok && m.Int == o.Int",
+			"}",
+			"",
+		}, "\n"),
+	})
+	outputDir := filepath.Join(t.TempDir(), "output")
+	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir}, nil, nil)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatal(err.Error())
+	}
+	content, err := os.ReadFile(filepath.Join(outputDir, "@goscript", "example.test", "protosync", "message.pb.gs.ts"))
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	text := string(content)
+	for _, bad := range []string{
+		"public async CloneVT",
+		"public async EqualVT",
+		"await $.pointerValue<Exclude<isMsg_Value",
+		"await $.pointerValue<any>",
+	} {
+		if strings.Contains(text, bad) {
+			t.Fatalf("generated protobuf VT method should stay synchronous; found %q in:\n%s", bad, text)
+		}
+	}
+}
+
 func TestLowerWideRelationalConstants(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod": "module example.test/widerel\n\ngo 1.25.3\n",

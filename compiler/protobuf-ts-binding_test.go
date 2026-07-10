@@ -191,24 +191,81 @@ export const Foo = {} as any
 
 func TestProtobufTypeScriptBindingEmitsMetadataForPreservedOneofFiles(t *testing.T) {
 	dir := t.TempDir()
-	writeTestFile(t, dir, "go.mod", "module example.test/oneofpb\n\ngo 1.25\n")
-	writeTestFile(t, dir, "foo.pb.go", "package oneofpb\n\n"+
-		"type Inner struct {\n"+
-		"\tName string `protobuf:\"bytes,1,opt,name=name,proto3\" json:\"name,omitempty\"`\n"+
-		"}\n\n"+
-		"type Wrapper struct {\n"+
-		"\tInner *Inner `protobuf:\"bytes,1,opt,name=inner,proto3\" json:\"inner,omitempty\"`\n"+
-		"\tChoice isWrapper_Choice `protobuf_oneof:\"choice\"`\n"+
-		"}\n\n"+
-		"type isWrapper_Choice interface { isWrapper_Choice() }\n\n"+
-		"type Wrapper_StringValue struct {\n"+
-		"\tStringValue string `protobuf:\"bytes,2,opt,name=string_value,json=stringValue,proto3,oneof\"`\n"+
-		"}\n\n"+
-		"func (*Wrapper_StringValue) isWrapper_Choice() {}\n\n"+
-		"type Wrapper_InnerValue struct {\n"+
-		"\tInnerValue *Inner `protobuf:\"bytes,3,opt,name=inner_value,json=innerValue,proto3,oneof\"`\n"+
-		"}\n\n"+
-		"func (*Wrapper_InnerValue) isWrapper_Choice() {}\n")
+	writeTestFile(t, dir, "go.mod", `module example.test/oneofpb
+
+go 1.25
+
+require github.com/aperturerobotics/protobuf-go-lite v0.0.0
+
+replace github.com/aperturerobotics/protobuf-go-lite => ./protobuf-go-lite
+`)
+	writeTestFile(t, dir, "protobuf-go-lite/go.mod", `module github.com/aperturerobotics/protobuf-go-lite
+
+go 1.25
+`)
+	writeTestFile(t, dir, "protobuf-go-lite/protobuf-go-lite.go", `package protobuf_go_lite
+
+type CloneMessage interface {
+	CloneMessageVT() CloneMessage
+}
+`)
+	writeTestFile(t, dir, "foo.pb.go", `package oneofpb
+
+import protobuf_go_lite "github.com/aperturerobotics/protobuf-go-lite"
+
+type Inner struct {
+	Name string `+"`"+`protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`+"`"+`
+}
+
+func (x *Inner) CloneVT() *Inner {
+	println("inline Inner CloneVT marker")
+	return &Inner{Name: x.Name}
+}
+
+type Wrapper struct {
+	Inner *Inner `+"`"+`protobuf:"bytes,1,opt,name=inner,proto3" json:"inner,omitempty"`+"`"+`
+	Choice isWrapper_Choice `+"`"+`protobuf_oneof:"choice"`+"`"+`
+}
+
+func (x *Wrapper) CloneMessageVT() protobuf_go_lite.CloneMessage {
+	println("inline Wrapper CloneMessageVT marker")
+	return x.CloneVT()
+}
+
+func (x *Wrapper) CloneVT() *Wrapper {
+	println("inline Wrapper CloneVT marker")
+	return &Wrapper{Inner: x.Inner}
+}
+
+func (x *Wrapper) EqualVT(other *Wrapper) bool {
+	println("inline Wrapper EqualVT marker")
+	return other != nil && x.Inner == other.Inner
+}
+
+func (x *Wrapper) SizeVT() int {
+	println("inline Wrapper SizeVT marker")
+	return 0
+}
+
+type isWrapper_Choice interface { isWrapper_Choice() }
+
+type Wrapper_StringValue struct {
+	StringValue string `+"`"+`protobuf:"bytes,2,opt,name=string_value,json=stringValue,proto3,oneof"`+"`"+`
+}
+
+func (*Wrapper_StringValue) isWrapper_Choice() {}
+
+func (x *Wrapper_StringValue) CloneVT() *Wrapper_StringValue {
+	println("inline branch CloneVT marker")
+	return &Wrapper_StringValue{StringValue: x.StringValue}
+}
+
+type Wrapper_InnerValue struct {
+	InnerValue *Inner `+"`"+`protobuf:"bytes,3,opt,name=inner_value,json=innerValue,proto3,oneof"`+"`"+`
+}
+
+func (*Wrapper_InnerValue) isWrapper_Choice() {}
+`)
 	writeTestFile(t, dir, "foo.pb.ts", `export interface Inner {
   name?: string
 }
@@ -238,6 +295,22 @@ export const Wrapper = {} as any
 		!strings.Contains(binding, `(Wrapper as any).__protobufTypeScriptFields = {"inner": Inner, "innerValue": Inner};`) ||
 		!strings.Contains(binding, `(Wrapper as any).__protobufTypeScriptOneofFields = {"choice": {"innerValue": Wrapper_InnerValue, "stringValue": Wrapper_StringValue}};`) {
 		t.Fatalf("oneof-preserved protobuf file should still expose TypeScript metadata, got:\n%s", binding)
+	}
+	wantSnippets := []string{
+		`protobuf_go_lite.CloneBoundMessage(Wrapper, this)`,
+		`protobuf_go_lite.EqualBoundMessage(Wrapper, this, other)`,
+		`protobuf_go_lite.SizeBoundMessageVT(Wrapper, this)`,
+	}
+	for _, snippet := range wantSnippets {
+		if !strings.Contains(binding, snippet) {
+			t.Fatalf("oneof-preserved protobuf file should still rewrite generated method %q, got:\n%s", snippet, binding)
+		}
+	}
+	if strings.Contains(binding, "inline Wrapper") {
+		t.Fatalf("oneof-preserved protobuf file should not preserve parent generated method bodies, got:\n%s", binding)
+	}
+	if !strings.Contains(binding, "inline branch CloneVT marker") {
+		t.Fatalf("oneof branch wrapper should preserve generated method body, got:\n%s", binding)
 	}
 	if strings.Contains(binding, `__protobuf_ts.Wrapper_StringValue`) {
 		t.Fatalf("oneof wrapper structs should not reference missing TypeScript exports, got:\n%s", binding)

@@ -36,6 +36,7 @@ func newTestCommand() *cli.Command {
 	var cpuProfile string
 	var memProfile string
 	var incrementalTypeCheck bool
+	var protobufTypeScriptBinding bool
 
 	return &cli.Command{
 		Name:     "test",
@@ -43,21 +44,22 @@ func newTestCommand() *cli.Command {
 		Usage:    "compile and run Go package tests through GoScript",
 		Action: func(c *cli.Context) (err error) {
 			req := &gotest.Request{
-				Dir:                  dir,
-				Patterns:             c.Args().Slice(),
-				BuildTags:            tags.Value(),
-				OverrideDirs:         overrideDirs.Value(),
-				Run:                  run,
-				Count:                count,
-				Short:                short,
-				Timeout:              timeout,
-				Verbose:              verbose,
-				WorkDir:              workDir,
-				OutputRoot:           outputRoot,
-				Parallelism:          parallelism,
-				RuntimeBackend:       testRuntimeBackend(browser),
-				RuntimeGroups:        runtimeGroups,
-				IncrementalTypeCheck: incrementalTypeCheck,
+				Dir:                       dir,
+				Patterns:                  c.Args().Slice(),
+				BuildTags:                 tags.Value(),
+				OverrideDirs:              overrideDirs.Value(),
+				Run:                       run,
+				Count:                     count,
+				Short:                     short,
+				Timeout:                   timeout,
+				Verbose:                   verbose,
+				WorkDir:                   workDir,
+				OutputRoot:                outputRoot,
+				Parallelism:               parallelism,
+				RuntimeBackend:            testRuntimeBackend(browser),
+				RuntimeGroups:             runtimeGroups,
+				IncrementalTypeCheck:      incrementalTypeCheck,
+				ProtobufTypeScriptBinding: protobufTypeScriptBinding,
 			}
 			stopProfile, err := startCPUProfile(cpuProfile)
 			if err != nil {
@@ -153,6 +155,11 @@ func newTestCommand() *cli.Command {
 				Name:        "browser",
 				Usage:       "run package runtimes in a Chromium browser",
 				Destination: &browser,
+			},
+			&cli.BoolFlag{
+				Name:        "protobuf-ts-binding",
+				Usage:       "bind generated .pb.go files to sibling .pb.ts files",
+				Destination: &protobufTypeScriptBinding,
 			},
 			&cli.BoolFlag{
 				Name:        "incremental-typecheck",

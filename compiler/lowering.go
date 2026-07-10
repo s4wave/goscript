@@ -147,7 +147,7 @@ func (o *LoweringOwner) lowerPackage(
 			continue
 		}
 		if binding, ok := protobufBindings[sourcePath]; ok {
-			protobufAdapter := !binding.hasOneof && !strings.HasSuffix(filepath.Base(binding.sourcePath), "_srpc.pb.go")
+			protobufAdapter := !strings.HasSuffix(filepath.Base(binding.sourcePath), "_srpc.pb.go")
 			loweredFile, fileDiagnostics := o.lowerFile(
 				model,
 				semPkg,
@@ -1166,43 +1166,44 @@ func safeParamName(param *types.Var, idx int) string {
 }
 
 type lowerFileContext struct {
-	model                     *SemanticModel
-	semPkg                    *semanticPackage
-	file                      *ast.File
-	importAliases             map[string]string
-	importPaths               map[string]string
-	importNames               map[string]string
-	importObjects             map[*types.PkgName]string
-	sourcePath                string
-	localAliases              map[types.Object]string
-	lazyPackageVars           map[types.Object]bool
-	lazyPackageVarsByPkg      map[string]map[types.Object]bool
-	asyncLazyFunctionCache    map[*types.Func]bool
-	asyncLazyFunctionVisiting map[*types.Func]bool
-	identAliases              map[types.Object]string
-	identAliasRefs            map[types.Object]bool
-	tempNames                 *tempNameOwner
-	signature                 *types.Signature
-	typeParams                map[string]bool
-	staticTypeParams          map[string]bool
-	asyncFunction             bool
-	functionTypeDepth         int
-	deferState                *loweredDeferState
-	rangeBranch               *loweredRangeBranch
-	rangeBreak                bool
-	rangeContinue             bool
-	gotoLabels                map[string]bool
-	forwardGotos              map[string]bool
-	gotoStateLabels           map[string]bool
-	gotoStateVar              string
-	gotoStateLoop             string
-	functionScopedDecls       bool
-	loopLabel                 string
-	switchBreak               bool
-	topLevel                  bool
-	protobufTSAdapter         bool
-	trimTypeInfo              bool
-	displayRoot               string
+	model                         *SemanticModel
+	semPkg                        *semanticPackage
+	file                          *ast.File
+	importAliases                 map[string]string
+	importPaths                   map[string]string
+	importNames                   map[string]string
+	importObjects                 map[*types.PkgName]string
+	sourcePath                    string
+	localAliases                  map[types.Object]string
+	lazyPackageVars               map[types.Object]bool
+	lazyPackageVarsByPkg          map[string]map[types.Object]bool
+	asyncLazyFunctionCache        map[*types.Func]bool
+	asyncLazyFunctionVisiting     map[*types.Func]bool
+	identAliases                  map[types.Object]string
+	identAliasRefs                map[types.Object]bool
+	tempNames                     *tempNameOwner
+	signature                     *types.Signature
+	typeParams                    map[string]bool
+	staticTypeParams              map[string]bool
+	asyncFunction                 bool
+	protobufGeneratedSyncFunction bool
+	functionTypeDepth             int
+	deferState                    *loweredDeferState
+	rangeBranch                   *loweredRangeBranch
+	rangeBreak                    bool
+	rangeContinue                 bool
+	gotoLabels                    map[string]bool
+	forwardGotos                  map[string]bool
+	gotoStateLabels               map[string]bool
+	gotoStateVar                  string
+	gotoStateLoop                 string
+	functionScopedDecls           bool
+	loopLabel                     string
+	switchBreak                   bool
+	topLevel                      bool
+	protobufTSAdapter             bool
+	trimTypeInfo                  bool
+	displayRoot                   string
 }
 
 func (ctx lowerFileContext) diagnosticPosition(pos token.Pos) *DiagnosticPosition {
@@ -3222,6 +3223,7 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 		methodSourcePath := sourcePos(ctx.semPkg.source, methodDecl.Pos()).file
 		if ctx.protobufTSAdapter &&
 			methodSourcePath == ctx.sourcePath &&
+			!protobufTypeScriptAdapterOneofBranch(semType) &&
 			protobufTypeScriptBindingReplacesMethodName(methodDecl.Name.Name) &&
 			!(lowered.protobufPreserveJSON && protobufTypeScriptBindingJSONMethodName(methodDecl.Name.Name)) {
 			bodyless := *methodDecl
@@ -3242,6 +3244,22 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 		lowered.methods = append(lowered.methods, methods...)
 	}
 	return lowered, diagnostics
+}
+
+func protobufTypeScriptAdapterOneofBranch(semType *semanticType) bool {
+	if semType == nil {
+		return false
+	}
+	branch := false
+	for _, field := range semType.fields {
+		if strings.Contains(field.tag, "protobuf_oneof") {
+			return false
+		}
+		if strings.Contains(field.tag, "oneof") {
+			branch = true
+		}
+	}
+	return branch
 }
 
 func (o *LoweringOwner) protobufTypeScriptAdapterPreserveJSON(
@@ -3540,7 +3558,11 @@ func (o *LoweringOwner) lowerNamedReceiverMethodDecl(
 	if signature == nil || signature.Recv() == nil {
 		return nil, nil
 	}
+	protobufSync := protobufGeneratedSyncDecl(ctx, decl)
 	async := o.functionAsync(ctx, fnObj)
+	if protobufSync {
+		async = false
+	}
 	functionCtx := ctx.withSignature(signature)
 	resultCtx := functionCtx.withAsyncFunction(async)
 	result := o.tsSignatureResultFor(resultCtx, signature)
@@ -3579,7 +3601,7 @@ func (o *LoweringOwner) lowerNamedReceiverMethodDecl(
 		lowered.params, lowered.paramBindings = o.appendLoweredParam(ctx, lowered.params, lowered.paramBindings, param, idx, decl.Body == nil || async)
 	}
 	if decl.Body != nil {
-		bodyCtx := ctx.withSignature(signature).withAsyncFunction(async).withDeferState(deferState)
+		bodyCtx := ctx.withSignature(signature).withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState)
 		body, diagnostics := o.lowerBlock(bodyCtx, decl.Body)
 		lowered.body = body
 		if deferState.used {
@@ -3609,7 +3631,11 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 	if signature == nil {
 		return nil, nil
 	}
+	protobufSync := protobufGeneratedSyncDecl(ctx, decl)
 	async := o.functionAsync(ctx, fnObj)
+	if protobufSync {
+		async = false
+	}
 	if decl.Name.Name == "main" {
 		async = true
 	}
@@ -3675,7 +3701,7 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 		lowered.params, lowered.paramBindings = o.appendLoweredParam(functionCtx, lowered.params, lowered.paramBindings, param, idx, decl.Body == nil || async)
 	}
 	if decl.Body != nil {
-		bodyCtx := functionCtx.withAsyncFunction(async).withDeferState(deferState)
+		bodyCtx := functionCtx.withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState)
 		body, diagnostics := o.lowerBlock(bodyCtx, decl.Body)
 		lowered.body = body
 		if deferState.used {
@@ -3862,6 +3888,11 @@ func (ctx lowerFileContext) withSignature(signature *types.Signature) lowerFileC
 
 func (ctx lowerFileContext) withAsyncFunction(async bool) lowerFileContext {
 	ctx.asyncFunction = async
+	return ctx
+}
+
+func (ctx lowerFileContext) withProtobufGeneratedSyncFunction(sync bool) lowerFileContext {
+	ctx.protobufGeneratedSyncFunction = sync
 	return ctx
 }
 
@@ -8996,6 +9027,9 @@ func (o *LoweringOwner) lowerWideIntegerBinaryExpr(ctx lowerFileContext, expr *a
 		isFixedSignedWideIntegerType(ctx.semPkg.source.TypesInfo.TypeOf(expr.X))
 	left = lowerWideIntegerOperand(ctx, expr.X, left)
 	right = lowerWideIntegerOperand(ctx, expr.Y, right)
+	// Wide helpers coerce both operands before using JS bigint operators. Even
+	// int64/uint64 results route through them because overrides and generated
+	// fields can present number-typed operands for Go wide-integer expressions.
 	wrap := func(call string) string {
 		return coerceWideHelperResult(o.runtimeOwner, resultType, call)
 	}
@@ -12870,8 +12904,33 @@ func selectorUsesGeneratedPackage(ctx lowerFileContext, expr *ast.SelectorExpr) 
 	return ok
 }
 
+func protobufGeneratedSyncDecl(ctx lowerFileContext, decl *ast.FuncDecl) bool {
+	if decl == nil || ctx.semPkg == nil || ctx.semPkg.source == nil || !protobufTypeScriptBindingReplacesMethodName(decl.Name.Name) {
+		return false
+	}
+	return strings.HasSuffix(sourcePos(ctx.semPkg.source, decl.Pos()).file, ".pb.go")
+}
+
+func protobufGeneratedSyncMethod(ctx lowerFileContext, fn *types.Func) bool {
+	if fn == nil || fn.Pkg() == nil || ctx.model == nil || !protobufTypeScriptBindingReplacesMethodName(fn.Name()) {
+		return false
+	}
+	semPkg := ctx.model.packages[fn.Pkg().Path()]
+	if semPkg == nil || semPkg.source == nil {
+		return false
+	}
+	decl := functionDeclForObject(semPkg, fn)
+	if decl == nil {
+		return false
+	}
+	return strings.HasSuffix(sourcePos(semPkg.source, decl.Pos()).file, ".pb.go")
+}
+
 func (o *LoweringOwner) functionAsync(ctx lowerFileContext, fn *types.Func) bool {
 	if fn == nil || ctx.model == nil {
+		return false
+	}
+	if protobufGeneratedSyncMethod(ctx, fn) {
 		return false
 	}
 	if ctx.model.functionAsync(fn) {
@@ -12989,18 +13048,26 @@ func (o *LoweringOwner) callNeedsAwait(ctx lowerFileContext, fun ast.Expr) bool 
 			if ctx.semPkg == nil || ctx.semPkg.source == nil {
 				return false
 			}
-			return o.functionAsync(ctx, calledFunction(ctx.semPkg.source, fun)) ||
+			called := calledFunction(ctx.semPkg.source, fun)
+			if ctx.protobufGeneratedSyncFunction && called != nil && protobufTypeScriptBindingReplacesMethodName(called.Name()) {
+				return false
+			}
+			return o.functionAsync(ctx, called) ||
 				o.overrideCallNeedsAwait(ctx, fun) ||
-				callUsesFunctionValue(ctx.semPkg.source, fun) ||
+				(!ctx.protobufGeneratedSyncFunction && callUsesFunctionValue(ctx.semPkg.source, fun)) ||
 				(ctx.asyncFunction && callUsesInterfaceMethod(ctx.semPkg.source, fun)) ||
 				(ctx.asyncFunction && callUsesFunctionIdentifier(ctx.semPkg.source, fun))
 		}
 		if ctx.semPkg == nil || ctx.semPkg.source == nil {
 			return false
 		}
-		return o.functionAsync(ctx, calledFunction(ctx.semPkg.source, fun)) ||
+		called := calledFunction(ctx.semPkg.source, fun)
+		if ctx.protobufGeneratedSyncFunction && called != nil && protobufTypeScriptBindingReplacesMethodName(called.Name()) {
+			return false
+		}
+		return o.functionAsync(ctx, called) ||
 			o.overrideCallNeedsAwait(ctx, fun) ||
-			callUsesFunctionValue(ctx.semPkg.source, fun) ||
+			(!ctx.protobufGeneratedSyncFunction && callUsesFunctionValue(ctx.semPkg.source, fun)) ||
 			(ctx.asyncFunction && callUsesInterfaceMethod(ctx.semPkg.source, fun)) ||
 			(ctx.asyncFunction && callUsesFunctionIdentifier(ctx.semPkg.source, fun))
 	}
@@ -13047,9 +13114,13 @@ func (o *LoweringOwner) overrideCallNeedsAwait(ctx lowerFileContext, fun ast.Exp
 	if o.overrideOwner == nil || ctx.semPkg == nil || ctx.semPkg.source == nil {
 		return false
 	}
-	if fn := calledFunction(ctx.semPkg.source, fun); fn != nil && fn.Pkg() != nil &&
-		o.overrideFacts().IsFunctionAsync(fn.Pkg().Path(), fn.Name()) {
-		return true
+	if fn := calledFunction(ctx.semPkg.source, fun); fn != nil && fn.Pkg() != nil {
+		if protobufGeneratedSyncMethod(ctx, fn) {
+			return false
+		}
+		if o.overrideFacts().IsFunctionAsync(fn.Pkg().Path(), fn.Name()) {
+			return true
+		}
 	}
 	selector, ok := fun.(*ast.SelectorExpr)
 	if !ok {
@@ -13061,6 +13132,9 @@ func (o *LoweringOwner) overrideCallNeedsAwait(ctx lowerFileContext, fun ast.Exp
 	}
 	method, _ := selection.Obj().(*types.Func)
 	if method == nil {
+		return false
+	}
+	if protobufGeneratedSyncMethod(ctx, method) {
 		return false
 	}
 	named := selectedReceiverNamedType(ctx.semPkg.source, selector, selection)

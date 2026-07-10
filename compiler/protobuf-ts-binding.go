@@ -306,17 +306,21 @@ func rewriteProtobufTypeScriptBindingFile(file *loweredFile, binding protobufTyp
 		sideEffect: true,
 	})
 	oneofCases := protobufTypeScriptBindingOneofCases(file)
+	oneofBranches := make(map[string]bool)
+	for _, cases := range oneofCases {
+		for _, oneofCase := range cases {
+			oneofBranches[oneofCase.branchCtor] = true
+		}
+	}
 	var setupDecls []loweredDecl
 	for _, decl := range file.decls {
 		if decl.structType == nil {
 			continue
 		}
-		if protobufTypeScriptBindingSyntheticMapEntry(decl.structType.name) {
+		if protobufTypeScriptBindingSyntheticMapEntry(decl.structType.name) || oneofBranches[decl.structType.name] {
 			continue
 		}
-		if !binding.hasOneof {
-			rewriteProtobufTypeScriptBindingStruct(decl.structType, binding.sourcePath)
-		}
+		rewriteProtobufTypeScriptBindingStruct(decl.structType, binding.sourcePath)
 		messageName, ok := binding.messageNames[decl.structType.name]
 		if !ok {
 			continue
@@ -550,6 +554,7 @@ func protobufTypeScriptBindingJSONMethodName(name string) bool {
 func protobufTypeScriptBindingReplacesMethodName(name string) bool {
 	switch name {
 	case "CloneMessageVT",
+		"CloneOneofVT",
 		"CloneVT",
 		"EqualVT",
 		"MarshalJSON",

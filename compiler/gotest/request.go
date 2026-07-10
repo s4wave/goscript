@@ -20,6 +20,8 @@ type Request struct {
 	BuildTags []string
 	// OverrideDirs are additional GoScript override roots.
 	OverrideDirs []string
+	// ProtobufTypeScriptBinding binds .pb.go files to sibling .pb.ts files during compilation.
+	ProtobufTypeScriptBinding bool
 	// Run is the optional Go test name regexp.
 	Run string
 	// Count is the number of times to run matched tests.
@@ -47,22 +49,23 @@ type Request struct {
 }
 
 type normalizedRequest struct {
-	Dir                  string
-	Patterns             []string
-	BuildFlags           []string
-	OverrideDirs         []string
-	Run                  string
-	Count                int
-	Short                bool
-	Timeout              time.Duration
-	Verbose              bool
-	PanicOnExit0         bool
-	WorkDir              string
-	OutputRoot           string
-	Parallelism          int
-	RuntimeBackend       RuntimeBackend
-	RuntimeGroups        bool
-	IncrementalTypeCheck bool
+	Dir                       string
+	Patterns                  []string
+	BuildFlags                []string
+	OverrideDirs              []string
+	ProtobufTypeScriptBinding bool
+	Run                       string
+	Count                     int
+	Short                     bool
+	Timeout                   time.Duration
+	Verbose                   bool
+	PanicOnExit0              bool
+	WorkDir                   string
+	OutputRoot                string
+	Parallelism               int
+	RuntimeBackend            RuntimeBackend
+	RuntimeGroups             bool
+	IncrementalTypeCheck      bool
 }
 
 // RuntimeBackend selects the JavaScript host used for package runtime tests.
@@ -161,22 +164,23 @@ func (r *Request) normalize() (*normalizedRequest, error) {
 	}
 
 	return &normalizedRequest{
-		Dir:                  absDir,
-		Patterns:             patterns,
-		BuildFlags:           buildFlags,
-		OverrideDirs:         overrideDirs,
-		Run:                  strings.TrimSpace(r.Run),
-		Count:                count,
-		Short:                r.Short,
-		Timeout:              r.Timeout,
-		Verbose:              r.Verbose,
-		PanicOnExit0:         r.PanicOnExit0,
-		WorkDir:              workDir,
-		OutputRoot:           outputRoot,
-		Parallelism:          parallelism,
-		RuntimeBackend:       runtimeBackend,
-		RuntimeGroups:        r.RuntimeGroups,
-		IncrementalTypeCheck: r.IncrementalTypeCheck,
+		Dir:                       absDir,
+		Patterns:                  patterns,
+		BuildFlags:                buildFlags,
+		OverrideDirs:              overrideDirs,
+		ProtobufTypeScriptBinding: r.ProtobufTypeScriptBinding,
+		Run:                       strings.TrimSpace(r.Run),
+		Count:                     count,
+		Short:                     r.Short,
+		Timeout:                   r.Timeout,
+		Verbose:                   r.Verbose,
+		PanicOnExit0:              r.PanicOnExit0,
+		WorkDir:                   workDir,
+		OutputRoot:                outputRoot,
+		Parallelism:               parallelism,
+		RuntimeBackend:            runtimeBackend,
+		RuntimeGroups:             r.RuntimeGroups,
+		IncrementalTypeCheck:      r.IncrementalTypeCheck,
 	}, nil
 }
 
