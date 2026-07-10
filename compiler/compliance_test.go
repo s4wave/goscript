@@ -353,7 +353,6 @@ var expectedV2ComplianceGaps = map[string]bool{
 	"pointer_composite_literal_untyped": true,
 	"pointer_range_loop":                true,
 	"promise_return_type":               true,
-	"protobuf_lite_ts":                  true,
 	"receiver_variable":                 true,
 	"reflect_numfield":                  true,
 	"reserved_words":                    true,

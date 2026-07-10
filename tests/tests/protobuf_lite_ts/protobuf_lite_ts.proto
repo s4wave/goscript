@@ -1,7 +1,13 @@
 syntax = "proto3";
-package main;
+package protobuf_lite_ts;
+
+option go_package = "github.com/s4wave/goscript/tests/tests/protobuf_lite_ts;main";
 
 message ExampleMsg {
     bytes example_field = 1;
     string example_text = 2;
+    oneof choice {
+        string choice_text = 3;
+        bytes choice_data = 4;
+    }
 }

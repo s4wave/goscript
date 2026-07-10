@@ -1,15 +1,14 @@
 data: Uint8Array(14) [ 10, 5, 104, 101, 108, 108, 111, 18, 5, 119, 111, 114, 108, 100 ]
-out: {
-  exampleField: Uint8Array(5) [ 104, 101, 108, 108, 111 ],
-  exampleText: "world",
-}
+out: {"exampleField":"aGVsbG8=","exampleText":"world"}
 json marshaled: {"exampleField":"aGVsbG8=","exampleText":"world"}
-json unmarshaled: {
-  exampleField: Uint8Array(5) [ 104, 101, 108, 108, 111 ],
-  exampleText: "world",
-}
+json unmarshaled: {"exampleField":"aGVsbG8=","exampleText":"world"}
+oneof clone equal: true
+oneof clone independent: true
+oneof size matches: true
+oneof round trip equal: true
+oneof round trip value: 3
 varint uint32: 300 2
 varint int32: -1 5
 varint int64: 300 2
 fixed32: 287454020 4
-fixed64: 1234605616436508700 8
+fixed64: 1234605616436508552 8

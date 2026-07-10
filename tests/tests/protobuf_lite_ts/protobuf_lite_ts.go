@@ -42,6 +42,33 @@ func main() {
 
 	println("json unmarshaled:", out)
 
+	oneofMsg := &ExampleMsg{
+		ExampleText: "oneof",
+		Choice: &ExampleMsg_ChoiceData{
+			ChoiceData: []byte{1, 2, 3},
+		},
+	}
+	oneofClone := oneofMsg.CloneVT()
+	println("oneof clone equal:", oneofMsg.EqualVT(oneofClone))
+	oneofMsg.GetChoiceData()[0] = 9
+	println("oneof clone independent:", oneofClone.GetChoiceData()[0] == 1)
+
+	oneofSize := oneofClone.SizeVT()
+	oneofData, err := oneofClone.MarshalVT()
+	if err != nil {
+		println("error marshalling oneof:", err.Error())
+		return
+	}
+	println("oneof size matches:", oneofSize == len(oneofData))
+
+	oneofOut := &ExampleMsg{}
+	if err := oneofOut.UnmarshalVT(oneofData); err != nil {
+		println("error unmarshalling oneof:", err.Error())
+		return
+	}
+	println("oneof round trip equal:", oneofClone.EqualVT(oneofOut))
+	println("oneof round trip value:", oneofOut.GetChoiceData()[2])
+
 	u32, idx, err := protobuf_go_lite.DecodeVarintUint32([]byte{0xac, 0x02}, 0)
 	if err != nil {
 		println("error decoding uint32:", err.Error())

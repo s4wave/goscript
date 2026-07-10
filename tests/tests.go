@@ -161,11 +161,20 @@ func CompileGoToTypeScript(t *testing.T, parentModulePath, testDir, tempDir, out
 		t.Fatalf("failed to check for no-all-deps file in %s: %v", testDir, err)
 	}
 
+	protobufTypeScriptBinding := false
+	protobufTypeScriptBindingPath := filepath.Join(testDir, "protobuf-ts-binding")
+	if _, err := os.Stat(protobufTypeScriptBindingPath); err == nil {
+		protobufTypeScriptBinding = true
+	} else if !os.IsNotExist(err) {
+		t.Fatalf("failed to check for protobuf-ts-binding marker in %s: %v", testDir, err)
+	}
+
 	conf := &compiler.Config{
-		Dir:                testDir,
-		OutputPath:         outputDir,
-		AllDependencies:    allDependencies,
-		DisableEmitBuiltin: true, // We want to use the handwritten gs/ packages in compliance tests
+		Dir:                       testDir,
+		OutputPath:                outputDir,
+		AllDependencies:           allDependencies,
+		DisableEmitBuiltin:        true, // We want to use the handwritten gs/ packages in compliance tests
+		ProtobufTypeScriptBinding: protobufTypeScriptBinding,
 	}
 	if err := conf.Validate(); err != nil {
 		t.Fatalf("invalid compiler config: %v", err)
