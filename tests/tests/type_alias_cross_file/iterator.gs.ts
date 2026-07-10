@@ -8,7 +8,7 @@ import type * as subpkg from "@goscript/github.com/s4wave/goscript/tests/tests/t
 import type * as __goscript_alias from "./alias.gs.ts"
 
 export type Reader = {
-	Val(): __goscript_alias.Value
+	Val(): __goscript_alias.Value | globalThis.Promise<__goscript_alias.Value>
 }
 
 $.registerInterfaceType(

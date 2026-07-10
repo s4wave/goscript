@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type Block = {
-	Size(): number
+	Size(): number | globalThis.Promise<number>
 }
 
 $.registerInterfaceType(

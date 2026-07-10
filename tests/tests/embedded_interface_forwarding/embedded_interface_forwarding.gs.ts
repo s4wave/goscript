@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type Adder = {
-	Add(value: number): number
+	Add(value: number): number | globalThis.Promise<number>
 }
 
 $.registerInterfaceType(
@@ -39,8 +39,8 @@ export class Box {
 		return $.markAsStructValue(cloned)
 	}
 
-	public Add(value: any): any {
-		return $.pointerValue<Exclude<Adder | null, null>>(this.Adder).Add(value)
+	public async Add(value: any): globalThis.Promise<any> {
+		return await $.pointerValue<Exclude<Adder | null, null>>(this.Adder).Add(value)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -98,7 +98,7 @@ export async function call(adder: Adder | null): globalThis.Promise<number> {
 
 export async function main(): globalThis.Promise<void> {
 	let box: Box | $.VarRef<Box> | null = new Box({Adder: $.interfaceValue<Adder | null>(new Counter({base: 3}), "*main.Counter")})
-	$.println($.pointerValue<Exclude<Adder, null>>($.pointerValue<Box>(box).Adder).Add(5))
+	$.println(await $.pointerValue<Exclude<Adder, null>>($.pointerValue<Box>(box).Adder).Add(5))
 	$.println(await call($.interfaceValue<Adder | null>(box, "*main.Box")))
 }
 

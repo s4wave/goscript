@@ -7,7 +7,7 @@ import * as __goscript_method from "./method.gs.ts"
 import "./method.gs.ts"
 
 export type runner = {
-	Run(): string
+	Run(): string | globalThis.Promise<string>
 }
 
 $.registerInterfaceType(

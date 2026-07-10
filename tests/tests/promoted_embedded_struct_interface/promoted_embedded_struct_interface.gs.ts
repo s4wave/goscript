@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type closer = {
-	Close(): string
+	Close(): string | globalThis.Promise<string>
 }
 
 $.registerInterfaceType(

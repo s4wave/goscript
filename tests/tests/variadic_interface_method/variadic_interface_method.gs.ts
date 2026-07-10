@@ -7,7 +7,7 @@ import * as strings from "@goscript/strings/index.js"
 import "@goscript/strings/index.js"
 
 export type Basic = {
-	Join(elem: $.Slice<string>): string
+	Join(elem: $.Slice<string>): string | globalThis.Promise<string>
 }
 
 $.registerInterfaceType(

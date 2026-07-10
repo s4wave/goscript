@@ -86,19 +86,19 @@ export class Packet {
 		return $.markAsStructValue(cloned)
 	}
 
-	public async CloneMessageVT(): globalThis.Promise<protobuf_go_lite.CloneMessage | null> {
+	public CloneMessageVT(): protobuf_go_lite.CloneMessage | null {
 		const m: Packet | $.VarRef<Packet> | null = this
-		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(await Packet.prototype.CloneVT.call(m), "*srpc.Packet")
+		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(Packet.prototype.CloneVT.call(m), "*srpc.Packet")
 	}
 
-	public async CloneVT(): globalThis.Promise<Packet | $.VarRef<Packet> | null> {
+	public CloneVT(): Packet | $.VarRef<Packet> | null {
 		const m: Packet | $.VarRef<Packet> | null = this
 		if (m == null) {
 			return null
 		}
 		let r: Packet | $.VarRef<Packet> | null = new Packet()
 		if ($.pointerValue<Packet>(m).Body != null) {
-			$.pointerValue<Packet>(r).Body = await $.pointerValue<any>($.mustTypeAssert<any>($.pointerValue<Packet>(m).Body, { kind: $.TypeKind.Interface, methods: [{ name: "CloneOneofVT", args: [], returns: [{ name: "_r0", type: "srpc.isPacket_Body" }] }] })).CloneOneofVT()
+			$.pointerValue<Packet>(r).Body = $.pointerValue<any>($.mustTypeAssert<any>($.pointerValue<Packet>(m).Body, { kind: $.TypeKind.Interface, methods: [{ name: "CloneOneofVT", args: [], returns: [{ name: "_r0", type: "srpc.isPacket_Body" }] }] })).CloneOneofVT()
 		}
 		if ($.len($.pointerValue<Packet>(m).unknownFields) > 0) {
 			$.pointerValue<Packet>(r).unknownFields = (slices.Clone($.pointerValue<Packet>(m).unknownFields) as $.Slice<number>)
@@ -106,7 +106,7 @@ export class Packet {
 		return r
 	}
 
-	public async EqualMessageVT(thatMsg: any): globalThis.Promise<boolean> {
+	public EqualMessageVT(thatMsg: any): boolean {
 		const _this: Packet | $.VarRef<Packet> | null = this
 		let __goscriptTuple0: any = $.typeAssertTuple<Packet | $.VarRef<Packet> | null>(thatMsg, { kind: $.TypeKind.Pointer, elemType: "srpc.Packet" })
 		let that: Packet | $.VarRef<Packet> | null = __goscriptTuple0[0]
@@ -117,7 +117,7 @@ export class Packet {
 		return Packet.prototype.EqualVT.call(_this, that)
 	}
 
-	public async EqualVT(that: Packet | $.VarRef<Packet> | null): globalThis.Promise<boolean> {
+	public EqualVT(that: Packet | $.VarRef<Packet> | null): boolean {
 		const _this: Packet | $.VarRef<Packet> | null = this
 		if (_this == that) {
 			return true
@@ -133,7 +133,7 @@ export class Packet {
 				if ($.pointerValue<Packet>(that).Body == null) {
 					return false
 				}
-				if (!await $.pointerValue<any>($.mustTypeAssert<any>($.pointerValue<Packet>(_this).Body, { kind: $.TypeKind.Interface, methods: [{ name: "EqualVT", args: [{ name: "_p0", type: "srpc.isPacket_Body" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }] })).EqualVT($.pointerValue<Packet>(that).Body)) {
+				if (!$.pointerValue<any>($.mustTypeAssert<any>($.pointerValue<Packet>(_this).Body, { kind: $.TypeKind.Interface, methods: [{ name: "EqualVT", args: [{ name: "_p0", type: "srpc.isPacket_Body" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }] })).EqualVT($.pointerValue<Packet>(that).Body)) {
 					return false
 				}
 			}
@@ -287,7 +287,7 @@ export class Packet {
 		return sb.value.String()
 	}
 
-	public async MarshalToSizedBufferVT(dAtA: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
+	public MarshalToSizedBufferVT(dAtA: $.Slice<number>): [number, $.GoError] {
 		const m: Packet | $.VarRef<Packet> | null = this
 		if (m == null) {
 			return [0, null]
@@ -303,7 +303,7 @@ export class Packet {
 		{
 			let [vtmsg, ok] = $.typeAssertTuple<any>($.pointerValue<Packet>(m).Body, { kind: $.TypeKind.Interface, methods: [{ name: "MarshalToSizedBufferVT", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "_r1", type: "error" }] }] })
 			if (ok) {
-				let [size, err] = await $.pointerValue<any>(vtmsg).MarshalToSizedBufferVT($.goSlice(dAtA, undefined, i))
+				let [size, err] = $.pointerValue<any>(vtmsg).MarshalToSizedBufferVT($.goSlice(dAtA, undefined, i))
 				if (err != null) {
 					return [0, err]
 				}
@@ -313,22 +313,22 @@ export class Packet {
 		return [$.len(dAtA) - i, null]
 	}
 
-	public async MarshalToVT(dAtA: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
+	public MarshalToVT(dAtA: $.Slice<number>): [number, $.GoError] {
 		const m: Packet | $.VarRef<Packet> | null = this
-		let size = await Packet.prototype.SizeVT.call(m)
+		let size = Packet.prototype.SizeVT.call(m)
 		return Packet.prototype.MarshalToSizedBufferVT.call(m, $.goSlice(dAtA, undefined, size))
 	}
 
-	public async MarshalVT(): globalThis.Promise<[$.Slice<number>, $.GoError]> {
+	public MarshalVT(): [$.Slice<number>, $.GoError] {
 		const m: Packet | $.VarRef<Packet> | null = this
 		let dAtA: $.Slice<number> = null as $.Slice<number>
 		let err: $.GoError = null as $.GoError
 		if (m == null) {
 			return [null, null]
 		}
-		let size = await Packet.prototype.SizeVT.call(m)
+		let size = Packet.prototype.SizeVT.call(m)
 		dAtA = $.makeSlice<number>(size, undefined, "byte")
-		let __goscriptTuple4: any = await Packet.prototype.MarshalToSizedBufferVT.call(m, $.goSlice(dAtA, undefined, size))
+		let __goscriptTuple4: any = Packet.prototype.MarshalToSizedBufferVT.call(m, $.goSlice(dAtA, undefined, size))
 		let n = __goscriptTuple4[0]
 		err = __goscriptTuple4[1]
 		if (err != null) {
@@ -345,7 +345,7 @@ export class Packet {
 		$.assignStruct($.pointerValue<Packet>(x), $.markAsStructValue(new Packet()))
 	}
 
-	public async SizeVT(): globalThis.Promise<number> {
+	public SizeVT(): number {
 		const m: Packet | $.VarRef<Packet> | null = this
 		let n: number = 0
 		if (m == null) {
@@ -356,7 +356,7 @@ export class Packet {
 		{
 			let [vtmsg, ok] = $.typeAssertTuple<any>($.pointerValue<Packet>(m).Body, { kind: $.TypeKind.Interface, methods: [{ name: "SizeVT", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }] })
 			if (ok) {
-				n = n + (await $.pointerValue<any>(vtmsg).SizeVT())
+				n = n + ($.pointerValue<any>(vtmsg).SizeVT())
 			}
 		}
 		n = n + ($.len($.pointerValue<Packet>(m).unknownFields))

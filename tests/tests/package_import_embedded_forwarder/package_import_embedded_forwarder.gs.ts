@@ -13,8 +13,8 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/package_import_embedded
 import "@goscript/github.com/s4wave/goscript/tests/tests/package_import_embedded_forwarder/dep/tx/index.js"
 
 export type Store = {
-	Execute(): string
-	NewTransaction(write: boolean): tx.Tx | $.VarRef<tx.Tx> | null
+	Execute(): string | globalThis.Promise<string>
+	NewTransaction(write: boolean): tx.Tx | $.VarRef<tx.Tx> | null | globalThis.Promise<tx.Tx | $.VarRef<tx.Tx> | null>
 }
 
 $.registerInterfaceType(

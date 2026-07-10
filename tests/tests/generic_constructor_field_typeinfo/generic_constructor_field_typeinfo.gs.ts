@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type Block = {
-	MarshalBlock(): [$.Slice<number>, $.GoError]
+	MarshalBlock(): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>
 	UnmarshalBlock(_p0: $.Slice<number>): $.GoError
 }
 

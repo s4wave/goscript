@@ -39,8 +39,8 @@ import "./logrus.gs.ts"
 import "./writer.gs.ts"
 
 export type Hook = {
-	Fire(_p0: __goscript_entry.Entry | $.VarRef<__goscript_entry.Entry> | null): $.GoError
-	Levels(): $.Slice<__goscript_logrus.Level>
+	Fire(_p0: __goscript_entry.Entry | $.VarRef<__goscript_entry.Entry> | null): $.GoError | globalThis.Promise<$.GoError>
+	Levels(): $.Slice<__goscript_logrus.Level> | globalThis.Promise<$.Slice<__goscript_logrus.Level>>
 }
 
 $.registerInterfaceType(

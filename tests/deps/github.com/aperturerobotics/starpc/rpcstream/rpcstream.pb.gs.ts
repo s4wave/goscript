@@ -78,19 +78,19 @@ export class RpcStreamPacket {
 		return $.markAsStructValue(cloned)
 	}
 
-	public async CloneMessageVT(): globalThis.Promise<protobuf_go_lite.CloneMessage | null> {
+	public CloneMessageVT(): protobuf_go_lite.CloneMessage | null {
 		const m: RpcStreamPacket | $.VarRef<RpcStreamPacket> | null = this
-		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(await RpcStreamPacket.prototype.CloneVT.call(m), "*rpcstream.RpcStreamPacket")
+		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(RpcStreamPacket.prototype.CloneVT.call(m), "*rpcstream.RpcStreamPacket")
 	}
 
-	public async CloneVT(): globalThis.Promise<RpcStreamPacket | $.VarRef<RpcStreamPacket> | null> {
+	public CloneVT(): RpcStreamPacket | $.VarRef<RpcStreamPacket> | null {
 		const m: RpcStreamPacket | $.VarRef<RpcStreamPacket> | null = this
 		if (m == null) {
 			return null
 		}
 		let r: RpcStreamPacket | $.VarRef<RpcStreamPacket> | null = new RpcStreamPacket()
 		if ($.pointerValue<RpcStreamPacket>(m).Body != null) {
-			$.pointerValue<RpcStreamPacket>(r).Body = await $.pointerValue<any>($.mustTypeAssert<any>($.pointerValue<RpcStreamPacket>(m).Body, { kind: $.TypeKind.Interface, methods: [{ name: "CloneOneofVT", args: [], returns: [{ name: "_r0", type: "rpcstream.isRpcStreamPacket_Body" }] }] })).CloneOneofVT()
+			$.pointerValue<RpcStreamPacket>(r).Body = $.pointerValue<any>($.mustTypeAssert<any>($.pointerValue<RpcStreamPacket>(m).Body, { kind: $.TypeKind.Interface, methods: [{ name: "CloneOneofVT", args: [], returns: [{ name: "_r0", type: "rpcstream.isRpcStreamPacket_Body" }] }] })).CloneOneofVT()
 		}
 		if ($.len($.pointerValue<RpcStreamPacket>(m).unknownFields) > 0) {
 			$.pointerValue<RpcStreamPacket>(r).unknownFields = (slices.Clone($.pointerValue<RpcStreamPacket>(m).unknownFields) as $.Slice<number>)
@@ -98,7 +98,7 @@ export class RpcStreamPacket {
 		return r
 	}
 
-	public async EqualMessageVT(thatMsg: any): globalThis.Promise<boolean> {
+	public EqualMessageVT(thatMsg: any): boolean {
 		const _this: RpcStreamPacket | $.VarRef<RpcStreamPacket> | null = this
 		let __goscriptTuple0: any = $.typeAssertTuple<RpcStreamPacket | $.VarRef<RpcStreamPacket> | null>(thatMsg, { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket" })
 		let that: RpcStreamPacket | $.VarRef<RpcStreamPacket> | null = __goscriptTuple0[0]
@@ -109,7 +109,7 @@ export class RpcStreamPacket {
 		return RpcStreamPacket.prototype.EqualVT.call(_this, that)
 	}
 
-	public async EqualVT(that: RpcStreamPacket | $.VarRef<RpcStreamPacket> | null): globalThis.Promise<boolean> {
+	public EqualVT(that: RpcStreamPacket | $.VarRef<RpcStreamPacket> | null): boolean {
 		const _this: RpcStreamPacket | $.VarRef<RpcStreamPacket> | null = this
 		if (_this == that) {
 			return true
@@ -125,7 +125,7 @@ export class RpcStreamPacket {
 				if ($.pointerValue<RpcStreamPacket>(that).Body == null) {
 					return false
 				}
-				if (!await $.pointerValue<any>($.mustTypeAssert<any>($.pointerValue<RpcStreamPacket>(_this).Body, { kind: $.TypeKind.Interface, methods: [{ name: "EqualVT", args: [{ name: "_p0", type: "rpcstream.isRpcStreamPacket_Body" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }] })).EqualVT($.pointerValue<RpcStreamPacket>(that).Body)) {
+				if (!$.pointerValue<any>($.mustTypeAssert<any>($.pointerValue<RpcStreamPacket>(_this).Body, { kind: $.TypeKind.Interface, methods: [{ name: "EqualVT", args: [{ name: "_p0", type: "rpcstream.isRpcStreamPacket_Body" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }] })).EqualVT($.pointerValue<RpcStreamPacket>(that).Body)) {
 					return false
 				}
 			}
@@ -281,7 +281,7 @@ export class RpcStreamPacket {
 		return sb.value.String()
 	}
 
-	public async MarshalToSizedBufferVT(dAtA: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
+	public MarshalToSizedBufferVT(dAtA: $.Slice<number>): [number, $.GoError] {
 		const m: RpcStreamPacket | $.VarRef<RpcStreamPacket> | null = this
 		if (m == null) {
 			return [0, null]
@@ -297,7 +297,7 @@ export class RpcStreamPacket {
 		{
 			let [vtmsg, ok] = $.typeAssertTuple<any>($.pointerValue<RpcStreamPacket>(m).Body, { kind: $.TypeKind.Interface, methods: [{ name: "MarshalToSizedBufferVT", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "_r1", type: "error" }] }] })
 			if (ok) {
-				let [size, err] = await $.pointerValue<any>(vtmsg).MarshalToSizedBufferVT($.goSlice(dAtA, undefined, i))
+				let [size, err] = $.pointerValue<any>(vtmsg).MarshalToSizedBufferVT($.goSlice(dAtA, undefined, i))
 				if (err != null) {
 					return [0, err]
 				}
@@ -307,22 +307,22 @@ export class RpcStreamPacket {
 		return [$.len(dAtA) - i, null]
 	}
 
-	public async MarshalToVT(dAtA: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
+	public MarshalToVT(dAtA: $.Slice<number>): [number, $.GoError] {
 		const m: RpcStreamPacket | $.VarRef<RpcStreamPacket> | null = this
-		let size = await RpcStreamPacket.prototype.SizeVT.call(m)
+		let size = RpcStreamPacket.prototype.SizeVT.call(m)
 		return RpcStreamPacket.prototype.MarshalToSizedBufferVT.call(m, $.goSlice(dAtA, undefined, size))
 	}
 
-	public async MarshalVT(): globalThis.Promise<[$.Slice<number>, $.GoError]> {
+	public MarshalVT(): [$.Slice<number>, $.GoError] {
 		const m: RpcStreamPacket | $.VarRef<RpcStreamPacket> | null = this
 		let dAtA: $.Slice<number> = null as $.Slice<number>
 		let err: $.GoError = null as $.GoError
 		if (m == null) {
 			return [null, null]
 		}
-		let size = await RpcStreamPacket.prototype.SizeVT.call(m)
+		let size = RpcStreamPacket.prototype.SizeVT.call(m)
 		dAtA = $.makeSlice<number>(size, undefined, "byte")
-		let __goscriptTuple4: any = await RpcStreamPacket.prototype.MarshalToSizedBufferVT.call(m, $.goSlice(dAtA, undefined, size))
+		let __goscriptTuple4: any = RpcStreamPacket.prototype.MarshalToSizedBufferVT.call(m, $.goSlice(dAtA, undefined, size))
 		let n = __goscriptTuple4[0]
 		err = __goscriptTuple4[1]
 		if (err != null) {
@@ -339,7 +339,7 @@ export class RpcStreamPacket {
 		$.assignStruct($.pointerValue<RpcStreamPacket>(x), $.markAsStructValue(new RpcStreamPacket()))
 	}
 
-	public async SizeVT(): globalThis.Promise<number> {
+	public SizeVT(): number {
 		const m: RpcStreamPacket | $.VarRef<RpcStreamPacket> | null = this
 		let n: number = 0
 		if (m == null) {
@@ -350,7 +350,7 @@ export class RpcStreamPacket {
 		{
 			let [vtmsg, ok] = $.typeAssertTuple<any>($.pointerValue<RpcStreamPacket>(m).Body, { kind: $.TypeKind.Interface, methods: [{ name: "SizeVT", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }] })
 			if (ok) {
-				n = n + (await $.pointerValue<any>(vtmsg).SizeVT())
+				n = n + ($.pointerValue<any>(vtmsg).SizeVT())
 			}
 		}
 		n = n + ($.len($.pointerValue<RpcStreamPacket>(m).unknownFields))

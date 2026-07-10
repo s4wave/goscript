@@ -13,7 +13,7 @@ import "@goscript/context/index.js"
 export type Stream = {
 	Close(): $.GoError | globalThis.Promise<$.GoError>
 	CloseSend(): $.GoError | globalThis.Promise<$.GoError>
-	Context(): context.Context | null
+	Context(): context.Context | null | globalThis.Promise<context.Context | null>
 	MsgRecv(msg: __goscript_message.Message): $.GoError | globalThis.Promise<$.GoError>
 	MsgSend(msg: __goscript_message.Message): $.GoError | globalThis.Promise<$.GoError>
 }
@@ -27,10 +27,10 @@ $.registerInterfaceType(
 export type StreamRecv = {
 	Close(): $.GoError | globalThis.Promise<$.GoError>
 	CloseSend(): $.GoError | globalThis.Promise<$.GoError>
-	Context(): context.Context | null
+	Context(): context.Context | null | globalThis.Promise<context.Context | null>
 	MsgRecv(msg: __goscript_message.Message): $.GoError | globalThis.Promise<$.GoError>
 	MsgSend(msg: __goscript_message.Message): $.GoError | globalThis.Promise<$.GoError>
-	Recv(): [any, $.GoError]
+	Recv(): [any, $.GoError] | globalThis.Promise<[any, $.GoError]>
 	RecvTo(_p0: any): $.GoError
 }
 
@@ -43,7 +43,7 @@ $.registerInterfaceType(
 export type StreamSend = {
 	Close(): $.GoError | globalThis.Promise<$.GoError>
 	CloseSend(): $.GoError | globalThis.Promise<$.GoError>
-	Context(): context.Context | null
+	Context(): context.Context | null | globalThis.Promise<context.Context | null>
 	MsgRecv(msg: __goscript_message.Message): $.GoError | globalThis.Promise<$.GoError>
 	MsgSend(msg: __goscript_message.Message): $.GoError | globalThis.Promise<$.GoError>
 	Send(_p0: any): $.GoError
@@ -58,7 +58,7 @@ $.registerInterfaceType(
 export type StreamSendAndClose = {
 	Close(): $.GoError | globalThis.Promise<$.GoError>
 	CloseSend(): $.GoError | globalThis.Promise<$.GoError>
-	Context(): context.Context | null
+	Context(): context.Context | null | globalThis.Promise<context.Context | null>
 	MsgRecv(msg: __goscript_message.Message): $.GoError | globalThis.Promise<$.GoError>
 	MsgSend(msg: __goscript_message.Message): $.GoError | globalThis.Promise<$.GoError>
 	Send(_p0: any): $.GoError
@@ -121,8 +121,8 @@ export class streamWithClose {
 		return await $.pointerValue<Exclude<Stream | null, null>>(this.Stream).CloseSend()
 	}
 
-	public Context(): any {
-		return $.pointerValue<Exclude<Stream | null, null>>(this.Stream).Context()
+	public async Context(): globalThis.Promise<any> {
+		return await $.pointerValue<Exclude<Stream | null, null>>(this.Stream).Context()
 	}
 
 	public async MsgRecv(msg: any): globalThis.Promise<any> {

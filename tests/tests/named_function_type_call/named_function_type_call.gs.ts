@@ -31,7 +31,7 @@ $.registerInterfaceType(
 export type WalkFunc = ((path: string, info: FileInfo | null, err: $.GoError) => $.GoError | globalThis.Promise<$.GoError>) | null
 
 export type Shape = {
-	Stats(): number
+	Stats(): number | globalThis.Promise<number>
 }
 
 $.registerInterfaceType(

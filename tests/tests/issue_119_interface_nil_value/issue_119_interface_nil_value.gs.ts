@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type Animal = {
-	Name(): string
+	Name(): string | globalThis.Promise<string>
 }
 
 $.registerInterfaceType(

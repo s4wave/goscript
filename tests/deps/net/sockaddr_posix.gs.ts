@@ -42,7 +42,7 @@ import "./udpsock_posix.gs.ts"
 import "./unixsock_posix.gs.ts"
 
 export type sockaddr = {
-	Network(): string
+	Network(): string | globalThis.Promise<string>
 	String(): string | globalThis.Promise<string>
 	family(): number
 	isWildcard(): boolean

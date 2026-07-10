@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type sizer = {
-	Len(): number
+	Len(): number | globalThis.Promise<number>
 }
 
 $.registerInterfaceType(

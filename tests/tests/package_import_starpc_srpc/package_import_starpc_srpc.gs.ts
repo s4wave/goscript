@@ -119,8 +119,8 @@ export class embeddedStream {
 		return await $.pointerValue<Exclude<srpc.Stream | null, null>>(this.Stream).CloseSend()
 	}
 
-	public Context(): any {
-		return $.pointerValue<Exclude<srpc.Stream | null, null>>(this.Stream).Context()
+	public async Context(): globalThis.Promise<any> {
+		return await $.pointerValue<Exclude<srpc.Stream | null, null>>(this.Stream).Context()
 	}
 
 	public async MsgRecv(msg: any): globalThis.Promise<any> {
@@ -439,7 +439,7 @@ export class memoryRpcStream {
 				id: 1,
 				isSend: true,
 				channel: $.pointerValue<memoryRpcStream>(m).send,
-				value: await rpcstream.RpcStreamPacket.prototype.CloneVT.call(pkt),
+				value: rpcstream.RpcStreamPacket.prototype.CloneVT.call(pkt),
 				onSelected: async (__goscriptSelect1Result) => {
 					return null
 				}
@@ -896,7 +896,7 @@ export async function exerciseRpcStreamHandle(): globalThis.Promise<boolean> {
 		return false
 	}
 
-	let __goscriptTuple8: any = await srpc.Packet.prototype.MarshalVT.call(srpc.NewCallStartPacket("svc", "method", null, false))
+	let __goscriptTuple8: any = srpc.Packet.prototype.MarshalVT.call(srpc.NewCallStartPacket("svc", "method", null, false))
 	let start: $.Slice<number> = __goscriptTuple8[0]
 	err = __goscriptTuple8[1]
 	if (err != null) {
@@ -1003,14 +1003,14 @@ export async function exercisePushablePacketWriter(): globalThis.Promise<boolean
 
 	let writer: srpc.PushablePacketWriter | $.VarRef<srpc.PushablePacketWriter> | null = srpc.NewPushablePacketWriter($.markAsStructValue($.cloneStructValue(js.ValueOf($.interfaceValue<any>(new globalThis.Map<string, any>([["push", $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(pushFn)), "js.Func")], ["end", $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(endFn)), "js.Func")]]), "map[string]any")))))
 	{
-		let err = await srpc.PushablePacketWriter.prototype.WritePacket.call(writer, srpc.NewCallStartPacket("svc", "push", new Uint8Array([7, 8, 9]) as $.Slice<number>, false))
+		let err = srpc.PushablePacketWriter.prototype.WritePacket.call(writer, srpc.NewCallStartPacket("svc", "push", new Uint8Array([7, 8, 9]) as $.Slice<number>, false))
 		if (err != null) {
 			$.println("pushable call-start error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return false
 		}
 	}
 	{
-		let err = await srpc.PushablePacketWriter.prototype.WritePacket.call(writer, srpc.NewCallCancelPacket())
+		let err = srpc.PushablePacketWriter.prototype.WritePacket.call(writer, srpc.NewCallCancelPacket())
 		if (err != null) {
 			$.println("pushable cancel error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return false

@@ -98,6 +98,7 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph) (*S
 	if diagnosticsHaveErrors(diagnostics) {
 		return model, diagnostics
 	}
+	o.applyUnknownInterfaceAsyncMethods(model, interfaceGraph, anonymousInterfaceGraph)
 	for {
 		asyncCount := semanticAsyncFunctionCount(model)
 		diagnostics = append(diagnostics, o.applyInterfaceAsyncMethods(ctx, model, interfaceGraph)...)
@@ -109,6 +110,11 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph) (*S
 			return model, diagnostics
 		}
 		diagnostics = append(diagnostics, o.propagateFunctionAsync(ctx, model)...)
+		if diagnosticsHaveErrors(diagnostics) {
+			return model, diagnostics
+		}
+		// Interface coloring can reveal async calls inside function arguments.
+		diagnostics = append(diagnostics, o.propagateAsyncFunctionArguments(ctx, model)...)
 		if diagnosticsHaveErrors(diagnostics) {
 			return model, diagnostics
 		}
@@ -778,9 +784,6 @@ func (o *SemanticModelOwner) collectFunctionFacts(
 				if callUsesFunctionIdentifier(pkg, typed.Fun) {
 					markFunctionAsync(semFn, "function-identifier-call")
 				}
-				if callUsesInterfaceMethod(pkg, typed.Fun) {
-					markFunctionAsync(semFn, "interface-method-call")
-				}
 				if overrideFacts.IsMethodAsync(overrideCallPackage(pkg, typed.Fun), overrideCallMethod(pkg, typed.Fun)) {
 					markFunctionAsync(semFn, "override")
 				}
@@ -848,9 +851,6 @@ func recordImmediateFuncLitAsyncFacts(
 				markFunctionAsync(semFn, "async-function-literal-call")
 			}
 			if callUsesFunctionIdentifier(pkg, typed.Fun) {
-				markFunctionAsync(semFn, "async-function-literal-call")
-			}
-			if callUsesInterfaceMethod(pkg, typed.Fun) {
 				markFunctionAsync(semFn, "async-function-literal-call")
 			}
 			if called != nil {
@@ -1162,8 +1162,7 @@ func callPassesAsyncFunctionArgument(
 
 func exprMayNeedAwait(model *SemanticModel, pkg *packages.Package, expr ast.Expr) bool {
 	if called := calledFunction(pkg, expr); called != nil {
-		semFn := semanticFunctionFor(model, called)
-		return semFn != nil && semFn.async
+		return model.functionAsync(called)
 	}
 	lit, ok := expr.(*ast.FuncLit)
 	if !ok {
@@ -1194,16 +1193,9 @@ func exprMayNeedAwait(model *SemanticModel, pkg *packages.Package, expr ast.Expr
 				needsAwait = true
 				return false
 			}
-			if callUsesInterfaceMethod(pkg, typed.Fun) {
+			if called := calledFunction(pkg, typed.Fun); called != nil && model.functionAsync(called) {
 				needsAwait = true
 				return false
-			}
-			if called := calledFunction(pkg, typed.Fun); called != nil {
-				semFn := semanticFunctionFor(model, called)
-				if semFn != nil && semFn.async {
-					needsAwait = true
-					return false
-				}
 			}
 		}
 		return true
@@ -1341,67 +1333,51 @@ func (o *SemanticModelOwner) resolveAnonymousInterfaceImplementationGraph(
 	model *SemanticModel,
 	methodSets []semanticImplementationMethodSet,
 ) ([]semanticAnonymousInterfaceImplementation, []Diagnostic) {
-	interfaces := collectAnonymousInterfaceImplementationCandidates(model)
-	for _, namedIface := range collectNamedInterfaceImplementationCandidates(model) {
-		if err := ctx.Err(); err != nil {
-			return nil, []Diagnostic{contextCanceledDiagnostic(err)}
-		}
-		methodSets = append(methodSets, semanticImplementationMethodSet{
-			typ:      namedIface,
-			receiver: namedIface,
-			methods:  methodSetMap(namedIface),
-		})
-	}
-
 	methodSetIndexByName := indexImplementationMethodSets(methodSets)
 	implementationGraph := make([]semanticAnonymousInterfaceImplementation, 0)
-	for _, iface := range interfaces {
-		if err := ctx.Err(); err != nil {
-			return nil, []Diagnostic{contextCanceledDiagnostic(err)}
-		}
-		iface.Complete()
-		ifaceMethods := interfaceMethodMap(iface)
-		if len(ifaceMethods) == 0 {
-			continue
-		}
-		for _, methodSetIdx := range implementationMethodSetCandidates(methodSetIndexByName, ifaceMethods) {
+	for _, semPkg := range model.packages {
+		for _, assertion := range semPkg.typeAssertions {
 			if err := ctx.Err(); err != nil {
 				return nil, []Diagnostic{contextCanceledDiagnostic(err)}
 			}
-			methodSet := methodSets[methodSetIdx]
-			if !implementationHasMethods(methodSet.methods, ifaceMethods) {
+			if assertion.source == nil || assertion.target == nil {
 				continue
 			}
-			if !namedTypeHasParams(methodSet.typ) {
-				if matches, exact := implementationHasExactMethodSignatures(methodSet.methods, ifaceMethods); exact {
-					if !matches {
-						continue
+			sourceIface, _ := types.Unalias(assertion.source).Underlying().(*types.Interface)
+			iface, _ := types.Unalias(assertion.target).Underlying().(*types.Interface)
+			if sourceIface == nil || iface == nil || !interfaceIsPackageSealed(sourceIface) {
+				continue
+			}
+			sourceIface.Complete()
+			iface.Complete()
+			ifaceMethods := interfaceMethodMap(iface)
+			if len(ifaceMethods) == 0 {
+				continue
+			}
+			for _, methodSetIdx := range implementationMethodSetCandidates(methodSetIndexByName, ifaceMethods) {
+				if err := ctx.Err(); err != nil {
+					return nil, []Diagnostic{contextCanceledDiagnostic(err)}
+				}
+				methodSet := methodSets[methodSetIdx]
+				receiver := methodSet.receiver
+				if (methodSet.typ.TypeArgs() == nil || methodSet.typ.TypeArgs().Len() == 0) &&
+					methodSet.typ.TypeParams() != nil && methodSet.typ.TypeParams().Len() != 0 {
+					args := typeParamTypes(methodSet.typ.TypeParams())
+					if instantiated, err := types.Instantiate(nil, methodSet.typ, args, false); err == nil {
+						receiver = instantiated
+						if methodSet.pointer {
+							receiver = types.NewPointer(instantiated)
+						}
 					}
-					implementationGraph = append(implementationGraph, semanticAnonymousInterfaceImplementation{
-						ifaceMethods: ifaceMethods,
-						implMethods:  methodSet.methods,
-					})
+				}
+				if !types.Implements(receiver, sourceIface) || !types.Implements(receiver, iface) {
 					continue
 				}
+				implementationGraph = append(implementationGraph, semanticAnonymousInterfaceImplementation{
+					ifaceMethods: ifaceMethods,
+					implMethods:  methodSet.methods,
+				})
 			}
-			receiver := methodSet.receiver
-			if (methodSet.typ.TypeArgs() == nil || methodSet.typ.TypeArgs().Len() == 0) &&
-				methodSet.typ.TypeParams() != nil && methodSet.typ.TypeParams().Len() != 0 {
-				args := typeParamTypes(methodSet.typ.TypeParams())
-				if instantiated, err := types.Instantiate(nil, methodSet.typ, args, false); err == nil {
-					receiver = instantiated
-					if methodSet.pointer {
-						receiver = types.NewPointer(instantiated)
-					}
-				}
-			}
-			if !types.Implements(receiver, iface) {
-				continue
-			}
-			implementationGraph = append(implementationGraph, semanticAnonymousInterfaceImplementation{
-				ifaceMethods: ifaceMethods,
-				implMethods:  methodSet.methods,
-			})
 		}
 	}
 	return implementationGraph, nil
@@ -1512,184 +1488,60 @@ func collectInterfaceImplementationCandidates(model *SemanticModel) []*types.Nam
 	return interfaces
 }
 
-func collectAnonymousInterfaceImplementationCandidates(model *SemanticModel) []*types.Interface {
-	if model == nil {
-		return nil
-	}
-	seen := make(map[*types.Interface]bool)
-	var interfaces []*types.Interface
-	add := func(iface *types.Interface) {
-		if iface == nil || seen[iface] {
-			return
-		}
-		seen[iface] = true
-		interfaces = append(interfaces, iface)
-	}
-	var collect func(types.Type)
-	seenTypes := make(map[types.Type]bool)
-	collect = func(typ types.Type) {
-		if typ == nil {
-			return
-		}
-		typ = types.Unalias(typ)
-		if seenTypes[typ] {
-			return
-		}
-		seenTypes[typ] = true
-		switch typed := typ.(type) {
-		case *types.Named:
-			collect(typed.Underlying())
-		case *types.Pointer:
-			collect(typed.Elem())
-		case *types.Slice:
-			collect(typed.Elem())
-		case *types.Array:
-			collect(typed.Elem())
-		case *types.Map:
-			collect(typed.Key())
-			collect(typed.Elem())
-		case *types.Chan:
-			collect(typed.Elem())
-		case *types.Struct:
-			for field := range typed.Fields() {
-				collect(field.Type())
-			}
-		case *types.Interface:
-			typed.Complete()
-			add(typed)
-			for method := range typed.Methods() {
-				collect(method.Type())
-			}
-		case *types.Signature:
-			if typed.Recv() != nil {
-				collect(typed.Recv().Type())
-			}
-			collectTuple(collect, typed.Params())
-			collectTuple(collect, typed.Results())
-		}
-	}
-	for _, semType := range model.types {
-		collect(semType.named)
-		for _, field := range semType.fields {
-			collect(field.typ)
-		}
-	}
-	for _, semFn := range model.functions {
-		collect(semFn.signature)
-	}
-	for _, semValue := range model.values {
-		collect(semValue.typ)
-	}
-	for _, semPkg := range model.packages {
-		for _, assertion := range semPkg.typeAssertions {
-			collect(assertion.source)
-			collect(assertion.target)
-		}
-		for _, fact := range semPkg.nilFacts {
-			collect(fact.typ)
-		}
-	}
-	return interfaces
-}
-
-func collectNamedInterfaceImplementationCandidates(model *SemanticModel) []*types.Named {
-	if model == nil {
-		return nil
-	}
-	seen := make(map[string]bool)
-	var interfaces []*types.Named
-	add := func(named *types.Named) {
-		if named == nil {
-			return
-		}
-		if _, ok := types.Unalias(named.Underlying()).(*types.Interface); !ok {
-			return
-		}
-		key := types.TypeString(named, func(pkg *types.Package) string {
-			if pkg == nil {
-				return ""
-			}
-			return pkg.Path()
-		})
-		if seen[key] {
-			return
-		}
-		seen[key] = true
-		interfaces = append(interfaces, named)
-	}
-	var collect func(types.Type)
-	seenTypes := make(map[types.Type]bool)
-	collect = func(typ types.Type) {
-		if typ == nil {
-			return
-		}
-		typ = types.Unalias(typ)
-		if seenTypes[typ] {
-			return
-		}
-		seenTypes[typ] = true
-		switch typed := typ.(type) {
-		case *types.Named:
-			add(typed)
-			collect(typed.Underlying())
-		case *types.Pointer:
-			collect(typed.Elem())
-		case *types.Slice:
-			collect(typed.Elem())
-		case *types.Array:
-			collect(typed.Elem())
-		case *types.Map:
-			collect(typed.Key())
-			collect(typed.Elem())
-		case *types.Chan:
-			collect(typed.Elem())
-		case *types.Struct:
-			for field := range typed.Fields() {
-				collect(field.Type())
-			}
-		case *types.Interface:
-			typed.Complete()
-			for method := range typed.Methods() {
-				collect(method.Type())
-			}
-		case *types.Signature:
-			if typed.Recv() != nil {
-				collect(typed.Recv().Type())
-			}
-			collectTuple(collect, typed.Params())
-			collectTuple(collect, typed.Results())
-		}
-	}
-	for _, semType := range model.types {
-		collect(semType.named)
-		for _, field := range semType.fields {
-			collect(field.typ)
-		}
-	}
-	for _, semFn := range model.functions {
-		collect(semFn.signature)
-	}
-	for _, semValue := range model.values {
-		collect(semValue.typ)
-	}
-	for _, semPkg := range model.packages {
-		for _, assertion := range semPkg.typeAssertions {
-			collect(assertion.source)
-			collect(assertion.target)
-		}
-		for _, fact := range semPkg.nilFacts {
-			collect(fact.typ)
-		}
-	}
-	return interfaces
-}
-
 func collectTuple(collect func(types.Type), tuple *types.Tuple) {
 	if tuple == nil {
 		return
 	}
 	for v := range tuple.Variables() {
 		collect(v.Type())
+	}
+}
+
+func (o *SemanticModelOwner) applyUnknownInterfaceAsyncMethods(
+	model *SemanticModel,
+	interfaceGraph []semanticInterfaceImplementationGraphEntry,
+	anonymousInterfaceGraph []semanticAnonymousInterfaceImplementation,
+) {
+	known := make(map[*types.Func]bool)
+	for _, graphEntry := range interfaceGraph {
+		iface, _ := graphEntry.iface.Underlying().(*types.Interface)
+		if !interfaceIsPackageSealed(iface) || namedTypeHasParams(graphEntry.iface) {
+			continue
+		}
+		ifaceOrigin := namedOriginOrSelf(graphEntry.iface)
+		for _, method := range graphEntry.ifaceMethods {
+			signature, _ := method.Type().(*types.Signature)
+			if signature == nil || signature.Recv() == nil {
+				continue
+			}
+			receiver := receiverNamedType(signature.Recv().Type())
+			if receiver == nil || namedOriginOrSelf(receiver) != ifaceOrigin {
+				continue
+			}
+			known[functionOriginOrSelf(method)] = true
+		}
+	}
+	for _, graphEntry := range anonymousInterfaceGraph {
+		for _, method := range graphEntry.ifaceMethods {
+			signature, _ := method.Type().(*types.Signature)
+			if signature != nil && signature.Recv() != nil &&
+				receiverNamedType(signature.Recv().Type()) != nil {
+				continue
+			}
+			known[functionOriginOrSelf(method)] = true
+		}
+	}
+	for method := range model.functionCallers {
+		method = functionOriginOrSelf(method)
+		if method == nil || known[method] || isSyncErrorMethodFunc(method) {
+			continue
+		}
+		signature, _ := method.Type().(*types.Signature)
+		if signature == nil || signature.Recv() == nil || !isInterfaceType(signature.Recv().Type()) {
+			continue
+		}
+		// An implementation outside the compiled graph may suspend.
+		model.markInterfaceMethodAsync(method)
 	}
 }
 
@@ -1766,9 +1618,11 @@ func (m *SemanticModel) markInterfaceMethodAsync(fn *types.Func) {
 		return
 	}
 	m.asyncInterfaceMethodObjs[fn] = true
-	key := m.functionFullName(fn)
-	if key != "" {
-		m.asyncInterfaceMethods[key] = true
+	if interfaceMethodHasNamedReceiver(fn) {
+		key := m.functionFullName(fn)
+		if key != "" {
+			m.asyncInterfaceMethods[key] = true
+		}
 	}
 }
 
@@ -1779,8 +1633,20 @@ func (m *SemanticModel) interfaceMethodAsync(fn *types.Func) bool {
 	if m.asyncInterfaceMethodObjs[fn] {
 		return true
 	}
+	if !interfaceMethodHasNamedReceiver(fn) {
+		return false
+	}
 	key := m.functionFullName(fn)
 	return key != "" && m.asyncInterfaceMethods[key]
+}
+
+func interfaceMethodHasNamedReceiver(fn *types.Func) bool {
+	if fn == nil {
+		return false
+	}
+	signature, _ := fn.Type().(*types.Signature)
+	return signature != nil && signature.Recv() != nil &&
+		receiverNamedType(signature.Recv().Type()) != nil
 }
 
 func contextCanceledDiagnostic(err error) Diagnostic {
@@ -1855,6 +1721,20 @@ func interfaceMethodMap(iface *types.Interface) map[string]*types.Func {
 		methods[method.Name()] = method
 	}
 	return methods
+}
+
+func interfaceIsPackageSealed(iface *types.Interface) bool {
+	if iface == nil {
+		return false
+	}
+	iface.Complete()
+	for method := range iface.Methods() {
+		// A package-private method prevents implementations outside its package.
+		if !method.Exported() {
+			return true
+		}
+	}
+	return false
 }
 
 func indexImplementationMethodSets(methodSets []semanticImplementationMethodSet) map[string][]int {

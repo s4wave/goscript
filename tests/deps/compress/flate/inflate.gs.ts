@@ -32,7 +32,7 @@ export type CorruptInputError = bigint
 export type InternalError = string
 
 export type Resetter = {
-	Reset(r: io.Reader | null, dict: $.Slice<number>): $.GoError
+	Reset(r: io.Reader | null, dict: $.Slice<number>): $.GoError | globalThis.Promise<$.GoError>
 }
 
 $.registerInterfaceType(

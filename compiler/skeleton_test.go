@@ -3924,6 +3924,198 @@ func TestCompilePackagesPropagatesAsyncGenericInterfaceMethods(t *testing.T) {
 	}
 }
 
+func TestCompilePackagesKeepsProtoGeneratedMethodsSync(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/protosync\n\ngo 1.25.3\n",
+		"main.go": `package protosync
+
+type oneof interface {
+	isOneof()
+}
+
+type branch struct {
+	Value int
+}
+func (*branch) isOneof() {}
+
+func (b *branch) CloneOneofVT() oneof {
+	if b == nil {
+		return (*branch)(nil)
+	}
+	clone := *b
+	return &clone
+}
+
+func (b *branch) EqualVT(other oneof) bool {
+	that, ok := other.(*branch)
+	if !ok {
+		return false
+	}
+	if b == nil || that == nil {
+		return b == nil && that == nil
+	}
+	return b.Value == that.Value
+}
+
+func (b *branch) SizeVT() int {
+	if b == nil {
+		return 0
+	}
+	return 1
+}
+
+type unrelated struct {
+	ch chan struct{}
+}
+
+func (u *unrelated) SizeVT() int {
+	<-u.ch
+	return 0
+}
+
+func UseUnrelated(value interface{ SizeVT() int }) int {
+	return value.SizeVT()
+}
+
+type Inner struct {
+	Value oneof
+}
+
+func (m *Inner) CloneVT() *Inner {
+	if m == nil {
+		return nil
+	}
+	clone := &Inner{}
+	if m.Value != nil {
+		clone.Value = m.Value.(interface{ CloneOneofVT() oneof }).CloneOneofVT()
+	}
+	return clone
+}
+
+func (m *Inner) EqualVT(that *Inner) bool {
+	if m == nil || that == nil {
+		return m == nil && that == nil
+	}
+	if m.Value == nil || that.Value == nil {
+		return m.Value == nil && that.Value == nil
+	}
+	return m.Value.(interface{ EqualVT(oneof) bool }).EqualVT(that.Value)
+}
+
+func (m *Inner) SizeVT() int {
+	if m == nil || m.Value == nil {
+		return 0
+	}
+	if value, ok := m.Value.(interface{ SizeVT() int }); ok {
+		return value.SizeVT()
+	}
+	return 0
+}
+
+type Outer struct {
+	Value *Inner
+}
+
+func (m *Outer) CloneVT() *Outer {
+	if m == nil {
+		return nil
+	}
+	clone := &Outer{}
+	if m.Value != nil {
+		clone.Value = m.Value.CloneVT()
+	}
+	return clone
+}
+
+func (m *Outer) EqualVT(that *Outer) bool {
+	if m == nil || that == nil {
+		return m == nil && that == nil
+	}
+	if m.Value == nil || that.Value == nil {
+		return m.Value == nil && that.Value == nil
+	}
+	return m.Value.EqualVT(that.Value)
+}
+
+func (m *Outer) SizeVT() int {
+	if m == nil || m.Value == nil {
+		return 0
+	}
+	return m.Value.SizeVT()
+}
+
+type CloneVT[T comparable] interface {
+	comparable
+	CloneVT() T
+}
+
+type EqualVT[T comparable] interface {
+	comparable
+	EqualVT(T) bool
+}
+
+type Message[T comparable] interface {
+	CloneVT[T]
+	EqualVT[T]
+	SizeVT() int
+}
+
+func requireMessage[T comparable, M Message[T]]() {}
+
+func init() {
+	requireMessage[*Inner, *Inner]()
+	requireMessage[*Outer, *Outer]()
+}
+`,
+	})
+	outputDir := filepath.Join(t.TempDir(), "output")
+	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir}, nil, nil)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatal(err.Error())
+	}
+
+	content, err := os.ReadFile(filepath.Join(outputDir, "@goscript", "example.test", "protosync", "main.gs.ts"))
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	text := string(content)
+	for _, signature := range []string{
+		"public CloneVT(): Inner | $.VarRef<Inner> | null",
+		"public EqualVT(that: Inner | $.VarRef<Inner> | null): boolean",
+		"public CloneVT(): Outer | $.VarRef<Outer> | null",
+		"public EqualVT(that: Outer | $.VarRef<Outer> | null): boolean",
+	} {
+		if !strings.Contains(text, signature) {
+			t.Errorf("generated output is missing synchronous signature %q:\n%s", signature, text)
+		}
+	}
+	if count := strings.Count(text, "public SizeVT(): number"); count != 3 {
+		t.Errorf("generated output has %d synchronous SizeVT methods, want 3:\n%s", count, text)
+	}
+	if signature := "public async SizeVT(): globalThis.Promise<number>"; !strings.Contains(text, signature) {
+		t.Errorf("generated output is missing asynchronous unrelated signature %q:\n%s", signature, text)
+	}
+	for _, want := range []string{
+		"export async function UseUnrelated(value: any): globalThis.Promise<number>",
+		"return $.pointerValue<any>(value).SizeVT()",
+	} {
+		if !strings.Contains(text, want) {
+			t.Errorf("generated output is missing asynchronous open-interface call %q:\n%s", want, text)
+		}
+	}
+	for _, signature := range []string{
+		"public async CloneVT",
+		"public async EqualVT",
+	} {
+		if strings.Contains(text, signature) {
+			t.Errorf("generated output unexpectedly contains asynchronous method %q:\n%s", signature, text)
+		}
+	}
+}
+
 func TestCompilePackagesPropagatesAsyncAnonymousInterfaceMethods(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod": "module example.test/anonymousasynciface\n\ngo 1.25.3\n",
@@ -4023,6 +4215,59 @@ func TestCompilePackagesPropagatesAsyncThroughInstantiatedNamedInterface(t *test
 	for _, want := range []string{
 		"export async function Use(ctx: context.Context | null, w: any, old: Snapshot): globalThis.Promise<[Snapshot, $.GoError]>",
 		"return $.pointerValue<any>(w).WaitValueChange(ctx, old, null)",
+	} {
+		if !strings.Contains(text, want) {
+			t.Fatalf("missing %q in generated output:\n%s", want, text)
+		}
+	}
+}
+
+func TestCompilePackagesKeepsOpenEmbeddedInterfaceDispatchAsync(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/openembed\n\ngo 1.25.3\n",
+		"dep/open.go": strings.Join([]string{
+			"package dep",
+			"type Open interface { M() }",
+			"",
+		}, "\n"),
+		"main.go": strings.Join([]string{
+			"package openembed",
+			"import \"example.test/openembed/dep\"",
+			"type sealed interface {",
+			"  dep.Open",
+			"  seal()",
+			"}",
+			"type local struct{}",
+			"func (*local) M() {}",
+			"func (*local) seal() {}",
+			"var _ sealed = (*local)(nil)",
+			"func Use(value dep.Open) {",
+			"  value.M()",
+			"}",
+			"",
+		}, "\n"),
+	})
+	outputDir := filepath.Join(t.TempDir(), "output")
+	service := NewCompileService()
+	_, err := service.Compile(context.Background(), &CompileRequest{
+		Patterns:            []string{".", "./dep"},
+		Dir:                 moduleDir,
+		OutputPath:          outputDir,
+		DependencyMode:      DependencyModeAll,
+		RuntimeEmissionMode: RuntimeEmissionModeEmit,
+	})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	content, err := os.ReadFile(filepath.Join(outputDir, "@goscript", "example.test", "openembed", "main.gs.ts"))
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	text := string(content)
+	for _, want := range []string{
+		"export async function Use(value: dep.Open | null): globalThis.Promise<void>",
+		"await $.pointerValue<Exclude<dep.Open, null>>(value).M()",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)

@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type Writer = {
-	Write(_p0: $.Slice<number>): [number, $.GoError]
+	Write(_p0: $.Slice<number>): [number, $.GoError] | globalThis.Promise<[number, $.GoError]>
 }
 
 $.registerInterfaceType(

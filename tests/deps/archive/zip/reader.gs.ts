@@ -65,10 +65,10 @@ export type readBuf = $.Slice<number>
 export type fileInfoDirEntry = {
 	Info(): [fs.FileInfo | null, $.GoError]
 	IsDir(): boolean
-	ModTime(): time.Time
-	Mode(): fs.FileMode
-	Name(): string
-	Size(): bigint
+	ModTime(): time.Time | globalThis.Promise<time.Time>
+	Mode(): fs.FileMode | globalThis.Promise<fs.FileMode>
+	Name(): string | globalThis.Promise<string>
+	Size(): bigint | globalThis.Promise<bigint>
 	Sys(): any
 	Type(): fs.FileMode
 }

@@ -533,6 +533,43 @@ func TestSemanticModelPropagatesAsyncThroughInstantiatedNamedInterface(t *testin
 	}
 }
 
+func TestSemanticModelKeepsInstantiatedSealedInterfaceCallAsync(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/genericsealed\n\ngo 1.25.3\n",
+		"main.go": strings.Join([]string{
+			"package genericsealed",
+			"type Watchable[T any] interface {",
+			"  sealed()",
+			"  Run() int",
+			"}",
+			"type syncImpl[T any] struct{}",
+			"func (syncImpl[T]) sealed() {}",
+			"func (syncImpl[T]) Run() int { return 0 }",
+			"type asyncInt struct { ch chan struct{} }",
+			"func (asyncInt) sealed() {}",
+			"func (a asyncInt) Run() int { <-a.ch; return 1 }",
+			"func Bind(Watchable[int]) {}",
+			"func Use(value Watchable[int]) int {",
+			"  return value.Run()",
+			"}",
+			"",
+		}, "\n"),
+	})
+	graph := loadPackageGraph(t, &CompileRequest{
+		Patterns:            []string{"."},
+		Dir:                 moduleDir,
+		OutputPath:          filepath.Join(t.TempDir(), "out"),
+		DependencyMode:      DependencyModeAll,
+		RuntimeEmissionMode: RuntimeEmissionModeEmit,
+	})
+	model := buildSemanticModel(t, graph)
+
+	use := requireDefinedFunc(t, graph, "example.test/genericsealed", "Use")
+	if !model.functions[use].async {
+		t.Fatalf("expected Use to remain async for the instantiated sealed interface, got %#v", model.functions[use])
+	}
+}
+
 func TestSemanticModelIndexesFunctionsByFullName(t *testing.T) {
 	model := newSemanticModel()
 	semPkg := &semanticPackage{}

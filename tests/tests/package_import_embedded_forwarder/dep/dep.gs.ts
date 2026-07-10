@@ -12,7 +12,7 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/package_import_embedded
 export type Tx = tx.Tx
 
 export type Store = {
-	NewTransaction(write: boolean): tx.Tx | $.VarRef<tx.Tx> | null
+	NewTransaction(write: boolean): tx.Tx | $.VarRef<tx.Tx> | null | globalThis.Promise<tx.Tx | $.VarRef<tx.Tx> | null>
 }
 
 $.registerInterfaceType(

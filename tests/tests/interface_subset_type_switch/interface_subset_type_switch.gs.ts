@@ -4,8 +4,8 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type MyInterface1 = {
-	MyString1(): string
-	MyString2(): string
+	MyString1(): string | globalThis.Promise<string>
+	MyString2(): string | globalThis.Promise<string>
 }
 
 $.registerInterfaceType(
@@ -15,7 +15,7 @@ $.registerInterfaceType(
 );
 
 export type MyInterface2 = {
-	MyString1(): string
+	MyString1(): string | globalThis.Promise<string>
 }
 
 $.registerInterfaceType(

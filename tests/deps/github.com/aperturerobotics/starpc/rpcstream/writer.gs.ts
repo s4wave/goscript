@@ -65,7 +65,7 @@ export class RpcStreamWriter {
 
 	public async WritePacket(p: srpc.Packet | $.VarRef<srpc.Packet> | null): globalThis.Promise<$.GoError> {
 		const r: RpcStreamWriter | $.VarRef<RpcStreamWriter> | null = this
-		let __goscriptTuple0: any = await srpc.Packet.prototype.MarshalVT.call(p)
+		let __goscriptTuple0: any = srpc.Packet.prototype.MarshalVT.call(p)
 		let pktData: $.Slice<number> = __goscriptTuple0[0]
 		let err = __goscriptTuple0[1]
 		if (err != null) {
@@ -80,8 +80,8 @@ export class RpcStreamWriter {
 		return await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream | null, null>>(this.RpcStream).CloseSend()
 	}
 
-	public Context(): any {
-		return $.pointerValue<Exclude<__goscript_rpcstream.RpcStream | null, null>>(this.RpcStream).Context()
+	public async Context(): globalThis.Promise<any> {
+		return await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream | null, null>>(this.RpcStream).Context()
 	}
 
 	public async MsgRecv(msg: any): globalThis.Promise<any> {

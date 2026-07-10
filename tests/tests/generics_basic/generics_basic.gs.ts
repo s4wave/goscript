@@ -16,7 +16,7 @@ export type Score = number
 export type Set = globalThis.Map<any, {}> | null
 
 export type Cloner = {
-	Clone(): any
+	Clone(): any | globalThis.Promise<any>
 }
 
 $.registerInterfaceType(

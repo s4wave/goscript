@@ -221,7 +221,7 @@ export class PacketReadWriter {
 		await $.pointerValue<PacketReadWriter>(r).writeMtx.Lock()
 		__defer.defer(() => { $.pointerValue<PacketReadWriter>(r).writeMtx.Unlock() })
 
-		let msgSize = await __goscript_rpcproto_pb.Packet.prototype.SizeVT.call(p)
+		let msgSize = __goscript_rpcproto_pb.Packet.prototype.SizeVT.call(p)
 		if ((msgSize < 0) || (msgSize > 10000000)) {
 			return errors.Errorf("message size %v greater than maximum %v", $.namedValueInterfaceValue<any>(msgSize, "int", {}, { kind: $.TypeKind.Basic, name: "int" }), $.namedValueInterfaceValue<any>(10000000, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
 		}
@@ -231,7 +231,7 @@ export class PacketReadWriter {
 		let data: $.Slice<number> = $.pointerValue<writeBuffer>(writeBuf).data
 		$.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))).PutUint32(data, $.uint($.uint(msgSize, 32), 32))
 
-		let [, err] = await __goscript_rpcproto_pb.Packet.prototype.MarshalToSizedBufferVT.call(p, $.goSlice(data, 4, undefined))
+		let [, err] = __goscript_rpcproto_pb.Packet.prototype.MarshalToSizedBufferVT.call(p, $.goSlice(data, 4, undefined))
 		if (err != null) {
 			return err
 		}

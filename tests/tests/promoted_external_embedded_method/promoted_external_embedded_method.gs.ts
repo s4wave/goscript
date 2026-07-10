@@ -7,7 +7,7 @@ import * as sync from "@goscript/sync/index.js"
 import "@goscript/sync/index.js"
 
 export type runner = {
-	Run(): string
+	Run(): string | globalThis.Promise<string>
 }
 
 $.registerInterfaceType(
@@ -262,8 +262,8 @@ export class rawRunner {
 		return $.markAsStructValue(cloned)
 	}
 
-	public Run(): any {
-		return $.pointerValue<Exclude<runner | null, null>>(this.runner).Run()
+	public async Run(): globalThis.Promise<any> {
+		return await $.pointerValue<Exclude<runner | null, null>>(this.runner).Run()
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -301,8 +301,8 @@ export class outerRunner {
 		return $.markAsStructValue(cloned)
 	}
 
-	public Run(): any {
-		return $.pointerValue<any>($.pointerValue<rawRunner>(this.rawRunner).runner).Run()
+	public async Run(): globalThis.Promise<any> {
+		return await $.pointerValue<any>($.pointerValue<rawRunner>(this.rawRunner).runner).Run()
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -356,7 +356,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.pointerValue<Exclude<sync.Locker, null>>(locker).Unlock()
 
 	let or = $.markAsStructValue(new outerRunner({rawRunner: $.markAsStructValue(new rawRunner({runner: $.interfaceValue<runner | null>($.markAsStructValue(new runnable()), "main.runnable")}))}))
-	$.println($.pointerValue<Exclude<runner, null>>(or.rawRunner.runner).Run())
+	$.println(await $.pointerValue<Exclude<runner, null>>(or.rawRunner.runner).Run())
 	$.println("ok")
 }
 

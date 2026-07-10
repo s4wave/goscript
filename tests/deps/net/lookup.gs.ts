@@ -1747,12 +1747,12 @@ export class onlyValuesCtx {
 		throw new globalThis.Error("goscript: unreachable return")
 	}
 
-	public Deadline(): any {
-		return $.pointerValue<Exclude<context.Context | null, null>>(this.Context).Deadline()
+	public async Deadline(): globalThis.Promise<any> {
+		return await $.pointerValue<Exclude<context.Context | null, null>>(this.Context).Deadline()
 	}
 
-	public Done(): any {
-		return $.pointerValue<Exclude<context.Context | null, null>>(this.Context).Done()
+	public async Done(): globalThis.Promise<any> {
+		return await $.pointerValue<Exclude<context.Context | null, null>>(this.Context).Done()
 	}
 
 	public async Err(): globalThis.Promise<any> {

@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type provider = {
-	Items(): $.Slice<Group | $.VarRef<Group> | null>
+	Items(): $.Slice<Group | $.VarRef<Group> | null> | globalThis.Promise<$.Slice<Group | $.VarRef<Group> | null>>
 }
 
 $.registerInterfaceType(

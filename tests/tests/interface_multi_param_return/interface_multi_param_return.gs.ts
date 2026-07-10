@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type MultiParamReturner = {
-	Process(data: $.Slice<number>, count: number, _p2: string): [boolean, $.GoError]
+	Process(data: $.Slice<number>, count: number, _p2: string): [boolean, $.GoError] | globalThis.Promise<[boolean, $.GoError]>
 }
 
 $.registerInterfaceType(

@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type Reader = {
-	Read(p: $.Slice<number>): [number, $.GoError]
+	Read(p: $.Slice<number>): [number, $.GoError] | globalThis.Promise<[number, $.GoError]>
 }
 
 $.registerInterfaceType(
@@ -49,8 +49,8 @@ export class MyReader {
 		return $.markAsStructValue(cloned)
 	}
 
-	public Read(p: any): any {
-		return $.pointerValue<Exclude<Reader | null, null>>(this.Reader).Read(p)
+	public async Read(p: any): globalThis.Promise<any> {
+		return await $.pointerValue<Exclude<Reader | null, null>>(this.Reader).Read(p)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -126,7 +126,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println($.pointerValue<MyReader>(mr2).Reader != null)
 
 	let buf: $.Slice<number> = $.makeSlice<number>(5, undefined, "byte")
-	let [n, ] = $.pointerValue<Exclude<Reader, null>>($.pointerValue<MyReader>(mr2).Reader).Read(buf)
+	let [n, ] = await $.pointerValue<Exclude<Reader, null>>($.pointerValue<MyReader>(mr2).Reader).Read(buf)
 	$.println(n == 5)
 
 	$.println(10)

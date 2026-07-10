@@ -66,7 +66,7 @@ import "./tcpsock_posix.gs.ts"
 import "./tcpsock_unix.gs.ts"
 
 export type Addr = {
-	Network(): string
+	Network(): string | globalThis.Promise<string>
 	String(): string | globalThis.Promise<string>
 }
 
@@ -158,7 +158,7 @@ export type UnknownNetworkError = string
 export type InvalidAddrError = string
 
 export type buffersWriter = {
-	writeBuffers(_p0: $.VarRef<Buffers> | null): [bigint, $.GoError]
+	writeBuffers(_p0: $.VarRef<Buffers> | null): [bigint, $.GoError] | globalThis.Promise<[bigint, $.GoError]>
 }
 
 $.registerInterfaceType(

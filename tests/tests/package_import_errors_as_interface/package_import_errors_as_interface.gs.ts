@@ -8,7 +8,7 @@ import "@goscript/errors/index.js"
 
 export type healthError = {
 	Error(): string
-	Health(): string
+	Health(): string | globalThis.Promise<string>
 }
 
 $.registerInterfaceType(

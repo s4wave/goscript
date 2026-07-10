@@ -14,8 +14,8 @@ import type * as __goscript_message from "./message.gs.ts"
 import type * as __goscript_stream from "./stream.gs.ts"
 
 export type Handler = {
-	GetMethodIDs(): $.Slice<string>
-	GetServiceID(): string
+	GetMethodIDs(): $.Slice<string> | globalThis.Promise<$.Slice<string>>
+	GetServiceID(): string | globalThis.Promise<string>
 	InvokeMethod(serviceID: string, methodID: string, strm: __goscript_stream.Stream | null): [boolean, $.GoError] | globalThis.Promise<[boolean, $.GoError]>
 }
 

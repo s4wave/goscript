@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type reader = {
-	Read(): number
+	Read(): number | globalThis.Promise<number>
 }
 
 $.registerInterfaceType(

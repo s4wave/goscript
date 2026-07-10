@@ -6,7 +6,7 @@ import * as $ from "@goscript/builtin/index.js"
 export type MyInt = number
 
 export type Doubler = {
-	Double(): number
+	Double(): number | globalThis.Promise<number>
 }
 
 $.registerInterfaceType(
@@ -16,7 +16,7 @@ $.registerInterfaceType(
 );
 
 export type Stringer = {
-	String(): string
+	String(): string | globalThis.Promise<string>
 }
 
 $.registerInterfaceType(

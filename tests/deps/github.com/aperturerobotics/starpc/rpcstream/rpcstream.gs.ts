@@ -34,7 +34,7 @@ import "./writer.gs.ts"
 export type RpcStream = {
 	Close(): $.GoError | globalThis.Promise<$.GoError>
 	CloseSend(): $.GoError | globalThis.Promise<$.GoError>
-	Context(): context.Context | null
+	Context(): context.Context | null | globalThis.Promise<context.Context | null>
 	MsgRecv(msg: srpc.Message): $.GoError | globalThis.Promise<$.GoError>
 	MsgSend(msg: srpc.Message): $.GoError | globalThis.Promise<$.GoError>
 	Recv(): [__goscript_rpcstream_pb.RpcStreamPacket | $.VarRef<__goscript_rpcstream_pb.RpcStreamPacket> | null, $.GoError] | globalThis.Promise<[__goscript_rpcstream_pb.RpcStreamPacket | $.VarRef<__goscript_rpcstream_pb.RpcStreamPacket> | null, $.GoError]>
