@@ -286,6 +286,10 @@ That is how the lowered Go API can call methods such as `MarshalVT`,
 `UnmarshalVT`, `CloneVT`, `EqualVT`, and `MarshalJSON` while the actual wire and
 JSON work goes through the native TypeScript protobuf implementation.
 
+Binary unmarshal passes Go byte slices to the native decoder as `Uint8Array`
+views. Offset views retain their logical byte offset and length without copying
+through a number array.
+
 ## Oneof files
 
 Files containing protobuf `oneof` fields are handled more conservatively. The
@@ -431,7 +435,7 @@ go test -timeout 60s -run '^TestProtobufTypeScriptBinding' ./compiler
 Run the protobuf compliance fixture:
 
 ```bash
-go test -timeout 60s -run '^TestCompliance/protobuf_lite_ts$' ./compiler
+go test -timeout 60s -run '^TestCompliance/core/protobuf_lite_ts$' ./compiler
 ```
 
 Run the protobuf runtime helper tests:

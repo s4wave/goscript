@@ -752,7 +752,7 @@ export function UnmarshalBoundMessageVT<T>(
 ): $.GoError {
   try {
     const messageType = boundMessageType(ctor)
-    const decoded = messageType.fromBinary(Uint8Array.from($.asArray(data)))
+    const decoded = messageType.fromBinary($.bytesToUint8Array(data))
     const next = fromTypeScriptMessage(decoded, ctor, messageType)
     $.assignStruct($.pointerValue(target), $.markAsStructValue(next))
     return null

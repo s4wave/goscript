@@ -222,6 +222,20 @@ class BytesBoundMessage {
   },
 }
 
+class BinaryInputBoundMessage {
+  static lastInput: Uint8Array | null | undefined
+
+  static __protobufTypeScriptMessage = {
+    typeName: 'test.BinaryInputBoundMessage',
+    fields: { list: () => [] },
+    fromBinary: (bytes: Uint8Array | null | undefined) => {
+      BinaryInputBoundMessage.lastInput = bytes
+      return {}
+    },
+    toBinary: () => new Uint8Array(),
+  }
+}
+
 class TimestampBoundMessage {
   public get Seconds(): number {
     return this._fields.Seconds.value
@@ -516,6 +530,38 @@ describe('protobuf-go-lite TypeScript binding helpers', () => {
 
     expect(err).toBeNull()
     expect(Array.from(bytes ?? [])).toEqual([9])
+  })
+
+  it('passes byte slices to binary unmarshal as typed-array views', () => {
+    const target = new BinaryInputBoundMessage()
+
+    expect(
+      UnmarshalBoundMessageVT(BinaryInputBoundMessage, target, [1, 2, 3]),
+    ).toBeNull()
+    expect(BinaryInputBoundMessage.lastInput).toBeInstanceOf(Uint8Array)
+    expect(Array.from(BinaryInputBoundMessage.lastInput ?? [])).toEqual([
+      1, 2, 3,
+    ])
+
+    const full = new Uint8Array([4, 5, 6])
+    expect(
+      UnmarshalBoundMessageVT(BinaryInputBoundMessage, target, full),
+    ).toBeNull()
+    expect(BinaryInputBoundMessage.lastInput).toBe(full)
+
+    const backing = new Uint8Array([9, 8, 7, 6, 5])
+    const view = $.goSlice(backing, 1, 4)
+    expect(
+      UnmarshalBoundMessageVT(BinaryInputBoundMessage, target, view),
+    ).toBeNull()
+    expect(BinaryInputBoundMessage.lastInput?.buffer).toBe(backing.buffer)
+    expect(BinaryInputBoundMessage.lastInput?.byteOffset).toBe(
+      backing.byteOffset + 1,
+    )
+    expect(BinaryInputBoundMessage.lastInput?.byteLength).toBe(3)
+    expect(Array.from(BinaryInputBoundMessage.lastInput ?? [])).toEqual([
+      8, 7, 6,
+    ])
   })
 
   it('returns bytes written after marshaling into a sized buffer', () => {
