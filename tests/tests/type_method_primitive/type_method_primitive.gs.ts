@@ -39,7 +39,7 @@ export function MyBool_String(b: $.VarRef<MyBool> | null): string {
 }
 
 export function asDoubler(v: MyInt): Doubler | null {
-	return $.namedValueInterfaceValue<Doubler | null>(v, "main.MyInt", {Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyInt" })
+	return $.namedValueInterfaceValue<Doubler | null>(v, "main.MyInt", {Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyInt" }, [{ name: "Double", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }])
 }
 
 export async function sumDoublers(vals: $.Slice<Doubler | null>): globalThis.Promise<number> {
@@ -70,7 +70,7 @@ export async function main(): globalThis.Promise<void> {
 	let fn: (() => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => () => MyInt_Double(__receiver))(10), ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))
 	$.println("Method ref call:", await fn!())
 
-	let d: Doubler | null = $.namedValueInterfaceValue<Doubler | null>(12, "main.MyInt", {Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyInt" })
+	let d: Doubler | null = $.namedValueInterfaceValue<Doubler | null>(12, "main.MyInt", {Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyInt" }, [{ name: "Double", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }])
 	$.println("Interface method call:", await $.pointerValue<Exclude<Doubler, null>>(d).Double())
 
 	let ret = asDoubler(13)
@@ -80,7 +80,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println("Interface assertion:", $.int(asserted), ok)
 
 	let vals: $.Slice<Doubler | null> = null as $.Slice<Doubler | null>
-	vals = $.append(vals, $.namedValueInterfaceValue<Doubler | null>(14, "main.MyInt", {Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyInt" }), $.namedValueInterfaceValue<Doubler | null>(15, "main.MyInt", {Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyInt" }))
+	vals = $.append(vals, $.namedValueInterfaceValue<Doubler | null>(14, "main.MyInt", {Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyInt" }, [{ name: "Double", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]), $.namedValueInterfaceValue<Doubler | null>(15, "main.MyInt", {Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyInt" }, [{ name: "Double", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]))
 	$.println("Interface slice append:", await sumDoublers(vals))
 
 	let __goscriptTuple0: any = assertDoubler({T: { type: { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyInt" }, zero: () => 0, methods: {Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, methodSignatures: [{ name: "Double", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }] }}, ret)
@@ -89,7 +89,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println("Generic interface assertion:", $.int(genericAsserted), genericOK)
 
 	let flag: $.VarRef<boolean> = $.varRef(false)
-	let stringer: Stringer | null = $.namedValueInterfaceValue<Stringer | null>(newMyBool(true, flag), "*main.MyBool", {String: (receiver: any, ...args: any[]) => (MyBool_String as any)(receiver, ...args)}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "bool", typeName: "main.MyBool" } })
+	let stringer: Stringer | null = $.namedValueInterfaceValue<Stringer | null>(newMyBool(true, flag), "*main.MyBool", {String: (receiver: any, ...args: any[]) => (MyBool_String as any)(receiver, ...args)}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "bool", typeName: "main.MyBool" } }, [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])
 	$.println("Pointer primitive interface:", await $.pointerValue<Exclude<Stringer, null>>(stringer).String(), flag.value)
 
 	let __goscriptTuple1: any = assertStringer({T: { type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "bool", typeName: "main.MyBool" } }, zero: () => null, methods: {String: (receiver: any, ...args: any[]) => (MyBool_String as any)(receiver, ...args)}, methodSignatures: [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] }}, stringer)

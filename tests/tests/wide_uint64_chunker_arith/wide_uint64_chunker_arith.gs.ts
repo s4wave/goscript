@@ -77,10 +77,7 @@ export class repeatReader {
 		if ($.pointerValue<repeatReader>(r).remaining == 0) {
 			return [0, io.EOF]
 		}
-		let n = $.len(p)
-		if (n > $.pointerValue<repeatReader>(r).remaining) {
-			n = $.pointerValue<repeatReader>(r).remaining
-		}
+		let n = $.min($.len(p), $.pointerValue<repeatReader>(r).remaining)
 		for (let i = 0; i < n; i++) {
 			p![i] = $.uint($.uint(i, 8), 8)
 		}
