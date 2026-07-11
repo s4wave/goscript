@@ -366,14 +366,14 @@ export class parser {
 			}
 		}
 		if (parser.prototype.calcHeight.call(p, re, true) > 1000) {
-			$.panic($.namedValueInterfaceValue<any>("expression nests too deeply", "syntax.ErrorCode", {String: (receiver: any, ...args: any[]) => (ErrorCode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "string", typeName: "syntax.ErrorCode" }))
+			$.panic($.namedValueInterfaceValue<any>("expression nests too deeply", "syntax.ErrorCode", {String: (receiver: any, ...args: any[]) => (ErrorCode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "string", typeName: "syntax.ErrorCode" }, [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]))
 		}
 	}
 
 	public checkLimits(re: __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null): void {
 		const p: parser | $.VarRef<parser> | null = this
 		if ($.pointerValue<parser>(p).numRunes > 33554432) {
-			$.panic($.namedValueInterfaceValue<any>("expression too large", "syntax.ErrorCode", {String: (receiver: any, ...args: any[]) => (ErrorCode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "string", typeName: "syntax.ErrorCode" }))
+			$.panic($.namedValueInterfaceValue<any>("expression too large", "syntax.ErrorCode", {String: (receiver: any, ...args: any[]) => (ErrorCode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "string", typeName: "syntax.ErrorCode" }, [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]))
 		}
 		parser.prototype.checkSize.call(p, re)
 		parser.prototype.checkHeight.call(p, re)
@@ -419,7 +419,7 @@ export class parser {
 		}
 
 		if (parser.prototype.calcSize.call(p, re, true) > 3355443n) {
-			$.panic($.namedValueInterfaceValue<any>("expression too large", "syntax.ErrorCode", {String: (receiver: any, ...args: any[]) => (ErrorCode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "string", typeName: "syntax.ErrorCode" }))
+			$.panic($.namedValueInterfaceValue<any>("expression too large", "syntax.ErrorCode", {String: (receiver: any, ...args: any[]) => (ErrorCode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "string", typeName: "syntax.ErrorCode" }, [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]))
 		}
 	}
 
@@ -1965,12 +1965,12 @@ export async function parse(s: string, flags: Flags): globalThis.Promise<[__gosc
 					{
 						break
 					}
-					case $.comparableEqual(__goscriptSwitch0, $.namedValueInterfaceValue<any>("expression too large", "syntax.ErrorCode", {String: (receiver: any, ...args: any[]) => (ErrorCode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "string", typeName: "syntax.ErrorCode" })):
+					case $.comparableEqual(__goscriptSwitch0, $.namedValueInterfaceValue<any>("expression too large", "syntax.ErrorCode", {String: (receiver: any, ...args: any[]) => (ErrorCode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "string", typeName: "syntax.ErrorCode" }, [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])):
 					{
 						err = $.interfaceValue<$.GoError>(new Error({Code: "expression too large", Expr: s}), "*syntax.Error")
 						break
 					}
-					case $.comparableEqual(__goscriptSwitch0, $.namedValueInterfaceValue<any>("expression nests too deeply", "syntax.ErrorCode", {String: (receiver: any, ...args: any[]) => (ErrorCode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "string", typeName: "syntax.ErrorCode" })):
+					case $.comparableEqual(__goscriptSwitch0, $.namedValueInterfaceValue<any>("expression nests too deeply", "syntax.ErrorCode", {String: (receiver: any, ...args: any[]) => (ErrorCode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "string", typeName: "syntax.ErrorCode" }, [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])):
 					{
 						err = $.interfaceValue<$.GoError>(new Error({Code: "expression nests too deeply", Expr: s}), "*syntax.Error")
 						break

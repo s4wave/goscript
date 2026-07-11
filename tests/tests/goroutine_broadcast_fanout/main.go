@@ -21,12 +21,12 @@ func main() {
 	var bcast broadcast.Broadcast
 	completed := 0
 
-	for w := 0; w < workers; w++ {
+	for w := range workers {
 		go func(id int) {
 			// Await-free CPU span: a tight loop with no I/O or channel op, the
 			// starvation shape from issue_118 scaled across 16 goroutines.
 			sum := 0
-			for i := 0; i < 200000; i++ {
+			for i := range 200000 {
 				sum += i * (id + 1)
 			}
 			_ = sum

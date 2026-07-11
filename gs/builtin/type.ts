@@ -1669,6 +1669,7 @@ export function namedValueInterfaceValue<T>(
   typeName: string,
   methods: Record<string, (receiver: any, ...args: any[]) => any>,
   typeInfo?: TypeInfo | string,
+  methodSignatures?: MethodSignature[],
 ): T {
   const boxed: any = {
     __goType: typeName,
@@ -1681,7 +1682,9 @@ export function namedValueInterfaceValue<T>(
   for (const [name, method] of Object.entries(methods)) {
     boxed[name] = (...args: any[]) => method(value, ...args)
     boxed[name].__goscriptMethodWrapper = true
-    const signature = wrapperMethodSignatureFromTypeInfo(name, typeInfo)
+    const signature =
+      methodSignatures?.find((candidate) => candidate.name === name) ??
+      wrapperMethodSignatureFromTypeInfo(name, typeInfo)
     if (signature) {
       boxed[name].__goscriptMethodSignature = signature
     }

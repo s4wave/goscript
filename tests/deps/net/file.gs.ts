@@ -31,7 +31,7 @@ export function FileConn(f: os.File | $.VarRef<os.File> | null): [__goscript_net
 	c = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
 	if (err != null) {
-		err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField0 = $.namedValueInterfaceValue<__goscript_net.Addr | null>(os.File.prototype.Name.call($.pointerValue<os.File>(f)), "net.fileAddr", {Network: (receiver: any, ...args: any[]) => (fileAddr_Network as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args), String: (receiver: any, ...args: any[]) => (fileAddr_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.fileAddr" }); return new __goscript_net.OpError({Op: "file", Net: "file+net", Source: null, Addr: __goscriptLiteralField0, Err: err}) })(), "*net.OpError")
+		err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField0 = $.namedValueInterfaceValue<__goscript_net.Addr | null>(os.File.prototype.Name.call($.pointerValue<os.File>(f)), "net.fileAddr", {Network: (receiver: any, ...args: any[]) => (fileAddr_Network as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args), String: (receiver: any, ...args: any[]) => (fileAddr_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.fileAddr" }, [{ name: "Network", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]); return new __goscript_net.OpError({Op: "file", Net: "file+net", Source: null, Addr: __goscriptLiteralField0, Err: err}) })(), "*net.OpError")
 	}
 	return [c, err]
 }
@@ -43,7 +43,7 @@ export function FileListener(f: os.File | $.VarRef<os.File> | null): [__goscript
 	ln = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
-		err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField1 = $.namedValueInterfaceValue<__goscript_net.Addr | null>(os.File.prototype.Name.call($.pointerValue<os.File>(f)), "net.fileAddr", {Network: (receiver: any, ...args: any[]) => (fileAddr_Network as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args), String: (receiver: any, ...args: any[]) => (fileAddr_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.fileAddr" }); return new __goscript_net.OpError({Op: "file", Net: "file+net", Source: null, Addr: __goscriptLiteralField1, Err: err}) })(), "*net.OpError")
+		err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField1 = $.namedValueInterfaceValue<__goscript_net.Addr | null>(os.File.prototype.Name.call($.pointerValue<os.File>(f)), "net.fileAddr", {Network: (receiver: any, ...args: any[]) => (fileAddr_Network as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args), String: (receiver: any, ...args: any[]) => (fileAddr_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.fileAddr" }, [{ name: "Network", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]); return new __goscript_net.OpError({Op: "file", Net: "file+net", Source: null, Addr: __goscriptLiteralField1, Err: err}) })(), "*net.OpError")
 	}
 	return [ln, err]
 }
@@ -55,7 +55,7 @@ export function FilePacketConn(f: os.File | $.VarRef<os.File> | null): [__goscri
 	c = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	if (err != null) {
-		err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField2 = $.namedValueInterfaceValue<__goscript_net.Addr | null>(os.File.prototype.Name.call($.pointerValue<os.File>(f)), "net.fileAddr", {Network: (receiver: any, ...args: any[]) => (fileAddr_Network as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args), String: (receiver: any, ...args: any[]) => (fileAddr_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.fileAddr" }); return new __goscript_net.OpError({Op: "file", Net: "file+net", Source: null, Addr: __goscriptLiteralField2, Err: err}) })(), "*net.OpError")
+		err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField2 = $.namedValueInterfaceValue<__goscript_net.Addr | null>(os.File.prototype.Name.call($.pointerValue<os.File>(f)), "net.fileAddr", {Network: (receiver: any, ...args: any[]) => (fileAddr_Network as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args), String: (receiver: any, ...args: any[]) => (fileAddr_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.fileAddr" }, [{ name: "Network", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]); return new __goscript_net.OpError({Op: "file", Net: "file+net", Source: null, Addr: __goscriptLiteralField2, Err: err}) })(), "*net.OpError")
 	}
 	return [c, err]
 }

@@ -283,7 +283,7 @@ export function Level_MarshalText(level: Level): [$.Slice<number>, $.GoError] {
 		}
 		default:
 		{
-			return [null, fmt.Errorf("not a valid logrus level %d", $.namedValueInterfaceValue<any>(level, "logrus.Level", {MarshalText: (receiver: any, ...args: any[]) => (Level_MarshalText as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args), String: (receiver: any, ...args: any[]) => (Level_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "uint32", typeName: "logrus.Level" }))]
+			return [null, fmt.Errorf("not a valid logrus level %d", $.namedValueInterfaceValue<any>(level, "logrus.Level", {MarshalText: (receiver: any, ...args: any[]) => (Level_MarshalText as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args), String: (receiver: any, ...args: any[]) => (Level_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "uint32", typeName: "logrus.Level" }, [{ name: "MarshalText", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "_r1", type: "error" }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]))]
 			break
 		}
 	}

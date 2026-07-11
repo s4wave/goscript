@@ -2,7 +2,7 @@ package main
 
 func sum(values *[4]int) int {
 	out := len(values) + cap(values)
-	for i := 0; i < len(values); i++ {
+	for i := range len(values) {
 		out += values[i]
 	}
 	return out

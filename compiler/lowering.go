@@ -11434,10 +11434,14 @@ func (o *LoweringOwner) lowerNamedValueInterfaceWrapper(
 	if methods == "" {
 		return ""
 	}
+	signatures := o.genericMethodSignatureDescriptors(methodSetType)
+	if signatures == "" {
+		return ""
+	}
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperNamedValueInterfaceValue) +
 		"<" + o.tsTypeFor(ctx, targetType) + ">(" + value + ", " +
 		strconv.Quote(goRuntimeTypeString(sourceType)) + ", " + methods + ", " +
-		o.runtimeTypeInfoExpr(sourceType) + ")"
+		o.runtimeTypeInfoExpr(sourceType) + ", " + signatures + ")"
 }
 
 func (o *LoweringOwner) lowerPrimitiveErrorWrapper(ctx lowerFileContext, sourceType types.Type, value string) string {

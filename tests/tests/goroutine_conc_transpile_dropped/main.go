@@ -31,7 +31,7 @@ func main() {
 	leaf := func() {
 		// Await-free CPU span: a tight loop with no I/O or channel op.
 		sum := 0
-		for i := 0; i < 200000; i++ {
+		for i := range 200000 {
 			sum += i * 3
 		}
 		_ = sum
@@ -42,7 +42,7 @@ func main() {
 
 	child := func() {
 		jobs := make([]func(), 0, leaves)
-		for l := 0; l < leaves; l++ {
+		for range leaves {
 			jobs = append(jobs, leaf)
 		}
 		q.Enqueue(jobs...)
@@ -50,7 +50,7 @@ func main() {
 
 	root := func() {
 		jobs := make([]func(), 0, children)
-		for c := 0; c < children; c++ {
+		for range children {
 			jobs = append(jobs, child)
 		}
 		q.Enqueue(jobs...)
