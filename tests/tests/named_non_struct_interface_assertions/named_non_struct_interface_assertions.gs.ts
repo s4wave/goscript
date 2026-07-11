@@ -21,6 +21,10 @@ export type namedArray = number[]
 
 export type namedInt = number
 
+export type namedFunc = (() => number | globalThis.Promise<number>) | null
+
+export type namedChan = $.Channel<number> | null
+
 export type pointerSlice = $.Slice<number>
 
 export type pointerMap = globalThis.Map<string, number> | null
@@ -39,6 +43,14 @@ export function namedArray_Add(v: namedArray, n: number): number {
 
 export function namedInt_Add(v: namedInt, n: number): number {
 	return $.int(v) + n
+}
+
+export async function namedFunc_Add(v: namedFunc | null, n: number): globalThis.Promise<number> {
+	return await v!() + n
+}
+
+export function namedChan_Add(v: namedChan, n: number): number {
+	return $.cap(v) + n
 }
 
 export function pointerSlice_Add(v: $.VarRef<pointerSlice> | null, n: number): number {
@@ -65,6 +77,10 @@ export async function main(): globalThis.Promise<void> {
 	await check($.namedValueInterfaceValue<any>(new globalThis.Map<string, number>([["one", 1], ["two", 2]]), "main.namedMap", {Add: (receiver: any, ...args: any[]) => (namedMap_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, "main.namedMap", [{ name: "Add", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]))
 	await check($.namedValueInterfaceValue<any>([1, 2], "main.namedArray", {Add: (receiver: any, ...args: any[]) => (namedArray_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, "main.namedArray", [{ name: "Add", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]))
 	await check($.namedValueInterfaceValue<any>(4, "main.namedInt", {Add: (receiver: any, ...args: any[]) => (namedInt_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "int", typeName: "main.namedInt" }, [{ name: "Add", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]))
+	await check($.namedValueInterfaceValue<any>($.namedFunction($.functionValue((): number => {
+		return 2
+	}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo)), "main.namedFunc", ({ kind: $.TypeKind.Function, name: "main.namedFunc", params: [], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo)), "main.namedFunc", {Add: (receiver: any, ...args: any[]) => (namedFunc_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, ({ kind: $.TypeKind.Function, name: "main.namedFunc", params: [], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo), [{ name: "Add", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]))
+	await check($.namedValueInterfaceValue<any>($.makeChannel<number>(2, 0, "both"), "main.namedChan", {Add: (receiver: any, ...args: any[]) => (namedChan_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, "main.namedChan", [{ name: "Add", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]))
 	let value: $.VarRef<pointerSlice> = $.varRef(($.arrayToSlice<number>([1, 2]) as pointerSlice))
 	await check($.namedValueInterfaceValue<any>(value, "*main.pointerSlice", {Add: (receiver: any, ...args: any[]) => (pointerSlice_Add as any)(receiver, ...args)}, { kind: $.TypeKind.Pointer, elemType: "main.pointerSlice" }, [{ name: "Add", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]))
 	let mapped: $.VarRef<pointerMap> = $.varRef(new globalThis.Map<string, number>([["one", 1], ["two", 2]]))

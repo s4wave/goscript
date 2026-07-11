@@ -28,6 +28,18 @@ func (v namedInt) Add(n int) int {
 	return int(v) + n
 }
 
+type namedFunc func() int
+
+func (v namedFunc) Add(n int) int {
+	return v() + n
+}
+
+type namedChan chan int
+
+func (v namedChan) Add(n int) int {
+	return cap(v) + n
+}
+
 type pointerSlice []int
 
 func (v *pointerSlice) Add(n int) int {
@@ -54,6 +66,8 @@ func main() {
 	check(namedMap{"one": 1, "two": 2})
 	check(namedArray{1, 2})
 	check(namedInt(4))
+	check(namedFunc(func() int { return 2 }))
+	check(make(namedChan, 2))
 	value := pointerSlice{1, 2}
 	check(&value)
 	mapped := pointerMap{"one": 1, "two": 2}
