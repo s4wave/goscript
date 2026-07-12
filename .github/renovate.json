@@ -21,7 +21,7 @@
     {
       "matchManagers": ["gomod"],
       "matchDepTypes": ["golang"],
-      "enabled": false
+      "enabled": true
     }
   ]
 }
