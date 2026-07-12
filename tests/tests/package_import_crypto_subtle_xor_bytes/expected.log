@@ -1,0 +1,10 @@
+normal count 4
+normal value true
+unequal count 2
+unequal value true
+short panics true
+short unchanged true
+exact count 4
+exact value true
+inexact panics true
+inexact unchanged true

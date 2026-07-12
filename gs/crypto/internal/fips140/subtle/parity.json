@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "strict": true,
+  "symbols": {
+    "ConstantTimeCompare": { "status": "real" },
+    "ConstantTimeCopy": { "status": "real" },
+    "ConstantTimeLessOrEqBytes": { "status": "real" },
+    "XORBytes": { "status": "real" }
+  }
+}
