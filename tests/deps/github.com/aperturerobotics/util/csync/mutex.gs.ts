@@ -155,7 +155,7 @@ export class Mutex {
 
 	public Locker(): sync.Locker | null {
 		const m: Mutex | $.VarRef<Mutex> | null = this
-		return $.interfaceValue<sync.Locker | null>(new MutexLocker({m: m}), "*csync.MutexLocker")
+		return $.interfaceValue<sync.Locker | null>(new MutexLocker({m: m}), "*csync.MutexLocker", { kind: $.TypeKind.Pointer, elemType: "csync.MutexLocker" })
 	}
 
 	public async TryLock(): globalThis.Promise<[(() => void) | null, boolean]> {

@@ -986,7 +986,7 @@ export class decompressor {
 			// bufio.NewReader will not return r, as r does not implement flate.Reader, so it is not bufio.Reader.
 			$.pointerValue<decompressor>(f).rBuf = bufio.NewReader(r)
 		}
-		$.pointerValue<decompressor>(f).r = $.interfaceValue<Reader | null>($.pointerValue<decompressor>(f).rBuf, "*bufio.Reader")
+		$.pointerValue<decompressor>(f).r = $.interfaceValue<Reader | null>($.pointerValue<decompressor>(f).rBuf, "*bufio.Reader", { kind: $.TypeKind.Pointer, elemType: "bufio.Reader" })
 	}
 
 	public async moreBits(): globalThis.Promise<$.GoError> {
@@ -1269,7 +1269,7 @@ export async function NewReader(r: io.Reader | null): globalThis.Promise<io.Read
 	f.value.codebits = $.varRef<number[]>(Array.from({ length: 19 }, () => 0))
 	f.value.step = $.functionValue(async (f: decompressor | $.VarRef<decompressor> | null): globalThis.Promise<void> => await $.pointerValue<decompressor>(f).nextBlock(), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "flate.decompressor" }], results: [] } as $.FunctionTypeInfo))
 	f.value.dict.init(32768, null)
-	return $.interfaceValue<io.ReadCloser | null>(f, "*flate.decompressor")
+	return $.interfaceValue<io.ReadCloser | null>(f, "*flate.decompressor", { kind: $.TypeKind.Pointer, elemType: "flate.decompressor" })
 }
 
 export async function NewReaderDict(r: io.Reader | null, dict: $.Slice<number>): globalThis.Promise<io.ReadCloser | null> {
@@ -1281,5 +1281,5 @@ export async function NewReaderDict(r: io.Reader | null, dict: $.Slice<number>):
 	f.value.codebits = $.varRef<number[]>(Array.from({ length: 19 }, () => 0))
 	f.value.step = $.functionValue(async (f: decompressor | $.VarRef<decompressor> | null): globalThis.Promise<void> => await $.pointerValue<decompressor>(f).nextBlock(), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "flate.decompressor" }], results: [] } as $.FunctionTypeInfo))
 	f.value.dict.init(32768, dict)
-	return $.interfaceValue<io.ReadCloser | null>(f, "*flate.decompressor")
+	return $.interfaceValue<io.ReadCloser | null>(f, "*flate.decompressor", { kind: $.TypeKind.Pointer, elemType: "flate.decompressor" })
 }

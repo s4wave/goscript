@@ -36,6 +36,21 @@ describe('crypto/ed25519 override', () => {
     )
     expect(ok).toBe(true)
     expect(Array.from(unboxed)).toEqual(Array.from(pub))
-    expect((boxed as any).Equal(boxed)).toBe(true)
+    const [equaler, equalerOK] = $.typeAssertTuple<{
+      Equal(x: unknown): boolean
+    }>(boxed, {
+      kind: $.TypeKind.Interface,
+      methods: [
+        {
+          name: 'Equal',
+          args: [{ name: 'x', type: 'crypto.PublicKey' }],
+          returns: [
+            { name: '_r0', type: { kind: $.TypeKind.Basic, name: 'bool' } },
+          ],
+        },
+      ],
+    })
+    expect(equalerOK).toBe(true)
+    expect(equaler.Equal(boxed)).toBe(true)
   })
 })

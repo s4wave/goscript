@@ -98,7 +98,7 @@ export class divisor {
 		() => new divisor(),
 		[],
 		divisor,
-		[{ name: "bbb", key: "bbb", type: "big.nat" }, { name: "nbits", key: "nbits", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "ndigits", key: "ndigits", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		[{ name: "bbb", key: "bbb", type: { kind: $.TypeKind.Slice, typeName: "big.nat", elemType: { kind: $.TypeKind.Basic, name: "uint", typeName: "big.Word" } }, pkgPath: "math/big", index: [0], offset: 0, exported: false }, { name: "nbits", key: "nbits", type: { kind: $.TypeKind.Basic, name: "int" }, pkgPath: "math/big", index: [1], offset: 24, exported: false }, { name: "ndigits", key: "ndigits", type: { kind: $.TypeKind.Basic, name: "int" }, pkgPath: "math/big", index: [2], offset: 32, exported: false }]
 	)
 }
 

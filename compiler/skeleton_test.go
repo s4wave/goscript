@@ -1028,8 +1028,35 @@ func TestCompilePackagesWrapsChannelSendInterfaceValues(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	text := string(content)
-	if !strings.Contains(text, "$.chanSend(ch, $.interfaceValue<item | null>(v, \"*main.concrete\"))") {
+	if !strings.Contains(text, "$.chanSend(ch, $.interfaceValue<item | null>(v, \"*main.concrete\",") {
 		t.Fatalf("missing interface wrapper for channel send:\n%s", text)
+	}
+}
+
+func TestCompilePackagesEndsImportOnlyFilesWithOneNewline(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/importonly\n\ngo 1.25.3\n",
+		"main.go": strings.Join([]string{
+			"package importonly",
+			"import _ \"hash\"",
+			"",
+		}, "\n"),
+	})
+	outputDir := filepath.Join(t.TempDir(), "output")
+	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir}, nil, nil)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatal(err.Error())
+	}
+	content, err := os.ReadFile(filepath.Join(outputDir, "@goscript", "example.test", "importonly", "main.gs.ts"))
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	if strings.HasSuffix(string(content), "\n\n") {
+		t.Fatalf("import-only generated file ended with a blank line:\n%s", content)
 	}
 }
 
@@ -2915,7 +2942,7 @@ func TestCompilePackagesEmitsInterfacesMethodValuesTypeSwitchesAndFunctionAssert
 		"$.namedFunction(greet, \"main.Greeter\", ({ kind: $.TypeKind.Function, name: \"main.Greeter\"",
 		"params: [{ kind: $.TypeKind.Basic, name: \"string\" }]",
 		"results: [{ kind: $.TypeKind.Basic, name: \"string\" }]",
-		"$.interfaceValue<any>(null, \"*struct{Name string}\")",
+		"$.interfaceValue<any>(null, \"*struct{Name string}\",",
 		"elemType: { kind: $.TypeKind.Struct, methods: [], fields: [{ name: \"Name\", key: \"Name\", type: { kind: $.TypeKind.Basic, name: \"string\" }",
 		"let fn = __goscriptTuple",
 		"switch (true)",
@@ -3064,9 +3091,9 @@ func TestCompilePackagesBoxesTypedNilInterfaceValues(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"return $.interfaceValue<Animal | null>(FindDog(), \"*main.Dog\")",
+		"return $.interfaceValue<Animal | null>(FindDog(), \"*main.Dog\",",
 		"$.println(await $.pointerValue<Exclude<Animal, null>>(animal).Name())",
-		"let a: Animal | null = $.interfaceValue<Animal | null>(dog, \"*main.Dog\")",
+		"let a: Animal | null = $.interfaceValue<Animal | null>(dog, \"*main.Dog\",",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -3108,7 +3135,7 @@ func TestCompilePackagesBoxesAliasPointerInterfacesWithTargetRuntimeType(t *test
 		t.Fatal(err.Error())
 	}
 	text := string(content)
-	if !strings.Contains(text, "$.interfaceValue<$.GoError>(new dep.CloudError(), \"*dep.CloudError\")") {
+	if !strings.Contains(text, "$.interfaceValue<$.GoError>(new dep.CloudError(), \"*dep.CloudError\",") {
 		t.Fatalf("alias pointer was not boxed with target runtime type:\n%s", text)
 	}
 	if strings.Contains(text, "*main.cloudError") {
@@ -3930,7 +3957,7 @@ func TestCompilePackagesEmitsAsyncChannelsSelectAndDefer(t *testing.T) {
 		"$.selectStatement<any, void>([",
 		"let v = __goscriptSelect1Result.value",
 		"return $.selectVoidReturn()",
-		"await call($.interfaceValue<Processor | null>(new Worker({ch: $.makeChannel<number>(1, 0, \"both\")}), \"*main.Worker\"))",
+		"await call($.interfaceValue<Processor | null>(new Worker({ch: $.makeChannel<number>(1, 0, \"both\")}), \"*main.Worker\",",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)

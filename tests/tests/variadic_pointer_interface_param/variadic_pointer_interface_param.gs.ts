@@ -66,8 +66,8 @@ export function replace(to: Expr | null, exprs: $.Slice<$.VarRef<Expr | null> | 
 }
 
 export async function main(): globalThis.Promise<void> {
-	let expr: $.VarRef<Expr | null> = $.varRef($.interfaceValue<Expr | null>(new lit({n: 1}), "*main.lit"))
-	let next: Expr | null = $.interfaceValue<Expr | null>(new lit({n: 7}), "*main.lit")
+	let expr: $.VarRef<Expr | null> = $.varRef($.interfaceValue<Expr | null>(new lit({n: 1}), "*main.lit", { kind: $.TypeKind.Pointer, elemType: "main.lit" }))
+	let next: Expr | null = $.interfaceValue<Expr | null>(new lit({n: 7}), "*main.lit", { kind: $.TypeKind.Pointer, elemType: "main.lit" })
 	$.println(replace(next, $.arrayToSlice<$.VarRef<Expr | null> | null>([expr])), await $.pointerValue<Exclude<Expr, null>>(expr.value).Value())
 }
 

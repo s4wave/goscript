@@ -146,9 +146,9 @@ export class State {
 	static __typeInfo = $.registerStructType(
 		"chacha8rand.State",
 		() => new State(),
-		[{ name: "Init", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "Init64", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "Next", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint64" } }, { type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Refill", args: [], returns: [] }, { name: "Reseed", args: [], returns: [] }],
+		[{ name: "Init", args: [{ name: "seed", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 32 } }], returns: [] }, { name: "Init64", args: [{ name: "seed", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint64" }, length: 4 } }], returns: [] }, { name: "Next", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint64" } }, { name: "_r1", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Refill", args: [], returns: [] }, { name: "Reseed", args: [], returns: [] }],
 		State,
-		[{ name: "buf", key: "buf", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint64" }, length: 32 } }, { name: "seed", key: "seed", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint64" }, length: 4 } }, { name: "i", key: "i", type: { kind: $.TypeKind.Basic, name: "uint32" } }, { name: "n", key: "n", type: { kind: $.TypeKind.Basic, name: "uint32" } }, { name: "c", key: "c", type: { kind: $.TypeKind.Basic, name: "uint32" } }]
+		[{ name: "buf", key: "buf", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint64" }, length: 32 }, pkgPath: "internal/chacha8rand", index: [0], offset: 0, exported: false }, { name: "seed", key: "seed", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint64" }, length: 4 }, pkgPath: "internal/chacha8rand", index: [1], offset: 256, exported: false }, { name: "i", key: "i", type: { kind: $.TypeKind.Basic, name: "uint32" }, pkgPath: "internal/chacha8rand", index: [2], offset: 288, exported: false }, { name: "n", key: "n", type: { kind: $.TypeKind.Basic, name: "uint32" }, pkgPath: "internal/chacha8rand", index: [3], offset: 292, exported: false }, { name: "c", key: "c", type: { kind: $.TypeKind.Basic, name: "uint32" }, pkgPath: "internal/chacha8rand", index: [4], offset: 296, exported: false }]
 	)
 }
 
@@ -175,7 +175,7 @@ export class errUnmarshalChaCha8 {
 	static __typeInfo = $.registerStructType(
 		"chacha8rand.errUnmarshalChaCha8",
 		() => new errUnmarshalChaCha8(),
-		[{ name: "Error", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		[{ name: "Error", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }],
 		errUnmarshalChaCha8,
 		[]
 	)
@@ -210,11 +210,11 @@ export function Marshal(s: State | $.VarRef<State> | null): $.Slice<number> {
 
 export function Unmarshal(s: State | $.VarRef<State> | null, data: $.Slice<number>): $.GoError {
 	if (($.len(data) != (6 * 8)) || (!$.stringEqual($.bytesToString($.goSlice(data, undefined, 8)), "chacha8:"))) {
-		return $.interfaceValue<$.GoError>(new errUnmarshalChaCha8(), "*chacha8rand.errUnmarshalChaCha8")
+		return $.interfaceValue<$.GoError>(new errUnmarshalChaCha8(), "*chacha8rand.errUnmarshalChaCha8", { kind: $.TypeKind.Pointer, elemType: "chacha8rand.errUnmarshalChaCha8" })
 	}
 	let used = byteorder.BEUint64($.goSlice(data, 1 * 8, undefined))
 	if (used > 124n) {
-		return $.interfaceValue<$.GoError>(new errUnmarshalChaCha8(), "*chacha8rand.errUnmarshalChaCha8")
+		return $.interfaceValue<$.GoError>(new errUnmarshalChaCha8(), "*chacha8rand.errUnmarshalChaCha8", { kind: $.TypeKind.Pointer, elemType: "chacha8rand.errUnmarshalChaCha8" })
 	}
 	for (let __goscriptRangeTarget2 = $.pointerValue<State>(s).seed, i = 0; i < $.len(__goscriptRangeTarget2); i++) {
 		$.pointerValue<State>(s).seed[i] = byteorder.LEUint64($.goSlice(data, (2 + i) * 8, undefined))

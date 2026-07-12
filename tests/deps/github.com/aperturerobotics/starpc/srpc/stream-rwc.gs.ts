@@ -99,7 +99,7 @@ export class StreamRwc {
 
 				$.pointerValue<StreamRwc>(s).readMsg.Clear()
 				{
-					let __goscriptShadow0 = await $.pointerValue<Exclude<__goscript_stream.Stream, null>>($.pointerValue<StreamRwc>(s).Stream).MsgRecv($.interfaceValue<__goscript_message.Message>($.pointerValue<StreamRwc>(s)._fields.readMsg, "*srpc.RawMessage"))
+					let __goscriptShadow0 = await $.pointerValue<Exclude<__goscript_stream.Stream, null>>($.pointerValue<StreamRwc>(s).Stream).MsgRecv($.interfaceValue<__goscript_message.Message>($.pointerValue<StreamRwc>(s)._fields.readMsg, "*srpc.RawMessage", { kind: $.TypeKind.Pointer, elemType: "srpc.RawMessage" }))
 					if (__goscriptShadow0 != null) {
 						return [n, __goscriptShadow0]
 					}
@@ -133,7 +133,7 @@ export class StreamRwc {
 		let n: number = 0
 		let err: $.GoError = null as $.GoError
 		$.pointerValue<StreamRwc>(s).writeMsg.SetData(p)
-		err = await $.pointerValue<Exclude<__goscript_stream.Stream, null>>($.pointerValue<StreamRwc>(s).Stream).MsgSend($.interfaceValue<__goscript_message.Message>($.pointerValue<StreamRwc>(s)._fields.writeMsg, "*srpc.RawMessage"))
+		err = await $.pointerValue<Exclude<__goscript_stream.Stream, null>>($.pointerValue<StreamRwc>(s).Stream).MsgSend($.interfaceValue<__goscript_message.Message>($.pointerValue<StreamRwc>(s)._fields.writeMsg, "*srpc.RawMessage", { kind: $.TypeKind.Pointer, elemType: "srpc.RawMessage" }))
 		$.pointerValue<StreamRwc>(s).writeMsg.Clear()
 		if (err != null) {
 			return [0, err]

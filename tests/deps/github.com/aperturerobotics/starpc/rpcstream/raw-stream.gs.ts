@@ -71,7 +71,7 @@ export async function HandleRawRpcStream(stream: __goscript_rpcstream.RpcStream 
 	if (err != null) {
 		errStr = $.pointerValue<Exclude<$.GoError, null>>(err).Error()
 	}
-	let sendErr = await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream, null>>(stream).Send(new __goscript_rpcstream_pb.RpcStreamPacket({Body: $.interfaceValue<__goscript_rpcstream_pb.isRpcStreamPacket_Body | null>(new __goscript_rpcstream_pb.RpcStreamPacket_Ack({Ack: new __goscript_rpcstream_pb.RpcAck({Error: errStr})}), "*rpcstream.RpcStreamPacket_Ack")}))
+	let sendErr = await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream, null>>(stream).Send(new __goscript_rpcstream_pb.RpcStreamPacket({Body: $.interfaceValue<__goscript_rpcstream_pb.isRpcStreamPacket_Body | null>(new __goscript_rpcstream_pb.RpcStreamPacket_Ack({Ack: new __goscript_rpcstream_pb.RpcAck({Error: errStr})}), "*rpcstream.RpcStreamPacket_Ack", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket_Ack" })}))
 	if (err != null) {
 		return err
 	}
@@ -84,8 +84,8 @@ export async function HandleRawRpcStream(stream: __goscript_rpcstream.RpcStream 
 	// 1 incoming message = 1 outgoing message
 	let srw: __goscript_read_writer.RpcStreamReadWriter | $.VarRef<__goscript_read_writer.RpcStreamReadWriter> | null = __goscript_read_writer.NewRpcStreamReadWriter(stream)
 	let errCh: $.Channel<$.GoError> | null = $.makeChannel<$.GoError>(2, null, "both")
-	queueMicrotask(async () => { await copyRwcTo(remoteRwc, $.interfaceValue<io.ReadWriteCloser | null>(srw, "*rpcstream.RpcStreamReadWriter"), errCh) })
-	queueMicrotask(async () => { await copyRwcTo($.interfaceValue<io.ReadWriteCloser | null>(srw, "*rpcstream.RpcStreamReadWriter"), remoteRwc, errCh) })
+	queueMicrotask(async () => { await copyRwcTo(remoteRwc, $.interfaceValue<io.ReadWriteCloser | null>(srw, "*rpcstream.RpcStreamReadWriter", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamReadWriter" }), errCh) })
+	queueMicrotask(async () => { await copyRwcTo($.interfaceValue<io.ReadWriteCloser | null>(srw, "*rpcstream.RpcStreamReadWriter", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamReadWriter" }), remoteRwc, errCh) })
 
 	// wait for both errors
 	let outErr: $.GoError = null as $.GoError

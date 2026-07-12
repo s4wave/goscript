@@ -39,7 +39,7 @@ export class msg {
 
 	public CloneMessageVT(): protobuf_go_lite.CloneMessage | null {
 		const m: msg | $.VarRef<msg> | null = this
-		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(msg.prototype.CloneVT.call(m), "*main.msg")
+		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(msg.prototype.CloneVT.call(m), "*main.msg", { kind: $.TypeKind.Pointer, elemType: "main.msg" })
 	}
 
 	public CloneVT(): msg | $.VarRef<msg> | null {

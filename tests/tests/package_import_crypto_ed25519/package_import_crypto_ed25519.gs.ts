@@ -35,7 +35,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println("verify ok", await ed25519.Verify((pub as ed25519.PublicKey), msg, sig))
 	$.println("verify wrong", await ed25519.Verify((pub as ed25519.PublicKey), new Uint8Array([119, 114, 111, 110, 103]), sig))
 
-	let pubFromPriv: ed25519.PublicKey = ($.mustTypeAssert<ed25519.PublicKey>(ed25519.PrivateKey_Public(priv), "ed25519.PublicKey") as ed25519.PublicKey)
+	let pubFromPriv: ed25519.PublicKey = ($.mustTypeAssert<ed25519.PublicKey>(ed25519.PrivateKey_Public(priv), { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }) as ed25519.PublicKey)
 	$.println("public equal", bytes.Equal(pub, pubFromPriv))
 	$.println("private seed len", $.len(ed25519.PrivateKey_Seed(priv)))
 	$.println("nil literal reader err nil", await generateWithReader(null) == null)

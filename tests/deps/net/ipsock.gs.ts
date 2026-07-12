@@ -340,7 +340,7 @@ export async function filterAddrList(filter: ((_p0: __goscript_iprawsock.IPAddr)
 		}
 	}
 	if ($.len((addrs as addrList)) == 0) {
-		return [(null as addrList), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField2 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_net.errNoSuitableAddress).Error(); return new __goscript_net.AddrError({Err: __goscriptLiteralField2, Addr: originalAddr}) })(), "*net.AddrError")]
+		return [(null as addrList), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField2 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_net.errNoSuitableAddress).Error(); return new __goscript_net.AddrError({Err: __goscriptLiteralField2, Addr: originalAddr}) })(), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 	}
 	return [(addrs as addrList), null]
 }
@@ -363,7 +363,7 @@ export async function SplitHostPort(hostport: string): globalThis.Promise<[strin
 		let host: string = ""
 		let port: string = ""
 		let err: $.GoError = null as $.GoError
-		return ["", "", $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: why, Addr: addr}), "*net.AddrError")]
+		return ["", "", $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: why, Addr: addr}), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "error"] } as $.FunctionTypeInfo))
 	let j = 0
 	let k = 0

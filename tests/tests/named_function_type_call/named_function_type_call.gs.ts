@@ -130,7 +130,7 @@ export class MockFilesystem {
 
 	public ReadDir(path: string): [$.Slice<FileInfo | null>, $.GoError] {
 		const m: MockFilesystem | $.VarRef<MockFilesystem> | null = this
-		return [$.arrayToSlice<FileInfo | null>([$.interfaceValue<FileInfo | null>(new MockFileInfo({name: "file1.txt", size: 100n, isDir: false}), "*main.MockFileInfo"), $.interfaceValue<FileInfo | null>(new MockFileInfo({name: "subdir", size: 0n, isDir: true}), "*main.MockFileInfo")]), null]
+		return [$.arrayToSlice<FileInfo | null>([$.interfaceValue<FileInfo | null>(new MockFileInfo({name: "file1.txt", size: 100n, isDir: false}), "*main.MockFileInfo", { kind: $.TypeKind.Pointer, elemType: "main.MockFileInfo" }), $.interfaceValue<FileInfo | null>(new MockFileInfo({name: "subdir", size: 0n, isDir: true}), "*main.MockFileInfo", { kind: $.TypeKind.Pointer, elemType: "main.MockFileInfo" })]), null]
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -361,7 +361,7 @@ export async function main(): globalThis.Promise<void> {
 		return null
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }, "main.FileInfo", "error"], results: ["error"] } as $.FunctionTypeInfo))
 
-	let err = await walkWithCustomFunc($.interfaceValue<Filesystem | null>(fs, "*main.MockFilesystem"), "/test", $.interfaceValue<FileInfo | null>(fileInfo, "*main.MockFileInfo"), walkFunc)
+	let err = await walkWithCustomFunc($.interfaceValue<Filesystem | null>(fs, "*main.MockFilesystem", { kind: $.TypeKind.Pointer, elemType: "main.MockFilesystem" }), "/test", $.interfaceValue<FileInfo | null>(fileInfo, "*main.MockFileInfo", { kind: $.TypeKind.Pointer, elemType: "main.MockFileInfo" }), walkFunc)
 	if (err != null) {
 		$.println("Walk error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 	}
@@ -390,10 +390,10 @@ export async function main(): globalThis.Promise<void> {
 
 	let worker: morphismWorker | $.VarRef<morphismWorker> | null = new morphismWorker({ready: $.makeChannel<boolean>(1, false, "both")})
 	let shape: shapeNode | $.VarRef<shapeNode> | null = new shapeNode({value: 7})
-	$.println("Named morphism:", await useMorphism($.functionValue(((__receiver) => (s: Shape | null) => __receiver.lookup(s))($.pointerValue<morphismWorker>(worker)), ({ kind: $.TypeKind.Function, params: ["main.Shape"], results: ["main.Shape"] } as $.FunctionTypeInfo)), $.interfaceValue<Shape | null>(shape, "*main.shapeNode")))
+	$.println("Named morphism:", await useMorphism($.functionValue(((__receiver) => (s: Shape | null) => __receiver.lookup(s))($.pointerValue<morphismWorker>(worker)), ({ kind: $.TypeKind.Function, params: ["main.Shape"], results: ["main.Shape"] } as $.FunctionTypeInfo)), $.interfaceValue<Shape | null>(shape, "*main.shapeNode", { kind: $.TypeKind.Pointer, elemType: "main.shapeNode" })))
 	let holder: MorphismHolder | $.VarRef<MorphismHolder> | null = await newMorphismHolder($.functionValue(((__receiver) => (s: Shape | null) => __receiver.lookup(s))($.pointerValue<morphismWorker>(worker)), ({ kind: $.TypeKind.Function, params: ["main.Shape"], results: ["main.Shape"] } as $.FunctionTypeInfo)))
-	$.println("Field morphism:", await MorphismHolder.prototype.apply.call(holder, $.interfaceValue<Shape | null>(shape, "*main.shapeNode")))
-	$.println("Cloned field morphism:", await MorphismHolder.prototype.cloneApply.call(holder, $.interfaceValue<Shape | null>(shape, "*main.shapeNode")))
+	$.println("Field morphism:", await MorphismHolder.prototype.apply.call(holder, $.interfaceValue<Shape | null>(shape, "*main.shapeNode", { kind: $.TypeKind.Pointer, elemType: "main.shapeNode" })))
+	$.println("Cloned field morphism:", await MorphismHolder.prototype.cloneApply.call(holder, $.interfaceValue<Shape | null>(shape, "*main.shapeNode", { kind: $.TypeKind.Pointer, elemType: "main.shapeNode" })))
 	$.pointerValue<morphismWorker>(worker).ready!.close()
 }
 

@@ -110,7 +110,7 @@ export class file {
 		}
 		if ($.len($.pointerValue<file>(f).data) < $.cap($.pointerValue<file>(f).data)) {
 			let ln = $.len($.pointerValue<file>(f).data)
-			let [n, err] = await io.ReadFull($.pointerValueOrNil($.interfaceValue<io.Reader | null>($.pointerValue<file>(f).file, "*os.File"))!, $.goSlice($.pointerValue<file>(f).data, ln, $.cap($.pointerValue<file>(f).data)))
+			let [n, err] = await io.ReadFull($.pointerValueOrNil($.interfaceValue<io.Reader | null>($.pointerValue<file>(f).file, "*os.File", { kind: $.TypeKind.Pointer, elemType: "os.File" }))!, $.goSlice($.pointerValue<file>(f).data, ln, $.cap($.pointerValue<file>(f).data)))
 			if (n >= 0) {
 				$.pointerValue<file>(f).data = $.goSlice($.pointerValue<file>(f).data, 0, ln + n)
 			}

@@ -174,14 +174,14 @@ export class Reader {
 		await Reader.prototype.initFileList.call(r)
 
 		if (!fs.ValidPath(name)) {
-			return [null, $.interfaceValue<$.GoError>(new fs.PathError({Op: "open", Path: name, Err: fs.ErrInvalid}), "*fs.PathError")]
+			return [null, $.interfaceValue<$.GoError>(new fs.PathError({Op: "open", Path: name, Err: fs.ErrInvalid}), "*fs.PathError", { kind: $.TypeKind.Pointer, elemType: "fs.PathError" })]
 		}
 		let e: fileListEntry | $.VarRef<fileListEntry> | null = Reader.prototype.openLookup.call(r, name)
 		if (e == null) {
-			return [null, $.interfaceValue<$.GoError>(new fs.PathError({Op: "open", Path: name, Err: fs.ErrNotExist}), "*fs.PathError")]
+			return [null, $.interfaceValue<$.GoError>(new fs.PathError({Op: "open", Path: name, Err: fs.ErrNotExist}), "*fs.PathError", { kind: $.TypeKind.Pointer, elemType: "fs.PathError" })]
 		}
 		if ($.pointerValue<fileListEntry>(e).isDir) {
-			return [$.interfaceValue<fs.File | null>((() => { const __goscriptLiteralField0 = Reader.prototype.openReadDir.call(r, name); return new openDir({e: e, files: __goscriptLiteralField0, offset: 0}) })(), "*zip.openDir"), null]
+			return [$.interfaceValue<fs.File | null>((() => { const __goscriptLiteralField0 = Reader.prototype.openReadDir.call(r, name); return new openDir({e: e, files: __goscriptLiteralField0, offset: 0}) })(), "*zip.openDir", { kind: $.TypeKind.Pointer, elemType: "zip.openDir" }), null]
 		}
 		let [rc, err] = await File.prototype.Open.call($.pointerValue<fileListEntry>(e).file)
 		if (err != null) {
@@ -236,7 +236,7 @@ export class Reader {
 				return err
 			}
 		}
-		let buf: bufio.Reader | $.VarRef<bufio.Reader> | null = bufio.NewReader($.interfaceValue<io.Reader | null>(rs, "*io.SectionReader"))
+		let buf: bufio.Reader | $.VarRef<bufio.Reader> | null = bufio.NewReader($.interfaceValue<io.Reader | null>(rs, "*io.SectionReader", { kind: $.TypeKind.Pointer, elemType: "io.SectionReader" }))
 
 		// The count of files inside a zip is truncated to fit in a uint16.
 		// Gloss over this by reading headers until we encounter
@@ -244,7 +244,7 @@ export class Reader {
 		// the file count modulo 65536 is incorrect.
 		while (true) {
 			let f: File | $.VarRef<File> | null = new File({zip: r, zipr: rdr})
-			err = await readDirectoryHeader(f, $.interfaceValue<io.Reader | null>(buf, "*bufio.Reader"))
+			err = await readDirectoryHeader(f, $.interfaceValue<io.Reader | null>(buf, "*bufio.Reader", { kind: $.TypeKind.Pointer, elemType: "bufio.Reader" }))
 			if (($.comparableEqual(err, ErrFormat)) || ($.comparableEqual(err, io.ErrUnexpectedEOF))) {
 				break
 			}
@@ -594,9 +594,9 @@ export class File {
 			// data, but we are tolerant of cases where the uncompressed size is
 			// zero but compressed size is not.
 			if ($.pointerValue<File>(f).FileHeader.UncompressedSize64 != 0n) {
-				return [$.interfaceValue<io.ReadCloser | null>(new dirReader({err: ErrFormat}), "*zip.dirReader"), null]
+				return [$.interfaceValue<io.ReadCloser | null>(new dirReader({err: ErrFormat}), "*zip.dirReader", { kind: $.TypeKind.Pointer, elemType: "zip.dirReader" }), null]
 			} else {
-				return [$.interfaceValue<io.ReadCloser | null>(new dirReader({err: io.EOF}), "*zip.dirReader"), null]
+				return [$.interfaceValue<io.ReadCloser | null>(new dirReader({err: io.EOF}), "*zip.dirReader", { kind: $.TypeKind.Pointer, elemType: "zip.dirReader" }), null]
 			}
 		}
 		let size = $.int64($.pointerValue<File>(f).FileHeader.CompressedSize64)
@@ -605,12 +605,12 @@ export class File {
 		if (dcomp == null) {
 			return [null, ErrAlgorithm]
 		}
-		let rc: io.ReadCloser | null = await dcomp!($.interfaceValue<io.Reader | null>(r, "*io.SectionReader"))
+		let rc: io.ReadCloser | null = await dcomp!($.interfaceValue<io.Reader | null>(r, "*io.SectionReader", { kind: $.TypeKind.Pointer, elemType: "io.SectionReader" }))
 		let desr: io.Reader | null = null as io.Reader | null
 		if ($.pointerValue<File>(f).FileHeader.hasDataDescriptor()) {
-			desr = $.interfaceValue<io.Reader | null>(io.NewSectionReader($.pointerValueOrNil($.pointerValue<File>(f).zipr)!, $.int64Add(($.int64Add($.pointerValue<File>(f).headerOffset, bodyOffset)), size), 16n), "*io.SectionReader")
+			desr = $.interfaceValue<io.Reader | null>(io.NewSectionReader($.pointerValueOrNil($.pointerValue<File>(f).zipr)!, $.int64Add(($.int64Add($.pointerValue<File>(f).headerOffset, bodyOffset)), size), 16n), "*io.SectionReader", { kind: $.TypeKind.Pointer, elemType: "io.SectionReader" })
 		}
-		rc = $.interfaceValue<io.ReadCloser | null>((() => { const __goscriptLiteralField1 = crc32.NewIEEE(); return new checksumReader({rc: rc, hash: __goscriptLiteralField1, f: f, desr: desr}) })(), "*zip.checksumReader")
+		rc = $.interfaceValue<io.ReadCloser | null>((() => { const __goscriptLiteralField1 = crc32.NewIEEE(); return new checksumReader({rc: rc, hash: __goscriptLiteralField1, f: f, desr: desr}) })(), "*zip.checksumReader", { kind: $.TypeKind.Pointer, elemType: "zip.checksumReader" })
 		return [rc, null]
 	}
 
@@ -621,7 +621,7 @@ export class File {
 			return [null, err]
 		}
 		let r: io.SectionReader | $.VarRef<io.SectionReader> | null = io.NewSectionReader($.pointerValueOrNil($.pointerValue<File>(f).zipr)!, $.int64Add($.pointerValue<File>(f).headerOffset, bodyOffset), $.int64($.pointerValue<File>(f).FileHeader.CompressedSize64))
-		return [$.interfaceValue<io.Reader | null>(r, "*io.SectionReader"), null]
+		return [$.interfaceValue<io.Reader | null>(r, "*io.SectionReader", { kind: $.TypeKind.Pointer, elemType: "io.SectionReader" }), null]
 	}
 
 	public async findBodyOffset(): globalThis.Promise<[bigint, $.GoError]> {
@@ -861,7 +861,7 @@ export class checksumReader {
 
 	public Stat(): [fs.FileInfo | null, $.GoError] {
 		const r: checksumReader | $.VarRef<checksumReader> | null = this
-		return [$.interfaceValue<fs.FileInfo | null>($.markAsStructValue(new __goscript_struct.headerFileInfo({fh: $.pointerValue<File>($.pointerValue<checksumReader>(r).f)._fields.FileHeader})), "zip.headerFileInfo"), null]
+		return [$.interfaceValue<fs.FileInfo | null>($.markAsStructValue(new __goscript_struct.headerFileInfo({fh: $.pointerValue<File>($.pointerValue<checksumReader>(r).f)._fields.FileHeader})), "zip.headerFileInfo", "zip.headerFileInfo"), null]
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -931,7 +931,7 @@ export class fileListEntry {
 
 	public Info(): [fs.FileInfo | null, $.GoError] {
 		const f: fileListEntry | $.VarRef<fileListEntry> | null = this
-		return [$.interfaceValue<fs.FileInfo | null>(f, "*zip.fileListEntry"), null]
+		return [$.interfaceValue<fs.FileInfo | null>(f, "*zip.fileListEntry", { kind: $.TypeKind.Pointer, elemType: "zip.fileListEntry" }), null]
 	}
 
 	public IsDir(): boolean {
@@ -965,7 +965,7 @@ export class fileListEntry {
 
 	public String(): string {
 		const f: fileListEntry | $.VarRef<fileListEntry> | null = this
-		return fs.FormatDirEntry($.pointerValueOrNil($.interfaceValue<fs.DirEntry | null>(f, "*zip.fileListEntry"))!)
+		return fs.FormatDirEntry($.pointerValueOrNil($.interfaceValue<fs.DirEntry | null>(f, "*zip.fileListEntry", { kind: $.TypeKind.Pointer, elemType: "zip.fileListEntry" }))!)
 	}
 
 	public Sys(): any {
@@ -984,9 +984,9 @@ export class fileListEntry {
 			return [null, errors.New($.pointerValue<fileListEntry>(f).name + ": duplicate entries in zip file")]
 		}
 		if (!$.pointerValue<fileListEntry>(f).isDir) {
-			return [$.interfaceValue<fileInfoDirEntry | null>($.markAsStructValue(new __goscript_struct.headerFileInfo({fh: $.pointerValue<File>($.pointerValue<fileListEntry>(f).file)._fields.FileHeader})), "zip.headerFileInfo"), null]
+			return [$.interfaceValue<fileInfoDirEntry | null>($.markAsStructValue(new __goscript_struct.headerFileInfo({fh: $.pointerValue<File>($.pointerValue<fileListEntry>(f).file)._fields.FileHeader})), "zip.headerFileInfo", "zip.headerFileInfo"), null]
 		}
-		return [$.interfaceValue<fileInfoDirEntry | null>(f, "*zip.fileListEntry"), null]
+		return [$.interfaceValue<fileInfoDirEntry | null>(f, "*zip.fileListEntry", { kind: $.TypeKind.Pointer, elemType: "zip.fileListEntry" }), null]
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -1051,7 +1051,7 @@ export class openDir {
 
 	public Read(_p0: $.Slice<number>): [number, $.GoError] {
 		const d: openDir | $.VarRef<openDir> | null = this
-		return [0, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField9 = errors.New("is a directory"); return new fs.PathError({Op: "read", Path: $.pointerValue<fileListEntry>($.pointerValue<openDir>(d).e).name, Err: __goscriptLiteralField9}) })(), "*fs.PathError")]
+		return [0, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField9 = errors.New("is a directory"); return new fs.PathError({Op: "read", Path: $.pointerValue<fileListEntry>($.pointerValue<openDir>(d).e).name, Err: __goscriptLiteralField9}) })(), "*fs.PathError", { kind: $.TypeKind.Pointer, elemType: "fs.PathError" })]
 	}
 
 	public async ReadDir(count: number): globalThis.Promise<[$.Slice<fs.DirEntry | null>, $.GoError]> {
@@ -1073,7 +1073,7 @@ export class openDir {
 				return [null, err]
 			} else {
 				if (($.stringEqual(await $.pointerValue<Exclude<fileInfoDirEntry, null>>(s).Name(), ".")) || !fs.ValidPath(await $.pointerValue<Exclude<fileInfoDirEntry, null>>(s).Name())) {
-					return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField10 = fmt.Errorf("invalid file name: %v", $.arrayIndex($.pointerValue<openDir>(d).files!, $.pointerValue<openDir>(d).offset + i).name); return new fs.PathError({Op: "readdir", Path: $.pointerValue<fileListEntry>($.pointerValue<openDir>(d).e).name, Err: __goscriptLiteralField10}) })(), "*fs.PathError")]
+					return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField10 = fmt.Errorf("invalid file name: %v", $.arrayIndex($.pointerValue<openDir>(d).files!, $.pointerValue<openDir>(d).offset + i).name); return new fs.PathError({Op: "readdir", Path: $.pointerValue<fileListEntry>($.pointerValue<openDir>(d).e).name, Err: __goscriptLiteralField10}) })(), "*fs.PathError", { kind: $.TypeKind.Pointer, elemType: "fs.PathError" })]
 				}
 			}
 			list![i] = (s as fs.DirEntry | null)
@@ -1144,7 +1144,7 @@ export async function OpenReader(name: string): globalThis.Promise<[ReadCloser |
 	}
 	let r: ReadCloser | $.VarRef<ReadCloser> | null = new ReadCloser()
 	{
-		err = await $.pointerValue<ReadCloser>(r).Reader.init($.interfaceValue<io.ReaderAt | null>(f, "*os.File"), await $.pointerValue<Exclude<fs.FileInfo, null>>(fi).Size())
+		err = await $.pointerValue<ReadCloser>(r).Reader.init($.interfaceValue<io.ReaderAt | null>(f, "*os.File", { kind: $.TypeKind.Pointer, elemType: "os.File" }), await $.pointerValue<Exclude<fs.FileInfo, null>>(fi).Size())
 		if ((err != null) && (!$.comparableEqual(err, ErrInsecurePath))) {
 			os.File.prototype.Close.call($.pointerValue<os.File>(f))
 			return [null, err]
@@ -1486,7 +1486,7 @@ export async function readDirectoryEnd(r: io.ReaderAt | null, size: bigint): glo
 	if (baseOffset > 0n) {
 		let off = $.int64($.pointerValue<__goscript_struct.directoryEnd>(d).directoryOffset)
 		let rs: io.SectionReader | $.VarRef<io.SectionReader> | null = io.NewSectionReader($.pointerValueOrNil(r)!, off, $.int64Sub(size, off))
-		if (await readDirectoryHeader(new File(), $.interfaceValue<io.Reader | null>(rs, "*io.SectionReader")) == null) {
+		if (await readDirectoryHeader(new File(), $.interfaceValue<io.Reader | null>(rs, "*io.SectionReader", { kind: $.TypeKind.Pointer, elemType: "io.SectionReader" })) == null) {
 			baseOffset = 0n
 		}
 	}

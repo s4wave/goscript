@@ -215,8 +215,10 @@ function fieldPointerAddress(target: object, key: string): number {
 
 function internType(t: Type): Type {
   const key = typeIdentityKey(t)
+  $.markReflectTypeIdentity(t, key)
   const existing = canonicalTypes.get(key)
   if (existing) {
+    $.markReflectTypeIdentity(existing, key)
     mergeTypeMetadata(existing, t)
     return existing
   }
@@ -522,15 +524,17 @@ export class Value {
   // _parentVarRef tracks the VarRef this value was dereferenced from (for Set support)
   private _parentVarRef?: $.VarRef<ReflectValue>
   // _parentStruct and _fieldName track the parent struct and field name for struct field Set() support
-  private _parentStruct?: Record<string, any>
+  private _parentStruct?: Record<string, unknown>
   private _fieldName?: string
+  private _interfaceValue?: ReflectValue
 
   constructor(
     value?: ReflectValue | Record<string, never>,
     type?: Type | null,
     parentVarRef?: $.VarRef<ReflectValue>,
-    parentStruct?: Record<string, any>,
+    parentStruct?: Record<string, unknown>,
     fieldName?: string,
+    interfaceValue?: ReflectValue,
   ) {
     // Handle zero-value initialization: new Value({}) or new Value()
     // This corresponds to reflect.Value{} in Go which is an invalid/zero value
@@ -552,6 +556,7 @@ export class Value {
     this._parentVarRef = parentVarRef
     this._parentStruct = parentStruct
     this._fieldName = fieldName
+    this._interfaceValue = interfaceValue
   }
 
   public clone(): Value {
@@ -561,6 +566,7 @@ export class Value {
       this._parentVarRef,
       this._parentStruct,
       this._fieldName,
+      this._interfaceValue,
     )
     return cloned
   }
@@ -826,7 +832,9 @@ export class Value {
         .__goValue
       return new Value(varRef.value, this._type.Elem(), varRef)
     }
-    // For interfaces, return the underlying value
+    if (this._type.Kind() === Interface) {
+      return ValueOf(this._value)
+    }
     return new Value(this._value, this._type, this._parentVarRef)
   }
 
@@ -961,7 +969,12 @@ export class Value {
   }
 
   public CanAddr(): boolean {
-    return this.Kind() !== Ptr && this._value !== null // Simplified
+    return (
+      this.Kind() !== Ptr &&
+      (this._parentVarRef !== undefined ||
+        (this._parentStruct !== undefined && this._fieldName !== undefined) ||
+        this._value !== null)
+    )
   }
 
   public Addr(): Value {
@@ -997,7 +1010,37 @@ export class Value {
   }
 
   // Additional methods from deleted reflect.gs.ts
-  public Interface(): any {
+  public Interface(): ReflectValue {
+    if (this._interfaceValue !== undefined) {
+      return this._interfaceValue
+    }
+    const typeInfo = typeInfoFromReflectType(this._type)
+    const namedType =
+      this._type.Name() !== '' &&
+      (this._type.PkgPath() !== '' || this._type.String().includes('.'))
+    const elemType = this._type.Kind() === Ptr ? this._type.Elem() : null
+    const namedElemType =
+      elemType !== null &&
+      elemType.Name() !== '' &&
+      (elemType.PkgPath() !== '' || elemType.String().includes('.'))
+    if (this._type.Kind() === Struct && namedType) {
+      return $.interfaceValue<ReflectValue>(
+        this._value,
+        this._type.String(),
+        typeInfo,
+      )
+    }
+    if (
+      (namedType && this._type.Kind() !== Struct) ||
+      (this._type.Kind() === Ptr && namedElemType)
+    ) {
+      return $.namedValueInterfaceValue<ReflectValue>(
+        this._value,
+        this._type.String(),
+        {},
+        typeInfo,
+      )
+    }
     return this._value
   }
 
@@ -1088,10 +1131,7 @@ export class Value {
     if (!value.has(rawKey)) {
       return new Value(null, new BasicType(Invalid, 'invalid'))
     }
-    return new Value(
-      value.get(rawKey) as ReflectValue,
-      this.Type().Elem(),
-    )
+    return new Value(value.get(rawKey) as ReflectValue, this.Type().Elem())
   }
 
   public MapKeys(): $.Slice<Value> {
@@ -1410,10 +1450,7 @@ export class Value {
 
   // Equal reports whether v is equal to u
   public Equal(u: Value): boolean {
-    return DeepEqual(
-      this._value,
-      (u as { value: ReflectValue }).value,
-    )
+    return DeepEqual(this._value, (u as { value: ReflectValue }).value)
   }
 
   // CanInterface reports whether Interface can be used without panicking
@@ -1713,10 +1750,13 @@ export class BasicType implements Type {
 
 // Slice type implementation
 class SliceType implements Type {
-  constructor(private _elemType: Type) {}
+  constructor(
+    private _elemType: Type,
+    private _typeName: string = '',
+  ) {}
 
   public String(): string {
-    return '[]' + this._elemType.String()
+    return this._typeName || '[]' + this._elemType.String()
   }
 
   public Kind(): Kind {
@@ -1760,12 +1800,17 @@ class SliceType implements Type {
   }
 
   public PkgPath(): string {
-    return ''
+    if (!this._typeName) return ''
+    const dotIndex = this._typeName.lastIndexOf('.')
+    return dotIndex > 0 ? this._typeName.substring(0, dotIndex) : ''
   }
 
   public Name(): string {
-    // Slice types are unnamed composite types
-    return ''
+    if (!this._typeName) return ''
+    const dotIndex = this._typeName.lastIndexOf('.')
+    return dotIndex >= 0 ?
+        this._typeName.substring(dotIndex + 1)
+      : this._typeName
   }
 
   public Field(_i: number): StructField {
@@ -4008,7 +4053,19 @@ export function TypeOf(i: ReflectValue): Type {
 }
 
 export function ValueOf(i: ReflectValue): Value {
-  return new Value(i, getTypeOf(i))
+  const typ = internType(getTypeOf(i))
+  if ($.isNamedValueBox(i)) {
+    // Named interface boxes contain Go values, which are all reflectable.
+    return new Value(
+      i.__goValue as ReflectValue,
+      typ,
+      undefined,
+      undefined,
+      undefined,
+      i,
+    )
+  }
+  return new Value(i, typ)
 }
 
 export function TypeAssert(
@@ -4353,6 +4410,7 @@ function typeFromStructuredTypeInfoWithSeen(
           info.elemType ?? { kind: $.TypeKind.Basic, name: 'unknown' },
           seen,
         ),
+        info.typeName,
       )
     case $.TypeKind.Struct:
       return StructType.createTypeFromFieldInfo(info, seen)
@@ -4429,8 +4487,9 @@ function functionTypeInfoFromType(typ: Type): $.FunctionTypeInfo {
 }
 
 export function typeInfoFromReflectType(typ: Type): string | $.TypeInfo {
-  if (typ.PkgPath() !== '' && typ.Name() !== '') {
-    return typ.String()
+  const typeName = typ.PkgPath() !== '' && typ.Name() !== '' ? typ.String() : ''
+  if (typeName !== '' && typ.Kind() === Struct) {
+    return typeName
   }
   switch (typ.Kind()) {
     case Bool:
@@ -4451,7 +4510,11 @@ export function typeInfoFromReflectType(typ: Type): string | $.TypeInfo {
     case Complex128:
     case String:
     case UnsafePointer:
-      return { kind: $.TypeKind.Basic, name: typ.String() }
+      return {
+        kind: $.TypeKind.Basic,
+        name: Kind_String(typ.Kind()),
+        ...(typeName !== '' ? { typeName } : {}),
+      }
     case Interface:
       return {
         kind: $.TypeKind.Interface,
@@ -4464,6 +4527,7 @@ export function typeInfoFromReflectType(typ: Type): string | $.TypeInfo {
     case Slice:
       return {
         kind: $.TypeKind.Slice,
+        ...(typeName !== '' ? { typeName } : {}),
         elemType: typeInfoFromReflectType(typ.Elem()),
       }
     case Array:

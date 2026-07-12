@@ -29,6 +29,27 @@ describe('time parse/since/until (Go semantics)', () => {
     expect(t.Unix()).toBe(1782137045n)
   })
 
+  it('Parse reads ASN.1 UTCTime layouts and preserves zone syntax', () => {
+    const [withSeconds, secondsErr] = Parse(
+      '060102150405Z0700',
+      '231114221320Z',
+    )
+    expect(secondsErr).toBeNull()
+    expect(withSeconds.Format('060102150405Z0700')).toBe('231114221320Z')
+
+    const [utc, utcErr] = Parse('0601021504Z0700', '2311142213Z')
+    const [offset, offsetErr] = Parse('0601021504Z0700', '2311142313+0100')
+    expect(utcErr).toBeNull()
+    expect(offsetErr).toBeNull()
+    expect(offset.Unix()).toBe(utc.Unix())
+    expect(offset.Format('0601021504Z0700')).toBe('2311142313+0100')
+  })
+
+  it('Parse rejects invalid ASN.1 UTCTime fields', () => {
+    const [, err] = Parse('060102150405Z0700', '231314221320Z')
+    expect(err).not.toBeNull()
+  })
+
   it('Since measures elapsed time as a positive delta', () => {
     const past = Now().Add(-Hour)
     const elapsed = Since(past)

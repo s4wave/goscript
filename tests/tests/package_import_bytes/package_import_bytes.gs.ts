@@ -108,7 +108,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test Buffer as Reader interface through an address expression.
 	buf.value.WriteString("abc")
-	let multi = io.MultiReader($.pointerValueOrNil($.interfaceValue<io.Reader | null>(buf, "*bytes.Buffer"))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(new Uint8Array([100, 101])), "*bytes.Reader"))!)
+	let multi = io.MultiReader($.pointerValueOrNil($.interfaceValue<io.Reader | null>(buf, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(new Uint8Array([100, 101])), "*bytes.Reader", { kind: $.TypeKind.Pointer, elemType: "bytes.Reader" }))!)
 	data = $.makeSlice<number>(5, undefined, "byte")
 	let __goscriptTuple0: any = await $.pointerValue<Exclude<io.Reader, null>>(multi).Read(data)
 	n = __goscriptTuple0[0]
@@ -127,7 +127,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println("Reader Seek", pos, "err:", err == null)
 	$.println("Reader Size", bytes.Reader.prototype.Size.call($.pointerValue<bytes.Reader>(reader)))
 	let writeDst: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
-	let __goscriptTuple3: any = await bytes.Reader.prototype.WriteTo.call($.pointerValue<bytes.Reader>(reader), $.pointerValueOrNil($.interfaceValue<io.Writer | null>(writeDst, "*bytes.Buffer"))!)
+	let __goscriptTuple3: any = await bytes.Reader.prototype.WriteTo.call($.pointerValue<bytes.Reader>(reader), $.pointerValueOrNil($.interfaceValue<io.Writer | null>(writeDst, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!)
 	let n64 = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
 	$.println("Reader WriteTo", n64, "bytes:", writeDst.value.String(), "err:", err == null)

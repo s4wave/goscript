@@ -59,6 +59,6 @@ export class NotInHeap {
 		() => new NotInHeap(),
 		[],
 		NotInHeap,
-		[{ name: "_", key: "_blank0", type: "sys.nih" }]
+		[{ name: "_", key: "_blank0", type: "sys.nih", pkgPath: "internal/runtime/sys", index: [0], offset: 0, exported: false }]
 	)
 }

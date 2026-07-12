@@ -207,9 +207,9 @@ export class decimal {
 	static __typeInfo = $.registerStructType(
 		"big.decimal",
 		() => new decimal(),
-		[{ name: "String", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "at", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint8" } }] }, { name: "init", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "round", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "roundDown", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "roundUp", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		[{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "at", args: [{ name: "i", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint8" } }] }, { name: "init", args: [{ name: "m", type: { kind: $.TypeKind.Slice, typeName: "big.nat", elemType: { kind: $.TypeKind.Basic, name: "uint", typeName: "big.Word" } } }, { name: "shift", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [] }, { name: "round", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [] }, { name: "roundDown", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [] }, { name: "roundUp", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [] }],
 		decimal,
-		[{ name: "mant", key: "mant", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "exp", key: "exp", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		[{ name: "mant", key: "mant", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, pkgPath: "math/big", index: [0], offset: 0, exported: false }, { name: "exp", key: "exp", type: { kind: $.TypeKind.Basic, name: "int" }, pkgPath: "math/big", index: [1], offset: 24, exported: false }]
 	)
 }
 

@@ -49,7 +49,8 @@ export class Time {
   // UnixMicro returns t as a Unix time, the number of microseconds elapsed since January 1, 1970 UTC
   public UnixMicro(): bigint {
     return (
-      BigInt(this._date.getTime()) * 1000n + BigInt(Math.floor(this._nsec / 1000))
+      BigInt(this._date.getTime()) * 1000n +
+      BigInt(Math.floor(this._nsec / 1000))
     )
   }
 
@@ -548,7 +549,11 @@ export class Time {
       }
 
       offsetMinutes = Math.trunc(zoneOffsetSeconds / 60)
-      if (offsetMinutes < -32768 || offsetMinutes === -1 || offsetMinutes > 32767) {
+      if (
+        offsetMinutes < -32768 ||
+        offsetMinutes === -1 ||
+        offsetMinutes > 32767
+      ) {
         return [b, $.newError('Time.MarshalBinary: unexpected zone offset')]
       }
     }
@@ -1345,6 +1350,83 @@ export function ParseInLocation(
   value: string,
   loc: Location,
 ): [Time, $.GoError] {
+  if (layout === '0601021504Z0700' || layout === '060102150405Z0700') {
+    const withSeconds = layout === '060102150405Z0700'
+    const match = value.match(
+      withSeconds ?
+        /^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(Z|[+-]\d{4})$/
+      : /^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(Z|[+-]\d{4})$/,
+    )
+    if (match === null) {
+      return [
+        new Time(),
+        $.toGoError(
+          new ParseError(
+            layout,
+            value,
+            '',
+            '',
+            `parsing time "${value}" as "${layout}": cannot parse`,
+          ),
+        ),
+      ]
+    }
+
+    const shortYear = Number(match[1])
+    const year = shortYear >= 69 ? 1900 + shortYear : 2000 + shortYear
+    const month = Number(match[2])
+    const day = Number(match[3])
+    const hour = Number(match[4])
+    const minute = Number(match[5])
+    const second = withSeconds ? Number(match[6]) : 0
+    const zone = match[withSeconds ? 7 : 6]
+    let offsetSeconds = 0
+    if (zone !== 'Z') {
+      const sign = zone[0] === '-' ? -1 : 1
+      offsetSeconds =
+        sign * (Number(zone.slice(1, 3)) * 60 + Number(zone.slice(3, 5))) * 60
+    }
+
+    const utcMillis =
+      globalThis.Date.UTC(year, month - 1, day, hour, minute, second) -
+      offsetSeconds * 1000
+    const check = new globalThis.Date(utcMillis + offsetSeconds * 1000)
+    if (
+      month < 1 ||
+      month > 12 ||
+      day < 1 ||
+      check.getUTCFullYear() !== year ||
+      check.getUTCMonth() !== month - 1 ||
+      check.getUTCDate() !== day ||
+      check.getUTCHours() !== hour ||
+      check.getUTCMinutes() !== minute ||
+      check.getUTCSeconds() !== second
+    ) {
+      return [
+        new Time(),
+        $.toGoError(
+          new ParseError(
+            layout,
+            value,
+            '',
+            '',
+            `parsing time "${value}" as "${layout}": cannot parse`,
+          ),
+        ),
+      ]
+    }
+
+    return [
+      Time.create(
+        new globalThis.Date(utcMillis),
+        0,
+        undefined,
+        zone === 'Z' ? UTC : FixedZone('', offsetSeconds),
+      ),
+      null,
+    ]
+  }
+
   // This is a simplified implementation
   // A full implementation would need to parse according to the layout format
 

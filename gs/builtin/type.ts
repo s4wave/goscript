@@ -1628,7 +1628,11 @@ export function typedNil(typeName: string): any {
   })
 }
 
-export function interfaceValue<T>(value: unknown, typeName: string): T {
+export function interfaceValue<T>(
+  value: unknown,
+  typeName: string,
+  typeInfo?: TypeInfo | string,
+): T {
   if (value !== null && value !== undefined) {
     if (typeof value === 'object') {
       Object.defineProperty(value, '__goType', {
@@ -1636,6 +1640,13 @@ export function interfaceValue<T>(value: unknown, typeName: string): T {
         writable: true,
         configurable: true,
       })
+      if (typeInfo !== undefined) {
+        Object.defineProperty(value, '__goTypeInfo', {
+          value: typeInfo,
+          writable: true,
+          configurable: true,
+        })
+      }
     }
     return value as T
   }

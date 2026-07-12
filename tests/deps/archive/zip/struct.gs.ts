@@ -244,7 +244,7 @@ export class FileHeader {
 
 	public FileInfo(): fs.FileInfo | null {
 		const h: FileHeader | $.VarRef<FileHeader> | null = this
-		return $.interfaceValue<fs.FileInfo | null>($.markAsStructValue(new headerFileInfo({fh: h})), "zip.headerFileInfo")
+		return $.interfaceValue<fs.FileInfo | null>($.markAsStructValue(new headerFileInfo({fh: h})), "zip.headerFileInfo", "zip.headerFileInfo")
 	}
 
 	public ModTime(): time.Time {
@@ -346,7 +346,7 @@ export class headerFileInfo {
 
 	public Info(): [fs.FileInfo | null, $.GoError] {
 		const fi = this
-		return [$.interfaceValue<fs.FileInfo | null>($.markAsStructValue($.cloneStructValue(fi)), "zip.headerFileInfo"), null]
+		return [$.interfaceValue<fs.FileInfo | null>($.markAsStructValue($.cloneStructValue(fi)), "zip.headerFileInfo", "zip.headerFileInfo"), null]
 	}
 
 	public IsDir(): boolean {
@@ -382,12 +382,12 @@ export class headerFileInfo {
 
 	public String(): string {
 		const fi = this
-		return fs.FormatFileInfo($.interfaceValue<fs.FileInfo | null>($.markAsStructValue($.cloneStructValue(fi)), "zip.headerFileInfo"))
+		return fs.FormatFileInfo($.interfaceValue<fs.FileInfo | null>($.markAsStructValue($.cloneStructValue(fi)), "zip.headerFileInfo", "zip.headerFileInfo"))
 	}
 
 	public Sys(): any {
 		const fi = this
-		return $.interfaceValue<any>(fi.fh, "*zip.FileHeader")
+		return $.interfaceValue<any>(fi.fh, "*zip.FileHeader", { kind: $.TypeKind.Pointer, elemType: "zip.FileHeader" })
 	}
 
 	public Type(): fs.FileMode {

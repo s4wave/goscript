@@ -10,7 +10,7 @@ import "@goscript/bytes/index.js"
 import "@goscript/sync/index.js"
 
 export let bpool: $.VarRef<sync.Pool> = $.varRef($.markAsStructValue(new sync.Pool({New: $.functionValue((): any => {
-	return $.interfaceValue<any>(new bytes.Buffer(), "*bytes.Buffer")
+	return $.interfaceValue<any>(new bytes.Buffer(), "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" })
 }, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))})))
 
 export function __goscript_set_bpool(__goscriptValue: sync.Pool): void {
@@ -24,5 +24,5 @@ export async function Get(): globalThis.Promise<bytes.Buffer | $.VarRef<bytes.Bu
 
 export function Put(b: bytes.Buffer | $.VarRef<bytes.Buffer> | null): void {
 	bytes.Buffer.prototype.Reset.call($.pointerValue<bytes.Buffer>(b))
-	bpool.value.Put($.interfaceValue<any>(b, "*bytes.Buffer"))
+	bpool.value.Put($.interfaceValue<any>(b, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))
 }

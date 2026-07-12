@@ -280,7 +280,7 @@ export class Stream {
 			case 2:
 			{
 				$.pointerValue<Stream>(s).stateLock.Unlock()
-				return $.interfaceValue<$.GoError>(__goscript__const.ErrStreamReset, "*yamux.Error")
+				return $.interfaceValue<$.GoError>(__goscript__const.ErrStreamReset, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })
 				break
 			}
 			default:
@@ -336,7 +336,7 @@ export class Stream {
 				}
 				case 2:
 				{
-					return [0, $.interfaceValue<$.GoError>(__goscript__const.ErrStreamReset, "*yamux.Error")]
+					return [0, $.interfaceValue<$.GoError>(__goscript__const.ErrStreamReset, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })]
 					break
 				}
 				default:
@@ -376,7 +376,7 @@ export class Stream {
 					case 1:
 						{
 							const __goscriptSelect0Result = __goscriptSelect0Value
-							return [0, $.interfaceValue<$.GoError>(__goscript__const.ErrTimeout, "*yamux.Error")]
+							return [0, $.interfaceValue<$.GoError>(__goscript__const.ErrTimeout, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })]
 							break
 						}
 				}
@@ -720,12 +720,12 @@ export class Stream {
 				}
 				case 1:
 				{
-					return [0, $.interfaceValue<$.GoError>(__goscript__const.ErrStreamClosed, "*yamux.Error")]
+					return [0, $.interfaceValue<$.GoError>(__goscript__const.ErrStreamClosed, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })]
 					break
 				}
 				case 2:
 				{
-					return [0, $.interfaceValue<$.GoError>(__goscript__const.ErrStreamReset, "*yamux.Error")]
+					return [0, $.interfaceValue<$.GoError>(__goscript__const.ErrStreamReset, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })]
 					break
 				}
 				default:
@@ -766,7 +766,7 @@ export class Stream {
 					case 1:
 						{
 							const __goscriptSelect1Result = __goscriptSelect1Value
-							return [0, $.interfaceValue<$.GoError>(__goscript__const.ErrTimeout, "*yamux.Error")]
+							return [0, $.interfaceValue<$.GoError>(__goscript__const.ErrTimeout, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })]
 							break
 						}
 				}

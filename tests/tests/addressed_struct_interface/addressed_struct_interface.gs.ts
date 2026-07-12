@@ -60,7 +60,7 @@ export async function use(w: Writer | null): globalThis.Promise<void> {
 
 export async function main(): globalThis.Promise<void> {
 	let b: $.VarRef<Buffer> = $.varRef($.markAsStructValue(new Buffer()))
-	await use($.interfaceValue<Writer | null>(b, "*main.Buffer"))
+	await use($.interfaceValue<Writer | null>(b, "*main.Buffer", { kind: $.TypeKind.Pointer, elemType: "main.Buffer" }))
 	$.println($.bytesToString(b.value.data))
 }
 

@@ -1,0 +1,8 @@
+marshal err nil true
+der len 21
+unmarshal err nil true
+rest len 0
+rdn count 1
+set count 1
+oid 2.5.4.3
+value goscript

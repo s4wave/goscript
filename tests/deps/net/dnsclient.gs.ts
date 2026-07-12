@@ -195,7 +195,7 @@ export function reverseaddr(addr: string): [string, $.GoError] {
 	let err: $.GoError = null as $.GoError
 	let ip: __goscript_ip.IP = (__goscript_ip.ParseIP(addr) as __goscript_ip.IP)
 	if (ip == null) {
-		return ["", $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "unrecognized address", Name: addr}), "*net.DNSError")]
+		return ["", $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "unrecognized address", Name: addr}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 	}
 	if (__goscript_ip.IP_To4(ip) != null) {
 		return [((((((strconv.Itoa($.int($.arrayIndex(ip!, 15))) + ".") + strconv.Itoa($.int($.arrayIndex(ip!, 14)))) + ".") + strconv.Itoa($.int($.arrayIndex(ip!, 13)))) + ".") + strconv.Itoa($.int($.arrayIndex(ip!, 12)))) + ".in-addr.arpa.", null]

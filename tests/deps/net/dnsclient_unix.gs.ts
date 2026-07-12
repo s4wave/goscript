@@ -485,7 +485,7 @@ export function checkHeader(p: dnsmessage.Parser | $.VarRef<dnsmessage.Parser> |
 	let hasAdd = __goscriptTuple5[1]
 
 	if ($.uint(rcode, 16) == $.uint(dnsmessage.RCodeNameError, 16)) {
-		return $.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError")
+		return $.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError", { kind: $.TypeKind.Pointer, elemType: "net.notFoundError" })
 	}
 
 	let [, err] = dnsmessage.Parser.prototype.AnswerHeader.call(p)
@@ -506,7 +506,7 @@ export function checkHeader(p: dnsmessage.Parser | $.VarRef<dnsmessage.Parser> |
 		// the server is behaving incorrectly or
 		// having temporary trouble.
 		if ($.uint(rcode, 16) == $.uint(dnsmessage.RCodeServerFailure, 16)) {
-			return $.interfaceValue<$.GoError>(__goscript_get_errServerTemporarilyMisbehaving(), "*net.temporaryError")
+			return $.interfaceValue<$.GoError>(__goscript_get_errServerTemporarilyMisbehaving(), "*net.temporaryError", { kind: $.TypeKind.Pointer, elemType: "net.temporaryError" })
 		}
 		return errServerMisbehaving
 	}
@@ -518,7 +518,7 @@ export function skipToAnswer(p: dnsmessage.Parser | $.VarRef<dnsmessage.Parser> 
 	while (true) {
 		let [h, err] = dnsmessage.Parser.prototype.AnswerHeader.call(p)
 		if ($.comparableEqual(err, dnsmessage.ErrSectionDone)) {
-			return $.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError")
+			return $.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError", { kind: $.TypeKind.Pointer, elemType: "net.notFoundError" })
 		}
 		if (err != null) {
 			return errCannotUnmarshalDNSMessage

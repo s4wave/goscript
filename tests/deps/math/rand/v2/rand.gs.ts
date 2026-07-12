@@ -24,7 +24,7 @@ export type Source = {
 $.registerInterfaceType(
 	"rand.Source",
 	null,
-	[{ name: "Uint64", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint64" } }] }]
+	[{ name: "Uint64", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint64" } }] }]
 );
 
 export type intType = any
@@ -342,9 +342,9 @@ export class Rand {
 	static __typeInfo = $.registerStructType(
 		"rand.Rand",
 		() => new Rand(),
-		[{ name: "ExpFloat64", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "float64" } }] }, { name: "Float32", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "float32" } }] }, { name: "Float64", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "float64" } }] }, { name: "Int", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "Int32", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int32" } }] }, { name: "Int32N", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int32" } }] }, { name: "Int64", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int64" } }] }, { name: "Int64N", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int64" } }] }, { name: "IntN", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "NormFloat64", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "float64" } }] }, { name: "Perm", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } } }] }, { name: "Shuffle", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "Uint", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint" } }] }, { name: "Uint32", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint32" } }] }, { name: "Uint32N", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint32" } }] }, { name: "Uint64", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint64" } }] }, { name: "Uint64N", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint64" } }] }, { name: "UintN", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint" } }] }, { name: "uint32n", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint32" } }] }, { name: "uint64n", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint64" } }] }],
+		[{ name: "ExpFloat64", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "float64" } }] }, { name: "Float32", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "float32" } }] }, { name: "Float64", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "float64" } }] }, { name: "Int", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "Int32", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int32" } }] }, { name: "Int32N", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "int32" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int32" } }] }, { name: "Int64", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int64" } }] }, { name: "Int64N", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "int64" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int64" } }] }, { name: "IntN", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "NormFloat64", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "float64" } }] }, { name: "Perm", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } } }] }, { name: "Shuffle", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "swap", type: ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [] } as $.FunctionTypeInfo) }], returns: [] }, { name: "Uint", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint" } }] }, { name: "Uint32", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint32" } }] }, { name: "Uint32N", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "uint32" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint32" } }] }, { name: "Uint64", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint64" } }] }, { name: "Uint64N", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "uint64" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint64" } }] }, { name: "UintN", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "uint" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint" } }] }, { name: "uint32n", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "uint32" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint32" } }] }, { name: "uint64n", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "uint64" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint64" } }] }],
 		Rand,
-		[{ name: "src", key: "src", type: "rand.Source" }]
+		[{ name: "src", key: "src", type: "rand.Source", pkgPath: "math/rand/v2", index: [0], offset: 0, exported: false }]
 	)
 }
 
@@ -371,7 +371,7 @@ export class runtimeSource {
 	static __typeInfo = $.registerStructType(
 		"rand.runtimeSource",
 		() => new runtimeSource(),
-		[{ name: "Uint64", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint64" } }] }],
+		[{ name: "Uint64", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint64" } }] }],
 		runtimeSource,
 		[]
 	)
@@ -383,7 +383,7 @@ export function New(src: Source | null): Rand | $.VarRef<Rand> | null {
 	return new Rand({src: src})
 }
 
-export let globalRand: Rand | $.VarRef<Rand> | null = new Rand({src: $.interfaceValue<Source | null>($.markAsStructValue(new runtimeSource()), "rand.runtimeSource")})
+export let globalRand: Rand | $.VarRef<Rand> | null = new Rand({src: $.interfaceValue<Source | null>($.markAsStructValue(new runtimeSource()), "rand.runtimeSource", "rand.runtimeSource")})
 
 export function __goscript_set_globalRand(__goscriptValue: Rand | $.VarRef<Rand> | null): void {
 	globalRand = __goscriptValue

@@ -122,7 +122,7 @@ export function ipToSockaddrInet4(ip: __goscript_ip.IP, port: number): [syscall.
 	}
 	let ip4: __goscript_ip.IP = (__goscript_ip.IP_To4(ip) as __goscript_ip.IP)
 	if (ip4 == null) {
-		return [$.markAsStructValue(new syscall.SockaddrInet4()), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField0 = __goscript_ip.IP_String(ip); return new __goscript_net.AddrError({Err: "non-IPv4 address", Addr: __goscriptLiteralField0}) })(), "*net.AddrError")]
+		return [$.markAsStructValue(new syscall.SockaddrInet4()), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField0 = __goscript_ip.IP_String(ip); return new __goscript_net.AddrError({Err: "non-IPv4 address", Addr: __goscriptLiteralField0}) })(), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 	}
 	let sa = $.markAsStructValue(new syscall.SockaddrInet4({Port: port}))
 	$.copy($.goSlice(sa.Addr, undefined, undefined), (ip4 as __goscript_ip.IP))
@@ -147,7 +147,7 @@ export async function ipToSockaddrInet6(ip: __goscript_ip.IP, port: number, zone
 	// IPv6 address.
 	let ip6: __goscript_ip.IP = (__goscript_ip.IP_To16(ip) as __goscript_ip.IP)
 	if (ip6 == null) {
-		return [$.markAsStructValue(new syscall.SockaddrInet6()), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField1 = __goscript_ip.IP_String(ip); return new __goscript_net.AddrError({Err: "non-IPv6 address", Addr: __goscriptLiteralField1}) })(), "*net.AddrError")]
+		return [$.markAsStructValue(new syscall.SockaddrInet6()), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField1 = __goscript_ip.IP_String(ip); return new __goscript_net.AddrError({Err: "non-IPv6 address", Addr: __goscriptLiteralField1}) })(), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 	}
 	let sa = (await (async () => { const __goscriptLiteralField2 = $.uint($.uint(await $.pointerValue<__goscript__interface.ipv6ZoneCache>(__goscript__interface.zoneCache).index(zone), 32), 32); return $.markAsStructValue(new syscall.SockaddrInet6({Port: port, ZoneId: __goscriptLiteralField2})) })())
 	$.copy($.goSlice(sa.Addr, undefined, undefined), (ip6 as __goscript_ip.IP))
@@ -164,7 +164,7 @@ export async function ipToSockaddr(family: number, ip: __goscript_ip.IP, port: n
 			if (err != null) {
 				return [null, err]
 			}
-			return [$.interfaceValue<syscall.Sockaddr | null>(sa, "*syscall.SockaddrInet4"), null]
+			return [$.interfaceValue<syscall.Sockaddr | null>(sa, "*syscall.SockaddrInet4", { kind: $.TypeKind.Pointer, elemType: "syscall.SockaddrInet4" }), null]
 			break
 		}
 		case syscall.AF_INET6:
@@ -175,11 +175,11 @@ export async function ipToSockaddr(family: number, ip: __goscript_ip.IP, port: n
 			if (err != null) {
 				return [null, err]
 			}
-			return [$.interfaceValue<syscall.Sockaddr | null>(sa, "*syscall.SockaddrInet6"), null]
+			return [$.interfaceValue<syscall.Sockaddr | null>(sa, "*syscall.SockaddrInet6", { kind: $.TypeKind.Pointer, elemType: "syscall.SockaddrInet6" }), null]
 			break
 		}
 	}
-	return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField3 = __goscript_ip.IP_String(ip); return new __goscript_net.AddrError({Err: "invalid address family", Addr: __goscriptLiteralField3}) })(), "*net.AddrError")]
+	return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField3 = __goscript_ip.IP_String(ip); return new __goscript_net.AddrError({Err: "invalid address family", Addr: __goscriptLiteralField3}) })(), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 }
 
 export function addrPortToSockaddrInet4(ap: netip.AddrPort): [syscall.SockaddrInet4, $.GoError] {
@@ -191,7 +191,7 @@ export function addrPortToSockaddrInet4(ap: netip.AddrPort): [syscall.SockaddrIn
 	// The error message is kept consistent with ipToSockaddrInet4.
 	let addr = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ap)).Addr()))
 	if (!$.markAsStructValue($.cloneStructValue(addr)).Is4() && !$.markAsStructValue($.cloneStructValue(addr)).Is4In6()) {
-		return [$.markAsStructValue(new syscall.SockaddrInet4()), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField4 = $.markAsStructValue($.cloneStructValue(addr)).String(); return new __goscript_net.AddrError({Err: "non-IPv4 address", Addr: __goscriptLiteralField4}) })(), "*net.AddrError")]
+		return [$.markAsStructValue(new syscall.SockaddrInet4()), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField4 = $.markAsStructValue($.cloneStructValue(addr)).String(); return new __goscript_net.AddrError({Err: "non-IPv4 address", Addr: __goscriptLiteralField4}) })(), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 	}
 	let sa = (() => { const __goscriptLiteralField5 = $.markAsStructValue($.cloneStructValue(addr)).As4(); const __goscriptLiteralField6 = $.int($.markAsStructValue($.cloneStructValue(ap)).Port()); return $.markAsStructValue(new syscall.SockaddrInet4({Addr: __goscriptLiteralField5, Port: __goscriptLiteralField6})) })()
 	return [$.markAsStructValue($.cloneStructValue(sa)), null]

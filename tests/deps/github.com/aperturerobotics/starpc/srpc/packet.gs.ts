@@ -33,7 +33,7 @@ export function NewPacketDataHandler(handler: PacketHandler): ((data: $.Slice<nu
 }
 
 export function NewCallStartPacket(service: string, method: string, data: $.Slice<number>, dataIsZero: boolean): __goscript_rpcproto_pb.Packet | $.VarRef<__goscript_rpcproto_pb.Packet> | null {
-	return new __goscript_rpcproto_pb.Packet({Body: $.interfaceValue<__goscript_rpcproto_pb.isPacket_Body | null>(new __goscript_rpcproto_pb.Packet_CallStart({CallStart: new __goscript_rpcproto_pb.CallStart({RpcService: service, RpcMethod: method, Data: data, DataIsZero: dataIsZero})}), "*srpc.Packet_CallStart")})
+	return new __goscript_rpcproto_pb.Packet({Body: $.interfaceValue<__goscript_rpcproto_pb.isPacket_Body | null>(new __goscript_rpcproto_pb.Packet_CallStart({CallStart: new __goscript_rpcproto_pb.CallStart({RpcService: service, RpcMethod: method, Data: data, DataIsZero: dataIsZero})}), "*srpc.Packet_CallStart", { kind: $.TypeKind.Pointer, elemType: "srpc.Packet_CallStart" })})
 }
 
 export function NewCallDataPacket(data: $.Slice<number>, dataIsZero: boolean, complete: boolean, err: $.GoError): __goscript_rpcproto_pb.Packet | $.VarRef<__goscript_rpcproto_pb.Packet> | null {
@@ -41,9 +41,9 @@ export function NewCallDataPacket(data: $.Slice<number>, dataIsZero: boolean, co
 	if (err != null) {
 		errStr = $.pointerValue<Exclude<$.GoError, null>>(err).Error()
 	}
-	return new __goscript_rpcproto_pb.Packet({Body: $.interfaceValue<__goscript_rpcproto_pb.isPacket_Body | null>(new __goscript_rpcproto_pb.Packet_CallData({CallData: new __goscript_rpcproto_pb.CallData({Data: data, DataIsZero: dataIsZero, Complete: (err != null) || complete, Error: errStr})}), "*srpc.Packet_CallData")})
+	return new __goscript_rpcproto_pb.Packet({Body: $.interfaceValue<__goscript_rpcproto_pb.isPacket_Body | null>(new __goscript_rpcproto_pb.Packet_CallData({CallData: new __goscript_rpcproto_pb.CallData({Data: data, DataIsZero: dataIsZero, Complete: (err != null) || complete, Error: errStr})}), "*srpc.Packet_CallData", { kind: $.TypeKind.Pointer, elemType: "srpc.Packet_CallData" })})
 }
 
 export function NewCallCancelPacket(): __goscript_rpcproto_pb.Packet | $.VarRef<__goscript_rpcproto_pb.Packet> | null {
-	return new __goscript_rpcproto_pb.Packet({Body: $.interfaceValue<__goscript_rpcproto_pb.isPacket_Body | null>(new __goscript_rpcproto_pb.Packet_CallCancel({CallCancel: true}), "*srpc.Packet_CallCancel")})
+	return new __goscript_rpcproto_pb.Packet({Body: $.interfaceValue<__goscript_rpcproto_pb.isPacket_Body | null>(new __goscript_rpcproto_pb.Packet_CallCancel({CallCancel: true}), "*srpc.Packet_CallCancel", { kind: $.TypeKind.Pointer, elemType: "srpc.Packet_CallCancel" })})
 }

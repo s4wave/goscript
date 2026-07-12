@@ -202,5 +202,5 @@ export function NewPipeStream(ctx: context.Context | null): [__goscript_stream.S
 	$.pointerValue<pipeStream>(s2).ctx = __goscriptTuple2[0]
 	$.pointerValue<pipeStream>(s2).ctxCancel = __goscriptTuple2[1]
 	$.pointerValue<pipeStream>(s1).other = s2
-	return [$.interfaceValue<__goscript_stream.Stream | null>(s1, "*srpc.pipeStream"), $.interfaceValue<__goscript_stream.Stream | null>(s2, "*srpc.pipeStream")]
+	return [$.interfaceValue<__goscript_stream.Stream | null>(s1, "*srpc.pipeStream", { kind: $.TypeKind.Pointer, elemType: "srpc.pipeStream" }), $.interfaceValue<__goscript_stream.Stream | null>(s2, "*srpc.pipeStream", { kind: $.TypeKind.Pointer, elemType: "srpc.pipeStream" })]
 }

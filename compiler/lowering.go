@@ -11325,14 +11325,18 @@ func (o *LoweringOwner) lowerValueForTargetTypes(
 			value = o.lowerStructClone(value)
 		}
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperInterfaceValue) +
-			"<" + o.tsTypeFor(ctx, targetType) + ">(" + value + ", " + strconv.Quote(goRuntimeTypeString(sourceType)) + ")"
+			"<" + o.tsTypeFor(ctx, targetType) + ">(" + value + ", " +
+			strconv.Quote(goRuntimeTypeString(sourceType)) + ", " +
+			o.runtimeTypeInfoExpr(sourceType) + ")"
 	}
 	if wrapper := o.lowerNamedValueInterfaceWrapper(ctx, targetType, sourceType, value); wrapper != "" {
 		return wrapper
 	}
 	if isInterfaceType(targetType) && !isInterfaceType(sourceType) && isNilableType(sourceType) {
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperInterfaceValue) +
-			"<" + o.tsTypeFor(ctx, targetType) + ">(" + value + ", " + strconv.Quote(goRuntimeTypeString(sourceType)) + ")"
+			"<" + o.tsTypeFor(ctx, targetType) + ">(" + value + ", " +
+			strconv.Quote(goRuntimeTypeString(sourceType)) + ", " +
+			o.runtimeTypeInfoExpr(sourceType) + ")"
 	}
 	if isInterfaceType(targetType) && isInterfaceType(sourceType) &&
 		!types.Identical(targetType, sourceType) && types.AssignableTo(sourceType, targetType) {
@@ -11593,6 +11597,11 @@ func (o *LoweringOwner) runtimeTypeAssertInfoExprWithSeen(ctx lowerFileContext, 
 		if basic, ok := types.Unalias(named.Underlying()).(*types.Basic); ok {
 			return runtimeBasicTypeInfoExpr(typeKind, basic, runtimeNamedTypeName(named))
 		}
+		if slice, ok := types.Unalias(named.Underlying()).(*types.Slice); ok {
+			return "{ kind: " + typeKind + ".Slice, typeName: " +
+				strconv.Quote(runtimeNamedTypeName(named)) + ", elemType: " +
+				o.runtimeTypeAssertInfoExprWithSeen(ctx, slice.Elem(), seen) + " }"
+		}
 		return strconv.Quote(runtimeNamedTypeName(named))
 	}
 	switch typed := types.Unalias(typ).Underlying().(type) {
@@ -11644,6 +11653,11 @@ func (o *LoweringOwner) runtimeTypeInfoExprWithSeen(typ types.Type, seen map[typ
 	if named := namedNonStructType(typ); named != nil {
 		if basic, ok := types.Unalias(named.Underlying()).(*types.Basic); ok {
 			return runtimeBasicTypeInfoExpr(typeKind, basic, runtimeNamedTypeName(named))
+		}
+		if slice, ok := types.Unalias(named.Underlying()).(*types.Slice); ok {
+			return "{ kind: " + typeKind + ".Slice, typeName: " +
+				strconv.Quote(runtimeNamedTypeName(named)) + ", elemType: " +
+				o.runtimeTypeInfoExprWithSeen(slice.Elem(), seen) + " }"
 		}
 		return strconv.Quote(runtimeNamedTypeName(named))
 	}

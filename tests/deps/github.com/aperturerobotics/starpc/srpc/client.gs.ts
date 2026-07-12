@@ -155,10 +155,10 @@ export class client {
 			}
 		}
 
-		return [$.interfaceValue<__goscript_stream.Stream | null>(await __goscript_msg_stream.NewMsgStream(ctx, $.interfaceValue<__goscript_msg_stream.MsgStreamRw | null>(clientRPC, "*srpc.ClientRPC"), $.functionValue(async (): globalThis.Promise<void> => {
+		return [$.interfaceValue<__goscript_stream.Stream | null>(await __goscript_msg_stream.NewMsgStream(ctx, $.interfaceValue<__goscript_msg_stream.MsgStreamRw | null>(clientRPC, "*srpc.ClientRPC", { kind: $.TypeKind.Pointer, elemType: "srpc.ClientRPC" }), $.functionValue(async (): globalThis.Promise<void> => {
 			await $.pointerValue<__goscript_client_rpc.ClientRPC>(clientRPC).commonRPC.cancelContext()
 			await $.pointerValue<Exclude<__goscript_writer.PacketWriter, null>>(writer).Close()
-		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))), "*srpc.MsgStream"), null]
+		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))), "*srpc.MsgStream", { kind: $.TypeKind.Pointer, elemType: "srpc.MsgStream" }), null]
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -171,5 +171,5 @@ export class client {
 }
 
 export function NewClient(openStream: OpenStreamFunc): Client | null {
-	return $.interfaceValue<Client | null>(new client({openStream: openStream}), "*srpc.client")
+	return $.interfaceValue<Client | null>(new client({openStream: openStream}), "*srpc.client", { kind: $.TypeKind.Pointer, elemType: "srpc.client" })
 }

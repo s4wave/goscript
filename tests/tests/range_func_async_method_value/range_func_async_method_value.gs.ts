@@ -124,7 +124,7 @@ export class Group {
 
 export async function main(): globalThis.Promise<void> {
 	let child: Group | $.VarRef<Group> | null = new Group()
-	let root: Group | $.VarRef<Group> | null = new Group({provider: $.interfaceValue<provider | null>(new listProvider({items: $.arrayToSlice<Group | $.VarRef<Group> | null>([child])}), "*main.listProvider")})
+	let root: Group | $.VarRef<Group> | null = new Group({provider: $.interfaceValue<provider | null>(new listProvider({items: $.arrayToSlice<Group | $.VarRef<Group> | null>([child])}), "*main.listProvider", { kind: $.TypeKind.Pointer, elemType: "main.listProvider" })})
 	await Group.prototype.Build.call(root)
 	$.println($.pointerValue<Group>(child).seen)
 }

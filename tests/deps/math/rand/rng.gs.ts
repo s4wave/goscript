@@ -103,9 +103,9 @@ export class rngSource {
 	static __typeInfo = $.registerStructType(
 		"rand.rngSource",
 		() => new rngSource(),
-		[{ name: "Int63", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int64" } }] }, { name: "Seed", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "Uint64", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint64" } }] }],
+		[{ name: "Int63", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int64" } }] }, { name: "Seed", args: [{ name: "seed", type: { kind: $.TypeKind.Basic, name: "int64" } }], returns: [] }, { name: "Uint64", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint64" } }] }],
 		rngSource,
-		[{ name: "tap", key: "tap", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "feed", key: "feed", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "vec", key: "vec", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "int64" }, length: 607 } }]
+		[{ name: "tap", key: "tap", type: { kind: $.TypeKind.Basic, name: "int" }, pkgPath: "math/rand", index: [0], offset: 0, exported: false }, { name: "feed", key: "feed", type: { kind: $.TypeKind.Basic, name: "int" }, pkgPath: "math/rand", index: [1], offset: 8, exported: false }, { name: "vec", key: "vec", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "int64" }, length: 607 }, pkgPath: "math/rand", index: [2], offset: 16, exported: false }]
 	)
 }
 

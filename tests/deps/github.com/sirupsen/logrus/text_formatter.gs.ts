@@ -599,12 +599,12 @@ export class TextFormatter {
 		switch (true) {
 			case $.pointerValue<TextFormatter>(f).DisableTimestamp:
 			{
-				await fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(b, "*bytes.Buffer"))!, "%s%s %-44s ", levelText, callerText, $.pointerValue<__goscript_entry.Entry>(entry).Message)
+				await fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(b, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!, "%s%s %-44s ", levelText, callerText, $.pointerValue<__goscript_entry.Entry>(entry).Message)
 				break
 			}
 			case !$.pointerValue<TextFormatter>(f).FullTimestamp:
 			{
-				await fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(b, "*bytes.Buffer"))!, "%s[%04d]%s %-44s ", levelText, $.namedValueInterfaceValue<any>($.int($.int64Div($.markAsStructValue($.cloneStructValue($.pointerValue<__goscript_entry.Entry>(entry).Time)).Sub($.markAsStructValue($.cloneStructValue(baseTimestamp))), 1000000000n)), "int", {}, { kind: $.TypeKind.Basic, name: "int" }), callerText, $.pointerValue<__goscript_entry.Entry>(entry).Message)
+				await fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(b, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!, "%s[%04d]%s %-44s ", levelText, $.namedValueInterfaceValue<any>($.int($.int64Div($.markAsStructValue($.cloneStructValue($.pointerValue<__goscript_entry.Entry>(entry).Time)).Sub($.markAsStructValue($.cloneStructValue(baseTimestamp))), 1000000000n)), "int", {}, { kind: $.TypeKind.Basic, name: "int" }), callerText, $.pointerValue<__goscript_entry.Entry>(entry).Message)
 				break
 			}
 			default:
@@ -613,7 +613,7 @@ export class TextFormatter {
 				if ($.stringEqual(timestampFormat, "")) {
 					timestampFormat = "2006-01-02T15:04:05Z07:00"
 				}
-				await fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(b, "*bytes.Buffer"))!, "%s[%s]%s %-44s ", levelText, $.markAsStructValue($.cloneStructValue($.pointerValue<__goscript_entry.Entry>(entry).Time)).Format(timestampFormat), callerText, $.pointerValue<__goscript_entry.Entry>(entry).Message)
+				await fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(b, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!, "%s[%s]%s %-44s ", levelText, $.markAsStructValue($.cloneStructValue($.pointerValue<__goscript_entry.Entry>(entry).Time)).Format(timestampFormat), callerText, $.pointerValue<__goscript_entry.Entry>(entry).Message)
 				break
 			}
 		}

@@ -184,13 +184,13 @@ export async function main(): globalThis.Promise<void> {
 
 	let oid: $.VarRef<ObjectIdentifier> = $.varRef(null as ObjectIdentifier)
 	let ok = false
-	let oidValue: any = $.interfaceValue<any>(oid, "*main.ObjectIdentifier")
+	let oidValue: any = $.interfaceValue<any>(oid, "*main.ObjectIdentifier", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, typeName: "main.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } } })
 	{
 		const __goscriptTypeSwitchValue = oidValue
 		switch (true) {
-			case $.typeAssert<$.VarRef<ObjectIdentifier> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "main.ObjectIdentifier" }).ok:
+			case $.typeAssert<$.VarRef<ObjectIdentifier> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, typeName: "main.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } } }).ok:
 				{
-					let v: $.VarRef<ObjectIdentifier> | null = $.typeAssert<$.VarRef<ObjectIdentifier> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "main.ObjectIdentifier" }).value
+					let v: $.VarRef<ObjectIdentifier> | null = $.typeAssert<$.VarRef<ObjectIdentifier> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, typeName: "main.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } } }).value
 					let __goscriptTuple0: any = parseObjectIdentifier()
 					v!.value = (__goscriptTuple0[0] as ObjectIdentifier)
 					ok = __goscriptTuple0[1]
@@ -201,7 +201,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println("oid", $.len((oid.value as ObjectIdentifier)), $.arrayIndex(oid.value!, 0), ok)
 
 	let raw: $.VarRef<RawValue> = $.varRef($.markAsStructValue(new RawValue()))
-	let rawValue: any = $.interfaceValue<any>(raw, "*main.RawValue")
+	let rawValue: any = $.interfaceValue<any>(raw, "*main.RawValue", { kind: $.TypeKind.Pointer, elemType: "main.RawValue" })
 	{
 		const __goscriptTypeSwitchValue = rawValue
 		switch (true) {

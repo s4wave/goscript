@@ -88,7 +88,7 @@ export class Packet {
 
 	public CloneMessageVT(): protobuf_go_lite.CloneMessage | null {
 		const m: Packet | $.VarRef<Packet> | null = this
-		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(Packet.prototype.CloneVT.call(m), "*srpc.Packet")
+		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(Packet.prototype.CloneVT.call(m), "*srpc.Packet", { kind: $.TypeKind.Pointer, elemType: "srpc.Packet" })
 	}
 
 	public CloneVT(): Packet | $.VarRef<Packet> | null {
@@ -193,7 +193,7 @@ export class Packet {
 
 	public MarshalJSON(): [$.Slice<number>, $.GoError] {
 		const x: Packet | $.VarRef<Packet> | null = this
-		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.MarshalerConfig>(json.DefaultMarshalerConfig))).Marshal($.pointerValueOrNil($.interfaceValue<json.Marshaler | null>(x, "*srpc.Packet"))!)
+		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.MarshalerConfig>(json.DefaultMarshalerConfig))).Marshal($.pointerValueOrNil($.interfaceValue<json.Marshaler | null>(x, "*srpc.Packet", { kind: $.TypeKind.Pointer, elemType: "srpc.Packet" }))!)
 	}
 
 	public MarshalProtoJSON(s: json.MarshalState | $.VarRef<json.MarshalState> | null): void {
@@ -370,7 +370,7 @@ export class Packet {
 
 	public UnmarshalJSON(b: $.Slice<number>): $.GoError {
 		const x: Packet | $.VarRef<Packet> | null = this
-		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.UnmarshalerConfig>(json.DefaultUnmarshalerConfig))).Unmarshal(b, $.pointerValueOrNil($.interfaceValue<json.Unmarshaler | null>(x, "*srpc.Packet"))!)
+		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.UnmarshalerConfig>(json.DefaultUnmarshalerConfig))).Unmarshal(b, $.pointerValueOrNil($.interfaceValue<json.Unmarshaler | null>(x, "*srpc.Packet", { kind: $.TypeKind.Pointer, elemType: "srpc.Packet" }))!)
 	}
 
 	public UnmarshalProtoJSON(s: json.UnmarshalState | $.VarRef<json.UnmarshalState> | null): void {
@@ -389,7 +389,7 @@ export class Packet {
 				case "callStart":
 				{
 					let ov: Packet_CallStart | $.VarRef<Packet_CallStart> | null = new Packet_CallStart()
-					$.pointerValue<Packet>(x).Body = $.interfaceValue<isPacket_Body | null>(ov, "*srpc.Packet_CallStart")
+					$.pointerValue<Packet>(x).Body = $.interfaceValue<isPacket_Body | null>(ov, "*srpc.Packet_CallStart", { kind: $.TypeKind.Pointer, elemType: "srpc.Packet_CallStart" })
 					if (json.UnmarshalState.prototype.ReadNil.call($.pointerValue<json.UnmarshalState>(s))) {
 						$.pointerValue<Packet_CallStart>(ov).CallStart = null
 						return
@@ -402,7 +402,7 @@ export class Packet {
 				case "callData":
 				{
 					let ov: Packet_CallData | $.VarRef<Packet_CallData> | null = new Packet_CallData()
-					$.pointerValue<Packet>(x).Body = $.interfaceValue<isPacket_Body | null>(ov, "*srpc.Packet_CallData")
+					$.pointerValue<Packet>(x).Body = $.interfaceValue<isPacket_Body | null>(ov, "*srpc.Packet_CallData", { kind: $.TypeKind.Pointer, elemType: "srpc.Packet_CallData" })
 					if (json.UnmarshalState.prototype.ReadNil.call($.pointerValue<json.UnmarshalState>(s))) {
 						$.pointerValue<Packet_CallData>(ov).CallData = null
 						return
@@ -416,7 +416,7 @@ export class Packet {
 				{
 					json.UnmarshalState.prototype.AddField.call($.pointerValue<json.UnmarshalState>(s), "call_cancel")
 					let ov: Packet_CallCancel | $.VarRef<Packet_CallCancel> | null = new Packet_CallCancel()
-					$.pointerValue<Packet>(x).Body = $.interfaceValue<isPacket_Body | null>(ov, "*srpc.Packet_CallCancel")
+					$.pointerValue<Packet>(x).Body = $.interfaceValue<isPacket_Body | null>(ov, "*srpc.Packet_CallCancel", { kind: $.TypeKind.Pointer, elemType: "srpc.Packet_CallCancel" })
 					$.pointerValue<Packet_CallCancel>(ov).CallCancel = json.UnmarshalState.prototype.ReadBool.call($.pointerValue<json.UnmarshalState>(s))
 					break
 				}
@@ -492,7 +492,7 @@ export class Packet {
 									return __goscriptShadow7
 								}
 							}
-							$.pointerValue<Packet>(m).Body = $.interfaceValue<isPacket_Body | null>(new Packet_CallStart({CallStart: v}), "*srpc.Packet_CallStart")
+							$.pointerValue<Packet>(m).Body = $.interfaceValue<isPacket_Body | null>(new Packet_CallStart({CallStart: v}), "*srpc.Packet_CallStart", { kind: $.TypeKind.Pointer, elemType: "srpc.Packet_CallStart" })
 						}
 					}
 					iNdEx = postIndex
@@ -542,7 +542,7 @@ export class Packet {
 									return __goscriptShadow9
 								}
 							}
-							$.pointerValue<Packet>(m).Body = $.interfaceValue<isPacket_Body | null>(new Packet_CallData({CallData: v}), "*srpc.Packet_CallData")
+							$.pointerValue<Packet>(m).Body = $.interfaceValue<isPacket_Body | null>(new Packet_CallData({CallData: v}), "*srpc.Packet_CallData", { kind: $.TypeKind.Pointer, elemType: "srpc.Packet_CallData" })
 						}
 					}
 					iNdEx = postIndex
@@ -564,7 +564,7 @@ export class Packet {
 						return err
 					}
 					let b = v != 0
-					$.pointerValue<Packet>(m).Body = $.interfaceValue<isPacket_Body | null>(new Packet_CallCancel({CallCancel: b}), "*srpc.Packet_CallCancel")
+					$.pointerValue<Packet>(m).Body = $.interfaceValue<isPacket_Body | null>(new Packet_CallCancel({CallCancel: b}), "*srpc.Packet_CallCancel", { kind: $.TypeKind.Pointer, elemType: "srpc.Packet_CallCancel" })
 					break
 				}
 				default:
@@ -665,7 +665,7 @@ export class Packet_CallStart {
 
 	public CloneOneofVT(): isPacket_Body | null {
 		const m: Packet_CallStart | $.VarRef<Packet_CallStart> | null = this
-		return $.interfaceValue<isPacket_Body | null>(Packet_CallStart.prototype.CloneVT.call(m), "*srpc.Packet_CallStart")
+		return $.interfaceValue<isPacket_Body | null>(Packet_CallStart.prototype.CloneVT.call(m), "*srpc.Packet_CallStart", { kind: $.TypeKind.Pointer, elemType: "srpc.Packet_CallStart" })
 	}
 
 	public CloneVT(): Packet_CallStart | $.VarRef<Packet_CallStart> | null {
@@ -794,7 +794,7 @@ export class Packet_CallData {
 
 	public CloneOneofVT(): isPacket_Body | null {
 		const m: Packet_CallData | $.VarRef<Packet_CallData> | null = this
-		return $.interfaceValue<isPacket_Body | null>(Packet_CallData.prototype.CloneVT.call(m), "*srpc.Packet_CallData")
+		return $.interfaceValue<isPacket_Body | null>(Packet_CallData.prototype.CloneVT.call(m), "*srpc.Packet_CallData", { kind: $.TypeKind.Pointer, elemType: "srpc.Packet_CallData" })
 	}
 
 	public CloneVT(): Packet_CallData | $.VarRef<Packet_CallData> | null {
@@ -923,7 +923,7 @@ export class Packet_CallCancel {
 
 	public CloneOneofVT(): isPacket_Body | null {
 		const m: Packet_CallCancel | $.VarRef<Packet_CallCancel> | null = this
-		return $.interfaceValue<isPacket_Body | null>(Packet_CallCancel.prototype.CloneVT.call(m), "*srpc.Packet_CallCancel")
+		return $.interfaceValue<isPacket_Body | null>(Packet_CallCancel.prototype.CloneVT.call(m), "*srpc.Packet_CallCancel", { kind: $.TypeKind.Pointer, elemType: "srpc.Packet_CallCancel" })
 	}
 
 	public CloneVT(): Packet_CallCancel | $.VarRef<Packet_CallCancel> | null {
@@ -1075,7 +1075,7 @@ export class CallStart {
 
 	public CloneMessageVT(): protobuf_go_lite.CloneMessage | null {
 		const m: CallStart | $.VarRef<CallStart> | null = this
-		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(CallStart.prototype.CloneVT.call(m), "*srpc.CallStart")
+		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(CallStart.prototype.CloneVT.call(m), "*srpc.CallStart", { kind: $.TypeKind.Pointer, elemType: "srpc.CallStart" })
 	}
 
 	public CloneVT(): CallStart | $.VarRef<CallStart> | null {
@@ -1168,7 +1168,7 @@ export class CallStart {
 
 	public MarshalJSON(): [$.Slice<number>, $.GoError] {
 		const x: CallStart | $.VarRef<CallStart> | null = this
-		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.MarshalerConfig>(json.DefaultMarshalerConfig))).Marshal($.pointerValueOrNil($.interfaceValue<json.Marshaler | null>(x, "*srpc.CallStart"))!)
+		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.MarshalerConfig>(json.DefaultMarshalerConfig))).Marshal($.pointerValueOrNil($.interfaceValue<json.Marshaler | null>(x, "*srpc.CallStart", { kind: $.TypeKind.Pointer, elemType: "srpc.CallStart" }))!)
 	}
 
 	public MarshalProtoJSON(s: json.MarshalState | $.VarRef<json.MarshalState> | null): void {
@@ -1353,7 +1353,7 @@ export class CallStart {
 
 	public UnmarshalJSON(b: $.Slice<number>): $.GoError {
 		const x: CallStart | $.VarRef<CallStart> | null = this
-		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.UnmarshalerConfig>(json.DefaultUnmarshalerConfig))).Unmarshal(b, $.pointerValueOrNil($.interfaceValue<json.Unmarshaler | null>(x, "*srpc.CallStart"))!)
+		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.UnmarshalerConfig>(json.DefaultUnmarshalerConfig))).Unmarshal(b, $.pointerValueOrNil($.interfaceValue<json.Unmarshaler | null>(x, "*srpc.CallStart", { kind: $.TypeKind.Pointer, elemType: "srpc.CallStart" }))!)
 	}
 
 	public UnmarshalProtoJSON(s: json.UnmarshalState | $.VarRef<json.UnmarshalState> | null): void {
@@ -1650,7 +1650,7 @@ export class CallData {
 
 	public CloneMessageVT(): protobuf_go_lite.CloneMessage | null {
 		const m: CallData | $.VarRef<CallData> | null = this
-		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(CallData.prototype.CloneVT.call(m), "*srpc.CallData")
+		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(CallData.prototype.CloneVT.call(m), "*srpc.CallData", { kind: $.TypeKind.Pointer, elemType: "srpc.CallData" })
 	}
 
 	public CloneVT(): CallData | $.VarRef<CallData> | null {
@@ -1743,7 +1743,7 @@ export class CallData {
 
 	public MarshalJSON(): [$.Slice<number>, $.GoError] {
 		const x: CallData | $.VarRef<CallData> | null = this
-		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.MarshalerConfig>(json.DefaultMarshalerConfig))).Marshal($.pointerValueOrNil($.interfaceValue<json.Marshaler | null>(x, "*srpc.CallData"))!)
+		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.MarshalerConfig>(json.DefaultMarshalerConfig))).Marshal($.pointerValueOrNil($.interfaceValue<json.Marshaler | null>(x, "*srpc.CallData", { kind: $.TypeKind.Pointer, elemType: "srpc.CallData" }))!)
 	}
 
 	public MarshalProtoJSON(s: json.MarshalState | $.VarRef<json.MarshalState> | null): void {
@@ -1930,7 +1930,7 @@ export class CallData {
 
 	public UnmarshalJSON(b: $.Slice<number>): $.GoError {
 		const x: CallData | $.VarRef<CallData> | null = this
-		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.UnmarshalerConfig>(json.DefaultUnmarshalerConfig))).Unmarshal(b, $.pointerValueOrNil($.interfaceValue<json.Unmarshaler | null>(x, "*srpc.CallData"))!)
+		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.UnmarshalerConfig>(json.DefaultUnmarshalerConfig))).Unmarshal(b, $.pointerValueOrNil($.interfaceValue<json.Unmarshaler | null>(x, "*srpc.CallData", { kind: $.TypeKind.Pointer, elemType: "srpc.CallData" }))!)
 	}
 
 	public UnmarshalProtoJSON(s: json.UnmarshalState | $.VarRef<json.UnmarshalState> | null): void {

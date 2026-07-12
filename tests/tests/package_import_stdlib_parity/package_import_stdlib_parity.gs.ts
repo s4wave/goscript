@@ -103,10 +103,10 @@ export async function main(): globalThis.Promise<void> {
 	$.println("leaf:", $.uint(bits.Rem32($.uint(1, 32), $.uint(0, 32), $.uint(3, 32)), 32), strings.ToValidUTF8("abc", "?"), strconv.FormatComplex(parsed, $.uint(102, 8), -1, 128), $.int($.real(parsed)), $.int($.imag(parsed)), zlib.NoCompression, $.pointerValue<Exclude<$.GoError, null>>(os.ErrNoHandle).Error(), strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "go"), $.stringEqual(strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "iki"), "İKİ"))
 
 	let scan: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
-	scanner.PrintError($.pointerValueOrNil($.interfaceValue<io.Writer | null>(scan, "*bytes.Buffer"))!, $.pointerValueOrNil(errors.New("scan failed"))!)
+	scanner.PrintError($.pointerValueOrNil($.interfaceValue<io.Writer | null>(scan, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!, $.pointerValueOrNil(errors.New("scan failed"))!)
 	$.println("scanner:", strings.TrimSpace(scan.value.String()))
 
-	let h: hash.XOF | null = $.interfaceValue<hash.XOF | null>($.markAsStructValue(new xof()), "main.xof")
+	let h: hash.XOF | null = $.interfaceValue<hash.XOF | null>($.markAsStructValue(new xof()), "main.xof", "main.xof")
 	$.println("hash:", await $.pointerValue<Exclude<hash.XOF, null>>(h).BlockSize())
 }
 

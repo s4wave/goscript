@@ -69,7 +69,7 @@ export async function main(): globalThis.Promise<void> {
 	let w: Worker | $.VarRef<Worker> | null = new Worker({ch: $.makeChannel<number>(1, 0, "both")})
 	await run($.functionValue(((__receiver) => () => __receiver.Spawn())($.pointerValue<Worker>(w)), ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo)))
 
-	let s: Spawner | null = $.interfaceValue<Spawner | null>(w, "*main.Worker")
+	let s: Spawner | null = $.interfaceValue<Spawner | null>(w, "*main.Worker", { kind: $.TypeKind.Pointer, elemType: "main.Worker" })
 	let err = await $.pointerValue<Exclude<Spawner, null>>(s).Spawn()
 	if (err == null) {
 		$.println("iface err: nil")

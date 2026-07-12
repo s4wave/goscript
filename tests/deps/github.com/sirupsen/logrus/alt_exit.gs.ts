@@ -24,7 +24,7 @@ export async function runHandler(handler: (() => void) | null): globalThis.Promi
 			{
 				let err = $.recover()
 				if (err != null) {
-					await fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(os.Stderr, "*os.File"))!, "Error: Logrus exit handler error:", err)
+					await fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(os.Stderr, "*os.File", { kind: $.TypeKind.Pointer, elemType: "os.File" }))!, "Error: Logrus exit handler error:", err)
 				}
 			}
 		})() })

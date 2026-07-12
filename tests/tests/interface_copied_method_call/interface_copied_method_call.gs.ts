@@ -51,7 +51,7 @@ export async function callCopied(r: runner | null): globalThis.Promise<void> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await callCopied($.interfaceValue<runner | null>($.markAsStructValue(new task()), "main.task"))
+	await callCopied($.interfaceValue<runner | null>($.markAsStructValue(new task()), "main.task", "main.task"))
 }
 
 if ($.isMainScript(import.meta)) {

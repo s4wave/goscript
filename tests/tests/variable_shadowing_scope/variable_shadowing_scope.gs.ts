@@ -80,7 +80,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	$.println("Completed successfully")
-	await describe($.interfaceValue<any>($.markAsStructValue(new item()), "main.item"))
+	await describe($.interfaceValue<any>($.markAsStructValue(new item()), "main.item", "main.item"))
 	await describe("nope")
 }
 

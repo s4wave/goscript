@@ -872,7 +872,7 @@ export function __goscript_set_RawURLEncoding(__goscriptValue: Encoding | $.VarR
 }
 
 export function NewEncoder(enc: Encoding | $.VarRef<Encoding> | null, w: io.Writer | null): io.WriteCloser | null {
-	return $.interfaceValue<io.WriteCloser | null>(new encoder({enc: enc, w: w}), "*base64.encoder")
+	return $.interfaceValue<io.WriteCloser | null>(new encoder({enc: enc, w: w}), "*base64.encoder", { kind: $.TypeKind.Pointer, elemType: "base64.encoder" })
 }
 
 export function CorruptInputError_Error(e: CorruptInputError): string {
@@ -902,7 +902,7 @@ export function assemble64(n1: number, n2: number, n3: number, n4: number, n5: n
 }
 
 export function NewDecoder(enc: Encoding | $.VarRef<Encoding> | null, r: io.Reader | null): io.Reader | null {
-	return $.interfaceValue<io.Reader | null>(new decoder({enc: enc, r: $.interfaceValue<io.Reader | null>(new newlineFilteringReader({wrapped: r}), "*base64.newlineFilteringReader")}), "*base64.decoder")
+	return $.interfaceValue<io.Reader | null>(new decoder({enc: enc, r: $.interfaceValue<io.Reader | null>(new newlineFilteringReader({wrapped: r}), "*base64.newlineFilteringReader", { kind: $.TypeKind.Pointer, elemType: "base64.newlineFilteringReader" })}), "*base64.decoder", { kind: $.TypeKind.Pointer, elemType: "base64.decoder" })
 }
 
 export function decodedLen(n: number, padChar: number): number {

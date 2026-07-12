@@ -183,7 +183,7 @@ export class IPAddr {
 		if (a == null) {
 			return null
 		}
-		return $.interfaceValue<__goscript_net.Addr | null>(a, "*net.IPAddr")
+		return $.interfaceValue<__goscript_net.Addr | null>(a, "*net.IPAddr", { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" })
 	}
 
 	public async sockaddr(family: number): globalThis.Promise<[syscall.Sockaddr | null, $.GoError]> {
@@ -196,7 +196,7 @@ export class IPAddr {
 
 	public toLocal(net: string): __goscript_sockaddr_posix.sockaddr | null {
 		const a: IPAddr | $.VarRef<IPAddr> | null = this
-		return $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>((() => { const __goscriptLiteralField2 = (__goscript_ipsock.loopbackIP(net) as __goscript_ip.IP); return new IPAddr({IP: __goscriptLiteralField2, Zone: $.pointerValue<IPAddr>(a).Zone}) })(), "*net.IPAddr")
+		return $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>((() => { const __goscriptLiteralField2 = (__goscript_ipsock.loopbackIP(net) as __goscript_ip.IP); return new IPAddr({IP: __goscriptLiteralField2, Zone: $.pointerValue<IPAddr>(a).Zone}) })(), "*net.IPAddr", { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" })
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -204,7 +204,7 @@ export class IPAddr {
 		() => new IPAddr(),
 		[{ name: "Network", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "family", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "isWildcard", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "opAddr", args: [], returns: [{ name: "_r0", type: "net.Addr" }] }, { name: "sockaddr", args: [{ name: "family", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [{ name: "_r0", type: "syscall.Sockaddr" }, { name: "_r1", type: "error" }] }, { name: "toLocal", args: [{ name: "net", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: "net.sockaddr" }] }],
 		IPAddr,
-		[{ name: "IP", key: "IP", type: "net.IP", index: [0], offset: 0, exported: true }, { name: "Zone", key: "Zone", type: { kind: $.TypeKind.Basic, name: "string" }, index: [1], offset: 24, exported: true }]
+		[{ name: "IP", key: "IP", type: { kind: $.TypeKind.Slice, typeName: "net.IP", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, index: [0], offset: 0, exported: true }, { name: "Zone", key: "Zone", type: { kind: $.TypeKind.Basic, name: "string" }, index: [1], offset: 24, exported: true }]
 	)
 }
 
@@ -244,12 +244,12 @@ export class IPConn {
 		let addr: IPAddr | $.VarRef<IPAddr> | null = __goscriptTuple1[1]
 		let err = __goscriptTuple1[2]
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		if (addr == null) {
 			return [n, null, err]
 		}
-		return [n, $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.IPAddr"), err]
+		return [n, $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.IPAddr", { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" }), err]
 	}
 
 	public async ReadFromIP(b: $.Slice<number>): globalThis.Promise<[number, IPAddr | $.VarRef<IPAddr> | null, $.GoError]> {
@@ -262,7 +262,7 @@ export class IPConn {
 		let addr: IPAddr | $.VarRef<IPAddr> | null = __goscriptTuple2[1]
 		let err = __goscriptTuple2[2]
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, addr, err]
 	}
@@ -284,7 +284,7 @@ export class IPConn {
 		addr = __goscriptTuple3[3]
 		err = __goscriptTuple3[4]
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, oobn, flags, addr, err]
 	}
@@ -294,7 +294,7 @@ export class IPConn {
 		if (!$.pointerValue<IPConn>(c).conn.ok()) {
 			return [null, $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 		}
-		return [$.interfaceValue<syscall.RawConn | null>(__goscript_rawconn.newRawConn($.pointerValue<IPConn>(c).conn.fd), "*net.rawConn"), null]
+		return [$.interfaceValue<syscall.RawConn | null>(__goscript_rawconn.newRawConn($.pointerValue<IPConn>(c).conn.fd), "*net.rawConn", { kind: $.TypeKind.Pointer, elemType: "net.rawConn" }), null]
 	}
 
 	public async WriteMsgIP(b: $.Slice<number>, oob: $.Slice<number>, addr: IPAddr | $.VarRef<IPAddr> | null): globalThis.Promise<[number, number, $.GoError]> {
@@ -310,7 +310,7 @@ export class IPConn {
 		oobn = __goscriptTuple4[1]
 		err = __goscriptTuple4[2]
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField3 = IPAddr.prototype.opAddr.call(addr); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField3, Err: err}) })(), "*net.OpError")
+			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField3 = IPAddr.prototype.opAddr.call(addr); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField3, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, oobn, err]
 	}
@@ -324,11 +324,11 @@ export class IPConn {
 		let a: IPAddr | $.VarRef<IPAddr> | null = __goscriptTuple5[0]
 		let ok = __goscriptTuple5[1]
 		if (!ok) {
-			return [0, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).laddr, Addr: addr, Err: $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })}), "*net.OpError")]
+			return [0, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).laddr, Addr: addr, Err: $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 		}
 		let [n, err] = await IPConn.prototype.writeTo.call(c, b, a)
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField4 = IPAddr.prototype.opAddr.call(a); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField4, Err: err}) })(), "*net.OpError")
+			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField4 = IPAddr.prototype.opAddr.call(a); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField4, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, err]
 	}
@@ -340,7 +340,7 @@ export class IPConn {
 		}
 		let [n, err] = await IPConn.prototype.writeTo.call(c, b, addr)
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField5 = IPAddr.prototype.opAddr.call(addr); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField5, Err: err}) })(), "*net.OpError")
+			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField5 = IPAddr.prototype.opAddr.call(addr); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField5, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, err]
 	}
@@ -542,7 +542,7 @@ export async function DialIP(network: string, laddr: IPAddr | $.VarRef<IPAddr> |
 
 export async function dialIP(ctx: context.Context | null, dialer: __goscript_dial.Dialer | $.VarRef<__goscript_dial.Dialer> | null, network: string, laddr: IPAddr | $.VarRef<IPAddr> | null, raddr: IPAddr | $.VarRef<IPAddr> | null): globalThis.Promise<[IPConn | $.VarRef<IPConn> | null, $.GoError]> {
 	if (raddr == null) {
-		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField8 = IPAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField8, Addr: null, Err: __goscript_net.errMissingAddress}) })(), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField8 = IPAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField8, Addr: null, Err: __goscript_net.errMissingAddress}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	let sd: __goscript_dial.sysDialer | $.VarRef<__goscript_dial.sysDialer> | null = (() => { const __goscriptLiteralField9 = IPAddr.prototype.String.call(raddr); return new __goscript_dial.sysDialer({network: network, address: __goscriptLiteralField9}) })()
 	if (dialer != null) {
@@ -552,7 +552,7 @@ export async function dialIP(ctx: context.Context | null, dialer: __goscript_dia
 	let c: IPConn | $.VarRef<IPConn> | null = __goscriptTuple8[0]
 	let err = __goscriptTuple8[1]
 	if (err != null) {
-		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField10 = IPAddr.prototype.opAddr.call(laddr); const __goscriptLiteralField11 = IPAddr.prototype.opAddr.call(raddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField10, Addr: __goscriptLiteralField11, Err: err}) })(), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField10 = IPAddr.prototype.opAddr.call(laddr); const __goscriptLiteralField11 = IPAddr.prototype.opAddr.call(raddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField10, Addr: __goscriptLiteralField11, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	return [c, null]
 }
@@ -566,7 +566,7 @@ export async function ListenIP(network: string, laddr: IPAddr | $.VarRef<IPAddr>
 	let c: IPConn | $.VarRef<IPConn> | null = __goscriptTuple9[0]
 	let err = __goscriptTuple9[1]
 	if (err != null) {
-		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField13 = IPAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField13, Err: err}) })(), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField13 = IPAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField13, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	return [c, null]
 }

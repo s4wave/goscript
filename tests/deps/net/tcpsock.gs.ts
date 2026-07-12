@@ -223,7 +223,7 @@ export class TCPAddr {
 		if (a == null) {
 			return null
 		}
-		return $.interfaceValue<__goscript_net.Addr | null>(a, "*net.TCPAddr")
+		return $.interfaceValue<__goscript_net.Addr | null>(a, "*net.TCPAddr", { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" })
 	}
 
 	public async sockaddr(family: number): globalThis.Promise<[syscall.Sockaddr | null, $.GoError]> {
@@ -236,7 +236,7 @@ export class TCPAddr {
 
 	public toLocal(net: string): __goscript_sockaddr_posix.sockaddr | null {
 		const a: TCPAddr | $.VarRef<TCPAddr> | null = this
-		return $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>((() => { const __goscriptLiteralField0 = (__goscript_ipsock.loopbackIP(net) as __goscript_ip.IP); return new TCPAddr({IP: __goscriptLiteralField0, Port: $.pointerValue<TCPAddr>(a).Port, Zone: $.pointerValue<TCPAddr>(a).Zone}) })(), "*net.TCPAddr")
+		return $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>((() => { const __goscriptLiteralField0 = (__goscript_ipsock.loopbackIP(net) as __goscript_ip.IP); return new TCPAddr({IP: __goscriptLiteralField0, Port: $.pointerValue<TCPAddr>(a).Port, Zone: $.pointerValue<TCPAddr>(a).Zone}) })(), "*net.TCPAddr", { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" })
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -244,7 +244,7 @@ export class TCPAddr {
 		() => new TCPAddr(),
 		[{ name: "AddrPort", args: [], returns: [{ name: "_r0", type: "netip.AddrPort" }] }, { name: "Network", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "family", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "isWildcard", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "opAddr", args: [], returns: [{ name: "_r0", type: "net.Addr" }] }, { name: "sockaddr", args: [{ name: "family", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [{ name: "_r0", type: "syscall.Sockaddr" }, { name: "_r1", type: "error" }] }, { name: "toLocal", args: [{ name: "net", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: "net.sockaddr" }] }],
 		TCPAddr,
-		[{ name: "IP", key: "IP", type: "net.IP", index: [0], offset: 0, exported: true }, { name: "Port", key: "Port", type: { kind: $.TypeKind.Basic, name: "int" }, index: [1], offset: 24, exported: true }, { name: "Zone", key: "Zone", type: { kind: $.TypeKind.Basic, name: "string" }, index: [2], offset: 32, exported: true }]
+		[{ name: "IP", key: "IP", type: { kind: $.TypeKind.Slice, typeName: "net.IP", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, index: [0], offset: 0, exported: true }, { name: "Port", key: "Port", type: { kind: $.TypeKind.Basic, name: "int" }, index: [1], offset: 24, exported: true }, { name: "Zone", key: "Zone", type: { kind: $.TypeKind.Basic, name: "string" }, index: [2], offset: 32, exported: true }]
 	)
 }
 
@@ -282,7 +282,7 @@ export class TCPConn {
 		{
 			let err = await __goscript_fd_fake.netFD.prototype.closeRead.call($.pointerValue<TCPConn>(c).conn.fd)
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "close", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "close", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		return null
@@ -296,7 +296,7 @@ export class TCPConn {
 		{
 			let err = await __goscript_fd_fake.netFD.prototype.closeWrite.call($.pointerValue<TCPConn>(c).conn.fd)
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "close", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "close", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		return null
@@ -317,7 +317,7 @@ export class TCPConn {
 		}
 		let [n, err] = await TCPConn.prototype.readFrom.call(c, r)
 		if ((err != null) && (!$.comparableEqual(err, io.EOF))) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "readfrom", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "readfrom", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, err]
 	}
@@ -330,7 +330,7 @@ export class TCPConn {
 		{
 			let err = __goscript_sockopt_fake.setKeepAlive($.pointerValue<TCPConn>(c).conn.fd, keepalive)
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		return null
@@ -345,25 +345,25 @@ export class TCPConn {
 		{
 			let err = __goscript_sockopt_fake.setKeepAlive($.pointerValue<TCPConn>(c).conn.fd, config.Enable)
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		{
 			let err = __goscript_tcpsockopt_stub.setKeepAliveIdle($.pointerValue<TCPConn>(c).conn.fd, config.Idle)
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		{
 			let err = __goscript_tcpsockopt_stub.setKeepAliveInterval($.pointerValue<TCPConn>(c).conn.fd, config.Interval)
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		{
 			let err = __goscript_tcpsockopt_stub.setKeepAliveCount($.pointerValue<TCPConn>(c).conn.fd, config.Count)
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 
@@ -378,7 +378,7 @@ export class TCPConn {
 		{
 			let err = __goscript_tcpsockopt_stub.setKeepAliveIdle($.pointerValue<TCPConn>(c).conn.fd, d)
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		return null
@@ -392,7 +392,7 @@ export class TCPConn {
 		{
 			let err = await __goscript_sockopt_fake.setLinger($.pointerValue<TCPConn>(c).conn.fd, sec)
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		return null
@@ -406,7 +406,7 @@ export class TCPConn {
 		{
 			let err = __goscript_tcpsockopt_stub.setNoDelay($.pointerValue<TCPConn>(c).conn.fd, noDelay)
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		return null
@@ -417,7 +417,7 @@ export class TCPConn {
 		if (!$.pointerValue<TCPConn>(c).conn.ok()) {
 			return [null, $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 		}
-		return [$.interfaceValue<syscall.RawConn | null>(__goscript_rawconn.newRawConn($.pointerValue<TCPConn>(c).conn.fd), "*net.rawConn"), null]
+		return [$.interfaceValue<syscall.RawConn | null>(__goscript_rawconn.newRawConn($.pointerValue<TCPConn>(c).conn.fd), "*net.rawConn", { kind: $.TypeKind.Pointer, elemType: "net.rawConn" }), null]
 	}
 
 	public async WriteTo(w: io.Writer | null): globalThis.Promise<[bigint, $.GoError]> {
@@ -427,7 +427,7 @@ export class TCPConn {
 		}
 		let [n, err] = await TCPConn.prototype.writeTo.call(c, w)
 		if ((err != null) && (!$.comparableEqual(err, io.EOF))) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "writeto", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "writeto", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, err]
 	}
@@ -636,9 +636,9 @@ export class TCPListener {
 		let c: TCPConn | $.VarRef<TCPConn> | null = __goscriptTuple3[0]
 		let err = __goscriptTuple3[1]
 		if (err != null) {
-			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "accept", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPListener>(l).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPListener>(l).fd).laddr, Err: err}), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "accept", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPListener>(l).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPListener>(l).fd).laddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 		}
-		return [$.interfaceValue<__goscript_net.Conn | null>(c, "*net.TCPConn"), null]
+		return [$.interfaceValue<__goscript_net.Conn | null>(c, "*net.TCPConn", { kind: $.TypeKind.Pointer, elemType: "net.TCPConn" }), null]
 	}
 
 	public async AcceptTCP(): globalThis.Promise<[TCPConn | $.VarRef<TCPConn> | null, $.GoError]> {
@@ -650,7 +650,7 @@ export class TCPListener {
 		let c: TCPConn | $.VarRef<TCPConn> | null = __goscriptTuple4[0]
 		let err = __goscriptTuple4[1]
 		if (err != null) {
-			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "accept", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPListener>(l).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPListener>(l).fd).laddr, Err: err}), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "accept", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPListener>(l).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPListener>(l).fd).laddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 		}
 		return [c, null]
 	}
@@ -668,7 +668,7 @@ export class TCPListener {
 		{
 			let err = await TCPListener.prototype.close.call(l)
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "close", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPListener>(l).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPListener>(l).fd).laddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "close", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPListener>(l).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPListener>(l).fd).laddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		return null
@@ -685,7 +685,7 @@ export class TCPListener {
 		f = __goscriptTuple5[0]
 		err = __goscriptTuple5[1]
 		if (err != null) {
-			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "file", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPListener>(l).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPListener>(l).fd).laddr, Err: err}), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "file", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPListener>(l).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<TCPListener>(l).fd).laddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 		}
 		return [f, err]
 	}
@@ -703,7 +703,7 @@ export class TCPListener {
 		if (!TCPListener.prototype.ok.call(l)) {
 			return [null, $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 		}
-		return [$.interfaceValue<syscall.RawConn | null>(__goscript_rawconn.newRawListener($.pointerValue<TCPListener>(l).fd), "*net.rawListener"), null]
+		return [$.interfaceValue<syscall.RawConn | null>(__goscript_rawconn.newRawListener($.pointerValue<TCPListener>(l).fd), "*net.rawListener", { kind: $.TypeKind.Pointer, elemType: "net.rawListener" }), null]
 	}
 
 	public async accept(): globalThis.Promise<[TCPConn | $.VarRef<TCPConn> | null, $.GoError]> {
@@ -811,12 +811,12 @@ export async function dialTCP(ctx: context.Context | null, dialer: __goscript_di
 		}
 		default:
 		{
-			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField4 = TCPAddr.prototype.opAddr.call(laddr); const __goscriptLiteralField5 = TCPAddr.prototype.opAddr.call(raddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField4, Addr: __goscriptLiteralField5, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField4 = TCPAddr.prototype.opAddr.call(laddr); const __goscriptLiteralField5 = TCPAddr.prototype.opAddr.call(raddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField4, Addr: __goscriptLiteralField5, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 			break
 		}
 	}
 	if (raddr == null) {
-		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField6 = TCPAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField6, Addr: null, Err: __goscript_net.errMissingAddress}) })(), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField6 = TCPAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField6, Addr: null, Err: __goscript_net.errMissingAddress}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	let sd: __goscript_dial.sysDialer | $.VarRef<__goscript_dial.sysDialer> | null = (() => { const __goscriptLiteralField7 = TCPAddr.prototype.String.call(raddr); return new __goscript_dial.sysDialer({network: network, address: __goscriptLiteralField7}) })()
 	let c: TCPConn | $.VarRef<TCPConn> | null = null as TCPConn | $.VarRef<TCPConn> | null
@@ -834,7 +834,7 @@ export async function dialTCP(ctx: context.Context | null, dialer: __goscript_di
 		err = __goscriptTuple2[1]
 	}
 	if (err != null) {
-		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField8 = TCPAddr.prototype.opAddr.call(laddr); const __goscriptLiteralField9 = TCPAddr.prototype.opAddr.call(raddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField8, Addr: __goscriptLiteralField9, Err: err}) })(), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField8 = TCPAddr.prototype.opAddr.call(laddr); const __goscriptLiteralField9 = TCPAddr.prototype.opAddr.call(raddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField8, Addr: __goscriptLiteralField9, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	return [c, null]
 }
@@ -849,7 +849,7 @@ export async function ListenTCP(network: string, laddr: TCPAddr | $.VarRef<TCPAd
 		}
 		default:
 		{
-			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField10 = TCPAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField10, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField10 = TCPAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField10, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 			break
 		}
 	}
@@ -869,7 +869,7 @@ export async function ListenTCP(network: string, laddr: TCPAddr | $.VarRef<TCPAd
 		err = __goscriptTuple9[1]
 	}
 	if (err != null) {
-		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField12 = TCPAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField12, Err: err}) })(), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField12 = TCPAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField12, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	return [ln, null]
 }

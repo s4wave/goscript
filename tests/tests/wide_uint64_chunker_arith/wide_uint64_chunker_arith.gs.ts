@@ -125,7 +125,7 @@ export async function main(): globalThis.Promise<void> {
 	let totalSize: bigint = 0n
 	let chkStart: bigint = 0n
 
-	let src = io.LimitReader($.pointerValueOrNil($.interfaceValue<io.Reader | null>(newRepeatReader(40), "*main.repeatReader"))!, 25n)
+	let src = io.LimitReader($.pointerValueOrNil($.interfaceValue<io.Reader | null>(newRepeatReader(40), "*main.repeatReader", { kind: $.TypeKind.Pointer, elemType: "main.repeatReader" }))!, 25n)
 	let buf: $.Slice<number> = $.makeSlice<number>(8, undefined, "byte")
 	while (true) {
 		let [nr, err] = await $.pointerValue<Exclude<io.Reader, null>>(src).Read(buf)

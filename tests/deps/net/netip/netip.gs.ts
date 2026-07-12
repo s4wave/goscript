@@ -780,9 +780,9 @@ export class Addr {
 	static __typeInfo = $.registerStructType(
 		"netip.Addr",
 		() => new Addr(),
-		[{ name: "AppendBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }, { name: "AppendText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }, { name: "AppendTo", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "As16", args: [], returns: [{ type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 16 } }] }, { name: "As4", args: [], returns: [{ type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 4 } }] }, { name: "AsSlice", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "BitLen", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "Compare", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "Is4", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Is4In6", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Is6", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsGlobalUnicast", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsInterfaceLocalMulticast", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsLinkLocalMulticast", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsLinkLocalUnicast", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsLoopback", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsMulticast", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsPrivate", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsUnspecified", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsValid", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Less", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "MarshalBinary", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }, { name: "MarshalText", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }, { name: "Next", args: [], returns: [{ type: "netip.Addr" }] }, { name: "Prefix", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "netip.Prefix" }, { type: "error" }] }, { name: "Prev", args: [], returns: [{ type: "netip.Addr" }] }, { name: "String", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "StringExpanded", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Unmap", args: [], returns: [{ type: "netip.Addr" }] }, { name: "UnmarshalBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }, { name: "UnmarshalText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }, { name: "WithZone", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "netip.Addr" }] }, { name: "Zone", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "appendTo4", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "appendTo4In6", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "appendTo6", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "hasZone", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "isZero", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "marshalBinarySize", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "string4", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "string4In6", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "string6", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "v4", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint8" } }] }, { name: "v6", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint8" } }] }, { name: "v6u16", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint16" } }] }, { name: "withoutZone", args: [], returns: [{ type: "netip.Addr" }] }],
+		[{ name: "AppendBinary", args: [{ name: "b", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "_r1", type: "error" }] }, { name: "AppendText", args: [{ name: "b", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "_r1", type: "error" }] }, { name: "AppendTo", args: [{ name: "b", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "As16", args: [], returns: [{ name: "a16", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 16 } }] }, { name: "As4", args: [], returns: [{ name: "a4", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 4 } }] }, { name: "AsSlice", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "BitLen", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "Compare", args: [{ name: "ip2", type: "netip.Addr" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "Is4", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Is4In6", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Is6", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsGlobalUnicast", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsInterfaceLocalMulticast", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsLinkLocalMulticast", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsLinkLocalUnicast", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsLoopback", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsMulticast", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsPrivate", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsUnspecified", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsValid", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Less", args: [{ name: "ip2", type: "netip.Addr" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "MarshalBinary", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "_r1", type: "error" }] }, { name: "MarshalText", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "_r1", type: "error" }] }, { name: "Next", args: [], returns: [{ name: "_r0", type: "netip.Addr" }] }, { name: "Prefix", args: [{ name: "b", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [{ name: "_r0", type: "netip.Prefix" }, { name: "_r1", type: "error" }] }, { name: "Prev", args: [], returns: [{ name: "_r0", type: "netip.Addr" }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "StringExpanded", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Unmap", args: [], returns: [{ name: "_r0", type: "netip.Addr" }] }, { name: "UnmarshalBinary", args: [{ name: "b", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: "error" }] }, { name: "UnmarshalText", args: [{ name: "text", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: "error" }] }, { name: "WithZone", args: [{ name: "zone", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: "netip.Addr" }] }, { name: "Zone", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "appendTo4", args: [{ name: "ret", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "appendTo4In6", args: [{ name: "ret", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "appendTo6", args: [{ name: "ret", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "hasZone", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "isZero", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "marshalBinarySize", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "string4", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "string4In6", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "string6", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "v4", args: [{ name: "i", type: { kind: $.TypeKind.Basic, name: "uint8" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint8" } }] }, { name: "v6", args: [{ name: "i", type: { kind: $.TypeKind.Basic, name: "uint8" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint8" } }] }, { name: "v6u16", args: [{ name: "i", type: { kind: $.TypeKind.Basic, name: "uint8" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint16" } }] }, { name: "withoutZone", args: [], returns: [{ name: "_r0", type: "netip.Addr" }] }],
 		Addr,
-		[{ name: "addr", key: "addr", type: "netip.uint128" }, { name: "z", key: "z", type: "unique.Handle" }]
+		[{ name: "addr", key: "addr", type: "netip.uint128", pkgPath: "net/netip", index: [0], offset: 0, exported: false }, { name: "z", key: "z", type: "unique.Handle", pkgPath: "net/netip", index: [1], offset: 16, exported: false }]
 	)
 }
 
@@ -827,7 +827,7 @@ export class addrDetail {
 		() => new addrDetail(),
 		[],
 		addrDetail,
-		[{ name: "isV6", key: "isV6", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "zoneV6", key: "zoneV6", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		[{ name: "isV6", key: "isV6", type: { kind: $.TypeKind.Basic, name: "bool" }, pkgPath: "net/netip", index: [0], offset: 0, exported: false }, { name: "zoneV6", key: "zoneV6", type: { kind: $.TypeKind.Basic, name: "string" }, pkgPath: "net/netip", index: [1], offset: 8, exported: false }]
 	)
 }
 
@@ -889,9 +889,9 @@ export class parseAddrError {
 	static __typeInfo = $.registerStructType(
 		"netip.parseAddrError",
 		() => new parseAddrError(),
-		[{ name: "Error", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		[{ name: "Error", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }],
 		parseAddrError,
-		[{ name: "in", key: "_in", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "msg", key: "msg", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "at", key: "at", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		[{ name: "in", key: "_in", type: { kind: $.TypeKind.Basic, name: "string" }, pkgPath: "net/netip", index: [0], offset: 0, exported: false }, { name: "msg", key: "msg", type: { kind: $.TypeKind.Basic, name: "string" }, pkgPath: "net/netip", index: [1], offset: 16, exported: false }, { name: "at", key: "at", type: { kind: $.TypeKind.Basic, name: "string" }, pkgPath: "net/netip", index: [2], offset: 32, exported: false }]
 	)
 }
 
@@ -1100,9 +1100,9 @@ export class AddrPort {
 	static __typeInfo = $.registerStructType(
 		"netip.AddrPort",
 		() => new AddrPort(),
-		[{ name: "Addr", args: [], returns: [{ type: "netip.Addr" }] }, { name: "AppendBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }, { name: "AppendText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }, { name: "AppendTo", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Compare", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "IsValid", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "MarshalBinary", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }, { name: "MarshalText", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }, { name: "Port", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint16" } }] }, { name: "String", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "UnmarshalBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }, { name: "UnmarshalText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
+		[{ name: "Addr", args: [], returns: [{ name: "_r0", type: "netip.Addr" }] }, { name: "AppendBinary", args: [{ name: "b", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "_r1", type: "error" }] }, { name: "AppendText", args: [{ name: "b", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "_r1", type: "error" }] }, { name: "AppendTo", args: [{ name: "b", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Compare", args: [{ name: "p2", type: "netip.AddrPort" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "IsValid", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "MarshalBinary", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "_r1", type: "error" }] }, { name: "MarshalText", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "_r1", type: "error" }] }, { name: "Port", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint16" } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "UnmarshalBinary", args: [{ name: "b", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: "error" }] }, { name: "UnmarshalText", args: [{ name: "text", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: "error" }] }],
 		AddrPort,
-		[{ name: "ip", key: "ip", type: "netip.Addr" }, { name: "port", key: "port", type: { kind: $.TypeKind.Basic, name: "uint16" } }]
+		[{ name: "ip", key: "ip", type: "netip.Addr", pkgPath: "net/netip", index: [0], offset: 0, exported: false }, { name: "port", key: "port", type: { kind: $.TypeKind.Basic, name: "uint16" }, pkgPath: "net/netip", index: [1], offset: 24, exported: false }]
 	)
 }
 
@@ -1386,9 +1386,9 @@ export class Prefix {
 	static __typeInfo = $.registerStructType(
 		"netip.Prefix",
 		() => new Prefix(),
-		[{ name: "Addr", args: [], returns: [{ type: "netip.Addr" }] }, { name: "AppendBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }, { name: "AppendText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }, { name: "AppendTo", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Bits", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "Compare", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "Contains", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsSingleIP", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsValid", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "MarshalBinary", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }, { name: "MarshalText", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }, { name: "Masked", args: [], returns: [{ type: "netip.Prefix" }] }, { name: "Overlaps", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "String", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "UnmarshalBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }, { name: "UnmarshalText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }, { name: "isZero", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }],
+		[{ name: "Addr", args: [], returns: [{ name: "_r0", type: "netip.Addr" }] }, { name: "AppendBinary", args: [{ name: "b", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "_r1", type: "error" }] }, { name: "AppendText", args: [{ name: "b", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "_r1", type: "error" }] }, { name: "AppendTo", args: [{ name: "b", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Bits", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "Compare", args: [{ name: "p2", type: "netip.Prefix" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "Contains", args: [{ name: "ip", type: "netip.Addr" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsSingleIP", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsValid", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "MarshalBinary", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "_r1", type: "error" }] }, { name: "MarshalText", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "_r1", type: "error" }] }, { name: "Masked", args: [], returns: [{ name: "_r0", type: "netip.Prefix" }] }, { name: "Overlaps", args: [{ name: "o", type: "netip.Prefix" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "UnmarshalBinary", args: [{ name: "b", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: "error" }] }, { name: "UnmarshalText", args: [{ name: "text", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: "error" }] }, { name: "isZero", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }],
 		Prefix,
-		[{ name: "ip", key: "ip", type: "netip.Addr" }, { name: "bitsPlusOne", key: "bitsPlusOne", type: { kind: $.TypeKind.Basic, name: "uint8" } }]
+		[{ name: "ip", key: "ip", type: "netip.Addr", pkgPath: "net/netip", index: [0], offset: 0, exported: false }, { name: "bitsPlusOne", key: "bitsPlusOne", type: { kind: $.TypeKind.Basic, name: "uint8" }, pkgPath: "net/netip", index: [1], offset: 24, exported: false }]
 	)
 }
 
@@ -1436,9 +1436,9 @@ export class parsePrefixError {
 	static __typeInfo = $.registerStructType(
 		"netip.parsePrefixError",
 		() => new parsePrefixError(),
-		[{ name: "Error", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		[{ name: "Error", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }],
 		parsePrefixError,
-		[{ name: "in", key: "_in", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "msg", key: "msg", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		[{ name: "in", key: "_in", type: { kind: $.TypeKind.Basic, name: "string" }, pkgPath: "net/netip", index: [0], offset: 0, exported: false }, { name: "msg", key: "msg", type: { kind: $.TypeKind.Basic, name: "string" }, pkgPath: "net/netip", index: [1], offset: 16, exported: false }]
 	)
 }
 
@@ -1505,12 +1505,12 @@ export function ParseAddr(s: string): [Addr, $.GoError] {
 			}
 			case 37:
 			{
-				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: s, msg: "missing IPv6 address"})), "netip.parseAddrError")]
+				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: s, msg: "missing IPv6 address"})), "netip.parseAddrError", "netip.parseAddrError")]
 				break
 			}
 		}
 	}
-	return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: s, msg: "unable to parse IP"})), "netip.parseAddrError")]
+	return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: s, msg: "unable to parse IP"})), "netip.parseAddrError", "netip.parseAddrError")]
 }
 
 export function MustParseAddr(s: string): Addr {
@@ -1529,12 +1529,12 @@ export function parseIPv4Fields(_in: string, off: number, end: number, fields: $
 	for (let i = 0; i < $.len(s); i++) {
 		if (($.uint($.indexStringOrBytes(s, i), 8) >= $.uint(48, 8)) && ($.uint($.indexStringOrBytes(s, i), 8) <= $.uint(57, 8))) {
 			if ((digLen == 1) && (val == 0)) {
-				return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv4 field has octet with leading zero"})), "netip.parseAddrError")
+				return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv4 field has octet with leading zero"})), "netip.parseAddrError", "netip.parseAddrError")
 			}
 			val = ((val * 10) + $.int($.indexStringOrBytes(s, i))) - 48
 			digLen++
 			if (val > 255) {
-				return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv4 field has value >255"})), "netip.parseAddrError")
+				return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv4 field has value >255"})), "netip.parseAddrError", "netip.parseAddrError")
 			}
 		} else {
 			if ($.uint($.indexStringOrBytes(s, i), 8) == $.uint(46, 8)) {
@@ -1542,23 +1542,23 @@ export function parseIPv4Fields(_in: string, off: number, end: number, fields: $
 				// 1.2.3.
 				// 1..2.3
 				if (((i == 0) || (i == ($.len(s) - 1))) || ($.uint($.indexStringOrBytes(s, i - 1), 8) == $.uint(46, 8))) {
-					return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv4 field must have at least one digit", at: $.sliceStringOrBytes(s, i, undefined)})), "netip.parseAddrError")
+					return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv4 field must have at least one digit", at: $.sliceStringOrBytes(s, i, undefined)})), "netip.parseAddrError", "netip.parseAddrError")
 				}
 				// 1.2.3.4.5
 				if (pos == 3) {
-					return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv4 address too long"})), "netip.parseAddrError")
+					return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv4 address too long"})), "netip.parseAddrError", "netip.parseAddrError")
 				}
 				fields![pos] = $.uint($.uint(val, 8), 8)
 				pos++
 				val = 0
 				digLen = 0
 			} else {
-				return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "unexpected character", at: $.sliceStringOrBytes(s, i, undefined)})), "netip.parseAddrError")
+				return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "unexpected character", at: $.sliceStringOrBytes(s, i, undefined)})), "netip.parseAddrError", "netip.parseAddrError")
 			}
 		}
 	}
 	if (pos < 3) {
-		return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv4 address too short"})), "netip.parseAddrError")
+		return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv4 address too short"})), "netip.parseAddrError", "netip.parseAddrError")
 	}
 	fields![3] = $.uint($.uint(val, 8), 8)
 	return null
@@ -1591,7 +1591,7 @@ export function parseIPv6(_in: string): [Addr, $.GoError] {
 		zone = __goscriptAssign1_1
 		if ($.stringEqual(zone, "")) {
 			// Not allowed to have an empty zone if explicitly specified.
-			return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "zone must be a non-empty string"})), "netip.parseAddrError")]
+			return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "zone must be a non-empty string"})), "netip.parseAddrError", "netip.parseAddrError")]
 		}
 	}
 
@@ -1632,27 +1632,27 @@ export function parseIPv6(_in: string): [Addr, $.GoError] {
 			}
 			if (off > 3) {
 				//more than 4 digits in group, fail.
-				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "each group must have 4 or less digits", at: s})), "netip.parseAddrError")]
+				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "each group must have 4 or less digits", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
 			}
 			if ($.uint(acc, 32) > $.uint(math.MaxUint16, 32)) {
 				// Overflow, fail.
-				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv6 field has value >=2^16", at: s})), "netip.parseAddrError")]
+				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv6 field has value >=2^16", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
 			}
 		}
 		if (off == 0) {
 			// No digits found, fail.
-			return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "each colon-separated field must have at least one digit", at: s})), "netip.parseAddrError")]
+			return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "each colon-separated field must have at least one digit", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
 		}
 
 		// If followed by dot, might be in trailing IPv4.
 		if ((off < $.len(s)) && ($.uint($.indexStringOrBytes(s, off), 8) == $.uint(46, 8))) {
 			if ((ellipsis < 0) && (i != 12)) {
 				// Not the right place.
-				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "embedded IPv4 address must replace the final 2 fields of the address", at: s})), "netip.parseAddrError")]
+				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "embedded IPv4 address must replace the final 2 fields of the address", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
 			}
 			if ((i + 4) > 16) {
 				// Not enough room.
-				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "too many hex fields to fit an embedded IPv4 at the end of the address", at: s})), "netip.parseAddrError")]
+				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "too many hex fields to fit an embedded IPv4 at the end of the address", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
 			}
 
 			let end = $.len(_in)
@@ -1681,10 +1681,10 @@ export function parseIPv6(_in: string): [Addr, $.GoError] {
 
 		// Otherwise must be followed by colon and more.
 		if ($.uint($.indexStringOrBytes(s, 0), 8) != $.uint(58, 8)) {
-			return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "unexpected character, want colon", at: s})), "netip.parseAddrError")]
+			return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "unexpected character, want colon", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
 		} else {
 			if ($.len(s) == 1) {
-				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "colon must be followed by more characters", at: s})), "netip.parseAddrError")]
+				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "colon must be followed by more characters", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
 			}
 		}
 		s = $.sliceStringOrBytes(s, 1, undefined)
@@ -1692,7 +1692,7 @@ export function parseIPv6(_in: string): [Addr, $.GoError] {
 		// Look for ellipsis.
 		if ($.uint($.indexStringOrBytes(s, 0), 8) == $.uint(58, 8)) {
 			if (ellipsis >= 0) {
-				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "multiple :: in address", at: s})), "netip.parseAddrError")]
+				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "multiple :: in address", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
 			}
 			ellipsis = i
 			s = $.sliceStringOrBytes(s, 1, undefined)
@@ -1704,13 +1704,13 @@ export function parseIPv6(_in: string): [Addr, $.GoError] {
 
 	// Must have used entire string.
 	if ($.len(s) != 0) {
-		return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "trailing garbage after address", at: s})), "netip.parseAddrError")]
+		return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "trailing garbage after address", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
 	}
 
 	// If didn't parse enough, expand ellipsis.
 	if (i < 16) {
 		if (ellipsis < 0) {
-			return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "address string too short"})), "netip.parseAddrError")]
+			return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "address string too short"})), "netip.parseAddrError", "netip.parseAddrError")]
 		}
 		let n = 16 - i
 		for (let j = i - 1; j >= ellipsis; j--) {
@@ -1720,7 +1720,7 @@ export function parseIPv6(_in: string): [Addr, $.GoError] {
 	} else {
 		if (ellipsis >= 0) {
 			// Ellipsis must represent at least one 0 group.
-			return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "the :: must expand to at least one field of zeros"})), "netip.parseAddrError")]
+			return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "the :: must expand to at least one field of zeros"})), "netip.parseAddrError", "netip.parseAddrError")]
 		}
 	}
 	return [$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(AddrFrom16(ip))).WithZone(zone))), null]
@@ -1860,36 +1860,36 @@ export function PrefixFrom(ip: Addr, bits: number): Prefix {
 export function ParsePrefix(s: string): [Prefix, $.GoError] {
 	let i = bytealg.LastIndexByteString(s, $.uint(47, 8))
 	if (i < 0) {
-		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>($.markAsStructValue(new parsePrefixError({_in: s, msg: "no '/'"})), "netip.parsePrefixError")]
+		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>($.markAsStructValue(new parsePrefixError({_in: s, msg: "no '/'"})), "netip.parsePrefixError", "netip.parsePrefixError")]
 	}
 	let [ip, err] = ParseAddr($.sliceStringOrBytes(s, undefined, i))
 	if (err != null) {
-		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField3 = $.pointerValue<Exclude<$.GoError, null>>(err).Error(); return $.markAsStructValue(new parsePrefixError({_in: s, msg: __goscriptLiteralField3})) })(), "netip.parsePrefixError")]
+		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField3 = $.pointerValue<Exclude<$.GoError, null>>(err).Error(); return $.markAsStructValue(new parsePrefixError({_in: s, msg: __goscriptLiteralField3})) })(), "netip.parsePrefixError", "netip.parsePrefixError")]
 	}
 	// IPv6 zones are not allowed: https://go.dev/issue/51899
 	if ($.markAsStructValue($.cloneStructValue(ip)).Is6() && (!$.comparableEqual(ip.z, z6noz))) {
-		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>($.markAsStructValue(new parsePrefixError({_in: s, msg: "IPv6 zones cannot be present in a prefix"})), "netip.parsePrefixError")]
+		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>($.markAsStructValue(new parsePrefixError({_in: s, msg: "IPv6 zones cannot be present in a prefix"})), "netip.parsePrefixError", "netip.parsePrefixError")]
 	}
 
 	let bitsStr = $.sliceStringOrBytes(s, i + 1, undefined)
 
 	// strconv.Atoi accepts a leading sign and leading zeroes, but we don't want that.
 	if (($.len(bitsStr) > 1) && (($.uint($.indexStringOrBytes(bitsStr, 0), 8) < $.uint(49, 8)) || ($.uint($.indexStringOrBytes(bitsStr, 0), 8) > $.uint(57, 8)))) {
-		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField4 = "bad bits after slash: " + strconv.Quote(bitsStr); return $.markAsStructValue(new parsePrefixError({_in: s, msg: __goscriptLiteralField4})) })(), "netip.parsePrefixError")]
+		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField4 = "bad bits after slash: " + strconv.Quote(bitsStr); return $.markAsStructValue(new parsePrefixError({_in: s, msg: __goscriptLiteralField4})) })(), "netip.parsePrefixError", "netip.parsePrefixError")]
 	}
 
 	let __goscriptTuple9: any = strconv.Atoi(bitsStr)
 	let bits = __goscriptTuple9[0]
 	err = __goscriptTuple9[1]
 	if (err != null) {
-		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField5 = "bad bits after slash: " + strconv.Quote(bitsStr); return $.markAsStructValue(new parsePrefixError({_in: s, msg: __goscriptLiteralField5})) })(), "netip.parsePrefixError")]
+		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField5 = "bad bits after slash: " + strconv.Quote(bitsStr); return $.markAsStructValue(new parsePrefixError({_in: s, msg: __goscriptLiteralField5})) })(), "netip.parsePrefixError", "netip.parsePrefixError")]
 	}
 	let maxBits = 32
 	if ($.markAsStructValue($.cloneStructValue(ip)).Is6()) {
 		maxBits = 128
 	}
 	if ((bits < 0) || (bits > maxBits)) {
-		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>($.markAsStructValue(new parsePrefixError({_in: s, msg: "prefix length out of range"})), "netip.parsePrefixError")]
+		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>($.markAsStructValue(new parsePrefixError({_in: s, msg: "prefix length out of range"})), "netip.parsePrefixError", "netip.parsePrefixError")]
 	}
 	return [$.markAsStructValue($.cloneStructValue(PrefixFrom($.markAsStructValue($.cloneStructValue(ip)), bits))), null]
 }

@@ -100,12 +100,12 @@ export async function proxyStreamTo(src: __goscript_stream.Stream | null, dst: _
 	let rerr = await (async (): globalThis.Promise<$.GoError> => {
 		let pkt: __goscript_message.RawMessage | $.VarRef<__goscript_message.RawMessage> | null = __goscript_message.NewRawMessage(null, true)
 		while (true) {
-			let err = await $.pointerValue<Exclude<__goscript_stream.Stream, null>>(src).MsgRecv($.interfaceValue<__goscript_message.Message>(pkt, "*srpc.RawMessage"))
+			let err = await $.pointerValue<Exclude<__goscript_stream.Stream, null>>(src).MsgRecv($.interfaceValue<__goscript_message.Message>(pkt, "*srpc.RawMessage", { kind: $.TypeKind.Pointer, elemType: "srpc.RawMessage" }))
 			if (err != null) {
 				return err
 			}
 			// Forward all messages including empty ones (valid for empty proto messages)
-			err = await $.pointerValue<Exclude<__goscript_stream.Stream, null>>(dst).MsgSend($.interfaceValue<__goscript_message.Message>(pkt, "*srpc.RawMessage"))
+			err = await $.pointerValue<Exclude<__goscript_stream.Stream, null>>(dst).MsgSend($.interfaceValue<__goscript_message.Message>(pkt, "*srpc.RawMessage", { kind: $.TypeKind.Pointer, elemType: "srpc.RawMessage" }))
 			__goscript_message.RawMessage.prototype.Clear.call(pkt)
 			if (err != null) {
 				return err

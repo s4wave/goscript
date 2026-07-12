@@ -32,4 +32,3 @@ import "@goscript/time/index.js"
 import "./netconn.gs.ts"
 import "./stringer.gs.ts"
 import "./ws_js.gs.ts"
-

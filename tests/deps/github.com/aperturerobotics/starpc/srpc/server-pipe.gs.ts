@@ -54,6 +54,6 @@ export function NewServerPipe(server: __goscript_server.Server | $.VarRef<__gosc
 		queueMicrotask(async () => { await __goscript_server.Server.prototype.HandleStream.call(server, ctx, (srvPipe as io.ReadWriteCloser | null)) })
 		let clientPrw: __goscript_packet_rw.PacketReadWriter | $.VarRef<__goscript_packet_rw.PacketReadWriter> | null = __goscript_packet_rw.NewPacketReadWriter((clientPipe as io.ReadWriteCloser | null))
 		queueMicrotask(async () => { await __goscript_packet_rw.PacketReadWriter.prototype.ReadPump.call(clientPrw, msgHandler, closeHandler) })
-		return [$.interfaceValue<__goscript_writer.PacketWriter | null>(clientPrw, "*srpc.PacketReadWriter"), null]
+		return [$.interfaceValue<__goscript_writer.PacketWriter | null>(clientPrw, "*srpc.PacketReadWriter", { kind: $.TypeKind.Pointer, elemType: "srpc.PacketReadWriter" }), null]
 	}, ({ kind: $.TypeKind.Function, params: ["context.Context", ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }], results: ["error"] } as $.FunctionTypeInfo), ({ kind: $.TypeKind.Function, params: ["error"], results: [] } as $.FunctionTypeInfo)], results: ["srpc.PacketWriter", "error"] } as $.FunctionTypeInfo))
 }

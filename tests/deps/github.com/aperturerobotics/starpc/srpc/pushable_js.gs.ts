@@ -82,7 +82,7 @@ export class PushablePacketWriter {
 
 		let a = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(js.Global())).Get("Uint8Array"))).New($.namedValueInterfaceValue<any>($.len(data), "int", {}, { kind: $.TypeKind.Basic, name: "int" }))))
 		js.CopyBytesToJS($.markAsStructValue($.cloneStructValue(a)), data)
-		$.markAsStructValue($.cloneStructValue($.pointerValue<PushablePacketWriter>(w).pushable)).Call("push", $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(a)), "js.Value"))
+		$.markAsStructValue($.cloneStructValue($.pointerValue<PushablePacketWriter>(w).pushable)).Call("push", $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(a)), "js.Value", "js.Value"))
 		return null
 	}
 

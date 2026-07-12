@@ -22,7 +22,9 @@ import {
   StructOf,
   TypeFor,
   TypeOf,
+  Slice,
   Uint64,
+  Value,
   ValueOf,
 } from './type.js'
 import { Indirect, New, Select, Zero } from './value.js'
@@ -186,6 +188,60 @@ describe('TypeFor', () => {
     expect(elem.Kind()).toBe(Uint64)
     elem.SetUint(15n)
     expect(target.value).toBe(15n)
+  })
+
+  it('preserves nested named slice metadata on interface boxes', () => {
+    const rdnType = {
+      kind: TypeKind.Slice,
+      typeName: 'pkix.RDNSequence',
+      elemType: {
+        kind: TypeKind.Slice,
+        typeName: 'pkix.RelativeDistinguishedNameSET',
+        elemType: { kind: TypeKind.Basic, name: 'int' },
+      },
+    }
+    const boxed = namedValueInterfaceValue(
+      [[1]],
+      'pkix.RDNSequence',
+      {},
+      rdnType,
+    )
+
+    const typ = TypeOf(boxed)
+    expect(typ.Kind()).toBe(Slice)
+    expect(typ.String()).toBe('pkix.RDNSequence')
+    expect(typ.Name()).toBe('RDNSequence')
+    expect(typ.PkgPath()).toBe('pkix')
+    expect(typ.Elem().Kind()).toBe(Slice)
+    expect(typ.Elem().Name()).toBe('RelativeDistinguishedNameSET')
+    const value = ValueOf(boxed)
+    expect(value.Len()).toBe(1)
+    expect(value.Index(0).Len()).toBe(1)
+    expect(value.Interface()).toBe(boxed)
+
+    const target = varRef<unknown>(null)
+    const pointerBox = namedValueInterfaceValue(
+      target,
+      '*pkix.RDNSequence',
+      {},
+      { kind: TypeKind.Pointer, elemType: rdnType },
+    )
+    const nilSlice = ValueOf(pointerBox).Elem()
+    expect(nilSlice.CanAddr()).toBe(true)
+    expect(nilSlice.Addr().Kind()).toBe(Ptr)
+    expect(TypeOf(nilSlice.Addr().Interface()).Elem().Name()).toBe(
+      'RDNSequence',
+    )
+
+    const interfaceType = TypeFor({
+      T: {
+        type: { kind: TypeKind.Interface, methods: [] },
+        zero: () => null,
+      },
+    })
+    expect(new Value('goscript', interfaceType).Elem().String()).toBe(
+      'goscript',
+    )
   })
 
   it('preserves channel type metadata on interface boxes', () => {
@@ -622,6 +678,24 @@ describe('TypeFor', () => {
     expect(fieldsType.Field(2).Type.Elem().String()).toBe(
       'main.RegisteredStruct',
     )
+  })
+
+  it('interns ValueOf types before comparable reflect use', () => {
+    class RegisteredType {
+      public _fields = {}
+    }
+    const typeInfo = registerStructType(
+      'asn1.BitString',
+      new RegisteredType(),
+      [],
+      RegisteredType,
+      [],
+    )
+    Object.defineProperty(RegisteredType, '__typeInfo', { value: typeInfo })
+    const value = markAsStructValue(new RegisteredType())
+
+    expect(ValueOf(value).Type()).toBe(TypeOf(value))
+    expect(TypeOf(ValueOf(value).Interface()).String()).toBe('asn1.BitString')
   })
 
   it('allocates registered struct zero values through the named constructor', () => {

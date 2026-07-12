@@ -252,7 +252,7 @@ func (o *TypeScriptEmitOwner) renderLoweredFile(pkg *loweredPackage, file *lower
 		b.WriteString("\tawait main()\n")
 		b.WriteString("}\n")
 	}
-	return b.String()
+	return strings.TrimRight(b.String(), "\n") + "\n"
 }
 
 func estimateLoweredFileSize(file *loweredFile) int {

@@ -283,20 +283,20 @@ export class pipe {
 	}
 
 	public LocalAddr(): __goscript_net.Addr | null {
-		return $.interfaceValue<__goscript_net.Addr | null>($.markAsStructValue(new pipeAddr()), "net.pipeAddr")
+		return $.interfaceValue<__goscript_net.Addr | null>($.markAsStructValue(new pipeAddr()), "net.pipeAddr", "net.pipeAddr")
 	}
 
 	public async Read(b: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const p: pipe | $.VarRef<pipe> | null = this
 		let [n, err] = await pipe.prototype.read.call(p, b)
 		if (((err != null) && (!$.comparableEqual(err, io.EOF))) && (!$.comparableEqual(err, io.ErrClosedPipe))) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: "pipe", Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: "pipe", Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, err]
 	}
 
 	public RemoteAddr(): __goscript_net.Addr | null {
-		return $.interfaceValue<__goscript_net.Addr | null>($.markAsStructValue(new pipeAddr()), "net.pipeAddr")
+		return $.interfaceValue<__goscript_net.Addr | null>($.markAsStructValue(new pipeAddr()), "net.pipeAddr", "net.pipeAddr")
 	}
 
 	public async SetDeadline(t: time.Time): globalThis.Promise<$.GoError> {
@@ -331,7 +331,7 @@ export class pipe {
 		const p: pipe | $.VarRef<pipe> | null = this
 		let [n, err] = await pipe.prototype.write.call(p, b)
 		if ((err != null) && (!$.comparableEqual(err, io.ErrClosedPipe))) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "write", Net: "pipe", Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "write", Net: "pipe", Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, err]
 	}
@@ -538,5 +538,5 @@ export function Pipe(): [__goscript_net.Conn | null, __goscript_net.Conn | null]
 
 	let p1: pipe | $.VarRef<pipe> | null = (() => { const __goscriptLiteralField0 = $.markAsStructValue($.cloneStructValue(makePipeDeadline())); const __goscriptLiteralField1 = $.markAsStructValue($.cloneStructValue(makePipeDeadline())); return new pipe({rdRx: cb1, rdTx: cn1, wrTx: cb2, wrRx: cn2, localDone: done1, remoteDone: done2, readDeadline: __goscriptLiteralField0, writeDeadline: __goscriptLiteralField1}) })()
 	let p2: pipe | $.VarRef<pipe> | null = (() => { const __goscriptLiteralField2 = $.markAsStructValue($.cloneStructValue(makePipeDeadline())); const __goscriptLiteralField3 = $.markAsStructValue($.cloneStructValue(makePipeDeadline())); return new pipe({rdRx: cb2, rdTx: cn2, wrTx: cb1, wrRx: cn1, localDone: done2, remoteDone: done1, readDeadline: __goscriptLiteralField2, writeDeadline: __goscriptLiteralField3}) })()
-	return [$.interfaceValue<__goscript_net.Conn | null>(p1, "*net.pipe"), $.interfaceValue<__goscript_net.Conn | null>(p2, "*net.pipe")]
+	return [$.interfaceValue<__goscript_net.Conn | null>(p1, "*net.pipe", { kind: $.TypeKind.Pointer, elemType: "net.pipe" }), $.interfaceValue<__goscript_net.Conn | null>(p2, "*net.pipe", { kind: $.TypeKind.Pointer, elemType: "net.pipe" })]
 }

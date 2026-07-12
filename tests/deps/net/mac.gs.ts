@@ -115,5 +115,5 @@ export function ParseMAC(s: string): [HardwareAddr, $.GoError] {
 		}
 		return [(hw as HardwareAddr), null]
 	}
-	return [(null as HardwareAddr), $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: "invalid MAC address", Addr: s}), "*net.AddrError")]
+	return [(null as HardwareAddr), $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: "invalid MAC address", Addr: s}), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 }

@@ -30,6 +30,21 @@ describe('DeepEqual', () => {
     expect(DeepEqual({ a: 1, b: 2 }, { a: 1 })).toBe(false)
   })
 
+  it('compares generated structs by field values, not VarRef mechanics', () => {
+    const left = {
+      _fields: { FullBytes: { value: null, address: () => 1 } },
+    }
+    const equal = {
+      _fields: { FullBytes: { value: null, address: () => 2 } },
+    }
+    const different = {
+      _fields: { FullBytes: { value: new Uint8Array([0]), address: () => 3 } },
+    }
+
+    expect(DeepEqual(left, equal)).toBe(true)
+    expect(DeepEqual(left, different)).toBe(false)
+  })
+
   it('should compare Value objects correctly', () => {
     const v1 = new Value(42, new BasicType(Int, 'int'))
     const v2 = new Value(42, new BasicType(Int, 'int'))
@@ -41,7 +56,7 @@ describe('DeepEqual', () => {
 
   it('reads numeric boxed values with basic numeric kinds', () => {
     const v = new Value(
-      { sentinel: true, valueOf: () => 7 } as any,
+      { sentinel: true, valueOf: () => 7 },
       new BasicType(Uint32, 'uint32'),
     )
 

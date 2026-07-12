@@ -58,7 +58,7 @@ export function accept(b: branch | $.VarRef<branch> | null): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let v: node | null = $.interfaceValue<node | null>(new branch({n: 3}), "*main.branch")
+	let v: node | null = $.interfaceValue<node | null>(new branch({n: 3}), "*main.branch", { kind: $.TypeKind.Pointer, elemType: "main.branch" })
 	{
 		const __goscriptTypeSwitchValue = v
 		switch (true) {

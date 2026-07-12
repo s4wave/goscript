@@ -84,7 +84,7 @@ func (r *repeatReader) Read(p []byte) (int, error) {
 		return 0, io.EOF
 	}
 	n := min(len(p), r.remaining)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		p[i] = byte(i)
 	}
 	r.remaining -= n

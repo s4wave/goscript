@@ -74,7 +74,7 @@ export class MyStruct {
 export async function main(): globalThis.Promise<void> {
 	let rwc: ReadCloser | null = null as ReadCloser | null
 	let s = $.markAsStructValue(new MyStruct())
-	rwc = $.interfaceValue<ReadCloser | null>($.markAsStructValue($.cloneStructValue(s)), "main.MyStruct")
+	rwc = $.interfaceValue<ReadCloser | null>($.markAsStructValue($.cloneStructValue(s)), "main.MyStruct", "main.MyStruct")
 
 	let [, ok] = $.typeAssertTuple<ReadCloser | null>(rwc, "main.ReadCloser")
 	if (ok) {

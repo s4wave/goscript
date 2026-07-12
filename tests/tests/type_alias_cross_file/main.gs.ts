@@ -35,15 +35,15 @@ export class source {
 	static __typeInfo = $.registerStructType(
 		"main.source",
 		() => new source(),
-		[{ name: "Val", args: [], returns: [{ type: "subpkg.Value" }] }],
+		[{ name: "Val", args: [], returns: [{ type: { kind: $.TypeKind.Slice, typeName: "subpkg.Value", elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }],
 		source,
 		[]
 	)
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println($.bytesToString(await __goscript_iterator.Read($.interfaceValue<__goscript_iterator.Reader | null>($.markAsStructValue(new source()), "main.source"))))
-	$.println($.bytesToString(subpkg.Value_Clone((await __goscript_iterator.Read($.interfaceValue<__goscript_iterator.Reader | null>($.markAsStructValue(new source()), "main.source"))))))
+	$.println($.bytesToString(await __goscript_iterator.Read($.interfaceValue<__goscript_iterator.Reader | null>($.markAsStructValue(new source()), "main.source", "main.source"))))
+	$.println($.bytesToString(subpkg.Value_Clone((await __goscript_iterator.Read($.interfaceValue<__goscript_iterator.Reader | null>($.markAsStructValue(new source()), "main.source", "main.source"))))))
 }
 
 if ($.isMainScript(import.meta)) {

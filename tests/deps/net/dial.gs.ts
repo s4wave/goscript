@@ -362,13 +362,13 @@ export class Dialer {
 		// Shadow the nettrace (if any) during resolve so Connect events don't fire for DNS lookups.
 		let resolveCtx: context.Context | null = ctx
 		{
-			let __goscriptTuple1: any = $.typeAssertTuple<nettrace.Trace | $.VarRef<nettrace.Trace> | null>(await $.pointerValue<Exclude<context.Context, null>>(ctx).Value($.interfaceValue<any>($.markAsStructValue(new nettrace.TraceKey()), "nettrace.TraceKey")), { kind: $.TypeKind.Pointer, elemType: "nettrace.Trace" })
+			let __goscriptTuple1: any = $.typeAssertTuple<nettrace.Trace | $.VarRef<nettrace.Trace> | null>(await $.pointerValue<Exclude<context.Context, null>>(ctx).Value($.interfaceValue<any>($.markAsStructValue(new nettrace.TraceKey()), "nettrace.TraceKey", "nettrace.TraceKey")), { kind: $.TypeKind.Pointer, elemType: "nettrace.Trace" })
 			let trace: nettrace.Trace | $.VarRef<nettrace.Trace> | null = __goscriptTuple1[0]
 			if (trace != null) {
 				let shadow = $.varRef($.markAsStructValue($.cloneStructValue($.pointerValue<nettrace.Trace>(trace))))
 				shadow.value.ConnectStart = (null as ((network: string, addr: string) => void) | null)
 				shadow.value.ConnectDone = (null as ((network: string, addr: string, err: $.GoError) => void) | null)
-				resolveCtx = context.WithValue($.pointerValueOrNil(resolveCtx)!, $.interfaceValue<any>($.markAsStructValue(new nettrace.TraceKey()), "nettrace.TraceKey"), $.interfaceValue<any>(shadow, "*nettrace.Trace"))
+				resolveCtx = context.WithValue($.pointerValueOrNil(resolveCtx)!, $.interfaceValue<any>($.markAsStructValue(new nettrace.TraceKey()), "nettrace.TraceKey", "nettrace.TraceKey"), $.interfaceValue<any>(shadow, "*nettrace.Trace", { kind: $.TypeKind.Pointer, elemType: "nettrace.Trace" }))
 			}
 		}
 
@@ -376,7 +376,7 @@ export class Dialer {
 		let addrs: __goscript_ipsock.addrList = (__goscriptTuple2[0] as __goscript_ipsock.addrList)
 		let err = __goscriptTuple2[1]
 		if (err != null) {
-			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "dial", Net: network, Source: null, Addr: null, Err: err}), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "dial", Net: network, Source: null, Addr: null, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 		}
 
 		let sd: sysDialer | $.VarRef<sysDialer> | null = new sysDialer({Dialer: $.markAsStructValue($.cloneStructValue($.pointerValue<Dialer>(d))), network: network, address: address})
@@ -635,7 +635,7 @@ export class sysDialer {
 				return await $.pointerValue<sysDialer>(sd).Dialer.Control!(network, address, c)
 			}, ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "syscall.RawConn"], results: ["error"] } as $.FunctionTypeInfo))
 		}
-		let __goscriptTuple11: any = await __goscript_ipsock_posix.internetSocket(ctx, network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.IPAddr"), $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(raddr, "*net.IPAddr"), syscall.SOCK_RAW, proto, "dial", ctrlCtxFn)
+		let __goscriptTuple11: any = await __goscript_ipsock_posix.internetSocket(ctx, network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.IPAddr", { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" }), $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(raddr, "*net.IPAddr", { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" }), syscall.SOCK_RAW, proto, "dial", ctrlCtxFn)
 		let fd: __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null = __goscriptTuple11[0]
 		err = __goscriptTuple11[1]
 		if (err != null) {
@@ -863,7 +863,7 @@ export class sysDialer {
 					isSend: false,
 					channel: await $.pointerValue<Exclude<context.Context, null>>(ctx).Done(),
 					onSelected: async (__goscriptSelect3Result) => {
-						return [null, $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField0 = __goscript_net.mapErr(await $.pointerValue<Exclude<context.Context, null>>(ctx).Err()); return new __goscript_net.OpError({Op: "dial", Net: $.pointerValue<sysDialer>(sd).network, Source: $.pointerValue<sysDialer>(sd).Dialer.LocalAddr, Addr: ra, Err: __goscriptLiteralField0}) })()), "*net.OpError")]
+						return [null, $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField0 = __goscript_net.mapErr(await $.pointerValue<Exclude<context.Context, null>>(ctx).Err()); return new __goscript_net.OpError({Op: "dial", Net: $.pointerValue<sysDialer>(sd).network, Source: $.pointerValue<sysDialer>(sd).Dialer.LocalAddr, Addr: ra, Err: __goscriptLiteralField0}) })()), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 					}
 				},
 				{
@@ -889,7 +889,7 @@ export class sysDialer {
 					if (err != null) {
 						// Ran out of time.
 						if (firstErr == null) {
-							firstErr = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "dial", Net: $.pointerValue<sysDialer>(sd).network, Source: $.pointerValue<sysDialer>(sd).Dialer.LocalAddr, Addr: ra, Err: err}), "*net.OpError")
+							firstErr = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "dial", Net: $.pointerValue<sysDialer>(sd).network, Source: $.pointerValue<sysDialer>(sd).Dialer.LocalAddr, Addr: ra, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 						}
 						break
 					}
@@ -913,7 +913,7 @@ export class sysDialer {
 		}
 
 		if (firstErr == null) {
-			firstErr = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "dial", Net: $.pointerValue<sysDialer>(sd).network, Source: null, Addr: null, Err: __goscript_net.errMissingAddress}), "*net.OpError")
+			firstErr = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "dial", Net: $.pointerValue<sysDialer>(sd).network, Source: null, Addr: null, Err: __goscript_net.errMissingAddress}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [null, firstErr]
 	}
@@ -923,7 +923,7 @@ export class sysDialer {
 		let c: __goscript_net.Conn | null = null as __goscript_net.Conn | null
 		let err: $.GoError = null as $.GoError
 		await using __defer = new $.AsyncDisposableStack()
-		let __goscriptTuple14: any = $.typeAssertTuple<nettrace.Trace | $.VarRef<nettrace.Trace> | null>(await $.pointerValue<Exclude<context.Context, null>>(ctx).Value($.interfaceValue<any>($.markAsStructValue(new nettrace.TraceKey()), "nettrace.TraceKey")), { kind: $.TypeKind.Pointer, elemType: "nettrace.Trace" })
+		let __goscriptTuple14: any = $.typeAssertTuple<nettrace.Trace | $.VarRef<nettrace.Trace> | null>(await $.pointerValue<Exclude<context.Context, null>>(ctx).Value($.interfaceValue<any>($.markAsStructValue(new nettrace.TraceKey()), "nettrace.TraceKey", "nettrace.TraceKey")), { kind: $.TypeKind.Pointer, elemType: "nettrace.Trace" })
 		let trace: nettrace.Trace | $.VarRef<nettrace.Trace> | null = __goscriptTuple14[0]
 		if (trace != null) {
 			let raStr = await $.pointerValue<Exclude<__goscript_net.Addr, null>>(ra).String()
@@ -948,11 +948,11 @@ export class sysDialer {
 						let __goscriptShadow9: __goscript_tcpsock.TCPAddr | $.VarRef<__goscript_tcpsock.TCPAddr> | null = __goscriptTuple15[0]
 						if ($.pointerValue<sysDialer>(sd).Dialer.MultipathTCP()) {
 							let __goscriptTuple16: any = await sysDialer.prototype.dialMPTCP.call(sd, ctx, __goscriptShadow9, ra)
-							c = $.interfaceValue<__goscript_net.Conn | null>(__goscriptTuple16[0], "*net.TCPConn")
+							c = $.interfaceValue<__goscript_net.Conn | null>(__goscriptTuple16[0], "*net.TCPConn", { kind: $.TypeKind.Pointer, elemType: "net.TCPConn" })
 							err = __goscriptTuple16[1]
 						} else {
 							let __goscriptTuple17: any = await sysDialer.prototype.dialTCP.call(sd, ctx, __goscriptShadow9, ra)
-							c = $.interfaceValue<__goscript_net.Conn | null>(__goscriptTuple17[0], "*net.TCPConn")
+							c = $.interfaceValue<__goscript_net.Conn | null>(__goscriptTuple17[0], "*net.TCPConn", { kind: $.TypeKind.Pointer, elemType: "net.TCPConn" })
 							err = __goscriptTuple17[1]
 						}
 					}
@@ -964,7 +964,7 @@ export class sysDialer {
 						let __goscriptTuple18: any = $.typeAssertTuple<__goscript_udpsock.UDPAddr | $.VarRef<__goscript_udpsock.UDPAddr> | null>(__goscriptShadow10, { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" })
 						let __goscriptShadow11: __goscript_udpsock.UDPAddr | $.VarRef<__goscript_udpsock.UDPAddr> | null = __goscriptTuple18[0]
 						let __goscriptTuple19: any = await sysDialer.prototype.dialUDP.call(sd, ctx, __goscriptShadow11, ra)
-						c = $.interfaceValue<__goscript_net.Conn | null>(__goscriptTuple19[0], "*net.UDPConn")
+						c = $.interfaceValue<__goscript_net.Conn | null>(__goscriptTuple19[0], "*net.UDPConn", { kind: $.TypeKind.Pointer, elemType: "net.UDPConn" })
 						err = __goscriptTuple19[1]
 					}
 					break
@@ -975,7 +975,7 @@ export class sysDialer {
 						let __goscriptTuple20: any = $.typeAssertTuple<__goscript_iprawsock.IPAddr | $.VarRef<__goscript_iprawsock.IPAddr> | null>(__goscriptShadow12, { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" })
 						let __goscriptShadow13: __goscript_iprawsock.IPAddr | $.VarRef<__goscript_iprawsock.IPAddr> | null = __goscriptTuple20[0]
 						let __goscriptTuple21: any = await sysDialer.prototype.dialIP.call(sd, ctx, __goscriptShadow13, ra)
-						c = $.interfaceValue<__goscript_net.Conn | null>(__goscriptTuple21[0], "*net.IPConn")
+						c = $.interfaceValue<__goscript_net.Conn | null>(__goscriptTuple21[0], "*net.IPConn", { kind: $.TypeKind.Pointer, elemType: "net.IPConn" })
 						err = __goscriptTuple21[1]
 					}
 					break
@@ -986,14 +986,14 @@ export class sysDialer {
 						let __goscriptTuple22: any = $.typeAssertTuple<__goscript_unixsock.UnixAddr | $.VarRef<__goscript_unixsock.UnixAddr> | null>(__goscriptShadow14, { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" })
 						let __goscriptShadow15: __goscript_unixsock.UnixAddr | $.VarRef<__goscript_unixsock.UnixAddr> | null = __goscriptTuple22[0]
 						let __goscriptTuple23: any = await sysDialer.prototype.dialUnix.call(sd, ctx, __goscriptShadow15, ra)
-						c = $.interfaceValue<__goscript_net.Conn | null>(__goscriptTuple23[0], "*net.UnixConn")
+						c = $.interfaceValue<__goscript_net.Conn | null>(__goscriptTuple23[0], "*net.UnixConn", { kind: $.TypeKind.Pointer, elemType: "net.UnixConn" })
 						err = __goscriptTuple23[1]
 					}
 					break
 				default:
 					{
 						let ra: any = __goscriptTypeSwitchValue
-						const __goscriptReturn10: [__goscript_net.Conn | null, $.GoError] = [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "dial", Net: $.pointerValue<sysDialer>(sd).network, Source: la, Addr: ra, Err: $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: "unexpected address type", Addr: $.pointerValue<sysDialer>(sd).address}), "*net.AddrError")}), "*net.OpError")]
+						const __goscriptReturn10: [__goscript_net.Conn | null, $.GoError] = [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "dial", Net: $.pointerValue<sysDialer>(sd).network, Source: la, Addr: ra, Err: $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: "unexpected address type", Addr: $.pointerValue<sysDialer>(sd).address}), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 						c = __goscriptReturn10[0]
 						err = __goscriptReturn10[1]
 						await __defer.dispose()
@@ -1003,7 +1003,7 @@ export class sysDialer {
 			}
 		}
 		if (err != null) {
-			const __goscriptReturn11: [__goscript_net.Conn | null, $.GoError] = [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "dial", Net: $.pointerValue<sysDialer>(sd).network, Source: la, Addr: ra, Err: err}), "*net.OpError")]
+			const __goscriptReturn11: [__goscript_net.Conn | null, $.GoError] = [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "dial", Net: $.pointerValue<sysDialer>(sd).network, Source: la, Addr: ra, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 			c = __goscriptReturn11[0]
 			err = __goscriptReturn11[1]
 			await __defer.dispose()
@@ -1042,7 +1042,7 @@ export class sysDialer {
 				return await $.pointerValue<sysDialer>(sd).Dialer.Control!(network, address, c)
 			}, ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "syscall.RawConn"], results: ["error"] } as $.FunctionTypeInfo))
 		}
-		let __goscriptTuple24: any = await __goscript_ipsock_posix.internetSocket(ctx, $.pointerValue<sysDialer>(sd).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.UDPAddr"), $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(raddr, "*net.UDPAddr"), syscall.SOCK_DGRAM, 0, "dial", ctrlCtxFn)
+		let __goscriptTuple24: any = await __goscript_ipsock_posix.internetSocket(ctx, $.pointerValue<sysDialer>(sd).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.UDPAddr", { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" }), $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(raddr, "*net.UDPAddr", { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" }), syscall.SOCK_DGRAM, 0, "dial", ctrlCtxFn)
 		let fd: __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null = __goscriptTuple24[0]
 		let err = __goscriptTuple24[1]
 		if (err != null) {
@@ -1059,7 +1059,7 @@ export class sysDialer {
 				return await $.pointerValue<sysDialer>(sd).Dialer.Control!(network, address, c)
 			}, ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "syscall.RawConn"], results: ["error"] } as $.FunctionTypeInfo))
 		}
-		let __goscriptTuple25: any = await __goscript_unixsock_posix.unixSocket(ctx, $.pointerValue<sysDialer>(sd).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.UnixAddr"), $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(raddr, "*net.UnixAddr"), "dial", ctrlCtxFn)
+		let __goscriptTuple25: any = await __goscript_unixsock_posix.unixSocket(ctx, $.pointerValue<sysDialer>(sd).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.UnixAddr", { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" }), $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(raddr, "*net.UnixAddr", { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" }), "dial", ctrlCtxFn)
 		let fd: __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null = __goscriptTuple25[0]
 		let err = __goscriptTuple25[1]
 		if (err != null) {
@@ -1081,7 +1081,7 @@ export class sysDialer {
 				return await $.pointerValue<sysDialer>(sd).Dialer.Control!(network, address, c)
 			}, ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "syscall.RawConn"], results: ["error"] } as $.FunctionTypeInfo))
 		}
-		let __goscriptTuple26: any = await __goscript_ipsock_posix.internetSocket(ctx, $.pointerValue<sysDialer>(sd).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.TCPAddr"), $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(raddr, "*net.TCPAddr"), syscall.SOCK_STREAM, proto, "dial", ctrlCtxFn)
+		let __goscriptTuple26: any = await __goscript_ipsock_posix.internetSocket(ctx, $.pointerValue<sysDialer>(sd).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.TCPAddr", { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" }), $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(raddr, "*net.TCPAddr", { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" }), syscall.SOCK_STREAM, proto, "dial", ctrlCtxFn)
 		let fd: __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null = __goscriptTuple26[0]
 		let err = __goscriptTuple26[1]
 		// The value 0 is the system default, linked to defaultMPTCPEnabledListen
@@ -1093,7 +1093,7 @@ export class sysDialer {
 			if (err == null) {
 				await __goscript_fd_fake.netFD.prototype.Close.call(fd)
 			}
-			let __goscriptTuple27: any = await __goscript_ipsock_posix.internetSocket(ctx, $.pointerValue<sysDialer>(sd).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.TCPAddr"), $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(raddr, "*net.TCPAddr"), syscall.SOCK_STREAM, proto, "dial", ctrlCtxFn)
+			let __goscriptTuple27: any = await __goscript_ipsock_posix.internetSocket(ctx, $.pointerValue<sysDialer>(sd).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.TCPAddr", { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" }), $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(raddr, "*net.TCPAddr", { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" }), syscall.SOCK_STREAM, proto, "dial", ctrlCtxFn)
 			fd = __goscriptTuple27[0]
 			err = __goscriptTuple27[1]
 		}
@@ -1159,7 +1159,7 @@ export class sysDialer {
 	static __typeInfo = $.registerStructType(
 		"net.sysDialer",
 		() => new sysDialer(),
-		[{ name: "dialIP", args: [{ name: "ctx", type: "context.Context" }, { name: "laddr", type: { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" } }, { name: "raddr", type: { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.IPConn" } }, { name: "_r1", type: "error" }] }, { name: "dialMPTCP", args: [{ name: "ctx", type: "context.Context" }, { name: "laddr", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" } }, { name: "raddr", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPConn" } }, { name: "_r1", type: "error" }] }, { name: "dialParallel", args: [{ name: "ctx", type: "context.Context" }, { name: "primaries", type: "net.addrList" }, { name: "fallbacks", type: "net.addrList" }], returns: [{ name: "_r0", type: "net.Conn" }, { name: "_r1", type: "error" }] }, { name: "dialSerial", args: [{ name: "ctx", type: "context.Context" }, { name: "ras", type: "net.addrList" }], returns: [{ name: "_r0", type: "net.Conn" }, { name: "_r1", type: "error" }] }, { name: "dialSingle", args: [{ name: "ctx", type: "context.Context" }, { name: "ra", type: "net.Addr" }], returns: [{ name: "c", type: "net.Conn" }, { name: "err", type: "error" }] }, { name: "dialTCP", args: [{ name: "ctx", type: "context.Context" }, { name: "laddr", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" } }, { name: "raddr", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPConn" } }, { name: "_r1", type: "error" }] }, { name: "dialUDP", args: [{ name: "ctx", type: "context.Context" }, { name: "laddr", type: { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" } }, { name: "raddr", type: { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.UDPConn" } }, { name: "_r1", type: "error" }] }, { name: "dialUnix", args: [{ name: "ctx", type: "context.Context" }, { name: "laddr", type: { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" } }, { name: "raddr", type: { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.UnixConn" } }, { name: "_r1", type: "error" }] }, { name: "doDialTCP", args: [{ name: "ctx", type: "context.Context" }, { name: "laddr", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" } }, { name: "raddr", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPConn" } }, { name: "_r1", type: "error" }] }, { name: "doDialTCPProto", args: [{ name: "ctx", type: "context.Context" }, { name: "laddr", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" } }, { name: "raddr", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" } }, { name: "proto", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPConn" } }, { name: "_r1", type: "error" }] }, { name: "Dial", args: [{ name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "address", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: "net.Conn" }, { name: "_r1", type: "error" }] }, { name: "DialContext", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "address", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: "net.Conn" }, { name: "_r1", type: "error" }] }, { name: "DialIP", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "laddr", type: "netip.Addr" }, { name: "raddr", type: "netip.Addr" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.IPConn" } }, { name: "_r1", type: "error" }] }, { name: "DialTCP", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "laddr", type: "netip.AddrPort" }, { name: "raddr", type: "netip.AddrPort" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPConn" } }, { name: "_r1", type: "error" }] }, { name: "DialUDP", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "laddr", type: "netip.AddrPort" }, { name: "raddr", type: "netip.AddrPort" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.UDPConn" } }, { name: "_r1", type: "error" }] }, { name: "DialUnix", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "laddr", type: { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" } }, { name: "raddr", type: { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.UnixConn" } }, { name: "_r1", type: "error" }] }, { name: "MultipathTCP", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "SetMultipathTCP", args: [{ name: "use", type: { kind: $.TypeKind.Basic, name: "bool" } }], returns: [] }, { name: "deadline", args: [{ name: "ctx", type: "context.Context" }, { name: "now", type: "time.Time" }], returns: [{ name: "earliest", type: "time.Time" }] }, { name: "dialCtx", args: [{ name: "ctx", type: "context.Context" }], returns: [{ name: "_r0", type: "context.Context" }, { name: "_r1", type: ({ kind: $.TypeKind.Function, name: "context.CancelFunc", params: [], results: [] } as $.FunctionTypeInfo) }] }, { name: "dualStack", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "fallbackDelay", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int64", typeName: "time.Duration" } }] }, { name: "resolver", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.Resolver" } }] }],
+		[{ name: "dialIP", args: [{ name: "ctx", type: "context.Context" }, { name: "laddr", type: { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" } }, { name: "raddr", type: { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.IPConn" } }, { name: "_r1", type: "error" }] }, { name: "dialMPTCP", args: [{ name: "ctx", type: "context.Context" }, { name: "laddr", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" } }, { name: "raddr", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPConn" } }, { name: "_r1", type: "error" }] }, { name: "dialParallel", args: [{ name: "ctx", type: "context.Context" }, { name: "primaries", type: { kind: $.TypeKind.Slice, typeName: "net.addrList", elemType: "net.Addr" } }, { name: "fallbacks", type: { kind: $.TypeKind.Slice, typeName: "net.addrList", elemType: "net.Addr" } }], returns: [{ name: "_r0", type: "net.Conn" }, { name: "_r1", type: "error" }] }, { name: "dialSerial", args: [{ name: "ctx", type: "context.Context" }, { name: "ras", type: { kind: $.TypeKind.Slice, typeName: "net.addrList", elemType: "net.Addr" } }], returns: [{ name: "_r0", type: "net.Conn" }, { name: "_r1", type: "error" }] }, { name: "dialSingle", args: [{ name: "ctx", type: "context.Context" }, { name: "ra", type: "net.Addr" }], returns: [{ name: "c", type: "net.Conn" }, { name: "err", type: "error" }] }, { name: "dialTCP", args: [{ name: "ctx", type: "context.Context" }, { name: "laddr", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" } }, { name: "raddr", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPConn" } }, { name: "_r1", type: "error" }] }, { name: "dialUDP", args: [{ name: "ctx", type: "context.Context" }, { name: "laddr", type: { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" } }, { name: "raddr", type: { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.UDPConn" } }, { name: "_r1", type: "error" }] }, { name: "dialUnix", args: [{ name: "ctx", type: "context.Context" }, { name: "laddr", type: { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" } }, { name: "raddr", type: { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.UnixConn" } }, { name: "_r1", type: "error" }] }, { name: "doDialTCP", args: [{ name: "ctx", type: "context.Context" }, { name: "laddr", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" } }, { name: "raddr", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPConn" } }, { name: "_r1", type: "error" }] }, { name: "doDialTCPProto", args: [{ name: "ctx", type: "context.Context" }, { name: "laddr", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" } }, { name: "raddr", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" } }, { name: "proto", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPConn" } }, { name: "_r1", type: "error" }] }, { name: "Dial", args: [{ name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "address", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: "net.Conn" }, { name: "_r1", type: "error" }] }, { name: "DialContext", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "address", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: "net.Conn" }, { name: "_r1", type: "error" }] }, { name: "DialIP", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "laddr", type: "netip.Addr" }, { name: "raddr", type: "netip.Addr" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.IPConn" } }, { name: "_r1", type: "error" }] }, { name: "DialTCP", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "laddr", type: "netip.AddrPort" }, { name: "raddr", type: "netip.AddrPort" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.TCPConn" } }, { name: "_r1", type: "error" }] }, { name: "DialUDP", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "laddr", type: "netip.AddrPort" }, { name: "raddr", type: "netip.AddrPort" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.UDPConn" } }, { name: "_r1", type: "error" }] }, { name: "DialUnix", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "laddr", type: { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" } }, { name: "raddr", type: { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.UnixConn" } }, { name: "_r1", type: "error" }] }, { name: "MultipathTCP", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "SetMultipathTCP", args: [{ name: "use", type: { kind: $.TypeKind.Basic, name: "bool" } }], returns: [] }, { name: "deadline", args: [{ name: "ctx", type: "context.Context" }, { name: "now", type: "time.Time" }], returns: [{ name: "earliest", type: "time.Time" }] }, { name: "dialCtx", args: [{ name: "ctx", type: "context.Context" }], returns: [{ name: "_r0", type: "context.Context" }, { name: "_r1", type: ({ kind: $.TypeKind.Function, name: "context.CancelFunc", params: [], results: [] } as $.FunctionTypeInfo) }] }, { name: "dualStack", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "fallbackDelay", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int64", typeName: "time.Duration" } }] }, { name: "resolver", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "net.Resolver" } }] }],
 		sysDialer,
 		[{ name: "Dialer", key: "Dialer", type: "net.Dialer", anonymous: true, index: [0], offset: 0, exported: true }, { name: "network", key: "network", type: { kind: $.TypeKind.Basic, name: "string" }, pkgPath: "net", index: [1], offset: 144, exported: false }, { name: "address", key: "address", type: { kind: $.TypeKind.Basic, name: "string" }, pkgPath: "net", index: [2], offset: 160, exported: false }, { name: "testHookDialTCP", key: "testHookDialTCP", type: ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" }, { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" }], results: [{ kind: $.TypeKind.Pointer, elemType: "net.TCPConn" }, "error"] } as $.FunctionTypeInfo), pkgPath: "net", index: [3], offset: 176, exported: false }]
 	)
@@ -1254,7 +1254,7 @@ export class ListenConfig {
 		let addrs: __goscript_ipsock.addrList = (__goscriptTuple28[0] as __goscript_ipsock.addrList)
 		let err = __goscriptTuple28[1]
 		if (err != null) {
-			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: null, Err: err}), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: null, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 		}
 		let sl: sysListener | $.VarRef<sysListener> | null = new sysListener({ListenConfig: $.markAsStructValue($.cloneStructValue($.pointerValue<ListenConfig>(lc))), network: network, address: address})
 		let l: __goscript_net.Listener | null = null as __goscript_net.Listener | null
@@ -1267,11 +1267,11 @@ export class ListenConfig {
 						let la: __goscript_tcpsock.TCPAddr | $.VarRef<__goscript_tcpsock.TCPAddr> | null = $.typeAssert<__goscript_tcpsock.TCPAddr | $.VarRef<__goscript_tcpsock.TCPAddr> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" }).value
 						if ($.pointerValue<sysListener>(sl).ListenConfig.MultipathTCP()) {
 							let __goscriptTuple29: any = await sysListener.prototype.listenMPTCP.call(sl, ctx, la)
-							l = $.interfaceValue<__goscript_net.Listener | null>(__goscriptTuple29[0], "*net.TCPListener")
+							l = $.interfaceValue<__goscript_net.Listener | null>(__goscriptTuple29[0], "*net.TCPListener", { kind: $.TypeKind.Pointer, elemType: "net.TCPListener" })
 							err = __goscriptTuple29[1]
 						} else {
 							let __goscriptTuple30: any = await sysListener.prototype.listenTCP.call(sl, ctx, la)
-							l = $.interfaceValue<__goscript_net.Listener | null>(__goscriptTuple30[0], "*net.TCPListener")
+							l = $.interfaceValue<__goscript_net.Listener | null>(__goscriptTuple30[0], "*net.TCPListener", { kind: $.TypeKind.Pointer, elemType: "net.TCPListener" })
 							err = __goscriptTuple30[1]
 						}
 					}
@@ -1280,20 +1280,20 @@ export class ListenConfig {
 					{
 						let la: __goscript_unixsock.UnixAddr | $.VarRef<__goscript_unixsock.UnixAddr> | null = $.typeAssert<__goscript_unixsock.UnixAddr | $.VarRef<__goscript_unixsock.UnixAddr> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" }).value
 						let __goscriptTuple31: any = await sysListener.prototype.listenUnix.call(sl, ctx, la)
-						l = $.interfaceValue<__goscript_net.Listener | null>(__goscriptTuple31[0], "*net.UnixListener")
+						l = $.interfaceValue<__goscript_net.Listener | null>(__goscriptTuple31[0], "*net.UnixListener", { kind: $.TypeKind.Pointer, elemType: "net.UnixListener" })
 						err = __goscriptTuple31[1]
 					}
 					break
 				default:
 					{
 						let la: any = __goscriptTypeSwitchValue
-						return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "listen", Net: $.pointerValue<sysListener>(sl).network, Source: null, Addr: la, Err: $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: "unexpected address type", Addr: address}), "*net.AddrError")}), "*net.OpError")]
+						return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "listen", Net: $.pointerValue<sysListener>(sl).network, Source: null, Addr: la, Err: $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: "unexpected address type", Addr: address}), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 					}
 					break
 			}
 		}
 		if (err != null) {
-			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "listen", Net: $.pointerValue<sysListener>(sl).network, Source: null, Addr: la, Err: err}), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "listen", Net: $.pointerValue<sysListener>(sl).network, Source: null, Addr: la, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 		}
 		return [l, null]
 	}
@@ -1304,7 +1304,7 @@ export class ListenConfig {
 		let addrs: __goscript_ipsock.addrList = (__goscriptTuple32[0] as __goscript_ipsock.addrList)
 		let err = __goscriptTuple32[1]
 		if (err != null) {
-			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: null, Err: err}), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: null, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 		}
 		let sl: sysListener | $.VarRef<sysListener> | null = new sysListener({ListenConfig: $.markAsStructValue($.cloneStructValue($.pointerValue<ListenConfig>(lc))), network: network, address: address})
 		let c: __goscript_net.PacketConn | null = null as __goscript_net.PacketConn | null
@@ -1316,7 +1316,7 @@ export class ListenConfig {
 					{
 						let la: __goscript_udpsock.UDPAddr | $.VarRef<__goscript_udpsock.UDPAddr> | null = $.typeAssert<__goscript_udpsock.UDPAddr | $.VarRef<__goscript_udpsock.UDPAddr> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" }).value
 						let __goscriptTuple33: any = await sysListener.prototype.listenUDP.call(sl, ctx, la)
-						c = $.interfaceValue<__goscript_net.PacketConn | null>(__goscriptTuple33[0], "*net.UDPConn")
+						c = $.interfaceValue<__goscript_net.PacketConn | null>(__goscriptTuple33[0], "*net.UDPConn", { kind: $.TypeKind.Pointer, elemType: "net.UDPConn" })
 						err = __goscriptTuple33[1]
 					}
 					break
@@ -1324,7 +1324,7 @@ export class ListenConfig {
 					{
 						let la: __goscript_iprawsock.IPAddr | $.VarRef<__goscript_iprawsock.IPAddr> | null = $.typeAssert<__goscript_iprawsock.IPAddr | $.VarRef<__goscript_iprawsock.IPAddr> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" }).value
 						let __goscriptTuple34: any = await sysListener.prototype.listenIP.call(sl, ctx, la)
-						c = $.interfaceValue<__goscript_net.PacketConn | null>(__goscriptTuple34[0], "*net.IPConn")
+						c = $.interfaceValue<__goscript_net.PacketConn | null>(__goscriptTuple34[0], "*net.IPConn", { kind: $.TypeKind.Pointer, elemType: "net.IPConn" })
 						err = __goscriptTuple34[1]
 					}
 					break
@@ -1332,20 +1332,20 @@ export class ListenConfig {
 					{
 						let la: __goscript_unixsock.UnixAddr | $.VarRef<__goscript_unixsock.UnixAddr> | null = $.typeAssert<__goscript_unixsock.UnixAddr | $.VarRef<__goscript_unixsock.UnixAddr> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" }).value
 						let __goscriptTuple35: any = await sysListener.prototype.listenUnixgram.call(sl, ctx, la)
-						c = $.interfaceValue<__goscript_net.PacketConn | null>(__goscriptTuple35[0], "*net.UnixConn")
+						c = $.interfaceValue<__goscript_net.PacketConn | null>(__goscriptTuple35[0], "*net.UnixConn", { kind: $.TypeKind.Pointer, elemType: "net.UnixConn" })
 						err = __goscriptTuple35[1]
 					}
 					break
 				default:
 					{
 						let la: any = __goscriptTypeSwitchValue
-						return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "listen", Net: $.pointerValue<sysListener>(sl).network, Source: null, Addr: la, Err: $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: "unexpected address type", Addr: address}), "*net.AddrError")}), "*net.OpError")]
+						return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "listen", Net: $.pointerValue<sysListener>(sl).network, Source: null, Addr: la, Err: $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: "unexpected address type", Addr: address}), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 					}
 					break
 			}
 		}
 		if (err != null) {
-			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "listen", Net: $.pointerValue<sysListener>(sl).network, Source: null, Addr: la, Err: err}), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "listen", Net: $.pointerValue<sysListener>(sl).network, Source: null, Addr: la, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 		}
 		return [c, null]
 	}
@@ -1443,7 +1443,7 @@ export class sysListener {
 				return await $.pointerValue<sysListener>(sl).ListenConfig.Control!(network, address, c)
 			}, ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "syscall.RawConn"], results: ["error"] } as $.FunctionTypeInfo))
 		}
-		let __goscriptTuple37: any = await __goscript_ipsock_posix.internetSocket(ctx, network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.IPAddr"), null, syscall.SOCK_RAW, proto, "listen", ctrlCtxFn)
+		let __goscriptTuple37: any = await __goscript_ipsock_posix.internetSocket(ctx, network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.IPAddr", { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" }), null, syscall.SOCK_RAW, proto, "listen", ctrlCtxFn)
 		let fd: __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null = __goscriptTuple37[0]
 		err = __goscriptTuple37[1]
 		if (err != null) {
@@ -1465,7 +1465,7 @@ export class sysListener {
 				return await $.pointerValue<sysListener>(sl).ListenConfig.Control!(network, address, c)
 			}, ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "syscall.RawConn"], results: ["error"] } as $.FunctionTypeInfo))
 		}
-		let __goscriptTuple38: any = await __goscript_ipsock_posix.internetSocket(ctx, $.pointerValue<sysListener>(sl).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(gaddr, "*net.UDPAddr"), null, syscall.SOCK_DGRAM, 0, "listen", ctrlCtxFn)
+		let __goscriptTuple38: any = await __goscript_ipsock_posix.internetSocket(ctx, $.pointerValue<sysListener>(sl).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(gaddr, "*net.UDPAddr", { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" }), null, syscall.SOCK_DGRAM, 0, "listen", ctrlCtxFn)
 		let fd: __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null = __goscriptTuple38[0]
 		let err = __goscriptTuple38[1]
 		if (err != null) {
@@ -1508,7 +1508,7 @@ export class sysListener {
 				return await $.pointerValue<sysListener>(sl).ListenConfig.Control!(network, address, c)
 			}, ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "syscall.RawConn"], results: ["error"] } as $.FunctionTypeInfo))
 		}
-		let __goscriptTuple39: any = await __goscript_ipsock_posix.internetSocket(ctx, $.pointerValue<sysListener>(sl).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.TCPAddr"), null, syscall.SOCK_STREAM, proto, "listen", ctrlCtxFn)
+		let __goscriptTuple39: any = await __goscript_ipsock_posix.internetSocket(ctx, $.pointerValue<sysListener>(sl).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.TCPAddr", { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" }), null, syscall.SOCK_STREAM, proto, "listen", ctrlCtxFn)
 		let fd: __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null = __goscriptTuple39[0]
 		let err = __goscriptTuple39[1]
 		if (err != null) {
@@ -1525,7 +1525,7 @@ export class sysListener {
 				return await $.pointerValue<sysListener>(sl).ListenConfig.Control!(network, address, c)
 			}, ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "syscall.RawConn"], results: ["error"] } as $.FunctionTypeInfo))
 		}
-		let __goscriptTuple40: any = await __goscript_ipsock_posix.internetSocket(ctx, $.pointerValue<sysListener>(sl).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.UDPAddr"), null, syscall.SOCK_DGRAM, 0, "listen", ctrlCtxFn)
+		let __goscriptTuple40: any = await __goscript_ipsock_posix.internetSocket(ctx, $.pointerValue<sysListener>(sl).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.UDPAddr", { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" }), null, syscall.SOCK_DGRAM, 0, "listen", ctrlCtxFn)
 		let fd: __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null = __goscriptTuple40[0]
 		let err = __goscriptTuple40[1]
 		if (err != null) {
@@ -1542,7 +1542,7 @@ export class sysListener {
 				return await $.pointerValue<sysListener>(sl).ListenConfig.Control!(network, address, c)
 			}, ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "syscall.RawConn"], results: ["error"] } as $.FunctionTypeInfo))
 		}
-		let __goscriptTuple41: any = await __goscript_unixsock_posix.unixSocket(ctx, $.pointerValue<sysListener>(sl).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.UnixAddr"), null, "listen", ctrlCtxFn)
+		let __goscriptTuple41: any = await __goscript_unixsock_posix.unixSocket(ctx, $.pointerValue<sysListener>(sl).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.UnixAddr", { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" }), null, "listen", ctrlCtxFn)
 		let fd: __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null = __goscriptTuple41[0]
 		let err = __goscriptTuple41[1]
 		if (err != null) {
@@ -1559,7 +1559,7 @@ export class sysListener {
 				return await $.pointerValue<sysListener>(sl).ListenConfig.Control!(network, address, c)
 			}, ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "syscall.RawConn"], results: ["error"] } as $.FunctionTypeInfo))
 		}
-		let __goscriptTuple42: any = await __goscript_unixsock_posix.unixSocket(ctx, $.pointerValue<sysListener>(sl).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.UnixAddr"), null, "listen", ctrlCtxFn)
+		let __goscriptTuple42: any = await __goscript_unixsock_posix.unixSocket(ctx, $.pointerValue<sysListener>(sl).network, $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(laddr, "*net.UnixAddr", { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" }), null, "listen", ctrlCtxFn)
 		let fd: __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null = __goscriptTuple42[0]
 		let err = __goscriptTuple42[1]
 		if (err != null) {

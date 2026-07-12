@@ -153,6 +153,12 @@ export function pointerValueOrNil<T>(
   return value
 }
 
+const reflectTypeIdentities = new WeakMap<object, string>()
+
+export function markReflectTypeIdentity(value: object, identity: string): void {
+  reflectTypeIdentities.set(value, identity)
+}
+
 export function arrayEqual(a: unknown, b: unknown): boolean {
   return comparableEqual(a, b)
 }
@@ -163,6 +169,13 @@ export function comparableEqual(a: unknown, b: unknown): boolean {
   }
   if (a === null || a === undefined || b === null || b === undefined) {
     return false
+  }
+  if (typeof a === 'object' && typeof b === 'object') {
+    const aType = reflectTypeIdentities.get(a)
+    const bType = reflectTypeIdentities.get(b)
+    if (aType !== undefined || bType !== undefined) {
+      return aType !== undefined && aType === bType
+    }
   }
   if (isArrayLike(a) && isArrayLike(b)) {
     if (a.length !== b.length) {

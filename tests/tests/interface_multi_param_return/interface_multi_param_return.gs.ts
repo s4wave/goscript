@@ -50,7 +50,7 @@ export class MyProcessor {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let processor: MultiParamReturner | null = $.interfaceValue<MultiParamReturner | null>($.markAsStructValue(new MyProcessor()), "main.MyProcessor")
+	let processor: MultiParamReturner | null = $.interfaceValue<MultiParamReturner | null>($.markAsStructValue(new MyProcessor()), "main.MyProcessor", "main.MyProcessor")
 
 	let data: $.Slice<number> = new Uint8Array([1, 2, 3]) as $.Slice<number>
 	let [success, ] = await $.pointerValue<Exclude<MultiParamReturner, null>>(processor).Process(data, 5, "unused")

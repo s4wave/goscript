@@ -4,8 +4,8 @@ import * as io from '@goscript/io/index.js'
 export type PublicKey = $.Bytes
 export type PrivateKey = $.Bytes
 type Hash = number
-type PublicKeyInterface = any
-type PrivateKeyInterface = any
+type PublicKeyInterface = unknown
+type PrivateKeyInterface = unknown
 type SignerOpts = { HashFunc(): Hash }
 
 export const PublicKeySize = 32
@@ -47,6 +47,20 @@ export function PrivateKey_Public(priv: PrivateKey): PublicKeyInterface | null {
     publicKey,
     'ed25519.PublicKey',
     { Equal: PublicKey_Equal },
+    {
+      kind: $.TypeKind.Slice,
+      typeName: 'ed25519.PublicKey',
+      elemType: { kind: $.TypeKind.Basic, name: 'uint8' },
+    },
+    [
+      {
+        name: 'Equal',
+        args: [{ name: 'x', type: 'crypto.PublicKey' }],
+        returns: [
+          { name: '_r0', type: { kind: $.TypeKind.Basic, name: 'bool' } },
+        ],
+      },
+    ],
   )
 }
 

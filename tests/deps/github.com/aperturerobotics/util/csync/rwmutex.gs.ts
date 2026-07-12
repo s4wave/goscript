@@ -186,12 +186,12 @@ export class RWMutex {
 
 	public Locker(): sync.Locker | null {
 		const m: RWMutex | $.VarRef<RWMutex> | null = this
-		return $.interfaceValue<sync.Locker | null>(new RWMutexLocker({m: m, write: true}), "*csync.RWMutexLocker")
+		return $.interfaceValue<sync.Locker | null>(new RWMutexLocker({m: m, write: true}), "*csync.RWMutexLocker", { kind: $.TypeKind.Pointer, elemType: "csync.RWMutexLocker" })
 	}
 
 	public RLocker(): sync.Locker | null {
 		const m: RWMutex | $.VarRef<RWMutex> | null = this
-		return $.interfaceValue<sync.Locker | null>(new RWMutexLocker({m: m, write: false}), "*csync.RWMutexLocker")
+		return $.interfaceValue<sync.Locker | null>(new RWMutexLocker({m: m, write: false}), "*csync.RWMutexLocker", { kind: $.TypeKind.Pointer, elemType: "csync.RWMutexLocker" })
 	}
 
 	public async TryLock(write: boolean): globalThis.Promise<[(() => void) | null, boolean]> {

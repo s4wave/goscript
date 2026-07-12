@@ -173,7 +173,7 @@ export class UnixAddr {
 		if (a == null) {
 			return null
 		}
-		return $.interfaceValue<__goscript_net.Addr | null>(a, "*net.UnixAddr")
+		return $.interfaceValue<__goscript_net.Addr | null>(a, "*net.UnixAddr", { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" })
 	}
 
 	public sockaddr(family: number): [syscall.Sockaddr | null, $.GoError] {
@@ -181,12 +181,12 @@ export class UnixAddr {
 		if (a == null) {
 			return [null, null]
 		}
-		return [$.interfaceValue<syscall.Sockaddr | null>(new syscall.SockaddrUnix({Name: $.pointerValue<UnixAddr>(a).Name}), "*syscall.SockaddrUnix"), null]
+		return [$.interfaceValue<syscall.Sockaddr | null>(new syscall.SockaddrUnix({Name: $.pointerValue<UnixAddr>(a).Name}), "*syscall.SockaddrUnix", { kind: $.TypeKind.Pointer, elemType: "syscall.SockaddrUnix" }), null]
 	}
 
 	public toLocal(net: string): __goscript_sockaddr_posix.sockaddr | null {
 		const a: UnixAddr | $.VarRef<UnixAddr> | null = this
-		return $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(a, "*net.UnixAddr")
+		return $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(a, "*net.UnixAddr", { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" })
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -232,7 +232,7 @@ export class UnixConn {
 		{
 			let err = await __goscript_fd_fake.netFD.prototype.closeRead.call($.pointerValue<UnixConn>(c).conn.fd)
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "close", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "close", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		return null
@@ -246,7 +246,7 @@ export class UnixConn {
 		{
 			let err = await __goscript_fd_fake.netFD.prototype.closeWrite.call($.pointerValue<UnixConn>(c).conn.fd)
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "close", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "close", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		return null
@@ -262,12 +262,12 @@ export class UnixConn {
 		let addr: UnixAddr | $.VarRef<UnixAddr> | null = __goscriptTuple0[1]
 		let err = __goscriptTuple0[2]
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		if (addr == null) {
 			return [n, null, err]
 		}
-		return [n, $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.UnixAddr"), err]
+		return [n, $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.UnixAddr", { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" }), err]
 	}
 
 	public async ReadFromUnix(b: $.Slice<number>): globalThis.Promise<[number, UnixAddr | $.VarRef<UnixAddr> | null, $.GoError]> {
@@ -280,7 +280,7 @@ export class UnixConn {
 		let addr: UnixAddr | $.VarRef<UnixAddr> | null = __goscriptTuple1[1]
 		let err = __goscriptTuple1[2]
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, addr, err]
 	}
@@ -302,7 +302,7 @@ export class UnixConn {
 		addr = __goscriptTuple2[3]
 		err = __goscriptTuple2[4]
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, oobn, flags, addr, err]
 	}
@@ -312,7 +312,7 @@ export class UnixConn {
 		if (!$.pointerValue<UnixConn>(c).conn.ok()) {
 			return [null, $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 		}
-		return [$.interfaceValue<syscall.RawConn | null>(__goscript_rawconn.newRawConn($.pointerValue<UnixConn>(c).conn.fd), "*net.rawConn"), null]
+		return [$.interfaceValue<syscall.RawConn | null>(__goscript_rawconn.newRawConn($.pointerValue<UnixConn>(c).conn.fd), "*net.rawConn", { kind: $.TypeKind.Pointer, elemType: "net.rawConn" }), null]
 	}
 
 	public async WriteMsgUnix(b: $.Slice<number>, oob: $.Slice<number>, addr: UnixAddr | $.VarRef<UnixAddr> | null): globalThis.Promise<[number, number, $.GoError]> {
@@ -328,7 +328,7 @@ export class UnixConn {
 		oobn = __goscriptTuple3[1]
 		err = __goscriptTuple3[2]
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField0 = UnixAddr.prototype.opAddr.call(addr); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField0, Err: err}) })(), "*net.OpError")
+			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField0 = UnixAddr.prototype.opAddr.call(addr); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField0, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, oobn, err]
 	}
@@ -342,11 +342,11 @@ export class UnixConn {
 		let a: UnixAddr | $.VarRef<UnixAddr> | null = __goscriptTuple4[0]
 		let ok = __goscriptTuple4[1]
 		if (!ok) {
-			return [0, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: addr, Err: $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })}), "*net.OpError")]
+			return [0, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: addr, Err: $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 		}
 		let [n, err] = await UnixConn.prototype.writeTo.call(c, b, a)
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField1 = UnixAddr.prototype.opAddr.call(a); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField1, Err: err}) })(), "*net.OpError")
+			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField1 = UnixAddr.prototype.opAddr.call(a); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField1, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, err]
 	}
@@ -358,7 +358,7 @@ export class UnixConn {
 		}
 		let [n, err] = await UnixConn.prototype.writeTo.call(c, b, addr)
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField2 = UnixAddr.prototype.opAddr.call(addr); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField2, Err: err}) })(), "*net.OpError")
+			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField2 = UnixAddr.prototype.opAddr.call(addr); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField2, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, err]
 	}
@@ -430,7 +430,7 @@ export class UnixConn {
 			if (!$.stringEqual($.pointerValue<UnixAddr>(addr).Net, __goscript_unixsock_posix.sotypeToNet($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).sotype))) {
 				return [0, 0, $.namedValueInterfaceValue<$.GoError>(syscall.EAFNOSUPPORT, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 			}
-			sa = $.interfaceValue<syscall.Sockaddr | null>(new syscall.SockaddrUnix({Name: $.pointerValue<UnixAddr>(addr).Name}), "*syscall.SockaddrUnix")
+			sa = $.interfaceValue<syscall.Sockaddr | null>(new syscall.SockaddrUnix({Name: $.pointerValue<UnixAddr>(addr).Name}), "*syscall.SockaddrUnix", { kind: $.TypeKind.Pointer, elemType: "syscall.SockaddrUnix" })
 		}
 		return $.pointerValue<__goscript_net_fake.fakeNetFD>($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).fakeNetFD).writeMsg(b, oob, sa)
 	}
@@ -447,7 +447,7 @@ export class UnixConn {
 			return [0, $.namedValueInterfaceValue<$.GoError>(syscall.EAFNOSUPPORT, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 		}
 		let sa: syscall.SockaddrUnix | $.VarRef<syscall.SockaddrUnix> | null = new syscall.SockaddrUnix({Name: $.pointerValue<UnixAddr>(addr).Name})
-		return $.pointerValue<__goscript_net_fake.fakeNetFD>($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).fakeNetFD).writeTo(b, $.interfaceValue<syscall.Sockaddr | null>(sa, "*syscall.SockaddrUnix"))
+		return $.pointerValue<__goscript_net_fake.fakeNetFD>($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).fakeNetFD).writeTo(b, $.interfaceValue<syscall.Sockaddr | null>(sa, "*syscall.SockaddrUnix", { kind: $.TypeKind.Pointer, elemType: "syscall.SockaddrUnix" }))
 	}
 
 	public async Close(): globalThis.Promise<any> {
@@ -572,9 +572,9 @@ export class UnixListener {
 		let c: UnixConn | $.VarRef<UnixConn> | null = __goscriptTuple7[0]
 		let err = __goscriptTuple7[1]
 		if (err != null) {
-			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "accept", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixListener>(l).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixListener>(l).fd).laddr, Err: err}), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "accept", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixListener>(l).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixListener>(l).fd).laddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 		}
-		return [$.interfaceValue<__goscript_net.Conn | null>(c, "*net.UnixConn"), null]
+		return [$.interfaceValue<__goscript_net.Conn | null>(c, "*net.UnixConn", { kind: $.TypeKind.Pointer, elemType: "net.UnixConn" }), null]
 	}
 
 	public async AcceptUnix(): globalThis.Promise<[UnixConn | $.VarRef<UnixConn> | null, $.GoError]> {
@@ -586,7 +586,7 @@ export class UnixListener {
 		let c: UnixConn | $.VarRef<UnixConn> | null = __goscriptTuple8[0]
 		let err = __goscriptTuple8[1]
 		if (err != null) {
-			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "accept", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixListener>(l).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixListener>(l).fd).laddr, Err: err}), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "accept", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixListener>(l).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixListener>(l).fd).laddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 		}
 		return [c, null]
 	}
@@ -604,7 +604,7 @@ export class UnixListener {
 		{
 			let err = await UnixListener.prototype.close.call(l)
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "close", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixListener>(l).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixListener>(l).fd).laddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "close", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixListener>(l).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixListener>(l).fd).laddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		return null
@@ -621,7 +621,7 @@ export class UnixListener {
 		f = __goscriptTuple9[0]
 		err = __goscriptTuple9[1]
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "file", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixListener>(l).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixListener>(l).fd).laddr, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "file", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixListener>(l).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixListener>(l).fd).laddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [f, err]
 	}
@@ -644,7 +644,7 @@ export class UnixListener {
 		if (!UnixListener.prototype.ok.call(l)) {
 			return [null, $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 		}
-		return [$.interfaceValue<syscall.RawConn | null>(__goscript_rawconn.newRawListener($.pointerValue<UnixListener>(l).fd), "*net.rawListener"), null]
+		return [$.interfaceValue<syscall.RawConn | null>(__goscript_rawconn.newRawListener($.pointerValue<UnixListener>(l).fd), "*net.rawListener", { kind: $.TypeKind.Pointer, elemType: "net.rawListener" }), null]
 	}
 
 	public async accept(): globalThis.Promise<[UnixConn | $.VarRef<UnixConn> | null, $.GoError]> {
@@ -730,7 +730,7 @@ export async function dialUnix(ctx: context.Context | null, dialer: __goscript_d
 		}
 		default:
 		{
-			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField5 = UnixAddr.prototype.opAddr.call(laddr); const __goscriptLiteralField6 = UnixAddr.prototype.opAddr.call(raddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField5, Addr: __goscriptLiteralField6, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField5 = UnixAddr.prototype.opAddr.call(laddr); const __goscriptLiteralField6 = UnixAddr.prototype.opAddr.call(raddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField5, Addr: __goscriptLiteralField6, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 			break
 		}
 	}
@@ -742,7 +742,7 @@ export async function dialUnix(ctx: context.Context | null, dialer: __goscript_d
 	let c: UnixConn | $.VarRef<UnixConn> | null = __goscriptTuple6[0]
 	let err = __goscriptTuple6[1]
 	if (err != null) {
-		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField8 = UnixAddr.prototype.opAddr.call(laddr); const __goscriptLiteralField9 = UnixAddr.prototype.opAddr.call(raddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField8, Addr: __goscriptLiteralField9, Err: err}) })(), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField8 = UnixAddr.prototype.opAddr.call(laddr); const __goscriptLiteralField9 = UnixAddr.prototype.opAddr.call(raddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField8, Addr: __goscriptLiteralField9, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	return [c, null]
 }
@@ -756,19 +756,19 @@ export async function ListenUnix(network: string, laddr: UnixAddr | $.VarRef<Uni
 		}
 		default:
 		{
-			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField10 = UnixAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField10, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField10 = UnixAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField10, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 			break
 		}
 	}
 	if (laddr == null) {
-		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField11 = UnixAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField11, Err: __goscript_net.errMissingAddress}) })(), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField11 = UnixAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField11, Err: __goscript_net.errMissingAddress}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	let sl: __goscript_dial.sysListener | $.VarRef<__goscript_dial.sysListener> | null = (() => { const __goscriptLiteralField12 = UnixAddr.prototype.String.call(laddr); return new __goscript_dial.sysListener({network: network, address: __goscriptLiteralField12}) })()
 	let __goscriptTuple12: any = await __goscript_dial.sysListener.prototype.listenUnix.call(sl, context.Background(), laddr)
 	let ln: UnixListener | $.VarRef<UnixListener> | null = __goscriptTuple12[0]
 	let err = __goscriptTuple12[1]
 	if (err != null) {
-		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField13 = UnixAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField13, Err: err}) })(), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField13 = UnixAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField13, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	return [ln, null]
 }
@@ -781,19 +781,19 @@ export async function ListenUnixgram(network: string, laddr: UnixAddr | $.VarRef
 		}
 		default:
 		{
-			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField14 = UnixAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField14, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField14 = UnixAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField14, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 			break
 		}
 	}
 	if (laddr == null) {
-		return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: null, Err: __goscript_net.errMissingAddress}), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: null, Err: __goscript_net.errMissingAddress}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	let sl: __goscript_dial.sysListener | $.VarRef<__goscript_dial.sysListener> | null = (() => { const __goscriptLiteralField15 = UnixAddr.prototype.String.call(laddr); return new __goscript_dial.sysListener({network: network, address: __goscriptLiteralField15}) })()
 	let __goscriptTuple13: any = await __goscript_dial.sysListener.prototype.listenUnixgram.call(sl, context.Background(), laddr)
 	let c: UnixConn | $.VarRef<UnixConn> | null = __goscriptTuple13[0]
 	let err = __goscriptTuple13[1]
 	if (err != null) {
-		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField16 = UnixAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField16, Err: err}) })(), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField16 = UnixAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField16, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	return [c, null]
 }

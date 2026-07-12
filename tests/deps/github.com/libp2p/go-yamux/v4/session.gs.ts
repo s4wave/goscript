@@ -480,7 +480,7 @@ export class Session {
 		if (err != null) {
 			return [null, err]
 		}
-		return [$.interfaceValue<net.Conn | null>(conn, "*yamux.Stream"), err]
+		return [$.interfaceValue<net.Conn | null>(conn, "*yamux.Stream", { kind: $.TypeKind.Pointer, elemType: "yamux.Stream" }), err]
 	}
 
 	public async AcceptStream(): globalThis.Promise<[__goscript_stream.Stream | $.VarRef<__goscript_stream.Stream> | null, $.GoError]> {
@@ -548,7 +548,7 @@ export class Session {
 		}
 		$.pointerValue<Session>(s).shutdown = true
 		if ($.pointerValue<Session>(s).shutdownErr == null) {
-			$.pointerValue<Session>(s).shutdownErr = $.interfaceValue<$.GoError>(__goscript__const.ErrSessionShutdown, "*yamux.Error")
+			$.pointerValue<Session>(s).shutdownErr = $.interfaceValue<$.GoError>(__goscript__const.ErrSessionShutdown, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })
 		}
 		$.pointerValue<Session>(s).shutdownCh!.close()
 		await $.pointerValue<Exclude<net.Conn, null>>($.pointerValue<Session>(s).conn).Close()
@@ -607,7 +607,7 @@ export class Session {
 		const s: Session | $.VarRef<Session> | null = this
 		let [addr, ok] = $.typeAssertTuple<__goscript_addr.hasAddr | null>($.pointerValue<Session>(s).conn, "yamux.hasAddr")
 		if (!ok) {
-			return $.interfaceValue<net.Addr | null>(new __goscript_addr.yamuxAddr({Addr: "local"}), "*yamux.yamuxAddr")
+			return $.interfaceValue<net.Addr | null>(new __goscript_addr.yamuxAddr({Addr: "local"}), "*yamux.yamuxAddr", { kind: $.TypeKind.Pointer, elemType: "yamux.yamuxAddr" })
 		}
 		return $.pointerValue<Exclude<__goscript_addr.hasAddr, null>>(addr).LocalAddr()
 	}
@@ -628,7 +628,7 @@ export class Session {
 		if (err != null) {
 			return [null, err]
 		}
-		return [$.interfaceValue<net.Conn | null>(conn, "*yamux.Stream"), null]
+		return [$.interfaceValue<net.Conn | null>(conn, "*yamux.Stream", { kind: $.TypeKind.Pointer, elemType: "yamux.Stream" }), null]
 	}
 
 	public async OpenStream(ctx: context.Context | null): globalThis.Promise<[__goscript_stream.Stream | $.VarRef<__goscript_stream.Stream> | null, $.GoError]> {
@@ -638,7 +638,7 @@ export class Session {
 			return [null, $.pointerValue<Session>(s).shutdownErr]
 		}
 		if ($.int(atomic.LoadInt32($.pointerValue<Session>(s)._fields.remoteGoAway), 32) == $.int(1, 32)) {
-			return [null, $.interfaceValue<$.GoError>(__goscript__const.ErrRemoteGoAway, "*yamux.Error")]
+			return [null, $.interfaceValue<$.GoError>(__goscript__const.ErrRemoteGoAway, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })]
 		}
 
 		// Block if we have too many inflight SYNs
@@ -689,7 +689,7 @@ export class Session {
 
 			if ($.uint(id, 32) >= $.uint((math.MaxUint32 - 1), 32)) {
 				await $.pointerValue<Exclude<MemoryManager, null>>(span).Done()
-				return [null, $.interfaceValue<$.GoError>(__goscript__const.ErrStreamsExhausted, "*yamux.Error")]
+				return [null, $.interfaceValue<$.GoError>(__goscript__const.ErrStreamsExhausted, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })]
 			}
 			if (!atomic.CompareAndSwapUint32($.pointerValue<Session>(s)._fields.nextStreamID, $.uint(id, 32), $.uint(id + 2, 32))) {
 				continue GET_ID
@@ -785,7 +785,7 @@ export class Session {
 				isSend: false,
 				channel: $.pointerValue<time.Timer>(timer).C,
 				onSelected: async (__goscriptSelect4Result) => {
-					const __goscriptReturn1: [time.Duration, $.GoError] = [0n, $.interfaceValue<$.GoError>(__goscript__const.ErrTimeout, "*yamux.Error")]
+					const __goscriptReturn1: [time.Duration, $.GoError] = [0n, $.interfaceValue<$.GoError>(__goscript__const.ErrTimeout, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })]
 					dur = __goscriptReturn1[0]
 					err = __goscriptReturn1[1]
 					await __defer.dispose()
@@ -831,7 +831,7 @@ export class Session {
 				isSend: false,
 				channel: $.pointerValue<time.Timer>(timer).C,
 				onSelected: async (__goscriptSelect5Result) => {
-					const __goscriptReturn3: [time.Duration, $.GoError] = [0n, $.interfaceValue<$.GoError>(__goscript__const.ErrTimeout, "*yamux.Error")]
+					const __goscriptReturn3: [time.Duration, $.GoError] = [0n, $.interfaceValue<$.GoError>(__goscript__const.ErrTimeout, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })]
 					dur = __goscriptReturn3[0]
 					err = __goscriptReturn3[1]
 					await __defer.dispose()
@@ -868,7 +868,7 @@ export class Session {
 		const s: Session | $.VarRef<Session> | null = this
 		let [addr, ok] = $.typeAssertTuple<__goscript_addr.hasAddr | null>($.pointerValue<Session>(s).conn, "yamux.hasAddr")
 		if (!ok) {
-			return $.interfaceValue<net.Addr | null>(new __goscript_addr.yamuxAddr({Addr: "remote"}), "*yamux.yamuxAddr")
+			return $.interfaceValue<net.Addr | null>(new __goscript_addr.yamuxAddr({Addr: "remote"}), "*yamux.yamuxAddr", { kind: $.TypeKind.Pointer, elemType: "yamux.yamuxAddr" })
 		}
 		return $.pointerValue<Exclude<__goscript_addr.hasAddr, null>>(addr).RemoteAddr()
 	}
@@ -1192,7 +1192,7 @@ export class Session {
 					}
 				}
 				await $.pointerValue<Exclude<MemoryManager, null>>(span).Done()
-				return $.interfaceValue<$.GoError>(__goscript__const.ErrDuplicateStream, "*yamux.Error")
+				return $.interfaceValue<$.GoError>(__goscript__const.ErrDuplicateStream, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })
 			}
 		}
 
@@ -1271,7 +1271,7 @@ export class Session {
 				{
 					let rerr = $.recover()
 					if (rerr != null) {
-						await fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(os.Stderr, "*os.File"))!, "caught panic: %s\n%s\n", rerr, $.interfaceValue<any>(debug.Stack(), "[]byte"))
+						await fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(os.Stderr, "*os.File", { kind: $.TypeKind.Pointer, elemType: "os.File" }))!, "caught panic: %s\n%s\n", rerr, $.interfaceValue<any>(debug.Stack(), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))
 						err = fmt.Errorf("panic in yamux receive loop: %s", rerr)
 					}
 				}
@@ -1303,7 +1303,7 @@ export class Session {
 				// Verify the version
 				if ($.uint(__goscript__const.header_Version(hdr), 8) != $.uint(0, 8)) {
 					await log.Logger.prototype.Printf.call($.pointerValue<Session>(s).logger, "[ERR] yamux: Invalid protocol version: %d", $.arrayToSlice<any>([$.namedValueInterfaceValue<any>(__goscript__const.header_Version(hdr), "uint8", {}, { kind: $.TypeKind.Basic, name: "uint8" })]))
-					const __goscriptReturn7: $.GoError = $.interfaceValue<$.GoError>(__goscript__const.ErrInvalidVersion, "*yamux.Error")
+					const __goscriptReturn7: $.GoError = $.interfaceValue<$.GoError>(__goscript__const.ErrInvalidVersion, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })
 					err = __goscriptReturn7
 					await __defer.dispose()
 					return err
@@ -1311,7 +1311,7 @@ export class Session {
 
 				let mt = $.uint(__goscript__const.header_MsgType(hdr), 8)
 				if (($.uint(mt, 8) < $.uint(0, 8)) || ($.uint(mt, 8) > $.uint(3, 8))) {
-					const __goscriptReturn8: $.GoError = $.interfaceValue<$.GoError>(__goscript__const.ErrInvalidMsgType, "*yamux.Error")
+					const __goscriptReturn8: $.GoError = $.interfaceValue<$.GoError>(__goscript__const.ErrInvalidMsgType, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })
 					err = __goscriptReturn8
 					await __defer.dispose()
 					return err
@@ -1356,7 +1356,7 @@ export class Session {
 				{
 					let rerr = $.recover()
 					if (rerr != null) {
-						await fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(os.Stderr, "*os.File"))!, "caught panic: %s\n%s\n", rerr, $.interfaceValue<any>(debug.Stack(), "[]byte"))
+						await fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(os.Stderr, "*os.File", { kind: $.TypeKind.Pointer, elemType: "os.File" }))!, "caught panic: %s\n%s\n", rerr, $.interfaceValue<any>(debug.Stack(), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))
 						err = fmt.Errorf("panic in yamux send loop: %s", rerr)
 					}
 				}
@@ -1524,7 +1524,7 @@ export class Session {
 
 				if (__goscriptShadow6 != null) {
 					if (os.IsTimeout($.pointerValueOrNil(__goscriptShadow6)!)) {
-						__goscriptShadow6 = $.interfaceValue<$.GoError>(__goscript__const.ErrConnectionWriteTimeout, "*yamux.Error")
+						__goscriptShadow6 = $.interfaceValue<$.GoError>(__goscript__const.ErrConnectionWriteTimeout, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })
 					}
 					const __goscriptReturn13: $.GoError = __goscriptShadow6
 					err = __goscriptReturn13
@@ -1571,7 +1571,7 @@ export class Session {
 				isSend: false,
 				channel: deadline,
 				onSelected: async (__goscriptSelect15Result) => {
-					return $.interfaceValue<$.GoError>(__goscript__const.ErrTimeout, "*yamux.Error")
+					return $.interfaceValue<$.GoError>(__goscript__const.ErrTimeout, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })
 				}
 			},
 			{
@@ -1616,7 +1616,7 @@ export class Session {
 				channel: deadline,
 				onSelected: async (__goscriptSelect16Result) => {
 					await pool.Put(buf)
-					return $.interfaceValue<$.GoError>(__goscript__const.ErrTimeout, "*yamux.Error")
+					return $.interfaceValue<$.GoError>(__goscript__const.ErrTimeout, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })
 				}
 			}
 		], false)
@@ -1653,7 +1653,7 @@ export class Session {
 
 			if (err != null) {
 				await log.Logger.prototype.Printf.call($.pointerValue<Session>(s).logger, "[ERR] yamux: keepalive failed: %v", $.arrayToSlice<any>([(err as any)]))
-				await Session.prototype.exitErr.call(s, $.interfaceValue<$.GoError>(__goscript__const.ErrKeepAliveTimeout, "*yamux.Error"))
+				await Session.prototype.exitErr.call(s, $.interfaceValue<$.GoError>(__goscript__const.ErrKeepAliveTimeout, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" }))
 			}
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	}
@@ -1718,11 +1718,11 @@ export function __goscript_set_nullMemoryManager(__goscriptValue: nullMemoryMana
 export async function newSession(config: __goscript_mux.Config | $.VarRef<__goscript_mux.Config> | null, conn: net.Conn | null, client: boolean, readBuf: number, newMemoryManager: (() => [MemoryManager | null, $.GoError] | globalThis.Promise<[MemoryManager | null, $.GoError]>) | null): globalThis.Promise<Session | $.VarRef<Session> | null> {
 	let reader: io.Reader | null = (conn as io.Reader | null)
 	if (readBuf > 0) {
-		reader = $.interfaceValue<io.Reader | null>(bufio.NewReaderSize(reader, readBuf), "*bufio.Reader")
+		reader = $.interfaceValue<io.Reader | null>(bufio.NewReaderSize(reader, readBuf), "*bufio.Reader", { kind: $.TypeKind.Pointer, elemType: "bufio.Reader" })
 	}
 	if (newMemoryManager == null) {
 		newMemoryManager = $.functionValue((): [MemoryManager | null, $.GoError] => {
-			return [$.interfaceValue<MemoryManager | null>(nullMemoryManager, "*yamux.nullMemoryManagerImpl"), null]
+			return [$.interfaceValue<MemoryManager | null>(nullMemoryManager, "*yamux.nullMemoryManagerImpl", { kind: $.TypeKind.Pointer, elemType: "yamux.nullMemoryManagerImpl" }), null]
 		}, ({ kind: $.TypeKind.Function, params: [], results: ["yamux.MemoryManager", "error"] } as $.FunctionTypeInfo))
 	}
 	let s: Session | $.VarRef<Session> | null = (await (async () => { const __goscriptLiteralField0 = await log.New($.pointerValue<__goscript_mux.Config>(config).LogOutput, "", log.LstdFlags); return new Session({config: config, client: client, logger: __goscriptLiteralField0, conn: conn, reader: reader, streams: $.makeMap<number, __goscript_stream.Stream | $.VarRef<__goscript_stream.Stream> | null>(), inflight: $.makeMap<number, {}>(), synCh: $.makeChannel<{}>($.pointerValue<__goscript_mux.Config>(config).AcceptBacklog, {}, "both"), acceptCh: $.makeChannel<__goscript_stream.Stream | $.VarRef<__goscript_stream.Stream> | null>($.pointerValue<__goscript_mux.Config>(config).AcceptBacklog, null, "both"), sendCh: $.makeChannel<$.Slice<number>>(64, null, "both"), pongCh: $.makeChannel<number>($.pointerValue<__goscript_mux.Config>(config).PingBacklog, 0, "both"), pingCh: $.makeChannel<number>(0, 0, "both"), recvDoneCh: $.makeChannel<{}>(0, {}, "both"), sendDoneCh: $.makeChannel<{}>(0, {}, "both"), shutdownCh: $.makeChannel<{}>(0, {}, "both"), newMemoryManager: newMemoryManager}) })())

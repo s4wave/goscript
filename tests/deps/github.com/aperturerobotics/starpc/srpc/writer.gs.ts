@@ -83,5 +83,5 @@ export class packetWriterWithClose {
 }
 
 export function NewPacketWriterWithClose(prw: PacketWriter | null, close: (() => $.GoError | globalThis.Promise<$.GoError>) | null): PacketWriter | null {
-	return $.interfaceValue<PacketWriter | null>(new packetWriterWithClose({PacketWriter: prw, closeFn: close}), "*srpc.packetWriterWithClose")
+	return $.interfaceValue<PacketWriter | null>(new packetWriterWithClose({PacketWriter: prw, closeFn: close}), "*srpc.packetWriterWithClose", { kind: $.TypeKind.Pointer, elemType: "srpc.packetWriterWithClose" })
 }

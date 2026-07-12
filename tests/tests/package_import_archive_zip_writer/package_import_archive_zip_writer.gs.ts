@@ -14,7 +14,7 @@ import "@goscript/io/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
-	let zw: zip.Writer | $.VarRef<zip.Writer> | null = zip.NewWriter($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer"))
+	let zw: zip.Writer | $.VarRef<zip.Writer> | null = zip.NewWriter($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))
 	let [w, err] = await zip.Writer.prototype.Create.call(zw, "hello.txt")
 	$.println("create", err == null)
 	let __goscriptTuple0: any = await $.pointerValue<Exclude<io.Writer, null>>(w).Write(new Uint8Array([104, 101, 108, 108, 111]))
@@ -24,7 +24,7 @@ export async function main(): globalThis.Promise<void> {
 	err = await zip.Writer.prototype.Close.call(zw)
 	$.println("close", err == null, buf.value.Len() > 0)
 
-	let __goscriptTuple1: any = await zip.NewReader($.interfaceValue<io.ReaderAt | null>(bytes.NewReader(buf.value.Bytes()), "*bytes.Reader"), $.int64(buf.value.Len()))
+	let __goscriptTuple1: any = await zip.NewReader($.interfaceValue<io.ReaderAt | null>(bytes.NewReader(buf.value.Bytes()), "*bytes.Reader", { kind: $.TypeKind.Pointer, elemType: "bytes.Reader" }), $.int64(buf.value.Len()))
 	let zr: zip.Reader | $.VarRef<zip.Reader> | null = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {

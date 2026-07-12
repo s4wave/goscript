@@ -643,7 +643,7 @@ export class Logger {
 	public releaseEntry(entry: __goscript_entry.Entry | $.VarRef<__goscript_entry.Entry> | null): void {
 		const logger: Logger | $.VarRef<Logger> | null = this
 		$.pointerValue<__goscript_entry.Entry>(entry).Data = new globalThis.Map<string, any>([])
-		$.pointerValue<Logger>(logger).entryPool.Put($.interfaceValue<any>(entry, "*logrus.Entry"))
+		$.pointerValue<Logger>(logger).entryPool.Put($.interfaceValue<any>(entry, "*logrus.Entry", { kind: $.TypeKind.Pointer, elemType: "logrus.Entry" }))
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -656,5 +656,5 @@ export class Logger {
 }
 
 export function New(): Logger | $.VarRef<Logger> | null {
-	return new Logger({Out: $.interfaceValue<io.Writer | null>(os.Stderr, "*os.File"), Formatter: $.interfaceValue<__goscript_formatter.Formatter | null>(new __goscript_text_formatter.TextFormatter(), "*logrus.TextFormatter"), Hooks: $.makeMap<__goscript_logrus.Level, $.Slice<__goscript_hooks.Hook | null>>(), Level: $.uint(4, 32), ExitFunc: os.Exit, ReportCaller: false})
+	return new Logger({Out: $.interfaceValue<io.Writer | null>(os.Stderr, "*os.File", { kind: $.TypeKind.Pointer, elemType: "os.File" }), Formatter: $.interfaceValue<__goscript_formatter.Formatter | null>(new __goscript_text_formatter.TextFormatter(), "*logrus.TextFormatter", { kind: $.TypeKind.Pointer, elemType: "logrus.TextFormatter" }), Hooks: $.makeMap<__goscript_logrus.Level, $.Slice<__goscript_hooks.Hook | null>>(), Level: $.uint(4, 32), ExitFunc: os.Exit, ReportCaller: false})
 }

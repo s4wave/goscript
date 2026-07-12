@@ -137,13 +137,13 @@ export async function closeIt(c: closer | null): globalThis.Promise<void> {
 
 export async function main(): globalThis.Promise<void> {
 	let value = $.markAsStructValue(new stopStream({stream: $.markAsStructValue(new stream({name: "value"}))}))
-	await closeIt($.interfaceValue<closer | null>($.markAsStructValue($.cloneStructValue(value)), "main.stopStream"))
+	await closeIt($.interfaceValue<closer | null>($.markAsStructValue($.cloneStructValue(value)), "main.stopStream", "main.stopStream"))
 
 	let ptr: stopStream | $.VarRef<stopStream> | null = new stopStream({stream: $.markAsStructValue(new stream({name: "pointer"}))})
-	await closeIt($.interfaceValue<closer | null>(ptr, "*main.stopStream"))
+	await closeIt($.interfaceValue<closer | null>(ptr, "*main.stopStream", { kind: $.TypeKind.Pointer, elemType: "main.stopStream" }))
 
 	let promotedPtr = $.markAsStructValue(new pointerStopStream({stream: new stream({name: "embedded pointer"})}))
-	await closeIt($.interfaceValue<closer | null>($.markAsStructValue($.cloneStructValue(promotedPtr)), "main.pointerStopStream"))
+	await closeIt($.interfaceValue<closer | null>($.markAsStructValue($.cloneStructValue(promotedPtr)), "main.pointerStopStream", "main.pointerStopStream"))
 }
 
 if ($.isMainScript(import.meta)) {

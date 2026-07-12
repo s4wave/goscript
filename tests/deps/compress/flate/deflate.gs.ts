@@ -1022,7 +1022,7 @@ export class Writer {
 			if (ok) {
 				// w was created with NewWriterDict
 				$.pointerValue<dictWriter>(dw).w = dst
-				$.pointerValue<Writer>(w).d.reset($.interfaceValue<io.Writer | null>(dw, "*flate.dictWriter"))
+				$.pointerValue<Writer>(w).d.reset($.interfaceValue<io.Writer | null>(dw, "*flate.dictWriter", { kind: $.TypeKind.Pointer, elemType: "flate.dictWriter" }))
 				await $.pointerValue<Writer>(w).d.fillWindow($.pointerValue<Writer>(w).dict)
 			} else {
 				// w was created with NewWriter
@@ -1137,7 +1137,7 @@ export function NewWriter(w: io.Writer | null, level: number): [Writer | $.VarRe
 
 export async function NewWriterDict(w: io.Writer | null, level: number, dict: $.Slice<number>): globalThis.Promise<[Writer | $.VarRef<Writer> | null, $.GoError]> {
 	let dw: dictWriter | $.VarRef<dictWriter> | null = new dictWriter({w: w})
-	let __goscriptTuple0: any = NewWriter($.interfaceValue<io.Writer | null>(dw, "*flate.dictWriter"), level)
+	let __goscriptTuple0: any = NewWriter($.interfaceValue<io.Writer | null>(dw, "*flate.dictWriter", { kind: $.TypeKind.Pointer, elemType: "flate.dictWriter" }), level)
 	let zw: Writer | $.VarRef<Writer> | null = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {

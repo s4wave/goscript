@@ -1,0 +1,414 @@
+// Generated file based on params.go
+// Updated when compliance tests are re-run, DO NOT EDIT!
+
+import * as $ from "@goscript/builtin/index.js"
+
+import * as big from "@goscript/math/big/index.js"
+
+import * as nistec from "@goscript/crypto/internal/fips140/nistec/index.js"
+
+import * as __goscript_elliptic from "./elliptic.gs.ts"
+
+import * as __goscript_nistec from "./nistec.gs.ts"
+import "@goscript/math/big/index.js"
+import "@goscript/crypto/internal/fips140/nistec/index.js"
+import "./elliptic.gs.ts"
+import "./nistec.gs.ts"
+
+export class CurveParams {
+	public get P(): big.Int | $.VarRef<big.Int> | null {
+		return this._fields.P.value
+	}
+	public set P(value: big.Int | $.VarRef<big.Int> | null) {
+		this._fields.P.value = value
+	}
+
+	public get N(): big.Int | $.VarRef<big.Int> | null {
+		return this._fields.N.value
+	}
+	public set N(value: big.Int | $.VarRef<big.Int> | null) {
+		this._fields.N.value = value
+	}
+
+	public get B(): big.Int | $.VarRef<big.Int> | null {
+		return this._fields.B.value
+	}
+	public set B(value: big.Int | $.VarRef<big.Int> | null) {
+		this._fields.B.value = value
+	}
+
+	public get Gx(): big.Int | $.VarRef<big.Int> | null {
+		return this._fields.Gx.value
+	}
+	public set Gx(value: big.Int | $.VarRef<big.Int> | null) {
+		this._fields.Gx.value = value
+	}
+
+	public get Gy(): big.Int | $.VarRef<big.Int> | null {
+		return this._fields.Gy.value
+	}
+	public set Gy(value: big.Int | $.VarRef<big.Int> | null) {
+		this._fields.Gy.value = value
+	}
+
+	public get BitSize(): number {
+		return this._fields.BitSize.value
+	}
+	public set BitSize(value: number) {
+		this._fields.BitSize.value = value
+	}
+
+	public get Name(): string {
+		return this._fields.Name.value
+	}
+	public set Name(value: string) {
+		this._fields.Name.value = value
+	}
+
+	public _fields: {
+		P: $.VarRef<big.Int | $.VarRef<big.Int> | null>
+		N: $.VarRef<big.Int | $.VarRef<big.Int> | null>
+		B: $.VarRef<big.Int | $.VarRef<big.Int> | null>
+		Gx: $.VarRef<big.Int | $.VarRef<big.Int> | null>
+		Gy: $.VarRef<big.Int | $.VarRef<big.Int> | null>
+		BitSize: $.VarRef<number>
+		Name: $.VarRef<string>
+	}
+
+	constructor(init?: Partial<{P?: big.Int | $.VarRef<big.Int> | null, N?: big.Int | $.VarRef<big.Int> | null, B?: big.Int | $.VarRef<big.Int> | null, Gx?: big.Int | $.VarRef<big.Int> | null, Gy?: big.Int | $.VarRef<big.Int> | null, BitSize?: number, Name?: string}>) {
+		this._fields = {
+			P: $.varRef(init?.P ?? (null as big.Int | $.VarRef<big.Int> | null)),
+			N: $.varRef(init?.N ?? (null as big.Int | $.VarRef<big.Int> | null)),
+			B: $.varRef(init?.B ?? (null as big.Int | $.VarRef<big.Int> | null)),
+			Gx: $.varRef(init?.Gx ?? (null as big.Int | $.VarRef<big.Int> | null)),
+			Gy: $.varRef(init?.Gy ?? (null as big.Int | $.VarRef<big.Int> | null)),
+			BitSize: $.varRef(init?.BitSize ?? (0 as number)),
+			Name: $.varRef(init?.Name ?? ("" as string))
+		}
+	}
+
+	public clone(): CurveParams {
+		const cloned = new CurveParams()
+		cloned._fields = {
+			P: $.varRef(this._fields.P.value),
+			N: $.varRef(this._fields.N.value),
+			B: $.varRef(this._fields.B.value),
+			Gx: $.varRef(this._fields.Gx.value),
+			Gy: $.varRef(this._fields.Gy.value),
+			BitSize: $.varRef(this._fields.BitSize.value),
+			Name: $.varRef(this._fields.Name.value)
+		}
+		return $.markAsStructValue(cloned)
+	}
+
+	public async Add(x1: big.Int | $.VarRef<big.Int> | null, y1: big.Int | $.VarRef<big.Int> | null, x2: big.Int | $.VarRef<big.Int> | null, y2: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
+		const curve: CurveParams | $.VarRef<CurveParams> | null = this
+		// If there is a dedicated constant-time implementation for this curve operation,
+		// use that instead of the generic one.
+		{
+			let [specific, ok] = await matchesSpecificCurve(curve)
+			if (ok) {
+				return $.pointerValue<Exclude<__goscript_elliptic.Curve, null>>(specific).Add(x1, y1, x2, y2)
+			}
+		}
+		await __goscript_elliptic.panicIfNotOnCurve($.interfaceValue<__goscript_elliptic.Curve | null>(curve, "*elliptic.CurveParams", { kind: $.TypeKind.Pointer, elemType: "elliptic.CurveParams" }), x1, y1)
+		await __goscript_elliptic.panicIfNotOnCurve($.interfaceValue<__goscript_elliptic.Curve | null>(curve, "*elliptic.CurveParams", { kind: $.TypeKind.Pointer, elemType: "elliptic.CurveParams" }), x2, y2)
+
+		let z1: big.Int | $.VarRef<big.Int> | null = zForAffine(x1, y1)
+		let z2: big.Int | $.VarRef<big.Int> | null = zForAffine(x2, y2)
+		return CurveParams.prototype.affineFromJacobian.call(curve, ...((await CurveParams.prototype.addJacobian.call(curve, x1, y1, z1, x2, y2, z2)) as [big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]))
+	}
+
+	public async Double(x1: big.Int | $.VarRef<big.Int> | null, y1: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
+		const curve: CurveParams | $.VarRef<CurveParams> | null = this
+		// If there is a dedicated constant-time implementation for this curve operation,
+		// use that instead of the generic one.
+		{
+			let [specific, ok] = await matchesSpecificCurve(curve)
+			if (ok) {
+				return $.pointerValue<Exclude<__goscript_elliptic.Curve, null>>(specific).Double(x1, y1)
+			}
+		}
+		await __goscript_elliptic.panicIfNotOnCurve($.interfaceValue<__goscript_elliptic.Curve | null>(curve, "*elliptic.CurveParams", { kind: $.TypeKind.Pointer, elemType: "elliptic.CurveParams" }), x1, y1)
+
+		let z1: big.Int | $.VarRef<big.Int> | null = zForAffine(x1, y1)
+		return CurveParams.prototype.affineFromJacobian.call(curve, ...((await CurveParams.prototype.doubleJacobian.call(curve, x1, y1, z1)) as [big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]))
+	}
+
+	public async IsOnCurve(x: big.Int | $.VarRef<big.Int> | null, y: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<boolean> {
+		const curve: CurveParams | $.VarRef<CurveParams> | null = this
+		// If there is a dedicated constant-time implementation for this curve operation,
+		// use that instead of the generic one.
+		{
+			let [specific, ok] = await matchesSpecificCurve(curve)
+			if (ok) {
+				return $.pointerValue<Exclude<__goscript_elliptic.Curve, null>>(specific).IsOnCurve(x, y)
+			}
+		}
+
+		if ((((big.Int.prototype.Sign.call(x) < 0) || (big.Int.prototype.Cmp.call(x, $.pointerValue<CurveParams>(curve).P) >= 0)) || (big.Int.prototype.Sign.call(y) < 0)) || (big.Int.prototype.Cmp.call(y, $.pointerValue<CurveParams>(curve).P) >= 0)) {
+			return false
+		}
+
+		// y² = x³ - 3x + b
+		let y2: big.Int | $.VarRef<big.Int> | null = await big.Int.prototype.Mul.call(new big.Int(), y, y)
+		await big.Int.prototype.Mod.call(y2, y2, $.pointerValue<CurveParams>(curve).P)
+
+		return big.Int.prototype.Cmp.call(await CurveParams.prototype.polynomial.call(curve, x), y2) == 0
+	}
+
+	public Params(): CurveParams | $.VarRef<CurveParams> | null {
+		const curve: CurveParams | $.VarRef<CurveParams> | null = this
+		return curve
+	}
+
+	public async ScalarBaseMult(k: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
+		const curve: CurveParams | $.VarRef<CurveParams> | null = this
+		// If there is a dedicated constant-time implementation for this curve operation,
+		// use that instead of the generic one.
+		{
+			let [specific, ok] = await matchesSpecificCurve(curve)
+			if (ok) {
+				return $.pointerValue<Exclude<__goscript_elliptic.Curve, null>>(specific).ScalarBaseMult(k)
+			}
+		}
+
+		return CurveParams.prototype.ScalarMult.call(curve, $.pointerValue<CurveParams>(curve).Gx, $.pointerValue<CurveParams>(curve).Gy, k)
+	}
+
+	public async ScalarMult(Bx: big.Int | $.VarRef<big.Int> | null, By: big.Int | $.VarRef<big.Int> | null, k: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
+		const curve: CurveParams | $.VarRef<CurveParams> | null = this
+		// If there is a dedicated constant-time implementation for this curve operation,
+		// use that instead of the generic one.
+		{
+			let [specific, ok] = await matchesSpecificCurve(curve)
+			if (ok) {
+				return $.pointerValue<Exclude<__goscript_elliptic.Curve, null>>(specific).ScalarMult(Bx, By, k)
+			}
+		}
+		await __goscript_elliptic.panicIfNotOnCurve($.interfaceValue<__goscript_elliptic.Curve | null>(curve, "*elliptic.CurveParams", { kind: $.TypeKind.Pointer, elemType: "elliptic.CurveParams" }), Bx, By)
+
+		let Bz: big.Int | $.VarRef<big.Int> | null = big.Int.prototype.SetInt64.call(new big.Int(), 1n)
+		let x: big.Int | $.VarRef<big.Int> | null = new big.Int()
+		let y: big.Int | $.VarRef<big.Int> | null = new big.Int()
+		let z: big.Int | $.VarRef<big.Int> | null = new big.Int()
+
+		for (let __goscriptRangeTarget0 = k, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
+			let b = __goscriptRangeTarget0![__rangeIndex]
+			for (let __rangeIndex = 0; __rangeIndex < 8; __rangeIndex++) {
+				let __goscriptTuple0: any = await CurveParams.prototype.doubleJacobian.call(curve, x, y, z)
+				x = __goscriptTuple0[0]
+				y = __goscriptTuple0[1]
+				z = __goscriptTuple0[2]
+				if ($.uint((b & 0x80), 8) == $.uint(0x80, 8)) {
+					let __goscriptTuple1: any = await CurveParams.prototype.addJacobian.call(curve, Bx, By, Bz, x, y, z)
+					x = __goscriptTuple1[0]
+					y = __goscriptTuple1[1]
+					z = __goscriptTuple1[2]
+				}
+				b = b << ($.uint(1, 8))
+			}
+		}
+
+		return CurveParams.prototype.affineFromJacobian.call(curve, x, y, z)
+	}
+
+	public async addJacobian(x1: big.Int | $.VarRef<big.Int> | null, y1: big.Int | $.VarRef<big.Int> | null, z1: big.Int | $.VarRef<big.Int> | null, x2: big.Int | $.VarRef<big.Int> | null, y2: big.Int | $.VarRef<big.Int> | null, z2: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
+		const curve: CurveParams | $.VarRef<CurveParams> | null = this
+		// See https://hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-3.html#addition-add-2007-bl
+		let x3: big.Int | $.VarRef<big.Int> | null = new big.Int()
+		let y3: big.Int | $.VarRef<big.Int> | null = new big.Int()
+		let z3: big.Int | $.VarRef<big.Int> | null = new big.Int()
+		if (big.Int.prototype.Sign.call(z1) == 0) {
+			big.Int.prototype.Set.call(x3, x2)
+			big.Int.prototype.Set.call(y3, y2)
+			big.Int.prototype.Set.call(z3, z2)
+			return [x3, y3, z3]
+		}
+		if (big.Int.prototype.Sign.call(z2) == 0) {
+			big.Int.prototype.Set.call(x3, x1)
+			big.Int.prototype.Set.call(y3, y1)
+			big.Int.prototype.Set.call(z3, z1)
+			return [x3, y3, z3]
+		}
+
+		let z1z1: big.Int | $.VarRef<big.Int> | null = await big.Int.prototype.Mul.call(new big.Int(), z1, z1)
+		await big.Int.prototype.Mod.call(z1z1, z1z1, $.pointerValue<CurveParams>(curve).P)
+		let z2z2: big.Int | $.VarRef<big.Int> | null = await big.Int.prototype.Mul.call(new big.Int(), z2, z2)
+		await big.Int.prototype.Mod.call(z2z2, z2z2, $.pointerValue<CurveParams>(curve).P)
+
+		let u1: big.Int | $.VarRef<big.Int> | null = await big.Int.prototype.Mul.call(new big.Int(), x1, z2z2)
+		await big.Int.prototype.Mod.call(u1, u1, $.pointerValue<CurveParams>(curve).P)
+		let u2: big.Int | $.VarRef<big.Int> | null = await big.Int.prototype.Mul.call(new big.Int(), x2, z1z1)
+		await big.Int.prototype.Mod.call(u2, u2, $.pointerValue<CurveParams>(curve).P)
+		let h: big.Int | $.VarRef<big.Int> | null = big.Int.prototype.Sub.call(new big.Int(), u2, u1)
+		let xEqual = big.Int.prototype.Sign.call(h) == 0
+		if (big.Int.prototype.Sign.call(h) == -1) {
+			big.Int.prototype.Add.call(h, h, $.pointerValue<CurveParams>(curve).P)
+		}
+		let i: big.Int | $.VarRef<big.Int> | null = big.Int.prototype.Lsh.call(new big.Int(), h, 1)
+		await big.Int.prototype.Mul.call(i, i, i)
+		let j: big.Int | $.VarRef<big.Int> | null = await big.Int.prototype.Mul.call(new big.Int(), h, i)
+
+		let s1: big.Int | $.VarRef<big.Int> | null = await big.Int.prototype.Mul.call(new big.Int(), y1, z2)
+		await big.Int.prototype.Mul.call(s1, s1, z2z2)
+		await big.Int.prototype.Mod.call(s1, s1, $.pointerValue<CurveParams>(curve).P)
+		let s2: big.Int | $.VarRef<big.Int> | null = await big.Int.prototype.Mul.call(new big.Int(), y2, z1)
+		await big.Int.prototype.Mul.call(s2, s2, z1z1)
+		await big.Int.prototype.Mod.call(s2, s2, $.pointerValue<CurveParams>(curve).P)
+		let r: big.Int | $.VarRef<big.Int> | null = big.Int.prototype.Sub.call(new big.Int(), s2, s1)
+		if (big.Int.prototype.Sign.call(r) == -1) {
+			big.Int.prototype.Add.call(r, r, $.pointerValue<CurveParams>(curve).P)
+		}
+		let yEqual = big.Int.prototype.Sign.call(r) == 0
+		if (xEqual && yEqual) {
+			return CurveParams.prototype.doubleJacobian.call(curve, x1, y1, z1)
+		}
+		big.Int.prototype.Lsh.call(r, r, 1)
+		let v: big.Int | $.VarRef<big.Int> | null = await big.Int.prototype.Mul.call(new big.Int(), u1, i)
+
+		big.Int.prototype.Set.call(x3, r)
+		await big.Int.prototype.Mul.call(x3, x3, x3)
+		big.Int.prototype.Sub.call(x3, x3, j)
+		big.Int.prototype.Sub.call(x3, x3, v)
+		big.Int.prototype.Sub.call(x3, x3, v)
+		await big.Int.prototype.Mod.call(x3, x3, $.pointerValue<CurveParams>(curve).P)
+
+		big.Int.prototype.Set.call(y3, r)
+		big.Int.prototype.Sub.call(v, v, x3)
+		await big.Int.prototype.Mul.call(y3, y3, v)
+		await big.Int.prototype.Mul.call(s1, s1, j)
+		big.Int.prototype.Lsh.call(s1, s1, 1)
+		big.Int.prototype.Sub.call(y3, y3, s1)
+		await big.Int.prototype.Mod.call(y3, y3, $.pointerValue<CurveParams>(curve).P)
+
+		big.Int.prototype.Add.call(z3, z1, z2)
+		await big.Int.prototype.Mul.call(z3, z3, z3)
+		big.Int.prototype.Sub.call(z3, z3, z1z1)
+		big.Int.prototype.Sub.call(z3, z3, z2z2)
+		await big.Int.prototype.Mul.call(z3, z3, h)
+		await big.Int.prototype.Mod.call(z3, z3, $.pointerValue<CurveParams>(curve).P)
+
+		return [x3, y3, z3]
+	}
+
+	public async affineFromJacobian(x: big.Int | $.VarRef<big.Int> | null, y: big.Int | $.VarRef<big.Int> | null, z: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
+		const curve: CurveParams | $.VarRef<CurveParams> | null = this
+		let xOut: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
+		let yOut: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
+		if (big.Int.prototype.Sign.call(z) == 0) {
+			return [new big.Int(), new big.Int()]
+		}
+
+		let zinv: big.Int | $.VarRef<big.Int> | null = await big.Int.prototype.ModInverse.call(new big.Int(), z, $.pointerValue<CurveParams>(curve).P)
+		let zinvsq: big.Int | $.VarRef<big.Int> | null = await big.Int.prototype.Mul.call(new big.Int(), zinv, zinv)
+
+		xOut = await big.Int.prototype.Mul.call(new big.Int(), x, zinvsq)
+		await big.Int.prototype.Mod.call(xOut, xOut, $.pointerValue<CurveParams>(curve).P)
+		await big.Int.prototype.Mul.call(zinvsq, zinvsq, zinv)
+		yOut = await big.Int.prototype.Mul.call(new big.Int(), y, zinvsq)
+		await big.Int.prototype.Mod.call(yOut, yOut, $.pointerValue<CurveParams>(curve).P)
+		return [xOut, yOut]
+	}
+
+	public async doubleJacobian(x: big.Int | $.VarRef<big.Int> | null, y: big.Int | $.VarRef<big.Int> | null, z: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
+		const curve: CurveParams | $.VarRef<CurveParams> | null = this
+		// See https://hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-3.html#doubling-dbl-2001-b
+		let delta: big.Int | $.VarRef<big.Int> | null = await big.Int.prototype.Mul.call(new big.Int(), z, z)
+		await big.Int.prototype.Mod.call(delta, delta, $.pointerValue<CurveParams>(curve).P)
+		let gamma: big.Int | $.VarRef<big.Int> | null = await big.Int.prototype.Mul.call(new big.Int(), y, y)
+		await big.Int.prototype.Mod.call(gamma, gamma, $.pointerValue<CurveParams>(curve).P)
+		let alpha: big.Int | $.VarRef<big.Int> | null = big.Int.prototype.Sub.call(new big.Int(), x, delta)
+		if (big.Int.prototype.Sign.call(alpha) == -1) {
+			big.Int.prototype.Add.call(alpha, alpha, $.pointerValue<CurveParams>(curve).P)
+		}
+		let alpha2: big.Int | $.VarRef<big.Int> | null = big.Int.prototype.Add.call(new big.Int(), x, delta)
+		await big.Int.prototype.Mul.call(alpha, alpha, alpha2)
+		big.Int.prototype.Set.call(alpha2, alpha)
+		big.Int.prototype.Lsh.call(alpha, alpha, 1)
+		big.Int.prototype.Add.call(alpha, alpha, alpha2)
+
+		let beta: big.Int | $.VarRef<big.Int> | null = await big.Int.prototype.Mul.call(alpha2, x, gamma)
+
+		let x3: big.Int | $.VarRef<big.Int> | null = await big.Int.prototype.Mul.call(new big.Int(), alpha, alpha)
+		let beta8: big.Int | $.VarRef<big.Int> | null = big.Int.prototype.Lsh.call(new big.Int(), beta, 3)
+		await big.Int.prototype.Mod.call(beta8, beta8, $.pointerValue<CurveParams>(curve).P)
+		big.Int.prototype.Sub.call(x3, x3, beta8)
+		if (big.Int.prototype.Sign.call(x3) == -1) {
+			big.Int.prototype.Add.call(x3, x3, $.pointerValue<CurveParams>(curve).P)
+		}
+		await big.Int.prototype.Mod.call(x3, x3, $.pointerValue<CurveParams>(curve).P)
+
+		let z3: big.Int | $.VarRef<big.Int> | null = big.Int.prototype.Add.call(new big.Int(), y, z)
+		await big.Int.prototype.Mul.call(z3, z3, z3)
+		big.Int.prototype.Sub.call(z3, z3, gamma)
+		if (big.Int.prototype.Sign.call(z3) == -1) {
+			big.Int.prototype.Add.call(z3, z3, $.pointerValue<CurveParams>(curve).P)
+		}
+		big.Int.prototype.Sub.call(z3, z3, delta)
+		if (big.Int.prototype.Sign.call(z3) == -1) {
+			big.Int.prototype.Add.call(z3, z3, $.pointerValue<CurveParams>(curve).P)
+		}
+		await big.Int.prototype.Mod.call(z3, z3, $.pointerValue<CurveParams>(curve).P)
+
+		big.Int.prototype.Lsh.call(beta, beta, 2)
+		big.Int.prototype.Sub.call(beta, beta, x3)
+		if (big.Int.prototype.Sign.call(beta) == -1) {
+			big.Int.prototype.Add.call(beta, beta, $.pointerValue<CurveParams>(curve).P)
+		}
+		let y3: big.Int | $.VarRef<big.Int> | null = await big.Int.prototype.Mul.call(alpha, alpha, beta)
+
+		await big.Int.prototype.Mul.call(gamma, gamma, gamma)
+		big.Int.prototype.Lsh.call(gamma, gamma, 3)
+		await big.Int.prototype.Mod.call(gamma, gamma, $.pointerValue<CurveParams>(curve).P)
+
+		big.Int.prototype.Sub.call(y3, y3, gamma)
+		if (big.Int.prototype.Sign.call(y3) == -1) {
+			big.Int.prototype.Add.call(y3, y3, $.pointerValue<CurveParams>(curve).P)
+		}
+		await big.Int.prototype.Mod.call(y3, y3, $.pointerValue<CurveParams>(curve).P)
+
+		return [x3, y3, z3]
+	}
+
+	public async polynomial(x: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<big.Int | $.VarRef<big.Int> | null> {
+		const curve: CurveParams | $.VarRef<CurveParams> | null = this
+		let x3: big.Int | $.VarRef<big.Int> | null = await big.Int.prototype.Mul.call(new big.Int(), x, x)
+		await big.Int.prototype.Mul.call(x3, x3, x)
+
+		let threeX: big.Int | $.VarRef<big.Int> | null = big.Int.prototype.Lsh.call(new big.Int(), x, 1)
+		big.Int.prototype.Add.call(threeX, threeX, x)
+
+		big.Int.prototype.Sub.call(x3, x3, threeX)
+		big.Int.prototype.Add.call(x3, x3, $.pointerValue<CurveParams>(curve).B)
+		await big.Int.prototype.Mod.call(x3, x3, $.pointerValue<CurveParams>(curve).P)
+
+		return x3
+	}
+
+	static __typeInfo = $.registerStructType(
+		"elliptic.CurveParams",
+		() => new CurveParams(),
+		[{ name: "Add", args: [{ name: "x1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "x2", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y2", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "_r1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }] }, { name: "Double", args: [{ name: "x1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "_r1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }] }, { name: "IsOnCurve", args: [{ name: "x", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Params", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "elliptic.CurveParams" } }] }, { name: "ScalarBaseMult", args: [{ name: "k", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "_r1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }] }, { name: "ScalarMult", args: [{ name: "Bx", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "By", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "k", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "_r1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }] }, { name: "addJacobian", args: [{ name: "x1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "z1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "x2", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y2", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "z2", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "_r1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "_r2", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }] }, { name: "affineFromJacobian", args: [{ name: "x", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "z", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }], returns: [{ name: "xOut", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "yOut", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }] }, { name: "doubleJacobian", args: [{ name: "x", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "z", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "_r1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "_r2", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }] }, { name: "polynomial", args: [{ name: "x", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }] }],
+		CurveParams,
+		[{ name: "P", key: "P", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" }, index: [0], offset: 0, exported: true }, { name: "N", key: "N", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" }, index: [1], offset: 8, exported: true }, { name: "B", key: "B", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" }, index: [2], offset: 16, exported: true }, { name: "Gx", key: "Gx", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" }, index: [3], offset: 24, exported: true }, { name: "Gy", key: "Gy", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" }, index: [4], offset: 32, exported: true }, { name: "BitSize", key: "BitSize", type: { kind: $.TypeKind.Basic, name: "int" }, index: [5], offset: 40, exported: true }, { name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" }, index: [6], offset: 48, exported: true }]
+	)
+}
+
+export function zForAffine(x: big.Int | $.VarRef<big.Int> | null, y: big.Int | $.VarRef<big.Int> | null): big.Int | $.VarRef<big.Int> | null {
+	let z: big.Int | $.VarRef<big.Int> | null = new big.Int()
+	if ((big.Int.prototype.Sign.call(x) != 0) || (big.Int.prototype.Sign.call(y) != 0)) {
+		big.Int.prototype.SetInt64.call(z, 1n)
+	}
+	return z
+}
+
+export async function matchesSpecificCurve(params: CurveParams | $.VarRef<CurveParams> | null): globalThis.Promise<[__goscript_elliptic.Curve | null, boolean]> {
+	for (let __goscriptRangeTarget1 = $.arrayToSlice<__goscript_elliptic.Curve | null>([$.interfaceValue<__goscript_elliptic.Curve | null>(__goscript_nistec.__goscript_get_p224(), "*elliptic.nistCurve[*nistec.P224Point]", { kind: $.TypeKind.Pointer, elemType: "elliptic.nistCurve" }), $.interfaceValue<__goscript_elliptic.Curve | null>(__goscript_nistec.__goscript_get_p256(), "*elliptic.nistCurve[*nistec.P256Point]", { kind: $.TypeKind.Pointer, elemType: "elliptic.nistCurve" }), $.interfaceValue<__goscript_elliptic.Curve | null>(__goscript_nistec.__goscript_get_p384(), "*elliptic.nistCurve[*nistec.P384Point]", { kind: $.TypeKind.Pointer, elemType: "elliptic.nistCurve" }), $.interfaceValue<__goscript_elliptic.Curve | null>(__goscript_nistec.__goscript_get_p521(), "*elliptic.nistCurve[*nistec.P521Point]", { kind: $.TypeKind.Pointer, elemType: "elliptic.nistCurve" })]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
+		let c = __goscriptRangeTarget1![__rangeIndex]
+		if (params == await $.pointerValue<Exclude<__goscript_elliptic.Curve, null>>(c).Params()) {
+			return [c, true]
+		}
+	}
+	return [null, false]
+}

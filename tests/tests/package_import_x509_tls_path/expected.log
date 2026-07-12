@@ -1,0 +1,9 @@
+keygen err nil true
+create err nil true
+parse err nil true
+certificate count 1
+chain count 1
+leaf common name bifrost.goscript.test
+private key signer true
+min version 771
+next proto bifrost

@@ -61,9 +61,9 @@ export class Pointer {
 	static __typeInfo = $.registerStructType(
 		"weak.Pointer",
 		() => new Pointer(),
-		[{ name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } } }] }],
+		[{ name: "Value", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } } }] }],
 		Pointer,
-		[{ name: "_", key: "_blank0", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } }, length: 0 } }, { name: "u", key: "u", type: { kind: $.TypeKind.Basic, name: "unknown" } }]
+		[{ name: "_", key: "_blank0", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } }, length: 0 }, pkgPath: "weak", index: [0], offset: 0, exported: false }, { name: "u", key: "u", type: { kind: $.TypeKind.Basic, name: "unknown" }, pkgPath: "weak", index: [1], offset: 0, exported: false }]
 	)
 }
 
@@ -75,7 +75,7 @@ export function Make(__typeArgs: $.GenericTypeArgs | undefined, ptr: any): Point
 	if (ptr != null) {
 		u = runtime_registerWeakPointer((ptr as any))
 	}
-	runtime.KeepAlive($.interfaceValue<any>(ptr, "*T"))
+	runtime.KeepAlive($.interfaceValue<any>(ptr, "*T", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } }))
 	return $.markAsStructValue(new Pointer({u: u}))
 }
 

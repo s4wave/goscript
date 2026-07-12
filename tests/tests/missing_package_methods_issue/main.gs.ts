@@ -12,11 +12,11 @@ import "@goscript/slices/index.js"
 export async function main(): globalThis.Promise<void> {
 	// Test slices.Delete which was missing in the error output
 	let numbers: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3, 4, 5])
-	fmt.Printf("Original: %v\n", $.interfaceValue<any>(numbers, "[]int"))
+	fmt.Printf("Original: %v\n", $.interfaceValue<any>(numbers, "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }))
 
 	// This should work but might be missing from the slices package implementation
 	numbers = (slices.Delete(numbers, 1, 3) as $.Slice<number>)
-	fmt.Printf("After delete: %v\n", $.interfaceValue<any>(numbers, "[]int"))
+	fmt.Printf("After delete: %v\n", $.interfaceValue<any>(numbers, "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }))
 
 	// Test slices.BinarySearchFunc which was also missing
 	let data: $.Slice<number> = $.arrayToSlice<number>([10, 20, 30, 40, 50])

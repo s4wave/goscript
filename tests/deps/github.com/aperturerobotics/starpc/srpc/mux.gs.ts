@@ -200,5 +200,5 @@ export class mux {
 }
 
 export function NewMux(fallbackInvokers: $.Slice<__goscript_invoker.Invoker | null>): Mux | null {
-	return $.interfaceValue<Mux | null>(new mux({fallback: fallbackInvokers, services: $.makeMap<string, muxMethods>()}), "*srpc.mux")
+	return $.interfaceValue<Mux | null>(new mux({fallback: fallbackInvokers, services: $.makeMap<string, muxMethods>()}), "*srpc.mux", { kind: $.TypeKind.Pointer, elemType: "srpc.mux" })
 }

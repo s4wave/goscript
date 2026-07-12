@@ -206,7 +206,7 @@ export class netConn {
 
 	public LocalAddr(): net.Addr | null {
 		const nc: netConn | $.VarRef<netConn> | null = this
-		return $.interfaceValue<net.Addr | null>($.markAsStructValue(new websocketAddr()), "websocket.websocketAddr")
+		return $.interfaceValue<net.Addr | null>($.markAsStructValue(new websocketAddr()), "websocket.websocketAddr", "websocket.websocketAddr")
 	}
 
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
@@ -230,7 +230,7 @@ export class netConn {
 
 	public RemoteAddr(): net.Addr | null {
 		const nc: netConn | $.VarRef<netConn> | null = this
-		return $.interfaceValue<net.Addr | null>($.markAsStructValue(new websocketAddr()), "websocket.websocketAddr")
+		return $.interfaceValue<net.Addr | null>($.markAsStructValue(new websocketAddr()), "websocket.websocketAddr", "websocket.websocketAddr")
 	}
 
 	public SetDeadline(t: time.Time): $.GoError {
@@ -417,5 +417,5 @@ export async function NetConn(ctx: context.Context | null, c: __goscript_ws_js.C
 		await $.chanRecv($.pointerValue<time.Timer>($.pointerValue<netConn>(nc).readTimer).C)
 	}
 
-	return $.interfaceValue<net.Conn | null>(nc, "*websocket.netConn")
+	return $.interfaceValue<net.Conn | null>(nc, "*websocket.netConn", { kind: $.TypeKind.Pointer, elemType: "websocket.netConn" })
 }

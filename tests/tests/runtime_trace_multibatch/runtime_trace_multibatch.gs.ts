@@ -75,7 +75,7 @@ export function toHex(b: $.Slice<number>): string {
 export async function main(): globalThis.Promise<void> {
 	let sink: byteSink | $.VarRef<byteSink> | null = new byteSink()
 	{
-		let err = trace.Start($.pointerValueOrNil($.interfaceValue<io.Writer | null>(sink, "*main.byteSink"))!)
+		let err = trace.Start($.pointerValueOrNil($.interfaceValue<io.Writer | null>(sink, "*main.byteSink", { kind: $.TypeKind.Pointer, elemType: "main.byteSink" }))!)
 		if (err != null) {
 			fmt.Println("ERROR:" + $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return

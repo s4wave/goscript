@@ -118,7 +118,7 @@ export class Server {
 		let [subCtx, subCtxCancel] = contextutil.WithCancel(ctx)
 		__defer.defer(async () => { await subCtxCancel!() })
 		let prw: __goscript_packet_rw.PacketReadWriter | $.VarRef<__goscript_packet_rw.PacketReadWriter> | null = __goscript_packet_rw.NewPacketReadWriter(rwc)
-		let serverRPC: __goscript_server_rpc.ServerRPC | $.VarRef<__goscript_server_rpc.ServerRPC> | null = __goscript_server_rpc.NewServerRPC(subCtx, $.pointerValue<Server>(s).invoker, $.interfaceValue<__goscript_writer.PacketWriter | null>(prw, "*srpc.PacketReadWriter"))
+		let serverRPC: __goscript_server_rpc.ServerRPC | $.VarRef<__goscript_server_rpc.ServerRPC> | null = __goscript_server_rpc.NewServerRPC(subCtx, $.pointerValue<Server>(s).invoker, $.interfaceValue<__goscript_writer.PacketWriter | null>(prw, "*srpc.PacketReadWriter", { kind: $.TypeKind.Pointer, elemType: "srpc.PacketReadWriter" }))
 		await __goscript_packet_rw.PacketReadWriter.prototype.ReadPump.call(prw, $.functionValue(((__receiver) => (data: $.Slice<number>) => __receiver.HandlePacketData(data))($.pointerValue<__goscript_server_rpc.ServerRPC>(serverRPC)), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }], results: ["error"] } as $.FunctionTypeInfo)), $.functionValue(((__receiver) => (closeErr: $.GoError) => __receiver.HandleStreamClose(closeErr))($.pointerValue<__goscript_server_rpc.ServerRPC>(serverRPC).commonRPC), ({ kind: $.TypeKind.Function, params: ["error"], results: [] } as $.FunctionTypeInfo)))
 	}
 

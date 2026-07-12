@@ -255,7 +255,7 @@ export class Writer {
 				}
 			}
 			{
-				let [, err] = await io.WriteString($.pointerValueOrNil($.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter"))!, $.pointerValue<__goscript_struct.FileHeader>($.pointerValue<header>(h).FileHeader).Name)
+				let [, err] = await io.WriteString($.pointerValueOrNil($.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter", { kind: $.TypeKind.Pointer, elemType: "zip.countWriter" }))!, $.pointerValue<__goscript_struct.FileHeader>($.pointerValue<header>(h).FileHeader).Name)
 				if (err != null) {
 					return err
 				}
@@ -267,7 +267,7 @@ export class Writer {
 				}
 			}
 			{
-				let [, err] = await io.WriteString($.pointerValueOrNil($.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter"))!, $.pointerValue<__goscript_struct.FileHeader>($.pointerValue<header>(h).FileHeader).Comment)
+				let [, err] = await io.WriteString($.pointerValueOrNil($.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter", { kind: $.TypeKind.Pointer, elemType: "zip.countWriter" }))!, $.pointerValue<__goscript_struct.FileHeader>($.pointerValue<header>(h).FileHeader).Comment)
 				if (err != null) {
 					return err
 				}
@@ -339,7 +339,7 @@ export class Writer {
 			}
 		}
 		{
-			let [, err] = await io.WriteString($.pointerValueOrNil($.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter"))!, $.pointerValue<Writer>(w).comment)
+			let [, err] = await io.WriteString($.pointerValueOrNil($.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter", { kind: $.TypeKind.Pointer, elemType: "zip.countWriter" }))!, $.pointerValue<Writer>(w).comment)
 			if (err != null) {
 				return err
 			}
@@ -465,17 +465,17 @@ export class Writer {
 			$.pointerValue<__goscript_struct.FileHeader>(fh).UncompressedSize = $.uint(0, 32)
 			$.pointerValue<__goscript_struct.FileHeader>(fh).UncompressedSize64 = 0n
 
-			ow = $.interfaceValue<io.Writer | null>($.markAsStructValue(new dirWriter()), "zip.dirWriter")
+			ow = $.interfaceValue<io.Writer | null>($.markAsStructValue(new dirWriter()), "zip.dirWriter", "zip.dirWriter")
 		} else {
 			$.pointerValue<__goscript_struct.FileHeader>(fh).Flags = $.pointerValue<__goscript_struct.FileHeader>(fh).Flags | ($.uint(0x8, 16))
 
-			fw = (() => { const __goscriptLiteralField0 = crc322.NewIEEE(); return new fileWriter({zipw: $.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter"), compCount: new countWriter({w: $.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter")}), crc32: __goscriptLiteralField0}) })()
+			fw = (() => { const __goscriptLiteralField0 = crc322.NewIEEE(); return new fileWriter({zipw: $.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter", { kind: $.TypeKind.Pointer, elemType: "zip.countWriter" }), compCount: new countWriter({w: $.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter", { kind: $.TypeKind.Pointer, elemType: "zip.countWriter" })}), crc32: __goscriptLiteralField0}) })()
 			let comp = await Writer.prototype.compressor.call(w, $.uint($.pointerValue<__goscript_struct.FileHeader>(fh).Method, 16))
 			if (comp == null) {
 				return [null, __goscript_reader.ErrAlgorithm]
 			}
 			let err: $.GoError = null as $.GoError
-			let __goscriptTuple8: any = await comp!($.interfaceValue<io.Writer | null>($.pointerValue<fileWriter>(fw).compCount, "*zip.countWriter"))
+			let __goscriptTuple8: any = await comp!($.interfaceValue<io.Writer | null>($.pointerValue<fileWriter>(fw).compCount, "*zip.countWriter", { kind: $.TypeKind.Pointer, elemType: "zip.countWriter" }))
 			$.pointerValue<fileWriter>(fw).comp = __goscriptTuple8[0]
 			err = __goscriptTuple8[1]
 			if (err != null) {
@@ -483,11 +483,11 @@ export class Writer {
 			}
 			$.pointerValue<fileWriter>(fw).rawCount = new countWriter({w: ($.pointerValue<fileWriter>(fw).comp as io.Writer | null)})
 			$.pointerValue<fileWriter>(fw).header = h
-			ow = $.interfaceValue<io.Writer | null>(fw, "*zip.fileWriter")
+			ow = $.interfaceValue<io.Writer | null>(fw, "*zip.fileWriter", { kind: $.TypeKind.Pointer, elemType: "zip.fileWriter" })
 		}
 		$.pointerValue<Writer>(w).dir = $.append($.pointerValue<Writer>(w).dir, h)
 		{
-			let err = await writeHeader($.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter"), h)
+			let err = await writeHeader($.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter", { kind: $.TypeKind.Pointer, elemType: "zip.countWriter" }), h)
 			if (err != null) {
 				return [null, err]
 			}
@@ -512,7 +512,7 @@ export class Writer {
 		let h: header | $.VarRef<header> | null = new header({FileHeader: fh, offset: $.uint64($.pointerValue<countWriter>($.pointerValue<Writer>(w).cw).count), raw: true})
 		$.pointerValue<Writer>(w).dir = $.append($.pointerValue<Writer>(w).dir, h)
 		{
-			let err = await writeHeader($.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter"), h)
+			let err = await writeHeader($.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter", { kind: $.TypeKind.Pointer, elemType: "zip.countWriter" }), h)
 			if (err != null) {
 				return [null, err]
 			}
@@ -520,12 +520,12 @@ export class Writer {
 
 		if (strings.HasSuffix($.pointerValue<__goscript_struct.FileHeader>(fh).Name, "/")) {
 			$.pointerValue<Writer>(w).last = null
-			return [$.interfaceValue<io.Writer | null>($.markAsStructValue(new dirWriter()), "zip.dirWriter"), null]
+			return [$.interfaceValue<io.Writer | null>($.markAsStructValue(new dirWriter()), "zip.dirWriter", "zip.dirWriter"), null]
 		}
 
-		let fw: fileWriter | $.VarRef<fileWriter> | null = new fileWriter({header: h, zipw: $.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter")})
+		let fw: fileWriter | $.VarRef<fileWriter> | null = new fileWriter({header: h, zipw: $.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter", { kind: $.TypeKind.Pointer, elemType: "zip.countWriter" })})
 		$.pointerValue<Writer>(w).last = fw
-		return [$.interfaceValue<io.Writer | null>(fw, "*zip.fileWriter"), null]
+		return [$.interfaceValue<io.Writer | null>(fw, "*zip.fileWriter", { kind: $.TypeKind.Pointer, elemType: "zip.fileWriter" }), null]
 	}
 
 	public async Flush(): globalThis.Promise<$.GoError> {
@@ -1016,7 +1016,7 @@ export function __goscript_set_errLongExtra(__goscriptValue: $.GoError): void {
 }
 
 export function NewWriter(w: io.Writer | null): Writer | $.VarRef<Writer> | null {
-	return new Writer({cw: (() => { const __goscriptLiteralField1 = $.interfaceValue<io.Writer | null>(bufio.NewWriter(w), "*bufio.Writer"); return new countWriter({w: __goscriptLiteralField1}) })()})
+	return new Writer({cw: (() => { const __goscriptLiteralField1 = $.interfaceValue<io.Writer | null>(bufio.NewWriter(w), "*bufio.Writer", { kind: $.TypeKind.Pointer, elemType: "bufio.Writer" }); return new countWriter({w: __goscriptLiteralField1}) })()})
 }
 
 export function detectUTF8(s: string): [boolean, boolean] {

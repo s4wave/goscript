@@ -206,7 +206,7 @@ export class UDPAddr {
 		if (a == null) {
 			return null
 		}
-		return $.interfaceValue<__goscript_net.Addr | null>(a, "*net.UDPAddr")
+		return $.interfaceValue<__goscript_net.Addr | null>(a, "*net.UDPAddr", { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" })
 	}
 
 	public async sockaddr(family: number): globalThis.Promise<[syscall.Sockaddr | null, $.GoError]> {
@@ -219,7 +219,7 @@ export class UDPAddr {
 
 	public toLocal(net: string): __goscript_sockaddr_posix.sockaddr | null {
 		const a: UDPAddr | $.VarRef<UDPAddr> | null = this
-		return $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>((() => { const __goscriptLiteralField0 = (__goscript_ipsock.loopbackIP(net) as __goscript_ip.IP); return new UDPAddr({IP: __goscriptLiteralField0, Port: $.pointerValue<UDPAddr>(a).Port, Zone: $.pointerValue<UDPAddr>(a).Zone}) })(), "*net.UDPAddr")
+		return $.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>((() => { const __goscriptLiteralField0 = (__goscript_ipsock.loopbackIP(net) as __goscript_ip.IP); return new UDPAddr({IP: __goscriptLiteralField0, Port: $.pointerValue<UDPAddr>(a).Port, Zone: $.pointerValue<UDPAddr>(a).Zone}) })(), "*net.UDPAddr", { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" })
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -227,7 +227,7 @@ export class UDPAddr {
 		() => new UDPAddr(),
 		[{ name: "AddrPort", args: [], returns: [{ name: "_r0", type: "netip.AddrPort" }] }, { name: "Network", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "family", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "isWildcard", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "opAddr", args: [], returns: [{ name: "_r0", type: "net.Addr" }] }, { name: "sockaddr", args: [{ name: "family", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [{ name: "_r0", type: "syscall.Sockaddr" }, { name: "_r1", type: "error" }] }, { name: "toLocal", args: [{ name: "net", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: "net.sockaddr" }] }],
 		UDPAddr,
-		[{ name: "IP", key: "IP", type: "net.IP", index: [0], offset: 0, exported: true }, { name: "Port", key: "Port", type: { kind: $.TypeKind.Basic, name: "int" }, index: [1], offset: 24, exported: true }, { name: "Zone", key: "Zone", type: { kind: $.TypeKind.Basic, name: "string" }, index: [2], offset: 32, exported: true }]
+		[{ name: "IP", key: "IP", type: { kind: $.TypeKind.Slice, typeName: "net.IP", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, index: [0], offset: 0, exported: true }, { name: "Port", key: "Port", type: { kind: $.TypeKind.Basic, name: "int" }, index: [1], offset: 24, exported: true }, { name: "Zone", key: "Zone", type: { kind: $.TypeKind.Basic, name: "string" }, index: [2], offset: 32, exported: true }]
 	)
 }
 
@@ -354,7 +354,7 @@ export class UDPConn {
 			// Return Addr(nil), not Addr(*UDPConn(nil)).
 			return [n, null, err]
 		}
-		return [n, $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.UDPAddr"), err]
+		return [n, $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.UDPAddr", { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" }), err]
 	}
 
 	public async ReadFromUDP(b: $.Slice<number>): globalThis.Promise<[number, UDPAddr | $.VarRef<UDPAddr> | null, $.GoError]> {
@@ -382,7 +382,7 @@ export class UDPConn {
 		addr = __goscriptTuple2[1]
 		err = __goscriptTuple2[2]
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, $.markAsStructValue($.cloneStructValue(addr)), err]
 	}
@@ -424,7 +424,7 @@ export class UDPConn {
 		addr = __goscriptTuple4[3]
 		err = __goscriptTuple4[4]
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, oobn, flags, addr, err]
 	}
@@ -434,7 +434,7 @@ export class UDPConn {
 		if (!$.pointerValue<UDPConn>(c).conn.ok()) {
 			return [null, $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 		}
-		return [$.interfaceValue<syscall.RawConn | null>(__goscript_rawconn.newRawConn($.pointerValue<UDPConn>(c).conn.fd), "*net.rawConn"), null]
+		return [$.interfaceValue<syscall.RawConn | null>(__goscript_rawconn.newRawConn($.pointerValue<UDPConn>(c).conn.fd), "*net.rawConn", { kind: $.TypeKind.Pointer, elemType: "net.rawConn" }), null]
 	}
 
 	public async WriteMsgUDP(b: $.Slice<number>, oob: $.Slice<number>, addr: UDPAddr | $.VarRef<UDPAddr> | null): globalThis.Promise<[number, number, $.GoError]> {
@@ -450,7 +450,7 @@ export class UDPConn {
 		oobn = __goscriptTuple5[1]
 		err = __goscriptTuple5[2]
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField4 = UDPAddr.prototype.opAddr.call(addr); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField4, Err: err}) })(), "*net.OpError")
+			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField4 = UDPAddr.prototype.opAddr.call(addr); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField4, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, oobn, err]
 	}
@@ -468,7 +468,7 @@ export class UDPConn {
 		oobn = __goscriptTuple6[1]
 		err = __goscriptTuple6[2]
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: $.interfaceValue<__goscript_net.Addr | null>($.markAsStructValue(new addrPortUDPAddr({AddrPort: $.markAsStructValue($.cloneStructValue(addr))})), "net.addrPortUDPAddr"), Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: $.interfaceValue<__goscript_net.Addr | null>($.markAsStructValue(new addrPortUDPAddr({AddrPort: $.markAsStructValue($.cloneStructValue(addr))})), "net.addrPortUDPAddr", "net.addrPortUDPAddr"), Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, oobn, err]
 	}
@@ -482,11 +482,11 @@ export class UDPConn {
 		let a: UDPAddr | $.VarRef<UDPAddr> | null = __goscriptTuple7[0]
 		let ok = __goscriptTuple7[1]
 		if (!ok) {
-			return [0, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: addr, Err: $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })}), "*net.OpError")]
+			return [0, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: addr, Err: $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 		}
 		let [n, err] = await UDPConn.prototype.writeTo.call(c, b, a)
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField5 = UDPAddr.prototype.opAddr.call(a); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField5, Err: err}) })(), "*net.OpError")
+			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField5 = UDPAddr.prototype.opAddr.call(a); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField5, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, err]
 	}
@@ -498,7 +498,7 @@ export class UDPConn {
 		}
 		let [n, err] = await UDPConn.prototype.writeTo.call(c, b, addr)
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField6 = UDPAddr.prototype.opAddr.call(addr); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField6, Err: err}) })(), "*net.OpError")
+			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField6 = UDPAddr.prototype.opAddr.call(addr); return new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: __goscriptLiteralField6, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, err]
 	}
@@ -510,7 +510,7 @@ export class UDPConn {
 		}
 		let [n, err] = await UDPConn.prototype.writeToAddrPort.call(c, b, $.markAsStructValue($.cloneStructValue(addr)))
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: $.interfaceValue<__goscript_net.Addr | null>($.markAsStructValue(new addrPortUDPAddr({AddrPort: $.markAsStructValue($.cloneStructValue(addr))})), "net.addrPortUDPAddr"), Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: $.interfaceValue<__goscript_net.Addr | null>($.markAsStructValue(new addrPortUDPAddr({AddrPort: $.markAsStructValue($.cloneStructValue(addr))})), "net.addrPortUDPAddr", "net.addrPortUDPAddr"), Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, err]
 	}
@@ -601,7 +601,7 @@ export class UDPConn {
 		addr = __goscriptTuple12[1]
 		let err = __goscriptTuple12[2]
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, addr, err]
 	}
@@ -707,7 +707,7 @@ export class UDPConn {
 			}
 			default:
 			{
-				return [0, 0, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField8 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(addr)).Addr())).String(); return new __goscript_net.AddrError({Err: "invalid address family", Addr: __goscriptLiteralField8}) })(), "*net.AddrError")]
+				return [0, 0, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField8 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(addr)).Addr())).String(); return new __goscript_net.AddrError({Err: "invalid address family", Addr: __goscriptLiteralField8}) })(), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 				break
 			}
 		}
@@ -748,7 +748,7 @@ export class UDPConn {
 			}
 			default:
 			{
-				return [0, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField9 = __goscript_ip.IP_String($.pointerValue<UDPAddr>(addr).IP); return new __goscript_net.AddrError({Err: "invalid address family", Addr: __goscriptLiteralField9}) })(), "*net.AddrError")]
+				return [0, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField9 = __goscript_ip.IP_String($.pointerValue<UDPAddr>(addr).IP); return new __goscript_net.AddrError({Err: "invalid address family", Addr: __goscriptLiteralField9}) })(), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 				break
 			}
 		}
@@ -789,7 +789,7 @@ export class UDPConn {
 			}
 			default:
 			{
-				return [0, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField10 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(addr)).Addr())).String(); return new __goscript_net.AddrError({Err: "invalid address family", Addr: __goscriptLiteralField10}) })(), "*net.AddrError")]
+				return [0, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField10 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(addr)).Addr())).String(); return new __goscript_net.AddrError({Err: "invalid address family", Addr: __goscriptLiteralField10}) })(), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 				break
 			}
 		}
@@ -903,12 +903,12 @@ export async function dialUDP(ctx: context.Context | null, dialer: __goscript_di
 		}
 		default:
 		{
-			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField11 = UDPAddr.prototype.opAddr.call(laddr); const __goscriptLiteralField12 = UDPAddr.prototype.opAddr.call(raddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField11, Addr: __goscriptLiteralField12, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField11 = UDPAddr.prototype.opAddr.call(laddr); const __goscriptLiteralField12 = UDPAddr.prototype.opAddr.call(raddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField11, Addr: __goscriptLiteralField12, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 			break
 		}
 	}
 	if (raddr == null) {
-		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField13 = UDPAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField13, Addr: null, Err: __goscript_net.errMissingAddress}) })(), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField13 = UDPAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField13, Addr: null, Err: __goscript_net.errMissingAddress}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	let sd: __goscript_dial.sysDialer | $.VarRef<__goscript_dial.sysDialer> | null = (() => { const __goscriptLiteralField14 = UDPAddr.prototype.String.call(raddr); return new __goscript_dial.sysDialer({network: network, address: __goscriptLiteralField14}) })()
 	if (dialer != null) {
@@ -918,7 +918,7 @@ export async function dialUDP(ctx: context.Context | null, dialer: __goscript_di
 	let c: UDPConn | $.VarRef<UDPConn> | null = __goscriptTuple22[0]
 	let err = __goscriptTuple22[1]
 	if (err != null) {
-		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField15 = UDPAddr.prototype.opAddr.call(laddr); const __goscriptLiteralField16 = UDPAddr.prototype.opAddr.call(raddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField15, Addr: __goscriptLiteralField16, Err: err}) })(), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField15 = UDPAddr.prototype.opAddr.call(laddr); const __goscriptLiteralField16 = UDPAddr.prototype.opAddr.call(raddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField15, Addr: __goscriptLiteralField16, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	return [c, null]
 }
@@ -933,7 +933,7 @@ export async function ListenUDP(network: string, laddr: UDPAddr | $.VarRef<UDPAd
 		}
 		default:
 		{
-			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField17 = UDPAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField17, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField17 = UDPAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField17, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 			break
 		}
 	}
@@ -945,7 +945,7 @@ export async function ListenUDP(network: string, laddr: UDPAddr | $.VarRef<UDPAd
 	let c: UDPConn | $.VarRef<UDPConn> | null = __goscriptTuple23[0]
 	let err = __goscriptTuple23[1]
 	if (err != null) {
-		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField19 = UDPAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField19, Err: err}) })(), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField19 = UDPAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField19, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	return [c, null]
 }
@@ -960,19 +960,19 @@ export async function ListenMulticastUDP(network: string, ifi: __goscript__inter
 		}
 		default:
 		{
-			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField20 = UDPAddr.prototype.opAddr.call(gaddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField20, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField20 = UDPAddr.prototype.opAddr.call(gaddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField20, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 			break
 		}
 	}
 	if ((gaddr == null) || ($.pointerValue<UDPAddr>(gaddr).IP == null)) {
-		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField21 = UDPAddr.prototype.opAddr.call(gaddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField21, Err: __goscript_net.errMissingAddress}) })(), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField21 = UDPAddr.prototype.opAddr.call(gaddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField21, Err: __goscript_net.errMissingAddress}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	let sl: __goscript_dial.sysListener | $.VarRef<__goscript_dial.sysListener> | null = (() => { const __goscriptLiteralField22 = UDPAddr.prototype.String.call(gaddr); return new __goscript_dial.sysListener({network: network, address: __goscriptLiteralField22}) })()
 	let __goscriptTuple24: any = await __goscript_dial.sysListener.prototype.listenMulticastUDP.call(sl, context.Background(), ifi, gaddr)
 	let c: UDPConn | $.VarRef<UDPConn> | null = __goscriptTuple24[0]
 	let err = __goscriptTuple24[1]
 	if (err != null) {
-		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField23 = UDPAddr.prototype.opAddr.call(gaddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField23, Err: err}) })(), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField23 = UDPAddr.prototype.opAddr.call(gaddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField23, Err: err}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	return [c, null]
 }

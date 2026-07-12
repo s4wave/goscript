@@ -234,7 +234,7 @@ export class inputs {
 	public newBytes(b: $.Slice<number>): __goscript_regexp.input | null {
 		let i: inputs | $.VarRef<inputs> | null = this
 		$.pointerValue<inputs>(i).bytes.str = b
-		return $.interfaceValue<__goscript_regexp.input | null>($.pointerValue<inputs>(i)._fields.bytes, "*regexp.inputBytes")
+		return $.interfaceValue<__goscript_regexp.input | null>($.pointerValue<inputs>(i)._fields.bytes, "*regexp.inputBytes", { kind: $.TypeKind.Pointer, elemType: "regexp.inputBytes" })
 	}
 
 	public newReader(r: io.RuneReader | null): __goscript_regexp.input | null {
@@ -242,13 +242,13 @@ export class inputs {
 		$.pointerValue<inputs>(i).reader.r = r
 		$.pointerValue<inputs>(i).reader.atEOT = false
 		$.pointerValue<inputs>(i).reader.pos = 0
-		return $.interfaceValue<__goscript_regexp.input | null>($.pointerValue<inputs>(i)._fields.reader, "*regexp.inputReader")
+		return $.interfaceValue<__goscript_regexp.input | null>($.pointerValue<inputs>(i)._fields.reader, "*regexp.inputReader", { kind: $.TypeKind.Pointer, elemType: "regexp.inputReader" })
 	}
 
 	public newString(s: string): __goscript_regexp.input | null {
 		let i: inputs | $.VarRef<inputs> | null = this
 		$.pointerValue<inputs>(i)._string.str = s
-		return $.interfaceValue<__goscript_regexp.input | null>($.pointerValue<inputs>(i)._fields._string, "*regexp.inputString")
+		return $.interfaceValue<__goscript_regexp.input | null>($.pointerValue<inputs>(i)._fields._string, "*regexp.inputString", { kind: $.TypeKind.Pointer, elemType: "regexp.inputString" })
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -766,7 +766,7 @@ export async function newOnePassMachine(): globalThis.Promise<onePassMachine | $
 
 export function freeOnePassMachine(m: onePassMachine | $.VarRef<onePassMachine> | null): void {
 	$.pointerValue<onePassMachine>(m).inputs.clear()
-	onePassPool.value.Put($.interfaceValue<any>(m, "*regexp.onePassMachine"))
+	onePassPool.value.Put($.interfaceValue<any>(m, "*regexp.onePassMachine", { kind: $.TypeKind.Pointer, elemType: "regexp.onePassMachine" }))
 }
 
 export let arrayNoInts: number[] = Array.from({ length: 0 }, () => 0)

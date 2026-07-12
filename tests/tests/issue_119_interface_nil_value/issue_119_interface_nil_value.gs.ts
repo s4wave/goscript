@@ -113,14 +113,14 @@ export function FindAnimal(): Animal | null {
 	// When assigned to Animal interface, the interface is NOT nil
 	// because it has type *Dog (even though value is nil)
 	{
-		let dog = $.interfaceValue<Animal | null>(FindDog(), "*main.Dog")
+		let dog = $.interfaceValue<Animal | null>(FindDog(), "*main.Dog", { kind: $.TypeKind.Pointer, elemType: "main.Dog" })
 		if (dog != null) {
 			// In Go, this branch IS taken because dog != nil
 			// The interface has type=*Dog, value=nil
 			return dog
 		}
 	}
-	return $.interfaceValue<Animal | null>(FindCat(), "*main.Cat")
+	return $.interfaceValue<Animal | null>(FindCat(), "*main.Cat", { kind: $.TypeKind.Pointer, elemType: "main.Cat" })
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -164,7 +164,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test 4: Direct nil pointer to interface assignment
 	let dog: Dog | $.VarRef<Dog> | null = null
-	let a: Animal | null = $.interfaceValue<Animal | null>(dog, "*main.Dog")
+	let a: Animal | null = $.interfaceValue<Animal | null>(dog, "*main.Dog", { kind: $.TypeKind.Pointer, elemType: "main.Dog" })
 
 	if (a == null) {
 		$.println("a is nil")

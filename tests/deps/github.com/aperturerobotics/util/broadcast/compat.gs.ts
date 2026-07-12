@@ -17,4 +17,3 @@ import "@goscript/errors/index.js"
 import "@goscript/sync/index.js"
 import "./broadcast.gs.ts"
 import "./locked.gs.ts"
-

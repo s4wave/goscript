@@ -494,7 +494,7 @@ export class Entry {
 
 		queueMicrotask(async () => { await Entry.prototype.writerScanner.call(entry, reader, printFunc) })
 
-		runtime.SetFinalizer($.interfaceValue<any>(writer, "*io.PipeWriter"), $.interfaceValue<any>(__goscript_writer.writerFinalizer, "func(writer *io.PipeWriter)"))
+		runtime.SetFinalizer($.interfaceValue<any>(writer, "*io.PipeWriter", { kind: $.TypeKind.Pointer, elemType: "io.PipeWriter" }), $.interfaceValue<any>(__goscript_writer.writerFinalizer, "func(writer *io.PipeWriter)", ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "io.PipeWriter" }], results: [] } as $.FunctionTypeInfo)))
 
 		return writer
 	}
@@ -506,7 +506,7 @@ export class Entry {
 			{
 				let err = await $.pointerValue<Exclude<__goscript_hooks.Hook, null>>(hook).Fire(entry)
 				if (err != null) {
-					await fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(os.Stderr, "*os.File"))!, "Failed to fire hook:", (err as any))
+					await fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(os.Stderr, "*os.File", { kind: $.TypeKind.Pointer, elemType: "os.File" }))!, "Failed to fire hook:", (err as any))
 					return
 				}
 			}
@@ -565,7 +565,7 @@ export class Entry {
 		// panic() to use in Entry#Panic(), we avoid the allocation by checking
 		// directly here.
 		if ($.uint(level, 32) <= $.uint(0, 32)) {
-			$.panic($.interfaceValue<any>(newEntry, "*logrus.Entry"))
+			$.panic($.interfaceValue<any>(newEntry, "*logrus.Entry", { kind: $.TypeKind.Pointer, elemType: "logrus.Entry" }))
 		}
 	}
 
@@ -590,7 +590,7 @@ export class Entry {
 		let serialized: $.Slice<number> = __goscriptTuple2[0]
 		let err = __goscriptTuple2[1]
 		if (err != null) {
-			await fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(os.Stderr, "*os.File"))!, "Failed to format entry:", (err as any))
+			await fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(os.Stderr, "*os.File", { kind: $.TypeKind.Pointer, elemType: "os.File" }))!, "Failed to format entry:", (err as any))
 			return
 		}
 
@@ -600,14 +600,14 @@ export class Entry {
 		{
 			let [, __goscriptShadow0] = await $.pointerValue<Exclude<io.Writer, null>>($.pointerValue<__goscript_logger.Logger>($.pointerValue<Entry>(entry).Logger).Out).Write(serialized)
 			if (__goscriptShadow0 != null) {
-				await fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(os.Stderr, "*os.File"))!, "Failed to write to log:", (__goscriptShadow0 as any))
+				await fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(os.Stderr, "*os.File", { kind: $.TypeKind.Pointer, elemType: "os.File" }))!, "Failed to write to log:", (__goscriptShadow0 as any))
 			}
 		}
 	}
 
 	public async writerScanner(reader: io.PipeReader | $.VarRef<io.PipeReader> | null, printFunc: ((args: $.Slice<any>) => void) | null): globalThis.Promise<void> {
 		const entry: Entry | $.VarRef<Entry> | null = this
-		let scanner: bufio.Scanner | $.VarRef<bufio.Scanner> | null = bufio.NewScanner($.interfaceValue<io.Reader | null>(reader, "*io.PipeReader"))
+		let scanner: bufio.Scanner | $.VarRef<bufio.Scanner> | null = bufio.NewScanner($.interfaceValue<io.Reader | null>(reader, "*io.PipeReader", { kind: $.TypeKind.Pointer, elemType: "io.PipeReader" }))
 
 		bufio.Scanner.prototype.Buffer.call(scanner, $.makeSlice<number>(bufio.MaxScanTokenSize, undefined, "byte"), bufio.MaxScanTokenSize)
 		// Caller contains the calling method information when caller

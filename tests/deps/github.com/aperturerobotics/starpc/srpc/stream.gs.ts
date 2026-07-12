@@ -209,9 +209,9 @@ export class streamWithContext {
 }
 
 export function NewStreamWithClose(strm: Stream | null, close: (() => $.GoError | globalThis.Promise<$.GoError>) | null): Stream | null {
-	return $.interfaceValue<Stream | null>(new streamWithClose({Stream: strm, closeFn: close}), "*srpc.streamWithClose")
+	return $.interfaceValue<Stream | null>(new streamWithClose({Stream: strm, closeFn: close}), "*srpc.streamWithClose", { kind: $.TypeKind.Pointer, elemType: "srpc.streamWithClose" })
 }
 
 export function NewStreamWithContext(strm: Stream | null, ctx: context.Context | null): Stream | null {
-	return $.interfaceValue<Stream | null>(new streamWithContext({Stream: strm, ctx: ctx}), "*srpc.streamWithContext")
+	return $.interfaceValue<Stream | null>(new streamWithContext({Stream: strm, ctx: ctx}), "*srpc.streamWithContext", { kind: $.TypeKind.Pointer, elemType: "srpc.streamWithContext" })
 }

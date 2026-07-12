@@ -241,7 +241,7 @@ export async function newBitState(): globalThis.Promise<bitState | $.VarRef<bitS
 
 export function freeBitState(b: bitState | $.VarRef<bitState> | null): void {
 	$.pointerValue<bitState>(b).inputs.clear()
-	bitStatePool.value.Put($.interfaceValue<any>(b, "*regexp.bitState"))
+	bitStatePool.value.Put($.interfaceValue<any>(b, "*regexp.bitState", { kind: $.TypeKind.Pointer, elemType: "regexp.bitState" }))
 }
 
 export function maxBitStateLen(prog: syntax.Prog | $.VarRef<syntax.Prog> | null): number {

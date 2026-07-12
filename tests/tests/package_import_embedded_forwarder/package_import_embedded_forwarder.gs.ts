@@ -90,7 +90,7 @@ export async function useStore(store: Store | null): globalThis.Promise<void> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await useStore($.interfaceValue<Store | null>(NewVerboseStore("outer"), "*main.VerboseStore"))
+	await useStore($.interfaceValue<Store | null>(NewVerboseStore("outer"), "*main.VerboseStore", { kind: $.TypeKind.Pointer, elemType: "main.VerboseStore" }))
 }
 
 if ($.isMainScript(import.meta)) {

@@ -101,7 +101,7 @@ export async function main(): globalThis.Promise<void> {
 	// pointer-to-struct population path can inspect fields.
 	let box = $.varRef($.markAsStructValue(new Box({Value: new Hooked({Seen: "before"})})))
 	{
-		let err = json.Unmarshal(new Uint8Array([123, 34, 118, 97, 108, 117, 101, 34, 58, 123, 34, 105, 103, 110, 111, 114, 101, 100, 34, 58, 48, 125, 125]), $.interfaceValue<any>(box, "*main.Box"))
+		let err = json.Unmarshal(new Uint8Array([123, 34, 118, 97, 108, 117, 101, 34, 58, 123, 34, 105, 103, 110, 111, 114, 101, 100, 34, 58, 48, 125, 125]), $.interfaceValue<any>(box, "*main.Box", { kind: $.TypeKind.Pointer, elemType: "main.Box" }))
 		if (err != null) {
 			fmt.Println("unmarshal error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return

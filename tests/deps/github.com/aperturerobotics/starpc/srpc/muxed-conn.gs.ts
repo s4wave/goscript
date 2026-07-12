@@ -92,7 +92,7 @@ export async function NewMuxedConn(conn: net.Conn | null, outbound: boolean, yam
 }
 
 export async function NewMuxedConnWithRwc(ctx: context.Context | null, rwc: io.ReadWriteCloser | null, outbound: boolean, yamuxConf: yamux.Config | $.VarRef<yamux.Config> | null): globalThis.Promise<[__goscript_muxed.MuxedConn | null, $.GoError]> {
-	return NewMuxedConn($.interfaceValue<net.Conn | null>(await __goscript_rwc_conn.NewRwcConn(ctx, rwc, null, null, 10), "*srpc.RwcConn"), outbound, yamuxConf)
+	return NewMuxedConn($.interfaceValue<net.Conn | null>(await __goscript_rwc_conn.NewRwcConn(ctx, rwc, null, null, 10), "*srpc.RwcConn", { kind: $.TypeKind.Pointer, elemType: "srpc.RwcConn" }), outbound, yamuxConf)
 }
 
 export async function NewClientWithConn(conn: net.Conn | null, outbound: boolean, yamuxConf: yamux.Config | $.VarRef<yamux.Config> | null): globalThis.Promise<[__goscript_client.Client | null, $.GoError]> {
@@ -122,6 +122,6 @@ export function NewOpenStreamWithMuxedConn(conn: __goscript_muxed.MuxedConn | nu
 		}
 		let rw: __goscript_packet_rw.PacketReadWriter | $.VarRef<__goscript_packet_rw.PacketReadWriter> | null = __goscript_packet_rw.NewPacketReadWriter((mstrm as io.ReadWriteCloser | null))
 		queueMicrotask(async () => { await __goscript_packet_rw.PacketReadWriter.prototype.ReadPump.call(rw, msgHandler, closeHandler) })
-		return [$.interfaceValue<__goscript_writer.PacketWriter | null>(rw, "*srpc.PacketReadWriter"), null]
+		return [$.interfaceValue<__goscript_writer.PacketWriter | null>(rw, "*srpc.PacketReadWriter", { kind: $.TypeKind.Pointer, elemType: "srpc.PacketReadWriter" }), null]
 	}, ({ kind: $.TypeKind.Function, params: ["context.Context", ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }], results: ["error"] } as $.FunctionTypeInfo), ({ kind: $.TypeKind.Function, params: ["error"], results: [] } as $.FunctionTypeInfo)], results: ["srpc.PacketWriter", "error"] } as $.FunctionTypeInfo))
 }

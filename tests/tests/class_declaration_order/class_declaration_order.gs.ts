@@ -42,7 +42,7 @@ export class lateType {
 	)
 }
 
-export let defaultNamed: named | null = $.interfaceValue<named | null>(new lateType(), "*main.lateType")
+export let defaultNamed: named | null = $.interfaceValue<named | null>(new lateType(), "*main.lateType", { kind: $.TypeKind.Pointer, elemType: "main.lateType" })
 
 export function __goscript_set_defaultNamed(__goscriptValue: named | null): void {
 	defaultNamed = __goscriptValue

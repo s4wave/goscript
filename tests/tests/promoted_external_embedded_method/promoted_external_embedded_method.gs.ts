@@ -355,7 +355,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.pointerValue<Exclude<sync.Locker, null>>(locker).Lock()
 	await $.pointerValue<Exclude<sync.Locker, null>>(locker).Unlock()
 
-	let or = $.markAsStructValue(new outerRunner({rawRunner: $.markAsStructValue(new rawRunner({runner: $.interfaceValue<runner | null>($.markAsStructValue(new runnable()), "main.runnable")}))}))
+	let or = $.markAsStructValue(new outerRunner({rawRunner: $.markAsStructValue(new rawRunner({runner: $.interfaceValue<runner | null>($.markAsStructValue(new runnable()), "main.runnable", "main.runnable")}))}))
 	$.println(await $.pointerValue<Exclude<runner, null>>(or.rawRunner.runner).Run())
 	$.println("ok")
 }

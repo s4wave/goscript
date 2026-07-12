@@ -44,4 +44,3 @@ import "./sockaddr_posix.gs.ts"
 import "./sockopt_fake.gs.ts"
 import "./tcpsock.gs.ts"
 import "./tcpsockopt_stub.gs.ts"
-

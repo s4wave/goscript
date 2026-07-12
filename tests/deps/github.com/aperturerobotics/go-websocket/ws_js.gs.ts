@@ -356,7 +356,7 @@ export class Conn {
 		if (err != null) {
 			return [0, null, err]
 		}
-		return [typ, $.interfaceValue<io.Reader | null>(bytes.NewReader(p), "*bytes.Reader"), null]
+		return [typ, $.interfaceValue<io.Reader | null>(bytes.NewReader(p), "*bytes.Reader", { kind: $.TypeKind.Pointer, elemType: "bytes.Reader" }), null]
 	}
 
 	public SetReadLimit(n: bigint): void {
@@ -388,13 +388,13 @@ export class Conn {
 
 	public async Writer(ctx: context.Context | null, typ: MessageType): globalThis.Promise<[io.WriteCloser | null, $.GoError]> {
 		const c: Conn | $.VarRef<Conn> | null = this
-		return [$.interfaceValue<io.WriteCloser | null>((await (async () => { const __goscriptLiteralField0 = await bpool.Get(); return new writer({c: c, ctx: ctx, typ: typ, b: __goscriptLiteralField0}) })()), "*websocket.writer"), null]
+		return [$.interfaceValue<io.WriteCloser | null>((await (async () => { const __goscriptLiteralField0 = await bpool.Get(); return new writer({c: c, ctx: ctx, typ: typ, b: __goscriptLiteralField0}) })()), "*websocket.writer", { kind: $.TypeKind.Pointer, elemType: "websocket.writer" }), null]
 	}
 
 	public async close(err: $.GoError, wasClean: boolean): globalThis.Promise<void> {
 		const c: Conn | $.VarRef<Conn> | null = this
 		await $.pointerValue<Conn>(c).closeOnce.Do($.functionValue(async (): globalThis.Promise<void> => {
-			runtime.SetFinalizer($.interfaceValue<any>(c, "*websocket.Conn"), null)
+			runtime.SetFinalizer($.interfaceValue<any>(c, "*websocket.Conn", { kind: $.TypeKind.Pointer, elemType: "websocket.Conn" }), null)
 
 			if (!wasClean) {
 				err = fmt.Errorf("unclean connection close: %w", (err as any))
@@ -420,7 +420,7 @@ export class Conn {
 			return net.ErrClosed
 		}
 
-		let ce = fmt.Errorf("sent close: %w", $.interfaceValue<any>($.markAsStructValue(new CloseError({Code: code, Reason: reason})), "websocket.CloseError"))
+		let ce = fmt.Errorf("sent close: %w", $.interfaceValue<any>($.markAsStructValue(new CloseError({Code: code, Reason: reason})), "websocket.CloseError", "websocket.CloseError"))
 
 		await Conn.prototype.setCloseErr.call(c, ce)
 		let err = await $.markAsStructValue($.cloneStructValue($.pointerValue<Conn>(c).ws)).Close($.int(code), reason)
@@ -447,7 +447,7 @@ export class Conn {
 			// We do not know if we sent or received this close as
 			// its possible the browser triggered it without us
 			// explicitly sending it.
-			await Conn.prototype.close.call(c, $.interfaceValue<$.GoError>($.markAsStructValue($.cloneStructValue(err)), "websocket.CloseError"), e.WasClean)
+			await Conn.prototype.close.call(c, $.interfaceValue<$.GoError>($.markAsStructValue($.cloneStructValue(err)), "websocket.CloseError", "websocket.CloseError"), e.WasClean)
 
 			await $.pointerValue<Conn>(c).releaseOnClose!()
 			await $.pointerValue<Conn>(c).releaseOnError!()
@@ -489,10 +489,10 @@ export class Conn {
 			}
 		}, ({ kind: $.TypeKind.Function, params: ["wsjs.MessageEvent"], results: [] } as $.FunctionTypeInfo)))
 
-		runtime.SetFinalizer($.interfaceValue<any>(c, "*websocket.Conn"), $.interfaceValue<any>($.functionValue(async (c: Conn | $.VarRef<Conn> | null): globalThis.Promise<void> => {
+		runtime.SetFinalizer($.interfaceValue<any>(c, "*websocket.Conn", { kind: $.TypeKind.Pointer, elemType: "websocket.Conn" }), $.interfaceValue<any>($.functionValue(async (c: Conn | $.VarRef<Conn> | null): globalThis.Promise<void> => {
 			await Conn.prototype.setCloseErr.call(c, errors.New("connection garbage collected"))
 			await Conn.prototype.closeWithInternal.call(c)
-		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "websocket.Conn" }], results: [] } as $.FunctionTypeInfo)), "func(c *websocket.Conn)"))
+		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "websocket.Conn" }], results: [] } as $.FunctionTypeInfo)), "func(c *websocket.Conn)", ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "websocket.Conn" }], results: [] } as $.FunctionTypeInfo)))
 	}
 
 	public async isClosed(): globalThis.Promise<boolean> {
@@ -1158,7 +1158,7 @@ export function Accept(w: any, r: any, opts: AcceptOptions | $.VarRef<AcceptOpti
 
 export function CloseStatus(err: $.GoError): StatusCode {
 	let ce: $.VarRef<CloseError> = $.varRef($.markAsStructValue(new CloseError()))
-	if (errors.As($.pointerValueOrNil(err)!, $.interfaceValue<any>(ce, "*websocket.CloseError"))) {
+	if (errors.As($.pointerValueOrNil(err)!, $.interfaceValue<any>(ce, "*websocket.CloseError", { kind: $.TypeKind.Pointer, elemType: "websocket.CloseError" }))) {
 		return ce.value.Code
 	}
 	return -1

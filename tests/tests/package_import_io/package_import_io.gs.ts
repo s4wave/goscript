@@ -324,29 +324,29 @@ export async function main(): globalThis.Promise<void> {
 	$.println("WriteString field writer - bytes:", n, "err:", err == null)
 
 	let buf: asyncBuffer | $.VarRef<asyncBuffer> | null = new asyncBuffer()
-	asyncBuffer.prototype.Reset.call(buf, $.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer"))
+	asyncBuffer.prototype.Reset.call(buf, $.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", { kind: $.TypeKind.Pointer, elemType: "main.asyncBuffer" }))
 	asyncBuffer.prototype.Reset.call(buf, null)
-	let __goscriptTuple1: any = await copyInterfaces(io.Discard, $.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader"))
+	let __goscriptTuple1: any = await copyInterfaces(io.Discard, $.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", { kind: $.TypeKind.Pointer, elemType: "main.staticReader" }))
 	let n64 = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	$.println("Copy interface - bytes:", n64, "err:", err == null)
-	let __goscriptTuple2: any = await io.Copy($.pointerValueOrNil(io.Discard)!, {Reader: $.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader")})
+	let __goscriptTuple2: any = await io.Copy($.pointerValueOrNil(io.Discard)!, {Reader: $.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", { kind: $.TypeKind.Pointer, elemType: "main.staticReader" })})
 	n64 = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	$.println("Copy embedded reader - bytes:", n64, "err:", err == null)
-	let __goscriptTuple3: any = await io.Copy({Writer: io.Discard}, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader"))!)
+	let __goscriptTuple3: any = await io.Copy({Writer: io.Discard}, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", { kind: $.TypeKind.Pointer, elemType: "main.staticReader" }))!)
 	n64 = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
 	$.println("Copy embedded writer - bytes:", n64, "err:", err == null)
-	let __goscriptTuple4: any = await io.Copy($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer"))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader"))!)
+	let __goscriptTuple4: any = await io.Copy($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", { kind: $.TypeKind.Pointer, elemType: "main.asyncBuffer" }))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", { kind: $.TypeKind.Pointer, elemType: "main.staticReader" }))!)
 	n64 = __goscriptTuple4[0]
 	err = __goscriptTuple4[1]
 	$.println("Copy async writer - bytes:", n64, "err:", err == null)
-	let __goscriptTuple5: any = await io.CopyN($.pointerValueOrNil(io.Discard)!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new asyncReader(), "*main.asyncReader"))!, 5n)
+	let __goscriptTuple5: any = await io.CopyN($.pointerValueOrNil(io.Discard)!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new asyncReader(), "*main.asyncReader", { kind: $.TypeKind.Pointer, elemType: "main.asyncReader" }))!, 5n)
 	n64 = __goscriptTuple5[0]
 	err = __goscriptTuple5[1]
 	$.println("CopyN async reader - bytes:", n64, "err:", err == null)
-	let __goscriptTuple6: any = await io.Copy($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer"))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewBuffer(new Uint8Array([99, 111, 112, 121])), "*bytes.Buffer"))!)
+	let __goscriptTuple6: any = await io.Copy($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", { kind: $.TypeKind.Pointer, elemType: "main.asyncBuffer" }))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewBuffer(new Uint8Array([99, 111, 112, 121])), "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!)
 	n64 = __goscriptTuple6[0]
 	err = __goscriptTuple6[1]
 	$.println("Copy bytes WriteTo async writer - bytes:", n64, "err:", err == null)
@@ -356,12 +356,12 @@ export async function main(): globalThis.Promise<void> {
 	err = __goscriptTuple7[1]
 	$.println("Read into byte slice view - bytes:", n, "data:", $.bytesToString(viewBacking), "err:", err == null)
 	let dst: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
-	let __goscriptTuple8: any = await io.Copy($.pointerValueOrNil($.interfaceValue<io.Writer | null>(dst, "*bytes.Buffer"))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new asyncReader(), "*main.asyncReader"))!)
+	let __goscriptTuple8: any = await io.Copy($.pointerValueOrNil($.interfaceValue<io.Writer | null>(dst, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new asyncReader(), "*main.asyncReader", { kind: $.TypeKind.Pointer, elemType: "main.asyncReader" }))!)
 	n64 = __goscriptTuple8[0]
 	err = __goscriptTuple8[1]
 	$.println("Copy bytes ReadFrom async reader - bytes:", n64, "data:", dst.value.String(), "err:", err == null)
-	let sectionReader: io.SectionReader | $.VarRef<io.SectionReader> | null = io.NewSectionReader($.pointerValueOrNil($.interfaceValue<io.ReaderAt | null>(new asyncReaderAt({data: new Uint8Array([97, 98, 99, 100, 101, 102])}), "*main.asyncReaderAt"))!, 1n, 3n)
-	let __goscriptTuple9: any = await io.CopyBuffer($.pointerValueOrNil(io.Discard)!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(sectionReader, "*io.SectionReader"))!, $.makeSlice<number>(2, undefined, "byte"))
+	let sectionReader: io.SectionReader | $.VarRef<io.SectionReader> | null = io.NewSectionReader($.pointerValueOrNil($.interfaceValue<io.ReaderAt | null>(new asyncReaderAt({data: new Uint8Array([97, 98, 99, 100, 101, 102])}), "*main.asyncReaderAt", { kind: $.TypeKind.Pointer, elemType: "main.asyncReaderAt" }))!, 1n, 3n)
+	let __goscriptTuple9: any = await io.CopyBuffer($.pointerValueOrNil(io.Discard)!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(sectionReader, "*io.SectionReader", { kind: $.TypeKind.Pointer, elemType: "io.SectionReader" }))!, $.makeSlice<number>(2, undefined, "byte"))
 	n64 = __goscriptTuple9[0]
 	err = __goscriptTuple9[1]
 	$.println("Copy section async readerat - bytes:", n64, "err:", err == null)

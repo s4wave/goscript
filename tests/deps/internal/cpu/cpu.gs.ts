@@ -39,7 +39,7 @@ export class CacheLinePad {
 		() => new CacheLinePad(),
 		[],
 		CacheLinePad,
-		[{ name: "_", key: "_blank0", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 64 } }]
+		[{ name: "_", key: "_blank0", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 64 }, pkgPath: "internal/cpu", index: [0], offset: 0, exported: false }]
 	)
 }
 
@@ -104,7 +104,7 @@ export class option {
 		() => new option(),
 		[],
 		option,
-		[{ name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "Feature", key: "Feature", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "bool" } } }, { name: "Specified", key: "Specified", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "Enable", key: "Enable", type: { kind: $.TypeKind.Basic, name: "bool" } }]
+		[{ name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" }, index: [0], offset: 0, exported: true }, { name: "Feature", key: "Feature", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "bool" } }, index: [1], offset: 16, exported: true }, { name: "Specified", key: "Specified", type: { kind: $.TypeKind.Basic, name: "bool" }, index: [2], offset: 24, exported: true }, { name: "Enable", key: "Enable", type: { kind: $.TypeKind.Basic, name: "bool" }, index: [3], offset: 25, exported: true }]
 	)
 }
 

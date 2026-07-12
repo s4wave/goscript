@@ -53,9 +53,9 @@ export class writeLogger {
 		n = __goscriptTuple0[0]
 		err = __goscriptTuple0[1]
 		if (err != null) {
-			await log.Printf("%s %x: %v", $.arrayToSlice<any>([$.pointerValue<writeLogger>(l).prefix, $.interfaceValue<any>($.goSlice(p, 0, n), "[]byte"), (err as any)]))
+			await log.Printf("%s %x: %v", $.arrayToSlice<any>([$.pointerValue<writeLogger>(l).prefix, $.interfaceValue<any>($.goSlice(p, 0, n), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }), (err as any)]))
 		} else {
-			await log.Printf("%s %x", $.arrayToSlice<any>([$.pointerValue<writeLogger>(l).prefix, $.interfaceValue<any>($.goSlice(p, 0, n), "[]byte")]))
+			await log.Printf("%s %x", $.arrayToSlice<any>([$.pointerValue<writeLogger>(l).prefix, $.interfaceValue<any>($.goSlice(p, 0, n), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })]))
 		}
 		return [n, err]
 	}
@@ -113,9 +113,9 @@ export class readLogger {
 		n = __goscriptTuple1[0]
 		err = __goscriptTuple1[1]
 		if (err != null) {
-			await log.Printf("%s %x: %v", $.arrayToSlice<any>([$.pointerValue<readLogger>(l).prefix, $.interfaceValue<any>($.goSlice(p, 0, n), "[]byte"), (err as any)]))
+			await log.Printf("%s %x: %v", $.arrayToSlice<any>([$.pointerValue<readLogger>(l).prefix, $.interfaceValue<any>($.goSlice(p, 0, n), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }), (err as any)]))
 		} else {
-			await log.Printf("%s %x", $.arrayToSlice<any>([$.pointerValue<readLogger>(l).prefix, $.interfaceValue<any>($.goSlice(p, 0, n), "[]byte")]))
+			await log.Printf("%s %x", $.arrayToSlice<any>([$.pointerValue<readLogger>(l).prefix, $.interfaceValue<any>($.goSlice(p, 0, n), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })]))
 		}
 		return [n, err]
 	}
@@ -130,9 +130,9 @@ export class readLogger {
 }
 
 export function NewWriteLogger(prefix: string, w: io.Writer | null): io.Writer | null {
-	return $.interfaceValue<io.Writer | null>(new writeLogger({prefix: prefix, w: w}), "*iotest.writeLogger")
+	return $.interfaceValue<io.Writer | null>(new writeLogger({prefix: prefix, w: w}), "*iotest.writeLogger", { kind: $.TypeKind.Pointer, elemType: "iotest.writeLogger" })
 }
 
 export function NewReadLogger(prefix: string, r: io.Reader | null): io.Reader | null {
-	return $.interfaceValue<io.Reader | null>(new readLogger({prefix: prefix, r: r}), "*iotest.readLogger")
+	return $.interfaceValue<io.Reader | null>(new readLogger({prefix: prefix, r: r}), "*iotest.readLogger", { kind: $.TypeKind.Pointer, elemType: "iotest.readLogger" })
 }

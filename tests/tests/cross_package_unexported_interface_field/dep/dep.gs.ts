@@ -78,5 +78,5 @@ export class Holder {
 }
 
 export function NewHolder(): Holder {
-	return $.markAsStructValue(new Holder({Hidden: $.interfaceValue<hidden | null>($.markAsStructValue(new impl()), "dep.impl")}))
+	return $.markAsStructValue(new Holder({Hidden: $.interfaceValue<hidden | null>($.markAsStructValue(new impl()), "dep.impl", "dep.impl")}))
 }

@@ -10,4 +10,3 @@ import type * as __goscript__type from "./type.gs.ts"
 import * as __goscript_helper from "./helper.gs.ts"
 import "@goscript/strings/index.js"
 import "./helper.gs.ts"
-

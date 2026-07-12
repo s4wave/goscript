@@ -98,7 +98,7 @@ export class stack {
 	public free(): void {
 		let s: stack | $.VarRef<stack> | null = this
 		$.pointerValue<stack>(s).w = $.goSlice($.pointerValue<stack>(s).w, undefined, 0)
-		$.pointerValue<sync.Pool>(__goscript_get_stackPool()).Put($.interfaceValue<any>(s, "*big.stack"))
+		$.pointerValue<sync.Pool>(__goscript_get_stackPool()).Put($.interfaceValue<any>(s, "*big.stack", { kind: $.TypeKind.Pointer, elemType: "big.stack" }))
 	}
 
 	public nat(n: number): nat {
@@ -127,9 +127,9 @@ export class stack {
 	static __typeInfo = $.registerStructType(
 		"big.stack",
 		() => new stack(),
-		[{ name: "free", args: [], returns: [] }, { name: "nat", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "big.nat" }] }, { name: "restore", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "save", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }],
+		[{ name: "free", args: [], returns: [] }, { name: "nat", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, typeName: "big.nat", elemType: { kind: $.TypeKind.Basic, name: "uint", typeName: "big.Word" } } }] }, { name: "restore", args: [{ name: "n", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [] }, { name: "save", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }],
 		stack,
-		[{ name: "w", key: "w", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint", typeName: "big.Word" } } }]
+		[{ name: "w", key: "w", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint", typeName: "big.Word" } }, pkgPath: "math/big", index: [0], offset: 0, exported: false }]
 	)
 }
 

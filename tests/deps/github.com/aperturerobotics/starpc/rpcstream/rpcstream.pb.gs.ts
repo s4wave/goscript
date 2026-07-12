@@ -80,7 +80,7 @@ export class RpcStreamPacket {
 
 	public CloneMessageVT(): protobuf_go_lite.CloneMessage | null {
 		const m: RpcStreamPacket | $.VarRef<RpcStreamPacket> | null = this
-		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(RpcStreamPacket.prototype.CloneVT.call(m), "*rpcstream.RpcStreamPacket")
+		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(RpcStreamPacket.prototype.CloneVT.call(m), "*rpcstream.RpcStreamPacket", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket" })
 	}
 
 	public CloneVT(): RpcStreamPacket | $.VarRef<RpcStreamPacket> | null {
@@ -185,7 +185,7 @@ export class RpcStreamPacket {
 
 	public MarshalJSON(): [$.Slice<number>, $.GoError] {
 		const x: RpcStreamPacket | $.VarRef<RpcStreamPacket> | null = this
-		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.MarshalerConfig>(json.DefaultMarshalerConfig))).Marshal($.pointerValueOrNil($.interfaceValue<json.Marshaler | null>(x, "*rpcstream.RpcStreamPacket"))!)
+		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.MarshalerConfig>(json.DefaultMarshalerConfig))).Marshal($.pointerValueOrNil($.interfaceValue<json.Marshaler | null>(x, "*rpcstream.RpcStreamPacket", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket" }))!)
 	}
 
 	public MarshalProtoJSON(s: json.MarshalState | $.VarRef<json.MarshalState> | null): void {
@@ -364,7 +364,7 @@ export class RpcStreamPacket {
 
 	public UnmarshalJSON(b: $.Slice<number>): $.GoError {
 		const x: RpcStreamPacket | $.VarRef<RpcStreamPacket> | null = this
-		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.UnmarshalerConfig>(json.DefaultUnmarshalerConfig))).Unmarshal(b, $.pointerValueOrNil($.interfaceValue<json.Unmarshaler | null>(x, "*rpcstream.RpcStreamPacket"))!)
+		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.UnmarshalerConfig>(json.DefaultUnmarshalerConfig))).Unmarshal(b, $.pointerValueOrNil($.interfaceValue<json.Unmarshaler | null>(x, "*rpcstream.RpcStreamPacket", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket" }))!)
 	}
 
 	public UnmarshalProtoJSON(s: json.UnmarshalState | $.VarRef<json.UnmarshalState> | null): void {
@@ -382,7 +382,7 @@ export class RpcStreamPacket {
 				case "init":
 				{
 					let ov: RpcStreamPacket_Init | $.VarRef<RpcStreamPacket_Init> | null = new RpcStreamPacket_Init()
-					$.pointerValue<RpcStreamPacket>(x).Body = $.interfaceValue<isRpcStreamPacket_Body | null>(ov, "*rpcstream.RpcStreamPacket_Init")
+					$.pointerValue<RpcStreamPacket>(x).Body = $.interfaceValue<isRpcStreamPacket_Body | null>(ov, "*rpcstream.RpcStreamPacket_Init", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket_Init" })
 					if (json.UnmarshalState.prototype.ReadNil.call($.pointerValue<json.UnmarshalState>(s))) {
 						$.pointerValue<RpcStreamPacket_Init>(ov).Init = null
 						return
@@ -394,7 +394,7 @@ export class RpcStreamPacket {
 				case "ack":
 				{
 					let ov: RpcStreamPacket_Ack | $.VarRef<RpcStreamPacket_Ack> | null = new RpcStreamPacket_Ack()
-					$.pointerValue<RpcStreamPacket>(x).Body = $.interfaceValue<isRpcStreamPacket_Body | null>(ov, "*rpcstream.RpcStreamPacket_Ack")
+					$.pointerValue<RpcStreamPacket>(x).Body = $.interfaceValue<isRpcStreamPacket_Body | null>(ov, "*rpcstream.RpcStreamPacket_Ack", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket_Ack" })
 					if (json.UnmarshalState.prototype.ReadNil.call($.pointerValue<json.UnmarshalState>(s))) {
 						$.pointerValue<RpcStreamPacket_Ack>(ov).Ack = null
 						return
@@ -407,7 +407,7 @@ export class RpcStreamPacket {
 				{
 					json.UnmarshalState.prototype.AddField.call($.pointerValue<json.UnmarshalState>(s), "data")
 					let ov: RpcStreamPacket_Data | $.VarRef<RpcStreamPacket_Data> | null = new RpcStreamPacket_Data()
-					$.pointerValue<RpcStreamPacket>(x).Body = $.interfaceValue<isRpcStreamPacket_Body | null>(ov, "*rpcstream.RpcStreamPacket_Data")
+					$.pointerValue<RpcStreamPacket>(x).Body = $.interfaceValue<isRpcStreamPacket_Body | null>(ov, "*rpcstream.RpcStreamPacket_Data", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket_Data" })
 					$.pointerValue<RpcStreamPacket_Data>(ov).Data = json.UnmarshalState.prototype.ReadBytes.call($.pointerValue<json.UnmarshalState>(s))
 					break
 				}
@@ -483,7 +483,7 @@ export class RpcStreamPacket {
 									return __goscriptShadow7
 								}
 							}
-							$.pointerValue<RpcStreamPacket>(m).Body = $.interfaceValue<isRpcStreamPacket_Body | null>(new RpcStreamPacket_Init({Init: v}), "*rpcstream.RpcStreamPacket_Init")
+							$.pointerValue<RpcStreamPacket>(m).Body = $.interfaceValue<isRpcStreamPacket_Body | null>(new RpcStreamPacket_Init({Init: v}), "*rpcstream.RpcStreamPacket_Init", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket_Init" })
 						}
 					}
 					iNdEx = postIndex
@@ -533,7 +533,7 @@ export class RpcStreamPacket {
 									return __goscriptShadow9
 								}
 							}
-							$.pointerValue<RpcStreamPacket>(m).Body = $.interfaceValue<isRpcStreamPacket_Body | null>(new RpcStreamPacket_Ack({Ack: v}), "*rpcstream.RpcStreamPacket_Ack")
+							$.pointerValue<RpcStreamPacket>(m).Body = $.interfaceValue<isRpcStreamPacket_Body | null>(new RpcStreamPacket_Ack({Ack: v}), "*rpcstream.RpcStreamPacket_Ack", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket_Ack" })
 						}
 					}
 					iNdEx = postIndex
@@ -566,7 +566,7 @@ export class RpcStreamPacket {
 					}
 					let v: $.Slice<number> = $.makeSlice<number>(postIndex - iNdEx, undefined, "byte")
 					$.copy(v, $.goSlice(dAtA, iNdEx, postIndex))
-					$.pointerValue<RpcStreamPacket>(m).Body = $.interfaceValue<isRpcStreamPacket_Body | null>(new RpcStreamPacket_Data({Data: v}), "*rpcstream.RpcStreamPacket_Data")
+					$.pointerValue<RpcStreamPacket>(m).Body = $.interfaceValue<isRpcStreamPacket_Body | null>(new RpcStreamPacket_Data({Data: v}), "*rpcstream.RpcStreamPacket_Data", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket_Data" })
 					iNdEx = postIndex
 					break
 				}
@@ -635,7 +635,7 @@ export class RpcStreamPacket_Init {
 
 	public CloneOneofVT(): isRpcStreamPacket_Body | null {
 		const m: RpcStreamPacket_Init | $.VarRef<RpcStreamPacket_Init> | null = this
-		return $.interfaceValue<isRpcStreamPacket_Body | null>(RpcStreamPacket_Init.prototype.CloneVT.call(m), "*rpcstream.RpcStreamPacket_Init")
+		return $.interfaceValue<isRpcStreamPacket_Body | null>(RpcStreamPacket_Init.prototype.CloneVT.call(m), "*rpcstream.RpcStreamPacket_Init", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket_Init" })
 	}
 
 	public CloneVT(): RpcStreamPacket_Init | $.VarRef<RpcStreamPacket_Init> | null {
@@ -765,7 +765,7 @@ export class RpcStreamPacket_Ack {
 
 	public CloneOneofVT(): isRpcStreamPacket_Body | null {
 		const m: RpcStreamPacket_Ack | $.VarRef<RpcStreamPacket_Ack> | null = this
-		return $.interfaceValue<isRpcStreamPacket_Body | null>(RpcStreamPacket_Ack.prototype.CloneVT.call(m), "*rpcstream.RpcStreamPacket_Ack")
+		return $.interfaceValue<isRpcStreamPacket_Body | null>(RpcStreamPacket_Ack.prototype.CloneVT.call(m), "*rpcstream.RpcStreamPacket_Ack", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket_Ack" })
 	}
 
 	public CloneVT(): RpcStreamPacket_Ack | $.VarRef<RpcStreamPacket_Ack> | null {
@@ -894,7 +894,7 @@ export class RpcStreamPacket_Data {
 
 	public CloneOneofVT(): isRpcStreamPacket_Body | null {
 		const m: RpcStreamPacket_Data | $.VarRef<RpcStreamPacket_Data> | null = this
-		return $.interfaceValue<isRpcStreamPacket_Body | null>(RpcStreamPacket_Data.prototype.CloneVT.call(m), "*rpcstream.RpcStreamPacket_Data")
+		return $.interfaceValue<isRpcStreamPacket_Body | null>(RpcStreamPacket_Data.prototype.CloneVT.call(m), "*rpcstream.RpcStreamPacket_Data", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket_Data" })
 	}
 
 	public CloneVT(): RpcStreamPacket_Data | $.VarRef<RpcStreamPacket_Data> | null {
@@ -1013,7 +1013,7 @@ export class RpcStreamInit {
 
 	public CloneMessageVT(): protobuf_go_lite.CloneMessage | null {
 		const m: RpcStreamInit | $.VarRef<RpcStreamInit> | null = this
-		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(RpcStreamInit.prototype.CloneVT.call(m), "*rpcstream.RpcStreamInit")
+		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(RpcStreamInit.prototype.CloneVT.call(m), "*rpcstream.RpcStreamInit", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamInit" })
 	}
 
 	public CloneVT(): RpcStreamInit | $.VarRef<RpcStreamInit> | null {
@@ -1065,7 +1065,7 @@ export class RpcStreamInit {
 
 	public MarshalJSON(): [$.Slice<number>, $.GoError] {
 		const x: RpcStreamInit | $.VarRef<RpcStreamInit> | null = this
-		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.MarshalerConfig>(json.DefaultMarshalerConfig))).Marshal($.pointerValueOrNil($.interfaceValue<json.Marshaler | null>(x, "*rpcstream.RpcStreamInit"))!)
+		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.MarshalerConfig>(json.DefaultMarshalerConfig))).Marshal($.pointerValueOrNil($.interfaceValue<json.Marshaler | null>(x, "*rpcstream.RpcStreamInit", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamInit" }))!)
 	}
 
 	public MarshalProtoJSON(s: json.MarshalState | $.VarRef<json.MarshalState> | null): void {
@@ -1177,7 +1177,7 @@ export class RpcStreamInit {
 
 	public UnmarshalJSON(b: $.Slice<number>): $.GoError {
 		const x: RpcStreamInit | $.VarRef<RpcStreamInit> | null = this
-		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.UnmarshalerConfig>(json.DefaultUnmarshalerConfig))).Unmarshal(b, $.pointerValueOrNil($.interfaceValue<json.Unmarshaler | null>(x, "*rpcstream.RpcStreamInit"))!)
+		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.UnmarshalerConfig>(json.DefaultUnmarshalerConfig))).Unmarshal(b, $.pointerValueOrNil($.interfaceValue<json.Unmarshaler | null>(x, "*rpcstream.RpcStreamInit", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamInit" }))!)
 	}
 
 	public UnmarshalProtoJSON(s: json.UnmarshalState | $.VarRef<json.UnmarshalState> | null): void {
@@ -1329,7 +1329,7 @@ export class RpcAck {
 
 	public CloneMessageVT(): protobuf_go_lite.CloneMessage | null {
 		const m: RpcAck | $.VarRef<RpcAck> | null = this
-		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(RpcAck.prototype.CloneVT.call(m), "*rpcstream.RpcAck")
+		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(RpcAck.prototype.CloneVT.call(m), "*rpcstream.RpcAck", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcAck" })
 	}
 
 	public CloneVT(): RpcAck | $.VarRef<RpcAck> | null {
@@ -1381,7 +1381,7 @@ export class RpcAck {
 
 	public MarshalJSON(): [$.Slice<number>, $.GoError] {
 		const x: RpcAck | $.VarRef<RpcAck> | null = this
-		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.MarshalerConfig>(json.DefaultMarshalerConfig))).Marshal($.pointerValueOrNil($.interfaceValue<json.Marshaler | null>(x, "*rpcstream.RpcAck"))!)
+		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.MarshalerConfig>(json.DefaultMarshalerConfig))).Marshal($.pointerValueOrNil($.interfaceValue<json.Marshaler | null>(x, "*rpcstream.RpcAck", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcAck" }))!)
 	}
 
 	public MarshalProtoJSON(s: json.MarshalState | $.VarRef<json.MarshalState> | null): void {
@@ -1493,7 +1493,7 @@ export class RpcAck {
 
 	public UnmarshalJSON(b: $.Slice<number>): $.GoError {
 		const x: RpcAck | $.VarRef<RpcAck> | null = this
-		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.UnmarshalerConfig>(json.DefaultUnmarshalerConfig))).Unmarshal(b, $.pointerValueOrNil($.interfaceValue<json.Unmarshaler | null>(x, "*rpcstream.RpcAck"))!)
+		return $.markAsStructValue($.cloneStructValue($.pointerValue<json.UnmarshalerConfig>(json.DefaultUnmarshalerConfig))).Unmarshal(b, $.pointerValueOrNil($.interfaceValue<json.Unmarshaler | null>(x, "*rpcstream.RpcAck", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcAck" }))!)
 	}
 
 	public UnmarshalProtoJSON(s: json.UnmarshalState | $.VarRef<json.UnmarshalState> | null): void {

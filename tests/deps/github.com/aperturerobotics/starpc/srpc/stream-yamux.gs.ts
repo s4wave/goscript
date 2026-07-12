@@ -206,7 +206,7 @@ export class yamuxStream {
 	public async Read(b: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const s: yamuxStream | $.VarRef<yamuxStream> | null = this
 		let [n, err] = await yamux2.Stream.prototype.Read.call(yamuxStream.prototype.yamux.call(s), b)
-		if (errors.Is($.pointerValueOrNil(err)!, $.pointerValueOrNil($.interfaceValue<$.GoError>(yamux2.ErrStreamReset, "*yamux.Error"))!)) {
+		if (errors.Is($.pointerValueOrNil(err)!, $.pointerValueOrNil($.interfaceValue<$.GoError>(yamux2.ErrStreamReset, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" }))!)) {
 			err = __goscript_errors.ErrReset
 		}
 		return [n, err]
@@ -235,7 +235,7 @@ export class yamuxStream {
 	public async Write(b: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const s: yamuxStream | $.VarRef<yamuxStream> | null = this
 		let [n, err] = await yamux2.Stream.prototype.Write.call(yamuxStream.prototype.yamux.call(s), b)
-		if (errors.Is($.pointerValueOrNil(err)!, $.pointerValueOrNil($.interfaceValue<$.GoError>(yamux2.ErrStreamReset, "*yamux.Error"))!)) {
+		if (errors.Is($.pointerValueOrNil(err)!, $.pointerValueOrNil($.interfaceValue<$.GoError>(yamux2.ErrStreamReset, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" }))!)) {
 			err = __goscript_errors.ErrReset
 		}
 		return [n, err]

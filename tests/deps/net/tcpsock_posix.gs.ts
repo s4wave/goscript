@@ -115,13 +115,13 @@ export async function sockaddrToTCP(sa: syscall.Sockaddr | null): globalThis.Pro
 			case $.typeAssert<syscall.SockaddrInet4 | $.VarRef<syscall.SockaddrInet4> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "syscall.SockaddrInet4" }).ok:
 				{
 					let sa: syscall.SockaddrInet4 | $.VarRef<syscall.SockaddrInet4> | null = $.typeAssert<syscall.SockaddrInet4 | $.VarRef<syscall.SockaddrInet4> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "syscall.SockaddrInet4" }).value
-					return $.interfaceValue<__goscript_net.Addr | null>(new __goscript_tcpsock.TCPAddr({IP: ($.goSlice($.pointerValue<syscall.SockaddrInet4>(sa).Addr, 0, undefined) as __goscript_ip.IP), Port: $.pointerValue<syscall.SockaddrInet4>(sa).Port}), "*net.TCPAddr")
+					return $.interfaceValue<__goscript_net.Addr | null>(new __goscript_tcpsock.TCPAddr({IP: ($.goSlice($.pointerValue<syscall.SockaddrInet4>(sa).Addr, 0, undefined) as __goscript_ip.IP), Port: $.pointerValue<syscall.SockaddrInet4>(sa).Port}), "*net.TCPAddr", { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" })
 				}
 				break
 			case $.typeAssert<syscall.SockaddrInet6 | $.VarRef<syscall.SockaddrInet6> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "syscall.SockaddrInet6" }).ok:
 				{
 					let sa: syscall.SockaddrInet6 | $.VarRef<syscall.SockaddrInet6> | null = $.typeAssert<syscall.SockaddrInet6 | $.VarRef<syscall.SockaddrInet6> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "syscall.SockaddrInet6" }).value
-					return $.interfaceValue<__goscript_net.Addr | null>((await (async () => { const __goscriptLiteralField0 = await $.pointerValue<__goscript__interface.ipv6ZoneCache>(__goscript__interface.zoneCache).name($.int($.pointerValue<syscall.SockaddrInet6>(sa).ZoneId)); return new __goscript_tcpsock.TCPAddr({IP: ($.goSlice($.pointerValue<syscall.SockaddrInet6>(sa).Addr, 0, undefined) as __goscript_ip.IP), Port: $.pointerValue<syscall.SockaddrInet6>(sa).Port, Zone: __goscriptLiteralField0}) })()), "*net.TCPAddr")
+					return $.interfaceValue<__goscript_net.Addr | null>((await (async () => { const __goscriptLiteralField0 = await $.pointerValue<__goscript__interface.ipv6ZoneCache>(__goscript__interface.zoneCache).name($.int($.pointerValue<syscall.SockaddrInet6>(sa).ZoneId)); return new __goscript_tcpsock.TCPAddr({IP: ($.goSlice($.pointerValue<syscall.SockaddrInet6>(sa).Addr, 0, undefined) as __goscript_ip.IP), Port: $.pointerValue<syscall.SockaddrInet6>(sa).Port, Zone: __goscriptLiteralField0}) })()), "*net.TCPAddr", { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" })
 				}
 				break
 		}

@@ -29,22 +29,22 @@ export async function main(): globalThis.Promise<void> {
 	fmt.Println(ind.value.String())
 
 	// Decoder reads one value per call and buffers the rest of the stream.
-	let dec: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("1 2 3"), "*strings.Reader"))!)
+	let dec: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("1 2 3"), "*strings.Reader", { kind: $.TypeKind.Pointer, elemType: "strings.Reader" }))!)
 	let n: $.VarRef<number> = $.varRef(0)
-	while (json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.interfaceValue<any>(n, "*int")) == null) {
+	while (json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.interfaceValue<any>(n, "*int", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "int" } })) == null) {
 		fmt.Println("decoded", $.namedValueInterfaceValue<any>(n.value, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
 	}
 
 	// UseNumber keeps the exact source literal beyond float64 precision.
-	let und: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"big\":9007199254740993}"), "*strings.Reader"))!)
+	let und: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"big\":9007199254740993}"), "*strings.Reader", { kind: $.TypeKind.Pointer, elemType: "strings.Reader" }))!)
 	json.Decoder.prototype.UseNumber.call($.pointerValue<json.Decoder>(und))
 	let m: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null as globalThis.Map<string, any> | null)
-	json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(und), $.interfaceValue<any>(m, "*map[string]any"))
+	json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(und), $.interfaceValue<any>(m, "*map[string]any", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Interface, methods: [] } } }))
 	fmt.Println("big", $.mapGet<string, any, any>(m.value, "big", null)[0])
 
 	// A malformed document yields a *json.SyntaxError with the Go byte offset.
 	let v: $.VarRef<any> = $.varRef(null as any)
-	let err = json.Unmarshal(new Uint8Array([91, 49, 44, 93]), $.interfaceValue<any>(v, "*any"))
+	let err = json.Unmarshal(new Uint8Array([91, 49, 44, 93]), $.interfaceValue<any>(v, "*any", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } }))
 	{
 		let __goscriptTuple0: any = $.typeAssertTuple<json.SyntaxError | $.VarRef<json.SyntaxError> | null>(err, { kind: $.TypeKind.Pointer, elemType: "json.SyntaxError" })
 		let se: json.SyntaxError | $.VarRef<json.SyntaxError> | null = __goscriptTuple0[0]
@@ -55,7 +55,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Token advances the stream; More reports remaining container elements.
-	let mdec: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("[10,20]"), "*strings.Reader"))!)
+	let mdec: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("[10,20]"), "*strings.Reader", { kind: $.TypeKind.Pointer, elemType: "strings.Reader" }))!)
 	json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec))
 	fmt.Println("more", json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(mdec)))
 	json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec))

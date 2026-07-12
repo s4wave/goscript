@@ -51,6 +51,24 @@
 // This ensures that DeepEqual terminates.
 import { ReflectValue } from './types.js'
 
+function hasGeneratedStructFields(
+  value: object,
+): value is { _fields: Record<string, { value: ReflectValue }> } {
+  if (!('_fields' in value)) {
+    return false
+  }
+  const fields = value._fields
+  return (
+    typeof fields === 'object' &&
+    fields !== null &&
+    !globalThis.Array.isArray(fields) &&
+    Object.values(fields).every(
+      (field) =>
+        typeof field === 'object' && field !== null && 'value' in field,
+    )
+  )
+}
+
 export function DeepEqual(
   x: ReflectValue | null | undefined,
   y: ReflectValue | null | undefined,
@@ -149,6 +167,22 @@ export function DeepEqual(
 
   // Handle objects (structs)
   if (typeof x === 'object' && typeof y === 'object') {
+    if (hasGeneratedStructFields(x) || hasGeneratedStructFields(y)) {
+      if (!hasGeneratedStructFields(x) || !hasGeneratedStructFields(y)) {
+        return false
+      }
+      const keysX = Object.keys(x._fields)
+      const keysY = Object.keys(y._fields)
+      return (
+        keysX.length === keysY.length &&
+        keysX.every(
+          (key) =>
+            key in y._fields &&
+            DeepEqual(x._fields[key].value, y._fields[key].value),
+        )
+      )
+    }
+
     const keysX = Object.keys(x)
     const keysY = Object.keys(y)
     if (keysX.length !== keysY.length) {

@@ -1,0 +1,223 @@
+// Generated file based on elliptic.go
+// Updated when compliance tests are re-run, DO NOT EDIT!
+
+import * as $ from "@goscript/builtin/index.js"
+
+import * as io from "@goscript/io/index.js"
+
+import * as big from "@goscript/math/big/index.js"
+
+import * as sync from "@goscript/sync/index.js"
+
+import * as nistec from "@goscript/crypto/internal/fips140/nistec/index.js"
+
+import * as __goscript_nistec from "./nistec.gs.ts"
+
+import * as __goscript_params from "./params.gs.ts"
+import "@goscript/io/index.js"
+import "@goscript/math/big/index.js"
+import "@goscript/sync/index.js"
+import "@goscript/crypto/internal/fips140/nistec/index.js"
+import "./nistec.gs.ts"
+import "./params.gs.ts"
+
+export type Curve = {
+	Add(x1: big.Int | $.VarRef<big.Int> | null, y1: big.Int | $.VarRef<big.Int> | null, x2: big.Int | $.VarRef<big.Int> | null, y2: big.Int | $.VarRef<big.Int> | null): [big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null] | globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]>
+	Double(x1: big.Int | $.VarRef<big.Int> | null, y1: big.Int | $.VarRef<big.Int> | null): [big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null] | globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]>
+	IsOnCurve(x: big.Int | $.VarRef<big.Int> | null, y: big.Int | $.VarRef<big.Int> | null): boolean | globalThis.Promise<boolean>
+	Params(): __goscript_params.CurveParams | $.VarRef<__goscript_params.CurveParams> | null | globalThis.Promise<__goscript_params.CurveParams | $.VarRef<__goscript_params.CurveParams> | null>
+	ScalarBaseMult(k: $.Slice<number>): [big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null] | globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]>
+	ScalarMult(x1: big.Int | $.VarRef<big.Int> | null, y1: big.Int | $.VarRef<big.Int> | null, k: $.Slice<number>): [big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null] | globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]>
+}
+
+$.registerInterfaceType(
+	"elliptic.Curve",
+	null,
+	[{ name: "Add", args: [{ name: "x1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "x2", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y2", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }], returns: [{ name: "x", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }] }, { name: "Double", args: [{ name: "x1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }], returns: [{ name: "x", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }] }, { name: "IsOnCurve", args: [{ name: "x", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Params", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "elliptic.CurveParams" } }] }, { name: "ScalarBaseMult", args: [{ name: "k", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "x", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }] }, { name: "ScalarMult", args: [{ name: "x1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y1", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "k", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "x", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }] }]
+);
+
+export type unmarshaler = {
+	Unmarshal(_p0: $.Slice<number>): [big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null] | globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]>
+	UnmarshalCompressed(_p0: $.Slice<number>): [big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null] | globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]>
+}
+
+$.registerInterfaceType(
+	"elliptic.unmarshaler",
+	null,
+	[{ name: "Unmarshal", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "x", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }] }, { name: "UnmarshalCompressed", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "x", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }, { name: "y", type: { kind: $.TypeKind.Pointer, elemType: "big.Int" } }] }]
+);
+
+export let mask: $.Slice<number> = new Uint8Array([255, 1, 3, 7, 15, 31, 63, 127]) as $.Slice<number>
+
+export function __goscript_set_mask(__goscriptValue: $.Slice<number>): void {
+	mask = __goscriptValue
+}
+
+export async function GenerateKey(curve: Curve | null, rand: io.Reader | null): globalThis.Promise<[$.Slice<number>, big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null, $.GoError]> {
+	let priv: $.Slice<number> = null as $.Slice<number>
+	let x: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
+	let y: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
+	let err: $.GoError = null as $.GoError
+	let N: big.Int | $.VarRef<big.Int> | null = $.pointerValue<__goscript_params.CurveParams>(await $.pointerValue<Exclude<Curve, null>>(curve).Params()).N
+	let bitSize = big.Int.prototype.BitLen.call(N)
+	let byteLen = Math.trunc((bitSize + 7) / 8)
+	priv = $.makeSlice<number>(byteLen, undefined, "byte")
+
+	while (x == null) {
+		let __goscriptTuple0: any = await io.ReadFull($.pointerValueOrNil(rand)!, priv)
+		err = __goscriptTuple0[1]
+		if (err != null) {
+			return [priv, x, y, err]
+		}
+		// We have to mask off any excess bits in the case that the size of the
+		// underlying field is not a whole number of bytes.
+		priv![0] = priv![0] & ($.uint($.arrayIndex(mask!, bitSize % 8), 8))
+		// This is because, in tests, rand will return all zeros and we don't
+		// want to get the point at infinity and loop forever.
+		priv![1] = priv![1] ^ ($.uint(0x42, 8))
+
+		// If the scalar is out of range, sample another random number.
+		if (big.Int.prototype.Cmp.call(big.Int.prototype.SetBytes.call(new big.Int(), priv), N) >= 0) {
+			continue
+		}
+
+		let __goscriptTuple1: any = await $.pointerValue<Exclude<Curve, null>>(curve).ScalarBaseMult(priv)
+		x = __goscriptTuple1[0]
+		y = __goscriptTuple1[1]
+	}
+	return [priv, x, y, err]
+}
+
+export async function Marshal(curve: Curve | null, x: big.Int | $.VarRef<big.Int> | null, y: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<$.Slice<number>> {
+	await panicIfNotOnCurve(curve, x, y)
+
+	let byteLen = Math.trunc(($.pointerValue<__goscript_params.CurveParams>(await $.pointerValue<Exclude<Curve, null>>(curve).Params()).BitSize + 7) / 8)
+
+	let ret: $.Slice<number> = $.makeSlice<number>(1 + (2 * byteLen), undefined, "byte")
+	ret![0] = $.uint(4, 8)
+
+	big.Int.prototype.FillBytes.call(x, $.goSlice(ret, 1, 1 + byteLen))
+	big.Int.prototype.FillBytes.call(y, $.goSlice(ret, 1 + byteLen, 1 + (2 * byteLen)))
+
+	return ret
+}
+
+export async function MarshalCompressed(curve: Curve | null, x: big.Int | $.VarRef<big.Int> | null, y: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<$.Slice<number>> {
+	await panicIfNotOnCurve(curve, x, y)
+	let byteLen = Math.trunc(($.pointerValue<__goscript_params.CurveParams>(await $.pointerValue<Exclude<Curve, null>>(curve).Params()).BitSize + 7) / 8)
+	let compressed: $.Slice<number> = $.makeSlice<number>(1 + byteLen, undefined, "byte")
+	compressed![0] = $.uint($.uint(big.Int.prototype.Bit.call(y, 0), 8) | 2, 8)
+	big.Int.prototype.FillBytes.call(x, $.goSlice(compressed, 1, undefined))
+	return compressed
+}
+
+export async function Unmarshal(curve: Curve | null, data: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
+	let x: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
+	let y: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
+	{
+		let [c, ok] = $.typeAssertTuple<unmarshaler | null>(curve, "elliptic.unmarshaler")
+		if (ok) {
+			return $.pointerValue<Exclude<unmarshaler, null>>(c).Unmarshal(data)
+		}
+	}
+
+	let byteLen = Math.trunc(($.pointerValue<__goscript_params.CurveParams>(await $.pointerValue<Exclude<Curve, null>>(curve).Params()).BitSize + 7) / 8)
+	if ($.len(data) != (1 + (2 * byteLen))) {
+		return [null, null]
+	}
+	if ($.uint($.arrayIndex(data!, 0), 8) != $.uint(4, 8)) {
+		return [null, null]
+	}
+	let p: big.Int | $.VarRef<big.Int> | null = $.pointerValue<__goscript_params.CurveParams>(await $.pointerValue<Exclude<Curve, null>>(curve).Params()).P
+	x = big.Int.prototype.SetBytes.call(new big.Int(), $.goSlice(data, 1, 1 + byteLen))
+	y = big.Int.prototype.SetBytes.call(new big.Int(), $.goSlice(data, 1 + byteLen, undefined))
+	if ((big.Int.prototype.Cmp.call(x, p) >= 0) || (big.Int.prototype.Cmp.call(y, p) >= 0)) {
+		return [null, null]
+	}
+	if (!await $.pointerValue<Exclude<Curve, null>>(curve).IsOnCurve(x, y)) {
+		return [null, null]
+	}
+	return [x, y]
+}
+
+export async function UnmarshalCompressed(curve: Curve | null, data: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
+	let x: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
+	let y: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
+	{
+		let [c, ok] = $.typeAssertTuple<unmarshaler | null>(curve, "elliptic.unmarshaler")
+		if (ok) {
+			return $.pointerValue<Exclude<unmarshaler, null>>(c).UnmarshalCompressed(data)
+		}
+	}
+
+	let byteLen = Math.trunc(($.pointerValue<__goscript_params.CurveParams>(await $.pointerValue<Exclude<Curve, null>>(curve).Params()).BitSize + 7) / 8)
+	if ($.len(data) != (1 + byteLen)) {
+		return [null, null]
+	}
+	if (($.uint($.arrayIndex(data!, 0), 8) != $.uint(2, 8)) && ($.uint($.arrayIndex(data!, 0), 8) != $.uint(3, 8))) {
+		return [null, null]
+	}
+	let p: big.Int | $.VarRef<big.Int> | null = $.pointerValue<__goscript_params.CurveParams>(await $.pointerValue<Exclude<Curve, null>>(curve).Params()).P
+	x = big.Int.prototype.SetBytes.call(new big.Int(), $.goSlice(data, 1, undefined))
+	if (big.Int.prototype.Cmp.call(x, p) >= 0) {
+		return [null, null]
+	}
+	// y² = x³ - 3x + b
+	y = await __goscript_params.CurveParams.prototype.polynomial.call(await $.pointerValue<Exclude<Curve, null>>(curve).Params(), x)
+	y = await big.Int.prototype.ModSqrt.call(y, y, p)
+	if (y == null) {
+		return [null, null]
+	}
+	if ($.uint($.uint(big.Int.prototype.Bit.call(y, 0), 8), 8) != $.uint(($.arrayIndex(data!, 0) & 1), 8)) {
+		await big.Int.prototype.Mod.call(big.Int.prototype.Neg.call(y, y), y, p)
+	}
+	if (!await $.pointerValue<Exclude<Curve, null>>(curve).IsOnCurve(x, y)) {
+		return [null, null]
+	}
+	return [x, y]
+}
+
+export async function panicIfNotOnCurve(curve: Curve | null, x: big.Int | $.VarRef<big.Int> | null, y: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<void> {
+	// (0, 0) is the point at infinity by convention. It's ok to operate on it,
+	// although IsOnCurve is documented to return false for it. See Issue 37294.
+	if ((big.Int.prototype.Sign.call(x) == 0) && (big.Int.prototype.Sign.call(y) == 0)) {
+		return
+	}
+
+	if (!await $.pointerValue<Exclude<Curve, null>>(curve).IsOnCurve(x, y)) {
+		$.panic("crypto/elliptic: attempted operation on invalid point")
+	}
+}
+
+export let initonce: $.VarRef<sync.Once> = $.varRef($.markAsStructValue(new sync.Once()))
+
+export function __goscript_set_initonce(__goscriptValue: sync.Once): void {
+	initonce.value = __goscriptValue
+}
+
+export async function initAll(): globalThis.Promise<void> {
+	await __goscript_nistec.initP224()
+	await __goscript_nistec.initP256()
+	await __goscript_nistec.initP384()
+	await __goscript_nistec.initP521()
+}
+
+export async function P224(): globalThis.Promise<Curve | null> {
+	await initonce.value.Do(initAll)
+	return $.interfaceValue<Curve | null>(__goscript_nistec.__goscript_get_p224(), "*elliptic.nistCurve[*nistec.P224Point]", { kind: $.TypeKind.Pointer, elemType: "elliptic.nistCurve" })
+}
+
+export async function P256(): globalThis.Promise<Curve | null> {
+	await initonce.value.Do(initAll)
+	return $.interfaceValue<Curve | null>(__goscript_nistec.__goscript_get_p256(), "*elliptic.nistCurve[*nistec.P256Point]", { kind: $.TypeKind.Pointer, elemType: "elliptic.nistCurve" })
+}
+
+export async function P384(): globalThis.Promise<Curve | null> {
+	await initonce.value.Do(initAll)
+	return $.interfaceValue<Curve | null>(__goscript_nistec.__goscript_get_p384(), "*elliptic.nistCurve[*nistec.P384Point]", { kind: $.TypeKind.Pointer, elemType: "elliptic.nistCurve" })
+}
+
+export async function P521(): globalThis.Promise<Curve | null> {
+	await initonce.value.Do(initAll)
+	return $.interfaceValue<Curve | null>(__goscript_nistec.__goscript_get_p521(), "*elliptic.nistCurve[*nistec.P521Point]", { kind: $.TypeKind.Pointer, elemType: "elliptic.nistCurve" })
+}

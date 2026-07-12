@@ -76,14 +76,14 @@ export async function HandleProxyRpcStream(__typeArgs: $.GenericTypeArgs | undef
 
 	// send the init message
 	if (err == null) {
-		err = await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream, null>>(remoteStrm).Send(new __goscript_rpcstream_pb.RpcStreamPacket({Body: $.interfaceValue<__goscript_rpcstream_pb.isRpcStreamPacket_Body | null>(new __goscript_rpcstream_pb.RpcStreamPacket_Init({Init: new __goscript_rpcstream_pb.RpcStreamInit({ComponentId: remoteComponentID})}), "*rpcstream.RpcStreamPacket_Init")}))
+		err = await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream, null>>(remoteStrm).Send(new __goscript_rpcstream_pb.RpcStreamPacket({Body: $.interfaceValue<__goscript_rpcstream_pb.isRpcStreamPacket_Body | null>(new __goscript_rpcstream_pb.RpcStreamPacket_Init({Init: new __goscript_rpcstream_pb.RpcStreamInit({ComponentId: remoteComponentID})}), "*rpcstream.RpcStreamPacket_Init", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket_Init" })}))
 	}
 
 	// send ack, but only if we have an error
 	// otherwise: we will proxy the ack from the remote stream.
 	if (err != null) {
 		let errStr = $.pointerValue<Exclude<$.GoError, null>>(err).Error()
-		await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream, null>>(stream).Send(new __goscript_rpcstream_pb.RpcStreamPacket({Body: $.interfaceValue<__goscript_rpcstream_pb.isRpcStreamPacket_Body | null>(new __goscript_rpcstream_pb.RpcStreamPacket_Ack({Ack: new __goscript_rpcstream_pb.RpcAck({Error: errStr})}), "*rpcstream.RpcStreamPacket_Ack")}))
+		await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream, null>>(stream).Send(new __goscript_rpcstream_pb.RpcStreamPacket({Body: $.interfaceValue<__goscript_rpcstream_pb.isRpcStreamPacket_Body | null>(new __goscript_rpcstream_pb.RpcStreamPacket_Ack({Ack: new __goscript_rpcstream_pb.RpcAck({Error: errStr})}), "*rpcstream.RpcStreamPacket_Ack", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket_Ack" })}))
 		return err
 	}
 
@@ -108,14 +108,14 @@ export async function copyRpcStreamTo(s1: __goscript_rpcstream.RpcStream | null,
 	let rerr = await (async (): globalThis.Promise<$.GoError> => {
 		let pkt: srpc.RawMessage | $.VarRef<srpc.RawMessage> | null = srpc.NewRawMessage(null, true)
 		while (true) {
-			let err = await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream, null>>(s1).MsgRecv($.interfaceValue<srpc.Message>(pkt, "*srpc.RawMessage"))
+			let err = await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream, null>>(s1).MsgRecv($.interfaceValue<srpc.Message>(pkt, "*srpc.RawMessage", { kind: $.TypeKind.Pointer, elemType: "srpc.RawMessage" }))
 			if (err != null) {
 				return err
 			}
 			if ($.len(srpc.RawMessage.prototype.GetData.call(pkt)) == 0) {
 				continue
 			}
-			err = await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream, null>>(s2).MsgSend($.interfaceValue<srpc.Message>(pkt, "*srpc.RawMessage"))
+			err = await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream, null>>(s2).MsgSend($.interfaceValue<srpc.Message>(pkt, "*srpc.RawMessage", { kind: $.TypeKind.Pointer, elemType: "srpc.RawMessage" }))
 			srpc.RawMessage.prototype.Clear.call(pkt)
 			if (err != null) {
 				return err

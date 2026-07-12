@@ -28,6 +28,7 @@ import {
   int64Or,
   int64AndNot,
   interfaceValue,
+  comparableEqual,
   len,
   makeSlice,
   makeChannel,
@@ -35,6 +36,7 @@ import {
   mapGet,
   mapSet,
   markAsStructValue,
+  markReflectTypeIdentity,
   namedFunction,
   namedValueInterfaceValue,
   newError,
@@ -246,6 +248,21 @@ describe('builtin runtime contract helpers', () => {
         elemType: 'main.ObjectIdentifier',
       }),
     ).toEqual({ value: nilNamedSlice, ok: true })
+    const identifierType = {
+      kind: TypeKind.Slice,
+      elemType: {
+        kind: TypeKind.Slice,
+        typeName: 'asn1.ObjectIdentifier',
+        elemType: { kind: TypeKind.Basic, name: 'int' },
+      },
+    }
+    const identifiers = interfaceValue(
+      [[1, 2, 840]],
+      '[]asn1.ObjectIdentifier',
+      identifierType,
+    )
+    expect('__goTypeInfo' in identifiers).toBe(true)
+    expect(identifiers.__goTypeInfo).toEqual(identifierType)
     expect(pointerValue({ ok: true })).toEqual({ ok: true })
     const nilSliceIface = interfaceValue(null, '[]*main.StatusEntry')
     expect(len(nilSliceIface as any)).toBe(0)
@@ -366,6 +383,18 @@ describe('builtin runtime contract helpers', () => {
       '',
       false,
     ])
+  })
+
+  it('compares independently materialized reflect types by identity', () => {
+    const first = {}
+    const second = {}
+    const different = {}
+    markReflectTypeIdentity(first, 'struct:asn1.BitString')
+    markReflectTypeIdentity(second, 'struct:asn1.BitString')
+    markReflectTypeIdentity(different, 'struct:asn1.RawValue')
+
+    expect(comparableEqual(first, second)).toBe(true)
+    expect(comparableEqual(first, different)).toBe(false)
   })
 
   it('does not compare runtime internals as generated struct values', () => {

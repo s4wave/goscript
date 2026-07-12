@@ -51,7 +51,7 @@ export class Buffer {
 
 export async function main(): globalThis.Promise<void> {
 	let b: $.VarRef<Buffer> = $.varRef($.markAsStructValue(new Buffer()))
-	await __goscript_sink.Use($.interfaceValue<subpkg.Writer | null>(b, "*main.Buffer"))
+	await __goscript_sink.Use($.interfaceValue<subpkg.Writer | null>(b, "*main.Buffer", { kind: $.TypeKind.Pointer, elemType: "main.Buffer" }))
 	$.println($.bytesToString(b.value.data))
 }
 

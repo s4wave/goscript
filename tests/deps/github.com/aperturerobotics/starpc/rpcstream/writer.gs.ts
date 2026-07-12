@@ -56,7 +56,7 @@ export class RpcStreamWriter {
 		if ($.len(p) == 0) {
 			return [0, null]
 		}
-		err = await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream, null>>($.pointerValue<RpcStreamWriter>(r).RpcStream).Send(new __goscript_rpcstream_pb.RpcStreamPacket({Body: $.interfaceValue<__goscript_rpcstream_pb.isRpcStreamPacket_Body | null>(new __goscript_rpcstream_pb.RpcStreamPacket_Data({Data: p}), "*rpcstream.RpcStreamPacket_Data")}))
+		err = await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream, null>>($.pointerValue<RpcStreamWriter>(r).RpcStream).Send(new __goscript_rpcstream_pb.RpcStreamPacket({Body: $.interfaceValue<__goscript_rpcstream_pb.isRpcStreamPacket_Body | null>(new __goscript_rpcstream_pb.RpcStreamPacket_Data({Data: p}), "*rpcstream.RpcStreamPacket_Data", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket_Data" })}))
 		if (err != null) {
 			return [0, err]
 		}

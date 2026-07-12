@@ -100,13 +100,13 @@ export class Interface {
 	public Addrs(): [$.Slice<__goscript_net.Addr | null>, $.GoError] {
 		const ifi: Interface | $.VarRef<Interface> | null = this
 		if (ifi == null) {
-			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: errInvalidInterface}), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: errInvalidInterface}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 		}
 		let __goscriptTuple0: any = __goscript_interface_stub.interfaceAddrTable(ifi)
 		let ifat: $.Slice<__goscript_net.Addr | null> = __goscriptTuple0[0]
 		let err = __goscriptTuple0[1]
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [ifat, err]
 	}
@@ -114,13 +114,13 @@ export class Interface {
 	public MulticastAddrs(): [$.Slice<__goscript_net.Addr | null>, $.GoError] {
 		const ifi: Interface | $.VarRef<Interface> | null = this
 		if (ifi == null) {
-			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: errInvalidInterface}), "*net.OpError")]
+			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: errInvalidInterface}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 		}
 		let __goscriptTuple1: any = __goscript_interface_stub.interfaceMulticastAddrTable(ifi)
 		let ifat: $.Slice<__goscript_net.Addr | null> = __goscriptTuple1[0]
 		let err = __goscriptTuple1[1]
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [ifat, err]
 	}
@@ -130,7 +130,7 @@ export class Interface {
 		() => new Interface(),
 		[{ name: "Addrs", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: "net.Addr" } }, { name: "_r1", type: "error" }] }, { name: "MulticastAddrs", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: "net.Addr" } }, { name: "_r1", type: "error" }] }],
 		Interface,
-		[{ name: "Index", key: "Index", type: { kind: $.TypeKind.Basic, name: "int" }, index: [0], offset: 0, exported: true }, { name: "MTU", key: "MTU", type: { kind: $.TypeKind.Basic, name: "int" }, index: [1], offset: 8, exported: true }, { name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" }, index: [2], offset: 16, exported: true }, { name: "HardwareAddr", key: "HardwareAddr", type: "net.HardwareAddr", index: [3], offset: 32, exported: true }, { name: "Flags", key: "Flags", type: { kind: $.TypeKind.Basic, name: "uint", typeName: "net.Flags" }, index: [4], offset: 56, exported: true }]
+		[{ name: "Index", key: "Index", type: { kind: $.TypeKind.Basic, name: "int" }, index: [0], offset: 0, exported: true }, { name: "MTU", key: "MTU", type: { kind: $.TypeKind.Basic, name: "int" }, index: [1], offset: 8, exported: true }, { name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" }, index: [2], offset: 16, exported: true }, { name: "HardwareAddr", key: "HardwareAddr", type: { kind: $.TypeKind.Slice, typeName: "net.HardwareAddr", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, index: [3], offset: 32, exported: true }, { name: "Flags", key: "Flags", type: { kind: $.TypeKind.Basic, name: "uint", typeName: "net.Flags" }, index: [4], offset: 56, exported: true }]
 	)
 }
 
@@ -393,7 +393,7 @@ export async function Interfaces(): globalThis.Promise<[$.Slice<Interface>, $.Go
 	let ift: $.Slice<Interface> = __goscriptTuple2[0]
 	let err = __goscriptTuple2[1]
 	if (err != null) {
-		return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: err}), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	if ($.len(ift) != 0) {
 		await zoneCache.value.update(ift, false)
@@ -406,26 +406,26 @@ export function InterfaceAddrs(): [$.Slice<__goscript_net.Addr | null>, $.GoErro
 	let ifat: $.Slice<__goscript_net.Addr | null> = __goscriptTuple3[0]
 	let err = __goscriptTuple3[1]
 	if (err != null) {
-		err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: err}), "*net.OpError")
+		err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 	}
 	return [ifat, err]
 }
 
 export function InterfaceByIndex(index: number): [Interface | $.VarRef<Interface> | null, $.GoError] {
 	if (index <= 0) {
-		return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: errInvalidInterfaceIndex}), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: errInvalidInterfaceIndex}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	let __goscriptTuple4: any = __goscript_interface_stub.interfaceTable(index)
 	let ift: $.Slice<Interface> = __goscriptTuple4[0]
 	let err = __goscriptTuple4[1]
 	if (err != null) {
-		return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: err}), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	let __goscriptTuple5: any = interfaceByIndex(ift, index)
 	let ifi: Interface | $.VarRef<Interface> | null = __goscriptTuple5[0]
 	err = __goscriptTuple5[1]
 	if (err != null) {
-		err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: err}), "*net.OpError")
+		err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 	}
 	return [ifi, err]
 }
@@ -442,13 +442,13 @@ export function interfaceByIndex(ift: $.Slice<Interface>, index: number): [Inter
 
 export async function InterfaceByName(name: string): globalThis.Promise<[Interface | $.VarRef<Interface> | null, $.GoError]> {
 	if ($.stringEqual(name, "")) {
-		return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: errInvalidInterfaceName}), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: errInvalidInterfaceName}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	let __goscriptTuple6: any = __goscript_interface_stub.interfaceTable(0)
 	let ift: $.Slice<Interface> = __goscriptTuple6[0]
 	let err = __goscriptTuple6[1]
 	if (err != null) {
-		return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: err}), "*net.OpError")]
+		return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	if ($.len(ift) != 0) {
 		await zoneCache.value.update(ift, false)
@@ -459,7 +459,7 @@ export async function InterfaceByName(name: string): globalThis.Promise<[Interfa
 			return [ifi, null]
 		}
 	}
-	return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: errNoSuchInterface}), "*net.OpError")]
+	return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "route", Net: "ip+net", Source: null, Addr: null, Err: errNoSuchInterface}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 }
 
 export let zoneCache: $.VarRef<ipv6ZoneCache> = $.varRef($.markAsStructValue(new ipv6ZoneCache({toIndex: $.makeMap<string, number>(), toName: $.makeMap<number, string>()})))

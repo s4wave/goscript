@@ -244,7 +244,7 @@ export class Resolver {
 			}
 		}
 		if ($.len(names) != $.len(filteredNames)) {
-			return [filteredNames, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: errMalformedDNSRecordsDetail, Name: addr}), "*net.DNSError")]
+			return [filteredNames, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: errMalformedDNSRecordsDetail, Name: addr}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 		}
 		return [filteredNames, null]
 	}
@@ -256,7 +256,7 @@ export class Resolver {
 			return ["", err]
 		}
 		if (!__goscript_dnsclient.isDomainName(cname)) {
-			return ["", $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: errMalformedDNSRecordsDetail, Name: host}), "*net.DNSError")]
+			return ["", $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: errMalformedDNSRecordsDetail, Name: host}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 		}
 		return [cname, null]
 	}
@@ -267,7 +267,7 @@ export class Resolver {
 		let err: $.GoError = null as $.GoError
 		// Make sure that no matter what we do later, host=="" is rejected.
 		if ($.stringEqual(host, "")) {
-			return [null, $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError"), host, ""), "*net.DNSError")]
+			return [null, $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError", { kind: $.TypeKind.Pointer, elemType: "net.notFoundError" }), host, ""), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 		}
 		{
 			let [, __goscriptShadow2] = netip.ParseAddr(host)
@@ -299,7 +299,7 @@ export class Resolver {
 		}
 
 		if ($.stringEqual(host, "")) {
-			return [null, $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError"), host, ""), "*net.DNSError")]
+			return [null, $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError", { kind: $.TypeKind.Pointer, elemType: "net.notFoundError" }), host, ""), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 		}
 		let __goscriptTuple2: any = await Resolver.prototype.internetAddrList.call(r, ctx, afnet, host)
 		let addrs: __goscript_ipsock.addrList = (__goscriptTuple2[0] as __goscript_ipsock.addrList)
@@ -346,7 +346,7 @@ export class Resolver {
 			filteredMX = $.append(filteredMX, mx)
 		}
 		if ($.len(records) != $.len(filteredMX)) {
-			return [filteredMX, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: errMalformedDNSRecordsDetail, Name: name}), "*net.DNSError")]
+			return [filteredMX, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: errMalformedDNSRecordsDetail, Name: name}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 		}
 		return [filteredMX, null]
 	}
@@ -371,7 +371,7 @@ export class Resolver {
 			filteredNS = $.append(filteredNS, ns)
 		}
 		if ($.len(records) != $.len(filteredNS)) {
-			return [filteredNS, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: errMalformedDNSRecordsDetail, Name: name}), "*net.DNSError")]
+			return [filteredNS, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: errMalformedDNSRecordsDetail, Name: name}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 		}
 		return [filteredNS, null]
 	}
@@ -427,7 +427,7 @@ export class Resolver {
 				}
 				default:
 				{
-					return [0, $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: "unknown network", Addr: network}), "*net.AddrError")]
+					return [0, $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: "unknown network", Addr: network}), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 					break
 				}
 			}
@@ -439,7 +439,7 @@ export class Resolver {
 			}
 		}
 		if ((0 > port) || (port > 65535)) {
-			return [0, $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: "invalid port", Addr: service}), "*net.AddrError")]
+			return [0, $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: "invalid port", Addr: service}), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 		}
 		return [port, null]
 	}
@@ -454,7 +454,7 @@ export class Resolver {
 			return ["", null, err]
 		}
 		if ((!$.stringEqual(cname, "")) && !__goscript_dnsclient.isDomainName(cname)) {
-			return ["", null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "SRV header name is invalid", Name: name}), "*net.DNSError")]
+			return ["", null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "SRV header name is invalid", Name: name}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 		}
 		let filteredAddrs: $.Slice<__goscript_dnsclient.SRV | $.VarRef<__goscript_dnsclient.SRV> | null> = $.makeSlice<__goscript_dnsclient.SRV | $.VarRef<__goscript_dnsclient.SRV> | null>(0, $.len(addrs))
 		for (let __goscriptRangeTarget5 = addrs, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget5); __rangeIndex++) {
@@ -468,7 +468,7 @@ export class Resolver {
 			filteredAddrs = $.append(filteredAddrs, addr)
 		}
 		if ($.len(addrs) != $.len(filteredAddrs)) {
-			return [cname, filteredAddrs, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: errMalformedDNSRecordsDetail, Name: name}), "*net.DNSError")]
+			return [cname, filteredAddrs, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: errMalformedDNSRecordsDetail, Name: name}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 		}
 		return [cname, filteredAddrs, null]
 	}
@@ -601,7 +601,7 @@ export class Resolver {
 			}
 
 			if (order == 3) {
-				return [null, $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError"), name, ""), "*net.DNSError")]
+				return [null, $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError", { kind: $.TypeKind.Pointer, elemType: "net.notFoundError" }), name, ""), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 			}
 		}
 		let __goscriptTuple16: any = await Resolver.prototype.goLookupIPCNAMEOrder.call(r, ctx, "ip", name, order, conf)
@@ -651,13 +651,13 @@ export class Resolver {
 			}
 
 			if (order == 3) {
-				return [null, $.markAsStructValue(new dnsmessage.Name()), $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError"), name, ""), "*net.DNSError")]
+				return [null, $.markAsStructValue(new dnsmessage.Name()), $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError", { kind: $.TypeKind.Pointer, elemType: "net.notFoundError" }), name, ""), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 			}
 		}
 
 		if (!__goscript_dnsclient.isDomainName(name)) {
 
-			return [null, $.markAsStructValue(new dnsmessage.Name()), $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError"), name, ""), "*net.DNSError")]
+			return [null, $.markAsStructValue(new dnsmessage.Name()), $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError", { kind: $.TypeKind.Pointer, elemType: "net.notFoundError" }), name, ""), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 		}
 		class result {
 			public get p(): dnsmessage.Parser {
@@ -795,7 +795,7 @@ export class Resolver {
 				loop: while (true) {
 					let [h, __goscriptShadow12] = __goscriptShadow11.p.AnswerHeader()
 					if ((__goscriptShadow12 != null) && (!$.comparableEqual(__goscriptShadow12, dnsmessage.ErrSectionDone))) {
-						lastErr = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField0 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotUnmarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField0, Name: name, Server: __goscriptShadow11.server}) })(), "*net.DNSError")
+						lastErr = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField0 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotUnmarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField0, Name: name, Server: __goscriptShadow11.server}) })(), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })
 					}
 					if (__goscriptShadow12 != null) {
 						break
@@ -805,7 +805,7 @@ export class Resolver {
 						{
 							let [a, __goscriptShadow13] = __goscriptShadow11.p.AResource()
 							if (__goscriptShadow13 != null) {
-								lastErr = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField1 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotUnmarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField1, Name: name, Server: __goscriptShadow11.server}) })(), "*net.DNSError")
+								lastErr = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField1 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotUnmarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField1, Name: name, Server: __goscriptShadow11.server}) })(), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })
 								break loop
 							}
 							addrs = $.append(addrs, $.markAsStructValue(new __goscript_iprawsock.IPAddr({IP: (($.goSlice(a.A, undefined, undefined) as __goscript_ip.IP) as __goscript_ip.IP)})))
@@ -818,7 +818,7 @@ export class Resolver {
 						{
 							let [aaaa, __goscriptShadow14] = __goscriptShadow11.p.AAAAResource()
 							if (__goscriptShadow14 != null) {
-								lastErr = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField2 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotUnmarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField2, Name: name, Server: __goscriptShadow11.server}) })(), "*net.DNSError")
+								lastErr = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField2 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotUnmarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField2, Name: name, Server: __goscriptShadow11.server}) })(), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })
 								break loop
 							}
 							addrs = $.append(addrs, $.markAsStructValue(new __goscript_iprawsock.IPAddr({IP: (($.goSlice(aaaa.AAAA, undefined, undefined) as __goscript_ip.IP) as __goscript_ip.IP)})))
@@ -831,7 +831,7 @@ export class Resolver {
 						{
 							let [c, __goscriptShadow15] = __goscriptShadow11.p.CNAMEResource()
 							if (__goscriptShadow15 != null) {
-								lastErr = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField3 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotUnmarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField3, Name: name, Server: __goscriptShadow11.server}) })(), "*net.DNSError")
+								lastErr = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField3 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotUnmarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField3, Name: name, Server: __goscriptShadow11.server}) })(), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })
 								break loop
 							}
 							if (($.uint(cname.Length, 8) == $.uint(0, 8)) && ($.uint(c.CNAME.Length, 8) > $.uint(0, 8))) {
@@ -844,7 +844,7 @@ export class Resolver {
 							{
 								let __goscriptShadow16 = __goscriptShadow11.p.SkipAnswer()
 								if (__goscriptShadow16 != null) {
-									lastErr = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField4 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotUnmarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField4, Name: name, Server: __goscriptShadow11.server}) })(), "*net.DNSError")
+									lastErr = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField4 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotUnmarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField4, Name: name, Server: __goscriptShadow11.server}) })(), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })
 									break loop
 								}
 							}
@@ -914,13 +914,13 @@ export class Resolver {
 				break
 			}
 			if (__goscriptShadow20 != null) {
-				return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError")]
+				return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 			}
 			if ($.uint(h.Type, 16) != $.uint(dnsmessage.TypeMX, 16)) {
 				{
 					let __goscriptShadow21 = p.value.SkipAnswer()
 					if (__goscriptShadow21 != null) {
-						return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError")]
+						return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 					}
 				}
 				continue
@@ -929,7 +929,7 @@ export class Resolver {
 			let mx = __goscriptTuple24[0]
 			__goscriptShadow20 = __goscriptTuple24[1]
 			if (__goscriptShadow20 != null) {
-				return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError")]
+				return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 			}
 			mxs = $.append(mxs, (() => { const __goscriptLiteralField5 = $.markAsStructValue($.cloneStructValue(mx.MX)).String(); return new __goscript_dnsclient.MX({Host: __goscriptLiteralField5, Pref: $.uint(mx.Pref, 16)}) })())
 		}
@@ -953,13 +953,13 @@ export class Resolver {
 				break
 			}
 			if (__goscriptShadow22 != null) {
-				return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError")]
+				return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 			}
 			if ($.uint(h.Type, 16) != $.uint(dnsmessage.TypeNS, 16)) {
 				{
 					let __goscriptShadow23 = p.value.SkipAnswer()
 					if (__goscriptShadow23 != null) {
-						return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError")]
+						return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 					}
 				}
 				continue
@@ -968,7 +968,7 @@ export class Resolver {
 			let ns = __goscriptTuple26[0]
 			__goscriptShadow22 = __goscriptTuple26[1]
 			if (__goscriptShadow22 != null) {
-				return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError")]
+				return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 			}
 			nss = $.append(nss, (() => { const __goscriptLiteralField6 = $.markAsStructValue($.cloneStructValue(ns.NS)).String(); return new __goscript_dnsclient.NS({Host: __goscriptLiteralField6}) })())
 		}
@@ -984,7 +984,7 @@ export class Resolver {
 			}
 
 			if (order == 3) {
-				return [null, $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError"), addr, ""), "*net.DNSError")]
+				return [null, $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError", { kind: $.TypeKind.Pointer, elemType: "net.notFoundError" }), addr, ""), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 			}
 		}
 
@@ -1019,12 +1019,12 @@ export class Resolver {
 				break
 			}
 			if (__goscriptShadow24 != null) {
-				return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField7 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotUnmarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField7, Name: addr, Server: server}) })(), "*net.DNSError")]
+				return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField7 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotUnmarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField7, Name: addr, Server: server}) })(), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 			}
 			if ($.uint(h.Type, 16) != $.uint(dnsmessage.TypePTR, 16)) {
 				let __goscriptShadow25 = p.value.SkipAnswer()
 				if (__goscriptShadow25 != null) {
-					return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField8 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotUnmarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField8, Name: addr, Server: server}) })(), "*net.DNSError")]
+					return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField8 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotUnmarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField8, Name: addr, Server: server}) })(), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 				}
 				continue
 			}
@@ -1032,7 +1032,7 @@ export class Resolver {
 			let ptr = __goscriptTuple29[0]
 			__goscriptShadow24 = __goscriptTuple29[1]
 			if (__goscriptShadow24 != null) {
-				return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField9 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotUnmarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField9, Name: addr, Server: server}) })(), "*net.DNSError")]
+				return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField9 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotUnmarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField9, Name: addr, Server: server}) })(), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 			}
 			ptrs = $.append(ptrs, $.markAsStructValue($.cloneStructValue(ptr.PTR)).String())
 		}
@@ -1064,13 +1064,13 @@ export class Resolver {
 				break
 			}
 			if (__goscriptShadow26 != null) {
-				return ["", null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError")]
+				return ["", null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 			}
 			if ($.uint(h.Type, 16) != $.uint(dnsmessage.TypeSRV, 16)) {
 				{
 					let __goscriptShadow27 = p.value.SkipAnswer()
 					if (__goscriptShadow27 != null) {
-						return ["", null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError")]
+						return ["", null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 					}
 				}
 				continue
@@ -1082,7 +1082,7 @@ export class Resolver {
 			let srv = __goscriptTuple31[0]
 			__goscriptShadow26 = __goscriptTuple31[1]
 			if (__goscriptShadow26 != null) {
-				return ["", null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError")]
+				return ["", null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 			}
 			srvs = $.append(srvs, (() => { const __goscriptLiteralField10 = $.markAsStructValue($.cloneStructValue(srv.Target)).String(); return new __goscript_dnsclient.SRV({Target: __goscriptLiteralField10, Port: $.uint(srv.Port, 16), Priority: $.uint(srv.Priority, 16), Weight: $.uint(srv.Weight, 16)}) })())
 		}
@@ -1106,13 +1106,13 @@ export class Resolver {
 				break
 			}
 			if (__goscriptShadow28 != null) {
-				return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError")]
+				return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 			}
 			if ($.uint(h.Type, 16) != $.uint(dnsmessage.TypeTXT, 16)) {
 				{
 					let __goscriptShadow29 = p.value.SkipAnswer()
 					if (__goscriptShadow29 != null) {
-						return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError")]
+						return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 					}
 				}
 				continue
@@ -1121,7 +1121,7 @@ export class Resolver {
 			let txt = __goscriptTuple33[0]
 			__goscriptShadow28 = __goscriptTuple33[1]
 			if (__goscriptShadow28 != null) {
-				return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError")]
+				return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 			}
 			// Multiple strings in one TXT record need to be
 			// concatenated without separator to be consistent
@@ -1200,21 +1200,21 @@ export class Resolver {
 				case "tcp4":
 				case "tcp6":
 				{
-					return $.interfaceValue<__goscript_net.Addr | null>(new __goscript_tcpsock.TCPAddr({IP: (ip.IP as __goscript_ip.IP), Port: portnum, Zone: ip.Zone}), "*net.TCPAddr")
+					return $.interfaceValue<__goscript_net.Addr | null>(new __goscript_tcpsock.TCPAddr({IP: (ip.IP as __goscript_ip.IP), Port: portnum, Zone: ip.Zone}), "*net.TCPAddr", { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" })
 					break
 				}
 				case "udp":
 				case "udp4":
 				case "udp6":
 				{
-					return $.interfaceValue<__goscript_net.Addr | null>(new __goscript_udpsock.UDPAddr({IP: (ip.IP as __goscript_ip.IP), Port: portnum, Zone: ip.Zone}), "*net.UDPAddr")
+					return $.interfaceValue<__goscript_net.Addr | null>(new __goscript_udpsock.UDPAddr({IP: (ip.IP as __goscript_ip.IP), Port: portnum, Zone: ip.Zone}), "*net.UDPAddr", { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" })
 					break
 				}
 				case "ip":
 				case "ip4":
 				case "ip6":
 				{
-					return $.interfaceValue<__goscript_net.Addr | null>(new __goscript_iprawsock.IPAddr({IP: (ip.IP as __goscript_ip.IP), Zone: ip.Zone}), "*net.IPAddr")
+					return $.interfaceValue<__goscript_net.Addr | null>(new __goscript_iprawsock.IPAddr({IP: (ip.IP as __goscript_ip.IP), Zone: ip.Zone}), "*net.IPAddr", { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" })
 					break
 				}
 				default:
@@ -1255,7 +1255,7 @@ export class Resolver {
 		const r: Resolver | $.VarRef<Resolver> | null = this
 		if (!__goscript_dnsclient.isDomainName(name)) {
 
-			return [$.markAsStructValue(new dnsmessage.Parser()), "", $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError"), name, ""), "*net.DNSError")]
+			return [$.markAsStructValue(new dnsmessage.Parser()), "", $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError", { kind: $.TypeKind.Pointer, elemType: "net.notFoundError" }), name, ""), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 		}
 
 		if (conf == null) {
@@ -1358,7 +1358,7 @@ export class Resolver {
 		const r: Resolver | $.VarRef<Resolver> | null = this
 		// Make sure that no matter what we do later, host=="" is rejected.
 		if ($.stringEqual(host, "")) {
-			return [null, $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError"), host, ""), "*net.DNSError")]
+			return [null, $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError", { kind: $.TypeKind.Pointer, elemType: "net.notFoundError" }), host, ""), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 		}
 		{
 			let [ip, err] = netip.ParseAddr(host)
@@ -1366,7 +1366,7 @@ export class Resolver {
 				return [$.arrayToSlice<__goscript_iprawsock.IPAddr>([(() => { const __goscriptLiteralField11 = (__goscript_ip.IP_To16(($.markAsStructValue($.cloneStructValue(ip)).AsSlice() as __goscript_ip.IP)) as __goscript_ip.IP); const __goscriptLiteralField12 = $.markAsStructValue($.cloneStructValue(ip)).Zone(); return $.markAsStructValue(new __goscript_iprawsock.IPAddr({IP: __goscriptLiteralField11, Zone: __goscriptLiteralField12})) })()]), null]
 			}
 		}
-		let __goscriptTuple44: any = $.typeAssertTuple<nettrace.Trace | $.VarRef<nettrace.Trace> | null>(await $.pointerValue<Exclude<context.Context, null>>(ctx).Value($.interfaceValue<any>($.markAsStructValue(new nettrace.TraceKey()), "nettrace.TraceKey")), { kind: $.TypeKind.Pointer, elemType: "nettrace.Trace" })
+		let __goscriptTuple44: any = $.typeAssertTuple<nettrace.Trace | $.VarRef<nettrace.Trace> | null>(await $.pointerValue<Exclude<context.Context, null>>(ctx).Value($.interfaceValue<any>($.markAsStructValue(new nettrace.TraceKey()), "nettrace.TraceKey", "nettrace.TraceKey")), { kind: $.TypeKind.Pointer, elemType: "nettrace.Trace" })
 		let trace: nettrace.Trace | $.VarRef<nettrace.Trace> | null = __goscriptTuple44[0]
 		if ((trace != null) && ($.pointerValue<nettrace.Trace>(trace).DNSStart != null)) {
 			await $.pointerValue<nettrace.Trace>(trace).DNSStart!(host)
@@ -1376,7 +1376,7 @@ export class Resolver {
 		// uses a context key instead of unexported variables.
 		let resolverFunc: ((ctx: context.Context | null, network: string, host: string) => [$.Slice<__goscript_iprawsock.IPAddr>, $.GoError] | globalThis.Promise<[$.Slice<__goscript_iprawsock.IPAddr>, $.GoError]>) | null = $.functionValue(((__receiver) => (ctx: context.Context | null, network: string, host: string) => __receiver.lookupIP(ctx, network, host))($.pointerValue<Resolver>(r)), ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Slice, elemType: "net.IPAddr" }, "error"] } as $.FunctionTypeInfo))
 		{
-			let [alt, ] = $.typeAssertTuple<((_p0: context.Context | null, _p1: string, _p2: string) => [$.Slice<__goscript_iprawsock.IPAddr>, $.GoError] | globalThis.Promise<[$.Slice<__goscript_iprawsock.IPAddr>, $.GoError]>) | null>(await $.pointerValue<Exclude<context.Context, null>>(ctx).Value($.interfaceValue<any>($.markAsStructValue(new nettrace.LookupIPAltResolverKey()), "nettrace.LookupIPAltResolverKey")), ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Slice, elemType: "net.IPAddr" }, "error"] } as $.FunctionTypeInfo))
+			let [alt, ] = $.typeAssertTuple<((_p0: context.Context | null, _p1: string, _p2: string) => [$.Slice<__goscript_iprawsock.IPAddr>, $.GoError] | globalThis.Promise<[$.Slice<__goscript_iprawsock.IPAddr>, $.GoError]>) | null>(await $.pointerValue<Exclude<context.Context, null>>(ctx).Value($.interfaceValue<any>($.markAsStructValue(new nettrace.LookupIPAltResolverKey()), "nettrace.LookupIPAltResolverKey", "nettrace.LookupIPAltResolverKey")), ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Slice, elemType: "net.IPAddr" }, "error"] } as $.FunctionTypeInfo))
 			if (alt != null) {
 				resolverFunc = alt
 			}
@@ -1393,7 +1393,7 @@ export class Resolver {
 		dnsWaitGroup.value.Add(1)
 		let ch: $.Channel<singleflight.Result> | null = await singleflight.Group.prototype.DoChan.call(Resolver.prototype.getLookupGroup.call(r), lookupKey, $.functionValue(async (): globalThis.Promise<[any, $.GoError]> => {
 			const __goscriptReturn13 = await __goscript_hook.__goscript_get_testHookLookupIP()!(lookupGroupCtx, resolverFunc, network, host)
-			return [$.interfaceValue<any>(__goscriptReturn13[0], "[]net.IPAddr"), __goscriptReturn13[1]]
+			return [$.interfaceValue<any>(__goscriptReturn13[0], "[]net.IPAddr", { kind: $.TypeKind.Slice, elemType: "net.IPAddr" }), __goscriptReturn13[1]]
 		}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [] }, "error"] } as $.FunctionTypeInfo)))
 
 		let dnsWaitGroupDone: ((ch: $.Channel<singleflight.Result> | null, cancelFn: (() => void) | null) => void) | null = $.functionValue(async (ch: $.Channel<singleflight.Result> | null, cancelFn: context.CancelFunc | null): globalThis.Promise<void> => {
@@ -1416,9 +1416,9 @@ export class Resolver {
 					}
 					let err: __goscript_net.DNSError | $.VarRef<__goscript_net.DNSError> | null = await __goscript_net.newDNSError(__goscript_net.mapErr(await $.pointerValue<Exclude<context.Context, null>>(ctx).Err()), host, "")
 					if ((trace != null) && ($.pointerValue<nettrace.Trace>(trace).DNSDone != null)) {
-						await $.pointerValue<nettrace.Trace>(trace).DNSDone!(null, false, $.interfaceValue<$.GoError>(err, "*net.DNSError"))
+						await $.pointerValue<nettrace.Trace>(trace).DNSDone!(null, false, $.interfaceValue<$.GoError>(err, "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" }))
 					}
-					return [null, $.interfaceValue<$.GoError>(err, "*net.DNSError")]
+					return [null, $.interfaceValue<$.GoError>(err, "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 				}
 			},
 			{
@@ -1434,7 +1434,7 @@ export class Resolver {
 						{
 							let [, ok] = $.typeAssertTuple<__goscript_net.DNSError | $.VarRef<__goscript_net.DNSError> | null>(err, { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })
 							if (!ok) {
-								err = $.interfaceValue<$.GoError>(await __goscript_net.newDNSError(__goscript_net.mapErr(err), host, ""), "*net.DNSError")
+								err = $.interfaceValue<$.GoError>(await __goscript_net.newDNSError(__goscript_net.mapErr(err), host, ""), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })
 							}
 						}
 					}
@@ -1520,9 +1520,9 @@ export class Resolver {
 					return [(null as __goscript_ipsock.addrList), __goscriptShadow40]
 				}
 				if ((($.stringEqual(op, "dial")) && (hint != null)) && (!$.stringEqual(__goscript_unixsock.UnixAddr.prototype.Network.call(__goscriptShadow39), await $.pointerValue<Exclude<__goscript_net.Addr, null>>(hint).Network()))) {
-					return [(null as __goscript_ipsock.addrList), $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField13 = await $.pointerValue<Exclude<__goscript_net.Addr, null>>(hint).String(); return new __goscript_net.AddrError({Err: "mismatched local address type", Addr: __goscriptLiteralField13}) })()), "*net.AddrError")]
+					return [(null as __goscript_ipsock.addrList), $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField13 = await $.pointerValue<Exclude<__goscript_net.Addr, null>>(hint).String(); return new __goscript_net.AddrError({Err: "mismatched local address type", Addr: __goscriptLiteralField13}) })()), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 				}
-				return [($.arrayToSlice<__goscript_net.Addr | null>([$.interfaceValue<__goscript_net.Addr | null>(__goscriptShadow39, "*net.UnixAddr")]) as __goscript_ipsock.addrList), null]
+				return [($.arrayToSlice<__goscript_net.Addr | null>([$.interfaceValue<__goscript_net.Addr | null>(__goscriptShadow39, "*net.UnixAddr", { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" })]) as __goscript_ipsock.addrList), null]
 				break
 			}
 		}
@@ -1566,7 +1566,7 @@ export class Resolver {
 		for (let __goscriptRangeTarget14 = addrs, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget14); __rangeIndex++) {
 			let addr = __goscriptRangeTarget14![__rangeIndex]
 			if (!$.stringEqual(await $.pointerValue<Exclude<__goscript_net.Addr, null>>(addr).Network(), await $.pointerValue<Exclude<__goscript_net.Addr, null>>(hint).Network())) {
-				return [(null as __goscript_ipsock.addrList), $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField14 = await $.pointerValue<Exclude<__goscript_net.Addr, null>>(hint).String(); return new __goscript_net.AddrError({Err: "mismatched local address type", Addr: __goscriptLiteralField14}) })()), "*net.AddrError")]
+				return [(null as __goscript_ipsock.addrList), $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField14 = await $.pointerValue<Exclude<__goscript_net.Addr, null>>(hint).String(); return new __goscript_net.AddrError({Err: "mismatched local address type", Addr: __goscriptLiteralField14}) })()), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 			}
 			{
 				const __goscriptTypeSwitchValue = addr
@@ -1577,7 +1577,7 @@ export class Resolver {
 							if ((!wildcard && !__goscript_tcpsock.TCPAddr.prototype.isWildcard.call(addr)) && !__goscript_ip.IP_matchAddrFamily($.pointerValue<__goscript_tcpsock.TCPAddr>(addr).IP, ($.pointerValue<__goscript_tcpsock.TCPAddr>(tcp).IP as __goscript_ip.IP))) {
 								continue
 							}
-							naddrs = ($.append((naddrs as __goscript_ipsock.addrList), $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.TCPAddr")) as __goscript_ipsock.addrList)
+							naddrs = ($.append((naddrs as __goscript_ipsock.addrList), $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.TCPAddr", { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" })) as __goscript_ipsock.addrList)
 						}
 						break
 					case $.typeAssert<__goscript_udpsock.UDPAddr | $.VarRef<__goscript_udpsock.UDPAddr> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" }).ok:
@@ -1586,7 +1586,7 @@ export class Resolver {
 							if ((!wildcard && !__goscript_udpsock.UDPAddr.prototype.isWildcard.call(addr)) && !__goscript_ip.IP_matchAddrFamily($.pointerValue<__goscript_udpsock.UDPAddr>(addr).IP, ($.pointerValue<__goscript_udpsock.UDPAddr>(udp).IP as __goscript_ip.IP))) {
 								continue
 							}
-							naddrs = ($.append((naddrs as __goscript_ipsock.addrList), $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.UDPAddr")) as __goscript_ipsock.addrList)
+							naddrs = ($.append((naddrs as __goscript_ipsock.addrList), $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.UDPAddr", { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" })) as __goscript_ipsock.addrList)
 						}
 						break
 					case $.typeAssert<__goscript_iprawsock.IPAddr | $.VarRef<__goscript_iprawsock.IPAddr> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" }).ok:
@@ -1595,14 +1595,14 @@ export class Resolver {
 							if ((!wildcard && !__goscript_iprawsock.IPAddr.prototype.isWildcard.call(addr)) && !__goscript_ip.IP_matchAddrFamily($.pointerValue<__goscript_iprawsock.IPAddr>(addr).IP, ($.pointerValue<__goscript_iprawsock.IPAddr>(ip).IP as __goscript_ip.IP))) {
 								continue
 							}
-							naddrs = ($.append((naddrs as __goscript_ipsock.addrList), $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.IPAddr")) as __goscript_ipsock.addrList)
+							naddrs = ($.append((naddrs as __goscript_ipsock.addrList), $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.IPAddr", { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" })) as __goscript_ipsock.addrList)
 						}
 						break
 				}
 			}
 		}
 		if ($.len((naddrs as __goscript_ipsock.addrList)) == 0) {
-			return [(null as __goscript_ipsock.addrList), $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField15 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_net.errNoSuitableAddress).Error(); const __goscriptLiteralField16 = await $.pointerValue<Exclude<__goscript_net.Addr, null>>(hint).String(); return new __goscript_net.AddrError({Err: __goscriptLiteralField15, Addr: __goscriptLiteralField16}) })()), "*net.AddrError")]
+			return [(null as __goscript_ipsock.addrList), $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField15 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_net.errNoSuitableAddress).Error(); const __goscriptLiteralField16 = await $.pointerValue<Exclude<__goscript_net.Addr, null>>(hint).String(); return new __goscript_net.AddrError({Err: __goscriptLiteralField15, Addr: __goscriptLiteralField16}) })()), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 		}
 		return [(naddrs as __goscript_ipsock.addrList), null]
 	}
@@ -1620,7 +1620,7 @@ export class Resolver {
 
 		let [n, err] = dnsmessage.NewName(name)
 		if (err != null) {
-			return [$.markAsStructValue(new dnsmessage.Parser()), "", $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField17 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotMarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField17, Name: name}) })(), "*net.DNSError")]
+			return [$.markAsStructValue(new dnsmessage.Parser()), "", $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField17 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_dnsclient_unix.errCannotMarshalDNSMessage).Error(); return new __goscript_net.DNSError({Err: __goscriptLiteralField17, Name: name}) })(), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 		}
 		let q = $.markAsStructValue(new dnsmessage.Question({Name: $.markAsStructValue($.cloneStructValue(n)), Type: $.uint(qtype, 16), Class: $.uint(dnsmessage.ClassINET, 16)}))
 
@@ -1641,7 +1641,7 @@ export class Resolver {
 							$.pointerValue<__goscript_net.DNSError>(dnsErr).IsTemporary = true
 						}
 					}
-					lastErr = $.interfaceValue<$.GoError>(dnsErr, "*net.DNSError")
+					lastErr = $.interfaceValue<$.GoError>(dnsErr, "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })
 					continue
 				}
 
@@ -1650,9 +1650,9 @@ export class Resolver {
 					if (__goscriptShadow42 != null) {
 						if ($.comparableEqual(__goscriptShadow42, __goscript_net.errNoSuchHost)) {
 
-							return [$.markAsStructValue($.cloneStructValue(p.value)), server, $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError"), name, server), "*net.DNSError")]
+							return [$.markAsStructValue($.cloneStructValue(p.value)), server, $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError", { kind: $.TypeKind.Pointer, elemType: "net.notFoundError" }), name, server), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 						}
-						lastErr = $.interfaceValue<$.GoError>(await __goscript_net.newDNSError(__goscriptShadow42, name, server), "*net.DNSError")
+						lastErr = $.interfaceValue<$.GoError>(await __goscript_net.newDNSError(__goscriptShadow42, name, server), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })
 						continue
 					}
 				}
@@ -1662,9 +1662,9 @@ export class Resolver {
 					if (__goscriptShadow43 != null) {
 						if ($.comparableEqual(__goscriptShadow43, __goscript_net.errNoSuchHost)) {
 
-							return [$.markAsStructValue($.cloneStructValue(p.value)), server, $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError"), name, server), "*net.DNSError")]
+							return [$.markAsStructValue($.cloneStructValue(p.value)), server, $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError", { kind: $.TypeKind.Pointer, elemType: "net.notFoundError" }), name, server), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 						}
-						lastErr = $.interfaceValue<$.GoError>(await __goscript_net.newDNSError(__goscriptShadow43, name, server), "*net.DNSError")
+						lastErr = $.interfaceValue<$.GoError>(await __goscript_net.newDNSError(__goscriptShadow43, name, server), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })
 						continue
 					}
 				}
@@ -1678,7 +1678,7 @@ export class Resolver {
 	static __typeInfo = $.registerStructType(
 		"net.Resolver",
 		() => new Resolver(),
-		[{ name: "LookupAddr", args: [{ name: "ctx", type: "context.Context" }, { name: "addr", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "_r1", type: "error" }] }, { name: "LookupCNAME", args: [{ name: "ctx", type: "context.Context" }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "_r1", type: "error" }] }, { name: "LookupHost", args: [{ name: "ctx", type: "context.Context" }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "addrs", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "err", type: "error" }] }, { name: "LookupIP", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: "net.IP" } }, { name: "_r1", type: "error" }] }, { name: "LookupIPAddr", args: [{ name: "ctx", type: "context.Context" }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: "net.IPAddr" } }, { name: "_r1", type: "error" }] }, { name: "LookupMX", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.MX" } } }, { name: "_r1", type: "error" }] }, { name: "LookupNS", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.NS" } } }, { name: "_r1", type: "error" }] }, { name: "LookupNetIP", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: "netip.Addr" } }, { name: "_r1", type: "error" }] }, { name: "LookupPort", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "service", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "port", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "err", type: "error" }] }, { name: "LookupSRV", args: [{ name: "ctx", type: "context.Context" }, { name: "service", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "proto", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "_r1", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.SRV" } } }, { name: "_r2", type: "error" }] }, { name: "LookupTXT", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "_r1", type: "error" }] }, { name: "dial", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "server", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: "net.Conn" }, { name: "_r1", type: "error" }] }, { name: "exchange", args: [{ name: "ctx", type: "context.Context" }, { name: "server", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "q", type: "dnsmessage.Question" }, { name: "timeout", type: { kind: $.TypeKind.Basic, name: "int64", typeName: "time.Duration" } }, { name: "useTCP", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "ad", type: { kind: $.TypeKind.Basic, name: "bool" } }], returns: [{ name: "_r0", type: "dnsmessage.Parser" }, { name: "_r1", type: "dnsmessage.Header" }, { name: "_r2", type: "error" }] }, { name: "getLookupGroup", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "singleflight.Group" } }] }, { name: "goLookupCNAME", args: [{ name: "ctx", type: "context.Context" }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "order", type: { kind: $.TypeKind.Basic, name: "int", typeName: "net.hostLookupOrder" } }, { name: "conf", type: { kind: $.TypeKind.Pointer, elemType: "net.dnsConfig" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "_r1", type: "error" }] }, { name: "goLookupHostOrder", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "order", type: { kind: $.TypeKind.Basic, name: "int", typeName: "net.hostLookupOrder" } }, { name: "conf", type: { kind: $.TypeKind.Pointer, elemType: "net.dnsConfig" } }], returns: [{ name: "addrs", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "err", type: "error" }] }, { name: "goLookupIP", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "order", type: { kind: $.TypeKind.Basic, name: "int", typeName: "net.hostLookupOrder" } }, { name: "conf", type: { kind: $.TypeKind.Pointer, elemType: "net.dnsConfig" } }], returns: [{ name: "addrs", type: { kind: $.TypeKind.Slice, elemType: "net.IPAddr" } }, { name: "err", type: "error" }] }, { name: "goLookupIPCNAMEOrder", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "order", type: { kind: $.TypeKind.Basic, name: "int", typeName: "net.hostLookupOrder" } }, { name: "conf", type: { kind: $.TypeKind.Pointer, elemType: "net.dnsConfig" } }], returns: [{ name: "addrs", type: { kind: $.TypeKind.Slice, elemType: "net.IPAddr" } }, { name: "cname", type: "dnsmessage.Name" }, { name: "err", type: "error" }] }, { name: "goLookupMX", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.MX" } } }, { name: "_r1", type: "error" }] }, { name: "goLookupNS", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.NS" } } }, { name: "_r1", type: "error" }] }, { name: "goLookupPTR", args: [{ name: "ctx", type: "context.Context" }, { name: "addr", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "order", type: { kind: $.TypeKind.Basic, name: "int", typeName: "net.hostLookupOrder" } }, { name: "conf", type: { kind: $.TypeKind.Pointer, elemType: "net.dnsConfig" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "_r1", type: "error" }] }, { name: "goLookupSRV", args: [{ name: "ctx", type: "context.Context" }, { name: "service", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "proto", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "target", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "srvs", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.SRV" } } }, { name: "err", type: "error" }] }, { name: "goLookupTXT", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "_r1", type: "error" }] }, { name: "internetAddrList", args: [{ name: "ctx", type: "context.Context" }, { name: "net", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "addr", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: "net.addrList" }, { name: "_r1", type: "error" }] }, { name: "lookup", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "qtype", type: { kind: $.TypeKind.Basic, name: "uint16", typeName: "dnsmessage.Type" } }, { name: "conf", type: { kind: $.TypeKind.Pointer, elemType: "net.dnsConfig" } }], returns: [{ name: "_r0", type: "dnsmessage.Parser" }, { name: "_r1", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "_r2", type: "error" }] }, { name: "lookupAddr", args: [{ name: "ctx", type: "context.Context" }, { name: "addr", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "_r1", type: "error" }] }, { name: "lookupCNAME", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "_r1", type: "error" }] }, { name: "lookupHost", args: [{ name: "ctx", type: "context.Context" }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "addrs", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "err", type: "error" }] }, { name: "lookupIP", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "addrs", type: { kind: $.TypeKind.Slice, elemType: "net.IPAddr" } }, { name: "err", type: "error" }] }, { name: "lookupIPAddr", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: "net.IPAddr" } }, { name: "_r1", type: "error" }] }, { name: "lookupMX", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.MX" } } }, { name: "_r1", type: "error" }] }, { name: "lookupNS", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.NS" } } }, { name: "_r1", type: "error" }] }, { name: "lookupPort", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "service", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "_r1", type: "error" }] }, { name: "lookupSRV", args: [{ name: "ctx", type: "context.Context" }, { name: "service", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "proto", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "_r1", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.SRV" } } }, { name: "_r2", type: "error" }] }, { name: "lookupTXT", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "_r1", type: "error" }] }, { name: "preferGo", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "resolveAddrList", args: [{ name: "ctx", type: "context.Context" }, { name: "op", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "addr", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "hint", type: "net.Addr" }], returns: [{ name: "_r0", type: "net.addrList" }, { name: "_r1", type: "error" }] }, { name: "strictErrors", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "tryOneName", args: [{ name: "ctx", type: "context.Context" }, { name: "cfg", type: { kind: $.TypeKind.Pointer, elemType: "net.dnsConfig" } }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "qtype", type: { kind: $.TypeKind.Basic, name: "uint16", typeName: "dnsmessage.Type" } }], returns: [{ name: "_r0", type: "dnsmessage.Parser" }, { name: "_r1", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "_r2", type: "error" }] }],
+		[{ name: "LookupAddr", args: [{ name: "ctx", type: "context.Context" }, { name: "addr", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "_r1", type: "error" }] }, { name: "LookupCNAME", args: [{ name: "ctx", type: "context.Context" }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "_r1", type: "error" }] }, { name: "LookupHost", args: [{ name: "ctx", type: "context.Context" }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "addrs", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "err", type: "error" }] }, { name: "LookupIP", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Slice, typeName: "net.IP", elemType: { kind: $.TypeKind.Basic, name: "uint8" } } } }, { name: "_r1", type: "error" }] }, { name: "LookupIPAddr", args: [{ name: "ctx", type: "context.Context" }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: "net.IPAddr" } }, { name: "_r1", type: "error" }] }, { name: "LookupMX", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.MX" } } }, { name: "_r1", type: "error" }] }, { name: "LookupNS", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.NS" } } }, { name: "_r1", type: "error" }] }, { name: "LookupNetIP", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: "netip.Addr" } }, { name: "_r1", type: "error" }] }, { name: "LookupPort", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "service", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "port", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "err", type: "error" }] }, { name: "LookupSRV", args: [{ name: "ctx", type: "context.Context" }, { name: "service", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "proto", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "_r1", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.SRV" } } }, { name: "_r2", type: "error" }] }, { name: "LookupTXT", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "_r1", type: "error" }] }, { name: "dial", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "server", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: "net.Conn" }, { name: "_r1", type: "error" }] }, { name: "exchange", args: [{ name: "ctx", type: "context.Context" }, { name: "server", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "q", type: "dnsmessage.Question" }, { name: "timeout", type: { kind: $.TypeKind.Basic, name: "int64", typeName: "time.Duration" } }, { name: "useTCP", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "ad", type: { kind: $.TypeKind.Basic, name: "bool" } }], returns: [{ name: "_r0", type: "dnsmessage.Parser" }, { name: "_r1", type: "dnsmessage.Header" }, { name: "_r2", type: "error" }] }, { name: "getLookupGroup", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "singleflight.Group" } }] }, { name: "goLookupCNAME", args: [{ name: "ctx", type: "context.Context" }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "order", type: { kind: $.TypeKind.Basic, name: "int", typeName: "net.hostLookupOrder" } }, { name: "conf", type: { kind: $.TypeKind.Pointer, elemType: "net.dnsConfig" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "_r1", type: "error" }] }, { name: "goLookupHostOrder", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "order", type: { kind: $.TypeKind.Basic, name: "int", typeName: "net.hostLookupOrder" } }, { name: "conf", type: { kind: $.TypeKind.Pointer, elemType: "net.dnsConfig" } }], returns: [{ name: "addrs", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "err", type: "error" }] }, { name: "goLookupIP", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "order", type: { kind: $.TypeKind.Basic, name: "int", typeName: "net.hostLookupOrder" } }, { name: "conf", type: { kind: $.TypeKind.Pointer, elemType: "net.dnsConfig" } }], returns: [{ name: "addrs", type: { kind: $.TypeKind.Slice, elemType: "net.IPAddr" } }, { name: "err", type: "error" }] }, { name: "goLookupIPCNAMEOrder", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "order", type: { kind: $.TypeKind.Basic, name: "int", typeName: "net.hostLookupOrder" } }, { name: "conf", type: { kind: $.TypeKind.Pointer, elemType: "net.dnsConfig" } }], returns: [{ name: "addrs", type: { kind: $.TypeKind.Slice, elemType: "net.IPAddr" } }, { name: "cname", type: "dnsmessage.Name" }, { name: "err", type: "error" }] }, { name: "goLookupMX", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.MX" } } }, { name: "_r1", type: "error" }] }, { name: "goLookupNS", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.NS" } } }, { name: "_r1", type: "error" }] }, { name: "goLookupPTR", args: [{ name: "ctx", type: "context.Context" }, { name: "addr", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "order", type: { kind: $.TypeKind.Basic, name: "int", typeName: "net.hostLookupOrder" } }, { name: "conf", type: { kind: $.TypeKind.Pointer, elemType: "net.dnsConfig" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "_r1", type: "error" }] }, { name: "goLookupSRV", args: [{ name: "ctx", type: "context.Context" }, { name: "service", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "proto", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "target", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "srvs", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.SRV" } } }, { name: "err", type: "error" }] }, { name: "goLookupTXT", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "_r1", type: "error" }] }, { name: "internetAddrList", args: [{ name: "ctx", type: "context.Context" }, { name: "net", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "addr", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, typeName: "net.addrList", elemType: "net.Addr" } }, { name: "_r1", type: "error" }] }, { name: "lookup", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "qtype", type: { kind: $.TypeKind.Basic, name: "uint16", typeName: "dnsmessage.Type" } }, { name: "conf", type: { kind: $.TypeKind.Pointer, elemType: "net.dnsConfig" } }], returns: [{ name: "_r0", type: "dnsmessage.Parser" }, { name: "_r1", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "_r2", type: "error" }] }, { name: "lookupAddr", args: [{ name: "ctx", type: "context.Context" }, { name: "addr", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "_r1", type: "error" }] }, { name: "lookupCNAME", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "_r1", type: "error" }] }, { name: "lookupHost", args: [{ name: "ctx", type: "context.Context" }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "addrs", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "err", type: "error" }] }, { name: "lookupIP", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "addrs", type: { kind: $.TypeKind.Slice, elemType: "net.IPAddr" } }, { name: "err", type: "error" }] }, { name: "lookupIPAddr", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "host", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: "net.IPAddr" } }, { name: "_r1", type: "error" }] }, { name: "lookupMX", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.MX" } } }, { name: "_r1", type: "error" }] }, { name: "lookupNS", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.NS" } } }, { name: "_r1", type: "error" }] }, { name: "lookupPort", args: [{ name: "ctx", type: "context.Context" }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "service", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "_r1", type: "error" }] }, { name: "lookupSRV", args: [{ name: "ctx", type: "context.Context" }, { name: "service", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "proto", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "_r1", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "net.SRV" } } }, { name: "_r2", type: "error" }] }, { name: "lookupTXT", args: [{ name: "ctx", type: "context.Context" }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }, { name: "_r1", type: "error" }] }, { name: "preferGo", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "resolveAddrList", args: [{ name: "ctx", type: "context.Context" }, { name: "op", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "network", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "addr", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "hint", type: "net.Addr" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, typeName: "net.addrList", elemType: "net.Addr" } }, { name: "_r1", type: "error" }] }, { name: "strictErrors", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "tryOneName", args: [{ name: "ctx", type: "context.Context" }, { name: "cfg", type: { kind: $.TypeKind.Pointer, elemType: "net.dnsConfig" } }, { name: "name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "qtype", type: { kind: $.TypeKind.Basic, name: "uint16", typeName: "dnsmessage.Type" } }], returns: [{ name: "_r0", type: "dnsmessage.Parser" }, { name: "_r1", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "_r2", type: "error" }] }],
 		Resolver,
 		[{ name: "PreferGo", key: "PreferGo", type: { kind: $.TypeKind.Basic, name: "bool" }, index: [0], offset: 0, exported: true }, { name: "StrictErrors", key: "StrictErrors", type: { kind: $.TypeKind.Basic, name: "bool" }, index: [1], offset: 1, exported: true }, { name: "Dial", key: "Dial", type: ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }], results: ["net.Conn", "error"] } as $.FunctionTypeInfo), index: [2], offset: 8, exported: true }, { name: "lookupGroup", key: "lookupGroup", type: "singleflight.Group", pkgPath: "net", index: [3], offset: 16, exported: false }]
 	)
@@ -1809,7 +1809,7 @@ export function lookupProtocolMap(name: string): [number, $.GoError] {
 	__goscript_parse.lowerASCIIBytes($.goSlice(lowerProtocol, undefined, n))
 	let [proto, found] = $.mapGet<string, number, number>(__goscript_get_protocols(), $.bytesToString($.goSlice(lowerProtocol, undefined, n)), 0)
 	if (!found || (n != $.len(name))) {
-		return [0, $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: "unknown IP protocol specified", Addr: name}), "*net.AddrError")]
+		return [0, $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: "unknown IP protocol specified", Addr: name}), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 	}
 	return [proto, null]
 }
@@ -1844,7 +1844,7 @@ export async function lookupPortMap(network: string, service: string): globalThi
 			break
 		}
 	}
-	return [0, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "unknown network", Name: (network + "/") + service}), "*net.DNSError")]
+	return [0, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "unknown network", Name: (network + "/") + service}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 }
 
 export async function lookupPortMapWithNetwork(network: string, errNetwork: string, service: string): globalThis.Promise<[number, $.GoError]> {
@@ -1864,10 +1864,10 @@ export async function lookupPortMapWithNetwork(network: string, errNetwork: stri
 					return [__goscriptShadow0, null]
 				}
 			}
-			return [0, $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errUnknownPort, "*net.notFoundError"), (errNetwork + "/") + service, ""), "*net.DNSError")]
+			return [0, $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errUnknownPort, "*net.notFoundError", { kind: $.TypeKind.Pointer, elemType: "net.notFoundError" }), (errNetwork + "/") + service, ""), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 		}
 	}
-	return [0, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "unknown network", Name: (errNetwork + "/") + service}), "*net.DNSError")]
+	return [0, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "unknown network", Name: (errNetwork + "/") + service}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 }
 
 export function ipVersion(network: string): number {
@@ -1909,7 +1909,7 @@ export async function LookupIP(host: string): globalThis.Promise<[$.Slice<__gosc
 }
 
 export function withUnexpiredValuesPreserved(lookupCtx: context.Context | null): context.Context | null {
-	return $.interfaceValue<context.Context | null>((() => { const __goscriptLiteralField18 = context.Background(); return new onlyValuesCtx({Context: __goscriptLiteralField18, lookupValues: lookupCtx}) })(), "*net.onlyValuesCtx")
+	return $.interfaceValue<context.Context | null>((() => { const __goscriptLiteralField18 = context.Background(); return new onlyValuesCtx({Context: __goscriptLiteralField18, lookupValues: lookupCtx}) })(), "*net.onlyValuesCtx", { kind: $.TypeKind.Pointer, elemType: "net.onlyValuesCtx" })
 }
 
 export function lookupIPReturn(addrsi: any, err: $.GoError, shared: boolean): [$.Slice<__goscript_iprawsock.IPAddr>, $.GoError] {
@@ -1929,7 +1929,7 @@ export function ipAddrsEface(addrs: $.Slice<__goscript_iprawsock.IPAddr>): $.Sli
 	let s: $.Slice<any> = $.makeSlice<any>($.len(addrs))
 	for (let __goscriptRangeTarget16 = addrs, i = 0; i < $.len(__goscriptRangeTarget16); i++) {
 		let v = __goscriptRangeTarget16![i]
-		s![i] = $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(v)), "net.IPAddr")
+		s![i] = $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(v)), "net.IPAddr", "net.IPAddr")
 	}
 	return s
 }

@@ -74,5 +74,5 @@ export class truncateWriter {
 }
 
 export function TruncateWriter(w: io.Writer | null, n: bigint): io.Writer | null {
-	return $.interfaceValue<io.Writer | null>(new truncateWriter({w: w, n: n}), "*iotest.truncateWriter")
+	return $.interfaceValue<io.Writer | null>(new truncateWriter({w: w, n: n}), "*iotest.truncateWriter", { kind: $.TypeKind.Pointer, elemType: "iotest.truncateWriter" })
 }

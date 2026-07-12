@@ -52,7 +52,7 @@ export async function main(): globalThis.Promise<void> {
 
 	$.println("json unmarshaled:", out)
 
-	let oneofMsg: __goscript_protobuf_lite_ts_pb_ts.ExampleMsg | $.VarRef<__goscript_protobuf_lite_ts_pb_ts.ExampleMsg> | null = new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg({ExampleText: "oneof", Choice: $.interfaceValue<__goscript_protobuf_lite_ts_pb_ts.isExampleMsg_Choice | null>(new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg_ChoiceData({ChoiceData: new Uint8Array([1, 2, 3]) as $.Slice<number>}), "*main.ExampleMsg_ChoiceData")})
+	let oneofMsg: __goscript_protobuf_lite_ts_pb_ts.ExampleMsg | $.VarRef<__goscript_protobuf_lite_ts_pb_ts.ExampleMsg> | null = new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg({ExampleText: "oneof", Choice: $.interfaceValue<__goscript_protobuf_lite_ts_pb_ts.isExampleMsg_Choice | null>(new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg_ChoiceData({ChoiceData: new Uint8Array([1, 2, 3]) as $.Slice<number>}), "*main.ExampleMsg_ChoiceData", { kind: $.TypeKind.Pointer, elemType: "main.ExampleMsg_ChoiceData" })})
 	let oneofClone: __goscript_protobuf_lite_ts_pb_ts.ExampleMsg | $.VarRef<__goscript_protobuf_lite_ts_pb_ts.ExampleMsg> | null = __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.CloneVT.call(oneofMsg)
 	$.println("oneof clone equal:", __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.EqualVT.call(oneofMsg, oneofClone))
 	__goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.GetChoiceData.call(oneofMsg)![0] = $.uint(9, 8)

@@ -63,7 +63,7 @@ export function __goscript_set_ready(__goscriptValue: $.Channel<boolean> | null)
 }
 
 export function NewSpecific(): Specific | null {
-	return $.interfaceValue<Specific | null>(new impl(), "*main.impl")
+	return $.interfaceValue<Specific | null>(new impl(), "*main.impl", { kind: $.TypeKind.Pointer, elemType: "main.impl" })
 }
 
 export async function main(): globalThis.Promise<void> {

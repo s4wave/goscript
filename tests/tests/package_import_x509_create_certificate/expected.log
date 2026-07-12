@@ -1,0 +1,10 @@
+keygen err nil true
+create err nil true
+der nonempty true
+parse err nil true
+serial 42
+common name goscript.test
+organization GoScript
+signature algorithm Ed25519
+public key algorithm Ed25519
+public key equal true

@@ -78,7 +78,7 @@ export class WebSocket {
 			if ($.markAsStructValue($.cloneStructValue(arrayBuffer)).Type() == js.TypeString) {
 				data = $.markAsStructValue($.cloneStructValue(arrayBuffer)).String()
 			} else {
-				data = $.interfaceValue<any>(extractArrayBuffer($.markAsStructValue($.cloneStructValue(arrayBuffer))), "[]byte")
+				data = $.interfaceValue<any>(extractArrayBuffer($.markAsStructValue($.cloneStructValue(arrayBuffer))), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })
 			}
 
 			let me = $.markAsStructValue(new MessageEvent({Data: data}))
@@ -98,7 +98,7 @@ export class WebSocket {
 		const __defer = new $.AsyncDisposableStack()
 		try {
 			__defer.defer(async () => { await handleJSError(err, (null as (() => void) | null)) })
-			$.markAsStructValue($.cloneStructValue(c.v)).Call("send", $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(uint8Array(v))), "js.Value"))
+			$.markAsStructValue($.cloneStructValue(c.v)).Call("send", $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(uint8Array(v))), "js.Value", "js.Value"))
 			const __goscriptReturn2: $.GoError = err.value
 			err.value = __goscriptReturn2
 			await __defer.dispose()
@@ -145,10 +145,10 @@ export class WebSocket {
 			fn!($.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))))
 			return null
 		}, ({ kind: $.TypeKind.Function, params: ["js.Value", { kind: $.TypeKind.Slice, elemType: "js.Value" }], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))))
-		$.markAsStructValue($.cloneStructValue(c.v)).Call("addEventListener", eventType, $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(f)), "js.Func"))
+		$.markAsStructValue($.cloneStructValue(c.v)).Call("addEventListener", eventType, $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(f)), "js.Func", "js.Func"))
 
 		return $.functionValue((): void => {
-			$.markAsStructValue($.cloneStructValue(c.v)).Call("removeEventListener", eventType, $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(f)), "js.Func"))
+			$.markAsStructValue($.cloneStructValue(c.v)).Call("removeEventListener", eventType, $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(f)), "js.Func", "js.Func"))
 			$.markAsStructValue($.cloneStructValue(f)).Release()
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 	}
@@ -264,7 +264,7 @@ export async function handleJSError(err: $.VarRef<$.GoError> | null, onErr: (() 
 	{
 		let [jsErr, ok] = $.typeAssertTuple<js.Error>(r, "js.Error")
 		if (ok) {
-			err!.value = $.interfaceValue<$.GoError>($.markAsStructValue($.cloneStructValue(jsErr)), "js.Error")
+			err!.value = $.interfaceValue<$.GoError>($.markAsStructValue($.cloneStructValue(jsErr)), "js.Error", "js.Error")
 
 			if (onErr != null) {
 				await onErr!()
@@ -293,7 +293,7 @@ export async function New(url: string, protocols: $.Slice<string>): globalThis.P
 			jsProtocols![i] = p
 		}
 
-		c = (() => { const __goscriptLiteralField0 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(js.Global())).Get("WebSocket"))).New(url, $.interfaceValue<any>(jsProtocols, "[]any")))); return $.markAsStructValue(new WebSocket({v: __goscriptLiteralField0})) })()
+		c = (() => { const __goscriptLiteralField0 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(js.Global())).Get("WebSocket"))).New(url, $.interfaceValue<any>(jsProtocols, "[]any", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Interface, methods: [] } })))); return $.markAsStructValue(new WebSocket({v: __goscriptLiteralField0})) })()
 
 		$.markAsStructValue($.cloneStructValue(c)).setBinaryType("arraybuffer")
 
@@ -313,7 +313,7 @@ export async function New(url: string, protocols: $.Slice<string>): globalThis.P
 }
 
 export function extractArrayBuffer(arrayBuffer: js.Value): $.Slice<number> {
-	let uint8Array = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(js.Global())).Get("Uint8Array"))).New($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(arrayBuffer)), "js.Value"))))
+	let uint8Array = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(js.Global())).Get("Uint8Array"))).New($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(arrayBuffer)), "js.Value", "js.Value"))))
 	let dst: $.Slice<number> = $.makeSlice<number>($.markAsStructValue($.cloneStructValue(uint8Array)).Length(), undefined, "byte")
 	js.CopyBytesToGo(dst, $.markAsStructValue($.cloneStructValue(uint8Array)))
 	return dst

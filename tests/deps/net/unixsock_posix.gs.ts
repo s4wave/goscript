@@ -167,7 +167,7 @@ export function sockaddrToUnix(sa: syscall.Sockaddr | null): __goscript_net.Addr
 		let s: syscall.SockaddrUnix | $.VarRef<syscall.SockaddrUnix> | null = __goscriptTuple1[0]
 		let ok = __goscriptTuple1[1]
 		if (ok) {
-			return $.interfaceValue<__goscript_net.Addr | null>(new __goscript_unixsock.UnixAddr({Name: $.pointerValue<syscall.SockaddrUnix>(s).Name, Net: "unix"}), "*net.UnixAddr")
+			return $.interfaceValue<__goscript_net.Addr | null>(new __goscript_unixsock.UnixAddr({Name: $.pointerValue<syscall.SockaddrUnix>(s).Name, Net: "unix"}), "*net.UnixAddr", { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" })
 		}
 	}
 	return null
@@ -179,7 +179,7 @@ export function sockaddrToUnixgram(sa: syscall.Sockaddr | null): __goscript_net.
 		let s: syscall.SockaddrUnix | $.VarRef<syscall.SockaddrUnix> | null = __goscriptTuple2[0]
 		let ok = __goscriptTuple2[1]
 		if (ok) {
-			return $.interfaceValue<__goscript_net.Addr | null>(new __goscript_unixsock.UnixAddr({Name: $.pointerValue<syscall.SockaddrUnix>(s).Name, Net: "unixgram"}), "*net.UnixAddr")
+			return $.interfaceValue<__goscript_net.Addr | null>(new __goscript_unixsock.UnixAddr({Name: $.pointerValue<syscall.SockaddrUnix>(s).Name, Net: "unixgram"}), "*net.UnixAddr", { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" })
 		}
 	}
 	return null
@@ -191,7 +191,7 @@ export function sockaddrToUnixpacket(sa: syscall.Sockaddr | null): __goscript_ne
 		let s: syscall.SockaddrUnix | $.VarRef<syscall.SockaddrUnix> | null = __goscriptTuple3[0]
 		let ok = __goscriptTuple3[1]
 		if (ok) {
-			return $.interfaceValue<__goscript_net.Addr | null>(new __goscript_unixsock.UnixAddr({Name: $.pointerValue<syscall.SockaddrUnix>(s).Name, Net: "unixpacket"}), "*net.UnixAddr")
+			return $.interfaceValue<__goscript_net.Addr | null>(new __goscript_unixsock.UnixAddr({Name: $.pointerValue<syscall.SockaddrUnix>(s).Name, Net: "unixpacket"}), "*net.UnixAddr", { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" })
 		}
 	}
 	return null

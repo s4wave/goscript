@@ -113,9 +113,9 @@ export class IPNet {
 	static __typeInfo = $.registerStructType(
 		"net.IPNet",
 		() => new IPNet(),
-		[{ name: "Contains", args: [{ name: "ip", type: "net.IP" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Network", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		[{ name: "Contains", args: [{ name: "ip", type: { kind: $.TypeKind.Slice, typeName: "net.IP", elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Network", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }],
 		IPNet,
-		[{ name: "IP", key: "IP", type: "net.IP", index: [0], offset: 0, exported: true }, { name: "Mask", key: "Mask", type: "net.IPMask", index: [1], offset: 24, exported: true }]
+		[{ name: "IP", key: "IP", type: { kind: $.TypeKind.Slice, typeName: "net.IP", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, index: [0], offset: 0, exported: true }, { name: "Mask", key: "Mask", type: { kind: $.TypeKind.Slice, typeName: "net.IPMask", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, index: [1], offset: 24, exported: true }]
 	)
 }
 
@@ -466,7 +466,7 @@ export function IP_AppendText(ip: IP, b: $.Slice<number>): [$.Slice<number>, $.G
 		return [b, null]
 	}
 	if (($.len((ip as IP)) != 4) && ($.len((ip as IP)) != 16)) {
-		return [b, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField0 = hexString(ip); return new __goscript_net.AddrError({Err: "invalid IP address", Addr: __goscriptLiteralField0}) })(), "*net.AddrError")]
+		return [b, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField0 = hexString(ip); return new __goscript_net.AddrError({Err: "invalid IP address", Addr: __goscriptLiteralField0}) })(), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 	}
 
 	return [IP_appendTo(ip, b), null]
@@ -491,7 +491,7 @@ export function IP_UnmarshalText(ip: $.VarRef<IP> | null, text: $.Slice<number>)
 	let s = $.bytesToString(text)
 	let x: IP = (ParseIP(s) as IP)
 	if (x == null) {
-		return $.interfaceValue<$.GoError>(new __goscript_net.ParseError({Type: "IP address", Text: s}), "*net.ParseError")
+		return $.interfaceValue<$.GoError>(new __goscript_net.ParseError({Type: "IP address", Text: s}), "*net.ParseError", { kind: $.TypeKind.Pointer, elemType: "net.ParseError" })
 	}
 	ip!.value = (x as IP)
 	return null
@@ -620,17 +620,17 @@ export function parseIP(s: string): [Uint8Array, boolean] {
 export function ParseCIDR(s: string): [IP, IPNet | $.VarRef<IPNet> | null, $.GoError] {
 	let [addr, mask, found] = stringslite.Cut(s, "/")
 	if (!found) {
-		return [(null as IP), null, $.interfaceValue<$.GoError>(new __goscript_net.ParseError({Type: "CIDR address", Text: s}), "*net.ParseError")]
+		return [(null as IP), null, $.interfaceValue<$.GoError>(new __goscript_net.ParseError({Type: "CIDR address", Text: s}), "*net.ParseError", { kind: $.TypeKind.Pointer, elemType: "net.ParseError" })]
 	}
 
 	let [ipAddr, err] = netip.ParseAddr(addr)
 	if ((err != null) || (!$.stringEqual($.markAsStructValue($.cloneStructValue(ipAddr)).Zone(), ""))) {
-		return [(null as IP), null, $.interfaceValue<$.GoError>(new __goscript_net.ParseError({Type: "CIDR address", Text: s}), "*net.ParseError")]
+		return [(null as IP), null, $.interfaceValue<$.GoError>(new __goscript_net.ParseError({Type: "CIDR address", Text: s}), "*net.ParseError", { kind: $.TypeKind.Pointer, elemType: "net.ParseError" })]
 	}
 
 	let [n, i, ok] = __goscript_parse.dtoi(mask)
 	if (((!ok || (i != $.len(mask))) || (n < 0)) || (n > $.markAsStructValue($.cloneStructValue(ipAddr)).BitLen())) {
-		return [(null as IP), null, $.interfaceValue<$.GoError>(new __goscript_net.ParseError({Type: "CIDR address", Text: s}), "*net.ParseError")]
+		return [(null as IP), null, $.interfaceValue<$.GoError>(new __goscript_net.ParseError({Type: "CIDR address", Text: s}), "*net.ParseError", { kind: $.TypeKind.Pointer, elemType: "net.ParseError" })]
 	}
 	let m: IPMask = (CIDRMask(n, $.markAsStructValue($.cloneStructValue(ipAddr)).BitLen()) as IPMask)
 	let addr16 = $.markAsStructValue($.cloneStructValue(ipAddr)).As16()

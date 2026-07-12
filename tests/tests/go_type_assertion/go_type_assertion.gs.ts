@@ -6,7 +6,7 @@ import * as $ from "@goscript/builtin/index.js"
 export async function main(): globalThis.Promise<void> {
 	let x: any = $.interfaceValue<any>($.functionValue((): void => {
 		$.println("goroutine executed")
-	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)), "func()")
+	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)), "func()", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 	queueMicrotask(async () => { await $.mustTypeAssert<(() => void) | null>(x, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))!() })
 	$.println("main finished")
 }

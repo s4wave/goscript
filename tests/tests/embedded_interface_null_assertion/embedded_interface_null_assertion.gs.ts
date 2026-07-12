@@ -122,7 +122,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println($.pointerValue<MyReader>(mr1).Reader == null)
 
 	let sr: StringReader | $.VarRef<StringReader> | null = new StringReader({data: "hello", pos: 0})
-	let mr2: MyReader | $.VarRef<MyReader> | null = new MyReader({Reader: $.interfaceValue<Reader | null>(sr, "*main.StringReader"), name: "test2"})
+	let mr2: MyReader | $.VarRef<MyReader> | null = new MyReader({Reader: $.interfaceValue<Reader | null>(sr, "*main.StringReader", { kind: $.TypeKind.Pointer, elemType: "main.StringReader" }), name: "test2"})
 	$.println($.pointerValue<MyReader>(mr2).Reader != null)
 
 	let buf: $.Slice<number> = $.makeSlice<number>(5, undefined, "byte")

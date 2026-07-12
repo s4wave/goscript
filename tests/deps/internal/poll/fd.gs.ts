@@ -110,10 +110,10 @@ export function errClosing(isFile: boolean): $.GoError {
 	if (isFile) {
 		return ErrFileClosing
 	}
-	return $.interfaceValue<$.GoError>($.markAsStructValue($.cloneStructValue(ErrNetClosing)), "poll.errNetClosing")
+	return $.interfaceValue<$.GoError>($.markAsStructValue($.cloneStructValue(ErrNetClosing)), "poll.errNetClosing", "poll.errNetClosing")
 }
 
-export let ErrDeadlineExceeded: $.GoError = $.interfaceValue<$.GoError>(new DeadlineExceededError(), "*poll.DeadlineExceededError")
+export let ErrDeadlineExceeded: $.GoError = $.interfaceValue<$.GoError>(new DeadlineExceededError(), "*poll.DeadlineExceededError", { kind: $.TypeKind.Pointer, elemType: "poll.DeadlineExceededError" })
 
 export function __goscript_set_ErrDeadlineExceeded(__goscriptValue: $.GoError): void {
 	ErrDeadlineExceeded = __goscriptValue

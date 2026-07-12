@@ -62,11 +62,11 @@ export class Person {
 }
 
 export function reflectOverlap(x: $.Slice<number>, y: $.Slice<number>): boolean {
-	return ((($.len(x) > 0) && ($.len(y) > 0)) && ($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>($.indexRef(x!, 0), "*byte")))).Pointer(), 64) <= $.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>($.indexRef(y!, $.len(y) - 1), "*byte")))).Pointer(), 64))) && ($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>($.indexRef(y!, 0), "*byte")))).Pointer(), 64) <= $.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>($.indexRef(x!, $.len(x) - 1), "*byte")))).Pointer(), 64))
+	return ((($.len(x) > 0) && ($.len(y) > 0)) && ($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>($.indexRef(x!, 0), "*byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })))).Pointer(), 64) <= $.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>($.indexRef(y!, $.len(y) - 1), "*byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })))).Pointer(), 64))) && ($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>($.indexRef(y!, 0), "*byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })))).Pointer(), 64) <= $.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>($.indexRef(x!, $.len(x) - 1), "*byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })))).Pointer(), 64))
 }
 
 export function reflectSameStart(x: $.Slice<number>, y: $.Slice<number>): boolean {
-	return (($.len(x) > 0) && ($.len(y) > 0)) && ($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>($.indexRef(x!, 0), "*byte")))).Pointer(), 64) == $.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>($.indexRef(y!, 0), "*byte")))).Pointer(), 64))
+	return (($.len(x) > 0) && ($.len(y) > 0)) && ($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>($.indexRef(x!, 0), "*byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })))).Pointer(), 64) == $.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>($.indexRef(y!, 0), "*byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })))).Pointer(), 64))
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -86,7 +86,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test with slice
 	let slice: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3])
-	let sliceV = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>(slice, "[]int"))))
+	let sliceV = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>(slice, "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }))))
 	$.println("Slice type:", await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor({T: { type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }, zero: () => null }})).String())
 	$.println("Slice len:", $.markAsStructValue($.cloneStructValue(sliceV)).Len())
 	$.println("Slice kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(sliceV)).Kind()))
@@ -95,8 +95,8 @@ export async function main(): globalThis.Promise<void> {
 	let a: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3])
 	let b: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3])
 	let c: $.Slice<number> = $.arrayToSlice<number>([1, 2, 4])
-	$.println("DeepEqual a==b:", reflect.DeepEqual($.interfaceValue<any>(a, "[]int"), $.interfaceValue<any>(b, "[]int")))
-	$.println("DeepEqual a==c:", reflect.DeepEqual($.interfaceValue<any>(a, "[]int"), $.interfaceValue<any>(c, "[]int")))
+	$.println("DeepEqual a==b:", reflect.DeepEqual($.interfaceValue<any>(a, "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }), $.interfaceValue<any>(b, "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } })))
+	$.println("DeepEqual a==c:", reflect.DeepEqual($.interfaceValue<any>(a, "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }), $.interfaceValue<any>(c, "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } })))
 
 	// Test Zero value
 	let zeroInt = $.markAsStructValue($.cloneStructValue(reflect.Zero($.pointerValueOrNil(reflect.TypeFor({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}))!)))
@@ -135,7 +135,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test Swapper function
 	let testSlice: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3, 4, 5])
-	let swapper: ((i: number, j: number) => void) | null = reflect.Swapper($.interfaceValue<any>(testSlice, "[]int"))
+	let swapper: ((i: number, j: number) => void) | null = reflect.Swapper($.interfaceValue<any>(testSlice, "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }))
 	$.println("Before swap:", $.arrayIndex(testSlice!, 0), $.arrayIndex(testSlice!, 4))
 	await swapper!(0, 4)
 	$.println("After swap:", $.arrayIndex(testSlice!, 0), $.arrayIndex(testSlice!, 4))
@@ -143,8 +143,8 @@ export async function main(): globalThis.Promise<void> {
 	// Test Copy function
 	let src: $.Slice<number> = $.arrayToSlice<number>([10, 20, 30])
 	let dst: $.Slice<number> = $.makeSlice<number>(2, undefined, "number")
-	let srcVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>(src, "[]int"))))
-	let dstVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>(dst, "[]int"))))
+	let srcVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>(src, "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }))))
+	let dstVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>(dst, "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }))))
 	let copied = reflect.Copy($.markAsStructValue($.cloneStructValue(dstVal)), $.markAsStructValue($.cloneStructValue(srcVal)))
 	$.println("Copied elements:", copied)
 	$.println("Dst after copy:", $.arrayIndex(dst!, 0), $.arrayIndex(dst!, 1))
@@ -155,7 +155,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println("Struct type:", await $.pointerValue<Exclude<reflect.Type, null>>(personType).String())
 	$.println("Struct kind:", reflect.Kind_String((await $.pointerValue<Exclude<reflect.Type, null>>(personType).Kind())))
 
-	let personVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(person)), "main.Person"))))
+	let personVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(person)), "main.Person", "main.Person"))))
 	$.println("Struct value type:", await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(personVal)).Type()).String())
 
 	// Test with different kinds
@@ -207,7 +207,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println("Complex real:", $.int($.real($.markAsStructValue($.cloneStructValue(complexReflect)).Complex())))
 	$.println("Complex imag:", $.int($.imag($.markAsStructValue($.cloneStructValue(complexReflect)).Complex())))
 	let complexTarget: $.VarRef<$.Complex> = $.varRef($.complex(0, 0))
-	let complexTargetValue = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>(complexTarget, "*complex128")))).Elem()))
+	let complexTargetValue = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>(complexTarget, "*complex128", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "complex128" } })))).Elem()))
 	$.markAsStructValue($.cloneStructValue(complexTargetValue)).SetComplex($.complex(7, 8))
 	$.println("SetComplex real:", $.int($.real($.markAsStructValue($.cloneStructValue(complexTargetValue)).Complex())))
 	$.println("SetComplex imag:", $.int($.imag($.markAsStructValue($.cloneStructValue(complexTargetValue)).Complex())))
@@ -217,13 +217,13 @@ export async function main(): globalThis.Promise<void> {
 	let fn: ((_p0: number) => string | globalThis.Promise<string>) | null = $.functionValue((_p0: number): string => {
 		return ""
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo))
-	let fnVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>(fn, "func(int) string"))))
+	let fnVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>(fn, "func(int) string", ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo)))))
 	$.println("Function type:", await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(fnVal)).Type()).String())
 	$.println("Function kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(fnVal)).Kind()))
 
 	// Test more complex types
 	let complexSlice: $.Slice<$.Slice<number>> = $.arrayToSlice<$.Slice<number>>([$.arrayToSlice<number>([1, 2]), $.arrayToSlice<number>([3, 4])])
-	let complexVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>(complexSlice, "[][]int"))))
+	let complexVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>(complexSlice, "[][]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } } }))))
 	$.println("Complex slice type:", await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(complexVal)).Type()).String())
 	$.println("Complex slice kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(complexVal)).Kind()))
 	$.println("Complex slice len:", $.markAsStructValue($.cloneStructValue(complexVal)).Len())
@@ -249,7 +249,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println("MakeMap type:", await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(newMap)).Type()).String())
 
 	// Test Append
-	let originalSlice = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>($.arrayToSlice<number>([1, 2]), "[]int"))))
+	let originalSlice = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>($.arrayToSlice<number>([1, 2]), "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }))))
 	let appendedSlice = $.markAsStructValue($.cloneStructValue(reflect.Append($.markAsStructValue($.cloneStructValue(originalSlice)), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.namedValueInterfaceValue<any>(3, "int", {}, { kind: $.TypeKind.Basic, name: "int" })))))))
 	$.println("Append result len:", $.markAsStructValue($.cloneStructValue(appendedSlice)).Len())
 

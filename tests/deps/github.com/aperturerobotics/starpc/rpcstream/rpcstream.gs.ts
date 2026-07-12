@@ -59,7 +59,7 @@ export async function OpenRpcStream(__typeArgs: $.GenericTypeArgs | undefined, c
 	}
 
 	// write the component id
-	err = await $.callGenericMethod(__typeArgs, "T", "Send", rpcStream, new __goscript_rpcstream_pb.RpcStreamPacket({Body: $.interfaceValue<__goscript_rpcstream_pb.isRpcStreamPacket_Body | null>(new __goscript_rpcstream_pb.RpcStreamPacket_Init({Init: new __goscript_rpcstream_pb.RpcStreamInit({ComponentId: componentID})}), "*rpcstream.RpcStreamPacket_Init")}))
+	err = await $.callGenericMethod(__typeArgs, "T", "Send", rpcStream, new __goscript_rpcstream_pb.RpcStreamPacket({Body: $.interfaceValue<__goscript_rpcstream_pb.isRpcStreamPacket_Body | null>(new __goscript_rpcstream_pb.RpcStreamPacket_Init({Init: new __goscript_rpcstream_pb.RpcStreamInit({ComponentId: componentID})}), "*rpcstream.RpcStreamPacket_Init", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket_Init" })}))
 	if (err != null) {
 		await $.callGenericMethod(__typeArgs, "T", "Close", rpcStream)
 		return [null, err]
@@ -114,7 +114,7 @@ export function NewRpcStreamOpenStream(__typeArgs: $.GenericTypeArgs | undefined
 		// start the read pump
 		queueMicrotask(async () => { await __goscript_read_writer.ReadPump(rw, msgHandler, closeHandler) })
 		// return the writer
-		return [$.interfaceValue<srpc.PacketWriter | null>(__goscript_writer.NewRpcStreamWriter(rw), "*rpcstream.RpcStreamWriter"), null]
+		return [$.interfaceValue<srpc.PacketWriter | null>(__goscript_writer.NewRpcStreamWriter(rw), "*rpcstream.RpcStreamWriter", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamWriter" }), null]
 	}, ({ kind: $.TypeKind.Function, params: ["context.Context", ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }], results: ["error"] } as $.FunctionTypeInfo), ({ kind: $.TypeKind.Function, params: ["error"], results: [] } as $.FunctionTypeInfo)], results: ["srpc.PacketWriter", "error"] } as $.FunctionTypeInfo))
 }
 
@@ -163,7 +163,7 @@ export async function HandleRpcStream(stream: RpcStream | null, getter: ((ctx: c
 	if (err != null) {
 		errStr = $.pointerValue<Exclude<$.GoError, null>>(err).Error()
 	}
-	let sendErr = await $.pointerValue<Exclude<RpcStream, null>>(stream).Send(new __goscript_rpcstream_pb.RpcStreamPacket({Body: $.interfaceValue<__goscript_rpcstream_pb.isRpcStreamPacket_Body | null>(new __goscript_rpcstream_pb.RpcStreamPacket_Ack({Ack: new __goscript_rpcstream_pb.RpcAck({Error: errStr})}), "*rpcstream.RpcStreamPacket_Ack")}))
+	let sendErr = await $.pointerValue<Exclude<RpcStream, null>>(stream).Send(new __goscript_rpcstream_pb.RpcStreamPacket({Body: $.interfaceValue<__goscript_rpcstream_pb.isRpcStreamPacket_Body | null>(new __goscript_rpcstream_pb.RpcStreamPacket_Ack({Ack: new __goscript_rpcstream_pb.RpcAck({Error: errStr})}), "*rpcstream.RpcStreamPacket_Ack", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket_Ack" })}))
 	if (err != null) {
 		return err
 	}
@@ -172,7 +172,7 @@ export async function HandleRpcStream(stream: RpcStream | null, getter: ((ctx: c
 	}
 
 	// handle the rpc
-	let serverRPC: srpc.ServerRPC | $.VarRef<srpc.ServerRPC> | null = srpc.NewServerRPC(ctx, mux, $.interfaceValue<srpc.PacketWriter | null>(__goscript_writer.NewRpcStreamWriter(stream), "*rpcstream.RpcStreamWriter"))
+	let serverRPC: srpc.ServerRPC | $.VarRef<srpc.ServerRPC> | null = srpc.NewServerRPC(ctx, mux, $.interfaceValue<srpc.PacketWriter | null>(__goscript_writer.NewRpcStreamWriter(stream), "*rpcstream.RpcStreamWriter", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamWriter" }))
 	queueMicrotask(async () => { await __goscript_read_writer.ReadPump(stream, $.functionValue(((__receiver) => (data: $.Slice<number>) => __receiver.HandlePacketData(data))($.pointerValue<srpc.ServerRPC>(serverRPC)), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }], results: ["error"] } as $.FunctionTypeInfo)), $.functionValue(((__receiver) => (closeErr: $.GoError) => __receiver.HandleStreamClose(closeErr))($.pointerValue<srpc.ServerRPC>(serverRPC).commonRPC), ({ kind: $.TypeKind.Function, params: ["error"], results: [] } as $.FunctionTypeInfo))) })
 	err = await $.pointerValue<srpc.ServerRPC>(serverRPC).commonRPC.Wait(ctx)
 	if (($.comparableEqual(err, context.Canceled)) && (await $.pointerValue<Exclude<context.Context, null>>(ctx).Err() == null)) {

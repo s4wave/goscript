@@ -111,7 +111,7 @@ $.registerInterfaceType(
 
 export type Listener = {
 	Accept(): [Conn | null, $.GoError] | globalThis.Promise<[Conn | null, $.GoError]>
-	Addr(): Addr | null | globalThis.Promise<Addr | null>
+	Addr(): Addr | null
 	Close(): $.GoError | globalThis.Promise<$.GoError>
 }
 
@@ -164,7 +164,7 @@ export type buffersWriter = {
 $.registerInterfaceType(
 	"net.buffersWriter",
 	null,
-	[{ name: "writeBuffers", args: [{ name: "_p0", type: { kind: $.TypeKind.Pointer, elemType: "net.Buffers" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int64" } }, { name: "_r1", type: "error" }] }]
+	[{ name: "writeBuffers", args: [{ name: "_p0", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, typeName: "net.Buffers", elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int64" } }, { name: "_r1", type: "error" }] }]
 );
 
 export type Buffers = $.Slice<$.Slice<number>>
@@ -202,7 +202,7 @@ export class conn {
 		}
 		let err = await __goscript_fd_fake.netFD.prototype.Close.call($.pointerValue<conn>(c).fd)
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>(new OpError({Op: "close", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).raddr, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new OpError({Op: "close", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return err
 	}
@@ -215,7 +215,7 @@ export class conn {
 		f = __goscriptTuple0[0]
 		err = __goscriptTuple0[1]
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>(new OpError({Op: "file", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).raddr, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new OpError({Op: "file", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [f, err]
 	}
@@ -235,7 +235,7 @@ export class conn {
 		}
 		let [n, err] = await __goscript_fd_fake.netFD.prototype.Read.call($.pointerValue<conn>(c).fd, b)
 		if ((err != null) && (!$.comparableEqual(err, io.EOF))) {
-			err = $.interfaceValue<$.GoError>(new OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).raddr, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new OpError({Op: "read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, err]
 	}
@@ -256,7 +256,7 @@ export class conn {
 		{
 			let err = await __goscript_fd_fake.netFD.prototype.SetDeadline.call($.pointerValue<conn>(c).fd, $.markAsStructValue($.cloneStructValue(t)))
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		return null
@@ -270,7 +270,7 @@ export class conn {
 		{
 			let err = await __goscript_sockopt_fake.setReadBuffer($.pointerValue<conn>(c).fd, bytes)
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		return null
@@ -284,7 +284,7 @@ export class conn {
 		{
 			let err = await __goscript_fd_fake.netFD.prototype.SetReadDeadline.call($.pointerValue<conn>(c).fd, $.markAsStructValue($.cloneStructValue(t)))
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		return null
@@ -298,7 +298,7 @@ export class conn {
 		{
 			let err = __goscript_sockopt_fake.setWriteBuffer($.pointerValue<conn>(c).fd, bytes)
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		return null
@@ -312,7 +312,7 @@ export class conn {
 		{
 			let err = await __goscript_fd_fake.netFD.prototype.SetWriteDeadline.call($.pointerValue<conn>(c).fd, $.markAsStructValue($.cloneStructValue(t)))
 			if (err != null) {
-				return $.interfaceValue<$.GoError>(new OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Err: err}), "*net.OpError")
+				return $.interfaceValue<$.GoError>(new OpError({Op: "set", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 			}
 		}
 		return null
@@ -325,7 +325,7 @@ export class conn {
 		}
 		let [n, err] = await __goscript_fd_fake.netFD.prototype.Write.call($.pointerValue<conn>(c).fd, b)
 		if (err != null) {
-			err = $.interfaceValue<$.GoError>(new OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).raddr, Err: err}), "*net.OpError")
+			err = $.interfaceValue<$.GoError>(new OpError({Op: "write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
 		return [n, err]
 	}
@@ -1371,7 +1371,7 @@ export function mapErr(err: $.GoError): $.GoError {
 		switch (true) {
 			case $.comparableEqual(__goscriptSwitch0, context.Canceled):
 			{
-				return $.interfaceValue<$.GoError>($.markAsStructValue($.cloneStructValue(errCanceled)), "net.canceledError")
+				return $.interfaceValue<$.GoError>($.markAsStructValue($.cloneStructValue(errCanceled)), "net.canceledError", "net.canceledError")
 				break
 			}
 			case $.comparableEqual(__goscriptSwitch0, context.DeadlineExceeded):
@@ -1431,7 +1431,7 @@ export function InvalidAddrError_Temporary(e: InvalidAddrError): boolean {
 	return false
 }
 
-export let errTimeout: $.GoError = $.interfaceValue<$.GoError>(new timeoutError(), "*net.timeoutError")
+export let errTimeout: $.GoError = $.interfaceValue<$.GoError>(new timeoutError(), "*net.timeoutError", { kind: $.TypeKind.Pointer, elemType: "net.timeoutError" })
 
 export function __goscript_set_errTimeout(__goscriptValue: $.GoError): void {
 	errTimeout = __goscriptValue
@@ -1481,7 +1481,7 @@ export function __goscript_set_errClosed(__goscriptValue: poll.errNetClosing): v
 	errClosed = __goscriptValue
 }
 
-export let ErrClosed: $.GoError = $.interfaceValue<$.GoError>($.markAsStructValue($.cloneStructValue(errClosed)), "poll.errNetClosing")
+export let ErrClosed: $.GoError = $.interfaceValue<$.GoError>($.markAsStructValue($.cloneStructValue(errClosed)), "poll.errNetClosing", "poll.errNetClosing")
 
 export function __goscript_set_ErrClosed(__goscriptValue: $.GoError): void {
 	ErrClosed = __goscriptValue
@@ -1491,14 +1491,14 @@ export async function genericReadFrom(c: __goscript_tcpsock.TCPConn | $.VarRef<_
 	let n: bigint = 0n
 	let err: $.GoError = null as $.GoError
 	// Use wrapper to hide existing r.ReadFrom from io.Copy.
-	return io.Copy($.interfaceValue<io.Writer | null>($.markAsStructValue(new tcpConnWithoutReadFrom({TCPConn: c})), "net.tcpConnWithoutReadFrom"), $.pointerValueOrNil(r)!)
+	return io.Copy($.interfaceValue<io.Writer | null>($.markAsStructValue(new tcpConnWithoutReadFrom({TCPConn: c})), "net.tcpConnWithoutReadFrom", "net.tcpConnWithoutReadFrom"), $.pointerValueOrNil(r)!)
 }
 
 export async function genericWriteTo(c: __goscript_tcpsock.TCPConn | $.VarRef<__goscript_tcpsock.TCPConn> | null, w: io.Writer | null): globalThis.Promise<[bigint, $.GoError]> {
 	let n: bigint = 0n
 	let err: $.GoError = null as $.GoError
 	// Use wrapper to hide existing w.WriteTo from io.Copy.
-	return io.Copy($.pointerValueOrNil(w)!, $.interfaceValue<io.Reader | null>($.markAsStructValue(new tcpConnWithoutWriteTo({TCPConn: c})), "net.tcpConnWithoutWriteTo"))
+	return io.Copy($.pointerValueOrNil(w)!, $.interfaceValue<io.Reader | null>($.markAsStructValue(new tcpConnWithoutWriteTo({TCPConn: c})), "net.tcpConnWithoutWriteTo", "net.tcpConnWithoutWriteTo"))
 }
 
 export let threadLimit: $.Channel<{}> | null = null as $.Channel<{}> | null

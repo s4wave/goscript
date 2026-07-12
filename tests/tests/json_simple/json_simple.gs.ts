@@ -43,7 +43,7 @@ export class Simple {
 
 export async function main(): globalThis.Promise<void> {
 	let s = $.markAsStructValue(new Simple({X: 42}))
-	let __goscriptTuple0: any = json.Marshal($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(s)), "main.Simple"))
+	let __goscriptTuple0: any = json.Marshal($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(s)), "main.Simple", "main.Simple"))
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {

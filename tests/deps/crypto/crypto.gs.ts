@@ -31,18 +31,18 @@ $.registerInterfaceType(
 );
 
 export type Signer = {
-	Public(): PublicKey | null
+	Public(): PublicKey | null | globalThis.Promise<PublicKey | null>
 	Sign(rand: io.Reader | null, digest: $.Slice<number>, opts: SignerOpts | null): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>
 }
 
 $.registerInterfaceType(
 	"crypto.Signer",
 	null,
-	[{ name: "Public", args: [], returns: [{ type: "crypto.PublicKey" }] }, { name: "Sign", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }]
+	[{ name: "Public", args: [], returns: [{ name: "_r0", type: "crypto.PublicKey" }] }, { name: "Sign", args: [{ name: "rand", type: "io.Reader" }, { name: "digest", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "opts", type: "crypto.SignerOpts" }], returns: [{ name: "signature", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "err", type: "error" }] }]
 );
 
 export type MessageSigner = {
-	Public(): PublicKey | null
+	Public(): PublicKey | null | globalThis.Promise<PublicKey | null>
 	Sign(rand: io.Reader | null, digest: $.Slice<number>, opts: SignerOpts | null): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>
 	SignMessage(rand: io.Reader | null, msg: $.Slice<number>, opts: SignerOpts | null): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>
 }
@@ -50,7 +50,7 @@ export type MessageSigner = {
 $.registerInterfaceType(
 	"crypto.MessageSigner",
 	null,
-	[{ name: "Public", args: [], returns: [{ type: "crypto.PublicKey" }] }, { name: "Sign", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }, { name: "SignMessage", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }]
+	[{ name: "Public", args: [], returns: [{ name: "_r0", type: "crypto.PublicKey" }] }, { name: "Sign", args: [{ name: "rand", type: "io.Reader" }, { name: "digest", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "opts", type: "crypto.SignerOpts" }], returns: [{ name: "signature", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "err", type: "error" }] }, { name: "SignMessage", args: [{ name: "rand", type: "io.Reader" }, { name: "msg", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "opts", type: "crypto.SignerOpts" }], returns: [{ name: "signature", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "err", type: "error" }] }]
 );
 
 export type SignerOpts = {
@@ -60,18 +60,18 @@ export type SignerOpts = {
 $.registerInterfaceType(
 	"crypto.SignerOpts",
 	null,
-	[{ name: "HashFunc", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "uint", typeName: "crypto.Hash" } }] }]
+	[{ name: "HashFunc", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint", typeName: "crypto.Hash" } }] }]
 );
 
 export type Decrypter = {
-	Decrypt(rand: io.Reader | null, msg: $.Slice<number>, opts: DecrypterOpts | null): [$.Slice<number>, $.GoError]
-	Public(): PublicKey | null
+	Decrypt(rand: io.Reader | null, msg: $.Slice<number>, opts: DecrypterOpts | null): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>
+	Public(): PublicKey | null | globalThis.Promise<PublicKey | null>
 }
 
 $.registerInterfaceType(
 	"crypto.Decrypter",
 	null,
-	[{ name: "Decrypt", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }, { name: "Public", args: [], returns: [{ type: "crypto.PublicKey" }] }]
+	[{ name: "Decrypt", args: [{ name: "rand", type: "io.Reader" }, { name: "msg", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "opts", type: "crypto.DecrypterOpts" }], returns: [{ name: "plaintext", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "err", type: "error" }] }, { name: "Public", args: [], returns: [{ name: "_r0", type: "crypto.PublicKey" }] }]
 );
 
 export type DecrypterOpts = any
@@ -83,25 +83,25 @@ $.registerInterfaceType(
 );
 
 export type Decapsulator = {
-	Decapsulate(ciphertext: $.Slice<number>): [$.Slice<number>, $.GoError]
-	Encapsulator(): Encapsulator | null
+	Decapsulate(ciphertext: $.Slice<number>): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>
+	Encapsulator(): Encapsulator | null | globalThis.Promise<Encapsulator | null>
 }
 
 $.registerInterfaceType(
 	"crypto.Decapsulator",
 	null,
-	[{ name: "Decapsulate", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }, { name: "Encapsulator", args: [], returns: [{ type: "crypto.Encapsulator" }] }]
+	[{ name: "Decapsulate", args: [{ name: "ciphertext", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "sharedKey", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "err", type: "error" }] }, { name: "Encapsulator", args: [], returns: [{ name: "_r0", type: "crypto.Encapsulator" }] }]
 );
 
 export type Encapsulator = {
-	Bytes(): $.Slice<number>
-	Encapsulate(): [$.Slice<number>, $.Slice<number>]
+	Bytes(): $.Slice<number> | globalThis.Promise<$.Slice<number>>
+	Encapsulate(): [$.Slice<number>, $.Slice<number>] | globalThis.Promise<[$.Slice<number>, $.Slice<number>]>
 }
 
 $.registerInterfaceType(
 	"crypto.Encapsulator",
 	null,
-	[{ name: "Bytes", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Encapsulate", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }]
+	[{ name: "Bytes", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Encapsulate", args: [], returns: [{ name: "sharedKey", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "ciphertext", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }]
 );
 
 export const MD4: Hash = 1
