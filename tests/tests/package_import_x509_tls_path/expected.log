@@ -7,3 +7,5 @@ leaf common name bifrost.goscript.test
 private key signer true
 min version 771
 next proto bifrost
+session cache hit true true
+session cache evicted true

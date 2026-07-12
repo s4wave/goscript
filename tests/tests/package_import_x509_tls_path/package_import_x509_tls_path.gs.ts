@@ -63,6 +63,19 @@ export async function main(): globalThis.Promise<void> {
 	$.println("private key signer", ed25519.PublicKey_Equal($.mustTypeAssert<ed25519.PublicKey>(ed25519.PrivateKey_Public($.mustTypeAssert<ed25519.PrivateKey>($.arrayIndex($.pointerValue<tls.Config>(config).Certificates!, 0).PrivateKey, { kind: $.TypeKind.Slice, typeName: "ed25519.PrivateKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } })), { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }), $.namedValueInterfaceValue<crypto.PublicKey | null>(pub, "ed25519.PublicKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PublicKey" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }])))
 	$.println("min version", $.uint($.pointerValue<tls.Config>(config).MinVersion, 16))
 	$.println("next proto", $.arrayIndex($.pointerValue<tls.Config>(config).NextProtos!, 0))
+
+	let cache = tls.NewLRUClientSessionCache(2)
+	let session: tls.ClientSessionState | $.VarRef<tls.ClientSessionState> | null = new tls.ClientSessionState()
+	await $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache).Put("one", session)
+	let __goscriptTuple3: any = await $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache).Get("one")
+	let cached: tls.ClientSessionState | $.VarRef<tls.ClientSessionState> | null = __goscriptTuple3[0]
+	let ok = __goscriptTuple3[1]
+	$.println("session cache hit", ok, cached == session)
+	await $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache).Put("two", new tls.ClientSessionState())
+	await $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache).Put("three", new tls.ClientSessionState())
+	let __goscriptTuple4: any = await $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache).Get("one")
+	ok = __goscriptTuple4[1]
+	$.println("session cache evicted", !ok)
 }
 
 if ($.isMainScript(import.meta)) {

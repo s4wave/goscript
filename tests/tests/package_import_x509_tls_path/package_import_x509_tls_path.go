@@ -55,4 +55,14 @@ func main() {
 	println("private key signer", config.Certificates[0].PrivateKey.(ed25519.PrivateKey).Public().(ed25519.PublicKey).Equal(pub))
 	println("min version", config.MinVersion)
 	println("next proto", config.NextProtos[0])
+
+	cache := tls.NewLRUClientSessionCache(2)
+	session := &tls.ClientSessionState{}
+	cache.Put("one", session)
+	cached, ok := cache.Get("one")
+	println("session cache hit", ok, cached == session)
+	cache.Put("two", &tls.ClientSessionState{})
+	cache.Put("three", &tls.ClientSessionState{})
+	_, ok = cache.Get("one")
+	println("session cache evicted", !ok)
 }

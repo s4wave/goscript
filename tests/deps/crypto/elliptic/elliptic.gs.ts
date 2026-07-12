@@ -204,20 +204,20 @@ export async function initAll(): globalThis.Promise<void> {
 
 export async function P224(): globalThis.Promise<Curve | null> {
 	await initonce.value.Do(initAll)
-	return $.interfaceValue<Curve | null>(__goscript_nistec.__goscript_get_p224(), "*elliptic.nistCurve[*nistec.P224Point]", { kind: $.TypeKind.Pointer, elemType: "elliptic.nistCurve" })
+	return $.interfaceValue<Curve | null>(__goscript_nistec.__goscript_get_p224(), "*elliptic.nistCurve", { kind: $.TypeKind.Pointer, elemType: "elliptic.nistCurve" })
 }
 
 export async function P256(): globalThis.Promise<Curve | null> {
 	await initonce.value.Do(initAll)
-	return $.interfaceValue<Curve | null>(__goscript_nistec.__goscript_get_p256(), "*elliptic.nistCurve[*nistec.P256Point]", { kind: $.TypeKind.Pointer, elemType: "elliptic.nistCurve" })
+	return $.interfaceValue<Curve | null>(__goscript_nistec.__goscript_get_p256(), "*elliptic.nistCurve", { kind: $.TypeKind.Pointer, elemType: "elliptic.nistCurve" })
 }
 
 export async function P384(): globalThis.Promise<Curve | null> {
 	await initonce.value.Do(initAll)
-	return $.interfaceValue<Curve | null>(__goscript_nistec.__goscript_get_p384(), "*elliptic.nistCurve[*nistec.P384Point]", { kind: $.TypeKind.Pointer, elemType: "elliptic.nistCurve" })
+	return $.interfaceValue<Curve | null>(__goscript_nistec.__goscript_get_p384(), "*elliptic.nistCurve", { kind: $.TypeKind.Pointer, elemType: "elliptic.nistCurve" })
 }
 
 export async function P521(): globalThis.Promise<Curve | null> {
 	await initonce.value.Do(initAll)
-	return $.interfaceValue<Curve | null>(__goscript_nistec.__goscript_get_p521(), "*elliptic.nistCurve[*nistec.P521Point]", { kind: $.TypeKind.Pointer, elemType: "elliptic.nistCurve" })
+	return $.interfaceValue<Curve | null>(__goscript_nistec.__goscript_get_p521(), "*elliptic.nistCurve", { kind: $.TypeKind.Pointer, elemType: "elliptic.nistCurve" })
 }

@@ -64,7 +64,7 @@ export class weakCertCache {
 
 		let wp = ($.markAsStructValue($.cloneStructValue(weak.Make({T: { type: "x509.Certificate", zero: () => $.markAsStructValue(new x509.Certificate()) }}, cert))) as weak.Pointer)
 		{
-			let [entry, loaded] = await $.pointerValue<weakCertCache>(wcc).Map.LoadOrStore($.bytesToString(der), $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(wp)), "weak.Pointer[x509.Certificate]", "weak.Pointer"))
+			let [entry, loaded] = await $.pointerValue<weakCertCache>(wcc).Map.LoadOrStore($.bytesToString(der), $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(wp)), "weak.Pointer", "weak.Pointer"))
 			if (!loaded) {
 				runtime.AddCleanup(cert, $.functionValue(async (_p0: any): globalThis.Promise<void> => {
 					await $.pointerValue<weakCertCache>(wcc).Map.CompareAndDelete($.bytesToString(der), entry)
@@ -75,9 +75,9 @@ export class weakCertCache {
 					if (v != null) {
 						return [v, null]
 					} else {
-						if ($.pointerValue<weakCertCache>(wcc).Map.CompareAndSwap($.bytesToString(der), entry, $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(wp)), "weak.Pointer[x509.Certificate]", "weak.Pointer"))) {
+						if ($.pointerValue<weakCertCache>(wcc).Map.CompareAndSwap($.bytesToString(der), entry, $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(wp)), "weak.Pointer", "weak.Pointer"))) {
 							runtime.AddCleanup(cert, $.functionValue(async (_p0: any): globalThis.Promise<void> => {
-								await $.pointerValue<weakCertCache>(wcc).Map.CompareAndDelete($.bytesToString(der), $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(wp)), "weak.Pointer[x509.Certificate]", "weak.Pointer"))
+								await $.pointerValue<weakCertCache>(wcc).Map.CompareAndDelete($.bytesToString(der), $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(wp)), "weak.Pointer", "weak.Pointer"))
 							}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }], results: [] } as $.FunctionTypeInfo)), $.bytesToString(der))
 						}
 					}

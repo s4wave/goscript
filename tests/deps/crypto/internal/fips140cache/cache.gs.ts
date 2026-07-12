@@ -42,7 +42,7 @@ export class Cache {
 		const c: Cache | $.VarRef<Cache> | null = this
 		let p = ($.markAsStructValue($.cloneStructValue(weak.Make({T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, k))) as weak.Pointer)
 		{
-			let [cached, ok] = await $.pointerValue<Cache>(c).m.Load($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(p)), "weak.Pointer[K]", "weak.Pointer"))
+			let [cached, ok] = await $.pointerValue<Cache>(c).m.Load($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(p)), "weak.Pointer", "weak.Pointer"))
 			if (ok) {
 				let v = $.mustTypeAssert<any>(cached, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } })
 				if (await check!(v)) {
@@ -55,7 +55,7 @@ export class Cache {
 			return [null, err]
 		}
 		{
-			let [, present] = await $.pointerValue<Cache>(c).m.Swap($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(p)), "weak.Pointer[K]", "weak.Pointer"), $.interfaceValue<any>(v, "*V", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } }))
+			let [, present] = await $.pointerValue<Cache>(c).m.Swap($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(p)), "weak.Pointer", "weak.Pointer"), $.interfaceValue<any>(v, "*V", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } }))
 			if (!present) {
 				runtime.AddCleanup(k, $.functionValue(((__receiver) => (p: weak.Pointer) => __receiver.evict(p))($.pointerValue<Cache>(c)), ({ kind: $.TypeKind.Function, params: ["weak.Pointer"], results: [] } as $.FunctionTypeInfo)), $.markAsStructValue($.cloneStructValue(p)))
 			}
@@ -65,7 +65,7 @@ export class Cache {
 
 	public async evict(p: weak.Pointer): globalThis.Promise<void> {
 		const c: Cache | $.VarRef<Cache> | null = this
-		await $.pointerValue<Cache>(c).m.Delete($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(p)), "weak.Pointer[K]", "weak.Pointer"))
+		await $.pointerValue<Cache>(c).m.Delete($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(p)), "weak.Pointer", "weak.Pointer"))
 	}
 
 	static __typeInfo = $.registerStructType(

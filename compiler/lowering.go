@@ -13510,27 +13510,31 @@ func runtimeNamedTypeName(named *types.Named) string {
 }
 
 func goRuntimeTypeString(typ types.Type) string {
-	return types.TypeString(runtimeIdentityType(typ), func(pkg *types.Package) string {
-		return pkg.Name()
-	})
-}
-
-func runtimeIdentityType(typ types.Type) types.Type {
+	typ = types.Unalias(typ)
 	switch typed := typ.(type) {
-	case *types.Alias:
-		return runtimeIdentityType(types.Unalias(typed))
+	case *types.Named:
+		return runtimeNamedTypeName(typed)
 	case *types.Pointer:
-		return types.NewPointer(runtimeIdentityType(typed.Elem()))
+		return "*" + goRuntimeTypeString(typed.Elem())
 	case *types.Slice:
-		return types.NewSlice(runtimeIdentityType(typed.Elem()))
+		return "[]" + goRuntimeTypeString(typed.Elem())
 	case *types.Array:
-		return types.NewArray(runtimeIdentityType(typed.Elem()), typed.Len())
+		return "[" + strconv.FormatInt(typed.Len(), 10) + "]" + goRuntimeTypeString(typed.Elem())
 	case *types.Map:
-		return types.NewMap(runtimeIdentityType(typed.Key()), runtimeIdentityType(typed.Elem()))
+		return "map[" + goRuntimeTypeString(typed.Key()) + "]" + goRuntimeTypeString(typed.Elem())
 	case *types.Chan:
-		return types.NewChan(typed.Dir(), runtimeIdentityType(typed.Elem()))
+		switch typed.Dir() {
+		case types.RecvOnly:
+			return "<-chan " + goRuntimeTypeString(typed.Elem())
+		case types.SendOnly:
+			return "chan<- " + goRuntimeTypeString(typed.Elem())
+		default:
+			return "chan " + goRuntimeTypeString(typed.Elem())
+		}
 	default:
-		return typ
+		return types.TypeString(typ, func(pkg *types.Package) string {
+			return pkg.Name()
+		})
 	}
 }
 

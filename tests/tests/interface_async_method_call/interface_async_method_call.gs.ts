@@ -181,7 +181,7 @@ export async function processViaInterface(processor: AsyncProcessor | null, inpu
 }
 
 export function newGenericStore(__typeArgs: $.GenericTypeArgs | undefined, value: any): GenericStore | null {
-	return $.interfaceValue<GenericStore | null>(new GenericChannelStore({ch: $.makeChannel<any>(1, null, "both"), value: value}), "*main.GenericChannelStore[V]", { kind: $.TypeKind.Pointer, elemType: "main.GenericChannelStore" })
+	return $.interfaceValue<GenericStore | null>(new GenericChannelStore({ch: $.makeChannel<any>(1, null, "both"), value: value}), "*main.GenericChannelStore", { kind: $.TypeKind.Pointer, elemType: "main.GenericChannelStore" })
 }
 
 export async function loadGenericStore(store: GenericStore | null): globalThis.Promise<number> {
