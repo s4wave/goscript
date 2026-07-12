@@ -15,6 +15,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/s4wave/goscript/compiler"
 	"github.com/s4wave/goscript/compiler/tsworkspace"
@@ -50,6 +51,8 @@ var (
 	// depsCopyMutex provides thread safety when copying dependency packages
 	depsCopyMutex sync.Mutex
 )
+
+const complianceToolTimeout = 30 * time.Second
 
 // getParentGoModulePath retrieves the Go module path of the parent project.
 // It executes `go list -m` once and caches the result for subsequent calls.
@@ -562,12 +565,18 @@ func RunTypeScriptRunner(t *testing.T, workspaceDir, tempDir, tsRunner string) s
 	depsCopyMutex.Lock()
 	defer depsCopyMutex.Unlock()
 
+	ctx, cancel := context.WithTimeout(context.Background(), complianceToolTimeout)
+	defer cancel()
+
 	workspace := tsworkspace.NewOwner(tempDir, workspaceDir)
-	phase := workspace.RunTool(context.Background(), tsworkspace.PhaseRuntime, tempDir, "bun", "run", tsRunner)
+	phase := workspace.RunTool(ctx, tsworkspace.PhaseRuntime, tempDir, "bun", "--smol", "run", tsRunner)
 	if phase.Output != "" {
 		fmt.Print(phase.Output)
 	}
 	if phase.Failed() {
+		if ctx.Err() != nil {
+			t.Fatalf("bun run exceeded %s: %v\noutput: %s", complianceToolTimeout, phase.Error, phase.Output)
+		}
 		t.Fatalf("bun run failed: %v\noutput: %s", phase.Error, phase.Output)
 	}
 	return phase.Output
@@ -725,8 +734,11 @@ func RunTypeScriptTypeCheck(t *testing.T, workspaceDir, testDir string, tsconfig
 		depsCopyMutex.Lock()
 		defer depsCopyMutex.Unlock()
 
+		ctx, cancel := context.WithTimeout(context.Background(), complianceToolTimeout)
+		defer cancel()
+
 		workspace := tsworkspace.NewOwner(testDir, workspaceDir)
-		phase := workspace.RunTool(context.Background(), tsworkspace.PhaseTypeCheck, testDir, "tsgo", "--project", filepath.Base(tsconfigPath))
+		phase := workspace.RunTool(ctx, tsworkspace.PhaseTypeCheck, testDir, "tsgo", "--project", filepath.Base(tsconfigPath))
 		if phase.Failed() {
 			t.Fatalf("TypeScript type checking failed: %v\noutput:\n%s", phase.Error, phase.Output)
 		}
@@ -859,7 +871,9 @@ func RunGoScriptTestDir(t *testing.T, workspaceDir, testDir string) {
 
 			if os.IsNotExist(errRead) {
 				t.Logf("expected.log not found in %s, generating from Go source", testDir)
-				goRunCmd := exec.Command("go", "run", "./") // Assumes main package in testDir
+				ctx, cancel := context.WithTimeout(context.Background(), complianceToolTimeout)
+				defer cancel()
+				goRunCmd := exec.CommandContext(ctx, "go", "run", "./") // Assumes main package in testDir
 				goRunCmd.Dir = testDir
 				var goRunOutBuf, goRunErrBuf bytes.Buffer
 				goRunCmd.Stdout = &goRunOutBuf
