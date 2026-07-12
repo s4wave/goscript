@@ -205,7 +205,7 @@ export class Group {
 
 		await $.pointerValue<Group>(g).mu.Lock()
 		$.pointerValue<call>(c).wg.Done()
-		if ($.mapGet<string, call | $.VarRef<call> | null, call | $.VarRef<call> | null>($.pointerValue<Group>(g).m, key, null)[0] == c) {
+		if ($.pointerEqual($.mapGet<string, call | $.VarRef<call> | null, call | $.VarRef<call> | null>($.pointerValue<Group>(g).m, key, null)[0], c)) {
 			$.deleteMapEntry($.pointerValue<Group>(g).m, key)
 		}
 		for (let __goscriptRangeTarget0 = $.pointerValue<call>(c).chans, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {

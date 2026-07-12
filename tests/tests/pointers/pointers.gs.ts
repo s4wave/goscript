@@ -58,22 +58,22 @@ export async function main(): globalThis.Promise<void> {
 	$.println("--- Initial Values ---")
 	$.println("s1.Val:", s1.value.Val)
 	$.println("s2.Val:", s2.value.Val)
-	$.println("p1==p2:", p1.value == p2.value)
-	$.println("p1==p3:", p1.value == p3.value)
+	$.println("p1==p2:", $.pointerEqual(p1.value, p2.value))
+	$.println("p1==p3:", $.pointerEqual(p1.value, p3.value))
 
 	// --- Pointer Comparisons ---
 	$.println("\n--- Pointer Comparisons ---")
-	$.println("pp1==pp2:", pp1.value == pp2)
-	$.println("pp1==pp3:", pp1.value == pp3)
-	$.println("*pp1==*pp2:", $.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value) == $.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp2))
-	$.println("*pp1==*pp3:", $.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value) == $.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp3))
+	$.println("pp1==pp2:", $.pointerEqual(pp1.value, pp2))
+	$.println("pp1==pp3:", $.pointerEqual(pp1.value, pp3))
+	$.println("*pp1==*pp2:", $.pointerEqual($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value), $.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp2)))
+	$.println("*pp1==*pp3:", $.pointerEqual($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value), $.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp3)))
 	$.println("(**pp1).Val == (**pp2).Val:", ($.pointerValue<MyStruct>($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value))).Val == ($.pointerValue<MyStruct>($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp2))).Val)
 	$.println("(**pp1).Val == (**pp3).Val:", ($.pointerValue<MyStruct>($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value))).Val == ($.pointerValue<MyStruct>($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp3))).Val)
 
 	// Triple pointer comparisons
-	$.println("ppp1==ppp1:", ppp1 == ppp1)
-	$.println("*ppp1==pp1:", $.pointerValue<$.VarRef<MyStruct | $.VarRef<MyStruct> | null> | null>(ppp1) == pp1.value)
-	$.println("**ppp1==p1:", $.pointerValue<MyStruct | $.VarRef<MyStruct> | null>($.pointerValue<$.VarRef<MyStruct | $.VarRef<MyStruct> | null> | null>(ppp1)) == p1.value)
+	$.println("ppp1==ppp1:", $.pointerEqual(ppp1, ppp1))
+	$.println("*ppp1==pp1:", $.pointerEqual($.pointerValue<$.VarRef<MyStruct | $.VarRef<MyStruct> | null> | null>(ppp1), pp1.value))
+	$.println("**ppp1==p1:", $.pointerEqual($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>($.pointerValue<$.VarRef<MyStruct | $.VarRef<MyStruct> | null> | null>(ppp1)), p1.value))
 	$.println("(***ppp1).Val == s1.Val:", ($.pointerValue<MyStruct>($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>($.pointerValue<$.VarRef<MyStruct | $.VarRef<MyStruct> | null> | null>(ppp1)))).Val == s1.value.Val)
 
 	// --- Modifications through Pointers ---

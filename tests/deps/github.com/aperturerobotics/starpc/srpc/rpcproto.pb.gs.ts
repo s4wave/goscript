@@ -119,7 +119,7 @@ export class Packet {
 
 	public EqualVT(that: Packet | $.VarRef<Packet> | null): boolean {
 		const _this: Packet | $.VarRef<Packet> | null = this
-		if (_this == that) {
+		if ($.pointerEqual(_this, that)) {
 			return true
 		} else {
 			if ((_this == null) || (that == null)) {
@@ -686,7 +686,7 @@ export class Packet_CallStart {
 		if (!ok) {
 			return false
 		}
-		if (_this == that) {
+		if ($.pointerEqual(_this, that)) {
 			return true
 		}
 		if (((_this == null) && (that != null)) || ((_this != null) && (that == null))) {
@@ -695,7 +695,7 @@ export class Packet_CallStart {
 		{
 			let p: CallStart | $.VarRef<CallStart> | null = $.pointerValue<Packet_CallStart>(_this).CallStart
 			let q: CallStart | $.VarRef<CallStart> | null = $.pointerValue<Packet_CallStart>(that).CallStart
-			if (p != q) {
+			if (!$.pointerEqual(p, q)) {
 				if (p == null) {
 					p = new CallStart()
 				}
@@ -815,7 +815,7 @@ export class Packet_CallData {
 		if (!ok) {
 			return false
 		}
-		if (_this == that) {
+		if ($.pointerEqual(_this, that)) {
 			return true
 		}
 		if (((_this == null) && (that != null)) || ((_this != null) && (that == null))) {
@@ -824,7 +824,7 @@ export class Packet_CallData {
 		{
 			let p: CallData | $.VarRef<CallData> | null = $.pointerValue<Packet_CallData>(_this).CallData
 			let q: CallData | $.VarRef<CallData> | null = $.pointerValue<Packet_CallData>(that).CallData
-			if (p != q) {
+			if (!$.pointerEqual(p, q)) {
 				if (p == null) {
 					p = new CallData()
 				}
@@ -944,7 +944,7 @@ export class Packet_CallCancel {
 		if (!ok) {
 			return false
 		}
-		if (_this == that) {
+		if ($.pointerEqual(_this, that)) {
 			return true
 		}
 		if (((_this == null) && (that != null)) || ((_this != null) && (that == null))) {
@@ -1112,7 +1112,7 @@ export class CallStart {
 
 	public EqualVT(that: CallStart | $.VarRef<CallStart> | null): boolean {
 		const _this: CallStart | $.VarRef<CallStart> | null = this
-		if (_this == that) {
+		if ($.pointerEqual(_this, that)) {
 			return true
 		} else {
 			if ((_this == null) || (that == null)) {
@@ -1687,7 +1687,7 @@ export class CallData {
 
 	public EqualVT(that: CallData | $.VarRef<CallData> | null): boolean {
 		const _this: CallData | $.VarRef<CallData> | null = this
-		if (_this == that) {
+		if ($.pointerEqual(_this, that)) {
 			return true
 		} else {
 			if ((_this == null) || (that == null)) {

@@ -319,7 +319,7 @@ export class Int {
 		// (-x) cmp y == y
 		// (-x) cmp (-y) == -(x cmp y)
 		switch (true) {
-			case x == y:
+			case $.pointerEqual(x, y):
 			{
 				break
 			}
@@ -368,7 +368,7 @@ export class Int {
 	public async DivMod(x: Int | $.VarRef<Int> | null, y: Int | $.VarRef<Int> | null, m: Int | $.VarRef<Int> | null): globalThis.Promise<[Int | $.VarRef<Int> | null, Int | $.VarRef<Int> | null]> {
 		const z: Int | $.VarRef<Int> | null = this
 		let y0: Int | $.VarRef<Int> | null = y
-		if ((z == y) || __goscript_nat.alias(($.pointerValue<Int>(z).abs as __goscript_nat.nat), ($.pointerValue<Int>(y).abs as __goscript_nat.nat))) {
+		if (($.pointerEqual(z, y)) || __goscript_nat.alias(($.pointerValue<Int>(z).abs as __goscript_nat.nat), ($.pointerValue<Int>(y).abs as __goscript_nat.nat))) {
 			y0 = Int.prototype.Set.call(new Int(), y)
 		}
 		await Int.prototype.QuoRem.call(z, x, y, m)
@@ -689,7 +689,7 @@ export class Int {
 	public async Mod(x: Int | $.VarRef<Int> | null, y: Int | $.VarRef<Int> | null): globalThis.Promise<Int | $.VarRef<Int> | null> {
 		const z: Int | $.VarRef<Int> | null = this
 		let y0: Int | $.VarRef<Int> | null = y
-		if ((z == y) || __goscript_nat.alias(($.pointerValue<Int>(z).abs as __goscript_nat.nat), ($.pointerValue<Int>(y).abs as __goscript_nat.nat))) {
+		if (($.pointerEqual(z, y)) || __goscript_nat.alias(($.pointerValue<Int>(z).abs as __goscript_nat.nat), ($.pointerValue<Int>(y).abs as __goscript_nat.nat))) {
 			y0 = Int.prototype.Set.call(new Int(), y)
 		}
 		let q: $.VarRef<Int> = $.varRef($.markAsStructValue(new Int()))
@@ -1027,7 +1027,7 @@ export class Int {
 
 	public Set(x: Int | $.VarRef<Int> | null): Int | $.VarRef<Int> | null {
 		let z: Int | $.VarRef<Int> | null = this
-		if (z != x) {
+		if (!$.pointerEqual(z, x)) {
 			$.pointerValue<Int>(z).abs = (__goscript_nat.nat__set($.pointerValue<Int>(z).abs, ($.pointerValue<Int>(x).abs as __goscript_nat.nat)) as __goscript_nat.nat)
 			$.pointerValue<Int>(z).neg = $.pointerValue<Int>(x).neg
 		}
@@ -1229,7 +1229,7 @@ export class Int {
 
 		let mWords: __goscript_nat.nat = null as __goscript_nat.nat
 		if (m != null) {
-			if ((z == m) || __goscript_nat.alias(($.pointerValue<Int>(z).abs as __goscript_nat.nat), ($.pointerValue<Int>(m).abs as __goscript_nat.nat))) {
+			if (($.pointerEqual(z, m)) || __goscript_nat.alias(($.pointerValue<Int>(z).abs as __goscript_nat.nat), ($.pointerValue<Int>(m).abs as __goscript_nat.nat))) {
 				m = Int.prototype.Set.call(new Int(), m)
 			}
 			mWords = ($.pointerValue<Int>(m).abs as __goscript_nat.nat)
@@ -1378,7 +1378,7 @@ export class Int {
 		let negA = $.pointerValue<Int>(a).neg
 		if (y != null) {
 			// avoid aliasing b needed in the division below
-			if (y == b) {
+			if ($.pointerEqual(y, b)) {
 				Int.prototype.Set.call(B, b)
 			} else {
 				B = b
@@ -1489,7 +1489,7 @@ export class Int {
 		// x * (-y) == -(x * y)
 		// (-x) * y == -(x * y)
 		// (-x) * (-y) == x * y
-		if (x == y) {
+		if ($.pointerEqual(x, y)) {
 			$.pointerValue<Int>(z).abs = (await __goscript_natmul.nat_sqr($.pointerValue<Int>(z).abs, stk, ($.pointerValue<Int>(x).abs as __goscript_nat.nat)) as __goscript_nat.nat)
 			$.pointerValue<Int>(z).neg = false
 			return

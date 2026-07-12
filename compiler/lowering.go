@@ -7447,6 +7447,19 @@ func (o *LoweringOwner) lowerComplexEqualityExpr(ctx lowerFileContext, expr *ast
 	return value, true
 }
 
+func (o *LoweringOwner) lowerPointerEqualityExpr(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, bool) {
+	leftType := ctx.semPkg.source.TypesInfo.TypeOf(expr.X)
+	rightType := ctx.semPkg.source.TypesInfo.TypeOf(expr.Y)
+	if !isPointerType(leftType) || !isPointerType(rightType) {
+		return "", false
+	}
+	value := o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerEqual) + "(" + left + ", " + right + ")"
+	if expr.Op == token.NEQ {
+		value = "!" + value
+	}
+	return value, true
+}
+
 func (o *LoweringOwner) lowerStructEqualityExpr(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, bool) {
 	leftType := ctx.semPkg.source.TypesInfo.TypeOf(expr.X)
 	rightType := ctx.semPkg.source.TypesInfo.TypeOf(expr.Y)
@@ -7655,6 +7668,9 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 		}
 		if isEqualityOperator(typed.Op) {
 			if value, ok := o.lowerArrayEqualityExpr(ctx, typed, left, right); ok {
+				return value, append(leftDiagnostics, rightDiagnostics...)
+			}
+			if value, ok := o.lowerPointerEqualityExpr(ctx, typed, left, right); ok {
 				return value, append(leftDiagnostics, rightDiagnostics...)
 			}
 			if value, ok := o.lowerComplexEqualityExpr(ctx, typed, left, right); ok {
@@ -8925,7 +8941,8 @@ func (o *LoweringOwner) lowerConversionExpr(
 		if source != nil && !types.Identical(target, source) &&
 			types.IdenticalIgnoreTags(target.Underlying(), source.Underlying()) {
 			return o.runtimeOwner.QualifiedHelper(RuntimeHelperUnsafePointerCast) +
-				"<" + o.tsTypeFor(ctx, targetType) + ">(" + value + ")", diagnostics
+				"<" + o.tsTypeFor(ctx, targetType) + ">(" + value + ", " +
+				o.namedTypeExpr(ctx, target) + ")", diagnostics
 		}
 	}
 	if conversion, ok := o.lowerNamedStructConversion(ctx, expr.Args[0], targetType, sourceType, value); ok {

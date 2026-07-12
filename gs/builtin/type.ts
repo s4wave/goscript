@@ -1,3 +1,5 @@
+import { isVarRef } from './varRef.js'
+
 /**
  * Represents the kinds of Go types that can be registered at runtime.
  */
@@ -1003,8 +1005,135 @@ export function namedStructConversion<T>(value: unknown): T {
   return markAsStructValue(cloneStructValue(value)) as T
 }
 
-export function unsafePointerCast<T>(value: unknown): T {
-  return value as T
+interface PointerCastTarget {
+  prototype: object
+}
+
+interface PointerCastSource {
+  identity: object
+  object: object
+  ref?: { value: unknown }
+}
+
+const pointerIdentities = new WeakMap<object, object>()
+const pointerViews = new WeakMap<object, WeakMap<PointerCastTarget, object>>()
+
+function pointerCastSource(value: unknown): PointerCastSource | null {
+  if (isVarRef(value)) {
+    const inner = value.value
+    if (typeof inner !== 'object' || inner === null) {
+      return null
+    }
+    return { identity: value, object: inner, ref: value }
+  }
+  if (typeof value !== 'object' || value === null) {
+    return null
+  }
+  return { identity: value, object: value }
+}
+
+function canonicalPointerIdentity(value: object): object {
+  const identity = pointerIdentities.get(value)
+  if (identity !== undefined) {
+    return identity
+  }
+  pointerIdentities.set(value, value)
+  return value
+}
+
+function markPointerAlias(source: object, view: object): void {
+  pointerIdentities.set(view, canonicalPointerIdentity(source))
+}
+
+function pointerBackingIdentityEqual(a: object, b: object): boolean {
+  const aIdentity = pointerIdentities.get(a)
+  return aIdentity !== undefined && aIdentity === pointerIdentities.get(b)
+}
+
+/** pointerIdentityEqual reports alias equality for interface pointer values. */
+export function pointerIdentityEqual(a: object, b: object): boolean {
+  if (!pointerBackingIdentityEqual(a, b)) {
+    return false
+  }
+  if (
+    '__goType' in a &&
+    '__goType' in b &&
+    typeof a.__goType === 'string' &&
+    typeof b.__goType === 'string' &&
+    a.__goType !== b.__goType
+  ) {
+    return false
+  }
+  return true
+}
+
+/** pointerEqual reports whether two Go pointers identify the same storage. */
+export function pointerEqual(a: unknown, b: unknown): boolean {
+  if (a === b) {
+    return true
+  }
+  return (
+    typeof a === 'object' &&
+    a !== null &&
+    typeof b === 'object' &&
+    b !== null &&
+    pointerBackingIdentityEqual(a, b)
+  )
+}
+
+function pointerViewFields(source: PointerCastSource): unknown {
+  const current = source.ref !== undefined ? source.ref.value : source.object
+  if (
+    typeof current !== 'object' ||
+    current === null ||
+    !('_fields' in current)
+  ) {
+    return undefined
+  }
+  return current._fields
+}
+
+function destinationPointerView(
+  source: PointerCastSource,
+  target: PointerCastTarget,
+): object {
+  let views = pointerViews.get(source.identity)
+  if (views === undefined) {
+    views = new WeakMap<PointerCastTarget, object>()
+    pointerViews.set(source.identity, views)
+  }
+  const existing = views.get(target)
+  if (existing !== undefined) {
+    return existing
+  }
+  const view = Object.create(target.prototype)
+  if (source.ref !== undefined) {
+    Object.defineProperty(view, '_fields', {
+      configurable: true,
+      enumerable: true,
+      get: () => pointerViewFields(source),
+    })
+  } else {
+    Object.assign(view, source.object)
+  }
+  views.set(target, view)
+  markPointerAlias(source.identity, view)
+  return view
+}
+
+/**
+ * unsafePointerCast returns a destination method-set view over shared pointer
+ * storage when target is present, or preserves the identity-only unsafe cast.
+ */
+export function unsafePointerCast<T>(
+  value: unknown,
+  target?: PointerCastTarget,
+): T {
+  const source = pointerCastSource(value)
+  if (source === null || target === undefined) {
+    return value as T
+  }
+  return destinationPointerView(source, target) as T
 }
 
 export function cloneArrayValue<T>(value: T): T {

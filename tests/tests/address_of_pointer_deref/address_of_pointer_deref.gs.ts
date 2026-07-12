@@ -68,7 +68,7 @@ export async function main(): globalThis.Promise<void> {
 	// Field selector: out.Default = &(*out.Default) keeps the same pointee.
 	let c: Col | $.VarRef<Col> | null = new Col({Name: "c", Default: v})
 	let out: Col | $.VarRef<Col> | null = cloneColField(c)
-	$.println("field alias same pointee:", $.pointerValue<Col>(out).Default == $.pointerValue<Col>(c).Default)
+	$.println("field alias same pointee:", $.pointerEqual($.pointerValue<Col>(out).Default, $.pointerValue<Col>(c).Default))
 	$.pointerValue<Col>(out).Default!.value = 30
 	$.println("field alias write:", v.value)
 }

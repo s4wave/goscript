@@ -153,7 +153,7 @@ export class dhKEM {
 		if (err != null) {
 			return [null, err]
 		}
-		if (kem == __goscript_get_dhKEMX25519()) {
+		if ($.pointerEqual(kem, __goscript_get_dhKEMX25519())) {
 			let __goscriptTuple1: any = await $.pointerValue<Exclude<__goscript_kdf.KDF, null>>($.pointerValue<dhKEM>(kem).kdf).labeledExpand(suiteID, prk, "sk", null, $.uint($.pointerValue<dhKEM>(kem).Nsk, 16))
 			let s: $.Slice<number> = __goscriptTuple1[0]
 			let __goscriptShadow0 = __goscriptTuple1[1]
@@ -170,7 +170,7 @@ export class dhKEM {
 			if (__goscriptShadow1 != null) {
 				return [null, __goscriptShadow1]
 			}
-			if (kem == __goscript_get_dhKEMP521()) {
+			if ($.pointerEqual(kem, __goscript_get_dhKEMP521())) {
 				s![0] = s![0] & ($.uint(0x01, 8))
 			}
 			let __goscriptTuple3: any = await dhKEM.prototype.NewPrivateKey.call(kem, s)
@@ -440,7 +440,7 @@ export class dhKEMPrivateKey {
 		if (!ok) {
 			return [null, errors.New("ecdh: private key does not support Bytes")]
 		}
-		if ($.pointerValue<dhKEMPrivateKey>(k).kem == __goscript_get_dhKEMX25519()) {
+		if ($.pointerEqual($.pointerValue<dhKEMPrivateKey>(k).kem, __goscript_get_dhKEMX25519())) {
 			let b: $.Slice<number> = ecdh.PrivateKey.prototype.Bytes.call($.pointerValue<ecdh.PrivateKey>(priv))
 			b![0] = b![0] & ($.uint(248, 8))
 			b![31] = b![31] & ($.uint(127, 8))

@@ -1,4 +1,5 @@
 import type { Slice, SliceProxy, StringHeaderData } from './slice.js'
+import { pointerIdentityEqual } from './type.js'
 import { writeHostStdoutText } from './hostio.js'
 import { runtimePanic } from './panic.js'
 import { formatPrintedArgs } from './print.js'
@@ -169,6 +170,13 @@ export function comparableEqual(a: unknown, b: unknown): boolean {
   }
   if (a === null || a === undefined || b === null || b === undefined) {
     return false
+  }
+  if (
+    typeof a === 'object' &&
+    typeof b === 'object' &&
+    pointerIdentityEqual(a, b)
+  ) {
+    return true
   }
   if (typeof a === 'object' && typeof b === 'object') {
     const aType = reflectTypeIdentities.get(a)

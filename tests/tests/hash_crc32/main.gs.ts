@@ -19,13 +19,13 @@ export async function main(): globalThis.Promise<void> {
 	if (((((crc32.Size as number) != 4) || ((crc32.IEEE as number) != 0xedb88320)) || ((crc32.Castagnoli as number) != 0x82f63b78)) || ((crc32.Koopman as number) != 0xeb31d82e)) {
 		$.panic("public constants")
 	}
-	if ((crc32.MakeTable($.uint(crc32.IEEE, 32)) != crc32.IEEETable) || (crc32.MakeTable($.uint(crc32.IEEE, 32)) != crc32.MakeTable($.uint(crc32.IEEE, 32)))) {
+	if ((!$.pointerEqual(crc32.MakeTable($.uint(crc32.IEEE, 32)), crc32.IEEETable)) || (!$.pointerEqual(crc32.MakeTable($.uint(crc32.IEEE, 32)), crc32.MakeTable($.uint(crc32.IEEE, 32))))) {
 		$.panic("IEEE table reuse")
 	}
-	if (crc32.MakeTable($.uint(crc32.Castagnoli, 32)) != crc32.MakeTable($.uint(crc32.Castagnoli, 32))) {
+	if (!$.pointerEqual(crc32.MakeTable($.uint(crc32.Castagnoli, 32)), crc32.MakeTable($.uint(crc32.Castagnoli, 32)))) {
 		$.panic("Castagnoli table reuse")
 	}
-	if (crc32.MakeTable($.uint(crc32.Koopman, 32)) == crc32.MakeTable($.uint(crc32.Koopman, 32))) {
+	if ($.pointerEqual(crc32.MakeTable($.uint(crc32.Koopman, 32)), crc32.MakeTable($.uint(crc32.Koopman, 32)))) {
 		$.panic("custom tables unexpectedly reused")
 	}
 

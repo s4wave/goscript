@@ -1371,7 +1371,7 @@ export class Certificate {
 	public Equal(other: Certificate | $.VarRef<Certificate> | null): boolean {
 		const c: Certificate | $.VarRef<Certificate> | null = this
 		if ((c == null) || (other == null)) {
-			return c == other
+			return $.pointerEqual(c, other)
 		}
 		return bytes.Equal($.pointerValue<Certificate>(c).Raw, $.pointerValue<Certificate>(other).Raw)
 	}

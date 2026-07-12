@@ -315,7 +315,7 @@ export class clientHandshakeStateTLS13 {
 		}
 
 		let selectedSuite: __goscript_cipher_suites.cipherSuiteTLS13 | $.VarRef<__goscript_cipher_suites.cipherSuiteTLS13> | null = __goscript_cipher_suites.mutualCipherSuiteTLS13($.pointerValue<__goscript_handshake_messages.clientHelloMsg>($.pointerValue<clientHandshakeStateTLS13>(hs).hello).cipherSuites, $.uint($.pointerValue<__goscript_handshake_messages.serverHelloMsg>($.pointerValue<clientHandshakeStateTLS13>(hs).serverHello).cipherSuite, 16))
-		if (($.pointerValue<clientHandshakeStateTLS13>(hs).suite != null) && (selectedSuite != $.pointerValue<clientHandshakeStateTLS13>(hs).suite)) {
+		if (($.pointerValue<clientHandshakeStateTLS13>(hs).suite != null) && (!$.pointerEqual(selectedSuite, $.pointerValue<clientHandshakeStateTLS13>(hs).suite))) {
 			await __goscript_conn.Conn.prototype.sendAlert.call(c, $.uint(47, 8))
 			return errors.New("tls: server changed cipher suite after a HelloRetryRequest")
 		}

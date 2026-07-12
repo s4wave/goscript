@@ -70,7 +70,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple3: any = await $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache).Get("one")
 	let cached: tls.ClientSessionState | $.VarRef<tls.ClientSessionState> | null = __goscriptTuple3[0]
 	let ok = __goscriptTuple3[1]
-	$.println("session cache hit", ok, cached == session)
+	$.println("session cache hit", ok, $.pointerEqual(cached, session))
 	await $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache).Put("two", new tls.ClientSessionState())
 	await $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache).Put("three", new tls.ClientSessionState())
 	let __goscriptTuple4: any = await $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache).Get("one")

@@ -418,7 +418,7 @@ export class Rat {
 		let stk: __goscript_nat.stack | $.VarRef<__goscript_nat.stack> | null = await __goscript_nat.getStack()
 		__defer.defer(() => { __goscript_nat.stack.prototype.free.call(stk) })
 
-		if (x == y) {
+		if ($.pointerEqual(x, y)) {
 			// a squared Rat is positive and can't be reduced (no need to call norm())
 			$.pointerValue<Rat>(z).a.neg = false
 			$.pointerValue<Rat>(z).a.abs = (await __goscript_natmul.nat_sqr($.pointerValue<Rat>(z).a.abs, stk, ($.pointerValue<Rat>(x).a.abs as __goscript_nat.nat)) as __goscript_nat.nat)
@@ -496,7 +496,7 @@ export class Rat {
 
 	public Set(x: Rat | $.VarRef<Rat> | null): Rat | $.VarRef<Rat> | null {
 		let z: Rat | $.VarRef<Rat> | null = this
-		if (z != x) {
+		if (!$.pointerEqual(z, x)) {
 			$.pointerValue<Rat>(z).a.Set($.pointerValue<Rat>(x)._fields.a)
 			$.pointerValue<Rat>(z).b.Set($.pointerValue<Rat>(x)._fields.b)
 		}
@@ -557,7 +557,7 @@ export class Rat {
 		if ($.len((babs as __goscript_nat.nat)) == 0) {
 			$.panic("division by zero")
 		}
-		if (($.pointerValue<Rat>(z)._fields.a == b) || __goscript_nat.alias(($.pointerValue<Rat>(z).a.abs as __goscript_nat.nat), (babs as __goscript_nat.nat))) {
+		if (($.pointerEqual($.pointerValue<Rat>(z)._fields.a, b)) || __goscript_nat.alias(($.pointerValue<Rat>(z).a.abs as __goscript_nat.nat), (babs as __goscript_nat.nat))) {
 			babs = (__goscript_nat.nat__set((null as __goscript_nat.nat), (babs as __goscript_nat.nat)) as __goscript_nat.nat)
 		}
 		$.pointerValue<Rat>(z).a.abs = (__goscript_nat.nat__set($.pointerValue<Rat>(z).a.abs, ($.pointerValue<__goscript_int.Int>(a).abs as __goscript_nat.nat)) as __goscript_nat.nat)

@@ -458,7 +458,7 @@ export class Float {
 		if (false) {
 			await Float.prototype.validate.call(x)
 		}
-		if (z != x) {
+		if (!$.pointerEqual(z, x)) {
 			$.pointerValue<Float>(z).prec = $.uint($.pointerValue<Float>(x).prec, 32)
 			$.pointerValue<Float>(z).mode = $.uint($.pointerValue<Float>(x).mode, 8)
 			$.pointerValue<Float>(z).acc = $.int($.pointerValue<Float>(x).acc, 8)
@@ -1303,7 +1303,7 @@ export class Float {
 			await Float.prototype.validate.call(x)
 		}
 		$.pointerValue<Float>(z).acc = $.int(0, 8)
-		if (z != x) {
+		if (!$.pointerEqual(z, x)) {
 			$.pointerValue<Float>(z).form = $.uint($.pointerValue<Float>(x).form, 8)
 			$.pointerValue<Float>(z).neg = $.pointerValue<Float>(x).neg
 			if ($.uint($.pointerValue<Float>(x).form, 8) == $.uint(1, 8)) {
@@ -2320,7 +2320,7 @@ export class Float {
 		// TODO(gri) Optimize this for the common case.
 
 		let e = $.int64Add($.int64($.pointerValue<Float>(x).exp), $.int64($.pointerValue<Float>(y).exp))
-		if (x == y) {
+		if ($.pointerEqual(x, y)) {
 			$.pointerValue<Float>(z).mant = (await __goscript_natmul.nat_sqr($.pointerValue<Float>(z).mant, null, ($.pointerValue<Float>(x).mant as __goscript_nat.nat)) as __goscript_nat.nat)
 		} else {
 			$.pointerValue<Float>(z).mant = (await __goscript_natmul.nat_mul($.pointerValue<Float>(z).mant, null, ($.pointerValue<Float>(x).mant as __goscript_nat.nat), ($.pointerValue<Float>(y).mant as __goscript_nat.nat)) as __goscript_nat.nat)

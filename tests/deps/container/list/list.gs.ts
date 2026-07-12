@@ -75,7 +75,7 @@ export class Element {
 		const e: Element | $.VarRef<Element> | null = this
 		{
 			let p: Element | $.VarRef<Element> | null = $.pointerValue<Element>(e).next
-			if (($.pointerValue<Element>(e).list != null) && (p != $.pointerValue<List>($.pointerValue<Element>(e).list)._fields.root)) {
+			if (($.pointerValue<Element>(e).list != null) && (!$.pointerEqual(p, $.pointerValue<List>($.pointerValue<Element>(e).list)._fields.root))) {
 				return p
 			}
 		}
@@ -86,7 +86,7 @@ export class Element {
 		const e: Element | $.VarRef<Element> | null = this
 		{
 			let p: Element | $.VarRef<Element> | null = $.pointerValue<Element>(e).prev
-			if (($.pointerValue<Element>(e).list != null) && (p != $.pointerValue<List>($.pointerValue<Element>(e).list)._fields.root)) {
+			if (($.pointerValue<Element>(e).list != null) && (!$.pointerEqual(p, $.pointerValue<List>($.pointerValue<Element>(e).list)._fields.root))) {
 				return p
 			}
 		}
@@ -164,7 +164,7 @@ export class List {
 
 	public InsertAfter(v: any, mark: Element | $.VarRef<Element> | null): Element | $.VarRef<Element> | null {
 		const l: List | $.VarRef<List> | null = this
-		if ($.pointerValue<Element>(mark).list != l) {
+		if (!$.pointerEqual($.pointerValue<Element>(mark).list, l)) {
 			return null
 		}
 		// see comment in List.Remove about initialization of l
@@ -173,7 +173,7 @@ export class List {
 
 	public InsertBefore(v: any, mark: Element | $.VarRef<Element> | null): Element | $.VarRef<Element> | null {
 		const l: List | $.VarRef<List> | null = this
-		if ($.pointerValue<Element>(mark).list != l) {
+		if (!$.pointerEqual($.pointerValue<Element>(mark).list, l)) {
 			return null
 		}
 		// see comment in List.Remove about initialization of l
@@ -187,7 +187,7 @@ export class List {
 
 	public MoveAfter(e: Element | $.VarRef<Element> | null, mark: Element | $.VarRef<Element> | null): void {
 		const l: List | $.VarRef<List> | null = this
-		if ((($.pointerValue<Element>(e).list != l) || (e == mark)) || ($.pointerValue<Element>(mark).list != l)) {
+		if (((!$.pointerEqual($.pointerValue<Element>(e).list, l)) || ($.pointerEqual(e, mark))) || (!$.pointerEqual($.pointerValue<Element>(mark).list, l))) {
 			return
 		}
 		List.prototype.move.call(l, e, mark)
@@ -195,7 +195,7 @@ export class List {
 
 	public MoveBefore(e: Element | $.VarRef<Element> | null, mark: Element | $.VarRef<Element> | null): void {
 		const l: List | $.VarRef<List> | null = this
-		if ((($.pointerValue<Element>(e).list != l) || (e == mark)) || ($.pointerValue<Element>(mark).list != l)) {
+		if (((!$.pointerEqual($.pointerValue<Element>(e).list, l)) || ($.pointerEqual(e, mark))) || (!$.pointerEqual($.pointerValue<Element>(mark).list, l))) {
 			return
 		}
 		List.prototype.move.call(l, e, $.pointerValue<Element>(mark).prev)
@@ -203,7 +203,7 @@ export class List {
 
 	public MoveToBack(e: Element | $.VarRef<Element> | null): void {
 		const l: List | $.VarRef<List> | null = this
-		if (($.pointerValue<Element>(e).list != l) || ($.pointerValue<List>(l).root.prev == e)) {
+		if ((!$.pointerEqual($.pointerValue<Element>(e).list, l)) || ($.pointerEqual($.pointerValue<List>(l).root.prev, e))) {
 			return
 		}
 		// see comment in List.Remove about initialization of l
@@ -212,7 +212,7 @@ export class List {
 
 	public MoveToFront(e: Element | $.VarRef<Element> | null): void {
 		const l: List | $.VarRef<List> | null = this
-		if (($.pointerValue<Element>(e).list != l) || ($.pointerValue<List>(l).root.next == e)) {
+		if ((!$.pointerEqual($.pointerValue<Element>(e).list, l)) || ($.pointerEqual($.pointerValue<List>(l).root.next, e))) {
 			return
 		}
 		// see comment in List.Remove about initialization of l
@@ -249,7 +249,7 @@ export class List {
 
 	public Remove(e: Element | $.VarRef<Element> | null): any {
 		const l: List | $.VarRef<List> | null = this
-		if ($.pointerValue<Element>(e).list == l) {
+		if ($.pointerEqual($.pointerValue<Element>(e).list, l)) {
 			// if e.list == l, l must have been initialized when e was inserted
 			// in l or l == nil (e is a zero Element) and l.remove will crash
 			List.prototype.remove.call(l, e)
@@ -282,7 +282,7 @@ export class List {
 
 	public move(e: Element | $.VarRef<Element> | null, at: Element | $.VarRef<Element> | null): void {
 		const l: List | $.VarRef<List> | null = this
-		if (e == at) {
+		if ($.pointerEqual(e, at)) {
 			return
 		}
 		$.pointerValue<Element>($.pointerValue<Element>(e).prev).next = $.pointerValue<Element>(e).next

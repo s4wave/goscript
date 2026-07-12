@@ -363,7 +363,7 @@ export class yamuxConn {
 		if (err != null) {
 			return [null, err]
 		}
-		return [$.interfaceValue<__goscript_muxed.MuxedStream | null>($.unsafePointerCast<__goscript_stream_yamux.yamuxStream | $.VarRef<__goscript_stream_yamux.yamuxStream> | null>(s), "*srpc.yamuxStream", { kind: $.TypeKind.Pointer, elemType: "srpc.yamuxStream" }), null]
+		return [$.interfaceValue<__goscript_muxed.MuxedStream | null>($.unsafePointerCast<__goscript_stream_yamux.yamuxStream | $.VarRef<__goscript_stream_yamux.yamuxStream> | null>(s, __goscript_stream_yamux.yamuxStream), "*srpc.yamuxStream", { kind: $.TypeKind.Pointer, elemType: "srpc.yamuxStream" }), null]
 	}
 
 	public async Close(): globalThis.Promise<$.GoError> {
@@ -384,12 +384,12 @@ export class yamuxConn {
 		if (err != null) {
 			return [null, err]
 		}
-		return [$.interfaceValue<__goscript_muxed.MuxedStream | null>($.unsafePointerCast<__goscript_stream_yamux.yamuxStream | $.VarRef<__goscript_stream_yamux.yamuxStream> | null>(s), "*srpc.yamuxStream", { kind: $.TypeKind.Pointer, elemType: "srpc.yamuxStream" }), null]
+		return [$.interfaceValue<__goscript_muxed.MuxedStream | null>($.unsafePointerCast<__goscript_stream_yamux.yamuxStream | $.VarRef<__goscript_stream_yamux.yamuxStream> | null>(s, __goscript_stream_yamux.yamuxStream), "*srpc.yamuxStream", { kind: $.TypeKind.Pointer, elemType: "srpc.yamuxStream" }), null]
 	}
 
 	public yamux(): yamux2.Session | $.VarRef<yamux2.Session> | null {
 		const c: yamuxConn | $.VarRef<yamuxConn> | null = this
-		return $.unsafePointerCast<yamux2.Session | $.VarRef<yamux2.Session> | null>(c)
+		return $.unsafePointerCast<yamux2.Session | $.VarRef<yamux2.Session> | null>(c, yamux2.Session)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -402,5 +402,5 @@ export class yamuxConn {
 }
 
 export function newYamuxConn(sess: yamux2.Session | $.VarRef<yamux2.Session> | null): __goscript_muxed.MuxedConn | null {
-	return $.interfaceValue<__goscript_muxed.MuxedConn | null>($.unsafePointerCast<yamuxConn | $.VarRef<yamuxConn> | null>(sess), "*srpc.yamuxConn", { kind: $.TypeKind.Pointer, elemType: "srpc.yamuxConn" })
+	return $.interfaceValue<__goscript_muxed.MuxedConn | null>($.unsafePointerCast<yamuxConn | $.VarRef<yamuxConn> | null>(sess, yamuxConn), "*srpc.yamuxConn", { kind: $.TypeKind.Pointer, elemType: "srpc.yamuxConn" })
 }

@@ -1956,7 +1956,7 @@ export async function fakeListen(fd: __goscript_fd_fake.netFD | $.VarRef<__goscr
 
 	let ffd: fakeNetFD | $.VarRef<fakeNetFD> | null = await newFakeNetFD(fd)
 	__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
-		if ($.pointerValue<__goscript_fd_fake.netFD>(fd).fakeNetFD != ffd) {
+		if (!$.pointerEqual($.pointerValue<__goscript_fd_fake.netFD>(fd).fakeNetFD, ffd)) {
 			// Failed to register listener; clean up.
 			await fakeNetFD.prototype.Close.call(ffd)
 		}
@@ -2121,7 +2121,7 @@ export async function fakeConnect(ctx: context.Context | null, fd: __goscript_fd
 	$.pointerValue<__goscript_fd_fake.netFD>(peer).fakeNetFD = await newFakeNetFD(fd)
 	$.pointerValue<fakeNetFD>($.pointerValue<__goscript_fd_fake.netFD>(peer).fakeNetFD).queue = await newPacketQueue(65535)
 	__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
-		if ($.pointerValue<fakeNetFD>($.pointerValue<__goscript_fd_fake.netFD>(fd).fakeNetFD).peer != peer) {
+		if (!$.pointerEqual($.pointerValue<fakeNetFD>($.pointerValue<__goscript_fd_fake.netFD>(fd).fakeNetFD).peer, peer)) {
 			// Failed to connect; clean up.
 			await __goscript_fd_fake.netFD.prototype.Close.call(peer)
 		}

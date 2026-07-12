@@ -409,7 +409,7 @@ export function atofHex(s: string, flt: __goscript_ftoa.floatInfo | $.VarRef<__g
 	if (neg) {
 		bits = $.uint64Or(bits, $.uint64Shl(($.uint64Shl(1n, $.pointerValue<__goscript_ftoa.floatInfo>(flt).mantbits)), $.pointerValue<__goscript_ftoa.floatInfo>(flt).expbits))
 	}
-	if (flt == __goscript_ftoa.float32info) {
+	if ($.pointerEqual(flt, __goscript_ftoa.float32info)) {
 		return [__goscript_deps.float32frombits($.uint($.uint(bits, 32), 32)), err]
 	}
 	return [__goscript_deps.float64frombits(bits), err]

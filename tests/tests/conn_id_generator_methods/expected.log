@@ -1,0 +1,7 @@
+source: 3
+same destination view: true
+destination: 7
+same pointer: true
+boxed same pointer: true
+map lookup: 42
+varref destination: 10

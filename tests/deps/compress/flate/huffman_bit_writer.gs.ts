@@ -457,7 +457,7 @@ export class huffmanBitWriter {
 		}
 
 		// Huffman.
-		if (literalEncoding == __goscript_huffman_code.__goscript_get_fixedLiteralEncoding()) {
+		if ($.pointerEqual(literalEncoding, __goscript_huffman_code.__goscript_get_fixedLiteralEncoding())) {
 			await huffmanBitWriter.prototype.writeFixedHeader.call(w, eof)
 		} else {
 			await huffmanBitWriter.prototype.writeDynamicHeader.call(w, numLiterals, numOffsets, numCodegens, eof)

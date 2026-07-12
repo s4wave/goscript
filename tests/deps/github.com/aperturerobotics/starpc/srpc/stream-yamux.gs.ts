@@ -243,7 +243,7 @@ export class yamuxStream {
 
 	public yamux(): yamux2.Stream | $.VarRef<yamux2.Stream> | null {
 		const s: yamuxStream | $.VarRef<yamuxStream> | null = this
-		return $.unsafePointerCast<yamux2.Stream | $.VarRef<yamux2.Stream> | null>(s)
+		return $.unsafePointerCast<yamux2.Stream | $.VarRef<yamux2.Stream> | null>(s, yamux2.Stream)
 	}
 
 	static __typeInfo = $.registerStructType(

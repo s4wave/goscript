@@ -154,7 +154,7 @@ export class Regexp {
 	public Equal(y: Regexp | $.VarRef<Regexp> | null): boolean {
 		const x: Regexp | $.VarRef<Regexp> | null = this
 		if ((x == null) || (y == null)) {
-			return x == y
+			return $.pointerEqual(x, y)
 		}
 		if ($.uint($.pointerValue<Regexp>(x).Op, 8) != $.uint($.pointerValue<Regexp>(y).Op, 8)) {
 			return false
@@ -238,14 +238,14 @@ export class Regexp {
 				for (let __goscriptRangeTarget1 = $.pointerValue<Regexp>(re).Sub, i = 0; i < $.len(__goscriptRangeTarget1); i++) {
 					let sub = __goscriptRangeTarget1![i]
 					let nsub: Regexp | $.VarRef<Regexp> | null = Regexp.prototype.Simplify.call(sub)
-					if ((nre == re) && (nsub != sub)) {
+					if (($.pointerEqual(nre, re)) && (!$.pointerEqual(nsub, sub))) {
 						// min, max for OpRepeat
 						nre = new Regexp()
 						$.assignStruct($.pointerValue<Regexp>(nre), $.markAsStructValue($.cloneStructValue($.pointerValue<Regexp>(re))))
 						$.pointerValue<Regexp>(nre).Rune = null
 						$.pointerValue<Regexp>(nre).Sub = $.appendSlice($.goSlice($.pointerValue<Regexp>(nre).Sub0, undefined, 0), $.goSlice($.pointerValue<Regexp>(re).Sub, undefined, i))
 					}
-					if (nre != re) {
+					if (!$.pointerEqual(nre, re)) {
 						$.pointerValue<Regexp>(nre).Sub = $.append($.pointerValue<Regexp>(nre).Sub, nsub)
 					}
 				}

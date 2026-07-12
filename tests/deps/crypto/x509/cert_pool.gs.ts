@@ -203,7 +203,7 @@ export class CertPool {
 	public Equal(other: CertPool | $.VarRef<CertPool> | null): boolean {
 		const s: CertPool | $.VarRef<CertPool> | null = this
 		if ((s == null) || (other == null)) {
-			return s == other
+			return $.pointerEqual(s, other)
 		}
 		if (($.pointerValue<CertPool>(s).systemPool != $.pointerValue<CertPool>(other).systemPool) || ($.len($.pointerValue<CertPool>(s).haveSum) != $.len($.pointerValue<CertPool>(other).haveSum))) {
 			return false

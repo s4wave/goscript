@@ -111,7 +111,7 @@ export class RpcStreamPacket {
 
 	public EqualVT(that: RpcStreamPacket | $.VarRef<RpcStreamPacket> | null): boolean {
 		const _this: RpcStreamPacket | $.VarRef<RpcStreamPacket> | null = this
-		if (_this == that) {
+		if ($.pointerEqual(_this, that)) {
 			return true
 		} else {
 			if ((_this == null) || (that == null)) {
@@ -656,7 +656,7 @@ export class RpcStreamPacket_Init {
 		if (!ok) {
 			return false
 		}
-		if (_this == that) {
+		if ($.pointerEqual(_this, that)) {
 			return true
 		}
 		if (((_this == null) && (that != null)) || ((_this != null) && (that == null))) {
@@ -665,7 +665,7 @@ export class RpcStreamPacket_Init {
 		{
 			let p: RpcStreamInit | $.VarRef<RpcStreamInit> | null = $.pointerValue<RpcStreamPacket_Init>(_this).Init
 			let q: RpcStreamInit | $.VarRef<RpcStreamInit> | null = $.pointerValue<RpcStreamPacket_Init>(that).Init
-			if (p != q) {
+			if (!$.pointerEqual(p, q)) {
 				if (p == null) {
 					p = new RpcStreamInit()
 				}
@@ -786,7 +786,7 @@ export class RpcStreamPacket_Ack {
 		if (!ok) {
 			return false
 		}
-		if (_this == that) {
+		if ($.pointerEqual(_this, that)) {
 			return true
 		}
 		if (((_this == null) && (that != null)) || ((_this != null) && (that == null))) {
@@ -795,7 +795,7 @@ export class RpcStreamPacket_Ack {
 		{
 			let p: RpcAck | $.VarRef<RpcAck> | null = $.pointerValue<RpcStreamPacket_Ack>(_this).Ack
 			let q: RpcAck | $.VarRef<RpcAck> | null = $.pointerValue<RpcStreamPacket_Ack>(that).Ack
-			if (p != q) {
+			if (!$.pointerEqual(p, q)) {
 				if (p == null) {
 					p = new RpcAck()
 				}
@@ -920,7 +920,7 @@ export class RpcStreamPacket_Data {
 		if (!ok) {
 			return false
 		}
-		if (_this == that) {
+		if ($.pointerEqual(_this, that)) {
 			return true
 		}
 		if (((_this == null) && (that != null)) || ((_this != null) && (that == null))) {
@@ -1042,7 +1042,7 @@ export class RpcStreamInit {
 
 	public EqualVT(that: RpcStreamInit | $.VarRef<RpcStreamInit> | null): boolean {
 		const _this: RpcStreamInit | $.VarRef<RpcStreamInit> | null = this
-		if (_this == that) {
+		if ($.pointerEqual(_this, that)) {
 			return true
 		} else {
 			if ((_this == null) || (that == null)) {
@@ -1358,7 +1358,7 @@ export class RpcAck {
 
 	public EqualVT(that: RpcAck | $.VarRef<RpcAck> | null): boolean {
 		const _this: RpcAck | $.VarRef<RpcAck> | null = this
-		if (_this == that) {
+		if ($.pointerEqual(_this, that)) {
 			return true
 		} else {
 			if ((_this == null) || (that == null)) {

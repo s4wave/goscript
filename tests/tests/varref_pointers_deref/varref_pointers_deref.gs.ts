@@ -12,14 +12,14 @@ export async function main(): globalThis.Promise<void> {
 	let p2 = x
 
 	// These should be different pointers but point to the same value
-	$.println("p1==p2:", p1 == p2)
+	$.println("p1==p2:", $.pointerEqual(p1, p2))
 	$.println("*p1==*p2:", $.pointerValue<number>(p1) == $.pointerValue<number>(p2))
 
 	// Now create a third pointer that's a copy of p1
 	let p3 = p1
 
 	// These should be the same pointer
-	$.println("p1==p3:", p1 == p3)
+	$.println("p1==p3:", $.pointerEqual(p1, p3))
 
 	// Now, let's create a scenario where one pointer is varrefed by taking its address
 	// but we compare it to itself through a different path
@@ -38,7 +38,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// This is a comparison of the same pointer through different paths
 	// but one path involves a varrefed variable and one doesn't
-	$.println("pp1==savedPP1:", pp1.value == savedPP1)
+	$.println("pp1==savedPP1:", $.pointerEqual(pp1.value, savedPP1))
 
 	// Print dereferenced values to verify they're the same
 	$.println("**pp1:", $.pointerValue<number>($.pointerValue<$.VarRef<number> | null>(pp1.value)))
