@@ -91,12 +91,25 @@ export class PrivateKey {
 export class x25519Curve {
   public GenerateKey(r: io.Reader | null): [PrivateKey | null, $.GoError] {
     const key = new Uint8Array(x25519PrivateKeySize)
-    if (r != null) {
-      throw new Error(
-        'crypto/ecdh: custom random readers are not implemented in GoScript',
-      )
+    if (r == null) {
+      globalThis.crypto.getRandomValues(key)
+      return this.NewPrivateKey(key)
     }
-    globalThis.crypto.getRandomValues(key)
+
+    let offset = 0
+    while (offset < key.length) {
+      const [n, err] = r.Read(key.subarray(offset))
+      offset += n
+      if (offset >= key.length) {
+        break
+      }
+      if (err != null) {
+        return [null, err === io.EOF && offset > 0 ? io.ErrUnexpectedEOF : err]
+      }
+      if (n === 0) {
+        return [null, io.ErrUnexpectedEOF]
+      }
+    }
     return this.NewPrivateKey(key)
   }
 
