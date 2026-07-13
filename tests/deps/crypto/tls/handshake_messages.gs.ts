@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+import * as bytes from "@goscript/bytes/index.js"
+
 import * as errors from "@goscript/errors/index.js"
 
 import * as fmt from "@goscript/fmt/index.js"
@@ -20,6 +22,9 @@ import * as x509 from "@goscript/crypto/x509/index.js"
 import * as __goscript_common from "./common.gs.ts"
 
 import * as __goscript_common_string from "./common_string.gs.ts"
+
+import * as __goscript_ech from "./ech.gs.ts"
+import "@goscript/bytes/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/fmt/index.js"
 import "@goscript/slices/index.js"
@@ -29,6 +34,7 @@ import "@goscript/crypto/index.js"
 import "@goscript/crypto/x509/index.js"
 import "./common.gs.ts"
 import "./common_string.gs.ts"
+import "./ech.gs.ts"
 
 export type marshalingFunction = ((b: cryptobyte.Builder | $.VarRef<cryptobyte.Builder> | null) => $.GoError | globalThis.Promise<$.GoError>) | null
 
@@ -583,7 +589,8 @@ export class clientHelloMsg {
 				}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "cryptobyte.Builder" }], results: [] } as $.FunctionTypeInfo)))
 			}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "cryptobyte.Builder" }], results: [] } as $.FunctionTypeInfo)))
 		}
-		if ($.len($.pointerValue<clientHelloMsg>(m).pskIdentities) > 0) {
+		// pre_shared_key must be the last extension
+		if (($.len($.pointerValue<clientHelloMsg>(m).pskIdentities) > 0) && ((echInner || ($.len($.pointerValue<clientHelloMsg>(m).encryptedClientHello) == 0)) || bytes.Equal($.pointerValue<clientHelloMsg>(m).encryptedClientHello, new Uint8Array([1]) as $.Slice<number>))) {
 			// RFC 8446, Section 4.2.11
 			exts.value.AddUint16($.uint(41, 16))
 			await exts.value.AddUint16LengthPrefixed($.functionValue(async (exts: cryptobyte.Builder | $.VarRef<cryptobyte.Builder> | null): globalThis.Promise<void> => {
