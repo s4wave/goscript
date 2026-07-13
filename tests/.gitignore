@@ -3,3 +3,5 @@ go.mod
 go.sum
 !tests/package_import_starpc_srpc/go.mod
 !tests/package_import_starpc_srpc/go.sum
+!tests/package_import_x_crypto_chacha20poly1305_packet_alias/go.mod
+!tests/package_import_x_crypto_chacha20poly1305_packet_alias/go.sum
