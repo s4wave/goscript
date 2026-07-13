@@ -3,6 +3,7 @@ import {
   getHostRuntime,
   type NodeCryptoHash,
 } from '@goscript/builtin/hostio.js'
+import * as crypto from '@goscript/crypto/index.js'
 
 export const Size = 32
 export const Size224 = 28
@@ -74,6 +75,9 @@ export function New(): any {
 export function New224(): any {
   return new Digest('sha224')
 }
+
+crypto.RegisterHash(crypto.SHA224, New224)
+crypto.RegisterHash(crypto.SHA256, New)
 
 export async function Sum224(data: $.Bytes): Promise<Uint8Array> {
   return sum('sha224', data)

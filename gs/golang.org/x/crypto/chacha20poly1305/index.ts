@@ -189,7 +189,7 @@ function seal(
   const sealed = cipher(key, nonceBytes, bytes(additionalData)).encrypt(
     plaintextBytes,
   )
-  return appendBytes(dst, sealed)
+  return $.appendSlice(dst, sealed, $.byteSliceHint)
 }
 
 function open(
@@ -215,9 +215,10 @@ function open(
 
   try {
     return [
-      appendBytes(
+      $.appendSlice(
         dst,
         cipher(key, nonceBytes, bytes(additionalData)).decrypt(ciphertextBytes),
+        $.byteSliceHint,
       ),
       null,
     ]
@@ -228,18 +229,4 @@ function open(
 
 function bytes(value: $.Slice<number>): Uint8Array {
   return $.bytesToUint8Array(value).slice()
-}
-
-function appendBytes(
-  dst: $.Slice<number>,
-  suffix: Uint8Array,
-): $.Slice<number> {
-  const prefix = $.bytesToUint8Array(dst)
-  if (prefix.length === 0) {
-    return suffix.slice()
-  }
-  const out = new Uint8Array(prefix.length + suffix.length)
-  out.set(prefix)
-  out.set(suffix, prefix.length)
-  return out
 }

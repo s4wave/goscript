@@ -16,6 +16,13 @@ export default defineConfig({
   },
   resolve: {
     alias: [
+      {
+        find: '@goscript/crypto/index.js',
+        replacement: resolve(
+          fileURLToPath(new URL('.', import.meta.url)),
+          'tests/deps/crypto/index.ts',
+        ),
+      },
       // Map @goscript/*.js to gs/*.ts for existing handwritten sources
       {
         find: /^@goscript\/(.*)\.js$/,

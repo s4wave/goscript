@@ -16,6 +16,7 @@
     "declaration": true,
     "sourceMap": true,
     "paths": {
+      "@goscript/crypto/index.js": ["./tests/deps/crypto/index.ts"],
       "@goscript/*": ["./gs/*"]
     }
   },
