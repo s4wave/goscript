@@ -827,15 +827,15 @@ function ascendingOrdered<T extends string | number | bigint>(
  * Optimized for different byte representations.
  */
 export function bytesEqual(a: Bytes | null, b: Bytes | null): boolean {
-  if (a === null && b === null) return true
-  if (a === null || b === null) return false
+  if (a === b) return true
 
-  const aLen = bytesLen(a)
-  const bLen = bytesLen(b)
+  const aLen = a === null ? 0 : bytesLen(a)
+  const bLen = b === null ? 0 : bytesLen(b)
   if (aLen !== bLen) return false
+  if (aLen === 0) return true
 
   for (let i = 0; i < aLen; i++) {
-    if (byteAt(a, i) !== byteAt(b, i)) return false
+    if (byteAt(a as ByteData, i) !== byteAt(b as ByteData, i)) return false
   }
 
   return true

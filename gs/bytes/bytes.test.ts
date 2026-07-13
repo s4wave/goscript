@@ -1,5 +1,5 @@
 import * as $ from '@goscript/builtin/index.js'
-import { Clone, IndexFunc, Replace } from './index.js'
+import { Clone, Equal, IndexFunc, Replace } from './index.js'
 import { describe, expect, test } from 'vitest'
 
 const rep = (s: string, old: string, n: string, count: number): string =>
@@ -18,6 +18,11 @@ describe('bytes', () => {
     expect(rep('abc', '', '-', 2)).toBe('-a-bc')
     expect(rep('abc', '', '-', -1)).toBe('-a-b-c-')
     expect(rep('aaa', 'a', 'b', -1)).toBe('bbb')
+  })
+
+  test('Equal treats nil and empty byte slices as equivalent', () => {
+    expect(Equal(null, new Uint8Array(0))).toBe(true)
+    expect(Equal(new Uint8Array(0), null)).toBe(true)
   })
 
   test('Clone preserves nil and gives non-nil bytes independent storage', () => {
