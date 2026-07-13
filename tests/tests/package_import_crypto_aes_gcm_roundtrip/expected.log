@@ -1,0 +1,6 @@
+round trip: true true 46 46
+ciphertext: a4232d82980bf58b40e4f21f2f4f791b00b9bbbbfefe224115f16e04e5e5d915970992b0da277aa7f7bd1a4ac692
+round trip: true true 61 46
+round trip: true true 46 46
+shared backing: true 64 46
+wrapped shared backing: true

@@ -1140,17 +1140,24 @@ export function appendSlice<T>(
   if (elements == null) {
     return slice as any
   }
-  // Byte specialization is destination-independent: the byte hint keeps a
-  // Uint8Array representation across the spread append form even when the
-  // destination is nil, empty, or a generically-backed array.
-  if (slice instanceof Uint8Array || elementHint === byteSliceHint) {
-    const source =
-      typeof elements === 'string' ? stringToBytes(elements) : elements
+  const source =
+    typeof elements === 'string' ? stringToBytes(elements) : elements
+  // A generically-backed byte slice with spare capacity must keep that
+  // backing so aliases observe the append. Byte-specialize nil, Uint8Array,
+  // and reallocating destinations.
+  const hintedComplexWithCapacity =
+    elementHint === byteSliceHint &&
+    isComplexSlice(slice) &&
+    len(slice) + len(source as Slice<T>) <= cap(slice)
+  if (
+    slice instanceof Uint8Array ||
+    (elementHint === byteSliceHint && !hintedComplexWithCapacity)
+  ) {
     return appendByteSlice(byteSliceFromSlice(slice as Slice<number>), [
       source,
     ]) as any
   }
-  const count = len(elements as Slice<T>)
+  const count = len(source as Slice<T>)
   if (count === 0) {
     return slice as any
   }
@@ -1162,11 +1169,11 @@ export function appendSlice<T>(
     const newLength = oldLength + count
     if (newLength <= meta.capacity) {
       for (let i = 0; i < count; i++) {
-        meta.backing[meta.offset + oldLength + i] = (elements as any)[i]
+        meta.backing[meta.offset + oldLength + i] = (source as any)[i]
       }
       if (meta.target !== undefined) {
         for (let i = 0; i < count; i++) {
-          meta.target[oldLength + i] = (elements as any)[i]
+          meta.target[oldLength + i] = (source as any)[i]
         }
       }
       return sliceProxyFromBacking(
@@ -1185,7 +1192,7 @@ export function appendSlice<T>(
     next[i] = (result as any)[i]
   }
   for (let i = 0; i < count; i++) {
-    next[baseLen + i] = (elements as any)[i]
+    next[baseLen + i] = (source as any)[i]
   }
   return sliceProxyFromBacking(next, 0, next.length, next.length)
 }

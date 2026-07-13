@@ -81,6 +81,15 @@ describe('destination-independent byte specialization', () => {
     expect(Array.from(out as Uint8Array)).toEqual([1, 2, 3, 4])
   })
 
+  it('preserves spare generic byte backing across appendSlice', () => {
+    const dst = makeSlice<number>(0, 64)
+    const alias = append(dst, 0, 0, 0)
+    const out = appendSlice(dst, new Uint8Array([11, 22, 33]), byteSliceHint)
+
+    expect(Array.from(out as number[])).toEqual([11, 22, 33])
+    expect(Array.from(alias as number[])).toEqual([11, 22, 33])
+  })
+
   it('leaves non-byte appends generic and hint-free', () => {
     const out = append([] as string[], 'a', 'b')
     expect(out).not.toBeInstanceOf(Uint8Array)
