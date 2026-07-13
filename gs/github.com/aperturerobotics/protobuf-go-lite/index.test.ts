@@ -449,6 +449,11 @@ describe('protobuf-go-lite static helper overrides', () => {
     expect(Array.from(clonedBytes ?? [])).toEqual([1, 2])
 
     expect(CloneSlice([1, 2])).toEqual([1, 2])
+
+    const numbers: $.Slice<number> = new Uint8Array([1, 2])
+    const clonedNumbers = CloneSlice(numbers)
+    expect(clonedNumbers).not.toBe(numbers)
+    expect(Array.from(clonedNumbers ?? [])).toEqual([1, 2])
     expect(CloneMap(new Map([['a', 1]]))?.get('a')).toBe(1)
 
     const bytesSlice = CloneBytesSlice([new Uint8Array([3])])

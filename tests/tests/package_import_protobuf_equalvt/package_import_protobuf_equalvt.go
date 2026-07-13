@@ -55,6 +55,9 @@ func main() {
 	cloned := protobuf_go_lite.CloneVTValue[*msg](original)
 	println("clone:", cloned != original, cloned.EqualVT(original))
 	println("clone-slice:", protobuf_go_lite.CloneVTSlice([]*msg{original})[0] != original)
+	enumSlice := []state{1, 0}
+	clonedEnumSlice := protobuf_go_lite.CloneSlice(enumSlice)
+	println("clone-enum-slice:", clonedEnumSlice[0], clonedEnumSlice[1])
 	println("equal:", protobuf_go_lite.IsEqualVT[*msg](original, &msg{v: 7}))
 	println("equal-slice-implicit:", protobuf_go_lite.EqualVTSliceImplicit([]*msg{nil, original}, []*msg{{}, {v: 7}}, func() *msg { return &msg{} }))
 	var sb protobuf_go_lite.TextBuilder

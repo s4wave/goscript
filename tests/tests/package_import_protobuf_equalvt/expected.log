@@ -1,5 +1,6 @@
 clone: true true
 clone-slice: true
+clone-enum-slice: 1 0
 equal: true
 equal-slice-implicit: true
 stringer: "running"

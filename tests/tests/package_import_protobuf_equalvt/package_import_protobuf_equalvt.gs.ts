@@ -109,6 +109,9 @@ export async function main(): globalThis.Promise<void> {
 	let cloned: msg | $.VarRef<msg> | null = (protobuf_go_lite.CloneVTValue({T: { type: { kind: $.TypeKind.Pointer, elemType: "main.msg" }, zero: () => null }}, original) as msg | $.VarRef<msg> | null)
 	$.println("clone:", !$.pointerEqual(cloned, original), msg.prototype.EqualVT.call(cloned, original))
 	$.println("clone-slice:", !$.pointerEqual($.arrayIndex(protobuf_go_lite.CloneVTSlice($.arrayToSlice<msg | $.VarRef<msg> | null>([original]))!, 0), original))
+	let enumSlice: $.Slice<state> = $.arrayToSlice<state>([$.int(1, 32), $.int(0, 32)])
+	let clonedEnumSlice: $.Slice<state> = (protobuf_go_lite.CloneSlice(enumSlice) as $.Slice<state>)
+	$.println("clone-enum-slice:", $.int($.arrayIndex(clonedEnumSlice!, 0), 32), $.int($.arrayIndex(clonedEnumSlice!, 1), 32))
 	$.println("equal:", protobuf_go_lite.IsEqualVT({T: { type: { kind: $.TypeKind.Pointer, elemType: "main.msg" }, zero: () => null }}, original, new msg({v: 7})))
 	$.println("equal-slice-implicit:", protobuf_go_lite.EqualVTSliceImplicit($.arrayToSlice<msg | $.VarRef<msg> | null>([null, original]), $.arrayToSlice<msg | $.VarRef<msg> | null>([new msg(), new msg({v: 7})]), $.functionValue((): msg | $.VarRef<msg> | null => {
 		return new msg()
