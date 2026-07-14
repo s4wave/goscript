@@ -1,9 +1,7 @@
 {
   "asyncFunctions": {
+    "DeleteFunc": true,
     "SortFunc": true
   },
-  "dependencies": [
-    "cmp",
-    "iter"
-  ]
+  "dependencies": ["cmp", "iter"]
 }

@@ -174,6 +174,20 @@ describe('slices compatibility helpers', () => {
     expect(BinarySearch($.arrayToSlice([1, 2, 3]), 2)).toEqual([1, true])
   })
 
+  it('preserves DeleteFunc order with asynchronous callbacks', async () => {
+    const seen: number[] = []
+    const result = await DeleteFunc(
+      $.arrayToSlice([1, 2, 3, 4]),
+      async (value) => {
+        seen.push(value)
+        return value % 2 === 0
+      },
+    )
+
+    expect(seen).toEqual([1, 2, 3, 4])
+    expect(Array.from(result ?? [])).toEqual([1, 3])
+  })
+
   it('rejects actual async callback results in sync helpers', () => {
     expect(() =>
       CompareFunc(

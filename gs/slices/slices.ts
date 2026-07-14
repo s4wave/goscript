@@ -328,7 +328,7 @@ export function Delete<T>(s: $.Slice<T>, i: number, j: number): $.Slice<T> {
 export function DeleteFunc<T>(
   s: $.Slice<T>,
   del: PredicateCallback<T>,
-): $.Slice<T> {
+): SyncCallbackResult<$.Slice<T>> {
   if (del == null) {
     throw new Error('slices.DeleteFunc: nil delete function')
   }
@@ -338,13 +338,33 @@ export function DeleteFunc<T>(
   let w = 0
   for (let i = 0; i < s.length; i++) {
     const value = s[i] as T
-    if (!syncBoolean(del(value))) {
-      ;(s as any)[w] = value
+    const deleted = del(value)
+    if (deleted instanceof Promise) {
+      return (async (): globalThis.Promise<$.Slice<T>> => {
+        if (!(await deleted)) {
+          s[w] = value
+          w++
+        }
+        for (let next = i + 1; next < s.length; next++) {
+          const nextValue = s[next] as T
+          if (!(await del(nextValue))) {
+            s[w] = nextValue
+            w++
+          }
+        }
+        for (let next = w; next < s.length; next++) {
+          s[next] = clearValue(s) as T
+        }
+        return $.goSlice(s, 0, w) as $.Slice<T>
+      })()
+    }
+    if (!deleted) {
+      s[w] = value
       w++
     }
   }
   for (let i = w; i < s.length; i++) {
-    ;(s as any)[i] = clearValue(s)
+    s[i] = clearValue(s) as T
   }
   return $.goSlice(s, 0, w) as $.Slice<T>
 }
