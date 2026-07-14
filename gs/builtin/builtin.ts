@@ -1,5 +1,5 @@
 import type { Slice, SliceProxy, StringHeaderData } from './slice.js'
-import { cloneStructValue, pointerIdentityEqual } from './type.js'
+import { pointerIdentityEqual } from './type.js'
 import { writeHostStdoutText } from './hostio.js'
 import { runtimePanic } from './panic.js'
 import { formatPrintedArgs } from './print.js'
@@ -88,7 +88,15 @@ export function assignStruct<T>(target: T, source: T): void {
   const targetFields = (target as any)._fields
   const sourceFields = (source as any)._fields
   if (!targetFields || !sourceFields) {
-    Object.assign(target as object, cloneStructValue(source) as object)
+    // Structs without a _fields map (e.g. bound protobuf messages) carry their
+    // data as plain enumerable properties. Copy a clone when the value defines
+    // one, otherwise copy the value's own properties directly.
+    const cloneable = source as {
+      __goscriptClone?: () => T
+      clone?: () => T
+    }
+    const copied = cloneable.__goscriptClone?.() ?? cloneable.clone?.() ?? source
+    Object.assign(target as object, copied as object)
     return
   }
   // Copy each field's value from source to target
