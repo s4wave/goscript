@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   append,
   appendSlice,
+  assignStruct,
   bytesToUint8Array,
   type Bytes,
   byte,
@@ -328,6 +329,24 @@ describe('builtin runtime contract helpers', () => {
       [1, 162],
       [3, 8364],
     ])
+  })
+
+  it('assigns cloneable runtime struct values', () => {
+    class ManualStruct {
+      constructor(public value = 0) {}
+
+      clone(): ManualStruct {
+        return new ManualStruct(this.value)
+      }
+    }
+
+    const target = new ManualStruct(1)
+    const source = new ManualStruct(42)
+    assignStruct(target, source)
+
+    expect(target.value).toBe(42)
+    source.value = 7
+    expect(target.value).toBe(42)
   })
 
   it('attaches owned pointer handles to variable and field refs', () => {

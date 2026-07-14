@@ -103,4 +103,18 @@ func main() {
 	_ = sealer.Seal(packet[15:15], packet[15:15+len(plaintext)])
 	packet = packet[:len(packet)+aead.Overhead()]
 	println("wrapped shared backing:", bytes.Equal(packet[15:15+len(expected)], expected))
+
+	randomAEAD, err := cipher.NewGCMWithRandomNonce(block)
+	randomSealed := randomAEAD.Seal([]byte{7}, nil, []byte("random nonce"), aad)
+	randomOpened, openErr := randomAEAD.Open(nil, nil, randomSealed[1:], aad)
+	println(
+		"random nonce:",
+		err == nil,
+		openErr == nil,
+		randomAEAD.NonceSize(),
+		randomAEAD.Overhead(),
+		len(randomSealed),
+		randomSealed[0] == 7,
+		bytes.Equal(randomOpened, []byte("random nonce")),
+	)
 }

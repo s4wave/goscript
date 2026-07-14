@@ -803,9 +803,20 @@ export class Value {
     throw new ValueError({ Kind: this.Kind(), Method: 'Slice' })
   }
 
-  public Bytes(): Uint8Array {
-    if (this._value instanceof Uint8Array) {
-      return this._value
+  public Bytes(): $.Slice<number> {
+    const value = this.currentValue()
+    if (
+      this.Kind() === Slice &&
+      this._type.Elem()?.Kind() === Uint8 &&
+      (value === null ||
+        value instanceof Uint8Array ||
+        globalThis.Array.isArray(value) ||
+        (typeof value === 'object' && '__meta__' in value))
+    ) {
+      return value as $.Slice<number>
+    }
+    if (this.Kind() === String && typeof value === 'string') {
+      return $.stringToBytes(value)
     }
     throw new Error(
       'reflect: call of reflect.Value.Bytes on ' +
@@ -959,7 +970,7 @@ export class Value {
 
   // Internal method to access the underlying value
   public get value(): ReflectValue {
-    return this._value
+    return this.currentValue()
   }
 
   // Convert method needed by iter.ts

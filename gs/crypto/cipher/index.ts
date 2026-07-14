@@ -250,6 +250,65 @@ class webCryptoGCM implements AEAD {
   }
 }
 
+class webCryptoGCMRandomNonce implements AEAD {
+  constructor(private readonly gcm: webCryptoGCM) {}
+
+  NonceSize(): number {
+    return 0
+  }
+
+  Overhead(): number {
+    return 28
+  }
+
+  async Seal(
+    dst: $.Bytes,
+    nonce: $.Bytes,
+    plaintext: $.Bytes,
+    additionalData: $.Bytes,
+  ): Promise<$.Bytes> {
+    if ($.len(nonce) !== 0) {
+      throw new Error(
+        'crypto/cipher: non-empty nonce passed to GCMWithRandomNonce',
+      )
+    }
+    const randomNonce = globalThis.crypto.getRandomValues(new Uint8Array(12))
+    const ciphertext = await this.gcm.Seal(
+      null,
+      randomNonce,
+      plaintext,
+      additionalData,
+    )
+    return appendBytes(
+      appendBytes(dst, randomNonce),
+      $.bytesToUint8Array(ciphertext),
+    )
+  }
+
+  async Open(
+    dst: $.Bytes,
+    nonce: $.Bytes,
+    ciphertext: $.Bytes,
+    additionalData: $.Bytes,
+  ): Promise<[$.Bytes, $.GoError]> {
+    if ($.len(nonce) !== 0) {
+      throw new Error(
+        'crypto/cipher: non-empty nonce passed to GCMWithRandomNonce',
+      )
+    }
+    if ($.len(ciphertext) < this.Overhead()) {
+      return [null, $.newError('cipher: message authentication failed')]
+    }
+    const bytes = $.bytesToUint8Array(ciphertext)
+    return this.gcm.Open(
+      dst,
+      bytes.subarray(0, 12),
+      bytes.subarray(12),
+      additionalData,
+    )
+  }
+}
+
 export function NewGCM(block: Block | null): [AEAD | null, $.GoError] {
   return NewGCMWithNonceSize(block, 12)
 }
@@ -272,13 +331,21 @@ export function NewGCMWithTagSize(
 }
 
 export function NewGCMWithRandomNonce(
-  _block: Block | null,
+  block: Block | null,
 ): [AEAD | null, $.GoError] {
+  if (
+    block == null ||
+    block.BlockSize() !== 16 ||
+    !isWebCryptoBlock(block)
+  ) {
+    return [
+      null,
+      $.newError('cipher: NewGCMWithRandomNonce requires aes.Block'),
+    ]
+  }
   return [
+    new webCryptoGCMRandomNonce(new webCryptoGCM(block, 12, 16)),
     null,
-    $.newError(
-      'crypto/cipher: NewGCMWithRandomNonce is not implemented in GoScript',
-    ),
   ]
 }
 

@@ -10,6 +10,12 @@ func (e *customErr) Error() string {
 	return e.msg
 }
 
+type scalarErr uint8
+
+func (scalarErr) Error() string {
+	return "scalar error"
+}
+
 type wrappedErr struct {
 	err error
 }
@@ -46,6 +52,14 @@ func main() {
 	}
 	_, ok = errors.AsType[*customErr](err1)
 	println("AsType missing:", ok)
+
+	var scalarTarget scalarErr
+	println("As scalar missing:", errors.As(err1, &scalarTarget), scalarTarget)
+	println(
+		"As scalar matched:",
+		errors.As(scalarErr(42), &scalarTarget),
+		scalarTarget,
+	)
 
 	println("test finished")
 }

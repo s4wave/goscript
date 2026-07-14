@@ -160,6 +160,12 @@ function getArrayFromValue(value: Value): unknown[] | null {
     }
   }
 
+  // Byte slices use typed arrays so reflect.Copy must mutate their backing
+  // storage directly, just as it does for ordinary GoScript slices.
+  if (globalThis.ArrayBuffer.isView(val) && !(val instanceof DataView)) {
+    return val as unknown as unknown[]
+  }
+
   // Check for regular JavaScript arrays
   if (globalThis.Array.isArray(val)) {
     return val

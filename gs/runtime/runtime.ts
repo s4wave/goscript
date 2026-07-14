@@ -56,6 +56,21 @@ export function Gosched(): Promise<void> {
   })
 }
 
+// Goexit terminates the current goroutine after deferred calls run. The
+// JavaScript runtime has no goroutine cancellation primitive to resume from, so
+// throw a non-panic sentinel: generated defer stacks still dispose while
+// recover() cannot intercept it as a Go panic.
+export class GoexitError extends Error {
+  constructor() {
+    super('runtime.Goexit')
+    this.name = 'GoexitError'
+  }
+}
+
+export function Goexit(): never {
+  throw new GoexitError()
+}
+
 // NumGoroutine returns the number of goroutines that currently exist.
 // In goscript, this is informational only
 let goroutineCount = 1 // Start with main goroutine

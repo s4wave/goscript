@@ -45,6 +45,30 @@ describe('time parse/since/until (Go semantics)', () => {
     expect(offset.Format('0601021504Z0700')).toBe('2311142313+0100')
   })
 
+  it('Parse reads ASN.1 GeneralizedTime layouts', () => {
+    const layout = '20060102150405.999999999Z0700'
+    const [utc, utcErr] = Parse(layout, '21250331123506.123456789Z')
+    const [offset, offsetErr] = Parse(
+      layout,
+      '21250331140506.123456789+0130',
+    )
+    const [whole, wholeErr] = Parse(layout, '21250331123506Z')
+    const canonicalLayout = '20060102150405Z0700'
+    const [canonical, canonicalErr] = Parse(
+      canonicalLayout,
+      '21250331123506Z',
+    )
+    expect(utcErr).toBeNull()
+    expect(offsetErr).toBeNull()
+    expect(offset.UnixNano()).toBe(utc.UnixNano())
+    expect(offset.Nanosecond()).toBe(123456789)
+    expect(wholeErr).toBeNull()
+    expect(whole.Format(layout)).toBe('21250331123506Z')
+    expect(offset.Format(layout)).toBe('21250331140506.123456789+0130')
+    expect(canonicalErr).toBeNull()
+    expect(canonical.Format(canonicalLayout)).toBe('21250331123506Z')
+  })
+
   it('Parse rejects invalid ASN.1 UTCTime fields', () => {
     const [, err] = Parse('060102150405Z0700', '231314221320Z')
     expect(err).not.toBeNull()

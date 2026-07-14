@@ -4,14 +4,18 @@ import * as $ from '@goscript/builtin/index.js'
 
 import {
   ArrayOf,
+  Copy,
   New,
   NewAt,
   StructField,
+  SliceOf,
   StructOf,
   TypeOf,
+  Uint8,
   Value,
   ValueOf,
 } from './index.js'
+import { BasicType } from './type.js'
 import { SliceAt } from './value.js'
 
 describe('reflect owned pointer handles', () => {
@@ -47,6 +51,47 @@ describe('reflect owned pointer handles', () => {
     const pointer = NewAt(element.Type(), address as any)
     pointer.Elem().SetUint(12n)
     expect(Array.from(bytes)).toEqual([4, 12, 6])
+  })
+
+  it('copies reflected byte slices into typed-array backing', () => {
+    const dst = new Uint8Array(3)
+    const copied = Copy(
+      ValueOf(dst),
+      ValueOf(new Uint8Array([7, 8, 9, 10])),
+    )
+
+    expect(copied).toBe(3)
+    expect(Array.from(dst)).toEqual([7, 8, 9])
+  })
+
+  it('returns byte slices from every supported slice backing', () => {
+    const values = [1, 2, 3]
+    const byteSliceType = SliceOf(new BasicType(Uint8, 'uint8', 1))
+    const bytes = new Value(values, byteSliceType).Bytes()
+
+    expect(Array.from(bytes ?? [])).toEqual([1, 2, 3])
+    bytes![1] = 9
+    expect(values).toEqual([1, 9, 3])
+    expect(new Value(null, byteSliceType).Bytes()).toBeNull()
+    expect(Array.from(ValueOf('go').Bytes() ?? [])).toEqual([103, 111])
+  })
+
+  it('copies through a reflected slice alias after Set', () => {
+    const parent: Record<string, unknown> = {
+      bytes: new Uint8Array([0]),
+    }
+    const value = new Value(
+      parent.bytes as Uint8Array,
+      TypeOf(parent.bytes),
+      undefined,
+      parent,
+      'bytes',
+    )
+    const alias = value.clone()
+    value.Set(ValueOf(new Uint8Array(3)))
+
+    expect(Copy(alias, ValueOf(new Uint8Array([4, 5, 6])))).toBe(3)
+    expect(Array.from(parent.bytes as Uint8Array)).toEqual([4, 5, 6])
   })
 
   it('keeps reflected array elements addressable through owned pointers', () => {

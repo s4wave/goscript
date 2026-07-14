@@ -6,4 +6,6 @@ nilErr == nil: true
 AsType matched: true
 AsType message: typed error
 AsType missing: false
+As scalar missing: false 0
+As scalar matched: true 42
 test finished

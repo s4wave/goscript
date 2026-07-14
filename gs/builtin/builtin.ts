@@ -1,5 +1,5 @@
 import type { Slice, SliceProxy, StringHeaderData } from './slice.js'
-import { pointerIdentityEqual } from './type.js'
+import { cloneStructValue, pointerIdentityEqual } from './type.js'
 import { writeHostStdoutText } from './hostio.js'
 import { runtimePanic } from './panic.js'
 import { formatPrintedArgs } from './print.js'
@@ -88,6 +88,7 @@ export function assignStruct<T>(target: T, source: T): void {
   const targetFields = (target as any)._fields
   const sourceFields = (source as any)._fields
   if (!targetFields || !sourceFields) {
+    Object.assign(target as object, cloneStructValue(source) as object)
     return
   }
   // Copy each field's value from source to target

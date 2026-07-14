@@ -1,7 +1,10 @@
 keygen err nil true
+extension marshal err nil true
 create err nil true
 der nonempty true
 parse err nil true
+extension unmarshal true 6 8 4 2
+verify err nil true
 serial 42
 common name goscript.test
 organization GoScript

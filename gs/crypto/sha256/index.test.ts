@@ -1,7 +1,14 @@
-import { describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
+
+import { resetHostRuntimeForTests } from '@goscript/builtin/hostio.js'
 import * as $ from '@goscript/builtin/index.js'
 
 import { New, New224, Size, Size224, Sum224, Sum256 } from './index.js'
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+  resetHostRuntimeForTests()
+})
 
 describe('crypto/sha256 override', () => {
   test('sums with WebCrypto', async () => {
@@ -38,6 +45,17 @@ describe('crypto/sha256 override', () => {
   })
 
   test('sums SHA-224 with host crypto', async () => {
+    const sum = await Sum224($.stringToBytes('abc'))
+    expect(Array.from(sum)).toEqual([
+      35, 9, 125, 34, 52, 5, 216, 34, 134, 66, 164, 119, 189, 162, 85, 179, 42,
+      173, 188, 228, 189, 160, 179, 247, 227, 108, 157, 167,
+    ])
+  })
+
+  test('sums SHA-224 without host crypto', async () => {
+    vi.stubGlobal('process', undefined)
+    resetHostRuntimeForTests()
+
     const sum = await Sum224($.stringToBytes('abc'))
     expect(Array.from(sum)).toEqual([
       35, 9, 125, 34, 52, 5, 216, 34, 134, 66, 164, 119, 189, 162, 85, 179, 42,

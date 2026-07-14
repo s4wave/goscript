@@ -218,11 +218,14 @@ function assignAsTarget(err: Exclude<$.GoError, null>, target: any): boolean {
     if (!ok) {
       return false
     }
-    if ($.isVarRef(target)) {
-      target.value = matched
+    const destination = $.isNamedValueBox(target)
+      ? target.__goValue
+      : target
+    if ($.isVarRef(destination)) {
+      destination.value = matched
       return true
     }
-    Object.assign(target, matched)
+    Object.assign(destination, matched)
     return true
   }
 

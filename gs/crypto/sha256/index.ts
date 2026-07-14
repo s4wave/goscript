@@ -1,3 +1,5 @@
+import { sha224 } from '@noble/hashes/sha2.js'
+
 import * as $ from '@goscript/builtin/index.js'
 import {
   getHostRuntime,
@@ -97,9 +99,7 @@ async function sum(
   }
 
   if (algorithm === 'sha224') {
-    throw new Error(
-      new Sha256Error('crypto/sha256: SHA-224 digest is unavailable').Error(),
-    )
+    return sha224($.bytesToUint8Array(data))
   }
 
   const subtle = subtleCrypto()

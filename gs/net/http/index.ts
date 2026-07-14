@@ -330,6 +330,41 @@ export function Header_WriteSubset(
   return null
 }
 
+export function Header__get(h: HeaderValue, key: string): string {
+  const values = headerMap(h).get(key)
+  return values == null || values.length === 0 ? '' : String(values[0])
+}
+
+export function Header_has(h: HeaderValue, key: string): boolean {
+  return headerMap(h).has(key)
+}
+
+export function Header_sortedKeyValues(
+  h: HeaderValue,
+  exclude: Map<string, boolean> | null,
+): [Array<{ key: string; values: $.Slice<string> }>, null] {
+  const values: Array<{ key: string; values: $.Slice<string> }> = []
+  for (const [key, headerValues] of headerMap(h).entries()) {
+    if (exclude?.get(key) === true) continue
+    values.push({ key, values: headerValues })
+  }
+  values.sort((a, b) => a.key.localeCompare(b.key))
+  return [values, null]
+}
+
+export function Header_write(h: HeaderValue, w: io.Writer, _trace: unknown): $.GoError {
+  return Header_WriteSubset(h, w, null)
+}
+
+export function Header_writeSubset(
+  h: HeaderValue,
+  w: io.Writer,
+  exclude: Map<string, boolean> | null,
+  _trace: unknown,
+): $.GoError {
+  return Header_WriteSubset(h, w, exclude)
+}
+
 export type Dir = string
 
 export interface CookieJar {
