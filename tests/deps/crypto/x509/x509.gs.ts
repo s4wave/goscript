@@ -1460,7 +1460,7 @@ export class Certificate {
 		let invalidPoliciesChains: number = 0
 		let incompatibleKeyUsageChains: number = 0
 		let constraintsHintErr: $.GoError = null as $.GoError
-		candidateChains = (slices.DeleteFunc(candidateChains, $.functionValue(async (chain: $.Slice<Certificate | $.VarRef<Certificate> | null>): globalThis.Promise<boolean> => {
+		candidateChains = (await slices.DeleteFunc(candidateChains, $.functionValue(async (chain: $.Slice<Certificate | $.VarRef<Certificate> | null>): globalThis.Promise<boolean> => {
 			if (!await __goscript_verify.policiesValid(chain, $.markAsStructValue($.cloneStructValue(opts.value)))) {
 				invalidPoliciesChains++
 				return true

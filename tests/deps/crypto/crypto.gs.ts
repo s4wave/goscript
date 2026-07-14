@@ -65,7 +65,7 @@ $.registerInterfaceType(
 
 export type Decrypter = {
 	Decrypt(rand: io.Reader | null, msg: $.Slice<number>, opts: DecrypterOpts | null): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>
-	Public(): PublicKey | null | globalThis.Promise<PublicKey | null>
+	Public(): PublicKey | null
 }
 
 $.registerInterfaceType(
@@ -83,8 +83,8 @@ $.registerInterfaceType(
 );
 
 export type Decapsulator = {
-	Decapsulate(ciphertext: $.Slice<number>): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>
-	Encapsulator(): Encapsulator | null | globalThis.Promise<Encapsulator | null>
+	Decapsulate(ciphertext: $.Slice<number>): [$.Slice<number>, $.GoError]
+	Encapsulator(): Encapsulator | null
 }
 
 $.registerInterfaceType(
@@ -94,8 +94,8 @@ $.registerInterfaceType(
 );
 
 export type Encapsulator = {
-	Bytes(): $.Slice<number> | globalThis.Promise<$.Slice<number>>
-	Encapsulate(): [$.Slice<number>, $.Slice<number>] | globalThis.Promise<[$.Slice<number>, $.Slice<number>]>
+	Bytes(): $.Slice<number>
+	Encapsulate(): [$.Slice<number>, $.Slice<number>]
 }
 
 $.registerInterfaceType(

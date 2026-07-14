@@ -78,9 +78,9 @@ $.registerInterfaceType(
 
 export type Conn = {
 	Close(): $.GoError | globalThis.Promise<$.GoError>
-	LocalAddr(): Addr | null | globalThis.Promise<Addr | null>
+	LocalAddr(): Addr | null
 	Read(b: $.Slice<number>): [number, $.GoError] | globalThis.Promise<[number, $.GoError]>
-	RemoteAddr(): Addr | null | globalThis.Promise<Addr | null>
+	RemoteAddr(): Addr | null
 	SetDeadline(t: time.Time): $.GoError | globalThis.Promise<$.GoError>
 	SetReadDeadline(t: time.Time): $.GoError | globalThis.Promise<$.GoError>
 	SetWriteDeadline(t: time.Time): $.GoError | globalThis.Promise<$.GoError>

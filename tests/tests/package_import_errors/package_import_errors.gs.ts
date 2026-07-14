@@ -6,6 +6,8 @@ import * as $ from "@goscript/builtin/index.js"
 import * as errors from "@goscript/errors/index.js"
 import "@goscript/errors/index.js"
 
+export type scalarErr = number
+
 export class customErr {
 	public get msg(): string {
 		return this._fields.msg.value
@@ -91,6 +93,10 @@ export class wrappedErr {
 	)
 }
 
+export function scalarErr_Error(recv: scalarErr): string {
+	return "scalar error"
+}
+
 export async function main(): globalThis.Promise<void> {
 	// Test basic error creation
 	let err1 = errors.New("first error")
@@ -118,6 +124,10 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple1: any = errors.AsType({E: { type: { kind: $.TypeKind.Pointer, elemType: "main.customErr" }, zero: () => null }}, $.pointerValueOrNil(err1)!)
 	ok = __goscriptTuple1[1]
 	$.println("AsType missing:", ok)
+
+	let scalarTarget: $.VarRef<scalarErr> = $.varRef(0)
+	$.println("As scalar missing:", errors.As($.pointerValueOrNil(err1)!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", {Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...args)}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" } }, [{ name: "Error", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])), $.uint(scalarTarget.value, 8))
+	$.println("As scalar matched:", errors.As($.namedValueInterfaceValue<$.GoError>(42, "main.scalarErr", {"Error": scalarErr_Error}, { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" }), $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", {Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...args)}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" } }, [{ name: "Error", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])), $.uint(scalarTarget.value, 8))
 
 	$.println("test finished")
 }

@@ -205,6 +205,13 @@ export async function main(): globalThis.Promise<void> {
 	await $.pointerValue<Exclude<packetSealer, null>>(sealer).Seal($.goSlice(packet, 15, 15), $.goSlice(packet, 15, 15 + $.len(plaintext)))
 	packet = $.goSlice(packet, undefined, $.len(packet) + await $.pointerValue<Exclude<cipher.AEAD, null>>(aead).Overhead())
 	$.println("wrapped shared backing:", bytes.Equal($.goSlice(packet, 15, 15 + $.len(expected)), expected))
+
+	let [randomAEAD, err] = cipher.NewGCMWithRandomNonce($.pointerValueOrNil(block)!)
+	let randomSealed: $.Slice<number> = await $.pointerValue<Exclude<cipher.AEAD, null>>(randomAEAD).Seal(new Uint8Array([7]) as $.Slice<number>, null, new Uint8Array([114, 97, 110, 100, 111, 109, 32, 110, 111, 110, 99, 101]), aad)
+	let __goscriptTuple2: any = await $.pointerValue<Exclude<cipher.AEAD, null>>(randomAEAD).Open(null, null, $.goSlice(randomSealed, 1, undefined), aad)
+	let randomOpened: $.Slice<number> = __goscriptTuple2[0]
+	let openErr = __goscriptTuple2[1]
+	$.println("random nonce:", err == null, openErr == null, await $.pointerValue<Exclude<cipher.AEAD, null>>(randomAEAD).NonceSize(), await $.pointerValue<Exclude<cipher.AEAD, null>>(randomAEAD).Overhead(), $.len(randomSealed), $.uint($.arrayIndex(randomSealed!, 0), 8) == $.uint(7, 8), bytes.Equal(randomOpened, new Uint8Array([114, 97, 110, 100, 111, 109, 32, 110, 111, 110, 99, 101])))
 }
 
 if ($.isMainScript(import.meta)) {
