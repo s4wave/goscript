@@ -8293,7 +8293,9 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 		if signature := callTargetSignature(ctx, fun); signature != nil {
 			if callTargetSignature(ctx, fun.X) != nil {
 				callee, calleeDiagnostics := o.lowerExpr(ctx, fun.X)
-				args = append([]string{o.genericTypeArgsExpr(ctx, fun.X, []ast.Expr{fun.Index})}, args...)
+				if !o.callUsesSlicesOverride(ctx, fun.X) {
+					args = append([]string{o.genericTypeArgsExpr(ctx, fun.X, []ast.Expr{fun.Index})}, args...)
+				}
 				call := o.lowerCallableExpr(ctx, fun.X, callee) + "(" + strings.Join(args, ", ") + ")"
 				return o.awaitCallIfNeeded(ctx, fun, call), append(diagnostics, calleeDiagnostics...)
 			}
@@ -8304,7 +8306,9 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 	case *ast.IndexListExpr:
 		if signature, _ := ctx.semPkg.source.TypesInfo.TypeOf(fun).(*types.Signature); signature != nil {
 			callee, calleeDiagnostics := o.lowerExpr(ctx, fun.X)
-			args = append([]string{o.genericTypeArgsExpr(ctx, fun.X, fun.Indices)}, args...)
+			if !o.callUsesSlicesOverride(ctx, fun.X) {
+				args = append([]string{o.genericTypeArgsExpr(ctx, fun.X, fun.Indices)}, args...)
+			}
 			call := o.lowerCallableExpr(ctx, fun.X, callee) + "(" + strings.Join(args, ", ") + ")"
 			return o.awaitCallIfNeeded(ctx, fun, call), append(diagnostics, calleeDiagnostics...)
 		}
@@ -8747,6 +8751,16 @@ func (o *LoweringOwner) callUsesOverridePackage(ctx lowerFileContext, expr ast.E
 		return false
 	}
 	return o.overrideFacts().HasPackage(fn.Pkg().Path())
+}
+
+// callUsesSlicesOverride reports whether expr resolves to the handwritten
+// slices package, whose TypeScript generic functions do not accept descriptors.
+func (o *LoweringOwner) callUsesSlicesOverride(ctx lowerFileContext, expr ast.Expr) bool {
+	if !o.callUsesOverridePackage(ctx, expr) {
+		return false
+	}
+	fn := calledFunction(ctx.semPkg.source, expr)
+	return fn != nil && fn.Pkg() != nil && fn.Pkg().Path() == "slices"
 }
 
 func unsafePackageFunction(ctx lowerFileContext, expr ast.Expr, name string) bool {
