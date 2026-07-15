@@ -3249,7 +3249,11 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 		}
 	}
 	for _, field := range semType.fields {
-		methods := o.lowerEmbeddedMethodForwarders(ctx, field, explicitMethods)
+		methods := o.lowerEmbeddedMethodForwarders(
+			ctx.withReceiverTypeParams(genericReceiverTypeParams(semType.named)),
+			field,
+			explicitMethods,
+		)
 		lowered.methods = append(lowered.methods, methods...)
 	}
 	return lowered, diagnostics
@@ -3443,6 +3447,13 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 			result:                  asyncResultType("any", async),
 			deferState:              &loweredDeferState{},
 		}
+		genericArgs := o.genericReceiverTypeArgsExpr(ctx, selection)
+		if strings.Contains(genericArgs, "__typeArgs") {
+			lowered.params = append(lowered.params, loweredParam{
+				name: "__typeArgs",
+				typ:  "$.GenericTypeArgs | undefined",
+			})
+		}
 		args := make([]string, 0, signature.Params().Len())
 		for idx := range signature.Params().Len() {
 			param := signature.Params().At(idx)
@@ -3450,8 +3461,12 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 			args = append(args, name)
 			lowered.params = append(lowered.params, loweredParam{name: name, typ: "any"})
 		}
+		callArgs := args
+		if genericArgs != "" {
+			callArgs = append([]string{genericArgs}, callArgs...)
+		}
 		target := o.embeddedForwarderTargetExpr(ctx, field, selection, targetType)
-		call := target + "." + method.Name() + "(" + strings.Join(args, ", ") + ")"
+		call := target + "." + method.Name() + "(" + strings.Join(callArgs, ", ") + ")"
 		if async {
 			call = "await " + call
 		}
