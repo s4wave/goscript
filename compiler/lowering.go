@@ -8338,6 +8338,15 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 			}
 			if genericArgs := o.genericReceiverTypeArgsExpr(ctx, selection); genericArgs != "" &&
 				!o.callUsesOverridePackage(ctx, fun) {
+				if isInterfaceType(selection.Recv()) {
+					receiverExpr, receiverDiagnostics := o.lowerMethodReceiverExpr(ctx, fun.X, selection)
+					diagnostics = append(diagnostics, receiverDiagnostics...)
+					callArgs := []string{receiverExpr, strconv.Quote(fun.Sel.Name), genericArgs}
+					callArgs = append(callArgs, args...)
+					call := o.runtimeOwner.QualifiedHelper(RuntimeHelperCallInterfaceMethod) +
+						"(" + strings.Join(callArgs, ", ") + ")"
+					return o.awaitCallIfNeeded(ctx, fun, call), diagnostics
+				}
 				args = append([]string{genericArgs}, args...)
 			}
 			receiver := methodReceiverNamedType(selection.Obj())
@@ -9922,12 +9931,20 @@ func (o *LoweringOwner) lowerMethodValueClosure(
 			args = append(args, name)
 		}
 	}
-	callArgs := make([]string, 0, len(args)+2)
-	if includeReceiver {
-		callArgs = append(callArgs, "__receiver")
-	}
+	callArgs := make([]string, 0, len(args)+3)
+	genericArgs := ""
 	if !o.methodSelectionUsesOverridePackage(ctx, selection) {
-		if genericArgs := o.genericReceiverTypeArgsExpr(ctx, selection); genericArgs != "" {
+		genericArgs = o.genericReceiverTypeArgsExpr(ctx, selection)
+	}
+	interfaceGeneric := genericArgs != "" && isInterfaceType(selection.Recv())
+	if interfaceGeneric {
+		callArgs = append(callArgs, "__receiver", strconv.Quote(selection.Obj().Name()), genericArgs)
+		callee = o.runtimeOwner.QualifiedHelper(RuntimeHelperCallInterfaceMethod)
+	} else {
+		if includeReceiver {
+			callArgs = append(callArgs, "__receiver")
+		}
+		if genericArgs != "" {
 			callArgs = append(callArgs, genericArgs)
 		}
 	}
@@ -9956,14 +9973,23 @@ func (o *LoweringOwner) lowerMethodExpressionClosure(ctx lowerFileContext, selec
 		args = append(args, safeParamName(signature.Params().At(idx), idx))
 	}
 	methodArgs := args
+	genericArgs := ""
 	if !o.methodSelectionUsesOverridePackage(ctx, selection) {
-		if genericArgs := o.genericReceiverTypeArgsExpr(ctx, selection); genericArgs != "" {
+		genericArgs = o.genericReceiverTypeArgsExpr(ctx, selection)
+	}
+	call := ""
+	if genericArgs != "" && isInterfaceType(selection.Recv()) {
+		methodArgs = append([]string{receiverName, strconv.Quote(method.Name()), genericArgs}, methodArgs...)
+		call = o.runtimeOwner.QualifiedHelper(RuntimeHelperCallInterfaceMethod) +
+			"(" + strings.Join(methodArgs, ", ") + ")"
+	} else {
+		if genericArgs != "" {
 			methodArgs = append([]string{genericArgs}, methodArgs...)
 		}
+		call = o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) +
+			"<" + o.namedTypeExpr(ctx, receiver) + ">(" + receiverName + ")." +
+			method.Name() + "(" + strings.Join(methodArgs, ", ") + ")"
 	}
-	call := o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) +
-		"<" + o.namedTypeExpr(ctx, receiver) + ">(" + receiverName + ")." +
-		method.Name() + "(" + strings.Join(methodArgs, ", ") + ")"
 	async := o.functionAsync(ctx, method)
 	prefix := ""
 	if async {

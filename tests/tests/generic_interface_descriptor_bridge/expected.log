@@ -1,5 +1,10 @@
 generic-generic 7 2
 generic-plain 8 3
 plain-generic 9 4
+retyped-plain-generic 12 7
+method-value 14
+method-expression 15
+pointer-equal true false
+typed-nil false true true 13
 retyped-generic 10 5
 retyped-plain 11 6

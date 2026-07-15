@@ -24,7 +24,9 @@ func (*genericBox[T]) Count(ctx context.Context, values ...T) int {
 	return len(values)
 }
 
-type intBox struct{}
+type intBox struct {
+	id int
+}
 
 func (*intBox) Wait(ctx context.Context, old int) int {
 	<-ctx.Done()
@@ -48,6 +50,22 @@ func main() {
 
 	var plainGeneric GenericWaiter[int] = &intBox{}
 	println("plain-generic", plainGeneric.Wait(ctx, 9), plainGeneric.Count(ctx, 1, 2, 3, 4))
+	var plainPlain IntWaiter = &intBox{}
+	var retypedPlainGeneric GenericWaiter[int] = plainPlain
+	println("retyped-plain-generic", retypedPlainGeneric.Wait(ctx, 12), retypedPlainGeneric.Count(ctx, 1, 2, 3, 4, 5, 6, 7))
+	var methodValue = retypedPlainGeneric.Wait
+	println("method-value", methodValue(ctx, 14))
+	var methodExpression = GenericWaiter[int].Wait
+	println("method-expression", methodExpression(retypedPlainGeneric, ctx, 15))
+	var samePointer = &intBox{}
+	var samePointerA IntWaiter = samePointer
+	var samePointerB IntWaiter = samePointer
+	var differentPointer IntWaiter = &intBox{}
+	println("pointer-equal", samePointerA == samePointerB, samePointerA == differentPointer)
+	var nilPointer *intBox
+	var nilInterface IntWaiter = nilPointer
+	assertedPointer, assertedOK := nilInterface.(*intBox)
+	println("typed-nil", nilInterface == nil, assertedPointer == nil, assertedOK, nilInterface.Wait(ctx, 13))
 
 	var retypedGeneric GenericWaiter[int] = genericPlain
 	println("retyped-generic", retypedGeneric.Wait(ctx, 10), retypedGeneric.Count(ctx, 1, 2, 3, 4, 5))

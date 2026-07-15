@@ -1,4 +1,5 @@
 import { isVarRef } from './varRef.js'
+import { runtimePanic } from './panic.js'
 
 /**
  * Represents the kinds of Go types that can be registered at runtime.
@@ -1802,6 +1803,39 @@ export function interfaceValue<T>(
     })
   }
   return nilValue as T
+}
+
+type InterfaceMethod = ((...args: unknown[]) => unknown) & {
+  __goscriptMethodWrapper?: boolean
+}
+
+function isInterfaceMethod(value: unknown): value is InterfaceMethod {
+  return typeof value === 'function'
+}
+
+export function callInterfaceMethod(
+  receiver: unknown,
+  methodName: string,
+  genericArgs: GenericTypeArgs | undefined,
+  ...args: unknown[]
+): any {
+  if (
+    receiver === null ||
+    receiver === undefined ||
+    (typeof receiver !== 'object' && typeof receiver !== 'function')
+  ) {
+    runtimePanic(
+      'runtime error: invalid memory address or nil pointer dereference',
+    )
+  }
+  const methodValue = (receiver as Record<string, unknown>)[methodName]
+  if (!isInterfaceMethod(methodValue)) {
+    runtimePanic(`interface method ${methodName} is not callable`)
+  }
+  if (methodValue.__goscriptMethodWrapper === true) {
+    return methodValue.call(receiver, genericArgs, ...args)
+  }
+  return methodValue.call(receiver, ...args)
 }
 
 export function namedValueInterfaceValue<T>(

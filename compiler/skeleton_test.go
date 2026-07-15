@@ -4050,7 +4050,7 @@ func TestCompilePackagesPropagatesAsyncGenericInterfaceMethods(t *testing.T) {
 	for _, want := range []string{
 		"Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): any | globalThis.Promise<any>",
 		"public async Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): globalThis.Promise<any>",
-		"return (await $.pointerValue<Exclude<Watchable, null>>(w).Wait({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: \"int\" }, zero: () => 0 }}, ctx, old) as number)",
+		"return (await $.callInterfaceMethod($.pointerValue<Exclude<Watchable, null>>(w), \"Wait\", {[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: \"int\" }, zero: () => 0 }}, ctx, old) as number)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -4758,7 +4758,7 @@ func TestCompilePackagesPropagatesImportedAsyncGenericInterfaceMethods(t *testin
 		t.Fatal(err.Error())
 	}
 	mainText := string(mainContent)
-	if want := "return (await $.pointerValue<Exclude<dep.Watchable, null>>(w).Wait({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: \"int\" }, zero: () => 0 }}, ctx, old) as number)"; !strings.Contains(mainText, want) {
+	if want := "return (await $.callInterfaceMethod($.pointerValue<Exclude<dep.Watchable, null>>(w), \"Wait\", {[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: \"int\" }, zero: () => 0 }}, ctx, old) as number)"; !strings.Contains(mainText, want) {
 		t.Fatalf("missing %q in generated main output:\n%s", want, mainText)
 	}
 }
