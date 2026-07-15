@@ -7961,11 +7961,22 @@ func stmtsContainAwait(stmts []loweredStmt) bool {
 			return true
 		}
 		if stmt.switchStmt != nil {
+			if strings.Contains(stmt.switchStmt.value, "await ") {
+				return true
+			}
 			for _, switchCase := range stmt.switchStmt.cases {
+				for _, value := range switchCase.values {
+					if strings.Contains(value, "await ") {
+						return true
+					}
+				}
 				if stmtsContainAwait(switchCase.body) {
 					return true
 				}
 			}
+		}
+		if stmt.typeSwitch != nil && strings.Contains(stmt.typeSwitch.value, "await ") {
+			return true
 		}
 		if stmt.typeSwitch != nil {
 			for _, switchCase := range stmt.typeSwitch.cases {

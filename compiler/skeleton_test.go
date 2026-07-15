@@ -4539,6 +4539,58 @@ func TestCompilePackagesMarksFunctionLiteralAsyncForInterfaceMethodCall(t *testi
 	}
 }
 
+func TestCompilePackagesMarksFunctionLiteralAsyncForSwitchCaseMethodCall(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/funclitswitchawait\n\ngo 1.25.3\n",
+		"main.go": strings.Join([]string{
+			"package funclitswitchawait",
+			"type Worker struct{}",
+			"func (w *Worker) Check() bool {",
+			"  select {",
+			"  default:",
+			"  }",
+			"  return true",
+			"}",
+			"func Each(cb func() error) error { return nil }",
+			"func Use(w *Worker) error {",
+			"  return Each(func() error {",
+			"    switch {",
+			"    case w.Check():",
+			"      return nil",
+			"    default:",
+			"      return nil",
+			"    }",
+			"  })",
+			"}",
+		}, "\n"),
+	})
+	outputDir := filepath.Join(t.TempDir(), "output")
+	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir}, nil, nil)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatal(err.Error())
+	}
+	outputFile := filepath.Join(outputDir, "@goscript", "example.test", "funclitswitchawait", "main.gs.ts")
+	content, err := os.ReadFile(outputFile)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	text := string(content)
+	for _, want := range []string{
+		"export async function Each(",
+		"export async function Use(",
+		"$.functionValue(async ()",
+		"case await Worker.prototype.Check.call(w)",
+	} {
+		if !strings.Contains(text, want) {
+			t.Fatalf("missing %q in generated output:\n%s", want, text)
+		}
+	}
+}
+
 func TestCompilePackagesMarksFunctionLiteralAsyncForInterfaceMethodTypeSwitch(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod": "module example.test/funclittypeswitchawait\n\ngo 1.25.3\n",
