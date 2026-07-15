@@ -8,10 +8,6 @@ async function nextMicrotask(): Promise<void> {
   await new Promise<void>((resolve) => queueMicrotask(resolve))
 }
 
-async function nextTask(): Promise<void> {
-  await new Promise<void>((resolve) => setTimeout(resolve, 0))
-}
-
 describe('context override', () => {
   it('matches generated struct keys by Go comparable value', () => {
     class Key {
@@ -38,14 +34,18 @@ describe('context override', () => {
   it('runs AfterFunc after cancellation', async () => {
     const [ctx, cancel] = WithCancel(Background())
     let called = false
+    let resolveCallback: (() => void) | null = null
+    const callbackComplete = new Promise<void>((resolve) => {
+      resolveCallback = resolve
+    })
 
     const stop = AfterFunc(ctx, () => {
       called = true
+      resolveCallback?.()
     })
 
     cancel?.()
-    await nextMicrotask()
-    await nextTask()
+    await callbackComplete
 
     expect(called).toBe(true)
     expect(stop()).toBe(false)
