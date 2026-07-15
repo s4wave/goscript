@@ -11496,6 +11496,9 @@ func (o *LoweringOwner) lowerValueForTargetTypes(
 		if cloneStructValue {
 			value = o.lowerStructClone(value)
 		}
+		if wrapper := o.lowerNamedValueInterfaceWrapper(ctx, targetType, sourceType, value); wrapper != "" {
+			return wrapper
+		}
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperInterfaceValue) +
 			"<" + o.tsTypeFor(ctx, targetType) + ">(" + value + ", " +
 			strconv.Quote(goRuntimeTypeString(sourceType)) + ", " +
@@ -11604,7 +11607,10 @@ func (o *LoweringOwner) lowerNamedValueInterfaceWrapper(
 	}
 	receiver, methodSetType := namedNonStructMethodSetType(sourceType)
 	if receiver == nil {
-		return ""
+		receiver, methodSetType = genericMethodSetDescriptorTarget(sourceType)
+		if receiver == nil || !genericMethodSetHasReceiverTypeParams(methodSetType) {
+			return ""
+		}
 	}
 	methods := o.genericMethodDescriptorsForType(ctx, receiver, methodSetType)
 	if methods == "" {
@@ -12613,6 +12619,36 @@ func genericReceiverTypeParams(typ types.Type) []*types.TypeParam {
 	return result
 }
 
+func (o *LoweringOwner) genericReceiverTypeArgsExprForMethod(
+	ctx lowerFileContext,
+	method *types.Func,
+	methodSetType types.Type,
+) string {
+	if method == nil || methodSetType == nil {
+		return ""
+	}
+	signature, _ := method.Type().(*types.Signature)
+	if signature == nil || signature.Recv() == nil {
+		return ""
+	}
+	params := genericReceiverTypeParams(signature.Recv().Type())
+	if len(params) == 0 {
+		return ""
+	}
+	receiver := receiverNamedType(methodSetType)
+	if receiver == nil || receiver.TypeArgs() == nil || receiver.TypeArgs().Len() != len(params) {
+		receiver = methodReceiverNamedType(method)
+	}
+	if receiver == nil || receiver.TypeArgs() == nil || receiver.TypeArgs().Len() != len(params) {
+		return ""
+	}
+	entries := make([]string, 0, len(params))
+	for idx, param := range params {
+		entries = append(entries, param.Obj().Name()+": "+o.genericTypeDescriptorExpr(ctx, receiver.TypeArgs().At(idx)))
+	}
+	return "{" + strings.Join(entries, ", ") + "}"
+}
+
 func (o *LoweringOwner) genericReceiverTypeArgsExpr(ctx lowerFileContext, selection *types.Selection) string {
 	if selection == nil || selection.Obj() == nil {
 		return ""
@@ -13566,8 +13602,14 @@ func (o *LoweringOwner) genericMethodDescriptorsForType(
 		if method == nil {
 			continue
 		}
+		genericArgs := o.genericReceiverTypeArgsExprForMethod(ctx, method, methodSetType)
 		if namedStructType(named) != nil || isInterfaceType(named) {
-			methods = append(methods, method.Name()+": (receiver: any, ...args: any[]) => receiver."+method.Name()+"(...args)")
+			callArgs := make([]string, 0, 2)
+			if genericArgs != "" {
+				callArgs = append(callArgs, genericArgs)
+			}
+			callArgs = append(callArgs, "...args")
+			methods = append(methods, method.Name()+": (receiver: any, ...args: any[]) => receiver."+method.Name()+"("+strings.Join(callArgs, ", ")+")")
 			continue
 		}
 		receiver := "receiver"
@@ -13583,8 +13625,13 @@ func (o *LoweringOwner) genericMethodDescriptorsForType(
 				}
 			}
 		}
+		callArgs := []string{receiver}
+		if genericArgs != "" {
+			callArgs = append(callArgs, genericArgs)
+		}
+		callArgs = append(callArgs, "...args")
 		methods = append(methods, method.Name()+": (receiver: any, ...args: any[]) => "+
-			"("+o.methodFunctionExpr(ctx, named.Origin(), method, method.Name())+" as any)("+receiver+", ...args)")
+			"("+o.methodFunctionExpr(ctx, named.Origin(), method, method.Name())+" as any)("+strings.Join(callArgs, ", ")+")")
 	}
 	if len(methods) == 0 {
 		return ""
@@ -13614,6 +13661,9 @@ func (o *LoweringOwner) genericMethodSignatureDescriptors(typ types.Type) string
 func genericMethodSetDescriptorTarget(typ types.Type) (*types.Named, types.Type) {
 	named, _ := types.Unalias(typ).(*types.Named)
 	if named == nil {
+		if pointer := pointerToNamedStructType(typ); pointer != nil {
+			return pointer, typ
+		}
 		return namedNonStructMethodSetType(typ)
 	}
 	return named, named
@@ -13632,6 +13682,24 @@ func namedNonStructMethodSetType(typ types.Type) (*types.Named, types.Type) {
 		return nil, nil
 	}
 	return named, typ
+}
+
+func genericMethodSetHasReceiverTypeParams(typ types.Type) bool {
+	if typ == nil {
+		return false
+	}
+	for method := range types.NewMethodSet(typ).Methods() {
+		fn, _ := method.Obj().(*types.Func)
+		if fn == nil {
+			continue
+		}
+		signature, _ := fn.Type().(*types.Signature)
+		if signature != nil && signature.Recv() != nil &&
+			len(genericReceiverTypeParams(signature.Recv().Type())) != 0 {
+			return true
+		}
+	}
+	return false
 }
 
 func methodFunctionName(receiver *types.Named, method string) string {
