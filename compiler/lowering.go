@@ -8833,9 +8833,23 @@ func (o *LoweringOwner) lowerMakeExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 
 func (o *LoweringOwner) lowerNewExpr(ctx lowerFileContext, expr *ast.CallExpr) (string, []Diagnostic) {
 	if len(expr.Args) != 1 {
-		return "undefined", []Diagnostic{loweringUnsupportedAt(ctx, expr, "call", ctx.semPkg.pkgPath, "new requires one type argument")}
+		return "undefined", []Diagnostic{loweringUnsupportedAt(ctx, expr, "call", ctx.semPkg.pkgPath, "new requires one argument")}
 	}
-	typ := typeFromExpr(ctx, expr.Args[0])
+	argument := expr.Args[0]
+	typ := typeFromExpr(ctx, argument)
+	if typ == nil {
+		if ctx.semPkg == nil || ctx.semPkg.source == nil || ctx.semPkg.source.TypesInfo == nil {
+			return "undefined", []Diagnostic{loweringUnsupportedAt(ctx, argument, "call", "new", "missing type information for new expression argument")}
+		}
+		typ = types.Default(ctx.semPkg.source.TypesInfo.TypeOf(argument))
+		if typ == nil || isUntypedNilType(typ) {
+			return "undefined", []Diagnostic{loweringUnsupportedAt(ctx, argument, "call", ctx.semPkg.pkgPath, "missing type information for new expression argument")}
+		}
+		value, diagnostics := o.lowerExpr(ctx, argument)
+		value = o.lowerValueForTarget(ctx, argument, typ, value)
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperVarRef) +
+			"<" + o.tsTypeFor(ctx, typ) + ">(" + value + ")", diagnostics
+	}
 	if named := namedStructType(typ); named != nil {
 		return "new " + o.namedTypeExpr(ctx, named) + "()", nil
 	}
@@ -12894,7 +12908,7 @@ func sliceTypeHint(typ types.Type) string {
 }
 
 func typeFromExpr(ctx lowerFileContext, expr ast.Expr) types.Type {
-	if expr == nil || ctx.semPkg == nil || ctx.semPkg.source == nil {
+	if expr == nil || ctx.semPkg == nil || ctx.semPkg.source == nil || ctx.semPkg.source.TypesInfo == nil {
 		return nil
 	}
 	if tv, ok := ctx.semPkg.source.TypesInfo.Types[expr]; ok && tv.IsType() {

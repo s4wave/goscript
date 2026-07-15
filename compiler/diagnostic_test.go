@@ -3,9 +3,14 @@ package compiler
 import (
 	"context"
 	"errors"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"golang.org/x/tools/go/packages"
 )
 
 func TestFormatDiagnosticIncludesDisplayPosition(t *testing.T) {
@@ -102,5 +107,59 @@ func TestLoweringUnsupportedDiagnosticIncludesSourcePosition(t *testing.T) {
 	}
 	if got := FormatDiagnostics(compileErr.Diagnostics); !strings.HasPrefix(got, "main.go:4:") {
 		t.Fatalf("formatted diagnostic = %q, want main.go:4 prefix", got)
+	}
+}
+
+func TestLowerNewExprMissingTypeInformationReturnsDiagnostic(t *testing.T) {
+	fset := token.NewFileSet()
+	file, err := parser.ParseFile(fset, "main.go", "package main\n\nfunc main() {\n\tnew(missing)\n}\n", 0)
+	if err != nil {
+		t.Fatalf("parse fixture: %v", err)
+	}
+	var call *ast.CallExpr
+	ast.Inspect(file, func(node ast.Node) bool {
+		if typed, ok := node.(*ast.CallExpr); ok {
+			call = typed
+			return false
+		}
+		return true
+	})
+	if call == nil {
+		t.Fatal("missing new call")
+	}
+
+	owner := NewLoweringOwner(nil, nil)
+	ctx := lowerFileContext{
+		semPkg: &semanticPackage{
+			pkgPath: "example.test/missing",
+			source: &packages.Package{
+				Fset:      fset,
+				TypesInfo: nil,
+			},
+		},
+		displayRoot: ".",
+	}
+	value, diagnostics := owner.lowerNewExpr(ctx, call)
+	if value != "undefined" {
+		t.Fatalf("lowered value = %q, want undefined", value)
+	}
+	if len(diagnostics) != 1 {
+		t.Fatalf("diagnostics = %#v, want exactly one", diagnostics)
+	}
+	diag := diagnostics[0]
+	if diag.Severity != DiagnosticSeverityError {
+		t.Fatalf("severity = %q, want error", diag.Severity)
+	}
+	if diag.Code != "goscript/lowering:unsupported" {
+		t.Fatalf("code = %q, want goscript/lowering:unsupported", diag.Code)
+	}
+	if diag.Detail != "new: missing type information for new expression argument" {
+		t.Fatalf("detail = %q, want missing-type detail", diag.Detail)
+	}
+	if diag.Position == nil {
+		t.Fatalf("missing position in %#v", diag)
+	}
+	if diag.Position.DisplayFile != "main.go" || diag.Position.Line != 4 {
+		t.Fatalf("position = %#v, want main.go:4", diag.Position)
 	}
 }

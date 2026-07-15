@@ -1,0 +1,5 @@
+untyped int: 42
+untyped bool: true
+typed value: 7
+named value: 9
+struct value: 11
