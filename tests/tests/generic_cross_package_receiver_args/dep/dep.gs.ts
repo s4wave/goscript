@@ -111,7 +111,7 @@ export class Wrapper {
 	}
 
 	public SetValues(__typeArgs: $.GenericTypeArgs | undefined, value: any): any {
-		return $.pointerValue<Keyed>(this.Keyed).SetValues({T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }, U: __typeArgs?.["U"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, value)
+		return $.pointerValue<Keyed>(this.Keyed).SetValues({[$.genericTypeArgsMarker]: true, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }, U: __typeArgs?.["U"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, value)
 	}
 
 	static __typeInfo = $.registerStructType(

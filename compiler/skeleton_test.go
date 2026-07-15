@@ -3207,9 +3207,9 @@ func TestCompilePackagesEmitsGenericMethodsAliasesAndDictionaries(t *testing.T) 
 		"$.mapSet(seen, 1, {})",
 		"$.genericZero(__typeArgs, \"T\", null)",
 		"return $.callGenericMethod(__typeArgs, \"T\", \"String\", v)",
-		"ZeroValue({T: { type: { kind: $.TypeKind.Basic, name: \"int\", typeName: \"main.MyInt\" }, zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, methodSignatures: [{ name: \"String\", args: [], returns: [{ name: \"_r0\", type: { kind: $.TypeKind.Basic, name: \"string\" } }] }] }})",
-		"await CallString({T: { type: { kind: $.TypeKind.Basic, name: \"int\", typeName: \"main.MyInt\" }, zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, methodSignatures: [{ name: \"String\", args: [], returns: [{ name: \"_r0\", type: { kind: $.TypeKind.Basic, name: \"string\" } }] }] }}, zero)",
-		"Sum({T: { type: { kind: $.TypeKind.Basic, name: \"int\", typeName: \"main.MyInt\" }, zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, methodSignatures: [{ name: \"String\", args: [], returns: [{ name: \"_r0\", type: { kind: $.TypeKind.Basic, name: \"string\" } }] }] }}, null)",
+		"ZeroValue({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: \"int\", typeName: \"main.MyInt\" }, zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: \"String\", args: [], returns: [{ name: \"_r0\", type: { kind: $.TypeKind.Basic, name: \"string\" } }] }] }})",
+		"await CallString({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: \"int\", typeName: \"main.MyInt\" }, zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: \"String\", args: [], returns: [{ name: \"_r0\", type: { kind: $.TypeKind.Basic, name: \"string\" } }] }] }}, zero)",
+		"Sum({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: \"int\", typeName: \"main.MyInt\" }, zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: \"String\", args: [], returns: [{ name: \"_r0\", type: { kind: $.TypeKind.Basic, name: \"string\" } }] }] }}, null)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -3270,7 +3270,7 @@ func TestCompilePackagesInfersGenericTypeArgsFromNamedArgument(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"await Get({T: { type: \"genericnamedarg.Source\", zero: () => null, methods: {Load: (receiver: any, ...args: any[]) => receiver.Load(...args)} }}, $.markAsStructValue($.cloneStructValue(loader)))",
+		"await Get({[$.genericTypeArgsMarker]: true, T: { type: \"genericnamedarg.Source\", zero: () => null, methods: {Load: (receiver: any, ...args: any[]) => receiver.Load(...$.stripGenericTypeArgs(args))} }}, $.markAsStructValue($.cloneStructValue(loader)))",
 		"return $.mustTypeAssert<(() => any | globalThis.Promise<any>) | null>(f, ({ kind: $.TypeKind.Function, params: [], results: [__typeArgs?.[\"T\"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))!()",
 		"$.mustTypeAssert<any>(v, { kind: $.TypeKind.Interface, methods: [{ name: \"Load\", args: [], returns: [{ name: \"_r0\", type: __typeArgs?.[\"T\"]?.type ?? { kind: $.TypeKind.Interface, methods: [] } }] }] })",
 		"return await $.pointerValue<Exclude<Source, null>>(src).Load()",
@@ -4050,7 +4050,7 @@ func TestCompilePackagesPropagatesAsyncGenericInterfaceMethods(t *testing.T) {
 	for _, want := range []string{
 		"Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): any | globalThis.Promise<any>",
 		"public async Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): globalThis.Promise<any>",
-		"return (await $.pointerValue<Exclude<Watchable, null>>(w).Wait({T: { type: { kind: $.TypeKind.Basic, name: \"int\" }, zero: () => 0 }}, ctx, old) as number)",
+		"return (await $.pointerValue<Exclude<Watchable, null>>(w).Wait({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: \"int\" }, zero: () => 0 }}, ctx, old) as number)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -4758,7 +4758,7 @@ func TestCompilePackagesPropagatesImportedAsyncGenericInterfaceMethods(t *testin
 		t.Fatal(err.Error())
 	}
 	mainText := string(mainContent)
-	if want := "return (await $.pointerValue<Exclude<dep.Watchable, null>>(w).Wait({T: { type: { kind: $.TypeKind.Basic, name: \"int\" }, zero: () => 0 }}, ctx, old) as number)"; !strings.Contains(mainText, want) {
+	if want := "return (await $.pointerValue<Exclude<dep.Watchable, null>>(w).Wait({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: \"int\" }, zero: () => 0 }}, ctx, old) as number)"; !strings.Contains(mainText, want) {
 		t.Fatalf("missing %q in generated main output:\n%s", want, mainText)
 	}
 }

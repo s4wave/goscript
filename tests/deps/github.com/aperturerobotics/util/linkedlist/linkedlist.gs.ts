@@ -110,7 +110,7 @@ export class LinkedList {
 	public async Push(__typeArgs: $.GenericTypeArgs | undefined, val: any): globalThis.Promise<void> {
 		const l: LinkedList | $.VarRef<LinkedList> | null = this
 		await $.pointerValue<LinkedList>(l).mtx.Lock()
-		LinkedList.prototype.pushElem.call(l, {T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, val)
+		LinkedList.prototype.pushElem.call(l, {[$.genericTypeArgsMarker]: true, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, val)
 		$.pointerValue<LinkedList>(l).mtx.Unlock()
 	}
 
@@ -208,7 +208,7 @@ export function NewLinkedList<T>(__typeArgs: $.GenericTypeArgs | undefined, elem
 	let ll: LinkedList | $.VarRef<LinkedList> | null = new LinkedList()
 	for (let __goscriptRangeTarget0 = elems, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let elem = __goscriptRangeTarget0![__rangeIndex]
-		LinkedList.prototype.pushElem.call(ll, {T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, elem)
+		LinkedList.prototype.pushElem.call(ll, {[$.genericTypeArgsMarker]: true, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, elem)
 	}
 	return ll
 }

@@ -72,5 +72,5 @@ export async function NewFactory(b: Bus): globalThis.Promise<Factory | null> {
 	let ch: $.Channel<{}> | null = $.makeChannel<{}>(1, {}, "both")
 	await $.chanSend(ch, {})
 	await $.chanRecv(ch)
-	return $.namedValueInterfaceValue<Factory | null>(new factory(), "*dep.factory", {GetConfigID: (receiver: any, ...args: any[]) => receiver.GetConfigID({T: { type: "dep.Bus", zero: () => $.markAsStructValue(new Bus()) }}, ...args)}, { kind: $.TypeKind.Pointer, elemType: "dep.factory" }, [{ name: "GetConfigID", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])
+	return $.namedValueInterfaceValue<Factory | null>(new factory(), "*dep.factory", {GetConfigID: (receiver: any, ...args: any[]) => receiver.GetConfigID({[$.genericTypeArgsMarker]: true, T: { type: "dep.Bus", zero: () => $.markAsStructValue(new Bus()) }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "dep.factory" }, [{ name: "GetConfigID", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])
 }

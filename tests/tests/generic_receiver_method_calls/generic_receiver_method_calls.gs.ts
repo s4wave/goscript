@@ -80,7 +80,7 @@ export class holder {
 	}
 
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
-		return $.pointerValue<box>(this.box).Value({T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
+		return $.pointerValue<box>(this.box).Value({[$.genericTypeArgsMarker]: true, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -93,28 +93,28 @@ export class holder {
 }
 
 export function direct(__typeArgs: $.GenericTypeArgs | undefined, b: box | $.VarRef<box> | null): any {
-	return (box.prototype.Value.call(b, {T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}) as any)
+	return (box.prototype.Value.call(b, {[$.genericTypeArgsMarker]: true, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}) as any)
 }
 
 export async function throughInterface(__typeArgs: $.GenericTypeArgs | undefined, r: reader | null): globalThis.Promise<any> {
-	return (await $.pointerValue<Exclude<reader, null>>(r).Value({T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}) as any)
+	return (await $.pointerValue<Exclude<reader, null>>(r).Value({[$.genericTypeArgsMarker]: true, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}) as any)
 }
 
 export function promoted(__typeArgs: $.GenericTypeArgs | undefined, h: holder | $.VarRef<holder> | null): any {
-	return ($.pointerValue<holder>(h).box.Value({T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}) as any)
+	return ($.pointerValue<holder>(h).box.Value({[$.genericTypeArgsMarker]: true, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}) as any)
 }
 
 export async function methodExpression(__typeArgs: $.GenericTypeArgs | undefined, b: box | $.VarRef<box> | null): globalThis.Promise<any> {
-	let value: ((_p0: box | $.VarRef<box> | null) => any | globalThis.Promise<any>) | null = $.functionValue((b: box | $.VarRef<box> | null): any => $.pointerValue<box>(b).Value({T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "main.box" }], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
+	let value: ((_p0: box | $.VarRef<box> | null) => any | globalThis.Promise<any>) | null = $.functionValue((b: box | $.VarRef<box> | null): any => $.pointerValue<box>(b).Value({[$.genericTypeArgsMarker]: true, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "main.box" }], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
 	return value!(b)
 }
 
 export async function main(): globalThis.Promise<void> {
 	let b: box | $.VarRef<box> | null = new box({value: 7})
-	$.println("direct:", direct({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, b))
-	$.println("interface:", await throughInterface({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, $.interfaceValue<reader | null>(b, "*main.box", { kind: $.TypeKind.Pointer, elemType: "main.box" })))
-	$.println("promoted:", promoted({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, new holder({box: $.markAsStructValue($.cloneStructValue($.pointerValue<box>(b)))})))
-	$.println("expression:", await methodExpression({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, b))
+	$.println("direct:", direct({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, b))
+	$.println("interface:", await throughInterface({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, $.namedValueInterfaceValue<reader | null>(b, "*main.box", {Value: (receiver: any, ...args: any[]) => receiver.Value({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "main.box" }, [{ name: "Value", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }])))
+	$.println("promoted:", promoted({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, new holder({box: $.markAsStructValue($.cloneStructValue($.pointerValue<box>(b)))})))
+	$.println("expression:", await methodExpression({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, b))
 }
 
 if ($.isMainScript(import.meta)) {

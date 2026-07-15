@@ -13,7 +13,7 @@ export function xorLoop<T>(__typeArgs: $.GenericTypeArgs | undefined, dst: $.Sli
 
 export async function main(): globalThis.Promise<void> {
 	let dst: $.Slice<number> = new Uint8Array([0, 0]) as $.Slice<number>
-	xorLoop({T: { type: { kind: $.TypeKind.Basic, name: "uint8" }, zero: () => 0 }}, dst, new Uint8Array([1, 3]) as $.Slice<number>, new Uint8Array([2, 1]) as $.Slice<number>)
+	xorLoop({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "uint8" }, zero: () => 0 }}, dst, new Uint8Array([1, 3]) as $.Slice<number>, new Uint8Array([2, 1]) as $.Slice<number>)
 	$.println($.uint($.arrayIndex(dst!, 0), 8), $.uint($.arrayIndex(dst!, 1), 8))
 }
 

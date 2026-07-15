@@ -7,13 +7,13 @@ import * as helper from "@goscript/github.com/s4wave/goscript/tests/tests/import
 import "@goscript/github.com/s4wave/goscript/tests/tests/imported_generic_function/helper/index.js"
 
 export function collectValues(value: helper.Value | null): [$.Slice<helper.Value | null>, $.GoError] {
-	const __goscriptReturn0 = helper.Collect({T: { type: "helper.Value", zero: () => null, methods: {GetValue: (receiver: any, ...args: any[]) => receiver.GetValue(...args)} }}, value)
+	const __goscriptReturn0 = helper.Collect({[$.genericTypeArgsMarker]: true, T: { type: "helper.Value", zero: () => null, methods: {GetValue: (receiver: any, ...args: any[]) => receiver.GetValue(...$.stripGenericTypeArgs(args))} }}, value)
 	return [(__goscriptReturn0[0] as $.Slice<helper.Value | null>), __goscriptReturn0[1]]
 	throw new globalThis.Error("goscript: unreachable return")
 }
 
 export function collectAssigned(value: helper.Value | null): [$.Slice<helper.Value | null>, $.GoError] {
-	let __goscriptTuple0: any = helper.Collect({T: { type: "helper.Value", zero: () => null, methods: {GetValue: (receiver: any, ...args: any[]) => receiver.GetValue(...args)} }}, value)
+	let __goscriptTuple0: any = helper.Collect({[$.genericTypeArgsMarker]: true, T: { type: "helper.Value", zero: () => null, methods: {GetValue: (receiver: any, ...args: any[]) => receiver.GetValue(...$.stripGenericTypeArgs(args))} }}, value)
 	let values: $.Slice<helper.Value | null> = (__goscriptTuple0[0] as $.Slice<helper.Value | null>)
 	let err = __goscriptTuple0[1]
 	if (err != null) {
@@ -23,7 +23,7 @@ export function collectAssigned(value: helper.Value | null): [$.Slice<helper.Val
 }
 
 export async function main(): globalThis.Promise<void> {
-	let box = ($.markAsStructValue($.cloneStructValue(helper.Wrap({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 21))) as helper.Box)
+	let box = ($.markAsStructValue($.cloneStructValue(helper.Wrap({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 21))) as helper.Box)
 	$.println("wrapped:", box.Value)
 	let __goscriptTuple1: any = collectValues($.interfaceValue<helper.Value | null>($.markAsStructValue(new helper.IntValue({N: 34})), "helper.IntValue", "helper.IntValue"))
 	let values: $.Slice<helper.Value | null> = __goscriptTuple1[0]

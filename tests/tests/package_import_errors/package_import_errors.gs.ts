@@ -114,20 +114,20 @@ export async function main(): globalThis.Promise<void> {
 	$.println("nilErr == nil:", nilErr == null)
 
 	let typedErr: customErr | $.VarRef<customErr> | null = new customErr({msg: "typed error"})
-	let __goscriptTuple0: any = errors.AsType({E: { type: { kind: $.TypeKind.Pointer, elemType: "main.customErr" }, zero: () => null }}, $.interfaceValue<$.GoError>($.markAsStructValue(new wrappedErr({err: $.interfaceValue<$.GoError>(typedErr, "*main.customErr", { kind: $.TypeKind.Pointer, elemType: "main.customErr" })})), "main.wrappedErr", "main.wrappedErr"))
+	let __goscriptTuple0: any = errors.AsType({[$.genericTypeArgsMarker]: true, E: { type: { kind: $.TypeKind.Pointer, elemType: "main.customErr" }, zero: () => null, methods: {Error: (receiver: any, ...args: any[]) => receiver.Error(...$.stripGenericTypeArgs(args))} }}, $.interfaceValue<$.GoError>($.markAsStructValue(new wrappedErr({err: $.interfaceValue<$.GoError>(typedErr, "*main.customErr", { kind: $.TypeKind.Pointer, elemType: "main.customErr" })})), "main.wrappedErr", "main.wrappedErr"))
 	let matched: customErr | $.VarRef<customErr> | null = (__goscriptTuple0[0] as customErr | $.VarRef<customErr> | null)
 	let ok = __goscriptTuple0[1]
 	$.println("AsType matched:", ok)
 	if (ok) {
 		$.println("AsType message:", $.pointerValue<customErr>(matched).msg)
 	}
-	let __goscriptTuple1: any = errors.AsType({E: { type: { kind: $.TypeKind.Pointer, elemType: "main.customErr" }, zero: () => null }}, $.pointerValueOrNil(err1)!)
+	let __goscriptTuple1: any = errors.AsType({[$.genericTypeArgsMarker]: true, E: { type: { kind: $.TypeKind.Pointer, elemType: "main.customErr" }, zero: () => null, methods: {Error: (receiver: any, ...args: any[]) => receiver.Error(...$.stripGenericTypeArgs(args))} }}, $.pointerValueOrNil(err1)!)
 	ok = __goscriptTuple1[1]
 	$.println("AsType missing:", ok)
 
 	let scalarTarget: $.VarRef<scalarErr> = $.varRef(0)
-	$.println("As scalar missing:", errors.As($.pointerValueOrNil(err1)!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", {Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...args)}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" } }, [{ name: "Error", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])), $.uint(scalarTarget.value, 8))
-	$.println("As scalar matched:", errors.As($.namedValueInterfaceValue<$.GoError>(42, "main.scalarErr", {"Error": scalarErr_Error}, { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" }), $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", {Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...args)}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" } }, [{ name: "Error", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])), $.uint(scalarTarget.value, 8))
+	$.println("As scalar missing:", errors.As($.pointerValueOrNil(err1)!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", {Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" } }, [{ name: "Error", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])), $.uint(scalarTarget.value, 8))
+	$.println("As scalar matched:", errors.As($.namedValueInterfaceValue<$.GoError>(42, "main.scalarErr", {"Error": scalarErr_Error}, { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" }), $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", {Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" } }, [{ name: "Error", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])), $.uint(scalarTarget.value, 8))
 
 	$.println("test finished")
 }

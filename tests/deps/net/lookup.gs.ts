@@ -998,7 +998,7 @@ export class Resolver {
 		err = __goscriptTuple27[2]
 		if (err != null) {
 			{
-				let __goscriptTuple28: any = errors.AsType({E: { type: { kind: $.TypeKind.Pointer, elemType: "net.DNSError" }, zero: () => null }}, $.pointerValueOrNil(err)!)
+				let __goscriptTuple28: any = errors.AsType({[$.genericTypeArgsMarker]: true, E: { type: { kind: $.TypeKind.Pointer, elemType: "net.DNSError" }, zero: () => null, methods: {Error: (receiver: any, ...args: any[]) => receiver.Error(...$.stripGenericTypeArgs(args)), Temporary: (receiver: any, ...args: any[]) => receiver.Temporary(...$.stripGenericTypeArgs(args)), Timeout: (receiver: any, ...args: any[]) => receiver.Timeout(...$.stripGenericTypeArgs(args)), Unwrap: (receiver: any, ...args: any[]) => receiver.Unwrap(...$.stripGenericTypeArgs(args))} }}, $.pointerValueOrNil(err)!)
 				let dnsErr: __goscript_net.DNSError | $.VarRef<__goscript_net.DNSError> | null = (__goscriptTuple28[0] as __goscript_net.DNSError | $.VarRef<__goscript_net.DNSError> | null)
 				let ok = __goscriptTuple28[1]
 				if (ok && $.pointerValue<__goscript_net.DNSError>(dnsErr).IsNotFound) {

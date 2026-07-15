@@ -11,7 +11,7 @@ import "@goscript/unsafe/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let local = $.varRef(41)
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(reflect.TypeFor({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}))!, (local as any)))).Elem())).SetInt(42n)
+	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}))!, (local as any)))).Elem())).SetInt(42n)
 	$.println("newat-local:", local.value)
 
 	class holder {
@@ -49,22 +49,22 @@ export async function main(): globalThis.Promise<void> {
 		)
 	}
 	let h = $.markAsStructValue(new holder({Count: 5}))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(reflect.TypeFor({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}))!, (h._fields.Count as any)))).Elem())).SetInt(6n)
+	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}))!, (h._fields.Count as any)))).Elem())).SetInt(6n)
 	$.println("newat-field:", h.Count)
 
 	let buf: $.Slice<number> = new Uint8Array([1, 2, 3, 4]) as $.Slice<number>
-	let bytes = $.markAsStructValue($.cloneStructValue(reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor({T: { type: { kind: $.TypeKind.Basic, name: "uint8" }, zero: () => 0 }}))!, ($.indexRef(buf!, 1) as any), 2)))
+	let bytes = $.markAsStructValue($.cloneStructValue(reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "uint8" }, zero: () => 0 }}))!, ($.indexRef(buf!, 1) as any), 2)))
 	$.println("bytes:", $.markAsStructValue($.cloneStructValue(bytes)).Len(), $.markAsStructValue($.cloneStructValue(bytes)).Cap(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bytes)).Index(0))).Uint(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bytes)).Index(1))).Uint())
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bytes)).Index(0))).SetUint(9n)
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bytes)).Index(1))).SetUint(8n)
 	$.println("buf:", $.uint($.arrayIndex(buf!, 0), 8), $.uint($.arrayIndex(buf!, 1), 8), $.uint($.arrayIndex(buf!, 2), 8), $.uint($.arrayIndex(buf!, 3), 8))
 
 	let ints: $.Slice<number> = $.arrayToSlice<number>([10, 20, 30, 40])
-	let intSlice = $.markAsStructValue($.cloneStructValue(reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}))!, ($.indexRef(ints!, 1) as any), 2)))
+	let intSlice = $.markAsStructValue($.cloneStructValue(reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}))!, ($.indexRef(ints!, 1) as any), 2)))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(intSlice)).Index(1))).SetInt(77n)
 	$.println("ints:", $.arrayIndex(ints!, 0), $.arrayIndex(ints!, 1), $.arrayIndex(ints!, 2), $.arrayIndex(ints!, 3), $.markAsStructValue($.cloneStructValue(intSlice)).Len(), $.markAsStructValue($.cloneStructValue(intSlice)).Cap())
 
-	let empty = $.markAsStructValue($.cloneStructValue(reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}))!, (null as any), 0)))
+	let empty = $.markAsStructValue($.cloneStructValue(reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}))!, (null as any), 0)))
 	$.println("empty:", $.markAsStructValue($.cloneStructValue(empty)).IsNil(), $.markAsStructValue($.cloneStructValue(empty)).Len(), $.markAsStructValue($.cloneStructValue(empty)).Cap())
 
 	$.println("reflect_slice_at test finished")

@@ -10,9 +10,9 @@ import "@goscript/encoding/json/index.js"
 import "@goscript/reflect/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let intType = reflect.TypeFor({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }})
-	let stringType = reflect.TypeFor({T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }})
-	let byteType = reflect.TypeFor({T: { type: { kind: $.TypeKind.Basic, name: "uint8" }, zero: () => 0 }})
+	let intType = reflect.TypeFor({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }})
+	let stringType = reflect.TypeFor({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }})
+	let byteType = reflect.TypeFor({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "uint8" }, zero: () => 0 }})
 
 	let fields: $.Slice<reflect.StructField> = $.arrayToSlice<reflect.StructField>([$.markAsStructValue(new reflect.StructField({Name: "Name", Type: stringType, Tag: "json:\"name\""})), $.markAsStructValue(new reflect.StructField({Name: "Count", Type: intType, Tag: "json:\"count\""}))])
 	let typ = reflect.StructOf(fields)

@@ -553,7 +553,7 @@ export async function closeEmbedded(strm: embeddedStream): globalThis.Promise<$.
 }
 
 export async function recvOne(__typeArgs: $.GenericTypeArgs | undefined, strm: srpc.StreamRecv | null): globalThis.Promise<$.GoError> {
-	let [, err] = await $.pointerValue<Exclude<srpc.StreamRecv, null>>(strm).Recv({T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
+	let [, err] = await $.pointerValue<Exclude<srpc.StreamRecv, null>>(strm).Recv({[$.genericTypeArgsMarker]: true, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
 	return err
 }
 
@@ -872,7 +872,7 @@ export async function exerciseRpcStreamHandle(): globalThis.Promise<boolean> {
 			return [$.namedValueInterfaceValue<srpc.Invoker | null>($.namedFunction($.functionValue(async (serviceID: string, methodID: string, strm: srpc.Stream | null): globalThis.Promise<[boolean, $.GoError]> => {
 				await $.chanSend(invoked, ($.stringEqual(serviceID, "svc")) && ($.stringEqual(methodID, "method")))
 				return [true, null]
-			}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "srpc.Stream"], results: [{ kind: $.TypeKind.Basic, name: "bool" }, "error"] } as $.FunctionTypeInfo)), "srpc.InvokerFunc", ({ kind: $.TypeKind.Function, name: "srpc.InvokerFunc", params: [{ kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "srpc.Stream"], results: [{ kind: $.TypeKind.Basic, name: "bool" }, "error"] } as $.FunctionTypeInfo)), "srpc.InvokerFunc", {InvokeMethod: (receiver: any, ...args: any[]) => (srpc.InvokerFunc_InvokeMethod as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, ({ kind: $.TypeKind.Function, name: "srpc.InvokerFunc", params: [{ kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "srpc.Stream"], results: [{ kind: $.TypeKind.Basic, name: "bool" }, "error"] } as $.FunctionTypeInfo), [{ name: "InvokeMethod", args: [{ name: "serviceID", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "methodID", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "strm", type: "srpc.Stream" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "_r1", type: "error" }] }]), (null as (() => void) | null), null]
+			}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "srpc.Stream"], results: [{ kind: $.TypeKind.Basic, name: "bool" }, "error"] } as $.FunctionTypeInfo)), "srpc.InvokerFunc", ({ kind: $.TypeKind.Function, name: "srpc.InvokerFunc", params: [{ kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "srpc.Stream"], results: [{ kind: $.TypeKind.Basic, name: "bool" }, "error"] } as $.FunctionTypeInfo)), "srpc.InvokerFunc", {InvokeMethod: (receiver: any, ...args: any[]) => (srpc.InvokerFunc_InvokeMethod as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, ({ kind: $.TypeKind.Function, name: "srpc.InvokerFunc", params: [{ kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "srpc.Stream"], results: [{ kind: $.TypeKind.Basic, name: "bool" }, "error"] } as $.FunctionTypeInfo), [{ name: "InvokeMethod", args: [{ name: "serviceID", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "methodID", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "strm", type: "srpc.Stream" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "_r1", type: "error" }] }]), (null as (() => void) | null), null]
 		}, ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)], results: ["srpc.Invoker", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "error"] } as $.FunctionTypeInfo))))
 	})() })
 
@@ -1082,7 +1082,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.pointerValue<Exclude<srpc.Mux, null>>(mux).Register($.interfaceValue<srpc.Handler | null>($.markAsStructValue(new handler()), "main.handler", "main.handler"))
 	await $.pointerValue<Exclude<srpc.Mux, null>>(mux).InvokeMethod("svc", "method", null)
 	closeEmbedded
-	$.functionValue(async (strm: srpc.StreamRecv | null): globalThis.Promise<$.GoError> => await recvOne({T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, strm), ({ kind: $.TypeKind.Function, params: ["srpc.StreamRecv"], results: ["error"] } as $.FunctionTypeInfo))
+	$.functionValue(async (strm: srpc.StreamRecv | null): globalThis.Promise<$.GoError> => await recvOne({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, strm), ({ kind: $.TypeKind.Function, params: ["srpc.StreamRecv"], results: ["error"] } as $.FunctionTypeInfo))
 	srpc.NewRawMessage(new Uint8Array([1, 2, 3]) as $.Slice<number>, true)
 	let server: srpc.Server | $.VarRef<srpc.Server> | null = srpc.NewServer((mux as srpc.Invoker | null))
 	let client = srpc.NewClient(srpc.NewServerPipe(server))

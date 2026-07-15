@@ -96,7 +96,7 @@ export class ConcurrentQueue {
 						queueMicrotask(async () => { await ConcurrentQueue.prototype.executeJob.call(s, job) })
 					} else {
 						$.pointerValue<ConcurrentQueue>(s).jobQueueSize++
-						await linkedlist.LinkedList.prototype.Push.call($.pointerValue<ConcurrentQueue>(s).jobQueue, {T: { type: ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), zero: () => null }}, job)
+						await linkedlist.LinkedList.prototype.Push.call($.pointerValue<ConcurrentQueue>(s).jobQueue, {[$.genericTypeArgsMarker]: true, T: { type: ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), zero: () => null }}, job)
 					}
 				}
 				await broadcast!()
@@ -223,7 +223,7 @@ export class ConcurrentQueue {
 
 			let jobOk: boolean = false
 			await $.pointerValue<ConcurrentQueue>(s).bcast.HoldLock($.functionValue(async (broadcast: (() => void) | null, getWaitCh: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null): globalThis.Promise<void> => {
-				let __goscriptTuple0: any = await linkedlist.LinkedList.prototype.Pop.call($.pointerValue<ConcurrentQueue>(s).jobQueue, {T: { type: ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), zero: () => null }})
+				let __goscriptTuple0: any = await linkedlist.LinkedList.prototype.Pop.call($.pointerValue<ConcurrentQueue>(s).jobQueue, {[$.genericTypeArgsMarker]: true, T: { type: ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), zero: () => null }})
 				job.value = (__goscriptTuple0[0] as (() => void) | null)
 				jobOk = __goscriptTuple0[1]
 				if (!jobOk) {
@@ -243,7 +243,7 @@ export class ConcurrentQueue {
 		let s: ConcurrentQueue | $.VarRef<ConcurrentQueue> | null = this
 		let dirty: boolean = false
 		while (($.pointerValue<ConcurrentQueue>(s).maxConcurrency <= 0) || ($.pointerValue<ConcurrentQueue>(s).running < $.pointerValue<ConcurrentQueue>(s).maxConcurrency)) {
-			let __goscriptTuple1: any = await linkedlist.LinkedList.prototype.Pop.call($.pointerValue<ConcurrentQueue>(s).jobQueue, {T: { type: ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), zero: () => null }})
+			let __goscriptTuple1: any = await linkedlist.LinkedList.prototype.Pop.call($.pointerValue<ConcurrentQueue>(s).jobQueue, {[$.genericTypeArgsMarker]: true, T: { type: ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), zero: () => null }})
 			let job: (() => void) | null = (__goscriptTuple1[0] as (() => void) | null)
 			let jobOk = __goscriptTuple1[1]
 			if (!jobOk) {
@@ -269,7 +269,7 @@ export class ConcurrentQueue {
 }
 
 export async function NewConcurrentQueue(maxConcurrency: number, initialElems: $.Slice<(() => void) | null>): globalThis.Promise<ConcurrentQueue | $.VarRef<ConcurrentQueue> | null> {
-	let str: ConcurrentQueue | $.VarRef<ConcurrentQueue> | null = (() => { const __goscriptLiteralField0 = linkedlist.NewLinkedList({T: { type: ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), zero: () => null }}, initialElems); return new ConcurrentQueue({jobQueue: __goscriptLiteralField0, jobQueueSize: $.len(initialElems), maxConcurrency: maxConcurrency}) })()
+	let str: ConcurrentQueue | $.VarRef<ConcurrentQueue> | null = (() => { const __goscriptLiteralField0 = linkedlist.NewLinkedList({[$.genericTypeArgsMarker]: true, T: { type: ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), zero: () => null }}, initialElems); return new ConcurrentQueue({jobQueue: __goscriptLiteralField0, jobQueueSize: $.len(initialElems), maxConcurrency: maxConcurrency}) })()
 	if ($.len(initialElems) != 0) {
 		await $.pointerValue<ConcurrentQueue>(str).bcast.HoldLock($.functionValue(async (broadcast: (() => void) | null, getWaitCh: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null): globalThis.Promise<void> => {
 			await ConcurrentQueue.prototype.updateLocked.call(str, broadcast)

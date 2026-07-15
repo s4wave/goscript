@@ -1907,7 +1907,27 @@ export interface GenericTypeDescriptor<T = any> {
   methodSignatures?: MethodSignature[]
 }
 
-export type GenericTypeArgs = Record<string, GenericTypeDescriptor>
+// genericTypeArgsMarker brands compiler-hidden descriptors.
+export const genericTypeArgsMarker: unique symbol = Symbol(
+  'goscript.genericTypeArgs',
+)
+
+export type GenericTypeArgs = Record<string, GenericTypeDescriptor> & {
+  [genericTypeArgsMarker]?: true
+}
+
+// stripGenericTypeArgs removes a hidden descriptor before interface dispatch.
+export function stripGenericTypeArgs(args: unknown[]): unknown[] {
+  const first = args[0]
+  if (
+    typeof first === 'object' &&
+    first !== null &&
+    genericTypeArgsMarker in first
+  ) {
+    args.shift()
+  }
+  return args
+}
 
 export function genericZero<T>(
   typeArgs: GenericTypeArgs | undefined,

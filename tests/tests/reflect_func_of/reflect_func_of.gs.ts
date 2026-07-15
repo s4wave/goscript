@@ -7,8 +7,8 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/reflect/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let intType = reflect.TypeFor({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }})
-	let stringType = reflect.TypeFor({T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }})
+	let intType = reflect.TypeFor({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }})
+	let stringType = reflect.TypeFor({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }})
 	let sliceStringType = reflect.SliceOf($.pointerValueOrNil(stringType)!)
 
 	let fnType = reflect.FuncOf($.arrayToSlice<reflect.Type | null>([intType]), $.arrayToSlice<reflect.Type | null>([stringType]), false)

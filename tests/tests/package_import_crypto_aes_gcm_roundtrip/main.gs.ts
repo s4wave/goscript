@@ -196,7 +196,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget1 = plaintext, i = 0; i < $.len(__goscriptRangeTarget1); i++) {
 		plaintext![i] = $.uint($.uint(i, 8), 8)
 	}
-	let packet: $.Slice<number> = (makeGeneric({T: { type: { kind: $.TypeKind.Basic, name: "uint8" }, zero: () => 0 }}, 15 + $.len(plaintext), 1452) as $.Slice<number>)
+	let packet: $.Slice<number> = (makeGeneric({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "uint8" }, zero: () => 0 }}, 15 + $.len(plaintext), 1452) as $.Slice<number>)
 	let nonce: $.Slice<number> = new Uint8Array([49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50])
 	let aad: $.Slice<number> = new Uint8Array([113, 117, 105, 99, 32, 112, 114, 111, 116, 101, 99, 116, 101, 100, 32, 104, 101, 97, 100, 101, 114])
 	let expected: $.Slice<number> = await $.pointerValue<Exclude<cipher.AEAD, null>>(aead).Seal(null, nonce, plaintext, aad)

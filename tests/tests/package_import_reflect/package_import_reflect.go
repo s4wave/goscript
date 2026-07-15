@@ -71,8 +71,7 @@ func main() {
 	println("PointerTo int:", ptrType.String())
 	println("PointerTo kind:", ptrType.Kind().String())
 
-	// Test PtrTo (alias for PointerTo)
-	ptrType2 := reflect.PtrTo(intType)
+	ptrType2 := reflect.PointerTo(intType)
 	println("PtrTo int:", ptrType2.String())
 
 	// Test New and Indirect

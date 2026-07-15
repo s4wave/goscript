@@ -264,48 +264,48 @@ export async function Apply(__typeArgs: $.GenericTypeArgs | undefined, value: an
 
 export async function main(): globalThis.Promise<void> {
 	$.println("=== Generic constraints ===")
-	$.println("min:", min({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 8, 3), min({T: { type: { kind: $.TypeKind.Basic, name: "int", typeName: "main.Score" }, zero: () => 0 }}, 9, 4), min({T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, "go", "ts"))
+	$.println("min:", min({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 8, 3), min({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int", typeName: "main.Score" }, zero: () => 0 }}, 9, 4), min({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, "go", "ts"))
 
 	$.println("=== Generic stack ===")
 	let stack: $.VarRef<Stack> = $.varRef($.markAsStructValue(new Stack()))
-	stack.value.Push({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 10)
-	stack.value.Push({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 20)
-	let __goscriptTuple0: any = stack.value.Pop({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }})
+	stack.value.Push({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 10)
+	stack.value.Push({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 20)
+	let __goscriptTuple0: any = stack.value.Pop({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }})
 	let value = (__goscriptTuple0[0] as number)
 	let ok = __goscriptTuple0[1]
-	$.println("pop:", value, ok, stack.value.Len({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}))
-	let __goscriptTuple1: any = stack.value.Pop({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }})
+	$.println("pop:", value, ok, stack.value.Len({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}))
+	let __goscriptTuple1: any = stack.value.Pop({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }})
 	value = (__goscriptTuple1[0] as number)
 	ok = __goscriptTuple1[1]
-	$.println("pop:", value, ok, stack.value.Len({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}))
+	$.println("pop:", value, ok, stack.value.Len({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}))
 
 	$.println("=== Generic map alias ===")
 	let seen: Set = (NewSet(undefined, $.arrayToSlice<string>(["go", "ts"])) as Set)
-	Set_Add(seen, {T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, "wasm")
-	$.println("set:", Set_Has(seen, {T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, "go"), Set_Has(seen, {T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, "rust"), $.len(seen))
+	Set_Add(seen, {[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, "wasm")
+	$.println("set:", Set_Has(seen, {[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, "go"), Set_Has(seen, {[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, "rust"), $.len(seen))
 
 	$.println("=== Interface constraint ===")
 	let items: $.Slice<Item | $.VarRef<Item> | null> = $.arrayToSlice<Item | $.VarRef<Item> | null>([new Item({Name: "alpha"}), new Item({Name: "beta"})])
-	let clones: $.Slice<Item | $.VarRef<Item> | null> = (await CloneAll({T: { type: { kind: $.TypeKind.Pointer, elemType: "main.Item" }, zero: () => null }}, items) as $.Slice<Item | $.VarRef<Item> | null>)
+	let clones: $.Slice<Item | $.VarRef<Item> | null> = (await CloneAll({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Pointer, elemType: "main.Item" }, zero: () => null, methods: {Clone: (receiver: any, ...args: any[]) => receiver.Clone(...$.stripGenericTypeArgs(args))} }}, items) as $.Slice<Item | $.VarRef<Item> | null>)
 	$.println("clone:", $.pointerValue<Item>($.arrayIndex(clones!, 0)).Name, $.pointerValue<Item>($.arrayIndex(clones!, 1)).Name, $.pointerEqual($.arrayIndex(clones!, 0), $.arrayIndex(items!, 0)))
 
 	$.println("=== Generic struct with map field ===")
-	let mapper: Mapper | $.VarRef<Mapper> | null = (NewMapper({K: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }, V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}) as Mapper | $.VarRef<Mapper> | null)
-	Mapper.prototype.Put.call(mapper, {K: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }, V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, "answer", 42)
-	let __goscriptTuple2: any = Mapper.prototype.Get.call(mapper, {K: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }, V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, "answer")
+	let mapper: Mapper | $.VarRef<Mapper> | null = (NewMapper({[$.genericTypeArgsMarker]: true, K: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }, V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}) as Mapper | $.VarRef<Mapper> | null)
+	Mapper.prototype.Put.call(mapper, {[$.genericTypeArgsMarker]: true, K: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }, V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, "answer", 42)
+	let __goscriptTuple2: any = Mapper.prototype.Get.call(mapper, {[$.genericTypeArgsMarker]: true, K: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }, V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, "answer")
 	let answer = (__goscriptTuple2[0] as number)
 	let found = __goscriptTuple2[1]
 	$.println("mapper:", answer, found)
 
 	$.println("=== Function instantiation ===")
-	let applyInt: ((value: number, fn: ((_p0: number) => number | globalThis.Promise<number>) | null) => number | globalThis.Promise<number>) | null = $.functionValue(async (value: any, fn: ((_p0: any) => any | globalThis.Promise<any>) | null): globalThis.Promise<any> => await Apply({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, value, fn), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
+	let applyInt: ((value: number, fn: ((_p0: number) => number | globalThis.Promise<number>) | null) => number | globalThis.Promise<number>) | null = $.functionValue(async (value: any, fn: ((_p0: any) => any | globalThis.Promise<any>) | null): globalThis.Promise<any> => await Apply({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, value, fn), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
 	$.println("apply:", await applyInt!(21, $.functionValue((n: number): number => {
 		return n * 2
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))))
 
 	$.println("=== Generic pair method ===")
 	let pair = $.markAsStructValue(new Pair({First: "left", Second: "right"}))
-	let swapped = ($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(pair)).Swap({T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}))) as Pair)
+	let swapped = ($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(pair)).Swap({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}))) as Pair)
 	$.println("pair:", swapped.First, swapped.Second)
 }
 

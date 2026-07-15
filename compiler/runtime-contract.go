@@ -146,6 +146,8 @@ const (
 	RuntimeHelperFunctionValue            RuntimeHelper = "type.functionValue"
 	RuntimeHelperNamedFunction            RuntimeHelper = "type.namedFunction"
 	RuntimeHelperGenericZero              RuntimeHelper = "type.genericZero"
+	RuntimeHelperGenericTypeArgsMarker    RuntimeHelper = "type.genericTypeArgsMarker"
+	RuntimeHelperStripGenericTypeArgs     RuntimeHelper = "type.stripGenericTypeArgs"
 	RuntimeHelperCallGenericMethod        RuntimeHelper = "type.callGenericMethod"
 
 	RuntimeHelperMakeChannel     RuntimeHelper = "channel.makeChannel"
@@ -386,6 +388,8 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperFunctionValue, "functionValue", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperNamedFunction, "namedFunction", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGenericZero, "genericZero", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperGenericTypeArgsMarker, "genericTypeArgsMarker", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperStripGenericTypeArgs, "stripGenericTypeArgs", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperCallGenericMethod, "callGenericMethod", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperMakeChannel, "makeChannel", RuntimeHelperCategoryChannel),
 		runtimeHelper(RuntimeHelperMakeChannelRef, "makeChannelRef", RuntimeHelperCategoryChannel),

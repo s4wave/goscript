@@ -181,11 +181,11 @@ export async function processViaInterface(processor: AsyncProcessor | null, inpu
 }
 
 export function newGenericStore(__typeArgs: $.GenericTypeArgs | undefined, value: any): GenericStore | null {
-	return $.interfaceValue<GenericStore | null>(new GenericChannelStore({ch: $.makeChannel<any>(1, null, "both"), value: value}), "*main.GenericChannelStore", { kind: $.TypeKind.Pointer, elemType: "main.GenericChannelStore" })
+	return $.namedValueInterfaceValue<GenericStore | null>(new GenericChannelStore({ch: $.makeChannel<any>(1, null, "both"), value: value}), "*main.GenericChannelStore", {Load: (receiver: any, ...args: any[]) => receiver.Load({[$.genericTypeArgsMarker]: true, V: __typeArgs?.["V"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "main.GenericChannelStore" }, [{ name: "Load", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }])
 }
 
 export async function loadGenericStore(store: GenericStore | null): globalThis.Promise<number> {
-	return (await $.pointerValue<Exclude<GenericStore, null>>(store).Load({V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}) as number)
+	return (await $.pointerValue<Exclude<GenericStore, null>>(store).Load({[$.genericTypeArgsMarker]: true, V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}) as number)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -202,7 +202,7 @@ export async function main(): globalThis.Promise<void> {
 	let result2 = await processViaInterface($.interfaceValue<AsyncProcessor | null>(simpleProc, "*main.SimpleProcessor", { kind: $.TypeKind.Pointer, elemType: "main.SimpleProcessor" }), 5)
 	$.println("SimpleProcessor result:", result2)
 
-	let genericStore = (newGenericStore({V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 7) as GenericStore | null)
+	let genericStore = (newGenericStore({[$.genericTypeArgsMarker]: true, V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 7) as GenericStore | null)
 	$.println("GenericStore result:", await loadGenericStore(genericStore))
 
 	ch!.close()

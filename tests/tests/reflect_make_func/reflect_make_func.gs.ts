@@ -7,9 +7,9 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/reflect/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let intType = reflect.TypeFor({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }})
-	let stringType = reflect.TypeFor({T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }})
-	let boolType = reflect.TypeFor({T: { type: { kind: $.TypeKind.Basic, name: "bool" }, zero: () => false }})
+	let intType = reflect.TypeFor({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }})
+	let stringType = reflect.TypeFor({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }})
+	let boolType = reflect.TypeFor({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "bool" }, zero: () => false }})
 
 	let unaryType = reflect.FuncOf($.arrayToSlice<reflect.Type | null>([intType]), $.arrayToSlice<reflect.Type | null>([stringType]), false)
 	let unaryValue = $.markAsStructValue($.cloneStructValue(reflect.MakeFunc($.pointerValueOrNil(unaryType)!, $.functionValue((args: $.Slice<reflect.Value>): $.Slice<reflect.Value> => {

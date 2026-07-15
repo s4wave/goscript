@@ -186,7 +186,7 @@ export function parseASN1String(tag: cryptobyte_asn1.Tag, value: $.Slice<number>
 			break
 		}
 	}
-	return ["", fmt.Errorf("unsupported string type: %v", $.namedValueInterfaceValue<any>(tag, "asn1.Tag", {Constructed: (receiver: any, ...args: any[]) => (cryptobyte_asn1.Tag_Constructed as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args), ContextSpecific: (receiver: any, ...args: any[]) => (cryptobyte_asn1.Tag_ContextSpecific as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "uint8", typeName: "asn1.Tag" }, [{ name: "Constructed", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint8", typeName: "asn1.Tag" } }] }, { name: "ContextSpecific", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint8", typeName: "asn1.Tag" } }] }]))]
+	return ["", fmt.Errorf("unsupported string type: %v", $.namedValueInterfaceValue<any>(tag, "asn1.Tag", {Constructed: (receiver: any, ...args: any[]) => (cryptobyte_asn1.Tag_Constructed as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), ContextSpecific: (receiver: any, ...args: any[]) => (cryptobyte_asn1.Tag_ContextSpecific as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Basic, name: "uint8", typeName: "asn1.Tag" }, [{ name: "Constructed", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint8", typeName: "asn1.Tag" } }] }, { name: "ContextSpecific", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint8", typeName: "asn1.Tag" } }] }]))]
 }
 
 export function parseName(__goscriptParam0: cryptobyte.String): [$.VarRef<pkix.RDNSequence> | null, $.GoError] {
@@ -369,7 +369,7 @@ export async function parsePublicKey(keyData: __goscript_x509.publicKeyInfo | $.
 			if ($.len(data) != ed25519.PublicKeySize) {
 				return [null, errors.New("x509: wrong Ed25519 public key size")]
 			}
-			return [$.namedValueInterfaceValue<any>((data as ed25519.PublicKey), "ed25519.PublicKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PublicKey" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }]), null]
+			return [$.namedValueInterfaceValue<any>((data as ed25519.PublicKey), "ed25519.PublicKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PublicKey" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }]), null]
 			break
 		}
 		case asn1.ObjectIdentifier_Equal(oid, (__goscript_x509.oidPublicKeyX25519 as asn1.ObjectIdentifier)):

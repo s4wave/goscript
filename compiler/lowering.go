@@ -11605,10 +11605,12 @@ func (o *LoweringOwner) lowerNamedValueInterfaceWrapper(
 	if targetInterface == nil || !types.Implements(sourceType, targetInterface) {
 		return ""
 	}
+	targetGeneric := genericMethodSetHasReceiverTypeParams(targetType)
 	receiver, methodSetType := namedNonStructMethodSetType(sourceType)
 	if receiver == nil {
 		receiver, methodSetType = genericMethodSetDescriptorTarget(sourceType)
-		if receiver == nil || !genericMethodSetHasReceiverTypeParams(methodSetType) {
+		if receiver == nil ||
+			(!genericMethodSetHasReceiverTypeParams(methodSetType) && !targetGeneric) {
 			return ""
 		}
 	}
@@ -12619,6 +12621,11 @@ func genericReceiverTypeParams(typ types.Type) []*types.TypeParam {
 	return result
 }
 
+func (o *LoweringOwner) genericTypeArgsLiteral(entries []string) string {
+	return "{[" + o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericTypeArgsMarker) +
+		"]: true, " + strings.Join(entries, ", ") + "}"
+}
+
 func (o *LoweringOwner) genericReceiverTypeArgsExprForMethod(
 	ctx lowerFileContext,
 	method *types.Func,
@@ -12646,7 +12653,7 @@ func (o *LoweringOwner) genericReceiverTypeArgsExprForMethod(
 	for idx, param := range params {
 		entries = append(entries, param.Obj().Name()+": "+o.genericTypeDescriptorExpr(ctx, receiver.TypeArgs().At(idx)))
 	}
-	return "{" + strings.Join(entries, ", ") + "}"
+	return o.genericTypeArgsLiteral(entries)
 }
 
 func (o *LoweringOwner) genericReceiverTypeArgsExpr(ctx lowerFileContext, selection *types.Selection) string {
@@ -12668,7 +12675,7 @@ func (o *LoweringOwner) genericReceiverTypeArgsExpr(ctx lowerFileContext, select
 	for idx, param := range params {
 		entries = append(entries, param.Obj().Name()+": "+o.genericTypeDescriptorExpr(ctx, receiver.TypeArgs().At(idx)))
 	}
-	return "{" + strings.Join(entries, ", ") + "}"
+	return o.genericTypeArgsLiteral(entries)
 }
 
 func (o *LoweringOwner) methodSelectionUsesOverridePackage(ctx lowerFileContext, selection *types.Selection) bool {
@@ -13463,7 +13470,7 @@ func (o *LoweringOwner) genericTypeArgsExpr(ctx lowerFileContext, callee ast.Exp
 	if len(entries) == 0 {
 		return "undefined"
 	}
-	return "{" + strings.Join(entries, ", ") + "}"
+	return o.genericTypeArgsLiteral(entries)
 }
 
 func (o *LoweringOwner) inferredGenericTypeArgsExpr(
@@ -13496,7 +13503,7 @@ func (o *LoweringOwner) inferredGenericTypeArgsExpr(
 	if len(entries) == 0 {
 		return "undefined"
 	}
-	return "{" + strings.Join(entries, ", ") + "}"
+	return o.genericTypeArgsLiteral(entries)
 }
 
 func (o *LoweringOwner) inferGenericTypeArg(
@@ -13608,7 +13615,7 @@ func (o *LoweringOwner) genericMethodDescriptorsForType(
 			if genericArgs != "" {
 				callArgs = append(callArgs, genericArgs)
 			}
-			callArgs = append(callArgs, "...args")
+			callArgs = append(callArgs, "..."+o.runtimeOwner.QualifiedHelper(RuntimeHelperStripGenericTypeArgs)+"(args)")
 			methods = append(methods, method.Name()+": (receiver: any, ...args: any[]) => receiver."+method.Name()+"("+strings.Join(callArgs, ", ")+")")
 			continue
 		}
@@ -13629,7 +13636,7 @@ func (o *LoweringOwner) genericMethodDescriptorsForType(
 		if genericArgs != "" {
 			callArgs = append(callArgs, genericArgs)
 		}
-		callArgs = append(callArgs, "...args")
+		callArgs = append(callArgs, "..."+o.runtimeOwner.QualifiedHelper(RuntimeHelperStripGenericTypeArgs)+"(args)")
 		methods = append(methods, method.Name()+": (receiver: any, ...args: any[]) => "+
 			"("+o.methodFunctionExpr(ctx, named.Origin(), method, method.Name())+" as any)("+strings.Join(callArgs, ", ")+")")
 	}

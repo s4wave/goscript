@@ -138,7 +138,7 @@ export class genericValue {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let resolver: Resolver | null = $.namedValueInterfaceValue<Resolver | null>(new genericResolver(), "*main.genericResolver", {Resolve: (receiver: any, ...args: any[]) => receiver.Resolve({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, ...args)}, { kind: $.TypeKind.Pointer, elemType: "main.genericResolver" }, [{ name: "Resolve", args: [{ name: "ctx", type: "context.Context" }, { name: "handler", type: "main.Handler" }], returns: [{ name: "_r0", type: "error" }] }])
+	let resolver: Resolver | null = $.namedValueInterfaceValue<Resolver | null>(new genericResolver(), "*main.genericResolver", {Resolve: (receiver: any, ...args: any[]) => receiver.Resolve({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "main.genericResolver" }, [{ name: "Resolve", args: [{ name: "ctx", type: "context.Context" }, { name: "handler", type: "main.Handler" }], returns: [{ name: "_r0", type: "error" }] }])
 	{
 		let err = await $.pointerValue<Exclude<Resolver, null>>(resolver).Resolve(context.Background(), $.interfaceValue<Handler | null>($.markAsStructValue(new handler()), "main.handler", "main.handler"))
 		if (err != null) {
@@ -148,7 +148,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	$.println("resolve ok")
 	let g = $.markAsStructValue(new genericValue({value: 7}))
-	let reader: ValueReader | null = $.namedValueInterfaceValue<ValueReader | null>($.markAsStructValue($.cloneStructValue(g)), "main.genericValue", {Get: (receiver: any, ...args: any[]) => receiver.Get({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, ...args)}, "main.genericValue", [{ name: "Get", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }])
+	let reader: ValueReader | null = $.namedValueInterfaceValue<ValueReader | null>($.markAsStructValue($.cloneStructValue(g)), "main.genericValue", {Get: (receiver: any, ...args: any[]) => receiver.Get({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, "main.genericValue", [{ name: "Get", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }])
 	g.value = 9
 	if (await $.pointerValue<Exclude<ValueReader, null>>(reader).Get() != 7) {
 		$.println("value copy failed")

@@ -8,13 +8,13 @@ export async function inner(__typeArgs: $.GenericTypeArgs | undefined, ch: $.Cha
 }
 
 export async function outer(__typeArgs: $.GenericTypeArgs | undefined, ch: $.Channel<any> | null): globalThis.Promise<any> {
-	return (await inner({T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, ch) as any)
+	return (await inner({[$.genericTypeArgsMarker]: true, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, ch) as any)
 }
 
 export async function main(): globalThis.Promise<void> {
 	let ch: $.Channel<number> | null = $.makeChannel<number>(1, 0, "both")
 	await $.chanSend(ch, 7)
-	$.println("value:", await outer({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, ch))
+	$.println("value:", await outer({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, ch))
 }
 
 if ($.isMainScript(import.meta)) {

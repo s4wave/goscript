@@ -181,7 +181,7 @@ export async function SignPSS(random: io.Reader | null, priv: __goscript_rsa.Pri
 		}
 	}
 
-	const __goscriptReturn1 = fipsError2({T: { type: { kind: $.TypeKind.Basic, name: "unknown" }, zero: () => null }}, ...((await rsa.SignPSS(random, k, h, digest, saltLength)) as [$.Slice<number>, $.GoError]))
+	const __goscriptReturn1 = fipsError2({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "unknown" }, zero: () => null }}, ...((await rsa.SignPSS(random, k, h, digest, saltLength)) as [$.Slice<number>, $.GoError]))
 	return [(__goscriptReturn1[0] as $.Slice<number>), __goscriptReturn1[1]]
 	throw new globalThis.Error("goscript: unreachable return")
 }
@@ -312,7 +312,7 @@ export async function encryptOAEP(hash: hash2.Hash | null, mgfHash: hash2.Hash |
 	if (err != null) {
 		return [null, err]
 	}
-	const __goscriptReturn6 = fipsError2({T: { type: { kind: $.TypeKind.Basic, name: "unknown" }, zero: () => null }}, ...((await rsa.EncryptOAEP(hash, mgfHash, random, k, msg, label)) as [$.Slice<number>, $.GoError]))
+	const __goscriptReturn6 = fipsError2({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "unknown" }, zero: () => null }}, ...((await rsa.EncryptOAEP(hash, mgfHash, random, k, msg, label)) as [$.Slice<number>, $.GoError]))
 	return [(__goscriptReturn6[0] as $.Slice<number>), __goscriptReturn6[1]]
 	throw new globalThis.Error("goscript: unreachable return")
 }
@@ -373,7 +373,7 @@ export async function decryptOAEP(hash: hash2.Hash | null, mgfHash: hash2.Hash |
 		return [null, err]
 	}
 
-	const __goscriptReturn8 = fipsError2({T: { type: { kind: $.TypeKind.Basic, name: "unknown" }, zero: () => null }}, ...((await rsa.DecryptOAEP(hash, mgfHash, k, ciphertext, label)) as [$.Slice<number>, $.GoError]))
+	const __goscriptReturn8 = fipsError2({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "unknown" }, zero: () => null }}, ...((await rsa.DecryptOAEP(hash, mgfHash, k, ciphertext, label)) as [$.Slice<number>, $.GoError]))
 	return [(__goscriptReturn8[0] as $.Slice<number>), __goscriptReturn8[1]]
 	throw new globalThis.Error("goscript: unreachable return")
 }
@@ -420,7 +420,7 @@ export async function SignPKCS1v15(random: io.Reader | null, priv: __goscript_rs
 	if (err != null) {
 		return [null, err]
 	}
-	const __goscriptReturn10 = fipsError2({T: { type: { kind: $.TypeKind.Basic, name: "unknown" }, zero: () => null }}, ...((await rsa.SignPKCS1v15(k, hashName, hashed)) as [$.Slice<number>, $.GoError]))
+	const __goscriptReturn10 = fipsError2({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "unknown" }, zero: () => null }}, ...((await rsa.SignPKCS1v15(k, hashName, hashed)) as [$.Slice<number>, $.GoError]))
 	return [(__goscriptReturn10[0] as $.Slice<number>), __goscriptReturn10[1]]
 	throw new globalThis.Error("goscript: unreachable return")
 }

@@ -67,7 +67,7 @@ export async function cloneSlice<T>(__typeArgs: $.GenericTypeArgs | undefined, i
 
 export async function main(): globalThis.Promise<void> {
 	let items: $.Slice<item | $.VarRef<item> | null> = $.arrayToSlice<item | $.VarRef<item> | null>([new item({value: "first"}), new item({value: "second"})])
-	let cloned: $.Slice<item | $.VarRef<item> | null> = (await cloneSlice({T: { type: { kind: $.TypeKind.Pointer, elemType: "main.item" }, zero: () => null }}, items) as $.Slice<item | $.VarRef<item> | null>)
+	let cloned: $.Slice<item | $.VarRef<item> | null> = (await cloneSlice({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Pointer, elemType: "main.item" }, zero: () => null, methods: {CloneVT: (receiver: any, ...args: any[]) => receiver.CloneVT(...$.stripGenericTypeArgs(args))} }}, items) as $.Slice<item | $.VarRef<item> | null>)
 	$.println($.len(cloned), $.pointerValue<item>($.arrayIndex(cloned!, 0)).value, $.pointerValue<item>($.arrayIndex(cloned!, 1)).value, $.pointerEqual($.arrayIndex(cloned!, 0), $.arrayIndex(items!, 0)))
 }
 

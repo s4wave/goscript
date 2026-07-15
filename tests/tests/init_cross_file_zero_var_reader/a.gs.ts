@@ -51,7 +51,7 @@ export var stringType: reflect.Type | null
 
 export function __goscript_init_stringType(): void {
 	if (((stringType) as any) === undefined) {
-		stringType = reflect.TypeFor({T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }})
+		stringType = reflect.TypeFor({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }})
 	}
 }
 

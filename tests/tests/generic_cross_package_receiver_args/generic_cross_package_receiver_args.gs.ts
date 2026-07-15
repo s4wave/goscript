@@ -50,7 +50,7 @@ export class wrapper {
 	}
 
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
-		return $.pointerValue<dep.Impl>(this.Impl).Value({T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
+		return $.pointerValue<dep.Impl>(this.Impl).Value({[$.genericTypeArgsMarker]: true, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -63,22 +63,22 @@ export class wrapper {
 }
 
 export async function read(__typeArgs: $.GenericTypeArgs | undefined, d: Derived | null): globalThis.Promise<any> {
-	return (await $.pointerValue<Exclude<Derived, null>>(d).Value({T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}) as any)
+	return (await $.pointerValue<Exclude<Derived, null>>(d).Value({[$.genericTypeArgsMarker]: true, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}) as any)
 }
 
 export function setGeneric(__typeArgs: $.GenericTypeArgs | undefined, w: dep.Wrapper | $.VarRef<dep.Wrapper> | null, value: any): any {
-	return (dep.Keyed.prototype.SetValues.call($.pointerValue<dep.Wrapper>(w).Keyed, {T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }, U: __typeArgs?.["U"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, value) as any)
+	return (dep.Keyed.prototype.SetValues.call($.pointerValue<dep.Wrapper>(w).Keyed, {[$.genericTypeArgsMarker]: true, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }, U: __typeArgs?.["U"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, value) as any)
 }
 
 export function setConcrete(w: dep.Wrapper | $.VarRef<dep.Wrapper> | null): string {
-	return (dep.Keyed.prototype.SetValues.call($.pointerValue<dep.Wrapper>(w).Keyed, {T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }, U: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, 7) as string)
+	return (dep.Keyed.prototype.SetValues.call($.pointerValue<dep.Wrapper>(w).Keyed, {[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }, U: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, 7) as string)
 }
 
 export async function main(): globalThis.Promise<void> {
 	let impl: wrapper | $.VarRef<wrapper> | null = new wrapper({Impl: new dep.Impl({Item: 7})})
-	$.println("interface:", await read({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }, E: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, $.interfaceValue<Derived | null>(impl, "*main.wrapper", { kind: $.TypeKind.Pointer, elemType: "main.wrapper" })))
+	$.println("interface:", await read({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }, E: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, $.namedValueInterfaceValue<Derived | null>(impl, "*main.wrapper", {Other: (receiver: any, ...args: any[]) => receiver.Other({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }, E: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, ...$.stripGenericTypeArgs(args)), Value: (receiver: any, ...args: any[]) => receiver.Value({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "main.wrapper" }, [{ name: "Other", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Value", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }])))
 	let keyed: dep.Wrapper | $.VarRef<dep.Wrapper> | null = new dep.Wrapper({Keyed: new dep.Keyed()})
-	$.println("generic empty:", $.stringEqual(setGeneric({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }, U: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, keyed, 7), ""))
+	$.println("generic empty:", $.stringEqual(setGeneric({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }, U: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, keyed, 7), ""))
 	$.println("concrete empty:", $.stringEqual(setConcrete(keyed), ""))
 }
 

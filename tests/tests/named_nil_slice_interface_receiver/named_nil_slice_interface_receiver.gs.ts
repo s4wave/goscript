@@ -21,7 +21,7 @@ export function bytesEncoder_Len(b: bytesEncoder): number {
 
 export async function main(): globalThis.Promise<void> {
 	let b: bytesEncoder = null as bytesEncoder
-	let s: sizer | null = $.namedValueInterfaceValue<sizer | null>(b, "main.bytesEncoder", {Len: (receiver: any, ...args: any[]) => (bytesEncoder_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Slice, typeName: "main.bytesEncoder", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Len", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }])
+	let s: sizer | null = $.namedValueInterfaceValue<sizer | null>(b, "main.bytesEncoder", {Len: (receiver: any, ...args: any[]) => (bytesEncoder_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "main.bytesEncoder", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Len", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }])
 	$.println(await $.pointerValue<Exclude<sizer, null>>(s).Len())
 }
 

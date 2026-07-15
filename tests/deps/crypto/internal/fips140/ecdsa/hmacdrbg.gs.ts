@@ -238,7 +238,7 @@ export async function newDRBG(__typeArgs: $.GenericTypeArgs | undefined, hash: (
 }
 
 export async function TestingOnlyNewDRBG(__typeArgs: $.GenericTypeArgs | undefined, hash: (() => any | globalThis.Promise<any>) | null, entropy: $.Slice<number>, nonce: $.Slice<number>, s: $.Slice<number>): globalThis.Promise<hmacDRBG | $.VarRef<hmacDRBG> | null> {
-	return newDRBG(undefined, hash, entropy, nonce, $.namedValueInterfaceValue<personalizationString | null>((s as plainPersonalizationString), "ecdsa.plainPersonalizationString", {isPersonalizationString: (receiver: any, ...args: any[]) => (plainPersonalizationString_isPersonalizationString as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Slice, typeName: "ecdsa.plainPersonalizationString", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "isPersonalizationString", args: [], returns: [] }]))
+	return newDRBG(undefined, hash, entropy, nonce, $.namedValueInterfaceValue<personalizationString | null>((s as plainPersonalizationString), "ecdsa.plainPersonalizationString", {isPersonalizationString: (receiver: any, ...args: any[]) => (plainPersonalizationString_isPersonalizationString as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "ecdsa.plainPersonalizationString", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "isPersonalizationString", args: [], returns: [] }]))
 }
 
 export async function pad000(h: hmac.HMAC | $.VarRef<hmac.HMAC> | null, writtenSoFar: number): globalThis.Promise<void> {

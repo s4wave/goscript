@@ -639,7 +639,7 @@ export class Conn {
 			}
 			default:
 			{
-				return fmt.Errorf("unexpected message type: %v", $.namedValueInterfaceValue<any>(typ, "websocket.MessageType", {String: (receiver: any, ...args: any[]) => (__goscript_stringer.MessageType_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "int", typeName: "websocket.MessageType" }, [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]))
+				return fmt.Errorf("unexpected message type: %v", $.namedValueInterfaceValue<any>(typ, "websocket.MessageType", {String: (receiver: any, ...args: any[]) => (__goscript_stringer.MessageType_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Basic, name: "int", typeName: "websocket.MessageType" }, [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]))
 				break
 			}
 		}
@@ -907,7 +907,7 @@ export class CloseError {
 
 	public async Error(): globalThis.Promise<string> {
 		const ce = this
-		return fmt.Sprintf("status = %v and reason = %q", $.namedValueInterfaceValue<any>(ce.Code, "websocket.StatusCode", {String: (receiver: any, ...args: any[]) => (__goscript_stringer.StatusCode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...args)}, { kind: $.TypeKind.Basic, name: "int", typeName: "websocket.StatusCode" }, [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]), ce.Reason)
+		return fmt.Sprintf("status = %v and reason = %q", $.namedValueInterfaceValue<any>(ce.Code, "websocket.StatusCode", {String: (receiver: any, ...args: any[]) => (__goscript_stringer.StatusCode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Basic, name: "int", typeName: "websocket.StatusCode" }, [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]), ce.Reason)
 	}
 
 	static __typeInfo = $.registerStructType(
