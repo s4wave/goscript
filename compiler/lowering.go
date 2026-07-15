@@ -12623,6 +12623,9 @@ func (o *LoweringOwner) genericReceiverTypeArgsExpr(ctx lowerFileContext, select
 	}
 	receiver := receiverNamedType(selection.Recv())
 	if receiver == nil || receiver.TypeArgs() == nil || receiver.TypeArgs().Len() != len(params) {
+		receiver = methodReceiverNamedType(selection.Obj())
+	}
+	if receiver == nil || receiver.TypeArgs() == nil || receiver.TypeArgs().Len() != len(params) {
 		return ""
 	}
 	entries := make([]string, 0, len(params))
