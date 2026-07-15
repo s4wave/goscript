@@ -57,7 +57,7 @@ export class LinkedList {
 		return $.markAsStructValue(cloned)
 	}
 
-	public async IsEmpty(): globalThis.Promise<boolean> {
+	public async IsEmpty(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<boolean> {
 		const l: LinkedList | $.VarRef<LinkedList> | null = this
 		await $.pointerValue<LinkedList>(l).mtx.Lock()
 		let empty = $.pointerValue<LinkedList>(l).head == null
@@ -65,10 +65,10 @@ export class LinkedList {
 		return empty
 	}
 
-	public async Peek(): globalThis.Promise<[any, boolean]> {
+	public async Peek(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<[any, boolean]> {
 		const l: LinkedList | $.VarRef<LinkedList> | null = this
 		await $.pointerValue<LinkedList>(l).mtx.Lock()
-		let val: any = null
+		let val: any = $.genericZero(__typeArgs, "T", null)
 		let exists = $.pointerValue<LinkedList>(l).head != null
 		if (exists) {
 			val = $.pointerValue<linkedListElem>($.pointerValue<LinkedList>(l).head).val
@@ -77,10 +77,10 @@ export class LinkedList {
 		return [val, exists]
 	}
 
-	public async PeekTail(): globalThis.Promise<[any, boolean]> {
+	public async PeekTail(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<[any, boolean]> {
 		const l: LinkedList | $.VarRef<LinkedList> | null = this
 		await $.pointerValue<LinkedList>(l).mtx.Lock()
-		let val: any = null
+		let val: any = $.genericZero(__typeArgs, "T", null)
 		let exists = $.pointerValue<LinkedList>(l).tail != null
 		if (exists) {
 			val = $.pointerValue<linkedListElem>($.pointerValue<LinkedList>(l).tail).val
@@ -89,10 +89,10 @@ export class LinkedList {
 		return [val, exists]
 	}
 
-	public async Pop(): globalThis.Promise<[any, boolean]> {
+	public async Pop(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<[any, boolean]> {
 		let l: LinkedList | $.VarRef<LinkedList> | null = this
 		await $.pointerValue<LinkedList>(l).mtx.Lock()
-		let val: any = null
+		let val: any = $.genericZero(__typeArgs, "T", null)
 		let exists = $.pointerValue<LinkedList>(l).head != null
 		if (exists) {
 			val = $.pointerValue<linkedListElem>($.pointerValue<LinkedList>(l).head).val
@@ -107,14 +107,14 @@ export class LinkedList {
 		return [val, exists]
 	}
 
-	public async Push(val: any): globalThis.Promise<void> {
+	public async Push(__typeArgs: $.GenericTypeArgs | undefined, val: any): globalThis.Promise<void> {
 		const l: LinkedList | $.VarRef<LinkedList> | null = this
 		await $.pointerValue<LinkedList>(l).mtx.Lock()
-		LinkedList.prototype.pushElem.call(l, val)
+		LinkedList.prototype.pushElem.call(l, {T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, val)
 		$.pointerValue<LinkedList>(l).mtx.Unlock()
 	}
 
-	public async PushFront(val: any): globalThis.Promise<void> {
+	public async PushFront(__typeArgs: $.GenericTypeArgs | undefined, val: any): globalThis.Promise<void> {
 		let l: LinkedList | $.VarRef<LinkedList> | null = this
 		await $.pointerValue<LinkedList>(l).mtx.Lock()
 		let elem: linkedListElem | $.VarRef<linkedListElem> | null = new linkedListElem({val: val})
@@ -127,7 +127,7 @@ export class LinkedList {
 		$.pointerValue<LinkedList>(l).mtx.Unlock()
 	}
 
-	public async Reset(): globalThis.Promise<void> {
+	public async Reset(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<void> {
 		let l: LinkedList | $.VarRef<LinkedList> | null = this
 		await $.pointerValue<LinkedList>(l).mtx.Lock()
 		let __goscriptAssign0_0: linkedListElem | $.VarRef<linkedListElem> | null = null
@@ -137,7 +137,7 @@ export class LinkedList {
 		$.pointerValue<LinkedList>(l).mtx.Unlock()
 	}
 
-	public pushElem(val: any): void {
+	public pushElem(__typeArgs: $.GenericTypeArgs | undefined, val: any): void {
 		let l: LinkedList | $.VarRef<LinkedList> | null = this
 		let elem: linkedListElem | $.VarRef<linkedListElem> | null = new linkedListElem({val: val})
 		if ($.pointerValue<LinkedList>(l).tail == null) {
@@ -208,7 +208,7 @@ export function NewLinkedList<T>(__typeArgs: $.GenericTypeArgs | undefined, elem
 	let ll: LinkedList | $.VarRef<LinkedList> | null = new LinkedList()
 	for (let __goscriptRangeTarget0 = elems, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let elem = __goscriptRangeTarget0![__rangeIndex]
-		LinkedList.prototype.pushElem.call(ll, elem)
+		LinkedList.prototype.pushElem.call(ll, {T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, elem)
 	}
 	return ll
 }

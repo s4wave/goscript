@@ -50,7 +50,7 @@ export class Pointer {
 		return $.markAsStructValue(cloned)
 	}
 
-	public Value(): any {
+	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const p = this
 		if (p.u == null) {
 			return null

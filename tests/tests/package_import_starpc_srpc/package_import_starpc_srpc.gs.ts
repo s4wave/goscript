@@ -553,7 +553,7 @@ export async function closeEmbedded(strm: embeddedStream): globalThis.Promise<$.
 }
 
 export async function recvOne(__typeArgs: $.GenericTypeArgs | undefined, strm: srpc.StreamRecv | null): globalThis.Promise<$.GoError> {
-	let [, err] = await $.pointerValue<Exclude<srpc.StreamRecv, null>>(strm).Recv()
+	let [, err] = await $.pointerValue<Exclude<srpc.StreamRecv, null>>(strm).Recv({T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
 	return err
 }
 

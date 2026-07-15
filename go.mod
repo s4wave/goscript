@@ -2,8 +2,6 @@ module github.com/s4wave/goscript
 
 go 1.26.4
 
-toolchain go1.26.4
-
 require (
 	github.com/aperturerobotics/cli v1.1.0 // latest
 	github.com/aperturerobotics/json-iterator-lite v1.1.0

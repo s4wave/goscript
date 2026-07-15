@@ -16,12 +16,12 @@ import "@goscript/math/big/index.js"
 import "./params.gs.ts"
 
 export type nistPoint = {
-	Add(_p0: any, _p1: any): any | globalThis.Promise<any>
-	Bytes(): $.Slice<number> | globalThis.Promise<$.Slice<number>>
-	Double(_p0: any): any | globalThis.Promise<any>
-	ScalarBaseMult(_p0: $.Slice<number>): [any, $.GoError] | globalThis.Promise<[any, $.GoError]>
-	ScalarMult(_p0: any, _p1: $.Slice<number>): [any, $.GoError] | globalThis.Promise<[any, $.GoError]>
-	SetBytes(_p0: $.Slice<number>): [any, $.GoError] | globalThis.Promise<[any, $.GoError]>
+	Add(__typeArgs: $.GenericTypeArgs | undefined, _p0: any, _p1: any): any | globalThis.Promise<any>
+	Bytes(__typeArgs: $.GenericTypeArgs | undefined): $.Slice<number> | globalThis.Promise<$.Slice<number>>
+	Double(__typeArgs: $.GenericTypeArgs | undefined, _p0: any): any | globalThis.Promise<any>
+	ScalarBaseMult(__typeArgs: $.GenericTypeArgs | undefined, _p0: $.Slice<number>): [any, $.GoError] | globalThis.Promise<[any, $.GoError]>
+	ScalarMult(__typeArgs: $.GenericTypeArgs | undefined, _p0: any, _p1: $.Slice<number>): [any, $.GoError] | globalThis.Promise<[any, $.GoError]>
+	SetBytes(__typeArgs: $.GenericTypeArgs | undefined, _p0: $.Slice<number>): [any, $.GoError] | globalThis.Promise<[any, $.GoError]>
 }
 
 $.registerInterfaceType(
@@ -66,81 +66,81 @@ export class nistCurve {
 		return $.markAsStructValue(cloned)
 	}
 
-	public async Add(x1: big.Int | $.VarRef<big.Int> | null, y1: big.Int | $.VarRef<big.Int> | null, x2: big.Int | $.VarRef<big.Int> | null, y2: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
+	public async Add(__typeArgs: $.GenericTypeArgs | undefined, x1: big.Int | $.VarRef<big.Int> | null, y1: big.Int | $.VarRef<big.Int> | null, x2: big.Int | $.VarRef<big.Int> | null, y2: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this
-		let __goscriptTuple0: any = await nistCurve.prototype.pointFromAffine.call(curve, x1, y1)
+		let __goscriptTuple0: any = await nistCurve.prototype.pointFromAffine.call(curve, {Point: __typeArgs?.["Point"] ?? { type: { kind: $.TypeKind.Interface, methods: [{ name: "Add", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Bytes", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Double", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "ScalarBaseMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "ScalarMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "SetBytes", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }] }, zero: () => null }}, x1, y1)
 		let p1 = (__goscriptTuple0[0] as any)
 		let err = __goscriptTuple0[1]
 		if (err != null) {
 			$.panic("crypto/elliptic: Add was called on an invalid point")
 		}
-		let __goscriptTuple1: any = await nistCurve.prototype.pointFromAffine.call(curve, x2, y2)
+		let __goscriptTuple1: any = await nistCurve.prototype.pointFromAffine.call(curve, {Point: __typeArgs?.["Point"] ?? { type: { kind: $.TypeKind.Interface, methods: [{ name: "Add", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Bytes", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Double", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "ScalarBaseMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "ScalarMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "SetBytes", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }] }, zero: () => null }}, x2, y2)
 		let p2 = (__goscriptTuple1[0] as any)
 		err = __goscriptTuple1[1]
 		if (err != null) {
 			$.panic("crypto/elliptic: Add was called on an invalid point")
 		}
-		return nistCurve.prototype.pointToAffine.call(curve, await p1.Add(p1, p2))
+		return nistCurve.prototype.pointToAffine.call(curve, {Point: __typeArgs?.["Point"] ?? { type: { kind: $.TypeKind.Interface, methods: [{ name: "Add", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Bytes", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Double", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "ScalarBaseMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "ScalarMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "SetBytes", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }] }, zero: () => null }}, await $.callGenericMethod(__typeArgs, "Point", "Add", p1, p1, p2))
 	}
 
-	public async Double(x1: big.Int | $.VarRef<big.Int> | null, y1: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
+	public async Double(__typeArgs: $.GenericTypeArgs | undefined, x1: big.Int | $.VarRef<big.Int> | null, y1: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this
-		let __goscriptTuple2: any = await nistCurve.prototype.pointFromAffine.call(curve, x1, y1)
+		let __goscriptTuple2: any = await nistCurve.prototype.pointFromAffine.call(curve, {Point: __typeArgs?.["Point"] ?? { type: { kind: $.TypeKind.Interface, methods: [{ name: "Add", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Bytes", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Double", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "ScalarBaseMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "ScalarMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "SetBytes", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }] }, zero: () => null }}, x1, y1)
 		let p = (__goscriptTuple2[0] as any)
 		let err = __goscriptTuple2[1]
 		if (err != null) {
 			$.panic("crypto/elliptic: Double was called on an invalid point")
 		}
-		return nistCurve.prototype.pointToAffine.call(curve, await p.Double(p))
+		return nistCurve.prototype.pointToAffine.call(curve, {Point: __typeArgs?.["Point"] ?? { type: { kind: $.TypeKind.Interface, methods: [{ name: "Add", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Bytes", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Double", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "ScalarBaseMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "ScalarMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "SetBytes", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }] }, zero: () => null }}, await $.callGenericMethod(__typeArgs, "Point", "Double", p, p))
 	}
 
-	public async IsOnCurve(x: big.Int | $.VarRef<big.Int> | null, y: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<boolean> {
+	public async IsOnCurve(__typeArgs: $.GenericTypeArgs | undefined, x: big.Int | $.VarRef<big.Int> | null, y: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<boolean> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this
 		// IsOnCurve is documented to reject (0, 0), the conventional point at
 		// infinity, which however is accepted by pointFromAffine.
 		if ((big.Int.prototype.Sign.call(x) == 0) && (big.Int.prototype.Sign.call(y) == 0)) {
 			return false
 		}
-		let [, err] = await nistCurve.prototype.pointFromAffine.call(curve, x, y)
+		let [, err] = await nistCurve.prototype.pointFromAffine.call(curve, {Point: __typeArgs?.["Point"] ?? { type: { kind: $.TypeKind.Interface, methods: [{ name: "Add", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Bytes", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Double", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "ScalarBaseMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "ScalarMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "SetBytes", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }] }, zero: () => null }}, x, y)
 		return err == null
 	}
 
-	public Params(): __goscript_params.CurveParams | $.VarRef<__goscript_params.CurveParams> | null {
+	public Params(__typeArgs: $.GenericTypeArgs | undefined): __goscript_params.CurveParams | $.VarRef<__goscript_params.CurveParams> | null {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this
 		return $.pointerValue<nistCurve>(curve).params
 	}
 
-	public async ScalarBaseMult(scalar: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
+	public async ScalarBaseMult(__typeArgs: $.GenericTypeArgs | undefined, scalar: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this
-		scalar = await nistCurve.prototype.normalizeScalar.call(curve, scalar)
-		let __goscriptTuple3: any = await await $.pointerValue<nistCurve>(curve).newPoint!().ScalarBaseMult(scalar)
+		scalar = await nistCurve.prototype.normalizeScalar.call(curve, {Point: __typeArgs?.["Point"] ?? { type: { kind: $.TypeKind.Interface, methods: [{ name: "Add", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Bytes", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Double", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "ScalarBaseMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "ScalarMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "SetBytes", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }] }, zero: () => null }}, scalar)
+		let __goscriptTuple3: any = await $.callGenericMethod(__typeArgs, "Point", "ScalarBaseMult", await $.pointerValue<nistCurve>(curve).newPoint!(), scalar)
 		let p = (__goscriptTuple3[0] as any)
 		let err = __goscriptTuple3[1]
 		if (err != null) {
 			$.panic("crypto/elliptic: nistec rejected normalized scalar")
 		}
-		return nistCurve.prototype.pointToAffine.call(curve, p)
+		return nistCurve.prototype.pointToAffine.call(curve, {Point: __typeArgs?.["Point"] ?? { type: { kind: $.TypeKind.Interface, methods: [{ name: "Add", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Bytes", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Double", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "ScalarBaseMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "ScalarMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "SetBytes", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }] }, zero: () => null }}, p)
 	}
 
-	public async ScalarMult(Bx: big.Int | $.VarRef<big.Int> | null, By: big.Int | $.VarRef<big.Int> | null, scalar: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
+	public async ScalarMult(__typeArgs: $.GenericTypeArgs | undefined, Bx: big.Int | $.VarRef<big.Int> | null, By: big.Int | $.VarRef<big.Int> | null, scalar: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this
-		let __goscriptTuple4: any = await nistCurve.prototype.pointFromAffine.call(curve, Bx, By)
+		let __goscriptTuple4: any = await nistCurve.prototype.pointFromAffine.call(curve, {Point: __typeArgs?.["Point"] ?? { type: { kind: $.TypeKind.Interface, methods: [{ name: "Add", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Bytes", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Double", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "ScalarBaseMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "ScalarMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "SetBytes", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }] }, zero: () => null }}, Bx, By)
 		let p = (__goscriptTuple4[0] as any)
 		let err = __goscriptTuple4[1]
 		if (err != null) {
 			$.panic("crypto/elliptic: ScalarMult was called on an invalid point")
 		}
-		scalar = await nistCurve.prototype.normalizeScalar.call(curve, scalar)
-		let __goscriptTuple5: any = await p.ScalarMult(p, scalar)
+		scalar = await nistCurve.prototype.normalizeScalar.call(curve, {Point: __typeArgs?.["Point"] ?? { type: { kind: $.TypeKind.Interface, methods: [{ name: "Add", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Bytes", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Double", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "ScalarBaseMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "ScalarMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "SetBytes", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }] }, zero: () => null }}, scalar)
+		let __goscriptTuple5: any = await $.callGenericMethod(__typeArgs, "Point", "ScalarMult", p, p, scalar)
 		p = (__goscriptTuple5[0] as any)
 		err = __goscriptTuple5[1]
 		if (err != null) {
 			$.panic("crypto/elliptic: nistec rejected normalized scalar")
 		}
-		return nistCurve.prototype.pointToAffine.call(curve, p)
+		return nistCurve.prototype.pointToAffine.call(curve, {Point: __typeArgs?.["Point"] ?? { type: { kind: $.TypeKind.Interface, methods: [{ name: "Add", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Bytes", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Double", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "ScalarBaseMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "ScalarMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "SetBytes", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }] }, zero: () => null }}, p)
 	}
 
-	public async Unmarshal(data: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
+	public async Unmarshal(__typeArgs: $.GenericTypeArgs | undefined, data: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this
 		let x: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
 		let y: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
@@ -148,7 +148,7 @@ export class nistCurve {
 			return [null, null]
 		}
 		// Use SetBytes to check that data encodes a valid point.
-		let [, err] = await await $.pointerValue<nistCurve>(curve).newPoint!().SetBytes(data)
+		let [, err] = await $.callGenericMethod(__typeArgs, "Point", "SetBytes", await $.pointerValue<nistCurve>(curve).newPoint!(), data)
 		if (err != null) {
 			return [null, null]
 		}
@@ -161,23 +161,23 @@ export class nistCurve {
 		return [x, y]
 	}
 
-	public async UnmarshalCompressed(data: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
+	public async UnmarshalCompressed(__typeArgs: $.GenericTypeArgs | undefined, data: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this
 		let x: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
 		let y: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
 		if (($.len(data) == 0) || (($.uint($.arrayIndex(data!, 0), 8) != $.uint(2, 8)) && ($.uint($.arrayIndex(data!, 0), 8) != $.uint(3, 8)))) {
 			return [null, null]
 		}
-		let __goscriptTuple6: any = await await $.pointerValue<nistCurve>(curve).newPoint!().SetBytes(data)
+		let __goscriptTuple6: any = await $.callGenericMethod(__typeArgs, "Point", "SetBytes", await $.pointerValue<nistCurve>(curve).newPoint!(), data)
 		let p = (__goscriptTuple6[0] as any)
 		let err = __goscriptTuple6[1]
 		if (err != null) {
 			return [null, null]
 		}
-		return nistCurve.prototype.pointToAffine.call(curve, p)
+		return nistCurve.prototype.pointToAffine.call(curve, {Point: __typeArgs?.["Point"] ?? { type: { kind: $.TypeKind.Interface, methods: [{ name: "Add", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Bytes", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Double", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "ScalarBaseMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "ScalarMult", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }, { name: "SetBytes", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_r1", type: "error" }] }] }, zero: () => null }}, p)
 	}
 
-	public async normalizeScalar(scalar: $.Slice<number>): globalThis.Promise<$.Slice<number>> {
+	public async normalizeScalar(__typeArgs: $.GenericTypeArgs | undefined, scalar: $.Slice<number>): globalThis.Promise<$.Slice<number>> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this
 		let byteSize = Math.trunc((big.Int.prototype.BitLen.call($.pointerValue<__goscript_params.CurveParams>($.pointerValue<nistCurve>(curve).params).N) + 7) / 8)
 		if ($.len(scalar) == byteSize) {
@@ -191,9 +191,9 @@ export class nistCurve {
 		return big.Int.prototype.FillBytes.call(s, out)
 	}
 
-	public async pointFromAffine(x: big.Int | $.VarRef<big.Int> | null, y: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<[any, $.GoError]> {
+	public async pointFromAffine(__typeArgs: $.GenericTypeArgs | undefined, x: big.Int | $.VarRef<big.Int> | null, y: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<[any, $.GoError]> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this
-		let p: any = null
+		let p: any = $.genericZero(__typeArgs, "Point", null)
 		let err: $.GoError = null as $.GoError
 		// (0, 0) is by convention the point at infinity, which can't be represented
 		// in affine coordinates. See Issue 37294.
@@ -213,16 +213,16 @@ export class nistCurve {
 		buf![0] = $.uint(4, 8)
 		big.Int.prototype.FillBytes.call(x, $.goSlice(buf, 1, 1 + byteLen))
 		big.Int.prototype.FillBytes.call(y, $.goSlice(buf, 1 + byteLen, 1 + (2 * byteLen)))
-		const __goscriptReturn5 = await await $.pointerValue<nistCurve>(curve).newPoint!().SetBytes(buf)
+		const __goscriptReturn5 = await $.callGenericMethod(__typeArgs, "Point", "SetBytes", await $.pointerValue<nistCurve>(curve).newPoint!(), buf)
 		return [(__goscriptReturn5[0] as any), __goscriptReturn5[1]]
 		throw new globalThis.Error("goscript: unreachable return")
 	}
 
-	public async pointToAffine(p: any): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
+	public async pointToAffine(__typeArgs: $.GenericTypeArgs | undefined, p: any): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this
 		let x: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
 		let y: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-		let out: $.Slice<number> = await p.Bytes()
+		let out: $.Slice<number> = await $.callGenericMethod(__typeArgs, "Point", "Bytes", p)
 		if (($.len(out) == 1) && ($.uint($.arrayIndex(out!, 0), 8) == $.uint(0, 8))) {
 			// This is the encoding of the point at infinity, which the affine
 			// coordinates API represents as (0, 0) by convention.

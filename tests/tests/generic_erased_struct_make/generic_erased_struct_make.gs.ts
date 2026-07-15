@@ -39,7 +39,7 @@ export class queue {
 }
 
 export function newQueue(__typeArgs: $.GenericTypeArgs | undefined, capacity: number): queue | $.VarRef<queue> | null {
-	return new queue({buf: $.makeSlice<any>(capacity)})
+	return new queue({buf: $.makeSlice<any>(capacity, undefined, undefined, () => ($.genericZero(__typeArgs, "T", null) as any))})
 }
 
 export async function main(): globalThis.Promise<void> {

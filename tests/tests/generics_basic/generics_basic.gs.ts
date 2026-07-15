@@ -16,7 +16,7 @@ export type Score = number
 export type Set = globalThis.Map<any, {}> | null
 
 export type Cloner = {
-	Clone(): any | globalThis.Promise<any>
+	Clone(__typeArgs: $.GenericTypeArgs | undefined): any | globalThis.Promise<any>
 }
 
 $.registerInterfaceType(
@@ -51,12 +51,12 @@ export class Stack {
 		return $.markAsStructValue(cloned)
 	}
 
-	public Len(): number {
+	public Len(__typeArgs: $.GenericTypeArgs | undefined): number {
 		const s: Stack | $.VarRef<Stack> | null = this
 		return $.len($.pointerValue<Stack>(s).items)
 	}
 
-	public Pop(): [any, boolean] {
+	public Pop(__typeArgs: $.GenericTypeArgs | undefined): [any, boolean] {
 		let s: Stack | $.VarRef<Stack> | null = this
 		if ($.len($.pointerValue<Stack>(s).items) == 0) {
 			$.panic("pop from empty stack")
@@ -67,7 +67,7 @@ export class Stack {
 		return [value, true]
 	}
 
-	public Push(value: any): void {
+	public Push(__typeArgs: $.GenericTypeArgs | undefined, value: any): void {
 		let s: Stack | $.VarRef<Stack> | null = this
 		$.pointerValue<Stack>(s).items = $.append($.pointerValue<Stack>(s).items, value)
 	}
@@ -150,13 +150,13 @@ export class Mapper {
 		return $.markAsStructValue(cloned)
 	}
 
-	public Get(key: any): [any, boolean] {
+	public Get(__typeArgs: $.GenericTypeArgs | undefined, key: any): [any, boolean] {
 		const m: Mapper | $.VarRef<Mapper> | null = this
 		let [value, ok] = $.mapGet<any, any, any>($.pointerValue<Mapper>(m).values, key, null)
 		return [value, ok]
 	}
 
-	public Put(key: any, value: any): void {
+	public Put(__typeArgs: $.GenericTypeArgs | undefined, key: any, value: any): void {
 		let m: Mapper | $.VarRef<Mapper> | null = this
 		$.mapSet($.pointerValue<Mapper>(m).values, key, value)
 	}
@@ -206,7 +206,7 @@ export class Pair {
 		return $.markAsStructValue(cloned)
 	}
 
-	public Swap(): Pair {
+	public Swap(__typeArgs: $.GenericTypeArgs | undefined): Pair {
 		const p = this
 		return $.markAsStructValue(new Pair({First: p.Second, Second: p.First}))
 	}
@@ -236,17 +236,17 @@ export function NewSet<T>(__typeArgs: $.GenericTypeArgs | undefined, values: $.S
 	return _set
 }
 
-export function Set_Add(s: Set, value: any): void {
+export function Set_Add(s: Set, __typeArgs: $.GenericTypeArgs | undefined, value: any): void {
 	$.mapSet(s, value, {})
 }
 
-export function Set_Has(s: Set, value: any): boolean {
+export function Set_Has(s: Set, __typeArgs: $.GenericTypeArgs | undefined, value: any): boolean {
 	let [, ok] = $.mapGet<any, {}, {}>(s, value, {})
 	return ok
 }
 
 export async function CloneAll<T>(__typeArgs: $.GenericTypeArgs | undefined, items: $.Slice<T>): globalThis.Promise<$.Slice<T>> {
-	let clones: $.Slice<T> = $.makeSlice<T>(0, $.len(items))
+	let clones: $.Slice<T> = $.makeSlice<T>(0, $.len(items), undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
 	for (let __goscriptRangeTarget1 = items, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
 		let item = __goscriptRangeTarget1![__rangeIndex]
 		clones = $.append(clones, await $.callGenericMethod(__typeArgs, "T", "Clone", item))
@@ -268,21 +268,21 @@ export async function main(): globalThis.Promise<void> {
 
 	$.println("=== Generic stack ===")
 	let stack: $.VarRef<Stack> = $.varRef($.markAsStructValue(new Stack()))
-	stack.value.Push(10)
-	stack.value.Push(20)
-	let __goscriptTuple0: any = stack.value.Pop()
+	stack.value.Push({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 10)
+	stack.value.Push({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 20)
+	let __goscriptTuple0: any = stack.value.Pop({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }})
 	let value = (__goscriptTuple0[0] as number)
 	let ok = __goscriptTuple0[1]
-	$.println("pop:", value, ok, stack.value.Len())
-	let __goscriptTuple1: any = stack.value.Pop()
+	$.println("pop:", value, ok, stack.value.Len({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}))
+	let __goscriptTuple1: any = stack.value.Pop({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }})
 	value = (__goscriptTuple1[0] as number)
 	ok = __goscriptTuple1[1]
-	$.println("pop:", value, ok, stack.value.Len())
+	$.println("pop:", value, ok, stack.value.Len({T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}))
 
 	$.println("=== Generic map alias ===")
 	let seen: Set = (NewSet(undefined, $.arrayToSlice<string>(["go", "ts"])) as Set)
-	Set_Add(seen, "wasm")
-	$.println("set:", Set_Has(seen, "go"), Set_Has(seen, "rust"), $.len(seen))
+	Set_Add(seen, {T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, "wasm")
+	$.println("set:", Set_Has(seen, {T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, "go"), Set_Has(seen, {T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, "rust"), $.len(seen))
 
 	$.println("=== Interface constraint ===")
 	let items: $.Slice<Item | $.VarRef<Item> | null> = $.arrayToSlice<Item | $.VarRef<Item> | null>([new Item({Name: "alpha"}), new Item({Name: "beta"})])
@@ -291,8 +291,8 @@ export async function main(): globalThis.Promise<void> {
 
 	$.println("=== Generic struct with map field ===")
 	let mapper: Mapper | $.VarRef<Mapper> | null = (NewMapper({K: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }, V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}) as Mapper | $.VarRef<Mapper> | null)
-	Mapper.prototype.Put.call(mapper, "answer", 42)
-	let __goscriptTuple2: any = Mapper.prototype.Get.call(mapper, "answer")
+	Mapper.prototype.Put.call(mapper, {K: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }, V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, "answer", 42)
+	let __goscriptTuple2: any = Mapper.prototype.Get.call(mapper, {K: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }, V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, "answer")
 	let answer = (__goscriptTuple2[0] as number)
 	let found = __goscriptTuple2[1]
 	$.println("mapper:", answer, found)
@@ -305,7 +305,7 @@ export async function main(): globalThis.Promise<void> {
 
 	$.println("=== Generic pair method ===")
 	let pair = $.markAsStructValue(new Pair({First: "left", Second: "right"}))
-	let swapped = ($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(pair)).Swap())) as Pair)
+	let swapped = ($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(pair)).Swap({T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}))) as Pair)
 	$.println("pair:", swapped.First, swapped.Second)
 }
 

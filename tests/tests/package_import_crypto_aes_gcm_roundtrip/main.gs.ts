@@ -182,7 +182,7 @@ export async function roundTrip(prefix: $.Slice<number>): globalThis.Promise<voi
 }
 
 export function makeGeneric<T>(__typeArgs: $.GenericTypeArgs | undefined, length: number, capacity: number): $.Slice<T> {
-	return $.makeSlice<T>(length, capacity)
+	return $.makeSlice<T>(length, capacity, undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
 }
 
 export async function main(): globalThis.Promise<void> {

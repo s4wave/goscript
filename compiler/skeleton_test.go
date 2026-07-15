@@ -3196,7 +3196,7 @@ func TestCompilePackagesEmitsGenericMethodsAliasesAndDictionaries(t *testing.T) 
 	}
 	text := string(content)
 	for _, want := range []string{
-		"public Get(): any",
+		"public Get(__typeArgs: $.GenericTypeArgs | undefined): any",
 		"export function NewBox(__typeArgs: $.GenericTypeArgs | undefined, value: any): Box",
 		"export function ZeroValue(__typeArgs: $.GenericTypeArgs | undefined): any",
 		"export async function CallString(__typeArgs: $.GenericTypeArgs | undefined, v: any): globalThis.Promise<string>",
@@ -4048,9 +4048,9 @@ func TestCompilePackagesPropagatesAsyncGenericInterfaceMethods(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"Wait(ctx: context.Context | null, old: any): any | globalThis.Promise<any>",
-		"public async Wait(ctx: context.Context | null, old: any): globalThis.Promise<any>",
-		"return (await $.pointerValue<Exclude<Watchable, null>>(w).Wait(ctx, old) as number)",
+		"Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): any | globalThis.Promise<any>",
+		"public async Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): globalThis.Promise<any>",
+		"return (await $.pointerValue<Exclude<Watchable, null>>(w).Wait({T: { type: { kind: $.TypeKind.Basic, name: \"int\" }, zero: () => 0 }}, ctx, old) as number)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -4744,8 +4744,8 @@ func TestCompilePackagesPropagatesImportedAsyncGenericInterfaceMethods(t *testin
 	}
 	depText := string(depContent)
 	for _, want := range []string{
-		"Wait(ctx: context.Context | null, old: any): any | globalThis.Promise<any>",
-		"public async Wait(ctx: context.Context | null, old: any): globalThis.Promise<any>",
+		"Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): any | globalThis.Promise<any>",
+		"public async Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): globalThis.Promise<any>",
 	} {
 		if !strings.Contains(depText, want) {
 			t.Fatalf("missing %q in generated dep output:\n%s", want, depText)
@@ -4758,7 +4758,7 @@ func TestCompilePackagesPropagatesImportedAsyncGenericInterfaceMethods(t *testin
 		t.Fatal(err.Error())
 	}
 	mainText := string(mainContent)
-	if want := "return (await $.pointerValue<Exclude<dep.Watchable, null>>(w).Wait(ctx, old) as number)"; !strings.Contains(mainText, want) {
+	if want := "return (await $.pointerValue<Exclude<dep.Watchable, null>>(w).Wait({T: { type: { kind: $.TypeKind.Basic, name: \"int\" }, zero: () => 0 }}, ctx, old) as number)"; !strings.Contains(mainText, want) {
 		t.Fatalf("missing %q in generated main output:\n%s", want, mainText)
 	}
 }

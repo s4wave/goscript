@@ -30,8 +30,8 @@ export type StreamRecv = {
 	Context(): context.Context | null | globalThis.Promise<context.Context | null>
 	MsgRecv(msg: __goscript_message.Message): $.GoError | globalThis.Promise<$.GoError>
 	MsgSend(msg: __goscript_message.Message): $.GoError | globalThis.Promise<$.GoError>
-	Recv(): [any, $.GoError] | globalThis.Promise<[any, $.GoError]>
-	RecvTo(_p0: any): $.GoError
+	Recv(__typeArgs: $.GenericTypeArgs | undefined): [any, $.GoError] | globalThis.Promise<[any, $.GoError]>
+	RecvTo(__typeArgs: $.GenericTypeArgs | undefined, _p0: any): $.GoError
 }
 
 $.registerInterfaceType(
@@ -46,7 +46,7 @@ export type StreamSend = {
 	Context(): context.Context | null | globalThis.Promise<context.Context | null>
 	MsgRecv(msg: __goscript_message.Message): $.GoError | globalThis.Promise<$.GoError>
 	MsgSend(msg: __goscript_message.Message): $.GoError | globalThis.Promise<$.GoError>
-	Send(_p0: any): $.GoError
+	Send(__typeArgs: $.GenericTypeArgs | undefined, _p0: any): $.GoError
 }
 
 $.registerInterfaceType(
@@ -61,8 +61,8 @@ export type StreamSendAndClose = {
 	Context(): context.Context | null | globalThis.Promise<context.Context | null>
 	MsgRecv(msg: __goscript_message.Message): $.GoError | globalThis.Promise<$.GoError>
 	MsgSend(msg: __goscript_message.Message): $.GoError | globalThis.Promise<$.GoError>
-	Send(_p0: any): $.GoError
-	SendAndClose(_p0: any): $.GoError
+	Send(__typeArgs: $.GenericTypeArgs | undefined, _p0: any): $.GoError
+	SendAndClose(__typeArgs: $.GenericTypeArgs | undefined, _p0: any): $.GoError
 }
 
 $.registerInterfaceType(

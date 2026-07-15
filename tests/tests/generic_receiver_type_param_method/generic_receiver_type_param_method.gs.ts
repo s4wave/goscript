@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type nistPoint = {
-	Add(_p0: any, _p1: any): any | globalThis.Promise<any>
+	Add(__typeArgs: $.GenericTypeArgs | undefined, _p0: any, _p1: any): any | globalThis.Promise<any>
 }
 
 $.registerInterfaceType(
@@ -29,14 +29,14 @@ export class nistCurve {
 		return $.markAsStructValue(cloned)
 	}
 
-	public async Add(p1: any, p2: any): globalThis.Promise<any> {
+	public async Add(__typeArgs: $.GenericTypeArgs | undefined, p1: any, p2: any): globalThis.Promise<any> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this
-		return (await p1.Add(p1, p2) as any)
+		return (await $.callGenericMethod(__typeArgs, "Point", "Add", p1, p1, p2) as any)
 	}
 
-	public Zero(): any {
+	public Zero(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this
-		let p: any = null
+		let p: any = $.genericZero(__typeArgs, "Point", null)
 		return p
 	}
 
@@ -96,9 +96,9 @@ export function __goscript_set_curve(__goscriptValue: nistCurve | $.VarRef<nistC
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p: point | $.VarRef<point> | null = (await nistCurve.prototype.Add.call(curve, new point({N: 2}), new point({N: 3})) as point | $.VarRef<point> | null)
+	let p: point | $.VarRef<point> | null = (await nistCurve.prototype.Add.call(curve, {Point: { type: { kind: $.TypeKind.Pointer, elemType: "main.point" }, zero: () => null }}, new point({N: 2}), new point({N: 3})) as point | $.VarRef<point> | null)
 	$.println("sum:", $.pointerValue<point>(p).N)
-	if (nistCurve.prototype.Zero.call(curve) == null) {
+	if (nistCurve.prototype.Zero.call(curve, {Point: { type: { kind: $.TypeKind.Pointer, elemType: "main.point" }, zero: () => null }}) == null) {
 		$.println("zero")
 	}
 }

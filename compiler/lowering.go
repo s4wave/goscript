@@ -3006,7 +3006,16 @@ func (o *LoweringOwner) tsMethodSignature(ctx lowerFileContext, method *types.Fu
 		return method.Name() + "(): unknown"
 	}
 	async := o.functionAsync(ctx, method)
-	return method.Name() + "(" + o.tsSignatureParamsFor(ctx, signature, async) + "): " +
+	params := o.tsSignatureParamsFor(ctx, signature, async)
+	if signature.Recv() != nil && len(genericReceiverTypeParams(signature.Recv().Type())) != 0 {
+		hidden := "__typeArgs: $.GenericTypeArgs | undefined"
+		if params == "" {
+			params = hidden
+		} else {
+			params = hidden + ", " + params
+		}
+	}
+	return method.Name() + "(" + params + "): " +
 		asyncCompatibleMethodResultType(o.tsSignatureResultFor(ctx, signature), async)
 }
 
@@ -3564,6 +3573,10 @@ func (o *LoweringOwner) lowerNamedReceiverMethodDecl(
 		async = false
 	}
 	functionCtx := ctx.withSignature(signature)
+	receiverTypeParams := genericReceiverTypeParams(signature.Recv().Type())
+	if len(receiverTypeParams) != 0 {
+		functionCtx = functionCtx.withReceiverTypeParams(receiverTypeParams)
+	}
 	resultCtx := functionCtx.withAsyncFunction(async)
 	result := o.tsSignatureResultFor(resultCtx, signature)
 	receiverName := "recv"
@@ -3583,7 +3596,13 @@ func (o *LoweringOwner) lowerNamedReceiverMethodDecl(
 			name: receiverName,
 			typ:  o.tsReceiverTypeFor(ctx, signature.Recv().Type()),
 		}},
-		namedResults: o.lowerNamedResults(ctx, signature),
+		namedResults: o.lowerNamedResults(functionCtx, signature),
+	}
+	if len(receiverTypeParams) != 0 {
+		lowered.params = append(lowered.params, loweredParam{
+			name: "__typeArgs",
+			typ:  "$.GenericTypeArgs | undefined",
+		})
 	}
 	if len(decl.Recv.List) != 0 && len(decl.Recv.List[0].Names) != 0 {
 		receiverObj := ctx.semPkg.source.TypesInfo.Defs[decl.Recv.List[0].Names[0]]
@@ -3598,10 +3617,10 @@ func (o *LoweringOwner) lowerNamedReceiverMethodDecl(
 	}
 	for idx := range signature.Params().Len() {
 		param := signature.Params().At(idx)
-		lowered.params, lowered.paramBindings = o.appendLoweredParam(ctx, lowered.params, lowered.paramBindings, param, idx, decl.Body == nil || async)
+		lowered.params, lowered.paramBindings = o.appendLoweredParam(functionCtx, lowered.params, lowered.paramBindings, param, idx, decl.Body == nil || async)
 	}
 	if decl.Body != nil {
-		bodyCtx := ctx.withSignature(signature).withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState)
+		bodyCtx := functionCtx.withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState)
 		body, diagnostics := o.lowerBlock(bodyCtx, decl.Body)
 		lowered.body = body
 		if deferState.used {
@@ -3612,11 +3631,11 @@ func (o *LoweringOwner) lowerNamedReceiverMethodDecl(
 		}
 		if deferState.async && !lowered.async {
 			lowered.async = true
-			lowered.result = asyncResultType(o.tsSignatureResultFor(ctx.withAsyncFunction(true), signature), true)
+			lowered.result = asyncResultType(o.tsSignatureResultFor(functionCtx.withAsyncFunction(true), signature), true)
 		}
 		return lowered, diagnostics
 	}
-	if zeroReturn, ok := o.lowerBodylessReturnStmt(ctx, signature); ok {
+	if zeroReturn, ok := o.lowerBodylessReturnStmt(functionCtx, signature); ok {
 		lowered.body = []loweredStmt{{text: zeroReturn}}
 	}
 	return lowered, nil
@@ -3640,6 +3659,11 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 		async = true
 	}
 	functionCtx := ctx.withSignature(signature)
+	var receiverTypeParams []*types.TypeParam
+	if signature.Recv() != nil {
+		receiverTypeParams = genericReceiverTypeParams(signature.Recv().Type())
+		functionCtx = functionCtx.withReceiverTypeParams(receiverTypeParams)
+	}
 	resultCtx := functionCtx.withAsyncFunction(async)
 	result := o.tsSignatureResultFor(resultCtx, signature)
 	deferState := &loweredDeferState{}
@@ -3695,6 +3719,12 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 			lowered.receiverType = ""
 			lowered.receiverValue = o.runtimeOwner.QualifiedHelper(RuntimeHelperVarRef) + "(this)"
 		}
+	}
+	if len(receiverTypeParams) != 0 {
+		lowered.params = append(lowered.params, loweredParam{
+			name: "__typeArgs",
+			typ:  "$.GenericTypeArgs | undefined",
+		})
 	}
 	for idx := range signature.Params().Len() {
 		param := signature.Params().At(idx)
@@ -3883,6 +3913,21 @@ func (ctx lowerFileContext) withSignature(signature *types.Signature) lowerFileC
 		ctx.typeParams = next
 		ctx.staticTypeParams = nextStatic
 	}
+	return ctx
+}
+
+func (ctx lowerFileContext) withReceiverTypeParams(params []*types.TypeParam) lowerFileContext {
+	if len(params) == 0 {
+		return ctx
+	}
+	next := make(map[string]bool, len(ctx.typeParams)+len(params))
+	maps.Copy(next, ctx.typeParams)
+	for _, param := range params {
+		if param != nil && param.Obj() != nil {
+			next[param.Obj().Name()] = true
+		}
+	}
+	ctx.typeParams = next
 	return ctx
 }
 
@@ -8276,6 +8321,10 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 				call := o.runtimeOwner.QualifiedHelper(RuntimeHelperCallGenericMethod) + "(" + strings.Join(methodArgs, ", ") + ")"
 				return o.awaitCallIfNeeded(ctx, fun, call), diagnostics
 			}
+			if genericArgs := o.genericReceiverTypeArgsExpr(ctx, selection); genericArgs != "" &&
+				!o.callUsesOverridePackage(ctx, fun) {
+				args = append([]string{genericArgs}, args...)
+			}
 			receiver := methodReceiverNamedType(selection.Obj())
 			if receiver == nil {
 				receiver = receiverNamedType(selection.Recv())
@@ -8295,6 +8344,7 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 		if signature := genericFunctionSignature(ctx, fun); signature != nil && !o.callUsesOverridePackage(ctx, fun) {
 			args = append([]string{o.inferredGenericTypeArgsExpr(ctx, signature, expr.Args)}, args...)
 		}
+		args = o.appendSlicesGrowZeroFactory(ctx, fun, expr, args)
 		call := o.lowerCallableExpr(ctx, fun, selector) + "(" + strings.Join(args, ", ") + ")"
 		if unsafePackageFunction(ctx, fun, "Slice") {
 			call = "(" + call + " as " + o.tsTypeFor(ctx, ctx.semPkg.source.TypesInfo.TypeOf(expr)) + ")"
@@ -8307,6 +8357,7 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 				if !o.callUsesSlicesOverride(ctx, fun.X) {
 					args = append([]string{o.genericTypeArgsExpr(ctx, fun.X, []ast.Expr{fun.Index})}, args...)
 				}
+				args = o.appendSlicesGrowZeroFactory(ctx, fun.X, expr, args)
 				call := o.lowerCallableExpr(ctx, fun.X, callee) + "(" + strings.Join(args, ", ") + ")"
 				return o.awaitCallIfNeeded(ctx, fun, call), append(diagnostics, calleeDiagnostics...)
 			}
@@ -8320,6 +8371,7 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 			if !o.callUsesSlicesOverride(ctx, fun.X) {
 				args = append([]string{o.genericTypeArgsExpr(ctx, fun.X, fun.Indices)}, args...)
 			}
+			args = o.appendSlicesGrowZeroFactory(ctx, fun.X, expr, args)
 			call := o.lowerCallableExpr(ctx, fun.X, callee) + "(" + strings.Join(args, ", ") + ")"
 			return o.awaitCallIfNeeded(ctx, fun, call), append(diagnostics, calleeDiagnostics...)
 		}
@@ -8774,6 +8826,33 @@ func (o *LoweringOwner) callUsesSlicesOverride(ctx lowerFileContext, expr ast.Ex
 	return fn != nil && fn.Pkg() != nil && fn.Pkg().Path() == "slices"
 }
 
+func (o *LoweringOwner) appendSlicesGrowZeroFactory(
+	ctx lowerFileContext,
+	callee ast.Expr,
+	expr *ast.CallExpr,
+	args []string,
+) []string {
+	selector, ok := callee.(*ast.SelectorExpr)
+	if !ok || selector.Sel.Name != "Grow" || !o.callUsesSlicesOverride(ctx, selector) {
+		return args
+	}
+	typ := ctx.semPkg.source.TypesInfo.TypeOf(expr)
+	if typ == nil {
+		return args
+	}
+	slice, ok := types.Unalias(typ).Underlying().(*types.Slice)
+	if !ok {
+		return args
+	}
+	typeParam, ok := types.Unalias(slice.Elem()).(*types.TypeParam)
+	if !ok || !typeParamInScope(ctx, typeParam) {
+		return args
+	}
+	zeroFactory := "() => (" + o.lowerDeclarationZeroValueExpr(ctx, slice.Elem()) +
+		" as " + o.tsSliceElemTypeFor(ctx, slice.Elem()) + ")"
+	return append(args, zeroFactory)
+}
+
 func unsafePackageFunction(ctx lowerFileContext, expr ast.Expr, name string) bool {
 	if ctx.semPkg == nil || ctx.semPkg.source == nil {
 		return false
@@ -8824,6 +8903,15 @@ func (o *LoweringOwner) lowerMakeExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 				args = append(args, "undefined")
 			}
 			args = append(args, strconv.Quote(hint))
+		}
+		if typeParam, ok := types.Unalias(typed.Elem()).(*types.TypeParam); ok && typeParamInScope(ctx, typeParam) {
+			if capacity == "" {
+				args = append(args, "undefined")
+			}
+			if len(args) < 3 {
+				args = append(args, "undefined")
+			}
+			args = append(args, "() => ("+o.lowerDeclarationZeroValueExpr(ctx, typed.Elem())+" as "+o.tsSliceElemTypeFor(ctx, typed.Elem())+")")
 		}
 		if namedStructType(typed.Elem()) != nil && isStructValueType(typed.Elem()) {
 			if capacity == "" {
@@ -9819,10 +9907,17 @@ func (o *LoweringOwner) lowerMethodValueClosure(
 			args = append(args, name)
 		}
 	}
+	callArgs := make([]string, 0, len(args)+2)
 	if includeReceiver {
-		args = append([]string{"__receiver"}, args...)
+		callArgs = append(callArgs, "__receiver")
 	}
-	closure := "((__receiver) => (" + strings.Join(params, ", ") + ") => " + callee + "(" + strings.Join(args, ", ") + "))(" + receiver + ")"
+	if !o.methodSelectionUsesOverridePackage(ctx, selection) {
+		if genericArgs := o.genericReceiverTypeArgsExpr(ctx, selection); genericArgs != "" {
+			callArgs = append(callArgs, genericArgs)
+		}
+	}
+	callArgs = append(callArgs, args...)
+	closure := "((__receiver) => (" + strings.Join(params, ", ") + ") => " + callee + "(" + strings.Join(callArgs, ", ") + "))(" + receiver + ")"
 	if signature == nil {
 		return closure
 	}
@@ -9845,9 +9940,15 @@ func (o *LoweringOwner) lowerMethodExpressionClosure(ctx lowerFileContext, selec
 	for idx := 1; idx < signature.Params().Len(); idx++ {
 		args = append(args, safeParamName(signature.Params().At(idx), idx))
 	}
+	methodArgs := args
+	if !o.methodSelectionUsesOverridePackage(ctx, selection) {
+		if genericArgs := o.genericReceiverTypeArgsExpr(ctx, selection); genericArgs != "" {
+			methodArgs = append([]string{genericArgs}, methodArgs...)
+		}
+	}
 	call := o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) +
 		"<" + o.namedTypeExpr(ctx, receiver) + ">(" + receiverName + ")." +
-		method.Name() + "(" + strings.Join(args, ", ") + ")"
+		method.Name() + "(" + strings.Join(methodArgs, ", ") + ")"
 	async := o.functionAsync(ctx, method)
 	prefix := ""
 	if async {
@@ -12475,6 +12576,59 @@ func receiverTypeParam(typ types.Type) *types.TypeParam {
 	}
 	typeParam, _ := types.Unalias(typ).(*types.TypeParam)
 	return typeParam
+}
+
+func genericReceiverTypeParams(typ types.Type) []*types.TypeParam {
+	named := receiverNamedType(typ)
+	if named == nil {
+		return nil
+	}
+	params := named.TypeParams()
+	if (params == nil || params.Len() == 0) && named.Origin() != nil {
+		params = named.Origin().TypeParams()
+	}
+
+	if params == nil {
+		return nil
+	}
+	result := make([]*types.TypeParam, 0, params.Len())
+	for param := range params.TypeParams() {
+		result = append(result, param)
+	}
+	return result
+}
+
+func (o *LoweringOwner) genericReceiverTypeArgsExpr(ctx lowerFileContext, selection *types.Selection) string {
+	if selection == nil || selection.Obj() == nil {
+		return ""
+	}
+	params := genericReceiverTypeParams(methodReceiverNamedType(selection.Obj()))
+	if len(params) == 0 {
+		return ""
+	}
+	receiver := receiverNamedType(selection.Recv())
+	if receiver == nil || receiver.TypeArgs() == nil || receiver.TypeArgs().Len() != len(params) {
+		return ""
+	}
+	entries := make([]string, 0, len(params))
+	for idx, param := range params {
+		entries = append(entries, param.Obj().Name()+": "+o.genericTypeDescriptorExpr(ctx, receiver.TypeArgs().At(idx)))
+	}
+	return "{" + strings.Join(entries, ", ") + "}"
+}
+
+func (o *LoweringOwner) methodSelectionUsesOverridePackage(ctx lowerFileContext, selection *types.Selection) bool {
+	if o.overrideOwner == nil || selection == nil || selection.Obj() == nil {
+		return false
+	}
+	method, _ := selection.Obj().(*types.Func)
+	if method == nil || method.Pkg() == nil {
+		return false
+	}
+	if ctx.model != nil && ctx.model.functions[method] != nil {
+		return false
+	}
+	return o.overrideFacts().HasPackage(method.Pkg().Path())
 }
 
 func signatureHasTypeParam(signature *types.Signature, target *types.TypeParam) bool {

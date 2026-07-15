@@ -96,7 +96,7 @@ export class ConcurrentQueue {
 						queueMicrotask(async () => { await ConcurrentQueue.prototype.executeJob.call(s, job) })
 					} else {
 						$.pointerValue<ConcurrentQueue>(s).jobQueueSize++
-						await linkedlist.LinkedList.prototype.Push.call($.pointerValue<ConcurrentQueue>(s).jobQueue, job)
+						await linkedlist.LinkedList.prototype.Push.call($.pointerValue<ConcurrentQueue>(s).jobQueue, {T: { type: ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), zero: () => null }}, job)
 					}
 				}
 				await broadcast!()
@@ -223,7 +223,7 @@ export class ConcurrentQueue {
 
 			let jobOk: boolean = false
 			await $.pointerValue<ConcurrentQueue>(s).bcast.HoldLock($.functionValue(async (broadcast: (() => void) | null, getWaitCh: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null): globalThis.Promise<void> => {
-				let __goscriptTuple0: any = await linkedlist.LinkedList.prototype.Pop.call($.pointerValue<ConcurrentQueue>(s).jobQueue)
+				let __goscriptTuple0: any = await linkedlist.LinkedList.prototype.Pop.call($.pointerValue<ConcurrentQueue>(s).jobQueue, {T: { type: ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), zero: () => null }})
 				job.value = (__goscriptTuple0[0] as (() => void) | null)
 				jobOk = __goscriptTuple0[1]
 				if (!jobOk) {
@@ -243,7 +243,7 @@ export class ConcurrentQueue {
 		let s: ConcurrentQueue | $.VarRef<ConcurrentQueue> | null = this
 		let dirty: boolean = false
 		while (($.pointerValue<ConcurrentQueue>(s).maxConcurrency <= 0) || ($.pointerValue<ConcurrentQueue>(s).running < $.pointerValue<ConcurrentQueue>(s).maxConcurrency)) {
-			let __goscriptTuple1: any = await linkedlist.LinkedList.prototype.Pop.call($.pointerValue<ConcurrentQueue>(s).jobQueue)
+			let __goscriptTuple1: any = await linkedlist.LinkedList.prototype.Pop.call($.pointerValue<ConcurrentQueue>(s).jobQueue, {T: { type: ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), zero: () => null }})
 			let job: (() => void) | null = (__goscriptTuple1[0] as (() => void) | null)
 			let jobOk = __goscriptTuple1[1]
 			if (!jobOk) {

@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type clonable = {
-	CloneVT(): any | globalThis.Promise<any>
+	CloneVT(__typeArgs: $.GenericTypeArgs | undefined): any | globalThis.Promise<any>
 }
 
 $.registerInterfaceType(
@@ -57,7 +57,7 @@ export class item {
 }
 
 export async function cloneSlice<T>(__typeArgs: $.GenericTypeArgs | undefined, items: $.Slice<T>): globalThis.Promise<$.Slice<T>> {
-	let cloned: $.Slice<T> = $.makeSlice<T>(0, $.len(items))
+	let cloned: $.Slice<T> = $.makeSlice<T>(0, $.len(items), undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
 	for (let __goscriptRangeTarget0 = items, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let item = __goscriptRangeTarget0![__rangeIndex]
 		cloned = $.append(cloned, await $.callGenericMethod(__typeArgs, "T", "CloneVT", item))

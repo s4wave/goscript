@@ -38,13 +38,13 @@ export class Cache {
 		return $.markAsStructValue(cloned)
 	}
 
-	public async Get(k: any, _new: (() => [any, $.GoError] | globalThis.Promise<[any, $.GoError]>) | null, check: ((_p0: any) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<[any, $.GoError]> {
+	public async Get(__typeArgs: $.GenericTypeArgs | undefined, k: any, _new: (() => [any, $.GoError] | globalThis.Promise<[any, $.GoError]>) | null, check: ((_p0: any) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<[any, $.GoError]> {
 		const c: Cache | $.VarRef<Cache> | null = this
-		let p = ($.markAsStructValue($.cloneStructValue(weak.Make({T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, k))) as weak.Pointer)
+		let p = ($.markAsStructValue($.cloneStructValue(weak.Make({T: __typeArgs?.["K"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, k))) as weak.Pointer)
 		{
 			let [cached, ok] = await $.pointerValue<Cache>(c).m.Load($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(p)), "weak.Pointer", "weak.Pointer"))
 			if (ok) {
-				let v = $.mustTypeAssert<any>(cached, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } })
+				let v = $.mustTypeAssert<any>(cached, { kind: $.TypeKind.Pointer, elemType: __typeArgs?.["V"]?.type ?? { kind: $.TypeKind.Interface, methods: [] } })
 				if (await check!(v)) {
 					return [v, null]
 				}
@@ -57,13 +57,13 @@ export class Cache {
 		{
 			let [, present] = await $.pointerValue<Cache>(c).m.Swap($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(p)), "weak.Pointer", "weak.Pointer"), $.interfaceValue<any>(v, "*V", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } }))
 			if (!present) {
-				runtime.AddCleanup(k, $.functionValue(((__receiver) => (p: weak.Pointer) => __receiver.evict(p))($.pointerValue<Cache>(c)), ({ kind: $.TypeKind.Function, params: ["weak.Pointer"], results: [] } as $.FunctionTypeInfo)), $.markAsStructValue($.cloneStructValue(p)))
+				runtime.AddCleanup(k, $.functionValue(((__receiver) => (p: weak.Pointer) => __receiver.evict({K: __typeArgs?.["K"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }, V: __typeArgs?.["V"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, p))($.pointerValue<Cache>(c)), ({ kind: $.TypeKind.Function, params: ["weak.Pointer"], results: [] } as $.FunctionTypeInfo)), $.markAsStructValue($.cloneStructValue(p)))
 			}
 		}
 		return [v, null]
 	}
 
-	public async evict(p: weak.Pointer): globalThis.Promise<void> {
+	public async evict(__typeArgs: $.GenericTypeArgs | undefined, p: weak.Pointer): globalThis.Promise<void> {
 		const c: Cache | $.VarRef<Cache> | null = this
 		await $.pointerValue<Cache>(c).m.Delete($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(p)), "weak.Pointer", "weak.Pointer"))
 	}

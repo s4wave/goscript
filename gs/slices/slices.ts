@@ -550,9 +550,14 @@ export function Reverse<T>(s: $.Slice<T>): void {
  * This is equivalent to Go's slices.Grow function.
  * @param s The slice to grow
  * @param n The number of additional elements to guarantee space for
+ * @param zeroFactory The factory used to initialize newly exposed elements
  * @returns The slice with increased capacity
  */
-export function Grow<T>(s: $.Slice<T>, n: number): $.Slice<T> {
+export function Grow<T>(
+  s: $.Slice<T>,
+  n: number,
+  zeroFactory?: () => T,
+): $.Slice<T> {
   if (n < 0) {
     throw new Error(`slices.Grow: negative n: ${n}`)
   }
@@ -571,7 +576,7 @@ export function Grow<T>(s: $.Slice<T>, n: number): $.Slice<T> {
     newCap = neededCap
   }
 
-  const newSlice = $.makeSlice<T>(currentLen, newCap)
+  const newSlice = $.makeSlice<T>(currentLen, newCap, undefined, zeroFactory)
   for (let i = 0; i < currentLen; i++) {
     ;(newSlice as any)[i] = (s as any)[i]
   }

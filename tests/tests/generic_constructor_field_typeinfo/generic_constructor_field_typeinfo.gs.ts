@@ -50,12 +50,12 @@ export class blockType {
 		return $.markAsStructValue(cloned)
 	}
 
-	public async Constructor(): globalThis.Promise<Block | null> {
+	public async Constructor(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<Block | null> {
 		const t: blockType | $.VarRef<blockType> | null = this
 		return (await $.pointerValue<blockType>(t)._constructor!() as Block | null)
 	}
 
-	public GetBlockTypeID(): string {
+	public GetBlockTypeID(__typeArgs: $.GenericTypeArgs | undefined): string {
 		const t: blockType | $.VarRef<blockType> | null = this
 		return $.pointerValue<blockType>(t).typeID
 	}
@@ -110,10 +110,10 @@ export async function main(): globalThis.Promise<void> {
 	let bt: blockType | $.VarRef<blockType> | null = (NewBlockType(undefined, "sample", $.functionValue((): sampleBlock | $.VarRef<sampleBlock> | null => {
 		return new sampleBlock()
 	}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Pointer, elemType: "main.sampleBlock" }] } as $.FunctionTypeInfo))) as blockType | $.VarRef<blockType> | null)
-	let blk = await blockType.prototype.Constructor.call(bt)
+	let blk = await blockType.prototype.Constructor.call(bt, {T: { type: { kind: $.TypeKind.Pointer, elemType: "main.sampleBlock" }, zero: () => null }})
 	let __goscriptTuple0: any = await $.pointerValue<Exclude<Block, null>>(blk).MarshalBlock()
 	let data: $.Slice<number> = __goscriptTuple0[0]
-	$.println(blockType.prototype.GetBlockTypeID.call(bt), $.len(data))
+	$.println(blockType.prototype.GetBlockTypeID.call(bt, {T: { type: { kind: $.TypeKind.Pointer, elemType: "main.sampleBlock" }, zero: () => null }}), $.len(data))
 }
 
 if ($.isMainScript(import.meta)) {

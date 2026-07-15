@@ -15,7 +15,7 @@ $.registerInterfaceType(
 );
 
 export type GenericStore = {
-	Load(): any | globalThis.Promise<any>
+	Load(__typeArgs: $.GenericTypeArgs | undefined): any | globalThis.Promise<any>
 }
 
 $.registerInterfaceType(
@@ -155,7 +155,7 @@ export class GenericChannelStore {
 		return $.markAsStructValue(cloned)
 	}
 
-	public async Load(): globalThis.Promise<any> {
+	public async Load(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<any> {
 		const s: GenericChannelStore | $.VarRef<GenericChannelStore> | null = this
 		await $.chanSend($.pointerValue<GenericChannelStore>(s).ch, $.pointerValue<GenericChannelStore>(s).value)
 		return await $.chanRecv($.pointerValue<GenericChannelStore>(s).ch)
@@ -185,7 +185,7 @@ export function newGenericStore(__typeArgs: $.GenericTypeArgs | undefined, value
 }
 
 export async function loadGenericStore(store: GenericStore | null): globalThis.Promise<number> {
-	return (await $.pointerValue<Exclude<GenericStore, null>>(store).Load() as number)
+	return (await $.pointerValue<Exclude<GenericStore, null>>(store).Load({V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}) as number)
 }
 
 export async function main(): globalThis.Promise<void> {
