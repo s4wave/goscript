@@ -185,7 +185,7 @@ export function newGenericStore(__typeArgs: $.GenericTypeArgs | undefined, value
 }
 
 export async function loadGenericStore(store: GenericStore | null): globalThis.Promise<number> {
-	return (await $.pointerValue<Exclude<GenericStore, null>>(store).Load({[$.genericTypeArgsMarker]: true, V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}) as number)
+	return (await $.callInterfaceMethod($.pointerValue<Exclude<GenericStore, null>>(store), "Load", {[$.genericTypeArgsMarker]: true, V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}) as number)
 }
 
 export async function main(): globalThis.Promise<void> {

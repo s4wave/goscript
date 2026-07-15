@@ -80,7 +80,7 @@ export class impl {
 }
 
 export async function read(__typeArgs: $.GenericTypeArgs | undefined, d: derived | null): globalThis.Promise<any> {
-	return (await $.pointerValue<Exclude<derived, null>>(d).Value({[$.genericTypeArgsMarker]: true, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}) as any)
+	return (await $.callInterfaceMethod($.pointerValue<Exclude<derived, null>>(d), "Value", {[$.genericTypeArgsMarker]: true, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}) as any)
 }
 
 export async function main(): globalThis.Promise<void> {
