@@ -929,8 +929,10 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 				}
 				addTypeDeps(obj.Type())
 			}
-			if pointer, ok := types.Unalias(semPkg.source.TypesInfo.TypeOf(typed.X)).Underlying().(*types.Pointer); ok {
-				addTypeDeps(pointer.Elem())
+			if selectorType := semPkg.source.TypesInfo.TypeOf(typed.X); selectorType != nil {
+				if pointer, ok := types.Unalias(selectorType).Underlying().(*types.Pointer); ok {
+					addTypeDeps(pointer.Elem())
+				}
 			}
 		case *ast.CompositeLit:
 			addRuntimeTypeDeps(semPkg.source.TypesInfo.TypeOf(typed))
@@ -7370,6 +7372,9 @@ func rangeFuncParamNames(keyName, valueName string, arity int, fallback string) 
 }
 
 func isIntegerRangeType(typ types.Type) bool {
+	if typ == nil {
+		return false
+	}
 	basic, ok := types.Unalias(typ).Underlying().(*types.Basic)
 	return ok && basic.Info()&types.IsInteger != 0
 }
