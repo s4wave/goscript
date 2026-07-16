@@ -1078,26 +1078,14 @@ function appendZeroValue(sample: unknown): unknown {
  * @param elements The elements to append.
  * @returns The modified or new slice.
  */
-type AppendHint = typeof byteSliceHint | object
-type AppendElement<T> =
-  | NoInfer<T>
-  | (T extends number ? Slice<number> : never)
-  | AppendHint
-
 export function append(
   slice: Uint8Array,
-  ...elements: AppendElement<number>[]
+  ...elements: unknown[]
 ): Uint8Array
 // Null destinations carry no runtime element type, so compiler-only hint
 // values are accepted alongside the elements.
-export function append<T>(
-  slice: null,
-  ...elements: AppendElement<T>[]
-): Slice<T>
-export function append<T>(
-  slice: Slice<T>,
-  ...elements: AppendElement<T>[]
-): Slice<T>
+export function append<T>(slice: null, ...elements: unknown[]): Slice<T>
+export function append<T>(slice: Slice<T>, ...elements: unknown[]): Slice<T>
 export function append<T>(
   slice: Slice<T> | Uint8Array | null,
   ...elements: unknown[]
