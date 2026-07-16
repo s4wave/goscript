@@ -239,7 +239,7 @@ export class commonRPC {
 		{
 			let data: $.Slice<number> = __goscript_rpcproto_pb.CallData.prototype.GetData.call(pkt)
 			if (($.len(data) != 0) || __goscript_rpcproto_pb.CallData.prototype.GetDataIsZero.call(pkt)) {
-				$.pointerValue<commonRPC>(c).dataQueue = $.append($.pointerValue<commonRPC>(c).dataQueue, data)
+				$.pointerValue<commonRPC>(c).dataQueue = $.append($.pointerValue<commonRPC>(c).dataQueue, data, $.appendZeros.nil)
 			}
 		}
 

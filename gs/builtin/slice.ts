@@ -1,3 +1,5 @@
+import { isMarkedAsStructValue, markAsStructValue } from './type.js'
+
 import { runtimePanic } from './panic.js'
 import {
   isOwnedPointerHandle,
@@ -978,6 +980,47 @@ export const cap = <T>(
 // and be silently consumed, whereas no Go value ever produces this Symbol.
 export const byteSliceHint: unique symbol = Symbol('goscript.byteSliceHint')
 
+const appendZeroValueMarker: unique symbol = Symbol('goscript.appendZeroValue')
+
+// appendZero carries a static slice-element zero factory through append's
+// variadic runtime boundary when the appended value cannot reveal it.
+export function appendZero<T>(factory: () => T): object {
+  return { [appendZeroValueMarker]: factory }
+}
+
+// appendZeros reuses immutable hints for static zeros that dynamic values
+// cannot reveal.
+export const appendZeros = Object.freeze({
+  complex: appendZero(() => ({ real: 0, imag: 0 })),
+  nil: appendZero(() => null),
+})
+
+function appendZeroValueFactory<T>(value: unknown): (() => T) | undefined {
+  if (
+    typeof value !== 'object' ||
+    value === null ||
+    !(appendZeroValueMarker in value)
+  ) {
+    return undefined
+  }
+  const factory = value[appendZeroValueMarker]
+  return typeof factory === 'function' ? (factory as () => T) : undefined
+}
+
+function nextAppendCapacity(
+  oldLength: number,
+  oldCapacity: number,
+  newLength: number,
+): number {
+  if (oldCapacity === 0) {
+    return newLength
+  }
+  if (oldLength < 1024) {
+    return Math.max(oldCapacity * 2, newLength)
+  }
+  return Math.max(oldCapacity + Math.floor(oldCapacity / 4), newLength)
+}
+
 // byteSliceFromSlice materializes a Uint8Array holding a slice's current byte
 // values. The byte hint routes nil, empty, or generically-backed []byte
 // destinations through here so append keeps a Uint8Array representation
@@ -994,6 +1037,39 @@ function byteSliceFromSlice(
   return Uint8Array.from(asArray(slice) as number[])
 }
 
+function appendZeroValue(sample: unknown): unknown {
+  switch (typeof sample) {
+    case 'bigint':
+      return 0n
+    case 'boolean':
+      return false
+    case 'number':
+      return 0
+    case 'string':
+      return ''
+  }
+  if (sample instanceof GoBinaryString) {
+    return ''
+  }
+  if (sample instanceof Uint8Array) {
+    return new Uint8Array(sample.length)
+  }
+  if (Array.isArray(sample)) {
+    return sample.map(appendZeroValue)
+  }
+  if (
+    typeof sample === 'object' &&
+    sample !== null &&
+    isMarkedAsStructValue(sample)
+  ) {
+    const ctor = sample.constructor
+    if (typeof ctor === 'function') {
+      return markAsStructValue(Reflect.construct(ctor, []))
+    }
+  }
+  return null
+}
+
 /**
  * Appends elements to a slice.
  * Note: In Go, append can return a new slice if the underlying array is reallocated.
@@ -1002,20 +1078,39 @@ function byteSliceFromSlice(
  * @param elements The elements to append.
  * @returns The modified or new slice.
  */
-export function append(slice: Uint8Array, ...elements: any[]): Uint8Array
-// Overload for null slice with number elements - returns number slice (Bytes compatible)
-export function append(slice: null, ...elements: number[]): Slice<number>
-export function append<T>(slice: null, ...elements: T[]): Slice<T>
-export function append<T>(slice: Slice<T>, ...elements: any[]): Slice<T>
+type AppendHint = typeof byteSliceHint | object
+type AppendElement<T> =
+  | NoInfer<T>
+  | (T extends number ? Slice<number> : never)
+  | AppendHint
+
+export function append(
+  slice: Uint8Array,
+  ...elements: AppendElement<number>[]
+): Uint8Array
+// Null destinations carry no runtime element type, so compiler-only hint
+// values are accepted alongside the elements.
+export function append<T>(
+  slice: null,
+  ...elements: AppendElement<T>[]
+): Slice<T>
+export function append<T>(
+  slice: Slice<T>,
+  ...elements: AppendElement<T>[]
+): Slice<T>
 export function append<T>(
   slice: Slice<T> | Uint8Array | null,
-  ...elements: any[]
+  ...elements: unknown[]
 ): Slice<T> {
   // Byte specialization is destination-independent: a Go []byte value keeps a
   // Uint8Array representation across append even when the destination was nil,
   // empty, or a generically-backed array. The compiler signals byte element
   // type with a trailing byteSliceHint, which is stripped here before the
   // remaining elements are appended.
+  let zeroFactory = appendZeroValueFactory<T>(elements[elements.length - 1])
+  if (zeroFactory !== undefined) {
+    elements.pop()
+  }
   let byteHinted = false
   if (elements.length > 0 && elements[elements.length - 1] === byteSliceHint) {
     byteHinted = true
@@ -1088,17 +1183,7 @@ export function append<T>(
   }
 
   // Case 2: Reallocation is needed.
-  let newCapacity = oldCapacity
-  if (newCapacity === 0) {
-    newCapacity = newLength
-  } else if (oldLength < 1024) {
-    newCapacity = Math.max(oldCapacity * 2, newLength)
-  } else {
-    newCapacity = Math.max(oldCapacity + Math.floor(oldCapacity / 4), newLength)
-  }
-  if (newCapacity < newLength) {
-    newCapacity = newLength
-  }
+  const newCapacity = nextAppendCapacity(oldLength, oldCapacity, newLength)
 
   const newBacking = new Array<T>(newCapacity)
   if (isOriginalComplex && originalBacking) {
@@ -1113,6 +1198,11 @@ export function append<T>(
   for (let i = 0; i < numAdded; i++) {
     newBacking[oldLength + i] = elements[i] as T
   }
+  const sample: unknown = elements[0]
+  zeroFactory ??= () => appendZeroValue(sample) as T
+  for (let i = newLength; i < newCapacity; i++) {
+    newBacking[i] = zeroFactory()
+  }
 
   return sliceProxyFromBacking(newBacking, 0, newLength, newCapacity) as any
 }
@@ -1120,22 +1210,22 @@ export function append<T>(
 export function appendSlice(
   slice: Uint8Array,
   elements: Uint8Array | Slice<number> | string | null | undefined,
-  elementHint?: typeof byteSliceHint,
+  elementHint?: typeof byteSliceHint | object,
 ): Uint8Array
 export function appendSlice<T>(
   slice: null,
   elements: Slice<T> | null | undefined,
-  elementHint?: typeof byteSliceHint,
+  elementHint?: typeof byteSliceHint | object,
 ): Slice<T>
 export function appendSlice<T>(
   slice: Slice<T>,
   elements: Slice<T> | null | undefined,
-  elementHint?: typeof byteSliceHint,
+  elementHint?: typeof byteSliceHint | object,
 ): Slice<T>
 export function appendSlice<T>(
   slice: Slice<T> | Uint8Array | null,
   elements: Slice<T> | Uint8Array | string | null | undefined,
-  elementHint?: typeof byteSliceHint,
+  elementHint?: typeof byteSliceHint | object,
 ): Slice<T> | Uint8Array {
   if (elements == null) {
     return slice as any
@@ -1187,14 +1277,27 @@ export function appendSlice<T>(
   }
 
   const baseLen = len(result as Slice<T>)
-  const next = new Array<T>(baseLen + count)
+  const newLength = baseLen + count
+  const newCapacity = nextAppendCapacity(
+    baseLen,
+    cap(result as Slice<T>),
+    newLength,
+  )
+  const next = new Array<T>(newCapacity)
   for (let i = 0; i < baseLen; i++) {
     next[i] = (result as any)[i]
   }
   for (let i = 0; i < count; i++) {
     next[baseLen + i] = (source as any)[i]
   }
-  return sliceProxyFromBacking(next, 0, next.length, next.length)
+  const sample: unknown = (source as any)[0]
+  const zeroFactory =
+    appendZeroValueFactory<T>(elementHint) ??
+    (() => appendZeroValue(sample) as T)
+  for (let i = newLength; i < newCapacity; i++) {
+    next[i] = zeroFactory()
+  }
+  return sliceProxyFromBacking(next, 0, newLength, newCapacity)
 }
 
 function appendByteSlice(slice: Uint8Array, elements: any[]): Uint8Array {

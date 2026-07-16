@@ -1149,11 +1149,12 @@ export function cloneArrayValue<T>(value: T): T {
   return value
 }
 
-// Check if a struct instance is marked as a value
-function isMarkedAsStructValue(value: any): boolean {
+// isMarkedAsStructValue reports whether value uses Go struct-value semantics.
+export function isMarkedAsStructValue(value: unknown): boolean {
   return (
     typeof value === 'object' &&
     value !== null &&
+    STRUCT_VALUE_MARKER in value &&
     value[STRUCT_VALUE_MARKER] === true
   )
 }

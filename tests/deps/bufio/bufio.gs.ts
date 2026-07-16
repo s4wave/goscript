@@ -527,7 +527,7 @@ export class Reader {
 
 			// Make a copy of the buffer.
 			let buf: $.Slice<number> = bytes.Clone(frag)
-			fullBuffers = $.append(fullBuffers, buf)
+			fullBuffers = $.append(fullBuffers, buf, $.appendZeros.nil)
 			totalLen = totalLen + ($.len(buf))
 		}
 

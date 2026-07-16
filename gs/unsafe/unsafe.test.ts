@@ -44,10 +44,10 @@ describe('unsafe package', () => {
     )
   })
 
-  it('should throw error for StringData', () => {
-    expect(() => unsafe.StringData('test')).toThrow(
-      'unsafe.StringData is not supported in JavaScript/TypeScript',
-    )
+  it('round-trips StringData through Slice as UTF-8 bytes', () => {
+    const ptr = unsafe.StringData('你')
+
+    expect(Array.from(unsafe.Slice(ptr, 3))).toEqual([0xe4, 0xbd, 0xa0])
   })
 
   it('should export IntegerType as number type', () => {

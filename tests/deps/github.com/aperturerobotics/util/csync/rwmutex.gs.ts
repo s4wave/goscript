@@ -306,7 +306,7 @@ export class RWMutexLocker {
 			$.panic((errors.Wrap($.pointerValueOrNil(err)!, "csync: failed RWMutexLocker Lock") as any))
 		}
 		await $.pointerValue<RWMutexLocker>(l).mtx.Lock()
-		$.pointerValue<RWMutexLocker>(l).rels = $.append($.pointerValue<RWMutexLocker>(l).rels, release)
+		$.pointerValue<RWMutexLocker>(l).rels = $.append($.pointerValue<RWMutexLocker>(l).rels, release, $.appendZeros.nil)
 		$.pointerValue<RWMutexLocker>(l).mtx.Unlock()
 	}
 

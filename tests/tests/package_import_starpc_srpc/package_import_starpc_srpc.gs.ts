@@ -603,7 +603,7 @@ export async function openHeldStreams(ctx: context.Context | null, client: srpc.
 						$.println("hold open error:", $.pointerValue<Exclude<$.GoError, null>>(result.err).Error())
 						return [streams, false]
 					}
-					streams = $.append(streams, result.stream)
+					streams = $.append(streams, result.stream, $.appendZeros.nil)
 				}
 			},
 			{
@@ -991,7 +991,7 @@ export async function exercisePushablePacketWriter(): globalThis.Promise<boolean
 		}
 		let data: $.Slice<number> = $.makeSlice<number>($.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).Length(), undefined, "byte")
 		js.CopyBytesToGo(data, $.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))))
-		pushed = $.append(pushed, data)
+		pushed = $.append(pushed, data, $.appendZeros.nil)
 		return null
 	}, ({ kind: $.TypeKind.Function, params: ["js.Value", { kind: $.TypeKind.Slice, elemType: "js.Value" }], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))))
 	__defer.defer(() => { $.markAsStructValue($.cloneStructValue(pushFn)).Release() })

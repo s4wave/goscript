@@ -226,7 +226,7 @@ export function parseName(__goscriptParam0: cryptobyte.String): [$.VarRef<pkix.R
 			rdnSet = ($.append((rdnSet as pkix.RelativeDistinguishedNameSET), attr) as pkix.RelativeDistinguishedNameSET)
 		}
 
-		rdnSeq.value = ($.append((rdnSeq.value as pkix.RDNSequence), (rdnSet as pkix.RelativeDistinguishedNameSET)) as pkix.RDNSequence)
+		rdnSeq.value = ($.append((rdnSeq.value as pkix.RDNSequence), (rdnSet as pkix.RelativeDistinguishedNameSET), $.appendZeros.nil) as pkix.RDNSequence)
 	}
 
 	return [rdnSeq, null]
@@ -520,7 +520,7 @@ export async function parseSANExtension(der: cryptobyte.String): globalThis.Prom
 				if (($.len($.pointerValue<url.URL>(uri).Host) > 0) && !domainNameValid($.pointerValue<url.URL>(uri).Host, false)) {
 					return fmt.Errorf("x509: cannot parse URI %q: invalid domain", uriStr)
 				}
-				uris = $.append(uris, uri)
+				uris = $.append(uris, uri, $.appendZeros.nil)
 				break
 			}
 			case 7:
@@ -529,7 +529,7 @@ export async function parseSANExtension(der: cryptobyte.String): globalThis.Prom
 					case net.IPv4len:
 					case net.IPv6len:
 					{
-						ipAddresses = $.append(ipAddresses, (data as net.IP))
+						ipAddresses = $.append(ipAddresses, (data as net.IP), $.appendZeros.nil)
 						break
 					}
 					default:
@@ -585,7 +585,7 @@ export function parseExtKeyUsageExtension(__goscriptParam7: cryptobyte.String): 
 			if (ok) {
 				extKeyUsages = $.append(extKeyUsages, extKeyUsage)
 			} else {
-				unknownUsages = $.append(unknownUsages, (eku.value as asn1.ObjectIdentifier))
+				unknownUsages = $.append(unknownUsages, (eku.value as asn1.ObjectIdentifier), $.appendZeros.nil)
 			}
 		}
 	}
@@ -762,7 +762,7 @@ export async function parseNameConstraintsExtension(out: __goscript_x509.Certifi
 						return [null, null, null, null, fmt.Errorf("x509: IP constraint contained invalid mask %x", $.interfaceValue<any>(mask, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))]
 					}
 
-					ips = $.append(ips, new net.IPNet({IP: ((ip as net.IP) as net.IP), Mask: ((mask as net.IPMask) as net.IPMask)}))
+					ips = $.append(ips, new net.IPNet({IP: ((ip as net.IP) as net.IP), Mask: ((mask as net.IPMask) as net.IPMask)}), $.appendZeros.nil)
 					break
 				}
 				case emailTag:
@@ -1028,7 +1028,7 @@ export async function processExtensions(out: __goscript_x509.Certificate | $.Var
 							let __goscriptShadow8: asn1.ObjectIdentifier = (__goscriptTuple12[0] as asn1.ObjectIdentifier)
 							let ok = __goscriptTuple12[1]
 							if (ok) {
-								$.pointerValue<__goscript_x509.Certificate>(out).PolicyIdentifiers = $.append($.pointerValue<__goscript_x509.Certificate>(out).PolicyIdentifiers, (__goscriptShadow8 as asn1.ObjectIdentifier))
+								$.pointerValue<__goscript_x509.Certificate>(out).PolicyIdentifiers = $.append($.pointerValue<__goscript_x509.Certificate>(out).PolicyIdentifiers, (__goscriptShadow8 as asn1.ObjectIdentifier), $.appendZeros.nil)
 							}
 						}
 					}
@@ -1112,7 +1112,7 @@ export async function processExtensions(out: __goscript_x509.Certificate | $.Var
 		}
 
 		if (e.Critical && unhandled) {
-			$.pointerValue<__goscript_x509.Certificate>(out).UnhandledCriticalExtensions = $.append($.pointerValue<__goscript_x509.Certificate>(out).UnhandledCriticalExtensions, (e.Id as asn1.ObjectIdentifier))
+			$.pointerValue<__goscript_x509.Certificate>(out).UnhandledCriticalExtensions = $.append($.pointerValue<__goscript_x509.Certificate>(out).UnhandledCriticalExtensions, (e.Id as asn1.ObjectIdentifier), $.appendZeros.nil)
 		}
 	}
 
@@ -1340,7 +1340,7 @@ export async function ParseCertificates(der: $.Slice<number>): globalThis.Promis
 		if (err != null) {
 			return [null, err]
 		}
-		certs = $.append(certs, cert)
+		certs = $.append(certs, cert, $.appendZeros.nil)
 		der = $.goSlice(der, $.len($.pointerValue<__goscript_x509.Certificate>(cert).Raw), undefined)
 	}
 	return [certs, null]

@@ -69,7 +69,7 @@ export class Stack {
 
 	public Push(__typeArgs: $.GenericTypeArgs | undefined, value: any): void {
 		let s: Stack | $.VarRef<Stack> | null = this
-		$.pointerValue<Stack>(s).items = $.append($.pointerValue<Stack>(s).items, value)
+		$.pointerValue<Stack>(s).items = $.append($.pointerValue<Stack>(s).items, value, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as any)))
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -249,7 +249,7 @@ export async function CloneAll<T>(__typeArgs: $.GenericTypeArgs | undefined, ite
 	let clones: $.Slice<T> = $.makeSlice<T>(0, $.len(items), undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
 	for (let __goscriptRangeTarget1 = items, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
 		let item = __goscriptRangeTarget1![__rangeIndex]
-		clones = $.append(clones, await $.callGenericMethod(__typeArgs, "T", "Clone", item))
+		clones = $.append(clones, await $.callGenericMethod(__typeArgs, "T", "Clone", item), $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as T)))
 	}
 	return clones
 }

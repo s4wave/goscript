@@ -737,12 +737,12 @@ export class policyGraph {
 		for (const [__rangeKey, n] of $.arrayIndex($.pointerValue<policyGraph>(pg).strata!, $.pointerValue<policyGraph>(pg).depth)?.entries() ?? []) {
 			for (let __goscriptRangeTarget12 = $.pointerValue<policyGraphNode>(n).expectedPolicySet, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget12); __rangeIndex++) {
 				let e = __goscriptRangeTarget12![__rangeIndex]
-				$.mapSet($.pointerValue<policyGraph>(pg).parentIndex, $.bytesToString(e.der), $.append($.mapGet<string, $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null>, $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null>>($.pointerValue<policyGraph>(pg).parentIndex, $.bytesToString(e.der), null)[0], n))
+				$.mapSet($.pointerValue<policyGraph>(pg).parentIndex, $.bytesToString(e.der), $.append($.mapGet<string, $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null>, $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null>>($.pointerValue<policyGraph>(pg).parentIndex, $.bytesToString(e.der), null)[0], n, $.appendZeros.nil))
 			}
 		}
 
 		$.pointerValue<policyGraph>(pg).depth++
-		$.pointerValue<policyGraph>(pg).strata = $.append($.pointerValue<policyGraph>(pg).strata, new globalThis.Map<string, policyGraphNode | $.VarRef<policyGraphNode> | null>([]))
+		$.pointerValue<policyGraph>(pg).strata = $.append($.pointerValue<policyGraph>(pg).strata, new globalThis.Map<string, policyGraphNode | $.VarRef<policyGraphNode> | null>([]), $.appendZeros.nil)
 	}
 
 	public insert(n: policyGraphNode | $.VarRef<policyGraphNode> | null): void {
@@ -810,7 +810,7 @@ export class policyGraph {
 				if ($.len($.pointerValue<policyGraphNode>(n).parents) == 1) {
 					for (const [p, __rangeValue] of $.pointerValue<policyGraphNode>(n).parents?.entries() ?? []) {
 						if ($.markAsStructValue($.cloneStructValue($.pointerValue<policyGraphNode>(p).validPolicy)).Equal($.markAsStructValue($.cloneStructValue((await __goscript_init_anyPolicyOID(), __goscript_get_anyPolicyOID()))))) {
-							validNodes = $.append(validNodes, n)
+							validNodes = $.append(validNodes, n, $.appendZeros.nil)
 						}
 					}
 				}
@@ -1421,7 +1421,7 @@ export async function policiesValid(chain: $.Slice<__goscript_x509.Certificate |
 						for (let __goscriptRangeTarget15 = $.pointerValue<policyGraphNode>(p).expectedPolicySet, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget15); __rangeIndex++) {
 							let expected = __goscriptRangeTarget15![__rangeIndex]
 							if ($.mapGet<string, policyGraphNode | $.VarRef<policyGraphNode> | null, policyGraphNode | $.VarRef<policyGraphNode> | null>(leaves, $.bytesToString(expected.der), null)[0] == null) {
-								$.mapSet(missing, $.bytesToString(expected.der), $.append($.mapGet<string, $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null>, $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null>>(missing, $.bytesToString(expected.der), null)[0], p))
+								$.mapSet(missing, $.bytesToString(expected.der), $.append($.mapGet<string, $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null>, $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null>>(missing, $.bytesToString(expected.der), null)[0], p, $.appendZeros.nil))
 							}
 						}
 						return true
@@ -1532,7 +1532,7 @@ export async function policiesValid(chain: $.Slice<__goscript_x509.Certificate |
 		{
 			let currentAny: policyGraphNode | $.VarRef<policyGraphNode> | null = policyGraph.prototype.leafWithPolicy.call(pg, $.markAsStructValue($.cloneStructValue((await __goscript_init_anyPolicyOID(), __goscript_get_anyPolicyOID()))))
 			if (currentAny != null) {
-				validPolicyNodeSet = $.append(validPolicyNodeSet, currentAny)
+				validPolicyNodeSet = $.append(validPolicyNodeSet, currentAny, $.appendZeros.nil)
 			}
 		}
 	}

@@ -323,9 +323,9 @@ export async function addrList_partition(addrs: addrList, strategy: ((_p0: __gos
 		let label = await strategy!(addr)
 		if ((i == 0) || (label == primaryLabel)) {
 			primaryLabel = label
-			primaries = ($.append((primaries as addrList), addr) as addrList)
+			primaries = ($.append((primaries as addrList), addr, $.appendZeros.nil) as addrList)
 		} else {
-			fallbacks = ($.append((fallbacks as addrList), addr) as addrList)
+			fallbacks = ($.append((fallbacks as addrList), addr, $.appendZeros.nil) as addrList)
 		}
 	}
 	return [primaries, fallbacks]
@@ -336,7 +336,7 @@ export async function filterAddrList(filter: ((_p0: __goscript_iprawsock.IPAddr)
 	for (let __goscriptRangeTarget3 = ips, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget3); __rangeIndex++) {
 		let ip = __goscriptRangeTarget3![__rangeIndex]
 		if ((filter == null) || await filter!($.markAsStructValue($.cloneStructValue(ip)))) {
-			addrs = ($.append((addrs as addrList), await inetaddr!($.markAsStructValue($.cloneStructValue(ip)))) as addrList)
+			addrs = ($.append((addrs as addrList), await inetaddr!($.markAsStructValue($.cloneStructValue(ip))), $.appendZeros.nil) as addrList)
 		}
 	}
 	if ($.len((addrs as addrList)) == 0) {

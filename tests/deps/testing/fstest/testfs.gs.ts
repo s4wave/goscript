@@ -263,7 +263,7 @@ export class fsTester {
 				fsTester.prototype.errorf.call(t, "%s: third Open: ReadDir(%d) after %d: %d entries (too many)", $.arrayToSlice<any>([dir, $.namedValueInterfaceValue<any>(n, "int", {}, { kind: $.TypeKind.Basic, name: "int" }), $.namedValueInterfaceValue<any>($.len(list2), "int", {}, { kind: $.TypeKind.Basic, name: "int" }), $.namedValueInterfaceValue<any>($.len(frag), "int", {}, { kind: $.TypeKind.Basic, name: "int" })]))
 				return
 			}
-			list2 = $.appendSlice(list2, frag)
+			list2 = $.appendSlice(list2, frag, $.appendZeros.nil)
 			if ($.comparableEqual(__goscriptShadow3, io.EOF)) {
 				break
 			}
@@ -721,7 +721,7 @@ export class fsTester {
 
 	public errorf(format: string, args: $.Slice<any>): void {
 		let t: fsTester | $.VarRef<fsTester> | null = this
-		$.pointerValue<fsTester>(t).errors = $.append($.pointerValue<fsTester>(t).errors, fmt.Errorf(format, ...(args ?? [])))
+		$.pointerValue<fsTester>(t).errors = $.append($.pointerValue<fsTester>(t).errors, fmt.Errorf(format, ...(args ?? [])), $.appendZeros.nil)
 	}
 
 	public async openDir(dir: string): globalThis.Promise<fs.ReadDirFile | null> {

@@ -8266,12 +8266,27 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 						appendHelper += "<" + o.tsTypeFor(ctx, slice.Elem()) + ">"
 					}
 				}
-				// Byte specialization is destination-independent: emit a trailing
-				// byte element-type hint (mirroring make([]byte,...)) so the runtime
-				// keeps a Uint8Array representation even when the append destination
-				// is nil, empty, or a generically-backed array.
-				if slice, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(expr)).Underlying().(*types.Slice); ok && isByteType(slice.Elem()) {
-					args = append(args, o.runtimeOwner.QualifiedHelper(RuntimeHelperByteSliceHint))
+				// Most zeros are inferred from appended values. Carry static
+				// metadata only when the dynamic value can differ from the Go
+				// slice element zero.
+				if slice, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(expr)).Underlying().(*types.Slice); ok {
+					if isByteType(slice.Elem()) {
+						args = append(args, o.runtimeOwner.QualifiedHelper(RuntimeHelperByteSliceHint))
+					} else if appendZeroNeedsStaticHint(slice.Elem()) {
+						zero := o.lowerDeclarationZeroValueExpr(ctx, slice.Elem())
+						zeroHint := ""
+						switch {
+						case zero == "null" || strings.HasPrefix(zero, "null as "):
+							zeroHint = o.runtimeOwner.QualifiedHelper(RuntimeHelperAppendZeros) + ".nil"
+						case isComplexType(slice.Elem()):
+							zeroHint = o.runtimeOwner.QualifiedHelper(RuntimeHelperAppendZeros) + ".complex"
+						default:
+							zeroFactory := "() => (" + zero + " as " + o.tsSliceElemTypeFor(ctx, slice.Elem()) + ")"
+							zeroHint = o.runtimeOwner.QualifiedHelper(RuntimeHelperAppendZero) +
+								"(" + zeroFactory + ")"
+						}
+						args = append(args, zeroHint)
+					}
 				}
 				return appendHelper + "(" + strings.Join(args, ", ") + ")", diagnostics
 			case "cap":
@@ -12498,6 +12513,20 @@ func (o *LoweringOwner) tsStructFieldTypeFor(ctx lowerFileContext, typ types.Typ
 	}
 	return "((" + o.tsSignatureParamsFor(ctx, signature, true) + ") => " +
 		asyncCompatibleResultType(o.tsSignatureResultFor(ctx, signature)) + ") | null"
+}
+
+func appendZeroNeedsStaticHint(typ types.Type) bool {
+	if namedStructType(typ) != nil && isStructValueType(typ) {
+		return false
+	}
+	switch typed := types.Unalias(typ).Underlying().(type) {
+	case *types.Basic:
+		return typed.Kind() == types.UnsafePointer || typed.Info()&types.IsComplex != 0
+	case *types.Array:
+		return appendZeroNeedsStaticHint(typed.Elem())
+	default:
+		return true
+	}
 }
 
 func zeroValueExpr(typ types.Type) string {

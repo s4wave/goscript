@@ -54,7 +54,7 @@ export type LevelHooks = globalThis.Map<__goscript_logrus.Level, $.Slice<Hook | 
 export async function LevelHooks_Add(hooks: LevelHooks, hook: Hook | null): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget0 = await $.pointerValue<Exclude<Hook, null>>(hook).Levels(), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let level = __goscriptRangeTarget0![__rangeIndex]
-		$.mapSet(hooks, $.uint(level, 32), $.append($.mapGet<__goscript_logrus.Level, $.Slice<Hook | null>, $.Slice<Hook | null>>(hooks, $.uint(level, 32), null)[0], hook))
+		$.mapSet(hooks, $.uint(level, 32), $.append($.mapGet<__goscript_logrus.Level, $.Slice<Hook | null>, $.Slice<Hook | null>>(hooks, $.uint(level, 32), null)[0], hook, $.appendZeros.nil))
 	}
 }
 

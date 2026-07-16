@@ -252,7 +252,7 @@ export class Reader {
 				return err
 			}
 			$.pointerValue<File>(f).headerOffset = $.int64Add($.pointerValue<File>(f).headerOffset, $.pointerValue<Reader>(r).baseOffset)
-			$.pointerValue<Reader>(r).File = $.append($.pointerValue<Reader>(r).File, f)
+			$.pointerValue<Reader>(r).File = $.append($.pointerValue<Reader>(r).File, f, $.appendZeros.nil)
 		}
 		if ($.uint($.uint($.len($.pointerValue<Reader>(r).File), 16), 16) != $.uint($.uint($.pointerValue<__goscript_struct.directoryEnd>(end).directoryRecords, 16), 16)) {
 			// Return the readDirectoryHeader error if we read

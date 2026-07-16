@@ -269,7 +269,7 @@ export class Regexp {
 			if (result == null) {
 				result = $.makeSlice<$.Slice<number>>(0, 10)
 			}
-			result = $.append(result, $.goSlice(b, $.arrayIndex(match!, 0), $.arrayIndex(match!, 1), $.arrayIndex(match!, 1)))
+			result = $.append(result, $.goSlice(b, $.arrayIndex(match!, 0), $.arrayIndex(match!, 1), $.arrayIndex(match!, 1)), $.appendZeros.nil)
 		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }], results: [] } as $.FunctionTypeInfo)))
 		return result
 	}
@@ -284,7 +284,7 @@ export class Regexp {
 			if (result == null) {
 				result = $.makeSlice<$.Slice<number>>(0, 10)
 			}
-			result = $.append(result, $.goSlice(match, 0, 2))
+			result = $.append(result, $.goSlice(match, 0, 2), $.appendZeros.nil)
 		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }], results: [] } as $.FunctionTypeInfo)))
 		return result
 	}
@@ -314,7 +314,7 @@ export class Regexp {
 			if (result == null) {
 				result = $.makeSlice<$.Slice<number>>(0, 10)
 			}
-			result = $.append(result, $.goSlice(match, 0, 2))
+			result = $.append(result, $.goSlice(match, 0, 2), $.appendZeros.nil)
 		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }], results: [] } as $.FunctionTypeInfo)))
 		return result
 	}
@@ -335,7 +335,7 @@ export class Regexp {
 					slice![j] = $.sliceStringOrBytes(s, $.arrayIndex(match!, 2 * j), $.arrayIndex(match!, (2 * j) + 1))
 				}
 			}
-			result = $.append(result, slice)
+			result = $.append(result, slice, $.appendZeros.nil)
 		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }], results: [] } as $.FunctionTypeInfo)))
 		return result
 	}
@@ -350,7 +350,7 @@ export class Regexp {
 			if (result == null) {
 				result = $.makeSlice<$.Slice<number>>(0, 10)
 			}
-			result = $.append(result, match)
+			result = $.append(result, match, $.appendZeros.nil)
 		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }], results: [] } as $.FunctionTypeInfo)))
 		return result
 	}
@@ -371,7 +371,7 @@ export class Regexp {
 					slice![j] = $.goSlice(b, $.arrayIndex(match!, 2 * j), $.arrayIndex(match!, (2 * j) + 1), $.arrayIndex(match!, (2 * j) + 1))
 				}
 			}
-			result = $.append(result, slice)
+			result = $.append(result, slice, $.appendZeros.nil)
 		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }], results: [] } as $.FunctionTypeInfo)))
 		return result
 	}
@@ -386,7 +386,7 @@ export class Regexp {
 			if (result == null) {
 				result = $.makeSlice<$.Slice<number>>(0, 10)
 			}
-			result = $.append(result, match)
+			result = $.append(result, match, $.appendZeros.nil)
 		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }], results: [] } as $.FunctionTypeInfo)))
 		return result
 	}

@@ -137,7 +137,7 @@ export async function readUniqueDirectoryEntries(dir: string): globalThis.Promis
 	for (let __goscriptRangeTarget3 = files, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget3); __rangeIndex++) {
 		let f = __goscriptRangeTarget3![__rangeIndex]
 		if (!await isSameDirSymlink(f, dir)) {
-			uniq = $.append(uniq, f)
+			uniq = $.append(uniq, f, $.appendZeros.nil)
 		}
 	}
 	return [uniq, null]

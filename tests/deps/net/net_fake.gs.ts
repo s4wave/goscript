@@ -2166,7 +2166,7 @@ export async function fakeConnect(ctx: context.Context | null, fd: __goscript_fd
 	$.pointerValue<fakeNetFD>($.pointerValue<__goscript_fd_fake.netFD>(fd).fakeNetFD).peer = peer
 	$.pointerValue<fakeNetFD>($.pointerValue<__goscript_fd_fake.netFD>(peer).fakeNetFD).peer = fd
 
-	incoming = $.append(incoming, peer)
+	incoming = $.append(incoming, peer, $.appendZeros.nil)
 	if ($.len(incoming) >= await __goscript_net.listenerBacklog()) {
 		await $.chanSend($.pointerValue<fakeNetFD>($.pointerValue<__goscript_fd_fake.netFD>(ln).fakeNetFD).incomingFull, incoming)
 	} else {

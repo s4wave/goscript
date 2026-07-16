@@ -243,10 +243,10 @@ export class Regexp {
 						nre = new Regexp()
 						$.assignStruct($.pointerValue<Regexp>(nre), $.markAsStructValue($.cloneStructValue($.pointerValue<Regexp>(re))))
 						$.pointerValue<Regexp>(nre).Rune = null
-						$.pointerValue<Regexp>(nre).Sub = $.appendSlice($.goSlice($.pointerValue<Regexp>(nre).Sub0, undefined, 0), $.goSlice($.pointerValue<Regexp>(re).Sub, undefined, i))
+						$.pointerValue<Regexp>(nre).Sub = $.appendSlice($.goSlice($.pointerValue<Regexp>(nre).Sub0, undefined, 0), $.goSlice($.pointerValue<Regexp>(re).Sub, undefined, i), $.appendZeros.nil)
 					}
 					if (!$.pointerEqual(nre, re)) {
-						$.pointerValue<Regexp>(nre).Sub = $.append($.pointerValue<Regexp>(nre).Sub, nsub)
+						$.pointerValue<Regexp>(nre).Sub = $.append($.pointerValue<Regexp>(nre).Sub, nsub, $.appendZeros.nil)
 					}
 				}
 				return nre
@@ -285,9 +285,9 @@ export class Regexp {
 					let nre: Regexp | $.VarRef<Regexp> | null = new Regexp({Op: $.uint(18, 8)})
 					$.pointerValue<Regexp>(nre).Sub = $.goSlice($.pointerValue<Regexp>(nre).Sub0, undefined, 0)
 					for (let i = 0; i < ($.pointerValue<Regexp>(re).Min - 1); i++) {
-						$.pointerValue<Regexp>(nre).Sub = $.append($.pointerValue<Regexp>(nre).Sub, sub)
+						$.pointerValue<Regexp>(nre).Sub = $.append($.pointerValue<Regexp>(nre).Sub, sub, $.appendZeros.nil)
 					}
-					$.pointerValue<Regexp>(nre).Sub = $.append($.pointerValue<Regexp>(nre).Sub, __goscript_simplify.simplify1($.uint(15, 8), $.uint($.pointerValue<Regexp>(re).Flags, 16), sub, null))
+					$.pointerValue<Regexp>(nre).Sub = $.append($.pointerValue<Regexp>(nre).Sub, __goscript_simplify.simplify1($.uint(15, 8), $.uint($.pointerValue<Regexp>(re).Flags, 16), sub, null), $.appendZeros.nil)
 					return nre
 				}
 
@@ -302,7 +302,7 @@ export class Regexp {
 					prefix = new Regexp({Op: $.uint(18, 8)})
 					$.pointerValue<Regexp>(prefix).Sub = $.goSlice($.pointerValue<Regexp>(prefix).Sub0, undefined, 0)
 					for (let i = 0; i < $.pointerValue<Regexp>(re).Min; i++) {
-						$.pointerValue<Regexp>(prefix).Sub = $.append($.pointerValue<Regexp>(prefix).Sub, sub)
+						$.pointerValue<Regexp>(prefix).Sub = $.append($.pointerValue<Regexp>(prefix).Sub, sub, $.appendZeros.nil)
 					}
 				}
 
@@ -310,13 +310,13 @@ export class Regexp {
 					let suffix: Regexp | $.VarRef<Regexp> | null = __goscript_simplify.simplify1($.uint(16, 8), $.uint($.pointerValue<Regexp>(re).Flags, 16), sub, null)
 					for (let i = $.pointerValue<Regexp>(re).Min + 1; i < $.pointerValue<Regexp>(re).Max; i++) {
 						let nre2: Regexp | $.VarRef<Regexp> | null = new Regexp({Op: $.uint(18, 8)})
-						$.pointerValue<Regexp>(nre2).Sub = $.append($.goSlice($.pointerValue<Regexp>(nre2).Sub0, undefined, 0), sub, suffix)
+						$.pointerValue<Regexp>(nre2).Sub = $.append($.goSlice($.pointerValue<Regexp>(nre2).Sub0, undefined, 0), sub, suffix, $.appendZeros.nil)
 						suffix = __goscript_simplify.simplify1($.uint(16, 8), $.uint($.pointerValue<Regexp>(re).Flags, 16), nre2, null)
 					}
 					if (prefix == null) {
 						return suffix
 					}
-					$.pointerValue<Regexp>(prefix).Sub = $.append($.pointerValue<Regexp>(prefix).Sub, suffix)
+					$.pointerValue<Regexp>(prefix).Sub = $.append($.pointerValue<Regexp>(prefix).Sub, suffix, $.appendZeros.nil)
 				}
 				if (prefix != null) {
 					return prefix

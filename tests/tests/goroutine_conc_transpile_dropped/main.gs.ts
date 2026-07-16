@@ -37,7 +37,7 @@ export async function main(): globalThis.Promise<void> {
 	let child: (() => void) | null = $.functionValue(async (): globalThis.Promise<void> => {
 		let jobs: $.Slice<(() => void) | null> = $.makeSlice<(() => void) | null>(0, 8)
 		for (let __rangeIndex = 0; __rangeIndex < 8; __rangeIndex++) {
-			jobs = $.append(jobs, leaf)
+			jobs = $.append(jobs, leaf, $.appendZeros.nil)
 		}
 		await conc.ConcurrentQueue.prototype.Enqueue.call(q, jobs)
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
@@ -45,7 +45,7 @@ export async function main(): globalThis.Promise<void> {
 	let root: (() => void) | null = $.functionValue(async (): globalThis.Promise<void> => {
 		let jobs: $.Slice<(() => void) | null> = $.makeSlice<(() => void) | null>(0, 16)
 		for (let __rangeIndex = 0; __rangeIndex < 16; __rangeIndex++) {
-			jobs = $.append(jobs, child)
+			jobs = $.append(jobs, child, $.appendZeros.nil)
 		}
 		await conc.ConcurrentQueue.prototype.Enqueue.call(q, jobs)
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))

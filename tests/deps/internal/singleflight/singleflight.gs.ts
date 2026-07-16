@@ -164,7 +164,7 @@ export class Group {
 			let ok = __goscriptTuple1[1]
 			if (ok) {
 				$.pointerValue<call>(c).dups++
-				$.pointerValue<call>(c).chans = $.append($.pointerValue<call>(c).chans, ch)
+				$.pointerValue<call>(c).chans = $.append($.pointerValue<call>(c).chans, ch, $.appendZeros.nil)
 				$.pointerValue<Group>(g).mu.Unlock()
 				return ch
 			}

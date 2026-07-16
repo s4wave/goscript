@@ -433,10 +433,10 @@ export class parser {
 		for (let __goscriptRangeTarget5 = subs, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget5); __rangeIndex++) {
 			let sub = __goscriptRangeTarget5![__rangeIndex]
 			if ($.uint($.pointerValue<__goscript_regexp.Regexp>(sub).Op, 8) == $.uint(op, 8)) {
-				$.pointerValue<__goscript_regexp.Regexp>(re).Sub = $.appendSlice($.pointerValue<__goscript_regexp.Regexp>(re).Sub, $.pointerValue<__goscript_regexp.Regexp>(sub).Sub)
+				$.pointerValue<__goscript_regexp.Regexp>(re).Sub = $.appendSlice($.pointerValue<__goscript_regexp.Regexp>(re).Sub, $.pointerValue<__goscript_regexp.Regexp>(sub).Sub, $.appendZeros.nil)
 				parser.prototype.reuse.call(p, sub)
 			} else {
-				$.pointerValue<__goscript_regexp.Regexp>(re).Sub = $.append($.pointerValue<__goscript_regexp.Regexp>(re).Sub, sub)
+				$.pointerValue<__goscript_regexp.Regexp>(re).Sub = $.append($.pointerValue<__goscript_regexp.Regexp>(re).Sub, sub, $.appendZeros.nil)
 			}
 		}
 		if ($.uint(op, 8) == $.uint(19, 8)) {
@@ -517,7 +517,7 @@ export class parser {
 			} else {
 				if (i == (start + 1)) {
 					// Just one: don't bother factoring.
-					out = $.append(out, $.arrayIndex(sub!, start))
+					out = $.append(out, $.arrayIndex(sub!, start), $.appendZeros.nil)
 				} else {
 					// Construct factored form: prefix(suffix1|suffix2|...)
 					let prefix: __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null = parser.prototype.newRegexp.call(p, $.uint(3, 8))
@@ -531,8 +531,8 @@ export class parser {
 					let suffix: __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null = await parser.prototype.collapse.call(p, $.goSlice(sub, start, i), $.uint(19, 8))
 
 					let re: __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null = parser.prototype.newRegexp.call(p, $.uint(18, 8))
-					$.pointerValue<__goscript_regexp.Regexp>(re).Sub = $.append($.goSlice($.pointerValue<__goscript_regexp.Regexp>(re).Sub, undefined, 0), prefix, suffix)
-					out = $.append(out, re)
+					$.pointerValue<__goscript_regexp.Regexp>(re).Sub = $.append($.goSlice($.pointerValue<__goscript_regexp.Regexp>(re).Sub, undefined, 0), prefix, suffix, $.appendZeros.nil)
+					out = $.append(out, re, $.appendZeros.nil)
 				}
 			}
 
@@ -576,7 +576,7 @@ export class parser {
 			} else {
 				if (i == (start + 1)) {
 					// Just one: don't bother factoring.
-					out = $.append(out, $.arrayIndex(sub!, start))
+					out = $.append(out, $.arrayIndex(sub!, start), $.appendZeros.nil)
 				} else {
 					// Construct factored form: prefix(suffix1|suffix2|...)
 					let prefix: __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null = first
@@ -588,8 +588,8 @@ export class parser {
 					let suffix: __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null = await parser.prototype.collapse.call(p, $.goSlice(sub, start, i), $.uint(19, 8))
 
 					let re: __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null = parser.prototype.newRegexp.call(p, $.uint(18, 8))
-					$.pointerValue<__goscript_regexp.Regexp>(re).Sub = $.append($.goSlice($.pointerValue<__goscript_regexp.Regexp>(re).Sub, undefined, 0), prefix, suffix)
-					out = $.append(out, re)
+					$.pointerValue<__goscript_regexp.Regexp>(re).Sub = $.append($.goSlice($.pointerValue<__goscript_regexp.Regexp>(re).Sub, undefined, 0), prefix, suffix, $.appendZeros.nil)
+					out = $.append(out, re, $.appendZeros.nil)
 				}
 			}
 
@@ -618,7 +618,7 @@ export class parser {
 			if (i == start) {
 			} else {
 				if (i == (start + 1)) {
-					out = $.append(out, $.arrayIndex(sub!, start))
+					out = $.append(out, $.arrayIndex(sub!, start), $.appendZeros.nil)
 				} else {
 					// Make new char class.
 					// Start with most complex regexp in sub[start].
@@ -638,13 +638,13 @@ export class parser {
 						parser.prototype.reuse.call(p, $.arrayIndex(sub!, j))
 					}
 					await cleanAlt($.arrayIndex(sub!, start))
-					out = $.append(out, $.arrayIndex(sub!, start))
+					out = $.append(out, $.arrayIndex(sub!, start), $.appendZeros.nil)
 				}
 			}
 
 			// ... and then emit sub[i].
 			if (i < $.len(sub)) {
-				out = $.append(out, $.arrayIndex(sub!, i))
+				out = $.append(out, $.arrayIndex(sub!, i), $.appendZeros.nil)
 			}
 			start = i + 1
 		}
@@ -657,7 +657,7 @@ export class parser {
 			if ((((i + 1) < $.len(sub)) && ($.uint($.pointerValue<__goscript_regexp.Regexp>($.arrayIndex(sub!, i)).Op, 8) == $.uint(2, 8))) && ($.uint($.pointerValue<__goscript_regexp.Regexp>($.arrayIndex(sub!, i + 1)).Op, 8) == $.uint(2, 8))) {
 				continue
 			}
-			out = $.append(out, $.arrayIndex(sub!, i))
+			out = $.append(out, $.arrayIndex(sub!, i), $.appendZeros.nil)
 		}
 		sub = out
 
@@ -1501,7 +1501,7 @@ export class parser {
 			}
 		}
 
-		$.pointerValue<parser>(p).stack = $.append($.pointerValue<parser>(p).stack, re)
+		$.pointerValue<parser>(p).stack = $.append($.pointerValue<parser>(p).stack, re, $.appendZeros.nil)
 		parser.prototype.checkLimits.call(p, re)
 		return re
 	}

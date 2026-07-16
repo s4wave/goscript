@@ -311,7 +311,7 @@ export class Resolver {
 		let ips: $.Slice<__goscript_ip.IP> = $.makeSlice<__goscript_ip.IP>(0, $.len((addrs as __goscript_ipsock.addrList)))
 		for (let __goscriptRangeTarget1 = addrs, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
 			let addr = __goscriptRangeTarget1![__rangeIndex]
-			ips = $.append(ips, ($.pointerValue<__goscript_iprawsock.IPAddr>($.mustTypeAssert<__goscript_iprawsock.IPAddr | $.VarRef<__goscript_iprawsock.IPAddr> | null>(addr, { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" })).IP as __goscript_ip.IP))
+			ips = $.append(ips, ($.pointerValue<__goscript_iprawsock.IPAddr>($.mustTypeAssert<__goscript_iprawsock.IPAddr | $.VarRef<__goscript_iprawsock.IPAddr> | null>(addr, { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" })).IP as __goscript_ip.IP), $.appendZeros.nil)
 		}
 		return [ips, null]
 	}
@@ -343,7 +343,7 @@ export class Resolver {
 					continue
 				}
 			}
-			filteredMX = $.append(filteredMX, mx)
+			filteredMX = $.append(filteredMX, mx, $.appendZeros.nil)
 		}
 		if ($.len(records) != $.len(filteredMX)) {
 			return [filteredMX, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: errMalformedDNSRecordsDetail, Name: name}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
@@ -368,7 +368,7 @@ export class Resolver {
 			if (!__goscript_dnsclient.isDomainName($.pointerValue<__goscript_dnsclient.NS>(ns).Host)) {
 				continue
 			}
-			filteredNS = $.append(filteredNS, ns)
+			filteredNS = $.append(filteredNS, ns, $.appendZeros.nil)
 		}
 		if ($.len(records) != $.len(filteredNS)) {
 			return [filteredNS, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: errMalformedDNSRecordsDetail, Name: name}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
@@ -465,7 +465,7 @@ export class Resolver {
 			if (!__goscript_dnsclient.isDomainName($.pointerValue<__goscript_dnsclient.SRV>(addr).Target)) {
 				continue
 			}
-			filteredAddrs = $.append(filteredAddrs, addr)
+			filteredAddrs = $.append(filteredAddrs, addr, $.appendZeros.nil)
 		}
 		if ($.len(addrs) != $.len(filteredAddrs)) {
 			return [cname, filteredAddrs, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: errMalformedDNSRecordsDetail, Name: name}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
@@ -931,7 +931,7 @@ export class Resolver {
 			if (__goscriptShadow20 != null) {
 				return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 			}
-			mxs = $.append(mxs, (() => { const __goscriptLiteralField5 = $.markAsStructValue($.cloneStructValue(mx.MX)).String(); return new __goscript_dnsclient.MX({Host: __goscriptLiteralField5, Pref: $.uint(mx.Pref, 16)}) })())
+			mxs = $.append(mxs, (() => { const __goscriptLiteralField5 = $.markAsStructValue($.cloneStructValue(mx.MX)).String(); return new __goscript_dnsclient.MX({Host: __goscriptLiteralField5, Pref: $.uint(mx.Pref, 16)}) })(), $.appendZeros.nil)
 		}
 		await __goscript_dnsclient.byPref_sort((mxs as __goscript_dnsclient.byPref))
 		return [mxs, null]
@@ -970,7 +970,7 @@ export class Resolver {
 			if (__goscriptShadow22 != null) {
 				return [null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 			}
-			nss = $.append(nss, (() => { const __goscriptLiteralField6 = $.markAsStructValue($.cloneStructValue(ns.NS)).String(); return new __goscript_dnsclient.NS({Host: __goscriptLiteralField6}) })())
+			nss = $.append(nss, (() => { const __goscriptLiteralField6 = $.markAsStructValue($.cloneStructValue(ns.NS)).String(); return new __goscript_dnsclient.NS({Host: __goscriptLiteralField6}) })(), $.appendZeros.nil)
 		}
 		return [nss, null]
 	}
@@ -1084,7 +1084,7 @@ export class Resolver {
 			if (__goscriptShadow26 != null) {
 				return ["", null, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "cannot unmarshal DNS message", Name: name, Server: server}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
 			}
-			srvs = $.append(srvs, (() => { const __goscriptLiteralField10 = $.markAsStructValue($.cloneStructValue(srv.Target)).String(); return new __goscript_dnsclient.SRV({Target: __goscriptLiteralField10, Port: $.uint(srv.Port, 16), Priority: $.uint(srv.Priority, 16), Weight: $.uint(srv.Weight, 16)}) })())
+			srvs = $.append(srvs, (() => { const __goscriptLiteralField10 = $.markAsStructValue($.cloneStructValue(srv.Target)).String(); return new __goscript_dnsclient.SRV({Target: __goscriptLiteralField10, Port: $.uint(srv.Port, 16), Priority: $.uint(srv.Priority, 16), Weight: $.uint(srv.Weight, 16)}) })(), $.appendZeros.nil)
 		}
 		await __goscript_dnsclient.byPriorityWeight_sort((srvs as __goscript_dnsclient.byPriorityWeight))
 		return [$.markAsStructValue($.cloneStructValue(cname)).String(), srvs, null]
@@ -1577,7 +1577,7 @@ export class Resolver {
 							if ((!wildcard && !__goscript_tcpsock.TCPAddr.prototype.isWildcard.call(addr)) && !__goscript_ip.IP_matchAddrFamily($.pointerValue<__goscript_tcpsock.TCPAddr>(addr).IP, ($.pointerValue<__goscript_tcpsock.TCPAddr>(tcp).IP as __goscript_ip.IP))) {
 								continue
 							}
-							naddrs = ($.append((naddrs as __goscript_ipsock.addrList), $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.TCPAddr", { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" })) as __goscript_ipsock.addrList)
+							naddrs = ($.append((naddrs as __goscript_ipsock.addrList), $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.TCPAddr", { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" }), $.appendZeros.nil) as __goscript_ipsock.addrList)
 						}
 						break
 					case $.typeAssert<__goscript_udpsock.UDPAddr | $.VarRef<__goscript_udpsock.UDPAddr> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" }).ok:
@@ -1586,7 +1586,7 @@ export class Resolver {
 							if ((!wildcard && !__goscript_udpsock.UDPAddr.prototype.isWildcard.call(addr)) && !__goscript_ip.IP_matchAddrFamily($.pointerValue<__goscript_udpsock.UDPAddr>(addr).IP, ($.pointerValue<__goscript_udpsock.UDPAddr>(udp).IP as __goscript_ip.IP))) {
 								continue
 							}
-							naddrs = ($.append((naddrs as __goscript_ipsock.addrList), $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.UDPAddr", { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" })) as __goscript_ipsock.addrList)
+							naddrs = ($.append((naddrs as __goscript_ipsock.addrList), $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.UDPAddr", { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" }), $.appendZeros.nil) as __goscript_ipsock.addrList)
 						}
 						break
 					case $.typeAssert<__goscript_iprawsock.IPAddr | $.VarRef<__goscript_iprawsock.IPAddr> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" }).ok:
@@ -1595,7 +1595,7 @@ export class Resolver {
 							if ((!wildcard && !__goscript_iprawsock.IPAddr.prototype.isWildcard.call(addr)) && !__goscript_ip.IP_matchAddrFamily($.pointerValue<__goscript_iprawsock.IPAddr>(addr).IP, ($.pointerValue<__goscript_iprawsock.IPAddr>(ip).IP as __goscript_ip.IP))) {
 								continue
 							}
-							naddrs = ($.append((naddrs as __goscript_ipsock.addrList), $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.IPAddr", { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" })) as __goscript_ipsock.addrList)
+							naddrs = ($.append((naddrs as __goscript_ipsock.addrList), $.interfaceValue<__goscript_net.Addr | null>(addr, "*net.IPAddr", { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" }), $.appendZeros.nil) as __goscript_ipsock.addrList)
 						}
 						break
 				}

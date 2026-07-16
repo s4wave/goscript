@@ -1602,7 +1602,7 @@ export class Certificate {
 			switch (certType) {
 				case 2:
 				{
-					chains = $.append(chains, __goscript_verify.appendToFreshChain(currentChain, candidate.cert))
+					chains = $.append(chains, __goscript_verify.appendToFreshChain(currentChain, candidate.cert), $.appendZeros.nil)
 					break
 				}
 				case 1:
@@ -1611,7 +1611,7 @@ export class Certificate {
 					let __goscriptTuple17: any = await Certificate.prototype.buildChains.call(candidate.cert, __goscript_verify.appendToFreshChain(currentChain, candidate.cert), sigChecks, opts)
 					childChains = __goscriptTuple17[0]
 					err = __goscriptTuple17[1]
-					chains = $.appendSlice(chains, childChains)
+					chains = $.appendSlice(chains, childChains, $.appendZeros.nil)
 					break
 				}
 			}

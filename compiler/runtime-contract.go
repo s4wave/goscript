@@ -100,6 +100,8 @@ const (
 	RuntimeHelperAppend                       RuntimeHelper = "slice.append"
 	RuntimeHelperAppendSlice                  RuntimeHelper = "slice.appendSlice"
 	RuntimeHelperByteSliceHint                RuntimeHelper = "slice.byteSliceHint"
+	RuntimeHelperAppendZero                   RuntimeHelper = "slice.appendZero"
+	RuntimeHelperAppendZeros                  RuntimeHelper = "slice.appendZeros"
 	RuntimeHelperCopy                         RuntimeHelper = "slice.copy"
 	RuntimeHelperAsArray                      RuntimeHelper = "slice.asArray"
 	RuntimeHelperStringToRunes                RuntimeHelper = "slice.stringToRunes"
@@ -143,7 +145,7 @@ const (
 	RuntimeHelperTypedNil                 RuntimeHelper = "type.typedNil"
 	RuntimeHelperInterfaceValue           RuntimeHelper = "type.interfaceValue"
 	RuntimeHelperNamedValueInterfaceValue RuntimeHelper = "type.namedValueInterfaceValue"
-	RuntimeHelperCallInterfaceMethod       RuntimeHelper = "type.callInterfaceMethod"
+	RuntimeHelperCallInterfaceMethod      RuntimeHelper = "type.callInterfaceMethod"
 	RuntimeHelperFunctionValue            RuntimeHelper = "type.functionValue"
 	RuntimeHelperNamedFunction            RuntimeHelper = "type.namedFunction"
 	RuntimeHelperGenericZero              RuntimeHelper = "type.genericZero"
@@ -346,6 +348,8 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperAppend, "append", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperAppendSlice, "appendSlice", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperByteSliceHint, "byteSliceHint", RuntimeHelperCategorySlice),
+		runtimeHelper(RuntimeHelperAppendZero, "appendZero", RuntimeHelperCategorySlice),
+		runtimeHelper(RuntimeHelperAppendZeros, "appendZeros", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperCopy, "copy", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperAsArray, "asArray", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperStringToRunes, "stringToRunes", RuntimeHelperCategorySlice),

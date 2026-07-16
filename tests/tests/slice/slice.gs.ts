@@ -262,7 +262,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Append a new slice to the slice of slices
 	$.println("--- Append a new slice to slice of slices ---")
-	sliceOfSlices = $.append(sliceOfSlices, $.arrayToSlice<number>([100, 110]))
+	sliceOfSlices = $.append(sliceOfSlices, $.arrayToSlice<number>([100, 110]), $.appendZeros.nil)
 	$.println("Length of sliceOfSlices after append:", $.len(sliceOfSlices))
 	$.println("Capacity of sliceOfSlices after append:", $.cap(sliceOfSlices))
 	$.println("sliceOfSlices[3][0]:", $.arrayIndex($.arrayIndex(sliceOfSlices!, 3)!, 0))
@@ -270,7 +270,7 @@ export async function main(): globalThis.Promise<void> {
 	// Append an existing slice to the slice of slices
 	$.println("--- Append an existing slice to slice of slices ---")
 	let existingSlice: $.Slice<number> = $.arrayToSlice<number>([200, 210])
-	sliceOfSlices = $.append(sliceOfSlices, existingSlice)
+	sliceOfSlices = $.append(sliceOfSlices, existingSlice, $.appendZeros.nil)
 	$.println("Length of sliceOfSlices after appending existing:", $.len(sliceOfSlices))
 	$.println("Capacity of sliceOfSlices after appending existing:", $.cap(sliceOfSlices))
 	$.println("sliceOfSlices[4][1]:", $.arrayIndex($.arrayIndex(sliceOfSlices!, 4)!, 1))
@@ -305,13 +305,13 @@ export async function main(): globalThis.Promise<void> {
 	$.println("makeSliceOfSlices[1][0]:", $.arrayIndex($.arrayIndex(makeSliceOfSlices!, 1)!, 0))
 
 	// Append a new inner slice
-	makeSliceOfSlices = $.append(makeSliceOfSlices, $.arrayToSlice<number>([4000, 5000]))
+	makeSliceOfSlices = $.append(makeSliceOfSlices, $.arrayToSlice<number>([4000, 5000]), $.appendZeros.nil)
 	$.println("Length of makeSliceOfSlices after append:", $.len(makeSliceOfSlices))
 	$.println("Capacity of makeSliceOfSlices after append:", $.cap(makeSliceOfSlices))
 	$.println("makeSliceOfSlices[2][1]:", $.arrayIndex($.arrayIndex(makeSliceOfSlices!, 2)!, 1))
 
 	// Append another new inner slice (should exceed capacity and reallocate outer slice)
-	makeSliceOfSlices = $.append(makeSliceOfSlices, $.arrayToSlice<number>([6000]))
+	makeSliceOfSlices = $.append(makeSliceOfSlices, $.arrayToSlice<number>([6000]), $.appendZeros.nil)
 	$.println("Length of makeSliceOfSlices after second append:", $.len(makeSliceOfSlices))
 	$.println("Capacity of makeSliceOfSlices after second append:", $.cap(makeSliceOfSlices))
 	$.println("makeSliceOfSlices[3][0]:", $.arrayIndex($.arrayIndex(makeSliceOfSlices!, 3)!, 0))
@@ -323,13 +323,13 @@ export async function main(): globalThis.Promise<void> {
 	$.println("Nil slice of slices cap:", $.cap(nilSliceOfSlices))
 
 	// Append to nil slice of slices
-	nilSliceOfSlices = $.append(nilSliceOfSlices, $.arrayToSlice<number>([10000]))
+	nilSliceOfSlices = $.append(nilSliceOfSlices, $.arrayToSlice<number>([10000]), $.appendZeros.nil)
 	$.println("Length of nilSliceOfSlices after append:", $.len(nilSliceOfSlices))
 	$.println("Capacity of nilSliceOfSlices after append:", $.cap(nilSliceOfSlices))
 	$.println("nilSliceOfSlices[0][0]:", $.arrayIndex($.arrayIndex(nilSliceOfSlices!, 0)!, 0))
 
 	// Append another slice to the nil slice of slices
-	nilSliceOfSlices = $.append(nilSliceOfSlices, $.arrayToSlice<number>([20000, 30000]))
+	nilSliceOfSlices = $.append(nilSliceOfSlices, $.arrayToSlice<number>([20000, 30000]), $.appendZeros.nil)
 	$.println("Length of nilSliceOfSlices after second append:", $.len(nilSliceOfSlices))
 	$.println("Capacity of nilSliceOfSlices after second append:", $.cap(nilSliceOfSlices))
 	$.println("nilSliceOfSlices[1][1]:", $.arrayIndex($.arrayIndex(nilSliceOfSlices!, 1)!, 1))
@@ -341,7 +341,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println("Empty slice of slices cap:", $.cap(emptySliceOfSlices))
 
 	// Append to empty slice of slices
-	emptySliceOfSlices = $.append(emptySliceOfSlices, $.arrayToSlice<number>([40000]))
+	emptySliceOfSlices = $.append(emptySliceOfSlices, $.arrayToSlice<number>([40000]), $.appendZeros.nil)
 	$.println("Length of emptySliceOfSlices after append:", $.len(emptySliceOfSlices))
 	$.println("Capacity of emptySliceOfSlices after append:", $.cap(emptySliceOfSlices))
 	$.println("emptySliceOfSlices[0][0]:", $.arrayIndex($.arrayIndex(emptySliceOfSlices!, 0)!, 0))

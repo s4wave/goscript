@@ -2,13 +2,20 @@
 // that violate the type system. Most operations are not supported in JavaScript/TypeScript
 // and will throw errors when used.
 
-import type * as $ from '../builtin/index.js'
+import * as $ from '../builtin/index.js'
+
+const stringDataPointer = Symbol('stringDataPointer')
+
+interface StringDataPointer {
+  [stringDataPointer]: true
+  value: string
+}
 
 // ArbitraryType is a shorthand for an arbitrary Go type; it is not a real type
-export type ArbitraryType = any
+export type ArbitraryType = unknown
 
 // Pointer is a pointer type but a Pointer value may not be dereferenced
-export type Pointer = any
+export type Pointer = unknown
 
 // IntegerType is a shorthand for an integer type; it is not a real type
 // This is the only type from unsafe that can be meaningfully implemented in JavaScript
@@ -46,9 +53,18 @@ export function Add(_ptr: Pointer, _len: IntegerType): Pointer {
   )
 }
 
-// Slice returns a slice whose underlying array starts at ptr
-// This operation is not meaningful in JavaScript/TypeScript
-export function Slice<T = any>(_ptr: Pointer, _len: IntegerType): $.Slice<T> {
+// Slice returns a byte slice for a pointer produced by StringData.
+export function Slice(ptr: Pointer, len: IntegerType): $.Slice<number> {
+  if (
+    typeof ptr === 'object' &&
+    ptr !== null &&
+    stringDataPointer in ptr &&
+    ptr[stringDataPointer] === true &&
+    'value' in ptr &&
+    typeof ptr.value === 'string'
+  ) {
+    return $.goSlice($.stringToBytes(ptr.value), 0, len)
+  }
   throw new Error(
     'unsafe.Slice is not supported in JavaScript/TypeScript: direct memory access is not available in JavaScript',
   )
@@ -56,7 +72,9 @@ export function Slice<T = any>(_ptr: Pointer, _len: IntegerType): $.Slice<T> {
 
 // SliceData returns a pointer to the underlying array of the slice
 // This operation is not meaningful in JavaScript/TypeScript
-export function SliceData(_slice: $.Slice<any> | Uint8Array | any[]): Pointer {
+export function SliceData(
+  _slice: $.Slice<unknown> | Uint8Array | unknown[],
+): Pointer {
   throw new Error(
     'unsafe.SliceData is not supported in JavaScript/TypeScript: direct memory access is not available in JavaScript',
   )
@@ -70,16 +88,13 @@ export function String(_ptr: Pointer, _len: IntegerType): string {
   )
 }
 
-// StringData returns a pointer to the underlying bytes of the str
-// This operation is not meaningful in JavaScript/TypeScript
-export function StringData(_str: string): Pointer {
-  throw new Error(
-    'unsafe.StringData is not supported in JavaScript/TypeScript: direct memory access is not available in JavaScript',
-  )
+// StringData returns a pointer that Slice can read as UTF-8 bytes.
+export function StringData(str: string): Pointer {
+  return { [stringDataPointer]: true, value: str } satisfies StringDataPointer
 }
 
 // Pointer converts a value to an unsafe.Pointer for atomic operations
 // In JavaScript/TypeScript, this is just a pass-through function
-export function Pointer(value: any): Pointer {
+export function Pointer(value: unknown): Pointer {
   return value
 }

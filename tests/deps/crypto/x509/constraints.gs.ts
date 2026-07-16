@@ -651,9 +651,9 @@ export async function newIPNetConstraints(l: $.Slice<net.IPNet | $.VarRef<net.IP
 	for (let __goscriptRangeTarget1 = l, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
 		let n = __goscriptRangeTarget1![__rangeIndex]
 		if ($.len(($.pointerValue<net.IPNet>(n).IP as net.IP)) == net.IPv4len) {
-			ipv4 = $.append(ipv4, n)
+			ipv4 = $.append(ipv4, n, $.appendZeros.nil)
 		} else {
-			ipv6 = $.append(ipv6, n)
+			ipv6 = $.append(ipv6, n, $.appendZeros.nil)
 		}
 	}
 	let v4c: nameConstraintsSet | $.VarRef<nameConstraintsSet> | null = null as nameConstraintsSet | $.VarRef<nameConstraintsSet> | null

@@ -3202,7 +3202,7 @@ func TestCompilePackagesEmitsGenericMethodsAliasesAndDictionaries(t *testing.T) 
 		"export async function CallString(__typeArgs: $.GenericTypeArgs | undefined, v: any): globalThis.Promise<string>",
 		"export function Sum<T>(__typeArgs: $.GenericTypeArgs | undefined, vals: $.Slice<T>): any",
 		"export function Copy<T>(__typeArgs: $.GenericTypeArgs | undefined, vals: $.Slice<T>): $.Slice<T>",
-		"return $.appendSlice($.arrayToSlice<T>([]), vals)",
+		"return $.appendSlice($.arrayToSlice<T>([]), vals, $.appendZero(() => ($.genericZero(__typeArgs, \"T\", null) as T)))",
 		"let seen: Set = $.makeMap<number, {}>()",
 		"$.mapSet(seen, 1, {})",
 		"$.genericZero(__typeArgs, \"T\", null)",

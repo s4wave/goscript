@@ -60,7 +60,7 @@ export async function cloneSlice<T>(__typeArgs: $.GenericTypeArgs | undefined, i
 	let cloned: $.Slice<T> = $.makeSlice<T>(0, $.len(items), undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
 	for (let __goscriptRangeTarget0 = items, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let item = __goscriptRangeTarget0![__rangeIndex]
-		cloned = $.append(cloned, await $.callGenericMethod(__typeArgs, "T", "CloneVT", item))
+		cloned = $.append(cloned, await $.callGenericMethod(__typeArgs, "T", "CloneVT", item), $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as T)))
 	}
 	return cloned
 }

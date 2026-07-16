@@ -470,7 +470,7 @@ export class machine {
 		for (let __goscriptRangeTarget0 = $.pointerValue<queue>(q).dense, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 			let d = __goscriptRangeTarget0![__rangeIndex]
 			if (d.t != null) {
-				$.pointerValue<machine>(m).pool = $.append($.pointerValue<machine>(m).pool, d.t)
+				$.pointerValue<machine>(m).pool = $.append($.pointerValue<machine>(m).pool, d.t, $.appendZeros.nil)
 			}
 		}
 		$.pointerValue<queue>(q).dense = $.goSlice($.pointerValue<queue>(q).dense, undefined, 0)
@@ -585,7 +585,7 @@ export class machine {
 				continue
 			}
 			if (((longest && $.pointerValue<machine>(m).matched) && ($.len($.pointerValue<thread>(t).cap) > 0)) && ($.arrayIndex($.pointerValue<machine>(m).matchcap!, 0) < $.arrayIndex($.pointerValue<thread>(t).cap!, 0))) {
-				$.pointerValue<machine>(m).pool = $.append($.pointerValue<machine>(m).pool, t)
+				$.pointerValue<machine>(m).pool = $.append($.pointerValue<machine>(m).pool, t, $.appendZeros.nil)
 				continue
 			}
 			let i: syntax.Inst | $.VarRef<syntax.Inst> | null = $.pointerValue<thread>(t).inst
@@ -607,7 +607,7 @@ export class machine {
 						for (let __goscriptRangeTarget3 = $.goSlice($.pointerValue<queue>(runq).dense, j + 1, undefined), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget3); __rangeIndex++) {
 							let d = __goscriptRangeTarget3![__rangeIndex]
 							if (d.t != null) {
-								$.pointerValue<machine>(m).pool = $.append($.pointerValue<machine>(m).pool, d.t)
+								$.pointerValue<machine>(m).pool = $.append($.pointerValue<machine>(m).pool, d.t, $.appendZeros.nil)
 							}
 						}
 						$.pointerValue<queue>(runq).dense = $.goSlice($.pointerValue<queue>(runq).dense, undefined, 0)
@@ -640,7 +640,7 @@ export class machine {
 				t = machine.prototype.add.call(m, nextq, $.uint($.pointerValue<syntax.Inst>(i).Out, 32), nextPos, $.pointerValue<thread>(t).cap, nextCond, t)
 			}
 			if (t != null) {
-				$.pointerValue<machine>(m).pool = $.append($.pointerValue<machine>(m).pool, t)
+				$.pointerValue<machine>(m).pool = $.append($.pointerValue<machine>(m).pool, t, $.appendZeros.nil)
 			}
 		}
 		$.pointerValue<queue>(runq).dense = $.goSlice($.pointerValue<queue>(runq).dense, undefined, 0)

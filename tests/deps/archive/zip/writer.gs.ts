@@ -485,7 +485,7 @@ export class Writer {
 			$.pointerValue<fileWriter>(fw).header = h
 			ow = $.interfaceValue<io.Writer | null>(fw, "*zip.fileWriter", { kind: $.TypeKind.Pointer, elemType: "zip.fileWriter" })
 		}
-		$.pointerValue<Writer>(w).dir = $.append($.pointerValue<Writer>(w).dir, h)
+		$.pointerValue<Writer>(w).dir = $.append($.pointerValue<Writer>(w).dir, h, $.appendZeros.nil)
 		{
 			let err = await writeHeader($.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter", { kind: $.TypeKind.Pointer, elemType: "zip.countWriter" }), h)
 			if (err != null) {
@@ -510,7 +510,7 @@ export class Writer {
 		$.pointerValue<__goscript_struct.FileHeader>(fh).UncompressedSize = $.uint($.uint($.min($.pointerValue<__goscript_struct.FileHeader>(fh).UncompressedSize64, 4294967295n), 32), 32)
 
 		let h: header | $.VarRef<header> | null = new header({FileHeader: fh, offset: $.uint64($.pointerValue<countWriter>($.pointerValue<Writer>(w).cw).count), raw: true})
-		$.pointerValue<Writer>(w).dir = $.append($.pointerValue<Writer>(w).dir, h)
+		$.pointerValue<Writer>(w).dir = $.append($.pointerValue<Writer>(w).dir, h, $.appendZeros.nil)
 		{
 			let err = await writeHeader($.interfaceValue<io.Writer | null>($.pointerValue<Writer>(w).cw, "*zip.countWriter", { kind: $.TypeKind.Pointer, elemType: "zip.countWriter" }), h)
 			if (err != null) {

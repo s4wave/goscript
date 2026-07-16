@@ -237,7 +237,7 @@ export class Rat {
 					break
 				}
 			}
-			tab = $.append(tab, (f as __goscript_nat.nat))
+			tab = $.append(tab, (f as __goscript_nat.nat), $.appendZeros.nil)
 			f = (await __goscript_natmul.nat_sqr((null as __goscript_nat.nat), stk, (f as __goscript_nat.nat)) as __goscript_nat.nat)
 		}
 

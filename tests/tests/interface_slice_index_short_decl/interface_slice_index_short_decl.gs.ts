@@ -97,8 +97,8 @@ export async function main(): globalThis.Promise<void> {
 				case $.typeAssert<Fixed>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Slice, typeName: "main.Fixed", elemType: "dep.Ref" }).ok:
 					{
 						let shape: Fixed = $.typeAssert<Fixed>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Slice, typeName: "main.Fixed", elemType: "dep.Ref" }).value
-						shape = ($.append((shape as Fixed), $.namedValueInterfaceValue<dep.Ref | null>(new Uint8Array([$.uint(3, 8), $.uint(4, 8)]), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [{ name: "Key", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }])) as Fixed)
-						fixed = $.append(fixed, (shape as Fixed))
+						shape = ($.append((shape as Fixed), $.namedValueInterfaceValue<dep.Ref | null>(new Uint8Array([$.uint(3, 8), $.uint(4, 8)]), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [{ name: "Key", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }]), $.appendZeros.nil) as Fixed)
+						fixed = $.append(fixed, (shape as Fixed), $.appendZeros.nil)
 					}
 					break
 				case $.typeAssert<Action>(__goscriptTypeSwitchValue, "main.Action").ok:

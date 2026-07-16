@@ -1,13 +1,15 @@
 import { describe, expect, it } from 'vitest'
-
 import { makeMap, mapGet, mapSet } from './map.js'
 import {
   append,
   appendSlice,
+  appendZero,
+  appendZeros,
   arrayToSlice,
   byteSliceHint,
   bytesToString,
   copy,
+  goSlice,
   indexString,
   len,
   makeSlice,
@@ -18,6 +20,7 @@ import {
   stringEqual,
   stringToBytes,
 } from './slice.js'
+import { markAsStructValue } from './type.js'
 
 describe('rune to string encoding (Go string(rune) semantics)', () => {
   it('preserves astral-plane runes above U+FFFF', () => {
@@ -94,6 +97,63 @@ describe('destination-independent byte specialization', () => {
     const out = append([] as string[], 'a', 'b')
     expect(out).not.toBeInstanceOf(Uint8Array)
     expect(Array.from(out as string[])).toEqual(['a', 'b'])
+  })
+})
+
+describe('append spare capacity', () => {
+  class item {
+    value = 0
+  }
+
+  it('zero-initializes primitive elements exposed by reslicing', () => {
+    let values = append<number>(null, 1)
+    values = append(values, 2)
+    values = append(values, 3)
+
+    expect(goSlice(values, undefined, 4)[3]).toBe(0)
+  })
+
+  it('zero-initializes struct elements exposed by reslicing', () => {
+    const zeroHint = appendZero(() => markAsStructValue(new item()))
+    let values = append<item>(null, markAsStructValue(new item()), zeroHint)
+    values = append(values, markAsStructValue(new item()), zeroHint)
+    values = append(values, markAsStructValue(new item()), zeroHint)
+
+    const zero = goSlice(values, undefined, 4)[3]
+    expect(zero).toBeInstanceOf(item)
+    expect(zero.value).toBe(0)
+  })
+
+  it('creates independent struct zeros for every spare slot', () => {
+    const zeroHint = appendZero(() => markAsStructValue(new item()))
+    let values = append<item>(null, markAsStructValue(new item()), zeroHint)
+    for (let i = 0; i < 4; i++) {
+      values = append(values, markAsStructValue(new item()), zeroHint)
+    }
+
+    const expanded = goSlice(values, undefined, 8)
+    expanded[5].value = 7
+    expect(expanded[6].value).toBe(0)
+    expect(expanded[5]).not.toBe(expanded[6])
+  })
+
+  it('zero-initializes appendSlice spare capacity from a static hint', () => {
+    const dynamic = markAsStructValue(new item())
+    const source: (item | null)[] = [dynamic]
+    let values = appendSlice<item | null>(null, source, appendZeros.nil)
+    values = appendSlice(values, source, appendZeros.nil)
+    values = appendSlice(values, source, appendZeros.nil)
+
+    expect(goSlice(values, undefined, 4)[3]).toBeNull()
+  })
+
+  it('uses the static interface zero instead of the dynamic element type', () => {
+    const dynamic = markAsStructValue(new item())
+    let values = append<item | null>(null, dynamic, appendZeros.nil)
+    values = append(values, dynamic, appendZeros.nil)
+    values = append(values, dynamic, appendZeros.nil)
+
+    expect(goSlice(values, undefined, 4)[3]).toBeNull()
   })
 })
 

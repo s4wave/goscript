@@ -443,10 +443,10 @@ export class Name {
 				}
 				// Place non-standard parsed values at the beginning of the sequence
 				// so they will be at the end of the string. See Issue 39924.
-				rdns = ($.append((rdns as RDNSequence), ($.arrayToSlice<AttributeTypeAndValue>([$.markAsStructValue($.cloneStructValue(atv))]) as RelativeDistinguishedNameSET)) as RDNSequence)
+				rdns = ($.append((rdns as RDNSequence), ($.arrayToSlice<AttributeTypeAndValue>([$.markAsStructValue($.cloneStructValue(atv))]) as RelativeDistinguishedNameSET), $.appendZeros.nil) as RDNSequence)
 			}
 		}
-		rdns = ($.appendSlice((rdns as RDNSequence), $.markAsStructValue($.cloneStructValue(n)).ToRDNSequence()) as RDNSequence)
+		rdns = ($.appendSlice((rdns as RDNSequence), $.markAsStructValue($.cloneStructValue(n)).ToRDNSequence(), $.appendZeros.nil) as RDNSequence)
 		return RDNSequence_String(rdns)
 	}
 
@@ -468,7 +468,7 @@ export class Name {
 		}
 		for (let __goscriptRangeTarget4 = n.ExtraNames, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget4); __rangeIndex++) {
 			let atv = __goscriptRangeTarget4![__rangeIndex]
-			ret = ($.append((ret as RDNSequence), ($.arrayToSlice<AttributeTypeAndValue>([$.markAsStructValue($.cloneStructValue(atv))]) as RelativeDistinguishedNameSET)) as RDNSequence)
+			ret = ($.append((ret as RDNSequence), ($.arrayToSlice<AttributeTypeAndValue>([$.markAsStructValue($.cloneStructValue(atv))]) as RelativeDistinguishedNameSET), $.appendZeros.nil) as RDNSequence)
 		}
 
 		return (ret as RDNSequence)
@@ -487,7 +487,7 @@ export class Name {
 			$.arrayIndex(s!, i).Value = value
 		}
 
-		return ($.append((_in as RDNSequence), (s as RelativeDistinguishedNameSET)) as RDNSequence)
+		return ($.append((_in as RDNSequence), (s as RelativeDistinguishedNameSET), $.appendZeros.nil) as RDNSequence)
 	}
 
 	static __typeInfo = $.registerStructType(

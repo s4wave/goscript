@@ -27,6 +27,6 @@ export function simplify1(op: __goscript_regexp.Op, flags: __goscript_parse.Flag
 	}
 
 	re = new __goscript_regexp.Regexp({Op: $.uint(op, 8), Flags: $.uint(flags, 16)})
-	$.pointerValue<__goscript_regexp.Regexp>(re).Sub = $.append($.goSlice($.pointerValue<__goscript_regexp.Regexp>(re).Sub0, undefined, 0), sub)
+	$.pointerValue<__goscript_regexp.Regexp>(re).Sub = $.append($.goSlice($.pointerValue<__goscript_regexp.Regexp>(re).Sub0, undefined, 0), sub, $.appendZeros.nil)
 	return re
 }

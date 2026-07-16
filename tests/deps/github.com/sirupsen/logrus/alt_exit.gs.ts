@@ -52,9 +52,9 @@ export async function Exit(code: number): globalThis.Promise<void> {
 }
 
 export function RegisterExitHandler(handler: (() => void) | null): void {
-	handlers = $.append(handlers, handler)
+	handlers = $.append(handlers, handler, $.appendZeros.nil)
 }
 
 export function DeferExitHandler(handler: (() => void) | null): void {
-	handlers = $.appendSlice($.arrayToSlice<(() => void) | null>([handler]), handlers)
+	handlers = $.appendSlice($.arrayToSlice<(() => void) | null>([handler]), handlers, $.appendZeros.nil)
 }

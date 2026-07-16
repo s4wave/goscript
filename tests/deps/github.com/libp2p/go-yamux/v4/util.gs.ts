@@ -137,7 +137,7 @@ export class segmentedBuffer {
 					}
 				}
 			}
-			$.pointerValue<segmentedBuffer>(s).b = $.append($.pointerValue<segmentedBuffer>(s).b, $.goSlice(dst, 0, n))
+			$.pointerValue<segmentedBuffer>(s).b = $.append($.pointerValue<segmentedBuffer>(s).b, $.goSlice(dst, 0, n), $.appendZeros.nil)
 		}
 		return err
 	}

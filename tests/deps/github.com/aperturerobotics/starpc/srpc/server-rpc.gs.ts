@@ -109,7 +109,7 @@ export class ServerRPC {
 		{
 			let data: $.Slice<number> = __goscript_rpcproto_pb.CallStart.prototype.GetData.call(pkt)
 			if (($.len(data) != 0) || __goscript_rpcproto_pb.CallStart.prototype.GetDataIsZero.call(pkt)) {
-				$.pointerValue<ServerRPC>(r).commonRPC.dataQueue = $.append($.pointerValue<ServerRPC>(r).commonRPC.dataQueue, data)
+				$.pointerValue<ServerRPC>(r).commonRPC.dataQueue = $.append($.pointerValue<ServerRPC>(r).commonRPC.dataQueue, data, $.appendZeros.nil)
 			}
 		}
 
