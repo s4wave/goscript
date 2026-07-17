@@ -71,7 +71,7 @@ export async function main(): globalThis.Promise<void> {
 	let err: wrappedHealthError | $.VarRef<wrappedHealthError> | null = (() => { const __goscriptLiteralField0 = errors.New("root"); return new wrappedHealthError({err: __goscriptLiteralField0}) })()
 
 	let target: $.VarRef<healthError | null> = $.varRef(null! as healthError | null)
-	let ok = errors.As($.pointerValueOrNil($.interfaceValue<$.GoError>(err, "*main.wrappedHealthError", { kind: $.TypeKind.Pointer, elemType: "main.wrappedHealthError" }))!, $.interfaceValue<any>(target, "*main.healthError", { kind: $.TypeKind.Pointer, elemType: "main.healthError" }))
+	let ok = errors.As($.pointerValueOrNil($.interfaceValue<$.GoError>(err, "*main.wrappedHealthError", { kind: $.TypeKind.Pointer, elemType: "main.wrappedHealthError" }))!, $.interfaceValue(target, "*main.healthError", { kind: $.TypeKind.Pointer, elemType: "main.healthError" }))
 	$.println("matched:", ok)
 	if (ok) {
 		$.println("health:", await $.pointerValue<Exclude<healthError, null>>(target.value).Health())

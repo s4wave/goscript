@@ -67,7 +67,7 @@ export class rawConn {
 			return $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })
 		}
 		let err = await $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<rawConn>(c).fd).pfd.RawControl(f)
-		runtime.KeepAlive($.interfaceValue<any>($.pointerValue<rawConn>(c).fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }))
+		runtime.KeepAlive($.interfaceValue($.pointerValue<rawConn>(c).fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }))
 		if (err != null) {
 			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "raw-control", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<rawConn>(c).fd).net, Source: null, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<rawConn>(c).fd).laddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
@@ -93,7 +93,7 @@ export class rawConn {
 			return $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })
 		}
 		let err = await $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<rawConn>(c).fd).pfd.RawRead(f)
-		runtime.KeepAlive($.interfaceValue<any>($.pointerValue<rawConn>(c).fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }))
+		runtime.KeepAlive($.interfaceValue($.pointerValue<rawConn>(c).fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }))
 		if (err != null) {
 			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "raw-read", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<rawConn>(c).fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<rawConn>(c).fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<rawConn>(c).fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}
@@ -106,7 +106,7 @@ export class rawConn {
 			return $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })
 		}
 		let err = await $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<rawConn>(c).fd).pfd.RawWrite(f)
-		runtime.KeepAlive($.interfaceValue<any>($.pointerValue<rawConn>(c).fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }))
+		runtime.KeepAlive($.interfaceValue($.pointerValue<rawConn>(c).fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }))
 		if (err != null) {
 			err = $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "raw-write", Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<rawConn>(c).fd).net, Source: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<rawConn>(c).fd).laddr, Addr: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<rawConn>(c).fd).raddr, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })
 		}

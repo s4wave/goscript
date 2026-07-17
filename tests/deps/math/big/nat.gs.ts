@@ -98,7 +98,7 @@ export class stack {
 	public free(): void {
 		let s: stack | $.VarRef<stack> | null = this
 		$.pointerValue<stack>(s).w = $.goSlice($.pointerValue<stack>(s).w, undefined, 0)
-		$.pointerValue<sync.Pool>(__goscript_get_stackPool()).Put($.interfaceValue<any>(s, "*big.stack", { kind: $.TypeKind.Pointer, elemType: "big.stack" }))
+		$.pointerValue<sync.Pool>(__goscript_get_stackPool()).Put($.interfaceValue(s, "*big.stack", { kind: $.TypeKind.Pointer, elemType: "big.stack" }))
 	}
 
 	public nat(n: number): nat {

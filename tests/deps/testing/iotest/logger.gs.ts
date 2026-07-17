@@ -53,9 +53,9 @@ export class writeLogger {
 		n = __goscriptTuple0[0]
 		err = __goscriptTuple0[1]
 		if (err != null) {
-			await log.Printf("%s %x: %v", $.arrayToSlice<any>([$.pointerValue<writeLogger>(l).prefix, $.interfaceValue<any>($.goSlice(p, 0, n), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }), (err as any)]))
+			await log.Printf("%s %x: %v", $.arrayToSlice<any>([$.pointerValue<writeLogger>(l).prefix, $.interfaceValue($.goSlice(p, 0, n), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }), (err as any)]))
 		} else {
-			await log.Printf("%s %x", $.arrayToSlice<any>([$.pointerValue<writeLogger>(l).prefix, $.interfaceValue<any>($.goSlice(p, 0, n), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })]))
+			await log.Printf("%s %x", $.arrayToSlice<any>([$.pointerValue<writeLogger>(l).prefix, $.interfaceValue($.goSlice(p, 0, n), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })]))
 		}
 		return [n, err]
 	}
@@ -113,9 +113,9 @@ export class readLogger {
 		n = __goscriptTuple1[0]
 		err = __goscriptTuple1[1]
 		if (err != null) {
-			await log.Printf("%s %x: %v", $.arrayToSlice<any>([$.pointerValue<readLogger>(l).prefix, $.interfaceValue<any>($.goSlice(p, 0, n), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }), (err as any)]))
+			await log.Printf("%s %x: %v", $.arrayToSlice<any>([$.pointerValue<readLogger>(l).prefix, $.interfaceValue($.goSlice(p, 0, n), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }), (err as any)]))
 		} else {
-			await log.Printf("%s %x", $.arrayToSlice<any>([$.pointerValue<readLogger>(l).prefix, $.interfaceValue<any>($.goSlice(p, 0, n), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })]))
+			await log.Printf("%s %x", $.arrayToSlice<any>([$.pointerValue<readLogger>(l).prefix, $.interfaceValue($.goSlice(p, 0, n), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })]))
 		}
 		return [n, err]
 	}

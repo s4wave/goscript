@@ -1052,7 +1052,7 @@ export class Regexp {
 		$.pointerValue<__goscript_exec.machine>(m).re = null
 		$.pointerValue<__goscript_exec.machine>(m).p = null
 		$.pointerValue<__goscript_exec.machine>(m).inputs.clear()
-		$.arrayIndex(matchPool, $.pointerValue<Regexp>(re).mpool).Put($.interfaceValue<any>(m, "*regexp.machine", { kind: $.TypeKind.Pointer, elemType: "regexp.machine" }))
+		$.arrayIndex(matchPool, $.pointerValue<Regexp>(re).mpool).Put($.interfaceValue(m, "*regexp.machine", { kind: $.TypeKind.Pointer, elemType: "regexp.machine" }))
 	}
 
 	public async replaceAll(bsrc: $.Slice<number>, src: string, nmatch: number, repl: ((dst: $.Slice<number>, m: $.Slice<number>) => $.Slice<number> | globalThis.Promise<$.Slice<number>>) | null): globalThis.Promise<$.Slice<number>> {

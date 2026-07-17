@@ -109,7 +109,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println("key", $.len((key as ed25519.PublicKey)), $.uint($.arrayIndex(key!, 0), 8))
 
 	let target: $.VarRef<recreateError | $.VarRef<recreateError> | null> = $.varRef(null! as recreateError | $.VarRef<recreateError> | null)
-	let matched = errors.As($.pointerValueOrNil($.interfaceValue<$.GoError>(new recreateError({next: 7n}), "*main.recreateError", { kind: $.TypeKind.Pointer, elemType: "main.recreateError" }))!, $.interfaceValue<any>(target, "**main.recreateError", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Pointer, elemType: "main.recreateError" } }))
+	let matched = errors.As($.pointerValueOrNil($.interfaceValue<$.GoError>(new recreateError({next: 7n}), "*main.recreateError", { kind: $.TypeKind.Pointer, elemType: "main.recreateError" }))!, $.interfaceValue(target, "**main.recreateError", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Pointer, elemType: "main.recreateError" } }))
 	$.println("error", matched, $.pointerValue<recreateError>(target.value).next)
 }
 

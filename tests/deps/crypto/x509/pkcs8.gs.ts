@@ -102,16 +102,16 @@ export async function ParsePKCS8PrivateKey(der: $.Slice<number>): globalThis.Pro
 	let err: $.GoError = null! as $.GoError
 	let privKey: $.VarRef<pkcs8> = $.varRef($.markAsStructValue(new pkcs8()))
 	{
-		let [, __goscriptShadow0] = await asn1.Unmarshal(der, $.interfaceValue<any>(privKey, "*x509.pkcs8", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs8" }))
+		let [, __goscriptShadow0] = await asn1.Unmarshal(der, $.interfaceValue(privKey, "*x509.pkcs8", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs8" }))
 		if (__goscriptShadow0 != null) {
 			{
-				let [, __goscriptShadow1] = await asn1.Unmarshal(der, $.interfaceValue<any>(new __goscript_sec1.ecPrivateKey(), "*x509.ecPrivateKey", { kind: $.TypeKind.Pointer, elemType: "x509.ecPrivateKey" }))
+				let [, __goscriptShadow1] = await asn1.Unmarshal(der, $.interfaceValue(new __goscript_sec1.ecPrivateKey(), "*x509.ecPrivateKey", { kind: $.TypeKind.Pointer, elemType: "x509.ecPrivateKey" }))
 				if (__goscriptShadow1 == null) {
 					return [null, errors.New("x509: failed to parse private key (use ParseECPrivateKey instead for this key format)")]
 				}
 			}
 			{
-				let [, __goscriptShadow2] = await asn1.Unmarshal(der, $.interfaceValue<any>(new __goscript_pkcs1.pkcs1PrivateKey(), "*x509.pkcs1PrivateKey", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs1PrivateKey" }))
+				let [, __goscriptShadow2] = await asn1.Unmarshal(der, $.interfaceValue(new __goscript_pkcs1.pkcs1PrivateKey(), "*x509.pkcs1PrivateKey", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs1PrivateKey" }))
 				if (__goscriptShadow2 == null) {
 					return [null, errors.New("x509: failed to parse private key (use ParsePKCS1PrivateKey instead for this key format)")]
 				}
@@ -123,7 +123,7 @@ export async function ParsePKCS8PrivateKey(der: $.Slice<number>): globalThis.Pro
 		case asn1.ObjectIdentifier_Equal(privKey.value.Algo.Algorithm, (__goscript_x509.oidPublicKeyRSA as asn1.ObjectIdentifier)):
 		{
 			let __goscriptTuple0: any = await __goscript_pkcs1.ParsePKCS1PrivateKey(privKey.value.PrivateKey)
-			key = $.interfaceValue<any>(__goscriptTuple0[0], "*rsa.PrivateKey", { kind: $.TypeKind.Pointer, elemType: "rsa.PrivateKey" })
+			key = $.interfaceValue(__goscriptTuple0[0], "*rsa.PrivateKey", { kind: $.TypeKind.Pointer, elemType: "rsa.PrivateKey" })
 			err = __goscriptTuple0[1]
 			if (err != null) {
 				return [null, errors.New("x509: failed to parse RSA private key embedded in PKCS#8: " + $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
@@ -142,7 +142,7 @@ export async function ParsePKCS8PrivateKey(der: $.Slice<number>): globalThis.Pro
 				}
 			}
 			let __goscriptTuple1: any = await __goscript_sec1.parseECPrivateKey(namedCurveOID, privKey.value.PrivateKey)
-			key = $.interfaceValue<any>(__goscriptTuple1[0], "*ecdsa.PrivateKey", { kind: $.TypeKind.Pointer, elemType: "ecdsa.PrivateKey" })
+			key = $.interfaceValue(__goscriptTuple1[0], "*ecdsa.PrivateKey", { kind: $.TypeKind.Pointer, elemType: "ecdsa.PrivateKey" })
 			err = __goscriptTuple1[1]
 			if (err != null) {
 				return [null, errors.New("x509: failed to parse EC private key embedded in PKCS#8: " + $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
@@ -160,7 +160,7 @@ export async function ParsePKCS8PrivateKey(der: $.Slice<number>): globalThis.Pro
 			}
 			let curvePrivateKey: $.VarRef<$.Slice<number>> = $.varRef(null! as $.Slice<number>)
 			{
-				let [, __goscriptShadow4] = await asn1.Unmarshal(privKey.value.PrivateKey, $.interfaceValue<any>(curvePrivateKey, "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }))
+				let [, __goscriptShadow4] = await asn1.Unmarshal(privKey.value.PrivateKey, $.interfaceValue(curvePrivateKey, "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }))
 				if (__goscriptShadow4 != null) {
 					return [null, fmt.Errorf("x509: invalid Ed25519 private key: %v", (__goscriptShadow4 as any))]
 				}
@@ -184,13 +184,13 @@ export async function ParsePKCS8PrivateKey(der: $.Slice<number>): globalThis.Pro
 			}
 			let curvePrivateKey: $.VarRef<$.Slice<number>> = $.varRef(null! as $.Slice<number>)
 			{
-				let [, __goscriptShadow5] = await asn1.Unmarshal(privKey.value.PrivateKey, $.interfaceValue<any>(curvePrivateKey, "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }))
+				let [, __goscriptShadow5] = await asn1.Unmarshal(privKey.value.PrivateKey, $.interfaceValue(curvePrivateKey, "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }))
 				if (__goscriptShadow5 != null) {
 					return [null, fmt.Errorf("x509: invalid X25519 private key: %v", (__goscriptShadow5 as any))]
 				}
 			}
 			const __goscriptReturn0 = await $.pointerValue<Exclude<ecdh.Curve, null>>(ecdh.X25519()).NewPrivateKey(curvePrivateKey.value)
-			return [$.interfaceValue<any>(__goscriptReturn0[0], "*ecdh.PrivateKey", { kind: $.TypeKind.Pointer, elemType: "ecdh.PrivateKey" }), __goscriptReturn0[1]]
+			return [$.interfaceValue(__goscriptReturn0[0], "*ecdh.PrivateKey", { kind: $.TypeKind.Pointer, elemType: "ecdh.PrivateKey" }), __goscriptReturn0[1]]
 			break
 		}
 		default:
@@ -252,7 +252,7 @@ export async function MarshalPKCS8PrivateKey(key: any): globalThis.Promise<[$.Sl
 				{
 					let k: ed25519.PrivateKey = $.typeAssert<ed25519.PrivateKey>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Slice, typeName: "ed25519.PrivateKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }).value
 					privKey.Algo = $.markAsStructValue(new pkix.AlgorithmIdentifier({Algorithm: (__goscript_x509.oidPublicKeyEd25519 as asn1.ObjectIdentifier)}))
-					let __goscriptTuple5: any = await asn1.Marshal($.interfaceValue<any>(ed25519.PrivateKey_Seed(k), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))
+					let __goscriptTuple5: any = await asn1.Marshal($.interfaceValue(ed25519.PrivateKey_Seed(k), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))
 					let curvePrivateKey: $.Slice<number> = __goscriptTuple5[0]
 					let err = __goscriptTuple5[1]
 					if (err != null) {
@@ -268,7 +268,7 @@ export async function MarshalPKCS8PrivateKey(key: any): globalThis.Promise<[$.Sl
 						privKey.Algo = $.markAsStructValue(new pkix.AlgorithmIdentifier({Algorithm: (__goscript_x509.oidPublicKeyX25519 as asn1.ObjectIdentifier)}))
 						let err: $.GoError = null! as $.GoError
 						{
-							let __goscriptTuple6: any = await asn1.Marshal($.interfaceValue<any>(ecdh.PrivateKey.prototype.Bytes.call($.pointerValue<ecdh.PrivateKey>(k)), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))
+							let __goscriptTuple6: any = await asn1.Marshal($.interfaceValue(ecdh.PrivateKey.prototype.Bytes.call($.pointerValue<ecdh.PrivateKey>(k)), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))
 							privKey.PrivateKey = __goscriptTuple6[0]
 							err = __goscriptTuple6[1]
 							if (err != null) {
@@ -309,5 +309,5 @@ export async function MarshalPKCS8PrivateKey(key: any): globalThis.Promise<[$.Sl
 		}
 	}
 
-	return asn1.Marshal($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(privKey)), "x509.pkcs8", "x509.pkcs8"))
+	return asn1.Marshal($.interfaceValue($.markAsStructValue($.cloneStructValue(privKey)), "x509.pkcs8", "x509.pkcs8"))
 }

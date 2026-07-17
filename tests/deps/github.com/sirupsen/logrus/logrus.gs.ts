@@ -248,7 +248,7 @@ export function parseLevel(b: $.Slice<number>): [Level, $.GoError] {
 		}
 		default:
 		{
-			return [$.uint(0, 32), fmt.Errorf("not a valid logrus Level: %q", $.interfaceValue<any>(b, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))]
+			return [$.uint(0, 32), fmt.Errorf("not a valid logrus Level: %q", $.interfaceValue(b, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))]
 			break
 		}
 	}

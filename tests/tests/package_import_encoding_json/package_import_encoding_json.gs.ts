@@ -75,7 +75,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Marshal a simple struct
 	let p = $.markAsStructValue(new Person({Name: "Alice", Age: 30, Active: true}))
-	let __goscriptTuple0: any = json.Marshal($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(p)), "main.Person", "main.Person"))
+	let __goscriptTuple0: any = json.Marshal($.interfaceValue($.markAsStructValue($.cloneStructValue(p)), "main.Person", "main.Person"))
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
@@ -83,7 +83,7 @@ export async function main(): globalThis.Promise<void> {
 	} else {
 		results = $.append(results, "Marshal: " + $.bytesToString(b))
 	}
-	let __goscriptTuple1: any = json.MarshalIndent($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(p)), "main.Person", "main.Person"), "", "  ")
+	let __goscriptTuple1: any = json.MarshalIndent($.interfaceValue($.markAsStructValue($.cloneStructValue(p)), "main.Person", "main.Person"), "", "  ")
 	let indented: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
@@ -95,7 +95,7 @@ export async function main(): globalThis.Promise<void> {
 	// Unmarshal into a struct
 	let q: $.VarRef<Person> = $.varRef($.markAsStructValue(new Person()))
 	{
-		let __goscriptShadow0 = json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 66, 111, 98, 34, 44, 34, 97, 103, 101, 34, 58, 50, 53, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 102, 97, 108, 115, 101, 125]), $.interfaceValue<any>(q, "*main.Person", { kind: $.TypeKind.Pointer, elemType: "main.Person" }))
+		let __goscriptShadow0 = json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 66, 111, 98, 34, 44, 34, 97, 103, 101, 34, 58, 50, 53, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 102, 97, 108, 115, 101, 125]), $.interfaceValue(q, "*main.Person", { kind: $.TypeKind.Pointer, elemType: "main.Person" }))
 		if (__goscriptShadow0 != null) {
 			results = $.append(results, "Unmarshal struct error: " + $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0).Error())
 		} else {
@@ -106,7 +106,7 @@ export async function main(): globalThis.Promise<void> {
 	// Unmarshal into a map[string]any
 	let m: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null! as globalThis.Map<string, any> | null)
 	{
-		let __goscriptShadow1 = json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 67, 97, 114, 111, 108, 34, 44, 34, 97, 103, 101, 34, 58, 50, 50, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 116, 114, 117, 101, 125]), $.interfaceValue<any>(m, "*map[string]any", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Interface, methods: [] } } }))
+		let __goscriptShadow1 = json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 67, 97, 114, 111, 108, 34, 44, 34, 97, 103, 101, 34, 58, 50, 50, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 116, 114, 117, 101, 125]), $.interfaceValue(m, "*map[string]any", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Interface, methods: [] } } }))
 		if (__goscriptShadow1 != null) {
 			results = $.append(results, "Unmarshal map error: " + $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow1).Error())
 		} else {

@@ -188,7 +188,7 @@ export class JSONFormatter {
 
 		if ((!$.stringEqual($.pointerValue<JSONFormatter>(f).DataKey, "")) && ($.len($.pointerValue<__goscript_entry.Entry>(entry).Data) > 0)) {
 			let newData: __goscript_logrus.Fields = $.makeMap<string, any>()
-			$.mapSet(newData, $.pointerValue<JSONFormatter>(f).DataKey, $.interfaceValue<any>(data, "logrus.Fields", "logrus.Fields"))
+			$.mapSet(newData, $.pointerValue<JSONFormatter>(f).DataKey, $.interfaceValue(data, "logrus.Fields", "logrus.Fields"))
 			data = newData
 		}
 
@@ -238,7 +238,7 @@ export class JSONFormatter {
 			json.Encoder.prototype.SetIndent.call($.pointerValue<json.Encoder>(encoder), "", "  ")
 		}
 		{
-			let err = json.Encoder.prototype.Encode.call($.pointerValue<json.Encoder>(encoder), $.interfaceValue<any>(data, "logrus.Fields", "logrus.Fields"))
+			let err = json.Encoder.prototype.Encode.call($.pointerValue<json.Encoder>(encoder), $.interfaceValue(data, "logrus.Fields", "logrus.Fields"))
 			if (err != null) {
 				return [null, fmt.Errorf("failed to marshal fields to JSON, %w", (err as any))]
 			}

@@ -1171,7 +1171,7 @@ export class Int {
 		{
 			let [, ok] = await Int.prototype.setFromScanner.call(z, $.interfaceValue<io.ByteScanner | null>(bytes.NewReader(text), "*bytes.Reader", { kind: $.TypeKind.Pointer, elemType: "bytes.Reader" }), 0)
 			if (!ok) {
-				return fmt.Errorf("math/big: cannot unmarshal %q into a *big.Int", $.interfaceValue<any>(text, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))
+				return fmt.Errorf("math/big: cannot unmarshal %q into a *big.Int", $.interfaceValue(text, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))
 			}
 		}
 		return null

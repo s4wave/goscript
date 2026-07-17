@@ -362,13 +362,13 @@ export class Dialer {
 		// Shadow the nettrace (if any) during resolve so Connect events don't fire for DNS lookups.
 		let resolveCtx: context.Context | null = ctx
 		{
-			let __goscriptTuple1: any = $.typeAssertTuple<nettrace.Trace | $.VarRef<nettrace.Trace> | null>(await $.pointerValue<Exclude<context.Context, null>>(ctx).Value($.interfaceValue<any>($.markAsStructValue(new nettrace.TraceKey()), "nettrace.TraceKey", "nettrace.TraceKey")), { kind: $.TypeKind.Pointer, elemType: "nettrace.Trace" })
+			let __goscriptTuple1: any = $.typeAssertTuple<nettrace.Trace | $.VarRef<nettrace.Trace> | null>(await $.pointerValue<Exclude<context.Context, null>>(ctx).Value($.interfaceValue($.markAsStructValue(new nettrace.TraceKey()), "nettrace.TraceKey", "nettrace.TraceKey")), { kind: $.TypeKind.Pointer, elemType: "nettrace.Trace" })
 			let trace: nettrace.Trace | $.VarRef<nettrace.Trace> | null = __goscriptTuple1[0]
 			if (trace != null) {
 				let shadow = $.varRef($.markAsStructValue($.cloneStructValue($.pointerValue<nettrace.Trace>(trace))))
 				shadow.value.ConnectStart = (null as ((network: string, addr: string) => void) | null)
 				shadow.value.ConnectDone = (null as ((network: string, addr: string, err: $.GoError) => void) | null)
-				resolveCtx = context.WithValue($.pointerValueOrNil(resolveCtx)!, $.interfaceValue<any>($.markAsStructValue(new nettrace.TraceKey()), "nettrace.TraceKey", "nettrace.TraceKey"), $.interfaceValue<any>(shadow, "*nettrace.Trace", { kind: $.TypeKind.Pointer, elemType: "nettrace.Trace" }))
+				resolveCtx = context.WithValue($.pointerValueOrNil(resolveCtx)!, $.interfaceValue($.markAsStructValue(new nettrace.TraceKey()), "nettrace.TraceKey", "nettrace.TraceKey"), $.interfaceValue(shadow, "*nettrace.Trace", { kind: $.TypeKind.Pointer, elemType: "nettrace.Trace" }))
 			}
 		}
 
@@ -923,7 +923,7 @@ export class sysDialer {
 		let c: __goscript_net.Conn | null = null! as __goscript_net.Conn | null
 		let err: $.GoError = null! as $.GoError
 		await using __defer = new $.AsyncDisposableStack()
-		let __goscriptTuple14: any = $.typeAssertTuple<nettrace.Trace | $.VarRef<nettrace.Trace> | null>(await $.pointerValue<Exclude<context.Context, null>>(ctx).Value($.interfaceValue<any>($.markAsStructValue(new nettrace.TraceKey()), "nettrace.TraceKey", "nettrace.TraceKey")), { kind: $.TypeKind.Pointer, elemType: "nettrace.Trace" })
+		let __goscriptTuple14: any = $.typeAssertTuple<nettrace.Trace | $.VarRef<nettrace.Trace> | null>(await $.pointerValue<Exclude<context.Context, null>>(ctx).Value($.interfaceValue($.markAsStructValue(new nettrace.TraceKey()), "nettrace.TraceKey", "nettrace.TraceKey")), { kind: $.TypeKind.Pointer, elemType: "nettrace.Trace" })
 		let trace: nettrace.Trace | $.VarRef<nettrace.Trace> | null = __goscriptTuple14[0]
 		if (trace != null) {
 			let raStr = await $.pointerValue<Exclude<__goscript_net.Addr, null>>(ra).String()

@@ -264,7 +264,7 @@ export function __goscript_set_x509rsacrt(__goscriptValue: godebug.Setting | $.V
 
 export async function ParsePKCS1PrivateKey(der: $.Slice<number>): globalThis.Promise<[rsa.PrivateKey | $.VarRef<rsa.PrivateKey> | null, $.GoError]> {
 	let priv: $.VarRef<pkcs1PrivateKey> = $.varRef($.markAsStructValue(new pkcs1PrivateKey()))
-	let __goscriptTuple0: any = await asn1.Unmarshal(der, $.interfaceValue<any>(priv, "*x509.pkcs1PrivateKey", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs1PrivateKey" }))
+	let __goscriptTuple0: any = await asn1.Unmarshal(der, $.interfaceValue(priv, "*x509.pkcs1PrivateKey", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs1PrivateKey" }))
 	let rest: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if ($.len(rest) > 0) {
@@ -272,13 +272,13 @@ export async function ParsePKCS1PrivateKey(der: $.Slice<number>): globalThis.Pro
 	}
 	if (err != null) {
 		{
-			let [, __goscriptShadow0] = await asn1.Unmarshal(der, $.interfaceValue<any>(new __goscript_sec1.ecPrivateKey(), "*x509.ecPrivateKey", { kind: $.TypeKind.Pointer, elemType: "x509.ecPrivateKey" }))
+			let [, __goscriptShadow0] = await asn1.Unmarshal(der, $.interfaceValue(new __goscript_sec1.ecPrivateKey(), "*x509.ecPrivateKey", { kind: $.TypeKind.Pointer, elemType: "x509.ecPrivateKey" }))
 			if (__goscriptShadow0 == null) {
 				return [null, errors.New("x509: failed to parse private key (use ParseECPrivateKey instead for this key format)")]
 			}
 		}
 		{
-			let [, __goscriptShadow1] = await asn1.Unmarshal(der, $.interfaceValue<any>(new __goscript_pkcs8.pkcs8(), "*x509.pkcs8", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs8" }))
+			let [, __goscriptShadow1] = await asn1.Unmarshal(der, $.interfaceValue(new __goscript_pkcs8.pkcs8(), "*x509.pkcs8", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs8" }))
 			if (__goscriptShadow1 == null) {
 				return [null, errors.New("x509: failed to parse private key (use ParsePKCS8PrivateKey instead for this key format)")]
 			}
@@ -357,19 +357,19 @@ export async function MarshalPKCS1PrivateKey(key: rsa.PrivateKey | $.VarRef<rsa.
 		$.arrayIndex(priv.AdditionalPrimes!, i).Coeff = values.Coeff
 	}
 
-	let __goscriptTuple1: any = await asn1.Marshal($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(priv)), "x509.pkcs1PrivateKey", "x509.pkcs1PrivateKey"))
+	let __goscriptTuple1: any = await asn1.Marshal($.interfaceValue($.markAsStructValue($.cloneStructValue(priv)), "x509.pkcs1PrivateKey", "x509.pkcs1PrivateKey"))
 	let b: $.Slice<number> = __goscriptTuple1[0]
 	return b
 }
 
 export async function ParsePKCS1PublicKey(der: $.Slice<number>): globalThis.Promise<[rsa.PublicKey | $.VarRef<rsa.PublicKey> | null, $.GoError]> {
 	let pub: $.VarRef<pkcs1PublicKey> = $.varRef($.markAsStructValue(new pkcs1PublicKey()))
-	let __goscriptTuple2: any = await asn1.Unmarshal(der, $.interfaceValue<any>(pub, "*x509.pkcs1PublicKey", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs1PublicKey" }))
+	let __goscriptTuple2: any = await asn1.Unmarshal(der, $.interfaceValue(pub, "*x509.pkcs1PublicKey", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs1PublicKey" }))
 	let rest: $.Slice<number> = __goscriptTuple2[0]
 	let err = __goscriptTuple2[1]
 	if (err != null) {
 		{
-			let [, __goscriptShadow4] = await asn1.Unmarshal(der, $.interfaceValue<any>(new __goscript_x509.publicKeyInfo(), "*x509.publicKeyInfo", { kind: $.TypeKind.Pointer, elemType: "x509.publicKeyInfo" }))
+			let [, __goscriptShadow4] = await asn1.Unmarshal(der, $.interfaceValue(new __goscript_x509.publicKeyInfo(), "*x509.publicKeyInfo", { kind: $.TypeKind.Pointer, elemType: "x509.publicKeyInfo" }))
 			if (__goscriptShadow4 == null) {
 				return [null, errors.New("x509: failed to parse public key (use ParsePKIXPublicKey instead for this key format)")]
 			}
@@ -391,7 +391,7 @@ export async function ParsePKCS1PublicKey(der: $.Slice<number>): globalThis.Prom
 }
 
 export async function MarshalPKCS1PublicKey(key: rsa.PublicKey | $.VarRef<rsa.PublicKey> | null): globalThis.Promise<$.Slice<number>> {
-	let __goscriptTuple3: any = await asn1.Marshal($.interfaceValue<any>($.markAsStructValue(new pkcs1PublicKey({N: $.pointerValue<rsa.PublicKey>(key).N, E: $.pointerValue<rsa.PublicKey>(key).E})), "x509.pkcs1PublicKey", "x509.pkcs1PublicKey"))
+	let __goscriptTuple3: any = await asn1.Marshal($.interfaceValue($.markAsStructValue(new pkcs1PublicKey({N: $.pointerValue<rsa.PublicKey>(key).N, E: $.pointerValue<rsa.PublicKey>(key).E})), "x509.pkcs1PublicKey", "x509.pkcs1PublicKey"))
 	let derBytes: $.Slice<number> = __goscriptTuple3[0]
 	return derBytes
 }

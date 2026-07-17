@@ -380,7 +380,7 @@ export function formatHeader(buf: $.VarRef<$.Slice<number>> | null, t: time.Time
 }
 
 export let bufferPool: $.VarRef<sync.Pool> = $.varRef($.markAsStructValue(new sync.Pool({New: $.functionValue((): any => {
-	return $.interfaceValue<any>($.varRef<$.Slice<number>>(null! as $.Slice<number>), "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } })
+	return $.interfaceValue($.varRef<$.Slice<number>>(null! as $.Slice<number>), "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } })
 }, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))})))
 
 export function __goscript_set_bufferPool(__goscriptValue: sync.Pool): void {
@@ -403,7 +403,7 @@ export function putBuffer(p: $.VarRef<$.Slice<number>> | null): void {
 	if ($.cap($.pointerValue<$.Slice<number>>(p)) > (65536)) {
 		p!.value = null
 	}
-	bufferPool.value.Put($.interfaceValue<any>(p, "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }))
+	bufferPool.value.Put($.interfaceValue(p, "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }))
 }
 
 function __goscriptInit0(): void {

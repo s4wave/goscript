@@ -162,7 +162,7 @@ export class netFD {
 			return __goscript_net_fake.fakeNetFD.prototype.Close.call($.pointerValue<netFD>(fd).fakeNetFD)
 		}
 		// TODO Replace with runtime.AddCleanup.
-		runtime.SetFinalizer($.interfaceValue<any>(fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }), null)
+		runtime.SetFinalizer($.interfaceValue(fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }), null)
 		return $.pointerValue<netFD>(fd).pfd.Close()
 	}
 
@@ -176,7 +176,7 @@ export class netFD {
 		let __goscriptTuple0: any = await $.pointerValue<netFD>(fd).pfd.Read(p)
 		n = __goscriptTuple0[0]
 		err = __goscriptTuple0[1]
-		runtime.KeepAlive($.interfaceValue<any>(fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }))
+		runtime.KeepAlive($.interfaceValue(fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }))
 		return [n, __goscript_error_posix.wrapSyscallError("fd_read", err)]
 	}
 
@@ -214,7 +214,7 @@ export class netFD {
 		let __goscriptTuple1: any = await $.pointerValue<netFD>(fd).pfd.Write(p)
 		nn = __goscriptTuple1[0]
 		err = __goscriptTuple1[1]
-		runtime.KeepAlive($.interfaceValue<any>(fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }))
+		runtime.KeepAlive($.interfaceValue(fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }))
 		return [nn, __goscript_error_posix.wrapSyscallError("fd_write", err)]
 	}
 
@@ -329,7 +329,7 @@ export class netFD {
 		$.pointerValue<netFD>(fd).laddr = laddr
 		$.pointerValue<netFD>(fd).raddr = raddr
 		// TODO Replace with runtime.AddCleanup.
-		runtime.SetFinalizer($.interfaceValue<any>(fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }), $.interfaceValue<any>($.functionValue(async (fd: netFD | $.VarRef<netFD> | null): globalThis.Promise<$.GoError> => await $.pointerValue<netFD>(fd).Close(), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "net.netFD" }], results: ["error"] } as $.FunctionTypeInfo)), "func(*net.netFD) error", ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "net.netFD" }], results: ["error"] } as $.FunctionTypeInfo)))
+		runtime.SetFinalizer($.interfaceValue(fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }), $.interfaceValue($.functionValue(async (fd: netFD | $.VarRef<netFD> | null): globalThis.Promise<$.GoError> => await $.pointerValue<netFD>(fd).Close(), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "net.netFD" }], results: ["error"] } as $.FunctionTypeInfo)), "func(*net.netFD) error", ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "net.netFD" }], results: ["error"] } as $.FunctionTypeInfo)))
 	}
 
 	public async shutdown(how: number): globalThis.Promise<$.GoError> {
@@ -338,7 +338,7 @@ export class netFD {
 			return null
 		}
 		let err = await $.pointerValue<netFD>(fd).pfd.Shutdown(how)
-		runtime.KeepAlive($.interfaceValue<any>(fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }))
+		runtime.KeepAlive($.interfaceValue(fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }))
 		return __goscript_error_posix.wrapSyscallError("shutdown", err)
 	}
 

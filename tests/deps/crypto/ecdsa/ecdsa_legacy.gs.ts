@@ -93,7 +93,7 @@ export async function Sign(rand: io.Reader | null, priv: __goscript_ecdsa.Privat
 	s = __goscriptAssign0_1
 	let inner: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	let input: $.VarRef<cryptobyte.String> = $.varRef(((sig as cryptobyte.String) as cryptobyte.String))
-	if ((((!cryptobyte.String_ReadASN1(input, inner, $.uint(asn1.SEQUENCE, 8)) || !cryptobyte.String_Empty(input.value)) || !cryptobyte.String_ReadASN1Integer(inner, $.interfaceValue<any>(r, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) || !cryptobyte.String_ReadASN1Integer(inner, $.interfaceValue<any>(s, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) || !cryptobyte.String_Empty(inner.value)) {
+	if ((((!cryptobyte.String_ReadASN1(input, inner, $.uint(asn1.SEQUENCE, 8)) || !cryptobyte.String_Empty(input.value)) || !cryptobyte.String_ReadASN1Integer(inner, $.interfaceValue(r, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) || !cryptobyte.String_ReadASN1Integer(inner, $.interfaceValue(s, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) || !cryptobyte.String_Empty(inner.value)) {
 		return [null, null, errors.New("invalid ASN.1 from SignASN1")]
 	}
 	return [r, s, null]

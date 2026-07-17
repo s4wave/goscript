@@ -1820,7 +1820,7 @@ export function typedNil(
   return value
 }
 
-export function interfaceValue<T>(
+export function interfaceValue<T = any>(
   value: unknown,
   typeName: string,
   typeInfo?: TypeInfo | string,

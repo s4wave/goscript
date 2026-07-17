@@ -53,7 +53,7 @@ export class defaultPool {
 
 	public Put(buf: bytes.Buffer | $.VarRef<bytes.Buffer> | null): void {
 		const p: defaultPool | $.VarRef<defaultPool> | null = this
-		sync.Pool.prototype.Put.call($.pointerValue<sync.Pool>($.pointerValue<defaultPool>(p).pool), $.interfaceValue<any>(buf, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))
+		sync.Pool.prototype.Put.call($.pointerValue<sync.Pool>($.pointerValue<defaultPool>(p).pool), $.interfaceValue(buf, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -66,7 +66,7 @@ export class defaultPool {
 }
 
 export let bufferPool: BufferPool | null = $.interfaceValue<BufferPool | null>(new defaultPool({pool: new sync.Pool({New: $.functionValue((): any => {
-	return $.interfaceValue<any>(new bytes.Buffer(), "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" })
+	return $.interfaceValue(new bytes.Buffer(), "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" })
 }, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))})}), "*logrus.defaultPool", { kind: $.TypeKind.Pointer, elemType: "logrus.defaultPool" })
 
 export function __goscript_set_bufferPool(__goscriptValue: BufferPool | null): void {

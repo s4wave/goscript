@@ -96,13 +96,13 @@ export async function main(): globalThis.Promise<void> {
 	fmt.Printf("Float: %f\n", $.basicInterfaceValue(3.14159, "float64"))
 	fmt.Printf("String: %s\n", "hello")
 	fmt.Printf("Type: %T\n", $.basicInterfaceValue(42, "int"))
-	fmt.Printf("Value: %v\n", $.interfaceValue<any>($.arrayToSlice<number>([1, 2, 3]), "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }))
+	fmt.Printf("Value: %v\n", $.interfaceValue($.arrayToSlice<number>([1, 2, 3]), "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }))
 
 	// Test width and precision
 	fmt.Printf("Width: '%5s'\n", "hi")
 	fmt.Printf("Precision: '%.2f'\n", $.basicInterfaceValue(3.14159, "float64"))
 	fmt.Printf("Both: '%5.2f'\n", $.basicInterfaceValue(3.14159, "float64"))
-	fmt.Printf("Formatter: %v\n", $.interfaceValue<any>($.markAsStructValue(new byteFormatter({prefix: new Uint8Array([98, 121, 116, 101, 45])})), "main.byteFormatter", "main.byteFormatter"))
+	fmt.Printf("Formatter: %v\n", $.interfaceValue($.markAsStructValue(new byteFormatter({prefix: new Uint8Array([98, 121, 116, 101, 45])})), "main.byteFormatter", "main.byteFormatter"))
 	let appended: $.Slice<number> = fmt.Append(new Uint8Array([98, 97, 115, 101, 45]), "tail")
 	fmt.Println("Append bytes:", $.bytesToString(appended))
 	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))

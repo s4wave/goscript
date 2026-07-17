@@ -139,14 +139,14 @@ export async function main(): globalThis.Promise<void> {
 	let asyncSlice: $.Slice<number> = $.arrayToSlice<number>([2, 1])
 	let ready: $.Channel<boolean> | null = $.makeChannel<boolean>(1, false, "both")
 	await $.chanSend(ready, true)
-	await sort2.Slice($.interfaceValue<any>(asyncSlice, "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }), $.functionValue(async (i: number, j: number): globalThis.Promise<boolean> => {
+	await sort2.Slice($.interfaceValue(asyncSlice, "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }), $.functionValue(async (i: number, j: number): globalThis.Promise<boolean> => {
 		await $.chanRecv(ready)
 		return $.arrayIndex(asyncSlice!, i) < $.arrayIndex(asyncSlice!, j)
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo)))
 	$.println("Async sorted slice:", $.arrayIndex(asyncSlice!, 0), $.arrayIndex(asyncSlice!, 1))
 
 	// Test SliceIsSorted
-	let isSliceSorted = await sort2.SliceIsSorted($.interfaceValue<any>(testSlice, "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }), $.functionValue((i: number, j: number): boolean => {
+	let isSliceSorted = await sort2.SliceIsSorted($.interfaceValue(testSlice, "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }), $.functionValue((i: number, j: number): boolean => {
 		return $.arrayIndex(testSlice!, i) < $.arrayIndex(testSlice!, j)
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo)))
 	$.println("Custom slice is sorted:", isSliceSorted)

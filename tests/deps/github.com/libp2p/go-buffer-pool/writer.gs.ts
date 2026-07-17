@@ -96,7 +96,7 @@ export class Writer {
 			}
 		}
 		bufio.Writer.prototype.Reset.call($.pointerValue<Writer>(w).bufw, null)
-		bufioWriterPool.value.Put($.interfaceValue<any>($.pointerValue<Writer>(w).bufw, "*bufio.Writer", { kind: $.TypeKind.Pointer, elemType: "bufio.Writer" }))
+		bufioWriterPool.value.Put($.interfaceValue($.pointerValue<Writer>(w).bufw, "*bufio.Writer", { kind: $.TypeKind.Pointer, elemType: "bufio.Writer" }))
 		$.pointerValue<Writer>(w).bufw = null
 		return null
 	}
@@ -156,7 +156,7 @@ export class Writer {
 export const WriterBufferSize: number = 4096
 
 export let bufioWriterPool: $.VarRef<sync.Pool> = $.varRef($.markAsStructValue(new sync.Pool({New: $.functionValue((): any => {
-	return $.interfaceValue<any>(bufio.NewWriterSize(null, 4096), "*bufio.Writer", { kind: $.TypeKind.Pointer, elemType: "bufio.Writer" })
+	return $.interfaceValue(bufio.NewWriterSize(null, 4096), "*bufio.Writer", { kind: $.TypeKind.Pointer, elemType: "bufio.Writer" })
 }, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))})))
 
 export function __goscript_set_bufioWriterPool(__goscriptValue: sync.Pool): void {

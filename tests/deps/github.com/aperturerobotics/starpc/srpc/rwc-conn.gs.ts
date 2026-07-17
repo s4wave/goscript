@@ -485,7 +485,7 @@ export class RwcConn {
 export const connPktSize: number = 2048
 
 export function newBufPool(poolSize: number, bufSize: number): bufPool | $.VarRef<bufPool> | null {
-	return new bufPool({ch: $.makeChannel<$.Slice<number>>(poolSize, null, "both"), size: bufSize})
+	return new bufPool({ch: $.makeChannel<$.Slice<number>>(poolSize, null! as $.Slice<number>, "both"), size: bufSize})
 }
 
 export async function NewRwcConn(ctx: context.Context | null, rwc: io.ReadWriteCloser | null, laddr: net.Addr | null, raddr: net.Addr | null, bufferPacketN: number): globalThis.Promise<RwcConn | $.VarRef<RwcConn> | null> {
@@ -496,7 +496,7 @@ export async function NewRwcConn(ctx: context.Context | null, rwc: io.ReadWriteC
 		bufferPacketN = 10
 	}
 
-	let c: RwcConn | $.VarRef<RwcConn> | null = (() => { const __goscriptLiteralField0 = newBufPool(bufferPacketN, 2048); return new RwcConn({ctx: ctx, ctxCancel: ctxCancel, rwc: rwc, laddr: laddr, raddr: raddr, pool: __goscriptLiteralField0, packetCh: $.makeChannel<$.Slice<number>>(bufferPacketN, null, "both")}) })()
+	let c: RwcConn | $.VarRef<RwcConn> | null = (() => { const __goscriptLiteralField0 = newBufPool(bufferPacketN, 2048); return new RwcConn({ctx: ctx, ctxCancel: ctxCancel, rwc: rwc, laddr: laddr, raddr: raddr, pool: __goscriptLiteralField0, packetCh: $.makeChannel<$.Slice<number>>(bufferPacketN, null! as $.Slice<number>, "both")}) })()
 	queueMicrotask(async () => { await RwcConn.prototype.rxPump.call(c) })
 	return c
 }

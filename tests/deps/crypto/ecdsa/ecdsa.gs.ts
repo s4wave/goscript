@@ -805,7 +805,7 @@ export function parseSignature(sig: $.Slice<number>): [$.Slice<number>, $.Slice<
 	let err: $.GoError = null! as $.GoError
 	let inner: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	let input: $.VarRef<cryptobyte.String> = $.varRef(((sig as cryptobyte.String) as cryptobyte.String))
-	if ((((!cryptobyte.String_ReadASN1(input, inner, $.uint(asn1.SEQUENCE, 8)) || !cryptobyte.String_Empty(input.value)) || !cryptobyte.String_ReadASN1Integer(inner, $.interfaceValue<any>(r, "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }))) || !cryptobyte.String_ReadASN1Integer(inner, $.interfaceValue<any>(s, "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }))) || !cryptobyte.String_Empty(inner.value)) {
+	if ((((!cryptobyte.String_ReadASN1(input, inner, $.uint(asn1.SEQUENCE, 8)) || !cryptobyte.String_Empty(input.value)) || !cryptobyte.String_ReadASN1Integer(inner, $.interfaceValue(r, "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }))) || !cryptobyte.String_ReadASN1Integer(inner, $.interfaceValue(s, "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }))) || !cryptobyte.String_Empty(inner.value)) {
 		return [null, null, errors.New("invalid ASN.1")]
 	}
 	return [r.value, s.value, null]

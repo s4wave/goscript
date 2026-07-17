@@ -89,7 +89,7 @@ export class BufferPool {
 			}
 		}
 		$.pointerValue<bufp>(bp).buf = buf
-		$.arrayIndex($.pointerValue<BufferPool>(p).pools, idx).Put($.interfaceValue<any>(bp, "*pool.bufp", { kind: $.TypeKind.Pointer, elemType: "pool.bufp" }))
+		$.arrayIndex($.pointerValue<BufferPool>(p).pools, idx).Put($.interfaceValue(bp, "*pool.bufp", { kind: $.TypeKind.Pointer, elemType: "pool.bufp" }))
 	}
 
 	static __typeInfo = $.registerStructType(

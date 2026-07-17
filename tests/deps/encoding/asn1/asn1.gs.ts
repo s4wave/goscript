@@ -1073,7 +1073,7 @@ export async function parseField(v: reflect.Value, bytes: $.Slice<number>, initO
 					case 3:
 					{
 						let __goscriptTuple16: any = parseBitString(innerBytes)
-						result = $.interfaceValue<any>(__goscriptTuple16[0], "asn1.BitString", "asn1.BitString")
+						result = $.interfaceValue(__goscriptTuple16[0], "asn1.BitString", "asn1.BitString")
 						err = __goscriptTuple16[1]
 						break
 					}
@@ -1087,20 +1087,20 @@ export async function parseField(v: reflect.Value, bytes: $.Slice<number>, initO
 					case 23:
 					{
 						let __goscriptTuple18: any = parseUTCTime(innerBytes)
-						result = $.interfaceValue<any>(__goscriptTuple18[0], "time.Time", "time.Time")
+						result = $.interfaceValue(__goscriptTuple18[0], "time.Time", "time.Time")
 						err = __goscriptTuple18[1]
 						break
 					}
 					case 24:
 					{
 						let __goscriptTuple19: any = parseGeneralizedTime(innerBytes)
-						result = $.interfaceValue<any>(__goscriptTuple19[0], "time.Time", "time.Time")
+						result = $.interfaceValue(__goscriptTuple19[0], "time.Time", "time.Time")
 						err = __goscriptTuple19[1]
 						break
 					}
 					case 4:
 					{
-						result = $.interfaceValue<any>(innerBytes, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })
+						result = $.interfaceValue(innerBytes, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })
 						break
 					}
 					case 30:
@@ -1256,7 +1256,7 @@ export async function parseField(v: reflect.Value, bytes: $.Slice<number>, initO
 		if (ok) {
 			offset = initOffset
 		} else {
-			err = $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField2 = await fmt.Sprintf("tags don't match (%d vs %+v) %+v %s @%d", $.basicInterfaceValue(expectedTag, "int"), $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(t)), "asn1.tagAndLength", "asn1.tagAndLength"), $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(params)), "asn1.fieldParameters", "asn1.fieldParameters"), await $.pointerValue<Exclude<reflect.Type, null>>(fieldType).Name(), $.basicInterfaceValue(offset, "int")); return $.markAsStructValue(new StructuralError({Msg: __goscriptLiteralField2})) })()), "asn1.StructuralError", "asn1.StructuralError")
+			err = $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField2 = await fmt.Sprintf("tags don't match (%d vs %+v) %+v %s @%d", $.basicInterfaceValue(expectedTag, "int"), $.interfaceValue($.markAsStructValue($.cloneStructValue(t)), "asn1.tagAndLength", "asn1.tagAndLength"), $.interfaceValue($.markAsStructValue($.cloneStructValue(params)), "asn1.fieldParameters", "asn1.fieldParameters"), await $.pointerValue<Exclude<reflect.Type, null>>(fieldType).Name(), $.basicInterfaceValue(offset, "int")); return $.markAsStructValue(new StructuralError({Msg: __goscriptLiteralField2})) })()), "asn1.StructuralError", "asn1.StructuralError")
 		}
 		return [offset, err]
 	}
@@ -1395,7 +1395,7 @@ export async function parseField(v: reflect.Value, bytes: $.Slice<number>, initO
 				if ((await $.pointerValue<Exclude<reflect.Type, null>>(structType).NumField() > 0) && ($.comparableEqual((await $.pointerValue<Exclude<reflect.Type, null>>(structType).Field(0)).Type, rawContentsType))) {
 					let __goscriptShadow0 = bytes
 					let __goscriptShadow1: $.Slice<number> = $.goSlice(__goscriptShadow0, initOffset, offset)
-					$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(val)).Field(0))).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>((__goscriptShadow1 as RawContent), "asn1.RawContent", { kind: $.TypeKind.Slice, typeName: "asn1.RawContent", elemType: { kind: $.TypeKind.Basic, name: "uint8" } })))))
+					$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(val)).Field(0))).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((__goscriptShadow1 as RawContent), "asn1.RawContent", { kind: $.TypeKind.Slice, typeName: "asn1.RawContent", elemType: { kind: $.TypeKind.Basic, name: "uint8" } })))))
 				}
 
 				let innerOffset = 0
@@ -1422,7 +1422,7 @@ export async function parseField(v: reflect.Value, bytes: $.Slice<number>, initO
 				let sliceType: reflect.Type | null = fieldType
 				if (await $.pointerValue<Exclude<reflect.Type, null>>((await $.pointerValue<Exclude<reflect.Type, null>>(sliceType).Elem())).Kind() == reflect.Uint8) {
 					$.markAsStructValue($.cloneStructValue(val)).Set($.markAsStructValue($.cloneStructValue(reflect.MakeSlice($.pointerValueOrNil(sliceType)!, $.len(innerBytes), $.len(innerBytes)))))
-					reflect.Copy($.markAsStructValue($.cloneStructValue(val)), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>(innerBytes, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })))))
+					reflect.Copy($.markAsStructValue($.cloneStructValue(val)), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(innerBytes, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })))))
 					return [offset, err]
 				}
 				let [newSlice, err1] = await parseSequenceOf(innerBytes, sliceType, await $.pointerValue<Exclude<reflect.Type, null>>(sliceType).Elem())

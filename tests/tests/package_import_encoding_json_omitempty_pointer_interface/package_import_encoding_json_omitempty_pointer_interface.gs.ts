@@ -121,7 +121,7 @@ export async function main(): globalThis.Promise<void> {
 	let zero = $.varRef(0)
 	let falseValue = $.varRef(false)
 	let nilIface: $.VarRef<any> = $.varRef(null! as any)
-	let __goscriptTuple0: any = json.Marshal($.interfaceValue<any>($.markAsStructValue(new Payload({Ptr: zero, IfaceZero: $.basicInterfaceValue(0, "int"), IfaceFalse: false, IfaceEmptyString: "", IfaceEmptySlice: $.interfaceValue<any>($.arrayToSlice<number>([]), "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }), IfaceEmptyMap: $.interfaceValue<any>(new globalThis.Map<string, number>([]), "map[string]int", { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } }), PtrNilIface: nilIface, PtrBool: falseValue})), "main.Payload", "main.Payload"))
+	let __goscriptTuple0: any = json.Marshal($.interfaceValue($.markAsStructValue(new Payload({Ptr: zero, IfaceZero: $.basicInterfaceValue(0, "int"), IfaceFalse: false, IfaceEmptyString: "", IfaceEmptySlice: $.interfaceValue($.arrayToSlice<number>([]), "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }), IfaceEmptyMap: $.interfaceValue(new globalThis.Map<string, number>([]), "map[string]int", { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } }), PtrNilIface: nilIface, PtrBool: falseValue})), "main.Payload", "main.Payload"))
 	let out: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {

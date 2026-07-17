@@ -11561,19 +11561,13 @@ func (o *LoweringOwner) lowerValueForTargetTypes(
 		if wrapper := o.lowerNamedValueInterfaceWrapper(ctx, targetType, sourceType, value); wrapper != "" {
 			return wrapper
 		}
-		return o.runtimeOwner.QualifiedHelper(RuntimeHelperInterfaceValue) +
-			"<" + o.tsTypeFor(ctx, targetType) + ">(" + value + ", " +
-			strconv.Quote(goRuntimeTypeString(sourceType)) + ", " +
-			o.runtimeTypeInfoExpr(sourceType) + ")"
+		return o.lowerInterfaceValueExpr(ctx, targetType, sourceType, value)
 	}
 	if wrapper := o.lowerNamedValueInterfaceWrapper(ctx, targetType, sourceType, value); wrapper != "" {
 		return wrapper
 	}
 	if isInterfaceType(targetType) && !isInterfaceType(sourceType) && isNilableType(sourceType) {
-		return o.runtimeOwner.QualifiedHelper(RuntimeHelperInterfaceValue) +
-			"<" + o.tsTypeFor(ctx, targetType) + ">(" + value + ", " +
-			strconv.Quote(goRuntimeTypeString(sourceType)) + ", " +
-			o.runtimeTypeInfoExpr(sourceType) + ")"
+		return o.lowerInterfaceValueExpr(ctx, targetType, sourceType, value)
 	}
 	if isInterfaceType(targetType) && isInterfaceType(sourceType) &&
 		!types.Identical(targetType, sourceType) && types.AssignableTo(sourceType, targetType) {
@@ -11617,6 +11611,20 @@ func (o *LoweringOwner) lowerValueForTargetTypes(
 		}
 	}
 	return value
+}
+func (o *LoweringOwner) lowerInterfaceValueExpr(
+	ctx lowerFileContext,
+	targetType types.Type,
+	sourceType types.Type,
+	value string,
+) string {
+	helper := o.runtimeOwner.QualifiedHelper(RuntimeHelperInterfaceValue)
+	if target := o.tsTypeFor(ctx, targetType); target != "any" {
+		helper += "<" + target + ">"
+	}
+	return helper + "(" + value + ", " +
+		strconv.Quote(goRuntimeTypeString(sourceType)) + ", " +
+		o.runtimeTypeInfoExpr(sourceType) + ")"
 }
 
 func (o *LoweringOwner) lowerNumericInterfaceWrapper(

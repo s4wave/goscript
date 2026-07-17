@@ -83,7 +83,7 @@ export async function HandleRawRpcStream(stream: __goscript_rpcstream.RpcStream 
 	// we re-use the rpcstream message framing here.
 	// 1 incoming message = 1 outgoing message
 	let srw: __goscript_read_writer.RpcStreamReadWriter | $.VarRef<__goscript_read_writer.RpcStreamReadWriter> | null = __goscript_read_writer.NewRpcStreamReadWriter(stream)
-	let errCh: $.Channel<$.GoError> | null = $.makeChannel<$.GoError>(2, null, "both")
+	let errCh: $.Channel<$.GoError> | null = $.makeChannel<$.GoError>(2, null! as $.GoError, "both")
 	queueMicrotask(async () => { await copyRwcTo(remoteRwc, $.interfaceValue<io.ReadWriteCloser | null>(srw, "*rpcstream.RpcStreamReadWriter", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamReadWriter" }), errCh) })
 	queueMicrotask(async () => { await copyRwcTo($.interfaceValue<io.ReadWriteCloser | null>(srw, "*rpcstream.RpcStreamReadWriter", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamReadWriter" }), remoteRwc, errCh) })
 

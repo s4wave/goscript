@@ -1271,7 +1271,7 @@ export class Session {
 				{
 					let rerr = $.recover()
 					if (rerr != null) {
-						await fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(os.Stderr, "*os.File", { kind: $.TypeKind.Pointer, elemType: "os.File" }))!, "caught panic: %s\n%s\n", rerr, $.interfaceValue<any>(debug.Stack(), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))
+						await fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(os.Stderr, "*os.File", { kind: $.TypeKind.Pointer, elemType: "os.File" }))!, "caught panic: %s\n%s\n", rerr, $.interfaceValue(debug.Stack(), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))
 						err = fmt.Errorf("panic in yamux receive loop: %s", rerr)
 					}
 				}
@@ -1356,7 +1356,7 @@ export class Session {
 				{
 					let rerr = $.recover()
 					if (rerr != null) {
-						await fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(os.Stderr, "*os.File", { kind: $.TypeKind.Pointer, elemType: "os.File" }))!, "caught panic: %s\n%s\n", rerr, $.interfaceValue<any>(debug.Stack(), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))
+						await fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(os.Stderr, "*os.File", { kind: $.TypeKind.Pointer, elemType: "os.File" }))!, "caught panic: %s\n%s\n", rerr, $.interfaceValue(debug.Stack(), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))
 						err = fmt.Errorf("panic in yamux send loop: %s", rerr)
 					}
 				}
@@ -1725,7 +1725,7 @@ export async function newSession(config: __goscript_mux.Config | $.VarRef<__gosc
 			return [$.interfaceValue<MemoryManager | null>(nullMemoryManager, "*yamux.nullMemoryManagerImpl", { kind: $.TypeKind.Pointer, elemType: "yamux.nullMemoryManagerImpl" }), null]
 		}, ({ kind: $.TypeKind.Function, params: [], results: ["yamux.MemoryManager", "error"] } as $.FunctionTypeInfo))
 	}
-	let s: Session | $.VarRef<Session> | null = (await (async () => { const __goscriptLiteralField0 = await log.New($.pointerValue<__goscript_mux.Config>(config).LogOutput, "", log.LstdFlags); return new Session({config: config, client: client, logger: __goscriptLiteralField0, conn: conn, reader: reader, streams: $.makeMap<number, __goscript_stream.Stream | $.VarRef<__goscript_stream.Stream> | null>(), inflight: $.makeMap<number, {}>(), synCh: $.makeChannel<{}>($.pointerValue<__goscript_mux.Config>(config).AcceptBacklog, {}, "both"), acceptCh: $.makeChannel<__goscript_stream.Stream | $.VarRef<__goscript_stream.Stream> | null>($.pointerValue<__goscript_mux.Config>(config).AcceptBacklog, null, "both"), sendCh: $.makeChannel<$.Slice<number>>(64, null, "both"), pongCh: $.makeChannel<number>($.pointerValue<__goscript_mux.Config>(config).PingBacklog, 0, "both"), pingCh: $.makeChannel<number>(0, 0, "both"), recvDoneCh: $.makeChannel<{}>(0, {}, "both"), sendDoneCh: $.makeChannel<{}>(0, {}, "both"), shutdownCh: $.makeChannel<{}>(0, {}, "both"), newMemoryManager: newMemoryManager}) })())
+	let s: Session | $.VarRef<Session> | null = (await (async () => { const __goscriptLiteralField0 = await log.New($.pointerValue<__goscript_mux.Config>(config).LogOutput, "", log.LstdFlags); return new Session({config: config, client: client, logger: __goscriptLiteralField0, conn: conn, reader: reader, streams: $.makeMap<number, __goscript_stream.Stream | $.VarRef<__goscript_stream.Stream> | null>(), inflight: $.makeMap<number, {}>(), synCh: $.makeChannel<{}>($.pointerValue<__goscript_mux.Config>(config).AcceptBacklog, {}, "both"), acceptCh: $.makeChannel<__goscript_stream.Stream | $.VarRef<__goscript_stream.Stream> | null>($.pointerValue<__goscript_mux.Config>(config).AcceptBacklog, null! as __goscript_stream.Stream | $.VarRef<__goscript_stream.Stream> | null, "both"), sendCh: $.makeChannel<$.Slice<number>>(64, null! as $.Slice<number>, "both"), pongCh: $.makeChannel<number>($.pointerValue<__goscript_mux.Config>(config).PingBacklog, 0, "both"), pingCh: $.makeChannel<number>(0, 0, "both"), recvDoneCh: $.makeChannel<{}>(0, {}, "both"), sendDoneCh: $.makeChannel<{}>(0, {}, "both"), shutdownCh: $.makeChannel<{}>(0, {}, "both"), newMemoryManager: newMemoryManager}) })())
 	if (client) {
 		$.pointerValue<Session>(s).nextStreamID = $.uint(1, 32)
 	} else {

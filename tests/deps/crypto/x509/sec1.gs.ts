@@ -131,11 +131,11 @@ export async function marshalECPrivateKeyWithOID(key: ecdsa.PrivateKey | $.VarRe
 	if (err != null) {
 		return [null, err]
 	}
-	return asn1.Marshal($.interfaceValue<any>($.markAsStructValue(new ecPrivateKey({Version: 1, PrivateKey: privateKey, NamedCurveOID: (oid as asn1.ObjectIdentifier), PublicKey: $.markAsStructValue(new asn1.BitString({Bytes: publicKey}))})), "x509.ecPrivateKey", "x509.ecPrivateKey"))
+	return asn1.Marshal($.interfaceValue($.markAsStructValue(new ecPrivateKey({Version: 1, PrivateKey: privateKey, NamedCurveOID: (oid as asn1.ObjectIdentifier), PublicKey: $.markAsStructValue(new asn1.BitString({Bytes: publicKey}))})), "x509.ecPrivateKey", "x509.ecPrivateKey"))
 }
 
 export async function marshalECDHPrivateKey(key: ecdh.PrivateKey | $.VarRef<ecdh.PrivateKey> | null): globalThis.Promise<[$.Slice<number>, $.GoError]> {
-	return asn1.Marshal($.interfaceValue<any>((() => { const __goscriptLiteralField0 = ecdh.PrivateKey.prototype.Bytes.call($.pointerValue<ecdh.PrivateKey>(key)); return $.markAsStructValue(new ecPrivateKey({Version: 1, PrivateKey: __goscriptLiteralField0, PublicKey: (() => { const __goscriptLiteralField1 = ecdh.PublicKey.prototype.Bytes.call($.pointerValue<ecdh.PublicKey>(ecdh.PrivateKey.prototype.PublicKey.call($.pointerValue<ecdh.PrivateKey>(key)))); return $.markAsStructValue(new asn1.BitString({Bytes: __goscriptLiteralField1})) })()})) })(), "x509.ecPrivateKey", "x509.ecPrivateKey"))
+	return asn1.Marshal($.interfaceValue((() => { const __goscriptLiteralField0 = ecdh.PrivateKey.prototype.Bytes.call($.pointerValue<ecdh.PrivateKey>(key)); return $.markAsStructValue(new ecPrivateKey({Version: 1, PrivateKey: __goscriptLiteralField0, PublicKey: (() => { const __goscriptLiteralField1 = ecdh.PublicKey.prototype.Bytes.call($.pointerValue<ecdh.PublicKey>(ecdh.PrivateKey.prototype.PublicKey.call($.pointerValue<ecdh.PrivateKey>(key)))); return $.markAsStructValue(new asn1.BitString({Bytes: __goscriptLiteralField1})) })()})) })(), "x509.ecPrivateKey", "x509.ecPrivateKey"))
 }
 
 export async function parseECPrivateKey(namedCurveOID: $.VarRef<asn1.ObjectIdentifier> | null, der: $.Slice<number>): globalThis.Promise<[ecdsa.PrivateKey | $.VarRef<ecdsa.PrivateKey> | null, $.GoError]> {
@@ -143,16 +143,16 @@ export async function parseECPrivateKey(namedCurveOID: $.VarRef<asn1.ObjectIdent
 	let err: $.GoError = null! as $.GoError
 	let privKey: $.VarRef<ecPrivateKey> = $.varRef($.markAsStructValue(new ecPrivateKey()))
 	{
-		let [, __goscriptShadow0] = await asn1.Unmarshal(der, $.interfaceValue<any>(privKey, "*x509.ecPrivateKey", { kind: $.TypeKind.Pointer, elemType: "x509.ecPrivateKey" }))
+		let [, __goscriptShadow0] = await asn1.Unmarshal(der, $.interfaceValue(privKey, "*x509.ecPrivateKey", { kind: $.TypeKind.Pointer, elemType: "x509.ecPrivateKey" }))
 		if (__goscriptShadow0 != null) {
 			{
-				let [, __goscriptShadow1] = await asn1.Unmarshal(der, $.interfaceValue<any>(new __goscript_pkcs8.pkcs8(), "*x509.pkcs8", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs8" }))
+				let [, __goscriptShadow1] = await asn1.Unmarshal(der, $.interfaceValue(new __goscript_pkcs8.pkcs8(), "*x509.pkcs8", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs8" }))
 				if (__goscriptShadow1 == null) {
 					return [null, errors.New("x509: failed to parse private key (use ParsePKCS8PrivateKey instead for this key format)")]
 				}
 			}
 			{
-				let [, __goscriptShadow2] = await asn1.Unmarshal(der, $.interfaceValue<any>(new __goscript_pkcs1.pkcs1PrivateKey(), "*x509.pkcs1PrivateKey", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs1PrivateKey" }))
+				let [, __goscriptShadow2] = await asn1.Unmarshal(der, $.interfaceValue(new __goscript_pkcs1.pkcs1PrivateKey(), "*x509.pkcs1PrivateKey", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs1PrivateKey" }))
 				if (__goscriptShadow2 == null) {
 					return [null, errors.New("x509: failed to parse private key (use ParsePKCS1PrivateKey instead for this key format)")]
 				}

@@ -19,7 +19,7 @@ export function unwrap(v: any): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println(unwrap($.interfaceValue<any>(new dep2.Thing({Value: 7}), "*dep.Thing", { kind: $.TypeKind.Pointer, elemType: "dep.Thing" })))
+	$.println(unwrap($.interfaceValue(new dep2.Thing({Value: 7}), "*dep.Thing", { kind: $.TypeKind.Pointer, elemType: "dep.Thing" })))
 }
 
 if ($.isMainScript(import.meta)) {

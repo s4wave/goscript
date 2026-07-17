@@ -69,7 +69,7 @@ export class pooledFlateWriter {
 		let err: $.GoError = null! as $.GoError
 		if ($.pointerValue<pooledFlateWriter>(w).fw != null) {
 			err = await flate.Writer.prototype.Close.call($.pointerValue<pooledFlateWriter>(w).fw)
-			flateWriterPool.value.Put($.interfaceValue<any>($.pointerValue<pooledFlateWriter>(w).fw, "*flate.Writer", { kind: $.TypeKind.Pointer, elemType: "flate.Writer" }))
+			flateWriterPool.value.Put($.interfaceValue($.pointerValue<pooledFlateWriter>(w).fw, "*flate.Writer", { kind: $.TypeKind.Pointer, elemType: "flate.Writer" }))
 			$.pointerValue<pooledFlateWriter>(w).fw = null
 		}
 		return err
@@ -235,20 +235,20 @@ export function __goscript_set_decompressors(__goscriptValue: sync.Map): void {
 }
 
 async function __goscriptInit0(): globalThis.Promise<void> {
-	await compressors.value.Store($.basicInterfaceValue(0, "uint16"), $.interfaceValue<any>($.namedFunction($.functionValue((w: io.Writer | null): [io.WriteCloser | null, $.GoError] => {
+	await compressors.value.Store($.basicInterfaceValue(0, "uint16"), $.interfaceValue($.namedFunction($.functionValue((w: io.Writer | null): [io.WriteCloser | null, $.GoError] => {
 		return [$.interfaceValue<io.WriteCloser | null>(new __goscript_writer.nopCloser({Writer: w}), "*zip.nopCloser", { kind: $.TypeKind.Pointer, elemType: "zip.nopCloser" }), null]
 	}, ({ kind: $.TypeKind.Function, params: ["io.Writer"], results: ["io.WriteCloser", "error"] } as $.FunctionTypeInfo)), "zip.Compressor", ({ kind: $.TypeKind.Function, name: "zip.Compressor", params: ["io.Writer"], results: ["io.WriteCloser", "error"] } as $.FunctionTypeInfo)), "zip.Compressor", ({ kind: $.TypeKind.Function, name: "zip.Compressor", params: ["io.Writer"], results: ["io.WriteCloser", "error"] } as $.FunctionTypeInfo)))
-	await compressors.value.Store($.basicInterfaceValue(8, "uint16"), $.interfaceValue<any>($.namedFunction($.functionValue(async (w: io.Writer | null): globalThis.Promise<[io.WriteCloser | null, $.GoError]> => {
+	await compressors.value.Store($.basicInterfaceValue(8, "uint16"), $.interfaceValue($.namedFunction($.functionValue(async (w: io.Writer | null): globalThis.Promise<[io.WriteCloser | null, $.GoError]> => {
 		return [await newFlateWriter(w), null]
 	}, ({ kind: $.TypeKind.Function, params: ["io.Writer"], results: ["io.WriteCloser", "error"] } as $.FunctionTypeInfo)), "zip.Compressor", ({ kind: $.TypeKind.Function, name: "zip.Compressor", params: ["io.Writer"], results: ["io.WriteCloser", "error"] } as $.FunctionTypeInfo)), "zip.Compressor", ({ kind: $.TypeKind.Function, name: "zip.Compressor", params: ["io.Writer"], results: ["io.WriteCloser", "error"] } as $.FunctionTypeInfo)))
 
-	await decompressors.value.Store($.basicInterfaceValue(0, "uint16"), $.interfaceValue<any>($.namedFunction(io.NopCloser, "zip.Decompressor", ({ kind: $.TypeKind.Function, name: "zip.Decompressor", params: ["io.Reader"], results: ["io.ReadCloser"] } as $.FunctionTypeInfo)), "zip.Decompressor", ({ kind: $.TypeKind.Function, name: "zip.Decompressor", params: ["io.Reader"], results: ["io.ReadCloser"] } as $.FunctionTypeInfo)))
-	await decompressors.value.Store($.basicInterfaceValue(8, "uint16"), $.interfaceValue<any>($.namedFunction(newFlateReader, "zip.Decompressor", ({ kind: $.TypeKind.Function, name: "zip.Decompressor", params: ["io.Reader"], results: ["io.ReadCloser"] } as $.FunctionTypeInfo)), "zip.Decompressor", ({ kind: $.TypeKind.Function, name: "zip.Decompressor", params: ["io.Reader"], results: ["io.ReadCloser"] } as $.FunctionTypeInfo)))
+	await decompressors.value.Store($.basicInterfaceValue(0, "uint16"), $.interfaceValue($.namedFunction(io.NopCloser, "zip.Decompressor", ({ kind: $.TypeKind.Function, name: "zip.Decompressor", params: ["io.Reader"], results: ["io.ReadCloser"] } as $.FunctionTypeInfo)), "zip.Decompressor", ({ kind: $.TypeKind.Function, name: "zip.Decompressor", params: ["io.Reader"], results: ["io.ReadCloser"] } as $.FunctionTypeInfo)))
+	await decompressors.value.Store($.basicInterfaceValue(8, "uint16"), $.interfaceValue($.namedFunction(newFlateReader, "zip.Decompressor", ({ kind: $.TypeKind.Function, name: "zip.Decompressor", params: ["io.Reader"], results: ["io.ReadCloser"] } as $.FunctionTypeInfo)), "zip.Decompressor", ({ kind: $.TypeKind.Function, name: "zip.Decompressor", params: ["io.Reader"], results: ["io.ReadCloser"] } as $.FunctionTypeInfo)))
 }
 
 export async function RegisterDecompressor(method: number, dcomp: ((r: io.Reader | null) => io.ReadCloser | null | globalThis.Promise<io.ReadCloser | null>) | null): globalThis.Promise<void> {
 	{
-		let [, dup] = await decompressors.value.LoadOrStore($.basicInterfaceValue(method, "uint16"), $.interfaceValue<any>(dcomp, "zip.Decompressor", ({ kind: $.TypeKind.Function, name: "zip.Decompressor", params: ["io.Reader"], results: ["io.ReadCloser"] } as $.FunctionTypeInfo)))
+		let [, dup] = await decompressors.value.LoadOrStore($.basicInterfaceValue(method, "uint16"), $.interfaceValue(dcomp, "zip.Decompressor", ({ kind: $.TypeKind.Function, name: "zip.Decompressor", params: ["io.Reader"], results: ["io.ReadCloser"] } as $.FunctionTypeInfo)))
 		if (dup) {
 			$.panic("decompressor already registered")
 		}
@@ -257,7 +257,7 @@ export async function RegisterDecompressor(method: number, dcomp: ((r: io.Reader
 
 export async function RegisterCompressor(method: number, comp: ((w: io.Writer | null) => [io.WriteCloser | null, $.GoError] | globalThis.Promise<[io.WriteCloser | null, $.GoError]>) | null): globalThis.Promise<void> {
 	{
-		let [, dup] = await compressors.value.LoadOrStore($.basicInterfaceValue(method, "uint16"), $.interfaceValue<any>(comp, "zip.Compressor", ({ kind: $.TypeKind.Function, name: "zip.Compressor", params: ["io.Writer"], results: ["io.WriteCloser", "error"] } as $.FunctionTypeInfo)))
+		let [, dup] = await compressors.value.LoadOrStore($.basicInterfaceValue(method, "uint16"), $.interfaceValue(comp, "zip.Compressor", ({ kind: $.TypeKind.Function, name: "zip.Compressor", params: ["io.Writer"], results: ["io.WriteCloser", "error"] } as $.FunctionTypeInfo)))
 		if (dup) {
 			$.panic("compressor already registered")
 		}

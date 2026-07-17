@@ -136,7 +136,7 @@ export class PacketReadWriter {
 		using __defer = new $.DisposableStack()
 		let currLen: number = 0
 		let bufPtr: $.VarRef<Uint8Array> | null = $.mustTypeAssert<$.VarRef<Uint8Array> | null>(await readBufferPool.value.Get(), { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 2048 } })
-		__defer.defer(() => { readBufferPool.value.Put($.interfaceValue<any>(bufPtr, "*[2048]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 2048 } })) })
+		__defer.defer(() => { readBufferPool.value.Put($.interfaceValue(bufPtr, "*[2048]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 2048 } })) })
 		let buf: $.Slice<number> = $.goSlice($.pointerValue<Uint8Array>(bufPtr), undefined, undefined)
 		let isOpen = true
 
@@ -278,7 +278,7 @@ export const readBufferSize: number = 2048
 export const pooledWriteBufferMaxSize: number = 65536
 
 export let readBufferPool: $.VarRef<sync.Pool> = $.varRef($.markAsStructValue(new sync.Pool({New: $.functionValue((): any => {
-	return $.interfaceValue<any>($.varRef<Uint8Array>(new Uint8Array(2048)), "*[2048]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 2048 } })
+	return $.interfaceValue($.varRef<Uint8Array>(new Uint8Array(2048)), "*[2048]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 2048 } })
 }, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))})))
 
 export function __goscript_set_readBufferPool(__goscriptValue: sync.Pool): void {
@@ -286,7 +286,7 @@ export function __goscript_set_readBufferPool(__goscriptValue: sync.Pool): void 
 }
 
 export let writeBufferPool: $.VarRef<sync.Pool> = $.varRef($.markAsStructValue(new sync.Pool({New: $.functionValue((): any => {
-	return $.interfaceValue<any>(new writeBuffer(), "*srpc.writeBuffer", { kind: $.TypeKind.Pointer, elemType: "srpc.writeBuffer" })
+	return $.interfaceValue(new writeBuffer(), "*srpc.writeBuffer", { kind: $.TypeKind.Pointer, elemType: "srpc.writeBuffer" })
 }, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))})))
 
 export function __goscript_set_writeBufferPool(__goscriptValue: sync.Pool): void {
@@ -313,6 +313,6 @@ export function putWriteBuffer(buf: writeBuffer | $.VarRef<writeBuffer> | null):
 	if ($.cap($.pointerValue<writeBuffer>(buf).data) <= 65536) {
 		$.clear($.pointerValue<writeBuffer>(buf).data)
 		$.pointerValue<writeBuffer>(buf).data = $.goSlice($.pointerValue<writeBuffer>(buf).data, undefined, 0)
-		writeBufferPool.value.Put($.interfaceValue<any>(buf, "*srpc.writeBuffer", { kind: $.TypeKind.Pointer, elemType: "srpc.writeBuffer" }))
+		writeBufferPool.value.Put($.interfaceValue(buf, "*srpc.writeBuffer", { kind: $.TypeKind.Pointer, elemType: "srpc.writeBuffer" }))
 	}
 }

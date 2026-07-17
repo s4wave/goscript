@@ -529,8 +529,8 @@ export async function isClosedChan(c: $.Channel<{}> | null): globalThis.Promise<
 }
 
 export function Pipe(): [__goscript_net.Conn | null, __goscript_net.Conn | null] {
-	let cb1: $.Channel<$.Slice<number>> | null = $.makeChannel<$.Slice<number>>(0, null, "both")
-	let cb2: $.Channel<$.Slice<number>> | null = $.makeChannel<$.Slice<number>>(0, null, "both")
+	let cb1: $.Channel<$.Slice<number>> | null = $.makeChannel<$.Slice<number>>(0, null! as $.Slice<number>, "both")
+	let cb2: $.Channel<$.Slice<number>> | null = $.makeChannel<$.Slice<number>>(0, null! as $.Slice<number>, "both")
 	let cn1: $.Channel<number> | null = $.makeChannel<number>(0, 0, "both")
 	let cn2: $.Channel<number> | null = $.makeChannel<number>(0, 0, "both")
 	let done1: $.Channel<{}> | null = $.makeChannel<{}>(0, {}, "both")

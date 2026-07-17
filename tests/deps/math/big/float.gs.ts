@@ -248,7 +248,7 @@ export class Float {
 			$.pointerValue<Float>(z).acc = $.int(0, 8)
 			$.pointerValue<Float>(z).form = $.uint(0, 8)
 			$.pointerValue<Float>(z).neg = false
-			$.panic($.interfaceValue<any>($.markAsStructValue(new ErrNaN({msg: "addition of infinities with opposite signs"})), "big.ErrNaN", "big.ErrNaN"))
+			$.panic($.interfaceValue($.markAsStructValue(new ErrNaN({msg: "addition of infinities with opposite signs"})), "big.ErrNaN", "big.ErrNaN"))
 		}
 
 		if (($.uint($.pointerValue<Float>(x).form, 8) == $.uint(0, 8)) && ($.uint($.pointerValue<Float>(y).form, 8) == $.uint(0, 8))) {
@@ -1121,7 +1121,7 @@ export class Float {
 			// value of z is undefined but make sure it's valid
 			$.pointerValue<Float>(z).form = $.uint(0, 8)
 			$.pointerValue<Float>(z).neg = false
-			$.panic($.interfaceValue<any>($.markAsStructValue(new ErrNaN({msg: "multiplication of zero with infinity"})), "big.ErrNaN", "big.ErrNaN"))
+			$.panic($.interfaceValue($.markAsStructValue(new ErrNaN({msg: "multiplication of zero with infinity"})), "big.ErrNaN", "big.ErrNaN"))
 		}
 
 		if (($.uint($.pointerValue<Float>(x).form, 8) == $.uint(2, 8)) || ($.uint($.pointerValue<Float>(y).form, 8) == $.uint(2, 8))) {
@@ -1217,7 +1217,7 @@ export class Float {
 			// value of z is undefined but make sure it's valid
 			$.pointerValue<Float>(z).form = $.uint(0, 8)
 			$.pointerValue<Float>(z).neg = false
-			$.panic($.interfaceValue<any>($.markAsStructValue(new ErrNaN({msg: "division of zero by zero or infinity by infinity"})), "big.ErrNaN", "big.ErrNaN"))
+			$.panic($.interfaceValue($.markAsStructValue(new ErrNaN({msg: "division of zero by zero or infinity by infinity"})), "big.ErrNaN", "big.ErrNaN"))
 		}
 
 		if (($.uint($.pointerValue<Float>(x).form, 8) == $.uint(0, 8)) || ($.uint($.pointerValue<Float>(y).form, 8) == $.uint(2, 8))) {
@@ -1327,7 +1327,7 @@ export class Float {
 			$.pointerValue<Float>(z).prec = $.uint(53, 32)
 		}
 		if (math.IsNaN(x)) {
-			$.panic($.interfaceValue<any>($.markAsStructValue(new ErrNaN({msg: "Float.SetFloat64(NaN)"})), "big.ErrNaN", "big.ErrNaN"))
+			$.panic($.interfaceValue($.markAsStructValue(new ErrNaN({msg: "Float.SetFloat64(NaN)"})), "big.ErrNaN", "big.ErrNaN"))
 		}
 		$.pointerValue<Float>(z).acc = $.int(0, 8)
 		$.pointerValue<Float>(z).neg = math.Signbit(x)
@@ -1504,7 +1504,7 @@ export class Float {
 
 		if (await Float.prototype.Sign.call(x) == -1) {
 
-			$.panic($.interfaceValue<any>($.markAsStructValue(new ErrNaN({msg: "square root of negative operand"})), "big.ErrNaN", "big.ErrNaN"))
+			$.panic($.interfaceValue($.markAsStructValue(new ErrNaN({msg: "square root of negative operand"})), "big.ErrNaN", "big.ErrNaN"))
 		}
 
 		if ($.uint($.pointerValue<Float>(x).form, 8) != $.uint(1, 8)) {
@@ -1590,7 +1590,7 @@ export class Float {
 			$.pointerValue<Float>(z).acc = $.int(0, 8)
 			$.pointerValue<Float>(z).form = $.uint(0, 8)
 			$.pointerValue<Float>(z).neg = false
-			$.panic($.interfaceValue<any>($.markAsStructValue(new ErrNaN({msg: "subtraction of infinities with equal signs"})), "big.ErrNaN", "big.ErrNaN"))
+			$.panic($.interfaceValue($.markAsStructValue(new ErrNaN({msg: "subtraction of infinities with equal signs"})), "big.ErrNaN", "big.ErrNaN"))
 		}
 
 		if (($.uint($.pointerValue<Float>(x).form, 8) == $.uint(0, 8)) && ($.uint($.pointerValue<Float>(y).form, 8) == $.uint(0, 8))) {
@@ -1675,7 +1675,7 @@ export class Float {
 
 		let [, , err] = await Float.prototype.Parse.call(z, $.bytesToString(text), 0)
 		if (err != null) {
-			err = fmt2.Errorf("math/big: cannot unmarshal %q into a *big.Float (%v)", $.interfaceValue<any>(text, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }), (err as any))
+			err = fmt2.Errorf("math/big: cannot unmarshal %q into a *big.Float (%v)", $.interfaceValue(text, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }), (err as any))
 		}
 		return err
 	}
@@ -2554,7 +2554,7 @@ export const Above: Accuracy = 1
 
 export async function NewFloat(x: number): globalThis.Promise<Float | $.VarRef<Float> | null> {
 	if (math.IsNaN(x)) {
-		$.panic($.interfaceValue<any>($.markAsStructValue(new ErrNaN({msg: "NewFloat(NaN)"})), "big.ErrNaN", "big.ErrNaN"))
+		$.panic($.interfaceValue($.markAsStructValue(new ErrNaN({msg: "NewFloat(NaN)"})), "big.ErrNaN", "big.ErrNaN"))
 	}
 	return Float.prototype.SetFloat64.call(new Float(), x)
 }

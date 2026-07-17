@@ -117,7 +117,7 @@ export async function main(): globalThis.Promise<void> {
 	await processInterface((i2 as any))
 
 	// Test with concrete type
-	await processInterface($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(s)), "main.MyStruct", "main.MyStruct"))
+	await processInterface($.interfaceValue($.markAsStructValue($.cloneStructValue(s)), "main.MyStruct", "main.MyStruct"))
 
 	// Type switch with subset casting
 	let i3: any = (i1 as any)

@@ -2942,7 +2942,7 @@ func TestCompilePackagesEmitsInterfacesMethodValuesTypeSwitchesAndFunctionAssert
 		"$.namedFunction(greet, \"main.Greeter\", ({ kind: $.TypeKind.Function, name: \"main.Greeter\"",
 		"params: [{ kind: $.TypeKind.Basic, name: \"string\" }]",
 		"results: [{ kind: $.TypeKind.Basic, name: \"string\" }]",
-		"$.interfaceValue<any>(null, \"*struct{Name string}\",",
+		"$.interfaceValue(null, \"*struct{Name string}\",",
 		"elemType: { kind: $.TypeKind.Struct, methods: [], fields: [{ name: \"Name\", key: \"Name\", type: { kind: $.TypeKind.Basic, name: \"string\" }",
 		"let fn = __goscriptTuple",
 		"switch (true)",

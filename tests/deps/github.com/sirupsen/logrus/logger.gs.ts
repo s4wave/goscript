@@ -643,7 +643,7 @@ export class Logger {
 	public releaseEntry(entry: __goscript_entry.Entry | $.VarRef<__goscript_entry.Entry> | null): void {
 		const logger: Logger | $.VarRef<Logger> | null = this
 		$.pointerValue<__goscript_entry.Entry>(entry).Data = new globalThis.Map<string, any>([])
-		$.pointerValue<Logger>(logger).entryPool.Put($.interfaceValue<any>(entry, "*logrus.Entry", { kind: $.TypeKind.Pointer, elemType: "logrus.Entry" }))
+		$.pointerValue<Logger>(logger).entryPool.Put($.interfaceValue(entry, "*logrus.Entry", { kind: $.TypeKind.Pointer, elemType: "logrus.Entry" }))
 	}
 
 	static __typeInfo = $.registerStructType(

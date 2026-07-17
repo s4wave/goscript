@@ -328,10 +328,10 @@ export async function parsePublicKey(keyData: __goscript_x509.publicKeyInfo | $.
 			if (!cryptobyte.String_ReadASN1(der, der, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 				return [null, errors.New("x509: invalid RSA public key")]
 			}
-			if (!cryptobyte.String_ReadASN1Integer(der, $.interfaceValue<any>($.pointerValue<__goscript_pkcs1.pkcs1PublicKey>(p).N, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) {
+			if (!cryptobyte.String_ReadASN1Integer(der, $.interfaceValue($.pointerValue<__goscript_pkcs1.pkcs1PublicKey>(p).N, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) {
 				return [null, errors.New("x509: invalid RSA modulus")]
 			}
-			if (!cryptobyte.String_ReadASN1Integer(der, $.interfaceValue<any>($.pointerValue<__goscript_pkcs1.pkcs1PublicKey>(p)._fields.E, "*int", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "int" } }))) {
+			if (!cryptobyte.String_ReadASN1Integer(der, $.interfaceValue($.pointerValue<__goscript_pkcs1.pkcs1PublicKey>(p)._fields.E, "*int", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "int" } }))) {
 				return [null, errors.New("x509: invalid RSA public exponent")]
 			}
 
@@ -343,7 +343,7 @@ export async function parsePublicKey(keyData: __goscript_x509.publicKeyInfo | $.
 			}
 
 			let pub: rsa.PublicKey | $.VarRef<rsa.PublicKey> | null = new rsa.PublicKey({E: $.pointerValue<__goscript_pkcs1.pkcs1PublicKey>(p).E, N: $.pointerValue<__goscript_pkcs1.pkcs1PublicKey>(p).N})
-			return [$.interfaceValue<any>(pub, "*rsa.PublicKey", { kind: $.TypeKind.Pointer, elemType: "rsa.PublicKey" }), null]
+			return [$.interfaceValue(pub, "*rsa.PublicKey", { kind: $.TypeKind.Pointer, elemType: "rsa.PublicKey" }), null]
 			break
 		}
 		case asn1.ObjectIdentifier_Equal(oid, (__goscript_x509.oidPublicKeyECDSA as asn1.ObjectIdentifier)):
@@ -358,7 +358,7 @@ export async function parsePublicKey(keyData: __goscript_x509.publicKeyInfo | $.
 				return [null, errors.New("x509: unsupported elliptic curve")]
 			}
 			const __goscriptReturn0 = await ecdsa.ParseUncompressedPublicKey(namedCurve, data)
-			return [$.interfaceValue<any>(__goscriptReturn0[0], "*ecdsa.PublicKey", { kind: $.TypeKind.Pointer, elemType: "ecdsa.PublicKey" }), __goscriptReturn0[1]]
+			return [$.interfaceValue(__goscriptReturn0[0], "*ecdsa.PublicKey", { kind: $.TypeKind.Pointer, elemType: "ecdsa.PublicKey" }), __goscriptReturn0[1]]
 			break
 		}
 		case asn1.ObjectIdentifier_Equal(oid, (__goscript_x509.oidPublicKeyEd25519 as asn1.ObjectIdentifier)):
@@ -378,25 +378,25 @@ export async function parsePublicKey(keyData: __goscript_x509.publicKeyInfo | $.
 				return [null, errors.New("x509: X25519 key encoded with illegal parameters")]
 			}
 			const __goscriptReturn1 = await $.pointerValue<Exclude<ecdh.Curve, null>>(ecdh.X25519()).NewPublicKey(data)
-			return [$.interfaceValue<any>(__goscriptReturn1[0], "*ecdh.PublicKey", { kind: $.TypeKind.Pointer, elemType: "ecdh.PublicKey" }), __goscriptReturn1[1]]
+			return [$.interfaceValue(__goscriptReturn1[0], "*ecdh.PublicKey", { kind: $.TypeKind.Pointer, elemType: "ecdh.PublicKey" }), __goscriptReturn1[1]]
 			break
 		}
 		case asn1.ObjectIdentifier_Equal(oid, (__goscript_x509.oidPublicKeyDSA as asn1.ObjectIdentifier)):
 		{
 			let der: $.VarRef<cryptobyte.String> = $.varRef(((data as cryptobyte.String) as cryptobyte.String))
 			let y: big.Int | $.VarRef<big.Int> | null = new big.Int()
-			if (!cryptobyte.String_ReadASN1Integer(der, $.interfaceValue<any>(y, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) {
+			if (!cryptobyte.String_ReadASN1Integer(der, $.interfaceValue(y, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) {
 				return [null, errors.New("x509: invalid DSA public key")]
 			}
 			let pub: dsa.PublicKey | $.VarRef<dsa.PublicKey> | null = new dsa.PublicKey({Y: y, Parameters: $.markAsStructValue(new dsa.Parameters({P: new big.Int(), Q: new big.Int(), G: new big.Int()}))})
 			let paramsDer: $.VarRef<cryptobyte.String> = $.varRef(((params.FullBytes as cryptobyte.String) as cryptobyte.String))
-			if (((!cryptobyte.String_ReadASN1(paramsDer, paramsDer, $.uint(cryptobyte_asn1.SEQUENCE, 8)) || !cryptobyte.String_ReadASN1Integer(paramsDer, $.interfaceValue<any>($.pointerValue<dsa.PublicKey>(pub).Parameters.P, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) || !cryptobyte.String_ReadASN1Integer(paramsDer, $.interfaceValue<any>($.pointerValue<dsa.PublicKey>(pub).Parameters.Q, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) || !cryptobyte.String_ReadASN1Integer(paramsDer, $.interfaceValue<any>($.pointerValue<dsa.PublicKey>(pub).Parameters.G, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) {
+			if (((!cryptobyte.String_ReadASN1(paramsDer, paramsDer, $.uint(cryptobyte_asn1.SEQUENCE, 8)) || !cryptobyte.String_ReadASN1Integer(paramsDer, $.interfaceValue($.pointerValue<dsa.PublicKey>(pub).Parameters.P, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) || !cryptobyte.String_ReadASN1Integer(paramsDer, $.interfaceValue($.pointerValue<dsa.PublicKey>(pub).Parameters.Q, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) || !cryptobyte.String_ReadASN1Integer(paramsDer, $.interfaceValue($.pointerValue<dsa.PublicKey>(pub).Parameters.G, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) {
 				return [null, errors.New("x509: invalid DSA parameters")]
 			}
 			if ((((big.Int.prototype.Sign.call($.pointerValue<dsa.PublicKey>(pub).Y) <= 0) || (big.Int.prototype.Sign.call($.pointerValue<dsa.PublicKey>(pub).Parameters.P) <= 0)) || (big.Int.prototype.Sign.call($.pointerValue<dsa.PublicKey>(pub).Parameters.Q) <= 0)) || (big.Int.prototype.Sign.call($.pointerValue<dsa.PublicKey>(pub).Parameters.G) <= 0)) {
 				return [null, errors.New("x509: zero or negative DSA parameter")]
 			}
-			return [$.interfaceValue<any>(pub, "*dsa.PublicKey", { kind: $.TypeKind.Pointer, elemType: "dsa.PublicKey" }), null]
+			return [$.interfaceValue(pub, "*dsa.PublicKey", { kind: $.TypeKind.Pointer, elemType: "dsa.PublicKey" }), null]
 			break
 		}
 		default:
@@ -439,7 +439,7 @@ export function parseBasicConstraintsExtension(__goscriptParam5: cryptobyte.Stri
 	let maxPathLen = -1
 	if (cryptobyte.String_PeekASN1Tag(der.value, $.uint(cryptobyte_asn1.INTEGER, 8))) {
 		let mpl: $.VarRef<number> = $.varRef(0)
-		if (!cryptobyte.String_ReadASN1Integer(der, $.interfaceValue<any>(mpl, "*uint", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint" } })) || (mpl.value > $.uint("9223372036854775807", 64))) {
+		if (!cryptobyte.String_ReadASN1Integer(der, $.interfaceValue(mpl, "*uint", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint" } })) || (mpl.value > $.uint("9223372036854775807", 64))) {
 			return [false, 0, errors.New("x509: invalid basic constraints")]
 		}
 		maxPathLen = $.int(mpl.value)
@@ -759,7 +759,7 @@ export async function parseNameConstraintsExtension(out: __goscript_x509.Certifi
 					}
 
 					if (!isValidIPMask(mask)) {
-						return [null, null, null, null, fmt.Errorf("x509: IP constraint contained invalid mask %x", $.interfaceValue<any>(mask, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))]
+						return [null, null, null, null, fmt.Errorf("x509: IP constraint contained invalid mask %x", $.interfaceValue(mask, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))]
 					}
 
 					ips = $.append(ips, new net.IPNet({IP: ((ip as net.IP) as net.IP), Mask: ((mask as net.IPMask) as net.IPMask)}), $.appendZeros.nil)
@@ -1054,7 +1054,7 @@ export async function processExtensions(out: __goscript_x509.Certificate | $.Var
 				case 54:
 				{
 					let val: $.VarRef<cryptobyte.String> = $.varRef(((e.Value as cryptobyte.String) as cryptobyte.String))
-					if (!cryptobyte.String_ReadASN1Integer(val, $.interfaceValue<any>($.pointerValue<__goscript_x509.Certificate>(out)._fields.InhibitAnyPolicy, "*int", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "int" } }))) {
+					if (!cryptobyte.String_ReadASN1Integer(val, $.interfaceValue($.pointerValue<__goscript_x509.Certificate>(out)._fields.InhibitAnyPolicy, "*int", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "int" } }))) {
 						return errors.New("x509: invalid inhibit any policy extension")
 					}
 					$.pointerValue<__goscript_x509.Certificate>(out).InhibitAnyPolicyZero = $.pointerValue<__goscript_x509.Certificate>(out).InhibitAnyPolicy == 0
@@ -1151,7 +1151,7 @@ export async function parseCertificate(der: $.Slice<number>): globalThis.Promise
 		return [null, errors.New("x509: malformed tbs certificate")]
 	}
 
-	if (!cryptobyte.String_ReadOptionalASN1Integer(tbs, $.interfaceValue<any>($.pointerValue<__goscript_x509.Certificate>(cert)._fields.Version, "*int", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "int" } }), $.uint(cryptobyte_asn1.Tag_ContextSpecific(cryptobyte_asn1.Tag_Constructed(0)), 8), $.basicInterfaceValue(0, "int"))) {
+	if (!cryptobyte.String_ReadOptionalASN1Integer(tbs, $.interfaceValue($.pointerValue<__goscript_x509.Certificate>(cert)._fields.Version, "*int", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "int" } }), $.uint(cryptobyte_asn1.Tag_ContextSpecific(cryptobyte_asn1.Tag_Constructed(0)), 8), $.basicInterfaceValue(0, "int"))) {
 		return [null, errors.New("x509: malformed version")]
 	}
 	if ($.pointerValue<__goscript_x509.Certificate>(cert).Version < 0) {
@@ -1165,7 +1165,7 @@ export async function parseCertificate(der: $.Slice<number>): globalThis.Promise
 	}
 
 	let serial: big.Int | $.VarRef<big.Int> | null = new big.Int()
-	if (!cryptobyte.String_ReadASN1Integer(tbs, $.interfaceValue<any>(serial, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) {
+	if (!cryptobyte.String_ReadASN1Integer(tbs, $.interfaceValue(serial, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) {
 		return [null, errors.New("x509: malformed serial number")]
 	}
 	if (big.Int.prototype.Sign.call(serial) == -1) {
@@ -1376,7 +1376,7 @@ export async function ParseRevocationList(der: $.Slice<number>): globalThis.Prom
 	if (!cryptobyte.String_PeekASN1Tag(tbs.value, $.uint(cryptobyte_asn1.INTEGER, 8))) {
 		return [null, errors.New("x509: unsupported crl version")]
 	}
-	if (!cryptobyte.String_ReadASN1Integer(tbs, $.interfaceValue<any>(version, "*int", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "int" } }))) {
+	if (!cryptobyte.String_ReadASN1Integer(tbs, $.interfaceValue(version, "*int", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "int" } }))) {
 		return [null, errors.New("x509: malformed crl")]
 	}
 	if (version.value != 1) {
@@ -1455,7 +1455,7 @@ export async function ParseRevocationList(der: $.Slice<number>): globalThis.Prom
 			}
 
 			rce.SerialNumber = new big.Int()
-			if (!cryptobyte.String_ReadASN1Integer(certSeq, $.interfaceValue<any>(rce.SerialNumber, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) {
+			if (!cryptobyte.String_ReadASN1Integer(certSeq, $.interfaceValue(rce.SerialNumber, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) {
 				return [null, errors.New("x509: malformed serial number")]
 			}
 			let __goscriptTuple23: any = parseTime(certSeq)
@@ -1524,7 +1524,7 @@ export async function ParseRevocationList(der: $.Slice<number>): globalThis.Prom
 				if (asn1.ObjectIdentifier_Equal(ext.Id, (__goscript_x509.oidExtensionCRLNumber as asn1.ObjectIdentifier))) {
 					let value: $.VarRef<cryptobyte.String> = $.varRef(((ext.Value as cryptobyte.String) as cryptobyte.String))
 					$.pointerValue<__goscript_x509.RevocationList>(rl).Number = new big.Int()
-					if (!cryptobyte.String_ReadASN1Integer(value, $.interfaceValue<any>($.pointerValue<__goscript_x509.RevocationList>(rl).Number, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) {
+					if (!cryptobyte.String_ReadASN1Integer(value, $.interfaceValue($.pointerValue<__goscript_x509.RevocationList>(rl).Number, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) {
 						return [null, errors.New("x509: malformed crl number")]
 					}
 				}

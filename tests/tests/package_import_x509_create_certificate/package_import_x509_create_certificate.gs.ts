@@ -92,7 +92,7 @@ export async function main(): globalThis.Promise<void> {
 	let priv: ed25519.PrivateKey = (__goscriptTuple0[1] as ed25519.PrivateKey)
 	let err = __goscriptTuple0[2]
 	$.println("keygen err nil", err == null)
-	let __goscriptTuple1: any = await asn1.Marshal($.interfaceValue<any>($.markAsStructValue(new signedKey({PubKey: new Uint8Array([8, 1, 18, 2, 3, 4]) as $.Slice<number>, Signature: new Uint8Array([5, 6]) as $.Slice<number>})), "main.signedKey", "main.signedKey"))
+	let __goscriptTuple1: any = await asn1.Marshal($.interfaceValue($.markAsStructValue(new signedKey({PubKey: new Uint8Array([8, 1, 18, 2, 3, 4]) as $.Slice<number>, Signature: new Uint8Array([5, 6]) as $.Slice<number>})), "main.signedKey", "main.signedKey"))
 	let extensionDER: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	$.println("extension marshal err nil", err == null)
@@ -132,7 +132,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	let decoded: $.VarRef<signedKey> = $.varRef($.markAsStructValue(new signedKey()))
-	let __goscriptTuple4: any = await asn1.Unmarshal(keyExt.Value, $.interfaceValue<any>(decoded, "*main.signedKey", { kind: $.TypeKind.Pointer, elemType: "main.signedKey" }))
+	let __goscriptTuple4: any = await asn1.Unmarshal(keyExt.Value, $.interfaceValue(decoded, "*main.signedKey", { kind: $.TypeKind.Pointer, elemType: "main.signedKey" }))
 	err = __goscriptTuple4[1]
 	$.println("extension unmarshal", err == null, $.len(decoded.value.PubKey), $.uint($.arrayIndex(decoded.value.PubKey!, 0), 8), $.uint($.arrayIndex(decoded.value.PubKey!, 5), 8), $.len(decoded.value.Signature))
 	let pool: x509.CertPool | $.VarRef<x509.CertPool> | null = x509.NewCertPool()

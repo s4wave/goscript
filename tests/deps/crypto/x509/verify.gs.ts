@@ -1279,7 +1279,7 @@ export function checkChainForKeyUsage(chain: $.Slice<__goscript_x509.Certificate
 export async function mustNewOIDFromInts(ints: $.Slice<bigint>): globalThis.Promise<__goscript_oid.OID> {
 	let [oid, err] = __goscript_oid.OIDFromInts(ints)
 	if (err != null) {
-		$.panic(await fmt.Sprintf("OIDFromInts(%v) unexpected error: %v", $.interfaceValue<any>(ints, "[]uint64", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint64" } }), (err as any)))
+		$.panic(await fmt.Sprintf("OIDFromInts(%v) unexpected error: %v", $.interfaceValue(ints, "[]uint64", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint64" } }), (err as any)))
 	}
 	return $.markAsStructValue($.cloneStructValue(oid))
 }

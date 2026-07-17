@@ -53,8 +53,8 @@ export function mapComparisonPanics(): boolean {
 			panicked = $.recover() != null
 		})() })
 		let mapped: globalThis.Map<string, number> | null = null! as globalThis.Map<string, number> | null
-		let left: any = $.interfaceValue<any>(mapped, "map[string]int", { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } })
-		let right: any = $.interfaceValue<any>(mapped, "map[string]int", { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } })
+		let left: any = $.interfaceValue(mapped, "map[string]int", { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } })
+		let right: any = $.interfaceValue(mapped, "map[string]int", { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } })
 		$.comparableEqual(left, right)
 		const __goscriptReturn0: boolean = false
 		panicked = __goscriptReturn0
@@ -72,26 +72,26 @@ export function mapComparisonPanics(): boolean {
 
 export async function main(): globalThis.Promise<void> {
 	let mapped: globalThis.Map<string, number> | null = null! as globalThis.Map<string, number> | null
-	let mappedAny: any = $.interfaceValue<any>(mapped, "map[string]int", { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } })
+	let mappedAny: any = $.interfaceValue(mapped, "map[string]int", { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } })
 	let __goscriptTuple0: any = $.typeAssertTuple<globalThis.Map<string, number> | null>(mappedAny, { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } })
 	let mappedValue: globalThis.Map<string, number> | null = __goscriptTuple0[0]
 	let mappedOK = __goscriptTuple0[1]
 	$.println("map", mappedOK, mappedValue == null)
 
 	let channel: $.Channel<number> | null = null! as $.Channel<number> | null
-	let channelAny: any = $.interfaceValue<any>(channel, "chan int", { kind: $.TypeKind.Channel, direction: "both", elemType: { kind: $.TypeKind.Basic, name: "int" } })
+	let channelAny: any = $.interfaceValue(channel, "chan int", { kind: $.TypeKind.Channel, direction: "both", elemType: { kind: $.TypeKind.Basic, name: "int" } })
 	let __goscriptTuple1: any = $.typeAssertTuple<$.Channel<number> | null>(channelAny, { kind: $.TypeKind.Channel, direction: "both", elemType: { kind: $.TypeKind.Basic, name: "int" } })
 	let channelValue: $.Channel<number> | null = __goscriptTuple1[0]
 	let channelOK = __goscriptTuple1[1]
 	$.println("chan", channelOK, channelValue == null)
 
 	let callback: (() => void) | null = null! as (() => void) | null
-	let callbackAny: any = $.interfaceValue<any>(callback, "func()", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
+	let callbackAny: any = $.interfaceValue(callback, "func()", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 	let [callbackValue, callbackOK] = $.typeAssertTuple<(() => void) | null>(callbackAny, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 	$.println("func", callbackOK, callbackValue == null)
 
 	let pointer: source | $.VarRef<source> | null = null! as source | $.VarRef<source> | null
-	let pointerAny: any = $.interfaceValue<any>(pointer, "*main.source", { kind: $.TypeKind.Pointer, elemType: "main.source" })
+	let pointerAny: any = $.interfaceValue(pointer, "*main.source", { kind: $.TypeKind.Pointer, elemType: "main.source" })
 	let [readerValue, readerOK] = $.typeAssertTuple<reader | null>(pointerAny, "main.reader")
 	let [count, err] = await $.pointerValue<Exclude<reader, null>>(readerValue).Read(new Uint8Array([1, 2]) as $.Slice<number>)
 	if (err != null) {
@@ -99,10 +99,10 @@ export async function main(): globalThis.Promise<void> {
 	}
 	$.println("reader", readerOK, count)
 
-	let mappedReflect = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>(mapped, "map[string]int", { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } }))))
+	let mappedReflect = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(mapped, "map[string]int", { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } }))))
 	$.println("reflect-map", $.markAsStructValue($.cloneStructValue(mappedReflect)).Kind() == reflect.Map, $.markAsStructValue($.cloneStructValue(mappedReflect)).IsNil())
 
-	let pointerReflect = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>(pointer, "*main.source", { kind: $.TypeKind.Pointer, elemType: "main.source" }))))
+	let pointerReflect = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(pointer, "*main.source", { kind: $.TypeKind.Pointer, elemType: "main.source" }))))
 	$.println("reflect-pointer", $.markAsStructValue($.cloneStructValue(pointerReflect)).Kind() == reflect.Pointer, $.markAsStructValue($.cloneStructValue(pointerReflect)).IsNil(), await $.pointerValue<Exclude<reflect.Type, null>>((await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(pointerReflect)).Type()).Elem())).Kind() == reflect.Struct)
 
 	$.println("map-comparison-panics", mapComparisonPanics())

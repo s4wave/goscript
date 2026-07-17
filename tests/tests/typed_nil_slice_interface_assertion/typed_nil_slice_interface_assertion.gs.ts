@@ -39,7 +39,7 @@ export class item {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let boxed: any = $.interfaceValue<any>(null, "[]*main.item", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.item" } })
+	let boxed: any = $.interfaceValue(null, "[]*main.item", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.item" } })
 	let asserted: $.Slice<item | $.VarRef<item> | null> = $.mustTypeAssert<$.Slice<item | $.VarRef<item> | null>>(boxed, { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.item" } })
 	$.println(asserted == null)
 

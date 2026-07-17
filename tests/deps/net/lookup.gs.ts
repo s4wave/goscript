@@ -1366,7 +1366,7 @@ export class Resolver {
 				return [$.arrayToSlice<__goscript_iprawsock.IPAddr>([(() => { const __goscriptLiteralField11 = (__goscript_ip.IP_To16(($.markAsStructValue($.cloneStructValue(ip)).AsSlice() as __goscript_ip.IP)) as __goscript_ip.IP); const __goscriptLiteralField12 = $.markAsStructValue($.cloneStructValue(ip)).Zone(); return $.markAsStructValue(new __goscript_iprawsock.IPAddr({IP: __goscriptLiteralField11, Zone: __goscriptLiteralField12})) })()]), null]
 			}
 		}
-		let __goscriptTuple44: any = $.typeAssertTuple<nettrace.Trace | $.VarRef<nettrace.Trace> | null>(await $.pointerValue<Exclude<context.Context, null>>(ctx).Value($.interfaceValue<any>($.markAsStructValue(new nettrace.TraceKey()), "nettrace.TraceKey", "nettrace.TraceKey")), { kind: $.TypeKind.Pointer, elemType: "nettrace.Trace" })
+		let __goscriptTuple44: any = $.typeAssertTuple<nettrace.Trace | $.VarRef<nettrace.Trace> | null>(await $.pointerValue<Exclude<context.Context, null>>(ctx).Value($.interfaceValue($.markAsStructValue(new nettrace.TraceKey()), "nettrace.TraceKey", "nettrace.TraceKey")), { kind: $.TypeKind.Pointer, elemType: "nettrace.Trace" })
 		let trace: nettrace.Trace | $.VarRef<nettrace.Trace> | null = __goscriptTuple44[0]
 		if ((trace != null) && ($.pointerValue<nettrace.Trace>(trace).DNSStart != null)) {
 			await $.pointerValue<nettrace.Trace>(trace).DNSStart!(host)
@@ -1376,7 +1376,7 @@ export class Resolver {
 		// uses a context key instead of unexported variables.
 		let resolverFunc: ((ctx: context.Context | null, network: string, host: string) => [$.Slice<__goscript_iprawsock.IPAddr>, $.GoError] | globalThis.Promise<[$.Slice<__goscript_iprawsock.IPAddr>, $.GoError]>) | null = $.functionValue(((__receiver) => (ctx: context.Context | null, network: string, host: string) => __receiver.lookupIP(ctx, network, host))($.pointerValue<Resolver>(r)), ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Slice, elemType: "net.IPAddr" }, "error"] } as $.FunctionTypeInfo))
 		{
-			let [alt, ] = $.typeAssertTuple<((_p0: context.Context | null, _p1: string, _p2: string) => [$.Slice<__goscript_iprawsock.IPAddr>, $.GoError] | globalThis.Promise<[$.Slice<__goscript_iprawsock.IPAddr>, $.GoError]>) | null>(await $.pointerValue<Exclude<context.Context, null>>(ctx).Value($.interfaceValue<any>($.markAsStructValue(new nettrace.LookupIPAltResolverKey()), "nettrace.LookupIPAltResolverKey", "nettrace.LookupIPAltResolverKey")), ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Slice, elemType: "net.IPAddr" }, "error"] } as $.FunctionTypeInfo))
+			let [alt, ] = $.typeAssertTuple<((_p0: context.Context | null, _p1: string, _p2: string) => [$.Slice<__goscript_iprawsock.IPAddr>, $.GoError] | globalThis.Promise<[$.Slice<__goscript_iprawsock.IPAddr>, $.GoError]>) | null>(await $.pointerValue<Exclude<context.Context, null>>(ctx).Value($.interfaceValue($.markAsStructValue(new nettrace.LookupIPAltResolverKey()), "nettrace.LookupIPAltResolverKey", "nettrace.LookupIPAltResolverKey")), ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Slice, elemType: "net.IPAddr" }, "error"] } as $.FunctionTypeInfo))
 			if (alt != null) {
 				resolverFunc = alt
 			}
@@ -1393,7 +1393,7 @@ export class Resolver {
 		dnsWaitGroup.value.Add(1)
 		let ch: $.Channel<singleflight.Result> | null = await singleflight.Group.prototype.DoChan.call(Resolver.prototype.getLookupGroup.call(r), lookupKey, $.functionValue(async (): globalThis.Promise<[any, $.GoError]> => {
 			const __goscriptReturn13 = await __goscript_hook.__goscript_get_testHookLookupIP()!(lookupGroupCtx, resolverFunc, network, host)
-			return [$.interfaceValue<any>(__goscriptReturn13[0], "[]net.IPAddr", { kind: $.TypeKind.Slice, elemType: "net.IPAddr" }), __goscriptReturn13[1]]
+			return [$.interfaceValue(__goscriptReturn13[0], "[]net.IPAddr", { kind: $.TypeKind.Slice, elemType: "net.IPAddr" }), __goscriptReturn13[1]]
 		}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [] }, "error"] } as $.FunctionTypeInfo)))
 
 		let dnsWaitGroupDone: ((ch: $.Channel<singleflight.Result> | null, cancelFn: (() => void) | null) => void) | null = $.functionValue(async (ch: $.Channel<singleflight.Result> | null, cancelFn: context.CancelFunc | null): globalThis.Promise<void> => {
@@ -1929,7 +1929,7 @@ export function ipAddrsEface(addrs: $.Slice<__goscript_iprawsock.IPAddr>): $.Sli
 	let s: $.Slice<any> = $.makeSlice<any>($.len(addrs))
 	for (let __goscriptRangeTarget16 = addrs, i = 0; i < $.len(__goscriptRangeTarget16); i++) {
 		let v = __goscriptRangeTarget16![i]
-		s![i] = $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(v)), "net.IPAddr", "net.IPAddr")
+		s![i] = $.interfaceValue($.markAsStructValue($.cloneStructValue(v)), "net.IPAddr", "net.IPAddr")
 	}
 	return s
 }

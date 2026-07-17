@@ -387,7 +387,7 @@ export class headerFileInfo {
 
 	public Sys(): any {
 		const fi = this
-		return $.interfaceValue<any>(fi.fh, "*zip.FileHeader", { kind: $.TypeKind.Pointer, elemType: "zip.FileHeader" })
+		return $.interfaceValue(fi.fh, "*zip.FileHeader", { kind: $.TypeKind.Pointer, elemType: "zip.FileHeader" })
 	}
 
 	public Type(): fs.FileMode {

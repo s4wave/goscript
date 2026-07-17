@@ -766,7 +766,7 @@ export async function newOnePassMachine(): globalThis.Promise<onePassMachine | $
 
 export function freeOnePassMachine(m: onePassMachine | $.VarRef<onePassMachine> | null): void {
 	$.pointerValue<onePassMachine>(m).inputs.clear()
-	onePassPool.value.Put($.interfaceValue<any>(m, "*regexp.onePassMachine", { kind: $.TypeKind.Pointer, elemType: "regexp.onePassMachine" }))
+	onePassPool.value.Put($.interfaceValue(m, "*regexp.onePassMachine", { kind: $.TypeKind.Pointer, elemType: "regexp.onePassMachine" }))
 }
 
 export let arrayNoInts: number[] = Array.from({ length: 0 }, () => 0)

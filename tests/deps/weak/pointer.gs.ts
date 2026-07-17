@@ -75,7 +75,7 @@ export function Make(__typeArgs: $.GenericTypeArgs | undefined, ptr: any): Point
 	if (ptr != null) {
 		u = runtime_registerWeakPointer((ptr as any))
 	}
-	runtime.KeepAlive($.interfaceValue<any>(ptr, "*T", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } }))
+	runtime.KeepAlive($.interfaceValue(ptr, "*T", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } }))
 	return $.markAsStructValue(new Pointer({u: u}))
 }
 

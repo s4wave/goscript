@@ -818,7 +818,7 @@ export class Rat {
 		{
 			let [, ok] = await Rat.prototype.SetString.call(z, $.bytesToString(text))
 			if (!ok) {
-				return fmt.Errorf("math/big: cannot unmarshal %q into a *big.Rat", $.interfaceValue<any>(text, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))
+				return fmt.Errorf("math/big: cannot unmarshal %q into a *big.Rat", $.interfaceValue(text, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))
 			}
 		}
 		return null

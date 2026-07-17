@@ -57,7 +57,7 @@ export async function Listen(ctx: context.Context | null, addr: string, srv: __g
 		return err
 	}
 
-	let listenErrCh: $.Channel<$.GoError> | null = $.makeChannel<$.GoError>(1, null, "both")
+	let listenErrCh: $.Channel<$.GoError> | null = $.makeChannel<$.GoError>(1, null! as $.GoError, "both")
 	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
 		await $.chanSend(listenErrCh, await __goscript_accept.AcceptMuxedListener(ctx, lis, srv, null))
 		await $.pointerValue<Exclude<net.Listener, null>>(lis).Close()

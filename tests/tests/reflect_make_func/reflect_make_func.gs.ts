@@ -49,7 +49,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println("variadic direct:", await variadic!(10, $.arrayToSlice<string>(["a", "b"])))
 	let reflectedVariadic: $.Slice<reflect.Value> = await $.markAsStructValue($.cloneStructValue(variadicValue)).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(20, "int")))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf("a"))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf("b"))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf("c")))]))
 	$.println("variadic reflected:", $.markAsStructValue($.cloneStructValue($.arrayIndex(reflectedVariadic!, 0))).Int())
-	let reflectedSlice: $.Slice<reflect.Value> = await $.markAsStructValue($.cloneStructValue(variadicValue)).CallSlice($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(30, "int")))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue<any>($.arrayToSlice<string>(["a", "b"]), "[]string", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } }))))]))
+	let reflectedSlice: $.Slice<reflect.Value> = await $.markAsStructValue($.cloneStructValue(variadicValue)).CallSlice($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(30, "int")))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<string>(["a", "b"]), "[]string", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } }))))]))
 	$.println("variadic callslice:", $.markAsStructValue($.cloneStructValue($.arrayIndex(reflectedSlice!, 0))).Int())
 
 	$.println("reflect_make_func test finished")

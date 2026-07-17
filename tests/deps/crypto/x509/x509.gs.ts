@@ -1341,7 +1341,7 @@ export class Certificate {
 		if ($.len($.pointerValue<Certificate>(c).SubjectKeyId) > 0) {
 			let aki: pkix2.Extension = $.markAsStructValue(new pkix2.Extension())
 			aki.Id = (oidExtensionAuthorityKeyId as asn1.ObjectIdentifier)
-			let __goscriptTuple11: any = await asn1.Marshal($.interfaceValue<any>($.markAsStructValue(new authKeyId({Id: $.pointerValue<Certificate>(c).SubjectKeyId})), "x509.authKeyId", "x509.authKeyId"))
+			let __goscriptTuple11: any = await asn1.Marshal($.interfaceValue($.markAsStructValue(new authKeyId({Id: $.pointerValue<Certificate>(c).SubjectKeyId})), "x509.authKeyId", "x509.authKeyId"))
 			aki.Value = __goscriptTuple11[0]
 			err = __goscriptTuple11[1]
 			if (err != null) {
@@ -1350,7 +1350,7 @@ export class Certificate {
 			tbsCertList.Extensions = $.append(tbsCertList.Extensions, aki)
 		}
 
-		let __goscriptTuple12: any = await asn1.Marshal($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(tbsCertList)), "pkix.TBSCertificateList", "pkix.TBSCertificateList"))
+		let __goscriptTuple12: any = await asn1.Marshal($.interfaceValue($.markAsStructValue($.cloneStructValue(tbsCertList)), "pkix.TBSCertificateList", "pkix.TBSCertificateList"))
 		let tbsCertListContents: $.Slice<number> = __goscriptTuple12[0]
 		err = __goscriptTuple12[1]
 		if (err != null) {
@@ -1365,7 +1365,7 @@ export class Certificate {
 			return [null, err]
 		}
 
-		return asn1.Marshal($.interfaceValue<any>($.markAsStructValue(new pkix2.CertificateList({TBSCertList: $.markAsStructValue($.cloneStructValue(tbsCertList)), SignatureAlgorithm: $.markAsStructValue($.cloneStructValue(algorithmIdentifier)), SignatureValue: $.markAsStructValue(new asn1.BitString({Bytes: signature, BitLength: $.len(signature) * 8}))})), "pkix.CertificateList", "pkix.CertificateList"))
+		return asn1.Marshal($.interfaceValue($.markAsStructValue(new pkix2.CertificateList({TBSCertList: $.markAsStructValue($.cloneStructValue(tbsCertList)), SignatureAlgorithm: $.markAsStructValue($.cloneStructValue(algorithmIdentifier)), SignatureValue: $.markAsStructValue(new asn1.BitString({Bytes: signature, BitLength: $.len(signature) * 8}))})), "pkix.CertificateList", "pkix.CertificateList"))
 	}
 
 	public Equal(other: Certificate | $.VarRef<Certificate> | null): boolean {
@@ -3008,12 +3008,12 @@ export async function ParsePKIXPublicKey(derBytes: $.Slice<number>): globalThis.
 	let err: $.GoError = null! as $.GoError
 	let pki: $.VarRef<publicKeyInfo> = $.varRef($.markAsStructValue(new publicKeyInfo()))
 	{
-		let __goscriptTuple0: any = await asn1.Unmarshal(derBytes, $.interfaceValue<any>(pki, "*x509.publicKeyInfo", { kind: $.TypeKind.Pointer, elemType: "x509.publicKeyInfo" }))
+		let __goscriptTuple0: any = await asn1.Unmarshal(derBytes, $.interfaceValue(pki, "*x509.publicKeyInfo", { kind: $.TypeKind.Pointer, elemType: "x509.publicKeyInfo" }))
 		let rest: $.Slice<number> = __goscriptTuple0[0]
 		let __goscriptShadow0 = __goscriptTuple0[1]
 		if (__goscriptShadow0 != null) {
 			{
-				let [, __goscriptShadow1] = await asn1.Unmarshal(derBytes, $.interfaceValue<any>(new __goscript_pkcs1.pkcs1PublicKey(), "*x509.pkcs1PublicKey", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs1PublicKey" }))
+				let [, __goscriptShadow1] = await asn1.Unmarshal(derBytes, $.interfaceValue(new __goscript_pkcs1.pkcs1PublicKey(), "*x509.pkcs1PublicKey", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs1PublicKey" }))
 				if (__goscriptShadow1 == null) {
 					return [null, errors.New("x509: failed to parse public key (use ParsePKCS1PublicKey instead for this key format)")]
 				}
@@ -3038,7 +3038,7 @@ export async function marshalPublicKey(pub: any): globalThis.Promise<[$.Slice<nu
 			case $.typeAssert<rsa.PublicKey | $.VarRef<rsa.PublicKey> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "rsa.PublicKey" }).ok:
 				{
 					let pub: rsa.PublicKey | $.VarRef<rsa.PublicKey> | null = $.typeAssert<rsa.PublicKey | $.VarRef<rsa.PublicKey> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "rsa.PublicKey" }).value
-					let __goscriptTuple1: any = await asn1.Marshal($.interfaceValue<any>($.markAsStructValue(new __goscript_pkcs1.pkcs1PublicKey({N: $.pointerValue<rsa.PublicKey>(pub).N, E: $.pointerValue<rsa.PublicKey>(pub).E})), "x509.pkcs1PublicKey", "x509.pkcs1PublicKey"))
+					let __goscriptTuple1: any = await asn1.Marshal($.interfaceValue($.markAsStructValue(new __goscript_pkcs1.pkcs1PublicKey({N: $.pointerValue<rsa.PublicKey>(pub).N, E: $.pointerValue<rsa.PublicKey>(pub).E})), "x509.pkcs1PublicKey", "x509.pkcs1PublicKey"))
 					publicKeyBytes = __goscriptTuple1[0]
 					err = __goscriptTuple1[1]
 					if (err != null) {
@@ -3137,7 +3137,7 @@ export async function MarshalPKIXPublicKey(pub: any): globalThis.Promise<[$.Slic
 
 	let __goscriptShadow2 = $.markAsStructValue(new pkixPublicKey({Algo: $.markAsStructValue($.cloneStructValue(publicKeyAlgorithm)), BitString: $.markAsStructValue(new asn1.BitString({Bytes: publicKeyBytes, BitLength: 8 * $.len(publicKeyBytes)}))}))
 
-	let __goscriptTuple8: any = await asn1.Marshal($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(__goscriptShadow2)), "x509.pkixPublicKey", "x509.pkixPublicKey"))
+	let __goscriptTuple8: any = await asn1.Marshal($.interfaceValue($.markAsStructValue($.cloneStructValue(__goscriptShadow2)), "x509.pkixPublicKey", "x509.pkixPublicKey"))
 	let ret: $.Slice<number> = __goscriptTuple8[0]
 	return [ret, null]
 }
@@ -3360,7 +3360,7 @@ export async function getSignatureAlgorithmFromAI(ai: pkix2.AlgorithmIdentifier)
 
 	let params: $.VarRef<pssParameters> = $.varRef($.markAsStructValue(new pssParameters()))
 	{
-		let [, err] = await asn1.Unmarshal(ai.Parameters.FullBytes, $.interfaceValue<any>(params, "*x509.pssParameters", { kind: $.TypeKind.Pointer, elemType: "x509.pssParameters" }))
+		let [, err] = await asn1.Unmarshal(ai.Parameters.FullBytes, $.interfaceValue(params, "*x509.pssParameters", { kind: $.TypeKind.Pointer, elemType: "x509.pssParameters" }))
 		if (err != null) {
 			return 0
 		}
@@ -3368,7 +3368,7 @@ export async function getSignatureAlgorithmFromAI(ai: pkix2.AlgorithmIdentifier)
 
 	let mgf1HashFunc: $.VarRef<pkix2.AlgorithmIdentifier> = $.varRef($.markAsStructValue(new pkix2.AlgorithmIdentifier()))
 	{
-		let [, err] = await asn1.Unmarshal(params.value.MGF.Parameters.FullBytes, $.interfaceValue<any>(mgf1HashFunc, "*pkix.AlgorithmIdentifier", { kind: $.TypeKind.Pointer, elemType: "pkix.AlgorithmIdentifier" }))
+		let [, err] = await asn1.Unmarshal(params.value.MGF.Parameters.FullBytes, $.interfaceValue(mgf1HashFunc, "*pkix.AlgorithmIdentifier", { kind: $.TypeKind.Pointer, elemType: "pkix.AlgorithmIdentifier" }))
 		if (err != null) {
 			return 0
 		}
@@ -3764,7 +3764,7 @@ export async function checkSignature(algo: SignatureAlgorithm, signed: $.Slice<n
 				{
 					let pub: rsa.PublicKey | $.VarRef<rsa.PublicKey> | null = $.typeAssert<rsa.PublicKey | $.VarRef<rsa.PublicKey> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "rsa.PublicKey" }).value
 					if (pubKeyAlgo != 1) {
-						return signaturePublicKeyAlgoMismatchError(pubKeyAlgo, $.interfaceValue<any>(pub, "*rsa.PublicKey", { kind: $.TypeKind.Pointer, elemType: "rsa.PublicKey" }))
+						return signaturePublicKeyAlgoMismatchError(pubKeyAlgo, $.interfaceValue(pub, "*rsa.PublicKey", { kind: $.TypeKind.Pointer, elemType: "rsa.PublicKey" }))
 					}
 					if (SignatureAlgorithm_isRSAPSS(algo)) {
 						return rsa.VerifyPSS(pub, hashType, signed, signature, new rsa.PSSOptions({SaltLength: rsa.PSSSaltLengthEqualsHash}))
@@ -3777,7 +3777,7 @@ export async function checkSignature(algo: SignatureAlgorithm, signed: $.Slice<n
 				{
 					let pub: ecdsa.PublicKey | $.VarRef<ecdsa.PublicKey> | null = $.typeAssert<ecdsa.PublicKey | $.VarRef<ecdsa.PublicKey> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "ecdsa.PublicKey" }).value
 					if (pubKeyAlgo != 3) {
-						return signaturePublicKeyAlgoMismatchError(pubKeyAlgo, $.interfaceValue<any>(pub, "*ecdsa.PublicKey", { kind: $.TypeKind.Pointer, elemType: "ecdsa.PublicKey" }))
+						return signaturePublicKeyAlgoMismatchError(pubKeyAlgo, $.interfaceValue(pub, "*ecdsa.PublicKey", { kind: $.TypeKind.Pointer, elemType: "ecdsa.PublicKey" }))
 					}
 					if (!await ecdsa.VerifyASN1(pub, signed, signature)) {
 						return errors.New("x509: ECDSA verification failure")
@@ -3964,7 +3964,7 @@ export async function marshalSANs(dnsNames: $.Slice<string>, emailAddresses: $.S
 		}
 		rawValues = $.append(rawValues, $.markAsStructValue(new asn1.RawValue({Tag: 6, Class: 2, Bytes: $.stringToBytes(uriStr)})))
 	}
-	return asn1.Marshal($.interfaceValue<any>(rawValues, "[]asn1.RawValue", { kind: $.TypeKind.Slice, elemType: "asn1.RawValue" }))
+	return asn1.Marshal($.interfaceValue(rawValues, "[]asn1.RawValue", { kind: $.TypeKind.Slice, elemType: "asn1.RawValue" }))
 }
 
 export function isIA5String(s: string): $.GoError {
@@ -4022,7 +4022,7 @@ export async function buildCertExtensions(template: Certificate | $.VarRef<Certi
 
 	if (($.len(subjectKeyId) > 0) && !oidInExtensions((oidExtensionSubjectKeyId as asn1.ObjectIdentifier), $.pointerValue<Certificate>(template).ExtraExtensions)) {
 		$.arrayIndex(ret!, n).Id = (oidExtensionSubjectKeyId as asn1.ObjectIdentifier)
-		let __goscriptTuple21: any = await asn1.Marshal($.interfaceValue<any>(subjectKeyId, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))
+		let __goscriptTuple21: any = await asn1.Marshal($.interfaceValue(subjectKeyId, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))
 		$.arrayIndex(ret!, n).Value = __goscriptTuple21[0]
 		err = __goscriptTuple21[1]
 		if (err != null) {
@@ -4033,7 +4033,7 @@ export async function buildCertExtensions(template: Certificate | $.VarRef<Certi
 
 	if (($.len(authorityKeyId) > 0) && !oidInExtensions((oidExtensionAuthorityKeyId as asn1.ObjectIdentifier), $.pointerValue<Certificate>(template).ExtraExtensions)) {
 		$.arrayIndex(ret!, n).Id = (oidExtensionAuthorityKeyId as asn1.ObjectIdentifier)
-		let __goscriptTuple22: any = await asn1.Marshal($.interfaceValue<any>($.markAsStructValue(new authKeyId({Id: authorityKeyId})), "x509.authKeyId", "x509.authKeyId"))
+		let __goscriptTuple22: any = await asn1.Marshal($.interfaceValue($.markAsStructValue(new authKeyId({Id: authorityKeyId})), "x509.authKeyId", "x509.authKeyId"))
 		$.arrayIndex(ret!, n).Value = __goscriptTuple22[0]
 		err = __goscriptTuple22[1]
 		if (err != null) {
@@ -4053,7 +4053,7 @@ export async function buildCertExtensions(template: Certificate | $.VarRef<Certi
 			let name = __goscriptRangeTarget21![__rangeIndex]
 			aiaValues = $.append(aiaValues, $.markAsStructValue(new authorityInfoAccess({Method: (oidAuthorityInfoAccessIssuers as asn1.ObjectIdentifier), Location: $.markAsStructValue(new asn1.RawValue({Tag: 6, Class: 2, Bytes: $.stringToBytes(name)}))})))
 		}
-		let __goscriptTuple23: any = await asn1.Marshal($.interfaceValue<any>(aiaValues, "[]x509.authorityInfoAccess", { kind: $.TypeKind.Slice, elemType: "x509.authorityInfoAccess" }))
+		let __goscriptTuple23: any = await asn1.Marshal($.interfaceValue(aiaValues, "[]x509.authorityInfoAccess", { kind: $.TypeKind.Slice, elemType: "x509.authorityInfoAccess" }))
 		$.arrayIndex(ret!, n).Value = __goscriptTuple23[0]
 		err = __goscriptTuple23[1]
 		if (err != null) {
@@ -4213,7 +4213,7 @@ export async function buildCertExtensions(template: Certificate | $.VarRef<Certi
 			crlDp = $.append(crlDp, dp)
 		}
 
-		let __goscriptTuple29: any = await asn1.Marshal($.interfaceValue<any>(crlDp, "[]x509.distributionPoint", { kind: $.TypeKind.Slice, elemType: "x509.distributionPoint" }))
+		let __goscriptTuple29: any = await asn1.Marshal($.interfaceValue(crlDp, "[]x509.distributionPoint", { kind: $.TypeKind.Slice, elemType: "x509.distributionPoint" }))
 		$.arrayIndex(ret!, n).Value = __goscriptTuple29[0]
 		err = __goscriptTuple29[1]
 		if (err != null) {
@@ -4243,7 +4243,7 @@ export async function marshalKeyUsage(ku: KeyUsage): globalThis.Promise<[pkix2.E
 
 	let bitString: $.Slice<number> = $.goSlice(a, undefined, l)
 	let err: $.GoError = null! as $.GoError
-	let __goscriptTuple30: any = await asn1.Marshal($.interfaceValue<any>((() => { const __goscriptLiteralField7 = asn1BitLength(bitString); return $.markAsStructValue(new asn1.BitString({Bytes: bitString, BitLength: __goscriptLiteralField7})) })(), "asn1.BitString", "asn1.BitString"))
+	let __goscriptTuple30: any = await asn1.Marshal($.interfaceValue((() => { const __goscriptLiteralField7 = asn1BitLength(bitString); return $.markAsStructValue(new asn1.BitString({Bytes: bitString, BitLength: __goscriptLiteralField7})) })(), "asn1.BitString", "asn1.BitString"))
 	ext.Value = __goscriptTuple30[0]
 	err = __goscriptTuple30[1]
 	return [$.markAsStructValue($.cloneStructValue(ext)), err]
@@ -4270,7 +4270,7 @@ export async function marshalExtKeyUsage(extUsages: $.Slice<ExtKeyUsage>, unknow
 	$.copy($.goSlice(oids, $.len(extUsages), undefined), unknownUsages)
 
 	let err: $.GoError = null! as $.GoError
-	let __goscriptTuple32: any = await asn1.Marshal($.interfaceValue<any>(oids, "[]asn1.ObjectIdentifier", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Slice, typeName: "asn1.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } } }))
+	let __goscriptTuple32: any = await asn1.Marshal($.interfaceValue(oids, "[]asn1.ObjectIdentifier", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Slice, typeName: "asn1.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } } }))
 	ext.Value = __goscriptTuple32[0]
 	err = __goscriptTuple32[1]
 	return [$.markAsStructValue($.cloneStructValue(ext)), err]
@@ -4285,7 +4285,7 @@ export async function marshalBasicConstraints(isCA: boolean, maxPathLen: number,
 		maxPathLen = -1
 	}
 	let err: $.GoError = null! as $.GoError
-	let __goscriptTuple33: any = await asn1.Marshal($.interfaceValue<any>($.markAsStructValue(new basicConstraints({IsCA: isCA, MaxPathLen: maxPathLen})), "x509.basicConstraints", "x509.basicConstraints"))
+	let __goscriptTuple33: any = await asn1.Marshal($.interfaceValue($.markAsStructValue(new basicConstraints({IsCA: isCA, MaxPathLen: maxPathLen})), "x509.basicConstraints", "x509.basicConstraints"))
 	ext.Value = __goscriptTuple33[0]
 	err = __goscriptTuple33[1]
 	return [$.markAsStructValue($.cloneStructValue(ext)), err]
@@ -4597,7 +4597,7 @@ export async function CreateCertificate(rand: io.Reader | null, template: Certif
 	let encodedPublicKey = $.markAsStructValue(new asn1.BitString({BitLength: $.len(publicKeyBytes) * 8, Bytes: publicKeyBytes}))
 	let c = $.markAsStructValue(new tbsCertificate({Version: 2, SerialNumber: serialNumber, SignatureAlgorithm: $.markAsStructValue($.cloneStructValue(algorithmIdentifier)), Issuer: $.markAsStructValue(new asn1.RawValue({FullBytes: asn1Issuer})), Validity: (() => { const __goscriptLiteralField8 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.pointerValue<Certificate>(template).NotBefore)).UTC())); const __goscriptLiteralField9 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.pointerValue<Certificate>(template).NotAfter)).UTC())); return $.markAsStructValue(new validity({NotBefore: __goscriptLiteralField8, NotAfter: __goscriptLiteralField9})) })(), Subject: $.markAsStructValue(new asn1.RawValue({FullBytes: asn1Subject})), PublicKey: $.markAsStructValue(new publicKeyInfo({Raw: (null as asn1.RawContent), Algorithm: $.markAsStructValue($.cloneStructValue(publicKeyAlgorithm)), PublicKey: $.markAsStructValue($.cloneStructValue(encodedPublicKey))})), Extensions: extensions}))
 
-	let __goscriptTuple41: any = await asn1.Marshal($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(c)), "x509.tbsCertificate", "x509.tbsCertificate"))
+	let __goscriptTuple41: any = await asn1.Marshal($.interfaceValue($.markAsStructValue($.cloneStructValue(c)), "x509.tbsCertificate", "x509.tbsCertificate"))
 	let tbsCertContents: $.Slice<number> = __goscriptTuple41[0]
 	err = __goscriptTuple41[1]
 	if (err != null) {
@@ -4612,7 +4612,7 @@ export async function CreateCertificate(rand: io.Reader | null, template: Certif
 		return [null, err]
 	}
 
-	return asn1.Marshal($.interfaceValue<any>($.markAsStructValue(new certificate({TBSCertificate: $.markAsStructValue($.cloneStructValue(c)), SignatureAlgorithm: $.markAsStructValue($.cloneStructValue(algorithmIdentifier)), SignatureValue: $.markAsStructValue(new asn1.BitString({Bytes: signature, BitLength: $.len(signature) * 8}))})), "x509.certificate", "x509.certificate"))
+	return asn1.Marshal($.interfaceValue($.markAsStructValue(new certificate({TBSCertificate: $.markAsStructValue($.cloneStructValue(c)), SignatureAlgorithm: $.markAsStructValue($.cloneStructValue(algorithmIdentifier)), SignatureValue: $.markAsStructValue(new asn1.BitString({Bytes: signature, BitLength: $.len(signature) * 8}))})), "x509.certificate", "x509.certificate"))
 }
 
 export let x509sha256skid: godebug.Setting | $.VarRef<godebug.Setting> | null = godebug.New("x509sha256skid")
@@ -4647,7 +4647,7 @@ export async function ParseCRL(crlBytes: $.Slice<number>): globalThis.Promise<[p
 export async function ParseDERCRL(derBytes: $.Slice<number>): globalThis.Promise<[pkix2.CertificateList | $.VarRef<pkix2.CertificateList> | null, $.GoError]> {
 	let certList: pkix2.CertificateList | $.VarRef<pkix2.CertificateList> | null = new pkix2.CertificateList()
 	{
-		let __goscriptTuple44: any = await asn1.Unmarshal(derBytes, $.interfaceValue<any>(certList, "*pkix.CertificateList", { kind: $.TypeKind.Pointer, elemType: "pkix.CertificateList" }))
+		let __goscriptTuple44: any = await asn1.Unmarshal(derBytes, $.interfaceValue(certList, "*pkix.CertificateList", { kind: $.TypeKind.Pointer, elemType: "pkix.CertificateList" }))
 		let rest: $.Slice<number> = __goscriptTuple44[0]
 		let err = __goscriptTuple44[1]
 		if (err != null) {
@@ -4669,13 +4669,13 @@ export function __goscript_set_oidExtensionRequest(__goscriptValue: asn1.ObjectI
 
 export async function newRawAttributes(attributes: $.Slice<pkix2.AttributeTypeAndValueSET>): globalThis.Promise<[$.Slice<asn1.RawValue>, $.GoError]> {
 	let rawAttributes: $.VarRef<$.Slice<asn1.RawValue>> = $.varRef(null! as $.Slice<asn1.RawValue>)
-	let __goscriptTuple45: any = await asn1.Marshal($.interfaceValue<any>(attributes, "[]pkix.AttributeTypeAndValueSET", { kind: $.TypeKind.Slice, elemType: "pkix.AttributeTypeAndValueSET" }))
+	let __goscriptTuple45: any = await asn1.Marshal($.interfaceValue(attributes, "[]pkix.AttributeTypeAndValueSET", { kind: $.TypeKind.Slice, elemType: "pkix.AttributeTypeAndValueSET" }))
 	let b: $.Slice<number> = __goscriptTuple45[0]
 	let err = __goscriptTuple45[1]
 	if (err != null) {
 		return [null, err]
 	}
-	let __goscriptTuple46: any = await asn1.Unmarshal(b, $.interfaceValue<any>(rawAttributes, "*[]asn1.RawValue", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: "asn1.RawValue" } }))
+	let __goscriptTuple46: any = await asn1.Unmarshal(b, $.interfaceValue(rawAttributes, "*[]asn1.RawValue", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: "asn1.RawValue" } }))
 	let rest: $.Slice<number> = __goscriptTuple46[0]
 	err = __goscriptTuple46[1]
 	if (err != null) {
@@ -4692,7 +4692,7 @@ export async function parseRawAttributes(rawAttributes: $.Slice<asn1.RawValue>):
 	for (let __goscriptRangeTarget31 = rawAttributes, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget31); __rangeIndex++) {
 		let rawAttr = __goscriptRangeTarget31![__rangeIndex]
 		let attr: $.VarRef<pkix2.AttributeTypeAndValueSET> = $.varRef($.markAsStructValue(new pkix2.AttributeTypeAndValueSET()))
-		let __goscriptTuple47: any = await asn1.Unmarshal(rawAttr.FullBytes, $.interfaceValue<any>(attr, "*pkix.AttributeTypeAndValueSET", { kind: $.TypeKind.Pointer, elemType: "pkix.AttributeTypeAndValueSET" }))
+		let __goscriptTuple47: any = await asn1.Unmarshal(rawAttr.FullBytes, $.interfaceValue(attr, "*pkix.AttributeTypeAndValueSET", { kind: $.TypeKind.Pointer, elemType: "pkix.AttributeTypeAndValueSET" }))
 		let rest: $.Slice<number> = __goscriptTuple47[0]
 		let err = __goscriptTuple47[1]
 		// Ignore attributes that don't parse into pkix.AttributeTypeAndValueSET
@@ -4757,7 +4757,7 @@ export async function parseCSRExtensions(rawAttributes: $.Slice<asn1.RawValue>):
 		let rawAttr = __goscriptRangeTarget33![__rangeIndex]
 		let attr: $.VarRef<pkcs10Attribute> = $.varRef($.markAsStructValue(new pkcs10Attribute()))
 		{
-			let __goscriptTuple48: any = await asn1.Unmarshal(rawAttr.FullBytes, $.interfaceValue<any>(attr, "*x509.pkcs10Attribute", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs10Attribute" }))
+			let __goscriptTuple48: any = await asn1.Unmarshal(rawAttr.FullBytes, $.interfaceValue(attr, "*x509.pkcs10Attribute", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs10Attribute" }))
 			let rest: $.Slice<number> = __goscriptTuple48[0]
 			let err = __goscriptTuple48[1]
 			if (((err != null) || ($.len(rest) != 0)) || ($.len(attr.value.Values) == 0)) {
@@ -4772,7 +4772,7 @@ export async function parseCSRExtensions(rawAttributes: $.Slice<asn1.RawValue>):
 
 		let extensions: $.VarRef<$.Slice<pkix2.Extension>> = $.varRef(null! as $.Slice<pkix2.Extension>)
 		{
-			let [, err] = await asn1.Unmarshal($.arrayIndex(attr.value.Values!, 0).FullBytes, $.interfaceValue<any>(extensions, "*[]pkix.Extension", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: "pkix.Extension" } }))
+			let [, err] = await asn1.Unmarshal($.arrayIndex(attr.value.Values!, 0).FullBytes, $.interfaceValue(extensions, "*[]pkix.Extension", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: "pkix.Extension" } }))
 			if (err != null) {
 				return [null, err]
 			}
@@ -4865,7 +4865,7 @@ export async function CreateCertificateRequest(rand: io.Reader | null, template:
 					continue
 				}
 
-				newValue = $.append(newValue, $.markAsStructValue(new pkix2.AttributeTypeAndValue({Type: (e.Id as asn1.ObjectIdentifier), Value: $.interfaceValue<any>(e.Value, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })})))
+				newValue = $.append(newValue, $.markAsStructValue(new pkix2.AttributeTypeAndValue({Type: (e.Id as asn1.ObjectIdentifier), Value: $.interfaceValue(e.Value, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } })})))
 			}
 
 			atvSet.Value![0] = newValue
@@ -4895,7 +4895,7 @@ export async function CreateCertificateRequest(rand: io.Reader | null, template:
 
 		let rawValue: $.VarRef<asn1.RawValue> = $.varRef($.markAsStructValue(new asn1.RawValue()))
 		{
-			let [, __goscriptShadow15] = await asn1.Unmarshal(b, $.interfaceValue<any>(rawValue, "*asn1.RawValue", { kind: $.TypeKind.Pointer, elemType: "asn1.RawValue" }))
+			let [, __goscriptShadow15] = await asn1.Unmarshal(b, $.interfaceValue(rawValue, "*asn1.RawValue", { kind: $.TypeKind.Pointer, elemType: "asn1.RawValue" }))
 			if (__goscriptShadow15 != null) {
 				return [null, __goscriptShadow15]
 			}
@@ -4916,7 +4916,7 @@ export async function CreateCertificateRequest(rand: io.Reader | null, template:
 
 	let tbsCSR = $.markAsStructValue(new tbsCertificateRequest({Version: 0, Subject: $.markAsStructValue(new asn1.RawValue({FullBytes: asn1Subject})), PublicKey: $.markAsStructValue(new publicKeyInfo({Algorithm: $.markAsStructValue($.cloneStructValue(publicKeyAlgorithm)), PublicKey: $.markAsStructValue(new asn1.BitString({Bytes: publicKeyBytes, BitLength: $.len(publicKeyBytes) * 8}))})), RawAttributes: rawAttributes}))
 
-	let __goscriptTuple55: any = await asn1.Marshal($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(tbsCSR)), "x509.tbsCertificateRequest", "x509.tbsCertificateRequest"))
+	let __goscriptTuple55: any = await asn1.Marshal($.interfaceValue($.markAsStructValue($.cloneStructValue(tbsCSR)), "x509.tbsCertificateRequest", "x509.tbsCertificateRequest"))
 	let tbsCSRContents: $.Slice<number> = __goscriptTuple55[0]
 	err = __goscriptTuple55[1]
 	if (err != null) {
@@ -4931,13 +4931,13 @@ export async function CreateCertificateRequest(rand: io.Reader | null, template:
 		return [null, err]
 	}
 
-	return asn1.Marshal($.interfaceValue<any>($.markAsStructValue(new certificateRequest({TBSCSR: $.markAsStructValue($.cloneStructValue(tbsCSR)), SignatureAlgorithm: $.markAsStructValue($.cloneStructValue(algorithmIdentifier)), SignatureValue: $.markAsStructValue(new asn1.BitString({Bytes: signature, BitLength: $.len(signature) * 8}))})), "x509.certificateRequest", "x509.certificateRequest"))
+	return asn1.Marshal($.interfaceValue($.markAsStructValue(new certificateRequest({TBSCSR: $.markAsStructValue($.cloneStructValue(tbsCSR)), SignatureAlgorithm: $.markAsStructValue($.cloneStructValue(algorithmIdentifier)), SignatureValue: $.markAsStructValue(new asn1.BitString({Bytes: signature, BitLength: $.len(signature) * 8}))})), "x509.certificateRequest", "x509.certificateRequest"))
 }
 
 export async function ParseCertificateRequest(asn1Data: $.Slice<number>): globalThis.Promise<[CertificateRequest | $.VarRef<CertificateRequest> | null, $.GoError]> {
 	let csr: $.VarRef<certificateRequest> = $.varRef($.markAsStructValue(new certificateRequest()))
 
-	let __goscriptTuple57: any = await asn1.Unmarshal(asn1Data, $.interfaceValue<any>(csr, "*x509.certificateRequest", { kind: $.TypeKind.Pointer, elemType: "x509.certificateRequest" }))
+	let __goscriptTuple57: any = await asn1.Unmarshal(asn1Data, $.interfaceValue(csr, "*x509.certificateRequest", { kind: $.TypeKind.Pointer, elemType: "x509.certificateRequest" }))
 	let rest: $.Slice<number> = __goscriptTuple57[0]
 	let err = __goscriptTuple57[1]
 	if (err != null) {
@@ -5093,7 +5093,7 @@ export async function CreateRevocationList(rand: io.Reader | null, template: Rev
 		}
 	}
 
-	let __goscriptTuple63: any = await asn1.Marshal($.interfaceValue<any>($.markAsStructValue(new authKeyId({Id: $.pointerValue<Certificate>(issuer).SubjectKeyId})), "x509.authKeyId", "x509.authKeyId"))
+	let __goscriptTuple63: any = await asn1.Marshal($.interfaceValue($.markAsStructValue(new authKeyId({Id: $.pointerValue<Certificate>(issuer).SubjectKeyId})), "x509.authKeyId", "x509.authKeyId"))
 	let aki: $.Slice<number> = __goscriptTuple63[0]
 	err = __goscriptTuple63[1]
 	if (err != null) {
@@ -5106,7 +5106,7 @@ export async function CreateRevocationList(rand: io.Reader | null, template: Rev
 			return [null, errors.New("x509: CRL number exceeds 20 octets")]
 		}
 	}
-	let __goscriptTuple64: any = await asn1.Marshal($.interfaceValue<any>($.pointerValue<RevocationList>(template).Number, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))
+	let __goscriptTuple64: any = await asn1.Marshal($.interfaceValue($.pointerValue<RevocationList>(template).Number, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))
 	let crlNum: $.Slice<number> = __goscriptTuple64[0]
 	err = __goscriptTuple64[1]
 	if (err != null) {
@@ -5130,7 +5130,7 @@ export async function CreateRevocationList(rand: io.Reader | null, template: Rev
 		tbsCertList.Extensions = $.appendSlice(tbsCertList.Extensions, $.pointerValue<RevocationList>(template).ExtraExtensions)
 	}
 
-	let __goscriptTuple66: any = await asn1.Marshal($.interfaceValue<any>($.markAsStructValue($.cloneStructValue(tbsCertList)), "x509.tbsCertificateList", "x509.tbsCertificateList"))
+	let __goscriptTuple66: any = await asn1.Marshal($.interfaceValue($.markAsStructValue($.cloneStructValue(tbsCertList)), "x509.tbsCertificateList", "x509.tbsCertificateList"))
 	let tbsCertListContents: $.Slice<number> = __goscriptTuple66[0]
 	err = __goscriptTuple66[1]
 	if (err != null) {
@@ -5148,5 +5148,5 @@ export async function CreateRevocationList(rand: io.Reader | null, template: Rev
 		return [null, err]
 	}
 
-	return asn1.Marshal($.interfaceValue<any>($.markAsStructValue(new certificateList({TBSCertList: $.markAsStructValue($.cloneStructValue(tbsCertList)), SignatureAlgorithm: $.markAsStructValue($.cloneStructValue(algorithmIdentifier)), SignatureValue: $.markAsStructValue(new asn1.BitString({Bytes: signature, BitLength: $.len(signature) * 8}))})), "x509.certificateList", "x509.certificateList"))
+	return asn1.Marshal($.interfaceValue($.markAsStructValue(new certificateList({TBSCertList: $.markAsStructValue($.cloneStructValue(tbsCertList)), SignatureAlgorithm: $.markAsStructValue($.cloneStructValue(algorithmIdentifier)), SignatureValue: $.markAsStructValue(new asn1.BitString({Bytes: signature, BitLength: $.len(signature) * 8}))})), "x509.certificateList", "x509.certificateList"))
 }

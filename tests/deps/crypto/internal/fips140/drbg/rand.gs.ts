@@ -48,7 +48,7 @@ export var drbgPool: $.VarRef<sync.Pool>
 export function __goscript_init_drbgPool(): void {
 	if (((drbgPool) as any) === undefined) {
 		drbgPool = $.varRef($.markAsStructValue(new sync.Pool({New: $.functionValue((): any => {
-	return $.interfaceValue<any>(__goscript_ctrdrbg.NewCounter(__goscript_entropy_wasm.getEntropy()), "*drbg.Counter", { kind: $.TypeKind.Pointer, elemType: "drbg.Counter" })
+	return $.interfaceValue(__goscript_ctrdrbg.NewCounter(__goscript_entropy_wasm.getEntropy()), "*drbg.Counter", { kind: $.TypeKind.Pointer, elemType: "drbg.Counter" })
 }, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))})))
 	}
 }
@@ -94,7 +94,7 @@ export async function Read(b: $.Slice<number>): globalThis.Promise<void> {
 	}
 	__defer.defer(() => { ((): void => {
 		if (!drbgInstance.value.CompareAndSwap(null, drbg)) {
-			$.pointerValue<sync.Pool>(__goscript_get_drbgPool()).Put($.interfaceValue<any>(drbg, "*drbg.Counter", { kind: $.TypeKind.Pointer, elemType: "drbg.Counter" }))
+			$.pointerValue<sync.Pool>(__goscript_get_drbgPool()).Put($.interfaceValue(drbg, "*drbg.Counter", { kind: $.TypeKind.Pointer, elemType: "drbg.Counter" }))
 		}
 	})() })
 

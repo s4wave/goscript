@@ -494,7 +494,7 @@ export class Entry {
 
 		queueMicrotask(async () => { await Entry.prototype.writerScanner.call(entry, reader, printFunc) })
 
-		runtime.SetFinalizer($.interfaceValue<any>(writer, "*io.PipeWriter", { kind: $.TypeKind.Pointer, elemType: "io.PipeWriter" }), $.interfaceValue<any>(__goscript_writer.writerFinalizer, "func(writer *io.PipeWriter)", ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "io.PipeWriter" }], results: [] } as $.FunctionTypeInfo)))
+		runtime.SetFinalizer($.interfaceValue(writer, "*io.PipeWriter", { kind: $.TypeKind.Pointer, elemType: "io.PipeWriter" }), $.interfaceValue(__goscript_writer.writerFinalizer, "func(writer *io.PipeWriter)", ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "io.PipeWriter" }], results: [] } as $.FunctionTypeInfo)))
 
 		return writer
 	}
@@ -565,7 +565,7 @@ export class Entry {
 		// panic() to use in Entry#Panic(), we avoid the allocation by checking
 		// directly here.
 		if ($.uint(level, 32) <= $.uint(0, 32)) {
-			$.panic($.interfaceValue<any>(newEntry, "*logrus.Entry", { kind: $.TypeKind.Pointer, elemType: "logrus.Entry" }))
+			$.panic($.interfaceValue(newEntry, "*logrus.Entry", { kind: $.TypeKind.Pointer, elemType: "logrus.Entry" }))
 		}
 	}
 

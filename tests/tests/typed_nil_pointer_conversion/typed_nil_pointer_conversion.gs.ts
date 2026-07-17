@@ -50,7 +50,7 @@ export async function main(): globalThis.Promise<void> {
 	let cloned: node | $.VarRef<node> | null = clone(n)
 	$.println(cloned == null)
 
-	let boxed: any = $.interfaceValue<any>(null, "*main.node", { kind: $.TypeKind.Pointer, elemType: "main.node" })
+	let boxed: any = $.interfaceValue(null, "*main.node", { kind: $.TypeKind.Pointer, elemType: "main.node" })
 	let [, ok] = $.typeAssertTuple<node | $.VarRef<node> | null>(boxed, { kind: $.TypeKind.Pointer, elemType: "main.node" })
 	$.println(boxed == null, ok)
 }

@@ -193,11 +193,11 @@ export class pipeStream {
 }
 
 export function NewPipeStream(ctx: context.Context | null): [__goscript_stream.Stream | null, __goscript_stream.Stream | null] {
-	let s1: pipeStream | $.VarRef<pipeStream> | null = new pipeStream({dataCh: $.makeChannel<$.Slice<number>>(5, null, "both")})
+	let s1: pipeStream | $.VarRef<pipeStream> | null = new pipeStream({dataCh: $.makeChannel<$.Slice<number>>(5, null! as $.Slice<number>, "both")})
 	let __goscriptTuple1: any = contextutil.WithCancel(ctx)
 	$.pointerValue<pipeStream>(s1).ctx = __goscriptTuple1[0]
 	$.pointerValue<pipeStream>(s1).ctxCancel = __goscriptTuple1[1]
-	let s2: pipeStream | $.VarRef<pipeStream> | null = new pipeStream({other: s1, dataCh: $.makeChannel<$.Slice<number>>(5, null, "both")})
+	let s2: pipeStream | $.VarRef<pipeStream> | null = new pipeStream({other: s1, dataCh: $.makeChannel<$.Slice<number>>(5, null! as $.Slice<number>, "both")})
 	let __goscriptTuple2: any = contextutil.WithCancel(ctx)
 	$.pointerValue<pipeStream>(s2).ctx = __goscriptTuple2[0]
 	$.pointerValue<pipeStream>(s2).ctxCancel = __goscriptTuple2[1]

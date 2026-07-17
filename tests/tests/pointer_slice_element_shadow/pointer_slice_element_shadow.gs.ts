@@ -89,14 +89,14 @@ export function parseKey(): [string, $.GoError] {
 
 export function printInterfaceSpareZero(): void {
 	let values: $.Slice<any> = $.makeSlice<any>(0, 2)
-	values = $.append(values, $.interfaceValue<any>($.markAsStructValue(new entry({key: "value"})), "main.entry", "main.entry"), $.appendZeros.nil)
+	values = $.append(values, $.interfaceValue($.markAsStructValue(new entry({key: "value"})), "main.entry", "main.entry"), $.appendZeros.nil)
 	values = $.goSlice(values, undefined, 2)
 	$.println($.arrayIndex(values!, 1) == null)
 }
 
 export function printInterfaceAppendSliceSpareZero(): void {
 	let values: $.Slice<any> = $.makeSlice<any>(0, 2)
-	values = $.appendSlice(values, $.arrayToSlice<any>([$.interfaceValue<any>($.markAsStructValue(new entry({key: "value"})), "main.entry", "main.entry")]), $.appendZeros.nil)
+	values = $.appendSlice(values, $.arrayToSlice<any>([$.interfaceValue($.markAsStructValue(new entry({key: "value"})), "main.entry", "main.entry")]), $.appendZeros.nil)
 	values = $.goSlice(values, undefined, 2)
 	$.println($.arrayIndex(values!, 1) == null)
 }

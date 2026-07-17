@@ -184,7 +184,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let oid: $.VarRef<ObjectIdentifier> = $.varRef(null! as ObjectIdentifier)
 	let ok = false
-	let oidValue: any = $.interfaceValue<any>(oid, "*main.ObjectIdentifier", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, typeName: "main.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } } })
+	let oidValue: any = $.interfaceValue(oid, "*main.ObjectIdentifier", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, typeName: "main.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } } })
 	{
 		const __goscriptTypeSwitchValue = oidValue
 		switch (true) {
@@ -201,7 +201,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println("oid", $.len((oid.value as ObjectIdentifier)), $.arrayIndex(oid.value!, 0), ok)
 
 	let raw: $.VarRef<RawValue> = $.varRef($.markAsStructValue(new RawValue()))
-	let rawValue: any = $.interfaceValue<any>(raw, "*main.RawValue", { kind: $.TypeKind.Pointer, elemType: "main.RawValue" })
+	let rawValue: any = $.interfaceValue(raw, "*main.RawValue", { kind: $.TypeKind.Pointer, elemType: "main.RawValue" })
 	{
 		const __goscriptTypeSwitchValue = rawValue
 		switch (true) {
