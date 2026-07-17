@@ -573,8 +573,8 @@ export function newMemoryRpcStreamPair(): [memoryRpcStream | $.VarRef<memoryRpcS
 	let __goscriptTuple3: any = newMemoryRpcContext()
 	let bCtx: memoryRpcContext | $.VarRef<memoryRpcContext> | null = __goscriptTuple3[0]
 	let bCancel: (() => void) | null = __goscriptTuple3[1]
-	let aToB: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null = $.makeChannel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null>(16, null, "both")
-	let bToA: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null = $.makeChannel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null>(16, null, "both")
+	let aToB: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null = $.makeChannel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null>(16, null! as rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null, "both")
+	let bToA: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null = $.makeChannel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null>(16, null! as rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null, "both")
 	return [new memoryRpcStream({ctx: $.interfaceValue<context.Context | null>(aCtx, "*main.memoryRpcContext", { kind: $.TypeKind.Pointer, elemType: "main.memoryRpcContext" }), cancel: aCancel, recv: bToA, send: aToB}), new memoryRpcStream({ctx: $.interfaceValue<context.Context | null>(bCtx, "*main.memoryRpcContext", { kind: $.TypeKind.Pointer, elemType: "main.memoryRpcContext" }), cancel: bCancel, recv: aToB, send: bToA})]
 }
 
@@ -862,7 +862,7 @@ export async function exerciseRpcStreamHandle(): globalThis.Promise<boolean> {
 	__defer.defer(async () => { await memoryRpcStream.prototype.Close.call(server) })
 
 	let invoked: $.Channel<boolean> | null = $.makeChannel<boolean>(1, false, "both")
-	let done: $.Channel<$.GoError> | null = $.makeChannel<$.GoError>(1, null, "both")
+	let done: $.Channel<$.GoError> | null = $.makeChannel<$.GoError>(1, null! as $.GoError, "both")
 	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
 		await $.chanSend(done, await rpcstream.HandleRpcStream($.interfaceValue<rpcstream.RpcStream | null>(server, "*main.memoryRpcStream", { kind: $.TypeKind.Pointer, elemType: "main.memoryRpcStream" }), $.functionValue(async (ctx: context.Context | null, componentID: string, released: (() => void) | null): globalThis.Promise<[srpc.Invoker | null, (() => void) | null, $.GoError]> => {
 			if (!$.stringEqual(componentID, "component-a")) {

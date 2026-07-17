@@ -57,7 +57,7 @@ export function printList(name: string, values: list.List | $.VarRef<list.List> 
 
 export function newElementPool(__typeArgs: $.GenericTypeArgs | undefined): sync.Pool | $.VarRef<sync.Pool> | null {
 	return new sync.Pool({New: $.functionValue((): any => {
-		return $.interfaceValue<any>(new pooledElement(), "*main.pooledElement", { kind: $.TypeKind.Pointer, elemType: "main.pooledElement" })
+		return $.interfaceValue<any>(new pooledElement({Value: $.genericZero(__typeArgs, "T", null)}), "*main.pooledElement", { kind: $.TypeKind.Pointer, elemType: "main.pooledElement" })
 	}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))})
 }
 

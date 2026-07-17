@@ -67,7 +67,7 @@ export class holder {
 
 	constructor(init?: Partial<{box?: box}>) {
 		this._fields = {
-			box: $.varRef(init?.box ? $.markAsStructValue($.cloneStructValue(init.box)) : $.markAsStructValue(new box()))
+			box: $.varRef(init?.box ? $.markAsStructValue($.cloneStructValue(init.box)) : $.markAsStructValue(new box({value: null})))
 		}
 	}
 

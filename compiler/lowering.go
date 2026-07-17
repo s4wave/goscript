@@ -8977,7 +8977,7 @@ func (o *LoweringOwner) lowerMakeExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 		}
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperMakeChannel) +
 			"<" + o.tsTypeFor(ctx, typed.Elem()) + ">(" + capacity + ", " +
-			o.lowerZeroValueExprFor(ctx, typed.Elem()) + ", " + strconv.Quote(channelDirectionString(typed.Dir())) + ")", diagnostics
+			o.lowerDeclarationZeroValueExpr(ctx, typed.Elem()) + ", " + strconv.Quote(channelDirectionString(typed.Dir())) + ")", diagnostics
 	default:
 		return "undefined", []Diagnostic{loweringUnsupportedAt(ctx, expr.Args[0], "call", ctx.semPkg.pkgPath, "unsupported make type")}
 	}
@@ -11043,11 +11043,13 @@ func (o *LoweringOwner) lowerStructCompositeLit(
 ) (string, []Diagnostic) {
 	structType, _ := named.Underlying().(*types.Struct)
 	fields := make([]string, 0, len(lit.Elts))
+	present := make([]bool, structType.NumFields())
 	var prelude []string
 	var diagnostics []Diagnostic
 	for idx, elt := range lit.Elts {
 		fieldName := ""
 		fieldType := types.Type(nil)
+		fieldIndex := -1
 		valueExpr := elt
 		if keyed, ok := elt.(*ast.KeyValueExpr); ok {
 			valueExpr = keyed.Value
@@ -11055,6 +11057,7 @@ func (o *LoweringOwner) lowerStructCompositeLit(
 				for index := range structType.NumFields() {
 					field := structType.Field(index)
 					if field.Name() == ident.Name {
+						fieldIndex = index
 						fieldName = tsStructFieldName(field.Name(), index)
 						fieldType = field.Type()
 						break
@@ -11063,6 +11066,7 @@ func (o *LoweringOwner) lowerStructCompositeLit(
 			}
 		} else if idx < structType.NumFields() {
 			field := structType.Field(idx)
+			fieldIndex = idx
 			fieldName = tsStructFieldName(field.Name(), idx)
 			fieldType = field.Type()
 		}
@@ -11078,7 +11082,24 @@ func (o *LoweringOwner) lowerStructCompositeLit(
 			prelude = append(prelude, "const "+temp+" = "+value)
 			value = temp
 		}
+		present[fieldIndex] = true
 		fields = append(fields, fieldName+": "+value)
+	}
+	if named.TypeArgs().Len() != 0 {
+		for idx := range structType.NumFields() {
+			if present[idx] {
+				continue
+			}
+			if !genericStructFieldNeedsInstantiatedZero(named, idx) {
+				continue
+			}
+			field := structType.Field(idx)
+			fields = append(
+				fields,
+				tsStructFieldName(field.Name(), idx)+": "+
+					o.lowerDeclarationZeroValueExpr(ctx, field.Type()),
+			)
+		}
 	}
 
 	expr := "new " + o.namedTypeExpr(ctx, named) + "()"
@@ -11698,11 +11719,43 @@ func (o *LoweringOwner) lowerStructClone(value string) string {
 		o.runtimeOwner.QualifiedHelper(RuntimeHelperCloneStructValue) + "(" + value + "))"
 }
 
-func (o *LoweringOwner) lowerZeroValueExpr(typ types.Type) string {
-	if named := namedStructType(typ); named != nil && isStructValueType(typ) {
-		return o.runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue) + "(new " + safeIdentifier(named.Obj().Name()) + "())"
+func (o *LoweringOwner) lowerNamedStructZeroValueExpr(
+	ctx lowerFileContext,
+	named *types.Named,
+) string {
+	name := o.namedTypeExpr(ctx, named)
+	if named.TypeArgs().Len() == 0 {
+		return "new " + name + "()"
 	}
-	return zeroValueExpr(typ)
+	structType := named.Underlying().(*types.Struct)
+	fields := make([]string, 0, structType.NumFields())
+	for idx := range structType.NumFields() {
+		if !genericStructFieldNeedsInstantiatedZero(named, idx) {
+			continue
+		}
+		field := structType.Field(idx)
+		fields = append(
+			fields,
+			tsStructFieldName(field.Name(), idx)+": "+
+				o.lowerDeclarationZeroValueExpr(ctx, field.Type()),
+		)
+	}
+	if len(fields) == 0 {
+		return "new " + name + "()"
+	}
+	return "new " + name + "({" + strings.Join(fields, ", ") + "})"
+}
+
+func genericStructFieldNeedsInstantiatedZero(named *types.Named, idx int) bool {
+	if named.TypeArgs().Len() == 0 {
+		return false
+	}
+	originType, ok := named.Origin().Underlying().(*types.Struct)
+	if !ok || idx >= originType.NumFields() {
+		return false
+	}
+	_, ok = types.Unalias(originType.Field(idx).Type()).(*types.TypeParam)
+	return ok
 }
 
 func (o *LoweringOwner) lowerZeroValueExprFor(ctx lowerFileContext, typ types.Type) string {
@@ -11710,8 +11763,10 @@ func (o *LoweringOwner) lowerZeroValueExprFor(ctx lowerFileContext, typ types.Ty
 		if !o.canSpellNamedType(ctx, named) {
 			return "undefined as any"
 		}
-		return o.runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue) + "(new " + o.namedTypeExpr(ctx, named) + "())"
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue) +
+			"(" + o.lowerNamedStructZeroValueExpr(ctx, named) + ")"
 	}
+
 	switch typed := types.Unalias(typ).Underlying().(type) {
 	case *types.Basic:
 		if typed.Kind() == types.UnsafePointer {

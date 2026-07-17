@@ -103,7 +103,7 @@ export async function main(): globalThis.Promise<void> {
 	let [written, err] = await $.pointerValue<Exclude<io.ReadWriteCloser, null>>(stream).Write(new Uint8Array([100, 105, 97, 108]))
 	$.println("stream", written, err == null, await $.pointerValue<Exclude<io.ReadWriteCloser, null>>(stream).Close() == null)
 
-	let keys: $.Channel<crypto.PublicKey | null> | null = $.makeChannel<crypto.PublicKey | null>(1, null, "both")
+	let keys: $.Channel<crypto.PublicKey | null> | null = $.makeChannel<crypto.PublicKey | null>(1, null! as crypto.PublicKey | null, "both")
 	await $.chanSend(keys, $.namedValueInterfaceValue<crypto.PublicKey | null>(new Uint8Array([1, 2, 3]) as $.Slice<number>, "ed25519.PublicKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PublicKey" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }]))
 	let key: ed25519.PublicKey = ($.mustTypeAssert<ed25519.PublicKey>((await $.chanRecv(keys)), { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }) as ed25519.PublicKey)
 	$.println("key", $.len((key as ed25519.PublicKey)), $.uint($.arrayIndex(key!, 0), 8))

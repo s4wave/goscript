@@ -1,4 +1,8 @@
-import { isMarkedAsStructValue, markAsStructValue } from './type.js'
+import {
+  isMarkedAsStructValue,
+  isTypedNilValue,
+  markAsStructValue,
+} from './type.js'
 
 import { runtimePanic } from './panic.js'
 import {
@@ -1078,10 +1082,7 @@ function appendZeroValue(sample: unknown): unknown {
  * @param elements The elements to append.
  * @returns The modified or new slice.
  */
-export function append(
-  slice: Uint8Array,
-  ...elements: unknown[]
-): Uint8Array
+export function append(slice: Uint8Array, ...elements: unknown[]): Uint8Array
 // Null destinations carry no runtime element type, so compiler-only hint
 // values are accepted alongside the elements.
 export function append<T>(slice: null, ...elements: unknown[]): Slice<T>
@@ -2265,11 +2266,7 @@ function collectionValue(value: unknown): unknown {
   if (isVarRef(value)) {
     return collectionValue(value.value)
   }
-  if (
-    typeof value === 'object' &&
-    value !== null &&
-    (value as { __isTypedNil?: unknown }).__isTypedNil === true
-  ) {
+  if (isTypedNilValue(value)) {
     return null
   }
   if (

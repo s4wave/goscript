@@ -338,6 +338,33 @@ function normalizeTypeInfo(info: string | TypeInfo): TypeInfo {
   return info
 }
 
+/**
+ * isTypeInfoComparable reports whether a dynamic Go type supports equality.
+ *
+ * @param info The dynamic type descriptor.
+ * @returns True when values of the type may be compared.
+ */
+export function isTypeInfoComparable(info: string | TypeInfo): boolean {
+  const normalized = normalizeTypeInfo(info)
+  switch (normalized.kind) {
+    case TypeKind.Map:
+    case TypeKind.Slice:
+    case TypeKind.Function:
+      return false
+    case TypeKind.Array:
+      return (
+        normalized.elemType === undefined ||
+        isTypeInfoComparable(normalized.elemType)
+      )
+    case TypeKind.Struct:
+      return normalized.fields.every((field) =>
+        isTypeInfoComparable(field.type),
+      )
+    default:
+      return true
+  }
+}
+
 function typeInfoRuntimeName(info: TypeInfo): string | undefined {
   return info.typeName || info.name
 }
@@ -859,9 +886,6 @@ function methodWrapperSignature(method: unknown): MethodSignature | null {
   const wrapper = method as {
     __goscriptMethodWrapper?: boolean
     __goscriptMethodSignature?: MethodSignature
-  }
-  if (wrapper.__goscriptMethodWrapper !== true) {
-    return null
   }
   return wrapper.__goscriptMethodSignature ?? null
 }
@@ -1534,12 +1558,20 @@ export function typeAssert<T>(
 ): TypeAssertResult<T> {
   const normalizedType = normalizeTypeInfo(typeInfo)
 
-  if (typeof value === 'object' && value !== null && value.__isTypedNil) {
+  if (isTypedNilValue(value)) {
     if (
       isInterfaceTypeInfo(normalizedType) &&
       matchesInterfaceType(value, normalizedType)
     ) {
       return { value: value as T, ok: true }
+    }
+
+    const storedTypeInfo = value.__goTypeInfo as TypeInfo | string | undefined
+    if (
+      storedTypeInfo !== undefined &&
+      areTypeInfosIdentical(storedTypeInfo, normalizedType)
+    ) {
+      return { value: null as T, ok: true }
     }
 
     // Go permits asserting a typed-nil interface value to its identical
@@ -1744,19 +1776,48 @@ export function typeSwitch(
   }
 }
 
+/** TypedNilValue carries a nilable Go value's dynamic type metadata. */
+export type TypedNilValue = {
+  __goType: string
+  __isTypedNil: true
+  __goTypeInfo?: TypeInfo | string
+} & Record<string, unknown>
+
+/** isTypedNilValue reports whether a value carries the typed-nil marker. */
+export function isTypedNilValue(value: unknown): value is TypedNilValue {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    '__isTypedNil' in value &&
+    value.__isTypedNil === true &&
+    '__goType' in value &&
+    typeof value.__goType === 'string'
+  )
+}
+
 /**
- * Creates a typed nil pointer with type metadata for reflection.
- * This is used for type conversions like (*Interface)(nil) where we need
- * to preserve the pointer type information even though the value is null.
+ * typedNil creates a typed nil value for interface and reflection operations.
  *
- * @param typeName The full Go type name (e.g., "*main.Stringer")
- * @returns An object that represents a typed nil with reflection metadata
+ * @param typeName The full Go type name.
+ * @param typeInfo The structured dynamic type descriptor, when available.
+ * @returns A typed nil marker that preserves dynamic type identity.
  */
-export function typedNil(typeName: string): any {
-  return Object.assign(Object.create(null), {
-    __goType: typeName,
-    __isTypedNil: true,
-  })
+export function typedNil(
+  typeName: string,
+  typeInfo?: TypeInfo | string,
+): TypedNilValue {
+  // A null prototype keeps Go method names separate from JavaScript built-ins.
+  const value = Object.create(null) as TypedNilValue
+  value.__goType = typeName
+  value.__isTypedNil = true
+  if (typeInfo !== undefined) {
+    Object.defineProperty(value, '__goTypeInfo', {
+      value: typeInfo,
+      writable: true,
+      configurable: true,
+    })
+  }
+  return value
 }
 
 export function interfaceValue<T>(
@@ -1782,7 +1843,7 @@ export function interfaceValue<T>(
     return value as T
   }
 
-  const nilValue = typedNil(typeName)
+  const nilValue = typedNil(typeName, typeInfo)
   if (!typeName.startsWith('*')) {
     return nilValue as T
   }
@@ -1798,8 +1859,11 @@ export function interfaceValue<T>(
     if (typeof implementation !== 'function') {
       continue
     }
+    const wrapper: InterfaceMethod = (...args: unknown[]) =>
+      implementation.call(null, ...args)
+    wrapper.__goscriptMethodSignature = method
     Object.defineProperty(nilValue, method.name, {
-      value: (...args: unknown[]) => implementation.call(null, ...args),
+      value: wrapper,
       enumerable: true,
     })
   }
@@ -1808,6 +1872,7 @@ export function interfaceValue<T>(
 
 type InterfaceMethod = ((...args: unknown[]) => unknown) & {
   __goscriptMethodWrapper?: boolean
+  __goscriptMethodSignature?: MethodSignature
 }
 
 function isInterfaceMethod(value: unknown): value is InterfaceMethod {

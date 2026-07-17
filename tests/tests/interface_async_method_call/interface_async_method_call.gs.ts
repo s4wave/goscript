@@ -181,7 +181,7 @@ export async function processViaInterface(processor: AsyncProcessor | null, inpu
 }
 
 export function newGenericStore(__typeArgs: $.GenericTypeArgs | undefined, value: any): GenericStore | null {
-	return $.namedValueInterfaceValue<GenericStore | null>(new GenericChannelStore({ch: $.makeChannel<any>(1, null, "both"), value: value}), "*main.GenericChannelStore", {Load: (receiver: any, ...args: any[]) => receiver.Load({[$.genericTypeArgsMarker]: true, V: __typeArgs?.["V"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "main.GenericChannelStore" }, [{ name: "Load", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }])
+	return $.namedValueInterfaceValue<GenericStore | null>(new GenericChannelStore({ch: $.makeChannel<any>(1, $.genericZero(__typeArgs, "V", null), "both"), value: value}), "*main.GenericChannelStore", {Load: (receiver: any, ...args: any[]) => receiver.Load({[$.genericTypeArgsMarker]: true, V: __typeArgs?.["V"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "main.GenericChannelStore" }, [{ name: "Load", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }])
 }
 
 export async function loadGenericStore(store: GenericStore | null): globalThis.Promise<number> {

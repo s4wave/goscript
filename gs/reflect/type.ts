@@ -759,7 +759,7 @@ export class Value {
 
   public IsNil(): boolean {
     const value = this.currentValue()
-    return value === null || value === undefined
+    return value === null || value === undefined || $.isTypedNilValue(value)
   }
 
   public Index(i: number): Value {
@@ -3806,19 +3806,14 @@ class InterfaceType implements Type {
 }
 
 function getTypeOf(value: ReflectValue): Type {
-  // Check for typed nil before checking for plain null
-  // Typed nils are created by $.typedNil() and have __goType and __isTypedNil properties
-  if (value && typeof value === 'object' && (value as any).__isTypedNil) {
-    const typeName = (value as any).__goType
-    if (typeName && typeof typeName === 'string') {
-      // Parse the type name to construct the appropriate Type
-      // For pointer types like "*main.Stringer", extract the element type
-      if (typeName.startsWith('*')) {
-        const elemTypeName = typeName.slice(1) // Remove the '*' prefix
-        // Create an InterfaceType for the element (works for interfaces and other types)
-        const elemType = new InterfaceType(elemTypeName)
-        return new PointerType(elemType)
-      }
+  if ($.isTypedNilValue(value)) {
+    const typedNil = value
+    if (typedNil.__goTypeInfo !== undefined) {
+      return typeFromTypeInfo(typedNil.__goTypeInfo)
+    }
+    if (typedNil.__goType.startsWith('*')) {
+      const elemTypeName = typedNil.__goType.slice(1)
+      return new PointerType(new InterfaceType(elemTypeName))
     }
   }
 

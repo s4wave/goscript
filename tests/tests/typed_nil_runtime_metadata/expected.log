@@ -1,0 +1,7 @@
+map true true
+chan true true
+func true true
+reader true 2
+reflect-map true true
+reflect-pointer true true true
+map-comparison-panics true

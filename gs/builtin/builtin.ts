@@ -1,5 +1,9 @@
 import type { Slice, SliceProxy, StringHeaderData } from './slice.js'
-import { pointerIdentityEqual } from './type.js'
+import {
+  isTypeInfoComparable,
+  pointerIdentityEqual,
+  type TypeInfo,
+} from './type.js'
 import { writeHostStdoutText } from './hostio.js'
 import { runtimePanic } from './panic.js'
 import { formatPrintedArgs } from './print.js'
@@ -95,7 +99,8 @@ export function assignStruct<T>(target: T, source: T): void {
       __goscriptClone?: () => T
       clone?: () => T
     }
-    const copied = cloneable.__goscriptClone?.() ?? cloneable.clone?.() ?? source
+    const copied =
+      cloneable.__goscriptClone?.() ?? cloneable.clone?.() ?? source
     Object.assign(target as object, copied as object)
     return
   }
@@ -174,6 +179,18 @@ export function arrayEqual(a: unknown, b: unknown): boolean {
 }
 
 export function comparableEqual(a: unknown, b: unknown): boolean {
+  if (
+    hasGoType(a) &&
+    hasGoType(b) &&
+    a.__isTypedNil === true &&
+    b.__isTypedNil === true &&
+    a.__goType === b.__goType
+  ) {
+    const typeInfo = a.__goTypeInfo ?? b.__goTypeInfo
+    if (typeInfo !== undefined && !isTypeInfoComparable(typeInfo)) {
+      runtimePanic(`runtime error: comparing uncomparable type ${a.__goType}`)
+    }
+  }
   if (a === b) {
     return true
   }
@@ -243,6 +260,7 @@ function isArrayLike(value: unknown): value is ArrayLike<unknown> {
 
 function hasGoType(value: unknown): value is {
   __goType: string
+  __goTypeInfo?: TypeInfo | string
   __isTypedNil?: boolean
 } {
   return (

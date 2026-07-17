@@ -803,6 +803,24 @@ describe('builtin runtime contract helpers', () => {
         elemType: 'phase5.Runner',
       }),
     ).toEqual({ value: null, ok: true })
+
+    const mapType = {
+      kind: TypeKind.Map,
+      keyType: { kind: TypeKind.Basic, name: 'string' },
+      elemType: { kind: TypeKind.Basic, name: 'int' },
+    } as const
+    const nilMap = interfaceValue<Map<string, number> | null>(
+      null,
+      'map[string]int',
+      mapType,
+    )
+    expect(typeAssert<Map<string, number> | null>(nilMap, mapType)).toEqual({
+      value: null,
+      ok: true,
+    })
+    expect(() => comparableEqual(nilMap, nilMap)).toThrow(
+      'runtime error: comparing uncomparable type map[string]int',
+    )
     expect(TypeKind.Pointer).toBe('pointer')
 
     class TypedDog {
