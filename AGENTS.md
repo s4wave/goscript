@@ -51,7 +51,7 @@ When working on compliance tests:
    go test -timeout 60s -run ^TestCompliance/if_statement$ ./compiler
    ```
 
-   **For the full suite (RECOMMENDED approach for detecting failures):**
+   **For a full local suite (optional; useful for deliberate breadth checks):**
    ```bash
    # Run once, capture to file, check result
    mkdir -p .tmp && go test -timeout 10m ./compiler 2>&1 > .tmp/test_output.txt; echo "Exit code: $?"
@@ -83,17 +83,26 @@ When working on compliance tests:
    - Run the integration test again
    - Repeat: update compiler code and/or `tests/WIP.md` until the compliance test passes successfully
    - If you make two or more edits and the test still does not pass, ask the user how to proceed providing several options
-   - After fixing a specific test, re-run the full compliance test to verify everything works properly
+   - After fixing a specific test, rerun that focused test. The full local
+     compliance suite is optional and must not block committing or pushing the
+     change.
 
 Once the issue is fixed and the compliance test passes you may delete WIP.md without updating it with a final summary.
 
 NOTE: `./tests/deps/` contains library dependencies compiled by the goscript compiler! do not edit! they will be re-generated when running the tests.
 
-When a compiler change alters generated TypeScript output, run `go test ./compiler`
-before committing so the compliance harness regenerates the `.gs.ts` outputs under
-`tests/tests/` and `tests/deps/`. Inspect the generated diff, then include the
-refreshed `.gs.ts` outputs in the same commit; use `git add -A` from the repo root
-when the generated output set may include additions or removals.
+When a compiler change alters generated TypeScript output, run the focused
+compliance tests needed to prove the change. Before every commit and push,
+inspect `tests/tests/` and `tests/deps/` for generated changes, review them, and
+include every generated addition, modification, or deletion in the same commit.
+Use `git add -A -- tests/tests tests/deps` so deleted generated files are not
+missed.
+
+Do not run the full compliance suite solely as a pre-commit or pre-push gate.
+GitHub CI owns the routine full-suite pass on `master` and automatically commits
+dirty generated compliance files. A broken CI run may be fixed later while
+development continues, but the latest `master` CI must be green before the next
+release.
 
 ## Design Patterns & Code Style
 
@@ -126,7 +135,9 @@ When working with golangci-lint:
    defer f.Close() //nolint:errcheck
    ```
 
-Make sure that `bun test` and `bun lint` both pass before suggesting a task is complete.
+Run `bun lint` and the focused tests covering touched behavior before suggesting
+a task is complete. Running `bun test` locally is optional because GitHub CI
+owns the routine full compliance suite.
 
 ## Specialized Workflows
 

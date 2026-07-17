@@ -14,12 +14,17 @@ on:
         type: boolean
         default: false
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 # Builds images for target boards.
 permissions:
   contents: read
 
 jobs:
   tests:
+    if: ${{ github.event_name != 'push' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -53,6 +58,68 @@ jobs:
 
       - name: Lint Js
         run: bun lint:js
+
+  tests-update:
+    if: ${{ github.event_name == 'push' && github.actor != 'spacewave-ci[bot]' }}
+    runs-on: ubuntu-latest
+    environment: compliance-update
+    strategy:
+      matrix:
+        go: ['1.26.5']
+        bun: ['latest']
+    timeout-minutes: 15
+    steps:
+      - name: Create spacewave-ci app token
+        id: spacewave_ci_app_token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.SPACEWAVE_CI_APP_CLIENT_ID }}
+          private-key: ${{ secrets.SPACEWAVE_CI_APP_PRIVATE_KEY }}
+          owner: s4wave
+          repositories: goscript
+          permission-contents: write
+
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          token: ${{ steps.spacewave_ci_app_token.outputs.token }}
+
+      - name: Setup Go ${{ matrix.go }}
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Setup Bun ${{ matrix.bun }}
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ matrix.bun }}
+
+      - name: Bun install
+        run: bun install
+
+      - name: Test Go
+        run: go test -timeout=10m -v ./...
+
+      - name: Typecheck Js
+        run: bun typecheck
+
+      - name: Test Js
+        run: bun run test:js
+
+      - name: Lint Js
+        run: bun lint:js
+
+      - name: Commit generated compliance files
+        run: |
+          if [[ -z "$(git status --porcelain=v1 -- tests/)" ]]; then
+            echo "tests/ is clean; nothing to commit."
+            exit 0
+          fi
+
+          git config user.name "spacewave-ci[bot]"
+          git config user.email "277994435+spacewave-ci[bot]@users.noreply.github.com"
+          git add tests/
+          git commit -s -m "chore(compliance): update generated test data"
+          git push origin HEAD:master
 
   browser-smoke:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.browser_smoke }}
