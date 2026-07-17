@@ -13,6 +13,7 @@ export const Stdout: number = 1
 export const Stderr: number = 2
 
 export const SIGINT: number = 2
+export const SIGKILL: number = 9
 export const SIGTERM: number = 15
 
 export const AF_UNIX: number = 1

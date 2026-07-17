@@ -19,6 +19,7 @@ func main() {
 	if syscall.F_DUPFD_CLOEXEC != 0 {
 		fmt.Println("cloexec supported")
 	}
+	fmt.Println("signals:", int(syscall.SIGINT), int(syscall.SIGKILL), int(syscall.SIGTERM))
 	if false {
 		var st syscall.Stat_t
 		var buf []byte
