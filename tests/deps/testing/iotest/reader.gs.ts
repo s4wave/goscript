@@ -29,7 +29,7 @@ export class oneByteReader {
 
 	constructor(init?: Partial<{r?: io.Reader | null}>) {
 		this._fields = {
-			r: $.varRef(init?.r ?? (null as io.Reader | null))
+			r: $.varRef(init?.r ?? (null! as io.Reader | null))
 		}
 	}
 
@@ -72,7 +72,7 @@ export class halfReader {
 
 	constructor(init?: Partial<{r?: io.Reader | null}>) {
 		this._fields = {
-			r: $.varRef(init?.r ?? (null as io.Reader | null))
+			r: $.varRef(init?.r ?? (null! as io.Reader | null))
 		}
 	}
 
@@ -128,9 +128,9 @@ export class dataErrReader {
 
 	constructor(init?: Partial<{r?: io.Reader | null, unread?: $.Slice<number>, data?: $.Slice<number>}>) {
 		this._fields = {
-			r: $.varRef(init?.r ?? (null as io.Reader | null)),
-			unread: $.varRef(init?.unread ?? (null as $.Slice<number>)),
-			data: $.varRef(init?.data ?? (null as $.Slice<number>))
+			r: $.varRef(init?.r ?? (null! as io.Reader | null)),
+			unread: $.varRef(init?.unread ?? (null! as $.Slice<number>)),
+			data: $.varRef(init?.data ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -147,7 +147,7 @@ export class dataErrReader {
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		let r: dataErrReader | $.VarRef<dataErrReader> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		// loop because first call needs two reads:
 		// one to get data and a second to look for an error.
 		while (true) {
@@ -196,7 +196,7 @@ export class timeoutReader {
 
 	constructor(init?: Partial<{r?: io.Reader | null, count?: number}>) {
 		this._fields = {
-			r: $.varRef(init?.r ?? (null as io.Reader | null)),
+			r: $.varRef(init?.r ?? (null! as io.Reader | null)),
 			count: $.varRef(init?.count ?? (0 as number))
 		}
 	}
@@ -242,7 +242,7 @@ export class errReader {
 
 	constructor(init?: Partial<{err?: $.GoError}>) {
 		this._fields = {
-			err: $.varRef(init?.err ?? (null as $.GoError))
+			err: $.varRef(init?.err ?? (null! as $.GoError))
 		}
 	}
 
@@ -298,7 +298,7 @@ export class smallByteReader {
 
 	constructor(init?: Partial<{r?: io.Reader | null, off?: number, n?: number}>) {
 		this._fields = {
-			r: $.varRef(init?.r ?? (null as io.Reader | null)),
+			r: $.varRef(init?.r ?? (null! as io.Reader | null)),
 			off: $.varRef(init?.off ?? (0 as number)),
 			n: $.varRef(init?.n ?? (0 as number))
 		}

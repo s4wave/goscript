@@ -80,7 +80,7 @@ export class Interface {
 			Index: $.varRef(init?.Index ?? (0 as number)),
 			MTU: $.varRef(init?.MTU ?? (0 as number)),
 			Name: $.varRef(init?.Name ?? ("" as string)),
-			HardwareAddr: $.varRef(init?.HardwareAddr ?? (null as __goscript_mac.HardwareAddr)),
+			HardwareAddr: $.varRef(init?.HardwareAddr ?? (null! as __goscript_mac.HardwareAddr)),
 			Flags: $.varRef(init?.Flags ?? (0 as Flags))
 		}
 	}
@@ -174,8 +174,8 @@ export class ipv6ZoneCache {
 		this._fields = {
 			RWMutex: $.varRef(init?.RWMutex ? $.markAsStructValue($.cloneStructValue(init.RWMutex)) : $.markAsStructValue(new sync.RWMutex())),
 			lastFetched: $.varRef(init?.lastFetched ? $.markAsStructValue($.cloneStructValue(init.lastFetched)) : $.markAsStructValue(new time.Time())),
-			toIndex: $.varRef(init?.toIndex ?? (null as globalThis.Map<string, number> | null)),
-			toName: $.varRef(init?.toName ?? (null as globalThis.Map<number, string> | null))
+			toIndex: $.varRef(init?.toIndex ?? (null! as globalThis.Map<string, number> | null)),
+			toName: $.varRef(init?.toName ?? (null! as globalThis.Map<number, string> | null))
 		}
 	}
 
@@ -252,7 +252,7 @@ export class ipv6ZoneCache {
 		}
 		$.pointerValue<ipv6ZoneCache>(zc).lastFetched = $.markAsStructValue($.cloneStructValue(now))
 		if ($.len(ift) == 0) {
-			let err: $.GoError = null as $.GoError
+			let err: $.GoError = null! as $.GoError
 			{
 				let __goscriptTuple10: any = __goscript_interface_stub.interfaceTable(0)
 				ift = __goscriptTuple10[0]

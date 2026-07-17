@@ -28,7 +28,7 @@ export class storage {
 
 	constructor(init?: Partial<{bytes?: $.Slice<number>, name?: string}>) {
 		this._fields = {
-			bytes: $.varRef(init?.bytes ?? (null as $.Slice<number>)),
+			bytes: $.varRef(init?.bytes ?? (null! as $.Slice<number>)),
 			name: $.varRef(init?.name ?? ("" as string))
 		}
 	}

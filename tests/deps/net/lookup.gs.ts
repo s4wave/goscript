@@ -212,7 +212,7 @@ export class Resolver {
 		this._fields = {
 			PreferGo: $.varRef(init?.PreferGo ?? (false as boolean)),
 			StrictErrors: $.varRef(init?.StrictErrors ?? (false as boolean)),
-			Dial: $.varRef(init?.Dial ?? (null as ((ctx: context.Context | null, network: string, address: string) => [__goscript_net.Conn | null, $.GoError] | globalThis.Promise<[__goscript_net.Conn | null, $.GoError]>) | null)),
+			Dial: $.varRef(init?.Dial ?? (null! as ((ctx: context.Context | null, network: string, address: string) => [__goscript_net.Conn | null, $.GoError] | globalThis.Promise<[__goscript_net.Conn | null, $.GoError]>) | null)),
 			lookupGroup: $.varRef(init?.lookupGroup ? $.markAsStructValue($.cloneStructValue(init.lookupGroup)) : $.markAsStructValue(new singleflight.Group()))
 		}
 	}
@@ -263,8 +263,8 @@ export class Resolver {
 
 	public async LookupHost(ctx: context.Context | null, host: string): globalThis.Promise<[$.Slice<string>, $.GoError]> {
 		const r: Resolver | $.VarRef<Resolver> | null = this
-		let addrs: $.Slice<string> = null as $.Slice<string>
-		let err: $.GoError = null as $.GoError
+		let addrs: $.Slice<string> = null! as $.Slice<string>
+		let err: $.GoError = null! as $.GoError
 		// Make sure that no matter what we do later, host=="" is rejected.
 		if ($.stringEqual(host, "")) {
 			return [null, $.interfaceValue<$.GoError>(await __goscript_net.newDNSError($.interfaceValue<$.GoError>(__goscript_net.errNoSuchHost, "*net.notFoundError", { kind: $.TypeKind.Pointer, elemType: "net.notFoundError" }), host, ""), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]
@@ -404,7 +404,7 @@ export class Resolver {
 	public async LookupPort(ctx: context.Context | null, network: string, service: string): globalThis.Promise<[number, $.GoError]> {
 		const r: Resolver | $.VarRef<Resolver> | null = this
 		let port: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let __goscriptTuple6: any = __goscript_port.parsePort(service)
 		port = __goscriptTuple6[0]
 		let needsLookup = __goscriptTuple6[1]
@@ -485,8 +485,8 @@ export class Resolver {
 		// call back here to translate it. The DNS config parser has
 		// already checked that all the cfg.servers are IP
 		// addresses, which Dial will use without a DNS lookup.
-		let c: __goscript_net.Conn | null = null as __goscript_net.Conn | null
-		let err: $.GoError = null as $.GoError
+		let c: __goscript_net.Conn | null = null! as __goscript_net.Conn | null
+		let err: $.GoError = null! as $.GoError
 		if ((r != null) && ($.pointerValue<Resolver>(r).Dial != null)) {
 			let __goscriptTuple9: any = await $.pointerValue<Resolver>(r).Dial!(ctx, network, server)
 			c = __goscriptTuple9[0]
@@ -515,7 +515,7 @@ export class Resolver {
 		if (err != null) {
 			return [$.markAsStructValue(new dnsmessage.Parser()), $.markAsStructValue(new dnsmessage.Header()), __goscript_dnsclient_unix.errCannotMarshalDNSMessage]
 		}
-		let networks: $.Slice<string> = null as $.Slice<string>
+		let networks: $.Slice<string> = null! as $.Slice<string>
 		if (useTCP) {
 			networks = $.arrayToSlice<string>(["tcp"])
 		} else {
@@ -590,8 +590,8 @@ export class Resolver {
 
 	public async goLookupHostOrder(ctx: context.Context | null, name: string, order: __goscript_dnsclient_unix.hostLookupOrder, conf: __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null): globalThis.Promise<[$.Slice<string>, $.GoError]> {
 		const r: Resolver | $.VarRef<Resolver> | null = this
-		let addrs: $.Slice<string> = null as $.Slice<string>
-		let err: $.GoError = null as $.GoError
+		let addrs: $.Slice<string> = null! as $.Slice<string>
+		let err: $.GoError = null! as $.GoError
 		if ((order == 1) || (order == 3)) {
 
 			let __goscriptTuple15: any = await __goscript_hosts.lookupStaticHost(name)
@@ -620,8 +620,8 @@ export class Resolver {
 
 	public async goLookupIP(ctx: context.Context | null, network: string, host: string, order: __goscript_dnsclient_unix.hostLookupOrder, conf: __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null): globalThis.Promise<[$.Slice<__goscript_iprawsock.IPAddr>, $.GoError]> {
 		const r: Resolver | $.VarRef<Resolver> | null = this
-		let addrs: $.Slice<__goscript_iprawsock.IPAddr> = null as $.Slice<__goscript_iprawsock.IPAddr>
-		let err: $.GoError = null as $.GoError
+		let addrs: $.Slice<__goscript_iprawsock.IPAddr> = null! as $.Slice<__goscript_iprawsock.IPAddr>
+		let err: $.GoError = null! as $.GoError
 		let __goscriptTuple17: any = await Resolver.prototype.goLookupIPCNAMEOrder.call(r, ctx, network, host, order, conf)
 		addrs = __goscriptTuple17[0]
 		err = __goscriptTuple17[2]
@@ -630,9 +630,9 @@ export class Resolver {
 
 	public async goLookupIPCNAMEOrder(ctx: context.Context | null, network: string, name: string, order: __goscript_dnsclient_unix.hostLookupOrder, conf: __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null): globalThis.Promise<[$.Slice<__goscript_iprawsock.IPAddr>, dnsmessage.Name, $.GoError]> {
 		const r: Resolver | $.VarRef<Resolver> | null = this
-		let addrs: $.Slice<__goscript_iprawsock.IPAddr> = null as $.Slice<__goscript_iprawsock.IPAddr>
+		let addrs: $.Slice<__goscript_iprawsock.IPAddr> = null! as $.Slice<__goscript_iprawsock.IPAddr>
 		let cname: dnsmessage.Name = $.markAsStructValue(new dnsmessage.Name())
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ((order == 1) || (order == 3)) {
 			let canonical: string = ""
 			let __goscriptTuple18: any = await __goscript_dnsclient_unix.goLookupIPFiles(name)
@@ -640,7 +640,7 @@ export class Resolver {
 			canonical = __goscriptTuple18[1]
 
 			if ($.len(addrs) > 0) {
-				let __goscriptShadow8: $.GoError = null as $.GoError
+				let __goscriptShadow8: $.GoError = null! as $.GoError
 				let __goscriptTuple19: any = dnsmessage.NewName(canonical)
 				cname = __goscriptTuple19[0]
 				__goscriptShadow8 = __goscriptTuple19[1]
@@ -691,7 +691,7 @@ export class Resolver {
 				this._fields = {
 					p: $.varRef(init?.p ? $.markAsStructValue($.cloneStructValue(init.p)) : $.markAsStructValue(new dnsmessage.Parser())),
 					server: $.varRef(init?.server ?? ("" as string)),
-					error: $.varRef(init?.error ?? (null as $.GoError))
+					error: $.varRef(init?.error ?? (null! as $.GoError))
 				}
 			}
 
@@ -739,8 +739,8 @@ export class Resolver {
 				break
 			}
 		}
-		let queryFn: ((fqdn: string, qtype: dnsmessage.Type) => void) | null = null as ((fqdn: string, qtype: dnsmessage.Type) => void) | null
-		let responseFn: ((fqdn: string, qtype: dnsmessage.Type) => result | globalThis.Promise<result>) | null = null as ((fqdn: string, qtype: dnsmessage.Type) => result | globalThis.Promise<result>) | null
+		let queryFn: ((fqdn: string, qtype: dnsmessage.Type) => void) | null = null! as ((fqdn: string, qtype: dnsmessage.Type) => void) | null
+		let responseFn: ((fqdn: string, qtype: dnsmessage.Type) => result | globalThis.Promise<result>) | null = null! as ((fqdn: string, qtype: dnsmessage.Type) => result | globalThis.Promise<result>) | null
 		if ($.pointerValue<__goscript_dnsconfig.dnsConfig>(conf).singleRequest) {
 			queryFn = $.functionValue((fqdn: string, qtype: dnsmessage.Type): void => {
 			}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "uint16", typeName: "dnsmessage.Type" }], results: [] } as $.FunctionTypeInfo))
@@ -764,7 +764,7 @@ export class Resolver {
 				return $.markAsStructValue($.cloneStructValue(await $.chanRecv(lane)))
 			}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "uint16", typeName: "dnsmessage.Type" }], results: ["net.result"] } as $.FunctionTypeInfo))
 		}
-		let lastErr: $.GoError = null as $.GoError
+		let lastErr: $.GoError = null! as $.GoError
 		for (let __goscriptRangeTarget10 = __goscript_dnsconfig.dnsConfig.prototype.nameList.call(conf, name), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget10); __rangeIndex++) {
 			let fqdn = __goscriptRangeTarget10![__rangeIndex]
 			for (let __goscriptRangeTarget8 = qtypes, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget8); __rangeIndex++) {
@@ -881,7 +881,7 @@ export class Resolver {
 				addrs = __goscriptTuple21[0]
 				canonical = __goscriptTuple21[1]
 				if ($.len(addrs) > 0) {
-					let __goscriptShadow19: $.GoError = null as $.GoError
+					let __goscriptShadow19: $.GoError = null! as $.GoError
 					let __goscriptTuple22: any = dnsmessage.NewName(canonical)
 					cname = __goscriptTuple22[0]
 					__goscriptShadow19 = __goscriptTuple22[1]
@@ -907,7 +907,7 @@ export class Resolver {
 		if (err != null) {
 			return [null, err]
 		}
-		let mxs: $.Slice<__goscript_dnsclient.MX | $.VarRef<__goscript_dnsclient.MX> | null> = null as $.Slice<__goscript_dnsclient.MX | $.VarRef<__goscript_dnsclient.MX> | null>
+		let mxs: $.Slice<__goscript_dnsclient.MX | $.VarRef<__goscript_dnsclient.MX> | null> = null! as $.Slice<__goscript_dnsclient.MX | $.VarRef<__goscript_dnsclient.MX> | null>
 		while (true) {
 			let [h, __goscriptShadow20] = p.value.AnswerHeader()
 			if ($.comparableEqual(__goscriptShadow20, dnsmessage.ErrSectionDone)) {
@@ -946,7 +946,7 @@ export class Resolver {
 		if (err != null) {
 			return [null, err]
 		}
-		let nss: $.Slice<__goscript_dnsclient.NS | $.VarRef<__goscript_dnsclient.NS> | null> = null as $.Slice<__goscript_dnsclient.NS | $.VarRef<__goscript_dnsclient.NS> | null>
+		let nss: $.Slice<__goscript_dnsclient.NS | $.VarRef<__goscript_dnsclient.NS> | null> = null! as $.Slice<__goscript_dnsclient.NS | $.VarRef<__goscript_dnsclient.NS> | null>
 		while (true) {
 			let [h, __goscriptShadow22] = p.value.AnswerHeader()
 			if ($.comparableEqual(__goscriptShadow22, dnsmessage.ErrSectionDone)) {
@@ -1012,7 +1012,7 @@ export class Resolver {
 			}
 			return [null, err]
 		}
-		let ptrs: $.Slice<string> = null as $.Slice<string>
+		let ptrs: $.Slice<string> = null! as $.Slice<string>
 		while (true) {
 			let [h, __goscriptShadow24] = p.value.AnswerHeader()
 			if ($.comparableEqual(__goscriptShadow24, dnsmessage.ErrSectionDone)) {
@@ -1043,8 +1043,8 @@ export class Resolver {
 	public async goLookupSRV(ctx: context.Context | null, service: string, proto: string, name: string): globalThis.Promise<[string, $.Slice<__goscript_dnsclient.SRV | $.VarRef<__goscript_dnsclient.SRV> | null>, $.GoError]> {
 		const r: Resolver | $.VarRef<Resolver> | null = this
 		let target: string = ""
-		let srvs: $.Slice<__goscript_dnsclient.SRV | $.VarRef<__goscript_dnsclient.SRV> | null> = null as $.Slice<__goscript_dnsclient.SRV | $.VarRef<__goscript_dnsclient.SRV> | null>
-		let err: $.GoError = null as $.GoError
+		let srvs: $.Slice<__goscript_dnsclient.SRV | $.VarRef<__goscript_dnsclient.SRV> | null> = null! as $.Slice<__goscript_dnsclient.SRV | $.VarRef<__goscript_dnsclient.SRV> | null>
+		let err: $.GoError = null! as $.GoError
 		if (($.stringEqual(service, "")) && ($.stringEqual(proto, ""))) {
 			target = name
 		} else {
@@ -1099,7 +1099,7 @@ export class Resolver {
 		if (err != null) {
 			return [null, err]
 		}
-		let txts: $.Slice<string> = null as $.Slice<string>
+		let txts: $.Slice<string> = null! as $.Slice<string>
 		while (true) {
 			let [h, __goscriptShadow28] = p.value.AnswerHeader()
 			if ($.comparableEqual(__goscriptShadow28, dnsmessage.ErrSectionDone)) {
@@ -1146,7 +1146,7 @@ export class Resolver {
 
 	public async internetAddrList(ctx: context.Context | null, net: string, addr: string): globalThis.Promise<[__goscript_ipsock.addrList, $.GoError]> {
 		const r: Resolver | $.VarRef<Resolver> | null = this
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let host: string = ""
 		let port: string = ""
 		let portnum: number = 0
@@ -1239,7 +1239,7 @@ export class Resolver {
 			ips = $.append(ips, $.markAsStructValue(new __goscript_iprawsock.IPAddr({IP: (__goscript_ip.IPv4zero as __goscript_ip.IP)})))
 		}
 
-		let filter: ((_p0: __goscript_iprawsock.IPAddr) => boolean | globalThis.Promise<boolean>) | null = null as ((_p0: __goscript_iprawsock.IPAddr) => boolean | globalThis.Promise<boolean>) | null
+		let filter: ((_p0: __goscript_iprawsock.IPAddr) => boolean | globalThis.Promise<boolean>) | null = null! as ((_p0: __goscript_iprawsock.IPAddr) => boolean | globalThis.Promise<boolean>) | null
 		if ((!$.stringEqual(net, "")) && ($.uint($.indexStringOrBytes(net, $.len(net) - 1), 8) == $.uint(52, 8))) {
 			filter = __goscript_ipsock.ipv4only
 		}
@@ -1264,7 +1264,7 @@ export class Resolver {
 
 		let p: dnsmessage.Parser = $.markAsStructValue(new dnsmessage.Parser())
 		let server: string = ""
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		for (let __goscriptRangeTarget13 = __goscript_dnsconfig.dnsConfig.prototype.nameList.call(conf, name), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget13); __rangeIndex++) {
 			let fqdn = __goscriptRangeTarget13![__rangeIndex]
 			let __goscriptTuple37: any = await Resolver.prototype.tryOneName.call(r, ctx, conf, fqdn, $.uint(qtype, 16))
@@ -1327,8 +1327,8 @@ export class Resolver {
 
 	public async lookupHost(ctx: context.Context | null, host: string): globalThis.Promise<[$.Slice<string>, $.GoError]> {
 		const r: Resolver | $.VarRef<Resolver> | null = this
-		let addrs: $.Slice<string> = null as $.Slice<string>
-		let err: $.GoError = null as $.GoError
+		let addrs: $.Slice<string> = null! as $.Slice<string>
+		let err: $.GoError = null! as $.GoError
 		let __goscriptTuple41: any = await __goscript_conf.conf.prototype.hostLookupOrder.call(await __goscript_conf.systemConf(), r, host)
 		let order = __goscriptTuple41[0]
 		let __goscriptShadow34: __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null = __goscriptTuple41[1]
@@ -1340,8 +1340,8 @@ export class Resolver {
 
 	public async lookupIP(ctx: context.Context | null, network: string, host: string): globalThis.Promise<[$.Slice<__goscript_iprawsock.IPAddr>, $.GoError]> {
 		const r: Resolver | $.VarRef<Resolver> | null = this
-		let addrs: $.Slice<__goscript_iprawsock.IPAddr> = null as $.Slice<__goscript_iprawsock.IPAddr>
-		let err: $.GoError = null as $.GoError
+		let addrs: $.Slice<__goscript_iprawsock.IPAddr> = null! as $.Slice<__goscript_iprawsock.IPAddr>
+		let err: $.GoError = null! as $.GoError
 		let __goscriptTuple42: any = await __goscript_conf.conf.prototype.hostLookupOrder.call(await __goscript_conf.systemConf(), r, host)
 		let order = __goscriptTuple42[0]
 		let __goscriptShadow35: __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null = __goscriptTuple42[1]
@@ -1532,9 +1532,9 @@ export class Resolver {
 		if (((err != null) || (!$.stringEqual(op, "dial"))) || (hint == null)) {
 			return [(addrs as __goscript_ipsock.addrList), err]
 		}
-		let tcp: __goscript_tcpsock.TCPAddr | $.VarRef<__goscript_tcpsock.TCPAddr> | null = null as __goscript_tcpsock.TCPAddr | $.VarRef<__goscript_tcpsock.TCPAddr> | null
-		let udp: __goscript_udpsock.UDPAddr | $.VarRef<__goscript_udpsock.UDPAddr> | null = null as __goscript_udpsock.UDPAddr | $.VarRef<__goscript_udpsock.UDPAddr> | null
-		let ip: __goscript_iprawsock.IPAddr | $.VarRef<__goscript_iprawsock.IPAddr> | null = null as __goscript_iprawsock.IPAddr | $.VarRef<__goscript_iprawsock.IPAddr> | null
+		let tcp: __goscript_tcpsock.TCPAddr | $.VarRef<__goscript_tcpsock.TCPAddr> | null = null! as __goscript_tcpsock.TCPAddr | $.VarRef<__goscript_tcpsock.TCPAddr> | null
+		let udp: __goscript_udpsock.UDPAddr | $.VarRef<__goscript_udpsock.UDPAddr> | null = null! as __goscript_udpsock.UDPAddr | $.VarRef<__goscript_udpsock.UDPAddr> | null
+		let ip: __goscript_iprawsock.IPAddr | $.VarRef<__goscript_iprawsock.IPAddr> | null = null! as __goscript_iprawsock.IPAddr | $.VarRef<__goscript_iprawsock.IPAddr> | null
 		let wildcard: boolean = false
 		{
 			const __goscriptTypeSwitchValue = hint
@@ -1614,7 +1614,7 @@ export class Resolver {
 
 	public async tryOneName(ctx: context.Context | null, cfg: __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null, name: string, qtype: dnsmessage.Type): globalThis.Promise<[dnsmessage.Parser, string, $.GoError]> {
 		const r: Resolver | $.VarRef<Resolver> | null = this
-		let lastErr: $.GoError = null as $.GoError
+		let lastErr: $.GoError = null! as $.GoError
 		let serverOffset = $.uint(__goscript_dnsconfig.dnsConfig.prototype.serverOffset.call(cfg), 32)
 		let sLen = $.uint($.uint($.len($.pointerValue<__goscript_dnsconfig.dnsConfig>(cfg).servers), 32), 32)
 
@@ -1706,8 +1706,8 @@ export class onlyValuesCtx {
 
 	constructor(init?: Partial<{Context?: context.Context | null, lookupValues?: context.Context | null}>) {
 		this._fields = {
-			Context: $.varRef(init?.Context ?? (null as context.Context | null)),
-			lookupValues: $.varRef(init?.lookupValues ?? (null as context.Context | null))
+			Context: $.varRef(init?.Context ?? (null! as context.Context | null)),
+			lookupValues: $.varRef(init?.lookupValues ?? (null! as context.Context | null))
 		}
 	}
 
@@ -1816,7 +1816,7 @@ export function lookupProtocolMap(name: string): [number, $.GoError] {
 
 export async function lookupPortMap(network: string, service: string): globalThis.Promise<[number, $.GoError]> {
 	let port: number = 0
-	let error: $.GoError = null as $.GoError
+	let error: $.GoError = null! as $.GoError
 	switch (network) {
 		case "ip":
 		{
@@ -1849,7 +1849,7 @@ export async function lookupPortMap(network: string, service: string): globalThi
 
 export async function lookupPortMapWithNetwork(network: string, errNetwork: string, service: string): globalThis.Promise<[number, $.GoError]> {
 	let port: number = 0
-	let error: $.GoError = null as $.GoError
+	let error: $.GoError = null! as $.GoError
 	{
 		let __goscriptTuple0: any = $.mapGet<string, globalThis.Map<string, number> | null, globalThis.Map<string, number> | null>(services, network, null)
 		let m: globalThis.Map<string, number> | null = __goscriptTuple0[0]
@@ -1888,8 +1888,8 @@ export function __goscript_set_DefaultResolver(__goscriptValue: Resolver | $.Var
 }
 
 export async function LookupHost(host: string): globalThis.Promise<[$.Slice<string>, $.GoError]> {
-	let addrs: $.Slice<string> = null as $.Slice<string>
-	let err: $.GoError = null as $.GoError
+	let addrs: $.Slice<string> = null! as $.Slice<string>
+	let err: $.GoError = null! as $.GoError
 	return Resolver.prototype.LookupHost.call(DefaultResolver, context.Background(), host)
 }
 
@@ -1936,20 +1936,20 @@ export function ipAddrsEface(addrs: $.Slice<__goscript_iprawsock.IPAddr>): $.Sli
 
 export async function LookupPort(network: string, service: string): globalThis.Promise<[number, $.GoError]> {
 	let port: number = 0
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	return Resolver.prototype.LookupPort.call(DefaultResolver, context.Background(), network, service)
 }
 
 export async function LookupCNAME(host: string): globalThis.Promise<[string, $.GoError]> {
 	let cname: string = ""
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	return Resolver.prototype.LookupCNAME.call(DefaultResolver, context.Background(), host)
 }
 
 export async function LookupSRV(service: string, proto: string, name: string): globalThis.Promise<[string, $.Slice<__goscript_dnsclient.SRV | $.VarRef<__goscript_dnsclient.SRV> | null>, $.GoError]> {
 	let cname: string = ""
-	let addrs: $.Slice<__goscript_dnsclient.SRV | $.VarRef<__goscript_dnsclient.SRV> | null> = null as $.Slice<__goscript_dnsclient.SRV | $.VarRef<__goscript_dnsclient.SRV> | null>
-	let err: $.GoError = null as $.GoError
+	let addrs: $.Slice<__goscript_dnsclient.SRV | $.VarRef<__goscript_dnsclient.SRV> | null> = null! as $.Slice<__goscript_dnsclient.SRV | $.VarRef<__goscript_dnsclient.SRV> | null>
+	let err: $.GoError = null! as $.GoError
 	return Resolver.prototype.LookupSRV.call(DefaultResolver, context.Background(), service, proto, name)
 }
 
@@ -1966,8 +1966,8 @@ export async function LookupTXT(name: string): globalThis.Promise<[$.Slice<strin
 }
 
 export async function LookupAddr(addr: string): globalThis.Promise<[$.Slice<string>, $.GoError]> {
-	let names: $.Slice<string> = null as $.Slice<string>
-	let err: $.GoError = null as $.GoError
+	let names: $.Slice<string> = null! as $.Slice<string>
+	let err: $.GoError = null! as $.GoError
 	return Resolver.prototype.LookupAddr.call(DefaultResolver, context.Background(), addr)
 }
 

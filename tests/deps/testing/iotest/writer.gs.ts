@@ -28,7 +28,7 @@ export class truncateWriter {
 
 	constructor(init?: Partial<{w?: io.Writer | null, n?: bigint}>) {
 		this._fields = {
-			w: $.varRef(init?.w ?? (null as io.Writer | null)),
+			w: $.varRef(init?.w ?? (null! as io.Writer | null)),
 			n: $.varRef(init?.n ?? (0n as bigint))
 		}
 	}
@@ -45,7 +45,7 @@ export class truncateWriter {
 	public async Write(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		let t: truncateWriter | $.VarRef<truncateWriter> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.pointerValue<truncateWriter>(t).n <= 0n) {
 			return [$.len(p), null]
 		}

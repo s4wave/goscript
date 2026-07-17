@@ -297,8 +297,8 @@ export function RegisterHash(h: Hash, f: (() => hash.Hash | null | globalThis.Pr
 }
 
 export async function SignMessage(signer: Signer | null, rand: io.Reader | null, msg: $.Slice<number>, opts: SignerOpts | null): globalThis.Promise<[$.Slice<number>, $.GoError]> {
-	let signature: $.Slice<number> = null as $.Slice<number>
-	let err: $.GoError = null as $.GoError
+	let signature: $.Slice<number> = null! as $.Slice<number>
+	let err: $.GoError = null! as $.GoError
 	{
 		let [ms, ok] = $.typeAssertTuple<MessageSigner | null>(signer, "crypto.MessageSigner")
 		if (ok) {

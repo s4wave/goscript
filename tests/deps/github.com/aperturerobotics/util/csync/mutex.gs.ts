@@ -63,7 +63,7 @@ export class Mutex {
 		// 1: locked
 		// 2: unlocked (released)
 		let status: $.VarRef<atomic.Int32> = $.varRef($.markAsStructValue(new atomic.Int32()))
-		let waitCh: $.Channel<{}> | null = null as $.Channel<{}> | null
+		let waitCh: $.Channel<{}> | null = null! as $.Channel<{}> | null
 		await $.pointerValue<Mutex>(m).bcast.HoldLock($.functionValue(async (_p0: (() => void) | null, getWaitCh: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null): globalThis.Promise<void> => {
 			if ($.pointerValue<Mutex>(m).locked) {
 				// keep waiting
@@ -217,7 +217,7 @@ export class MutexLocker {
 
 	constructor(init?: Partial<{m?: Mutex | $.VarRef<Mutex> | null, rel?: atomic.Pointer<(() => void) | null>}>) {
 		this._fields = {
-			m: $.varRef(init?.m ?? (null as Mutex | $.VarRef<Mutex> | null)),
+			m: $.varRef(init?.m ?? (null! as Mutex | $.VarRef<Mutex> | null)),
 			rel: $.varRef(init?.rel ? $.markAsStructValue($.cloneStructValue(init.rel)) : $.markAsStructValue(new atomic.Pointer<(() => void) | null>()))
 		}
 	}

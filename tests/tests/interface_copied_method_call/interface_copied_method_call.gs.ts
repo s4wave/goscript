@@ -43,7 +43,7 @@ export class task {
 }
 
 export async function callCopied(r: runner | null): globalThis.Promise<void> {
-	let curr: runner | null = null as runner | null
+	let curr: runner | null = null! as runner | null
 	void ((): void => {
 		curr = r
 	})()

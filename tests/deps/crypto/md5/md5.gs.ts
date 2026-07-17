@@ -164,7 +164,7 @@ export class digest {
 	public Write(p: $.Slice<number>): [number, $.GoError] {
 		let d: digest | $.VarRef<digest> | null = this
 		let nn: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if (fips140only.Enforced()) {
 			return [0, errors.New("crypto/md5: use of MD5 is not allowed in FIPS 140-only mode")]
 		}

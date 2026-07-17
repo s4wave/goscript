@@ -492,7 +492,11 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 			b.WriteString(field.name)
 			b.WriteString(" ?? ")
 			b.WriteString("(")
-			b.WriteString(field.zero)
+			if field.zero == "null" {
+				b.WriteString("null!")
+			} else {
+				b.WriteString(field.zero)
+			}
 			b.WriteString(" as ")
 			b.WriteString(field.typ)
 			b.WriteString(")")

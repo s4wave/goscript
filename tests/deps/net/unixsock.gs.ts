@@ -290,8 +290,8 @@ export class UnixConn {
 		let n: number = 0
 		let oobn: number = 0
 		let flags: number = 0
-		let addr: UnixAddr | $.VarRef<UnixAddr> | null = null as UnixAddr | $.VarRef<UnixAddr> | null
-		let err: $.GoError = null as $.GoError
+		let addr: UnixAddr | $.VarRef<UnixAddr> | null = null! as UnixAddr | $.VarRef<UnixAddr> | null
+		let err: $.GoError = null! as $.GoError
 		if (!$.pointerValue<UnixConn>(c).conn.ok()) {
 			return [0, 0, 0, null, $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 		}
@@ -319,7 +319,7 @@ export class UnixConn {
 		const c: UnixConn | $.VarRef<UnixConn> | null = this
 		let n: number = 0
 		let oobn: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if (!$.pointerValue<UnixConn>(c).conn.ok()) {
 			return [0, 0, $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 		}
@@ -365,7 +365,7 @@ export class UnixConn {
 
 	public async readFrom(b: $.Slice<number>): globalThis.Promise<[number, UnixAddr | $.VarRef<UnixAddr> | null, $.GoError]> {
 		const c: UnixConn | $.VarRef<UnixConn> | null = this
-		let addr: UnixAddr | $.VarRef<UnixAddr> | null = null as UnixAddr | $.VarRef<UnixAddr> | null
+		let addr: UnixAddr | $.VarRef<UnixAddr> | null = null! as UnixAddr | $.VarRef<UnixAddr> | null
 		let [n, sa, err] = await $.pointerValue<__goscript_net_fake.fakeNetFD>($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).fakeNetFD).readFrom(b)
 		{
 			const __goscriptTypeSwitchValue = sa
@@ -388,9 +388,9 @@ export class UnixConn {
 		let n: number = 0
 		let oobn: number = 0
 		let flags: number = 0
-		let addr: UnixAddr | $.VarRef<UnixAddr> | null = null as UnixAddr | $.VarRef<UnixAddr> | null
-		let err: $.GoError = null as $.GoError
-		let sa: syscall.Sockaddr | null = null as syscall.Sockaddr | null
+		let addr: UnixAddr | $.VarRef<UnixAddr> | null = null! as UnixAddr | $.VarRef<UnixAddr> | null
+		let err: $.GoError = null! as $.GoError
+		let sa: syscall.Sockaddr | null = null! as syscall.Sockaddr | null
 		let __goscriptTuple5: any = await $.pointerValue<__goscript_net_fake.fakeNetFD>($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).fakeNetFD).readMsg(b, oob, 0)
 		n = __goscriptTuple5[0]
 		oobn = __goscriptTuple5[1]
@@ -421,11 +421,11 @@ export class UnixConn {
 		const c: UnixConn | $.VarRef<UnixConn> | null = this
 		let n: number = 0
 		let oobn: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if (($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).sotype == syscall.SOCK_DGRAM) && $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).isConnected) {
 			return [0, 0, __goscript_net.ErrWriteToConnected]
 		}
-		let sa: syscall.Sockaddr | null = null as syscall.Sockaddr | null
+		let sa: syscall.Sockaddr | null = null! as syscall.Sockaddr | null
 		if (addr != null) {
 			if (!$.stringEqual($.pointerValue<UnixAddr>(addr).Net, __goscript_unixsock_posix.sotypeToNet($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UnixConn>(c).conn.fd).sotype))) {
 				return [0, 0, $.namedValueInterfaceValue<$.GoError>(syscall.EAFNOSUPPORT, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
@@ -545,7 +545,7 @@ export class UnixListener {
 
 	constructor(init?: Partial<{fd?: __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null, path?: string, unlink?: boolean, unlinkOnce?: sync.Once}>) {
 		this._fields = {
-			fd: $.varRef(init?.fd ?? (null as __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null)),
+			fd: $.varRef(init?.fd ?? (null! as __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null)),
 			path: $.varRef(init?.path ?? ("" as string)),
 			unlink: $.varRef(init?.unlink ?? (false as boolean)),
 			unlinkOnce: $.varRef(init?.unlinkOnce ? $.markAsStructValue($.cloneStructValue(init.unlinkOnce)) : $.markAsStructValue(new sync.Once()))
@@ -612,8 +612,8 @@ export class UnixListener {
 
 	public File(): [os.File | $.VarRef<os.File> | null, $.GoError] {
 		const l: UnixListener | $.VarRef<UnixListener> | null = this
-		let f: os.File | $.VarRef<os.File> | null = null as os.File | $.VarRef<os.File> | null
-		let err: $.GoError = null as $.GoError
+		let f: os.File | $.VarRef<os.File> | null = null! as os.File | $.VarRef<os.File> | null
+		let err: $.GoError = null! as $.GoError
 		if (!UnixListener.prototype.ok.call(l)) {
 			return [null, $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 		}

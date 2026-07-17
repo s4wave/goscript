@@ -83,7 +83,7 @@ export class rfc1423Algo {
 		this._fields = {
 			cipher: $.varRef(init?.cipher ?? (0 as PEMCipher)),
 			name: $.varRef(init?.name ?? ("" as string)),
-			cipherFunc: $.varRef(init?.cipherFunc ?? (null as ((key: $.Slice<number>) => [cipher2.Block | null, $.GoError] | globalThis.Promise<[cipher2.Block | null, $.GoError]>) | null)),
+			cipherFunc: $.varRef(init?.cipherFunc ?? (null! as ((key: $.Slice<number>) => [cipher2.Block | null, $.GoError] | globalThis.Promise<[cipher2.Block | null, $.GoError]>) | null)),
 			keySize: $.varRef(init?.keySize ?? (0 as number)),
 			blockSize: $.varRef(init?.blockSize ?? (0 as number))
 		}
@@ -105,7 +105,7 @@ export class rfc1423Algo {
 		const c = this
 		let hash = md5.New()
 		let out: $.Slice<number> = $.makeSlice<number>(c.keySize, undefined, "byte")
-		let digest: $.Slice<number> = null as $.Slice<number>
+		let digest: $.Slice<number> = null! as $.Slice<number>
 
 		for (let i = 0; i < $.len(out); i = i + ($.len(digest))) {
 			await $.pointerValue<Exclude<hash2.Hash, null>>(hash).Reset()

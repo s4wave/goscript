@@ -47,7 +47,7 @@ export class writeBuffer {
 
 	constructor(init?: Partial<{data?: $.Slice<number>}>) {
 		this._fields = {
-			data: $.varRef(init?.data ?? (null as $.Slice<number>))
+			data: $.varRef(init?.data ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -101,7 +101,7 @@ export class PacketReadWriter {
 
 	constructor(init?: Partial<{rw?: io.ReadWriteCloser | null, buf?: bytes.Buffer, writeMtx?: sync.Mutex}>) {
 		this._fields = {
-			rw: $.varRef(init?.rw ?? (null as io.ReadWriteCloser | null)),
+			rw: $.varRef(init?.rw ?? (null! as io.ReadWriteCloser | null)),
 			buf: $.varRef(init?.buf ? $.markAsStructValue($.cloneStructValue(init.buf)) : $.markAsStructValue(new bytes.Buffer())),
 			writeMtx: $.varRef(init?.writeMtx ? $.markAsStructValue($.cloneStructValue(init.writeMtx)) : $.markAsStructValue(new sync.Mutex()))
 		}
@@ -203,7 +203,7 @@ export class PacketReadWriter {
 	public async Write(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const r: PacketReadWriter | $.VarRef<PacketReadWriter> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		using __defer = new $.DisposableStack()
 		await $.pointerValue<PacketReadWriter>(r).writeMtx.Lock()
 		__defer.defer(() => { $.pointerValue<PacketReadWriter>(r).writeMtx.Unlock() })

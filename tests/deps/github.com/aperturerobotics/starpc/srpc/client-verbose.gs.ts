@@ -56,8 +56,8 @@ export class VClient {
 
 	constructor(init?: Partial<{le?: logrus.Entry | $.VarRef<logrus.Entry> | null, client?: __goscript_client.Client | null, execID?: atomic.Int32}>) {
 		this._fields = {
-			le: $.varRef(init?.le ?? (null as logrus.Entry | $.VarRef<logrus.Entry> | null)),
-			client: $.varRef(init?.client ?? (null as __goscript_client.Client | null)),
+			le: $.varRef(init?.le ?? (null! as logrus.Entry | $.VarRef<logrus.Entry> | null)),
+			client: $.varRef(init?.client ?? (null! as __goscript_client.Client | null)),
 			execID: $.varRef(init?.execID ? $.markAsStructValue($.cloneStructValue(init.execID)) : $.markAsStructValue(new atomic.Int32()))
 		}
 	}
@@ -74,7 +74,7 @@ export class VClient {
 
 	public async ExecCall(ctx: context.Context | null, service: string, method: string, _in: __goscript_message.Message, out: __goscript_message.Message): globalThis.Promise<$.GoError> {
 		const c: VClient | $.VarRef<VClient> | null = this
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		await using __defer = new $.AsyncDisposableStack()
 		let t1 = $.markAsStructValue($.cloneStructValue(time.Now()))
 		let id = $.int($.pointerValue<VClient>(c).execID.Add($.int(1, 32)) - 1, 32)
@@ -93,8 +93,8 @@ export class VClient {
 
 	public async NewStream(ctx: context.Context | null, service: string, method: string, firstMsg: __goscript_message.Message): globalThis.Promise<[__goscript_stream.Stream | null, $.GoError]> {
 		const c: VClient | $.VarRef<VClient> | null = this
-		let stream: __goscript_stream.Stream | null = null as __goscript_stream.Stream | null
-		let err: $.GoError = null as $.GoError
+		let stream: __goscript_stream.Stream | null = null! as __goscript_stream.Stream | null
+		let err: $.GoError = null! as $.GoError
 		await using __defer = new $.AsyncDisposableStack()
 		let t1 = $.markAsStructValue($.cloneStructValue(time.Now()))
 		__defer.defer(async () => { await (async (): globalThis.Promise<void> => {

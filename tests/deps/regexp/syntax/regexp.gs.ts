@@ -116,9 +116,9 @@ export class Regexp {
 		this._fields = {
 			Op: $.varRef(init?.Op ?? (0 as Op)),
 			Flags: $.varRef(init?.Flags ?? (0 as __goscript_parse.Flags)),
-			Sub: $.varRef(init?.Sub ?? (null as $.Slice<Regexp | $.VarRef<Regexp> | null>)),
+			Sub: $.varRef(init?.Sub ?? (null! as $.Slice<Regexp | $.VarRef<Regexp> | null>)),
 			Sub0: $.varRef(init?.Sub0 !== undefined ? $.cloneArrayValue(init.Sub0) : Array.from({ length: 1 }, () => null)),
-			Rune: $.varRef(init?.Rune ?? (null as $.Slice<number>)),
+			Rune: $.varRef(init?.Rune ?? (null! as $.Slice<number>)),
 			Rune0: $.varRef(init?.Rune0 !== undefined ? $.cloneArrayValue(init.Rune0) : Array.from({ length: 2 }, () => 0)),
 			Min: $.varRef(init?.Min ?? (0 as number)),
 			Max: $.varRef(init?.Max ?? (0 as number)),
@@ -297,7 +297,7 @@ export class Regexp {
 					return sub
 				}
 
-				let prefix: Regexp | $.VarRef<Regexp> | null = null as Regexp | $.VarRef<Regexp> | null
+				let prefix: Regexp | $.VarRef<Regexp> | null = null! as Regexp | $.VarRef<Regexp> | null
 				if ($.pointerValue<Regexp>(re).Min > 0) {
 					prefix = new Regexp({Op: $.uint(18, 8)})
 					$.pointerValue<Regexp>(prefix).Sub = $.goSlice($.pointerValue<Regexp>(prefix).Sub0, undefined, 0)
@@ -335,7 +335,7 @@ export class Regexp {
 	public String(): string {
 		const re: Regexp | $.VarRef<Regexp> | null = this
 		let b: $.VarRef<strings.Builder> = $.varRef($.markAsStructValue(new strings.Builder()))
-		let flags: $.VarRef<globalThis.Map<Regexp | $.VarRef<Regexp> | null, printFlags> | null> = $.varRef(null as globalThis.Map<Regexp | $.VarRef<Regexp> | null, printFlags> | null)
+		let flags: $.VarRef<globalThis.Map<Regexp | $.VarRef<Regexp> | null, printFlags> | null> = $.varRef(null! as globalThis.Map<Regexp | $.VarRef<Regexp> | null, printFlags> | null)
 		let __goscriptTuple0: any = calcFlags(re, flags)
 		let must = $.uint(__goscriptTuple0[0], 8)
 		let cant = $.uint(__goscriptTuple0[1], 8)

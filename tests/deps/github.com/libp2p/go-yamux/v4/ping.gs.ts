@@ -56,9 +56,9 @@ export class ping {
 	constructor(init?: Partial<{id?: number, pingResponse?: $.Channel<{}> | null, done?: $.Channel<{}> | null, err?: $.GoError, duration?: time.Duration}>) {
 		this._fields = {
 			id: $.varRef(init?.id ?? (0 as number)),
-			pingResponse: $.varRef(init?.pingResponse ?? (null as $.Channel<{}> | null)),
-			done: $.varRef(init?.done ?? (null as $.Channel<{}> | null)),
-			err: $.varRef(init?.err ?? (null as $.GoError)),
+			pingResponse: $.varRef(init?.pingResponse ?? (null! as $.Channel<{}> | null)),
+			done: $.varRef(init?.done ?? (null! as $.Channel<{}> | null)),
+			err: $.varRef(init?.err ?? (null! as $.GoError)),
 			duration: $.varRef(init?.duration ?? (0n as time.Duration))
 		}
 	}

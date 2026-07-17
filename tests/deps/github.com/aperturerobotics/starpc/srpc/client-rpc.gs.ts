@@ -63,7 +63,7 @@ export class ClientRPC {
 	public async Close(): globalThis.Promise<void> {
 		const r: ClientRPC | $.VarRef<ClientRPC> | null = this
 		let locked = $.varRef($.markAsStructValue($.cloneStructValue(await $.pointerValue<ClientRPC>(r).commonRPC.bcast.Lock())))
-		let writer: __goscript_writer.PacketWriter | null = null as __goscript_writer.PacketWriter | null
+		let writer: __goscript_writer.PacketWriter | null = null! as __goscript_writer.PacketWriter | null
 		// call did not start yet if writer is nil.
 		if ($.pointerValue<ClientRPC>(r).commonRPC.writer != null) {
 			await $.pointerValue<ClientRPC>(r).commonRPC.WriteCallCancel()
@@ -165,7 +165,7 @@ export class ClientRPC {
 		}
 
 		let firstMsgEmpty: boolean = false
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let locked = $.varRef($.markAsStructValue($.cloneStructValue(await $.pointerValue<ClientRPC>(r).commonRPC.bcast.Lock())))
 		$.pointerValue<ClientRPC>(r).commonRPC.writer = writer
 

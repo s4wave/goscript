@@ -55,7 +55,7 @@ export class SHAKE {
 	constructor(init?: Partial<{d?: __goscript_sha3.Digest, initBlock?: $.Slice<number>}>) {
 		this._fields = {
 			d: $.varRef(init?.d ? $.markAsStructValue($.cloneStructValue(init.d)) : $.markAsStructValue(new __goscript_sha3.Digest())),
-			initBlock: $.varRef(init?.initBlock ?? (null as $.Slice<number>))
+			initBlock: $.varRef(init?.initBlock ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -99,7 +99,7 @@ export class SHAKE {
 	public Read(out: $.Slice<number>): [number, $.GoError] {
 		const s: SHAKE | $.VarRef<SHAKE> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		fips140.RecordApproved()
 		// Note that read is not exposed on Digest since SHA-3 does not offer
 		// variable output length. It is only used internally by Sum.
@@ -142,7 +142,7 @@ export class SHAKE {
 	public Write(p: $.Slice<number>): [number, $.GoError] {
 		const s: SHAKE | $.VarRef<SHAKE> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		return $.pointerValue<SHAKE>(s).d.Write(p)
 	}
 

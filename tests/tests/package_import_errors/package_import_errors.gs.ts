@@ -62,7 +62,7 @@ export class wrappedErr {
 
 	constructor(init?: Partial<{err?: $.GoError}>) {
 		this._fields = {
-			err: $.varRef(init?.err ?? (null as $.GoError))
+			err: $.varRef(init?.err ?? (null! as $.GoError))
 		}
 	}
 
@@ -110,7 +110,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println("err1 == nil:", err1 == null)
 
 	// Test nil error
-	let nilErr: $.GoError = null as $.GoError
+	let nilErr: $.GoError = null! as $.GoError
 	$.println("nilErr == nil:", nilErr == null)
 
 	let typedErr: customErr | $.VarRef<customErr> | null = new customErr({msg: "typed error"})

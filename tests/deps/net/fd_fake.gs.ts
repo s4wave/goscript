@@ -135,9 +135,9 @@ export class netFD {
 			sotype: $.varRef(init?.sotype ?? (0 as number)),
 			isConnected: $.varRef(init?.isConnected ?? (false as boolean)),
 			net: $.varRef(init?.net ?? ("" as string)),
-			laddr: $.varRef(init?.laddr ?? (null as __goscript_net.Addr | null)),
-			raddr: $.varRef(init?.raddr ?? (null as __goscript_net.Addr | null)),
-			fakeNetFD: $.varRef(init?.fakeNetFD ?? (null as __goscript_net_fake.fakeNetFD | $.VarRef<__goscript_net_fake.fakeNetFD> | null))
+			laddr: $.varRef(init?.laddr ?? (null! as __goscript_net.Addr | null)),
+			raddr: $.varRef(init?.raddr ?? (null! as __goscript_net.Addr | null)),
+			fakeNetFD: $.varRef(init?.fakeNetFD ?? (null! as __goscript_net_fake.fakeNetFD | $.VarRef<__goscript_net_fake.fakeNetFD> | null))
 		}
 	}
 
@@ -169,7 +169,7 @@ export class netFD {
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const fd: netFD | $.VarRef<netFD> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.pointerValue<netFD>(fd).fakeNetFD != null) {
 			return __goscript_net_fake.fakeNetFD.prototype.Read.call($.pointerValue<netFD>(fd).fakeNetFD, p)
 		}
@@ -207,7 +207,7 @@ export class netFD {
 	public async Write(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const fd: netFD | $.VarRef<netFD> | null = this
 		let nn: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.pointerValue<netFD>(fd).fakeNetFD != null) {
 			return __goscript_net_fake.fakeNetFD.prototype.Write.call($.pointerValue<netFD>(fd).fakeNetFD, p)
 		}
@@ -220,8 +220,8 @@ export class netFD {
 
 	public async accept(): globalThis.Promise<[netFD | $.VarRef<netFD> | null, $.GoError]> {
 		const fd: netFD | $.VarRef<netFD> | null = this
-		let netfd: netFD | $.VarRef<netFD> | null = null as netFD | $.VarRef<netFD> | null
-		let err: $.GoError = null as $.GoError
+		let netfd: netFD | $.VarRef<netFD> | null = null! as netFD | $.VarRef<netFD> | null
+		let err: $.GoError = null! as $.GoError
 		if ($.pointerValue<netFD>(fd).fakeNetFD != null) {
 			return __goscript_net_fake.fakeNetFD.prototype.accept.call($.pointerValue<netFD>(fd).fakeNetFD, $.pointerValue<netFD>(fd).laddr)
 		}
@@ -461,8 +461,8 @@ export function newFD(net: string, sysfd: number): netFD | $.VarRef<netFD> | nul
 }
 
 export function newPollFD(net: string, pfd: poll.FD): netFD | $.VarRef<netFD> | null {
-	let laddr: __goscript_net.Addr | null = null as __goscript_net.Addr | null
-	let raddr: __goscript_net.Addr | null = null as __goscript_net.Addr | null
+	let laddr: __goscript_net.Addr | null = null! as __goscript_net.Addr | null
+	let raddr: __goscript_net.Addr | null = null! as __goscript_net.Addr | null
 	// WASI preview 1 does not have functions like getsockname/getpeername,
 	// so we cannot get access to the underlying IP address used by connections.
 	//

@@ -60,7 +60,7 @@ export async function HandleProxyRpcStream(__typeArgs: $.GenericTypeArgs | undef
 	}
 
 	// call the remote caller
-	let remoteStrm: __goscript_rpcstream.RpcStream | null = null as __goscript_rpcstream.RpcStream | null
+	let remoteStrm: __goscript_rpcstream.RpcStream | null = null! as __goscript_rpcstream.RpcStream | null
 	if (err == null) {
 		let __goscriptTuple3: any = await remoteCaller!(ctx)
 		remoteStrm = (__goscriptTuple3[0] as __goscript_rpcstream.RpcStream | null)
@@ -92,7 +92,7 @@ export async function HandleProxyRpcStream(__typeArgs: $.GenericTypeArgs | undef
 	queueMicrotask(async () => { await copyRpcStreamTo(stream, remoteStrm, errCh) })
 
 	// wait for both errors
-	let outErr: $.GoError = null as $.GoError
+	let outErr: $.GoError = null! as $.GoError
 	for (let __rangeIndex = 0; __rangeIndex < 2; __rangeIndex++) {
 		{
 			let __goscriptShadow0 = await $.chanRecv(errCh)

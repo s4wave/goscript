@@ -30,7 +30,7 @@ export async function main(): globalThis.Promise<void> {
 	let m: globalThis.Map<string, number> | null = new globalThis.Map<string, number>([["a", 1], ["b", 2], ["c", 3]])
 
 	// Collect results in a slice to ensure deterministic output
-	let results: $.Slice<string> = null as $.Slice<string>
+	let results: $.Slice<string> = null! as $.Slice<string>
 
 	// Test maps.All which returns an iterator function (this tests the maps package import)
 	let __goscriptRangeReturn0 = false
@@ -73,11 +73,11 @@ export async function main(): globalThis.Promise<void> {
 	let dst: globalThis.Map<string, number> | null = new globalThis.Map<string, number>([["base", 1]])
 	let src: globalThis.Map<string, number> | null = new globalThis.Map<string, number>([["copied", 2]])
 	maps.Copy(dst, src)
-	let nilSrc: globalThis.Map<string, number> | null = null as globalThis.Map<string, number> | null
+	let nilSrc: globalThis.Map<string, number> | null = null! as globalThis.Map<string, number> | null
 	maps.Copy(dst, nilSrc)
 	$.println("Copy result:", $.mapGet<string, number, number>(dst, "base", 0)[0], $.mapGet<string, number, number>(dst, "copied", 0)[0], $.len(dst))
 	let cloned: globalThis.Map<string, number> | null = (maps.Clone(dst) as globalThis.Map<string, number> | null)
-	let nilMap: globalThis.Map<string, number> | null = null as globalThis.Map<string, number> | null
+	let nilMap: globalThis.Map<string, number> | null = null! as globalThis.Map<string, number> | null
 	$.println("Clone result:", $.mapGet<string, number, number>(cloned, "base", 0)[0], $.mapGet<string, number, number>(cloned, "copied", 0)[0], maps.Clone(nilMap) == null)
 
 	$.println("test finished")

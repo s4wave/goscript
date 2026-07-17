@@ -31,7 +31,7 @@ export class wrapper {
 
 	constructor(init?: Partial<{Impl?: dep.Impl | $.VarRef<dep.Impl> | null}>) {
 		this._fields = {
-			Impl: $.varRef(init?.Impl ?? (null as dep.Impl | $.VarRef<dep.Impl> | null))
+			Impl: $.varRef(init?.Impl ?? (null! as dep.Impl | $.VarRef<dep.Impl> | null))
 		}
 	}
 

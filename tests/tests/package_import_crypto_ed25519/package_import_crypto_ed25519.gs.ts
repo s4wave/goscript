@@ -39,7 +39,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println("public equal", bytes.Equal(pub, pubFromPriv))
 	$.println("private seed len", $.len(ed25519.PrivateKey_Seed(priv)))
 	$.println("nil literal reader err nil", await generateWithReader(null) == null)
-	let src: io.Reader | null = null as io.Reader | null
+	let src: io.Reader | null = null! as io.Reader | null
 	$.println("nil interface reader err nil", await generateWithReader(src) == null)
 }
 

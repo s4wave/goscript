@@ -39,7 +39,7 @@ export class Stack {
 
 	constructor(init?: Partial<{items?: $.Slice<any>}>) {
 		this._fields = {
-			items: $.varRef(init?.items ?? (null as $.Slice<any>))
+			items: $.varRef(init?.items ?? (null! as $.Slice<any>))
 		}
 	}
 
@@ -138,7 +138,7 @@ export class Mapper {
 
 	constructor(init?: Partial<{values?: globalThis.Map<any, any> | null}>) {
 		this._fields = {
-			values: $.varRef(init?.values ?? (null as globalThis.Map<any, any> | null))
+			values: $.varRef(init?.values ?? (null! as globalThis.Map<any, any> | null))
 		}
 	}
 
@@ -192,8 +192,8 @@ export class Pair {
 
 	constructor(init?: Partial<{First?: any, Second?: any}>) {
 		this._fields = {
-			First: $.varRef(init?.First ?? (null as any)),
-			Second: $.varRef(init?.Second ?? (null as any))
+			First: $.varRef(init?.First ?? (null! as any)),
+			Second: $.varRef(init?.Second ?? (null! as any))
 		}
 	}
 

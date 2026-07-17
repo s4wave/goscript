@@ -83,7 +83,7 @@ export class stack {
 
 	constructor(init?: Partial<{w?: $.Slice<__goscript_arith.Word>}>) {
 		this._fields = {
-			w: $.varRef(init?.w ?? (null as $.Slice<__goscript_arith.Word>))
+			w: $.varRef(init?.w ?? (null! as $.Slice<__goscript_arith.Word>))
 		}
 	}
 
@@ -832,7 +832,7 @@ export async function nat_expNN(z: nat, stk: stack | $.VarRef<stack> | null, x: 
 	let v = $.arrayIndex(y!, $.len((y as nat)) - 1)
 	let shift = $.uint($.uint64Add(__goscript_arith.nlz(v), 1n), 64)
 	v = $.uint($.uint64Shl(v, shift), 64)
-	let q: nat = null as nat
+	let q: nat = null! as nat
 
 	const mask: number = 9223372036854775808
 
@@ -843,8 +843,8 @@ export async function nat_expNN(z: nat, stk: stack | $.VarRef<stack> | null, x: 
 	let w = 64 - $.int(shift)
 	// zz and r are used to avoid allocating in mul and div as
 	// otherwise the arguments would alias.
-	let zz: nat = null as nat
-	let r: nat = null as nat
+	let zz: nat = null! as nat
+	let r: nat = null! as nat
 	for (let j = 0; j < w; j++) {
 		zz = (await __goscript_natmul.nat_sqr(zz, stk, (z as nat)) as nat)
 		let __goscriptAssign2_0: nat = (z as nat)
@@ -1242,8 +1242,8 @@ export async function nat_sqrt(z: nat, stk: stack | $.VarRef<stack> | null, x: n
 	// https://members.loria.fr/PZimmermann/mca/pub226.html
 	// If x is one less than a perfect square, the sequence oscillates between the correct z and z+1;
 	// otherwise it converges to the correct z and stays there.
-	let z1: nat = null as nat
-	let z2: nat = null as nat
+	let z1: nat = null! as nat
+	let z2: nat = null! as nat
 	z1 = (z as nat)
 	z1 = (nat_setUint64(z1, 1n) as nat)
 	z1 = (nat_lsh(z1, (z1 as nat), $.uint($.uint64Div($.uint(nat_bitLen(x) + 1, 64), 2n), 64)) as nat)

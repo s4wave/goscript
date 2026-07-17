@@ -91,7 +91,7 @@ export class SHA3 {
 	public Write(p: $.Slice<number>): [number, $.GoError] {
 		const s: SHA3 | $.VarRef<SHA3> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		SHA3.prototype.init.call(s)
 		return $.pointerValue<SHA3>(s).s.Write(p)
 	}
@@ -159,7 +159,7 @@ export class SHAKE {
 	public Read(p: $.Slice<number>): [number, $.GoError] {
 		const s: SHAKE | $.VarRef<SHAKE> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		SHAKE.prototype.init.call(s)
 		return $.pointerValue<SHAKE>(s).s.Read(p)
 	}
@@ -179,7 +179,7 @@ export class SHAKE {
 	public Write(p: $.Slice<number>): [number, $.GoError] {
 		const s: SHAKE | $.VarRef<SHAKE> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		SHAKE.prototype.init.call(s)
 		return $.pointerValue<SHAKE>(s).s.Write(p)
 	}

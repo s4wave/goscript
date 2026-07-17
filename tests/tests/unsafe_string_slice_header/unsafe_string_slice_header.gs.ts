@@ -56,7 +56,7 @@ export class localSliceHeader {
 
 export function stringBytes(__goscriptParam0: string): $.Slice<number> {
 	let s: $.VarRef<string> = $.varRef(__goscriptParam0)
-	let b: $.VarRef<$.Slice<number>> = $.varRef(null as $.Slice<number>)
+	let b: $.VarRef<$.Slice<number>> = $.varRef(null! as $.Slice<number>)
 	let strh: reflect.StringHeader | $.VarRef<reflect.StringHeader> | null = $.unsafePointerCast<reflect.StringHeader | $.VarRef<reflect.StringHeader> | null>($.stringHeaderRef(s))
 	let sh: reflect.SliceHeader | $.VarRef<reflect.SliceHeader> | null = $.unsafePointerCast<reflect.SliceHeader | $.VarRef<reflect.SliceHeader> | null>($.sliceHeaderRef(b))
 	$.pointerValue<reflect.SliceHeader>(sh).Data = $.uint($.pointerValue<reflect.StringHeader>(strh).Data, 64)

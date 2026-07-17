@@ -76,9 +76,9 @@ export class mux {
 
 	constructor(init?: Partial<{fallback?: $.Slice<__goscript_invoker.Invoker | null>, rmtx?: sync.RWMutex, services?: globalThis.Map<string, muxMethods> | null}>) {
 		this._fields = {
-			fallback: $.varRef(init?.fallback ?? (null as $.Slice<__goscript_invoker.Invoker | null>)),
+			fallback: $.varRef(init?.fallback ?? (null! as $.Slice<__goscript_invoker.Invoker | null>)),
 			rmtx: $.varRef(init?.rmtx ? $.markAsStructValue($.cloneStructValue(init.rmtx)) : $.markAsStructValue(new sync.RWMutex())),
-			services: $.varRef(init?.services ?? (null as globalThis.Map<string, muxMethods> | null))
+			services: $.varRef(init?.services ?? (null! as globalThis.Map<string, muxMethods> | null))
 		}
 	}
 
@@ -127,7 +127,7 @@ export class mux {
 
 	public async InvokeMethod(serviceID: string, methodID: string, strm: __goscript_stream.Stream | null): globalThis.Promise<[boolean, $.GoError]> {
 		const m: mux | $.VarRef<mux> | null = this
-		let handler: __goscript_handler.Handler | null = null as __goscript_handler.Handler | null
+		let handler: __goscript_handler.Handler | null = null! as __goscript_handler.Handler | null
 		await $.pointerValue<mux>(m).rmtx.RLock()
 		if ($.stringEqual(serviceID, "")) {
 			for (const [__rangeKey, svc] of $.pointerValue<mux>(m).services?.entries() ?? []) {

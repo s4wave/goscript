@@ -314,15 +314,15 @@ export class Dialer {
 		this._fields = {
 			Timeout: $.varRef(init?.Timeout ?? (0n as time.Duration)),
 			Deadline: $.varRef(init?.Deadline ? $.markAsStructValue($.cloneStructValue(init.Deadline)) : $.markAsStructValue(new time.Time())),
-			LocalAddr: $.varRef(init?.LocalAddr ?? (null as __goscript_net.Addr | null)),
+			LocalAddr: $.varRef(init?.LocalAddr ?? (null! as __goscript_net.Addr | null)),
 			DualStack: $.varRef(init?.DualStack ?? (false as boolean)),
 			FallbackDelay: $.varRef(init?.FallbackDelay ?? (0n as time.Duration)),
 			KeepAlive: $.varRef(init?.KeepAlive ?? (0n as time.Duration)),
 			KeepAliveConfig: $.varRef(init?.KeepAliveConfig ? $.markAsStructValue($.cloneStructValue(init.KeepAliveConfig)) : $.markAsStructValue(new __goscript_tcpsock.KeepAliveConfig())),
-			Resolver: $.varRef(init?.Resolver ?? (null as __goscript_lookup.Resolver | $.VarRef<__goscript_lookup.Resolver> | null)),
-			Cancel: $.varRef(init?.Cancel ?? (null as $.Channel<{}> | null)),
-			Control: $.varRef(init?.Control ?? (null as ((network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null)),
-			ControlContext: $.varRef(init?.ControlContext ?? (null as ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null)),
+			Resolver: $.varRef(init?.Resolver ?? (null! as __goscript_lookup.Resolver | $.VarRef<__goscript_lookup.Resolver> | null)),
+			Cancel: $.varRef(init?.Cancel ?? (null! as $.Channel<{}> | null)),
+			Control: $.varRef(init?.Control ?? (null! as ((network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null)),
+			ControlContext: $.varRef(init?.ControlContext ?? (null! as ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null)),
 			mptcpStatus: $.varRef(init?.mptcpStatus ?? (0 as mptcpStatusDial))
 		}
 	}
@@ -381,8 +381,8 @@ export class Dialer {
 
 		let sd: sysDialer | $.VarRef<sysDialer> | null = new sysDialer({Dialer: $.markAsStructValue($.cloneStructValue($.pointerValue<Dialer>(d))), network: network, address: address})
 
-		let primaries: __goscript_ipsock.addrList = null as __goscript_ipsock.addrList
-		let fallbacks: __goscript_ipsock.addrList = null as __goscript_ipsock.addrList
+		let primaries: __goscript_ipsock.addrList = null! as __goscript_ipsock.addrList
+		let fallbacks: __goscript_ipsock.addrList = null! as __goscript_ipsock.addrList
 		if (Dialer.prototype.dualStack.call(d) && ($.stringEqual(network, "tcp"))) {
 			let __goscriptTuple3: any = await __goscript_ipsock.addrList_partition(addrs, __goscript_ipsock.isIPv4)
 			primaries = (__goscriptTuple3[0] as __goscript_ipsock.addrList)
@@ -465,14 +465,14 @@ export class Dialer {
 			$.panic("nil context")
 		}
 		let deadline = $.markAsStructValue($.cloneStructValue(await Dialer.prototype.deadline.call(d, ctx, $.markAsStructValue($.cloneStructValue(time.Now())))))
-		let cancel1: context.CancelFunc | null = null as context.CancelFunc | null
-		let cancel2: context.CancelFunc | null = null as context.CancelFunc | null
+		let cancel1: context.CancelFunc | null = null! as context.CancelFunc | null
+		let cancel2: context.CancelFunc | null = null! as context.CancelFunc | null
 		if (!$.markAsStructValue($.cloneStructValue(deadline)).IsZero()) {
 			await __goscript_hook.testHookStepTime!()
 			{
 				let [__goscriptShadow1, ok] = await $.pointerValue<Exclude<context.Context, null>>(ctx).Deadline()
 				if (!ok || $.markAsStructValue($.cloneStructValue(deadline)).Before($.markAsStructValue($.cloneStructValue(__goscriptShadow1)))) {
-					let subCtx: context.Context | null = null as context.Context | null
+					let subCtx: context.Context | null = null! as context.Context | null
 					let __goscriptTuple8: any = context.WithDeadline($.pointerValueOrNil(ctx)!, $.markAsStructValue($.cloneStructValue(deadline)))
 					subCtx = __goscriptTuple8[0]
 					cancel1 = __goscriptTuple8[1]
@@ -592,7 +592,7 @@ export class sysDialer {
 			Dialer: $.varRef(init?.Dialer ? $.markAsStructValue($.cloneStructValue(init.Dialer)) : $.markAsStructValue(new Dialer())),
 			network: $.varRef(init?.network ?? ("" as string)),
 			address: $.varRef(init?.address ?? ("" as string)),
-			testHookDialTCP: $.varRef(init?.testHookDialTCP ?? (null as ((ctx: context.Context | null, net: string, laddr: __goscript_tcpsock.TCPAddr | $.VarRef<__goscript_tcpsock.TCPAddr> | null, raddr: __goscript_tcpsock.TCPAddr | $.VarRef<__goscript_tcpsock.TCPAddr> | null) => [__goscript_tcpsock.TCPConn | $.VarRef<__goscript_tcpsock.TCPConn> | null, $.GoError] | globalThis.Promise<[__goscript_tcpsock.TCPConn | $.VarRef<__goscript_tcpsock.TCPConn> | null, $.GoError]>) | null))
+			testHookDialTCP: $.varRef(init?.testHookDialTCP ?? (null! as ((ctx: context.Context | null, net: string, laddr: __goscript_tcpsock.TCPAddr | $.VarRef<__goscript_tcpsock.TCPAddr> | null, raddr: __goscript_tcpsock.TCPAddr | $.VarRef<__goscript_tcpsock.TCPAddr> | null) => [__goscript_tcpsock.TCPConn | $.VarRef<__goscript_tcpsock.TCPConn> | null, $.GoError] | globalThis.Promise<[__goscript_tcpsock.TCPConn | $.VarRef<__goscript_tcpsock.TCPConn> | null, $.GoError]>) | null))
 		}
 	}
 
@@ -697,8 +697,8 @@ export class sysDialer {
 
 			constructor(init?: Partial<{Conn?: __goscript_net.Conn | null, error?: $.GoError, primary?: boolean, done?: boolean}>) {
 				this._fields = {
-					Conn: $.varRef(init?.Conn ?? (null as __goscript_net.Conn | null)),
-					error: $.varRef(init?.error ?? (null as $.GoError)),
+					Conn: $.varRef(init?.Conn ?? (null! as __goscript_net.Conn | null)),
+					error: $.varRef(init?.error ?? (null! as $.GoError)),
 					primary: $.varRef(init?.primary ?? (false as boolean)),
 					done: $.varRef(init?.done ?? (false as boolean))
 				}
@@ -853,7 +853,7 @@ export class sysDialer {
 	public async dialSerial(ctx: context.Context | null, ras: __goscript_ipsock.addrList): globalThis.Promise<[__goscript_net.Conn | null, $.GoError]> {
 		const sd: sysDialer | $.VarRef<sysDialer> | null = this
 		await using __defer = new $.AsyncDisposableStack()
-		let firstErr: $.GoError = null as $.GoError
+		let firstErr: $.GoError = null! as $.GoError
 
 		for (let __goscriptRangeTarget0 = ras, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
 			let ra = __goscriptRangeTarget0![i]
@@ -894,7 +894,7 @@ export class sysDialer {
 						break
 					}
 					if ($.markAsStructValue($.cloneStructValue(__goscriptShadow7)).Before($.markAsStructValue($.cloneStructValue(deadline)))) {
-						let cancel: context.CancelFunc | null = null as context.CancelFunc | null
+						let cancel: context.CancelFunc | null = null! as context.CancelFunc | null
 						let __goscriptTuple13: any = context.WithDeadline($.pointerValueOrNil(ctx)!, $.markAsStructValue($.cloneStructValue(__goscriptShadow7)))
 						dialCtx = __goscriptTuple13[0]
 						cancel = __goscriptTuple13[1]
@@ -920,8 +920,8 @@ export class sysDialer {
 
 	public async dialSingle(ctx: context.Context | null, ra: __goscript_net.Addr | null): globalThis.Promise<[__goscript_net.Conn | null, $.GoError]> {
 		const sd: sysDialer | $.VarRef<sysDialer> | null = this
-		let c: __goscript_net.Conn | null = null as __goscript_net.Conn | null
-		let err: $.GoError = null as $.GoError
+		let c: __goscript_net.Conn | null = null! as __goscript_net.Conn | null
+		let err: $.GoError = null! as $.GoError
 		await using __defer = new $.AsyncDisposableStack()
 		let __goscriptTuple14: any = $.typeAssertTuple<nettrace.Trace | $.VarRef<nettrace.Trace> | null>(await $.pointerValue<Exclude<context.Context, null>>(ctx).Value($.interfaceValue<any>($.markAsStructValue(new nettrace.TraceKey()), "nettrace.TraceKey", "nettrace.TraceKey")), { kind: $.TypeKind.Pointer, elemType: "nettrace.Trace" })
 		let trace: nettrace.Trace | $.VarRef<nettrace.Trace> | null = __goscriptTuple14[0]
@@ -1230,7 +1230,7 @@ export class ListenConfig {
 
 	constructor(init?: Partial<{Control?: ((network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null, KeepAlive?: time.Duration, KeepAliveConfig?: __goscript_tcpsock.KeepAliveConfig, mptcpStatus?: mptcpStatusListen}>) {
 		this._fields = {
-			Control: $.varRef(init?.Control ?? (null as ((network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null)),
+			Control: $.varRef(init?.Control ?? (null! as ((network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null)),
 			KeepAlive: $.varRef(init?.KeepAlive ?? (0n as time.Duration)),
 			KeepAliveConfig: $.varRef(init?.KeepAliveConfig ? $.markAsStructValue($.cloneStructValue(init.KeepAliveConfig)) : $.markAsStructValue(new __goscript_tcpsock.KeepAliveConfig())),
 			mptcpStatus: $.varRef(init?.mptcpStatus ?? (0 as mptcpStatusListen))
@@ -1257,7 +1257,7 @@ export class ListenConfig {
 			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: null, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 		}
 		let sl: sysListener | $.VarRef<sysListener> | null = new sysListener({ListenConfig: $.markAsStructValue($.cloneStructValue($.pointerValue<ListenConfig>(lc))), network: network, address: address})
-		let l: __goscript_net.Listener | null = null as __goscript_net.Listener | null
+		let l: __goscript_net.Listener | null = null! as __goscript_net.Listener | null
 		let la = await __goscript_ipsock.addrList_first(addrs, __goscript_ipsock.isIPv4)
 		{
 			const __goscriptTypeSwitchValue = la
@@ -1307,7 +1307,7 @@ export class ListenConfig {
 			return [null, $.interfaceValue<$.GoError>(new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: null, Err: err}), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 		}
 		let sl: sysListener | $.VarRef<sysListener> | null = new sysListener({ListenConfig: $.markAsStructValue($.cloneStructValue($.pointerValue<ListenConfig>(lc))), network: network, address: address})
-		let c: __goscript_net.PacketConn | null = null as __goscript_net.PacketConn | null
+		let c: __goscript_net.PacketConn | null = null! as __goscript_net.PacketConn | null
 		let la = await __goscript_ipsock.addrList_first(addrs, __goscript_ipsock.isIPv4)
 		{
 			const __goscriptTypeSwitchValue = la
@@ -1437,7 +1437,7 @@ export class sysListener {
 				break
 			}
 		}
-		let ctrlCtxFn: ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null = null as ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null
+		let ctrlCtxFn: ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null = null! as ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null
 		if ($.pointerValue<sysListener>(sl).ListenConfig.Control != null) {
 			ctrlCtxFn = $.functionValue(async (ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null): globalThis.Promise<$.GoError> => {
 				return await $.pointerValue<sysListener>(sl).ListenConfig.Control!(network, address, c)
@@ -1459,7 +1459,7 @@ export class sysListener {
 
 	public async listenMulticastUDP(ctx: context.Context | null, ifi: __goscript__interface.Interface | $.VarRef<__goscript__interface.Interface> | null, gaddr: __goscript_udpsock.UDPAddr | $.VarRef<__goscript_udpsock.UDPAddr> | null): globalThis.Promise<[__goscript_udpsock.UDPConn | $.VarRef<__goscript_udpsock.UDPConn> | null, $.GoError]> {
 		const sl: sysListener | $.VarRef<sysListener> | null = this
-		let ctrlCtxFn: ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null = null as ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null
+		let ctrlCtxFn: ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null = null! as ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null
 		if ($.pointerValue<sysListener>(sl).ListenConfig.Control != null) {
 			ctrlCtxFn = $.functionValue(async (ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null): globalThis.Promise<$.GoError> => {
 				return await $.pointerValue<sysListener>(sl).ListenConfig.Control!(network, address, c)
@@ -1502,7 +1502,7 @@ export class sysListener {
 
 	public async listenTCPProto(ctx: context.Context | null, laddr: __goscript_tcpsock.TCPAddr | $.VarRef<__goscript_tcpsock.TCPAddr> | null, proto: number): globalThis.Promise<[__goscript_tcpsock.TCPListener | $.VarRef<__goscript_tcpsock.TCPListener> | null, $.GoError]> {
 		const sl: sysListener | $.VarRef<sysListener> | null = this
-		let ctrlCtxFn: ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null = null as ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null
+		let ctrlCtxFn: ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null = null! as ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null
 		if ($.pointerValue<sysListener>(sl).ListenConfig.Control != null) {
 			ctrlCtxFn = $.functionValue(async (ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null): globalThis.Promise<$.GoError> => {
 				return await $.pointerValue<sysListener>(sl).ListenConfig.Control!(network, address, c)
@@ -1519,7 +1519,7 @@ export class sysListener {
 
 	public async listenUDP(ctx: context.Context | null, laddr: __goscript_udpsock.UDPAddr | $.VarRef<__goscript_udpsock.UDPAddr> | null): globalThis.Promise<[__goscript_udpsock.UDPConn | $.VarRef<__goscript_udpsock.UDPConn> | null, $.GoError]> {
 		const sl: sysListener | $.VarRef<sysListener> | null = this
-		let ctrlCtxFn: ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null = null as ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null
+		let ctrlCtxFn: ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null = null! as ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null
 		if ($.pointerValue<sysListener>(sl).ListenConfig.Control != null) {
 			ctrlCtxFn = $.functionValue(async (ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null): globalThis.Promise<$.GoError> => {
 				return await $.pointerValue<sysListener>(sl).ListenConfig.Control!(network, address, c)
@@ -1536,7 +1536,7 @@ export class sysListener {
 
 	public async listenUnix(ctx: context.Context | null, laddr: __goscript_unixsock.UnixAddr | $.VarRef<__goscript_unixsock.UnixAddr> | null): globalThis.Promise<[__goscript_unixsock.UnixListener | $.VarRef<__goscript_unixsock.UnixListener> | null, $.GoError]> {
 		const sl: sysListener | $.VarRef<sysListener> | null = this
-		let ctrlCtxFn: ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null = null as ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null
+		let ctrlCtxFn: ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null = null! as ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null
 		if ($.pointerValue<sysListener>(sl).ListenConfig.Control != null) {
 			ctrlCtxFn = $.functionValue(async (ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null): globalThis.Promise<$.GoError> => {
 				return await $.pointerValue<sysListener>(sl).ListenConfig.Control!(network, address, c)
@@ -1553,7 +1553,7 @@ export class sysListener {
 
 	public async listenUnixgram(ctx: context.Context | null, laddr: __goscript_unixsock.UnixAddr | $.VarRef<__goscript_unixsock.UnixAddr> | null): globalThis.Promise<[__goscript_unixsock.UnixConn | $.VarRef<__goscript_unixsock.UnixConn> | null, $.GoError]> {
 		const sl: sysListener | $.VarRef<sysListener> | null = this
-		let ctrlCtxFn: ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null = null as ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null
+		let ctrlCtxFn: ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null = null! as ((ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null
 		if ($.pointerValue<sysListener>(sl).ListenConfig.Control != null) {
 			ctrlCtxFn = $.functionValue(async (ctx: context.Context | null, network: string, address: string, c: syscall.RawConn | null): globalThis.Promise<$.GoError> => {
 				return await $.pointerValue<sysListener>(sl).ListenConfig.Control!(network, address, c)
@@ -1721,7 +1721,7 @@ export function partialDeadline(now: time.Time, deadline: time.Time, addrsRemain
 export async function parseNetwork(ctx: context.Context | null, network: string, needsProto: boolean): globalThis.Promise<[string, number, $.GoError]> {
 	let afnet: string = ""
 	let proto: number = 0
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let i = bytealg.LastIndexByteString(network, $.uint(58, 8))
 	if (i < 0) {
 		switch (network) {

@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let s: $.Slice<number> = null as $.Slice<number>
+	let s: $.Slice<number> = null! as $.Slice<number>
 	$.println("s == nil:", s == null)
 
 	// Slicing nil with valid bounds should work

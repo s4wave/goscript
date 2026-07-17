@@ -34,8 +34,8 @@ export class Writer {
 
 	constructor(init?: Partial<{W?: io.Writer | null, bufw?: bufio.Writer | $.VarRef<bufio.Writer> | null}>) {
 		this._fields = {
-			W: $.varRef(init?.W ?? (null as io.Writer | null)),
-			bufw: $.varRef(init?.bufw ?? (null as bufio.Writer | $.VarRef<bufio.Writer> | null))
+			W: $.varRef(init?.W ?? (null! as io.Writer | null)),
+			bufw: $.varRef(init?.bufw ?? (null! as bufio.Writer | $.VarRef<bufio.Writer> | null))
 		}
 	}
 
@@ -66,8 +66,8 @@ export class Writer {
 
 	public async Close(): globalThis.Promise<$.GoError> {
 		const w: Writer | $.VarRef<Writer> | null = this
-		let ferr: $.GoError = null as $.GoError
-		let cerr: $.GoError = null as $.GoError
+		let ferr: $.GoError = null! as $.GoError
+		let cerr: $.GoError = null! as $.GoError
 		ferr = await Writer.prototype.Flush.call(w)
 
 		// always close even if flush fails.

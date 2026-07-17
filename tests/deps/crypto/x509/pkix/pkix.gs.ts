@@ -44,7 +44,7 @@ export class AlgorithmIdentifier {
 
 	constructor(init?: Partial<{Algorithm?: asn1.ObjectIdentifier, Parameters?: asn1.RawValue}>) {
 		this._fields = {
-			Algorithm: $.varRef(init?.Algorithm ?? (null as asn1.ObjectIdentifier)),
+			Algorithm: $.varRef(init?.Algorithm ?? (null! as asn1.ObjectIdentifier)),
 			Parameters: $.varRef(init?.Parameters ? $.markAsStructValue($.cloneStructValue(init.Parameters)) : $.markAsStructValue(new asn1.RawValue()))
 		}
 	}
@@ -89,8 +89,8 @@ export class AttributeTypeAndValue {
 
 	constructor(init?: Partial<{Type?: asn1.ObjectIdentifier, Value?: any}>) {
 		this._fields = {
-			Type: $.varRef(init?.Type ?? (null as asn1.ObjectIdentifier)),
-			Value: $.varRef(init?.Value ?? (null as any))
+			Type: $.varRef(init?.Type ?? (null! as asn1.ObjectIdentifier)),
+			Value: $.varRef(init?.Value ?? (null! as any))
 		}
 	}
 
@@ -134,8 +134,8 @@ export class AttributeTypeAndValueSET {
 
 	constructor(init?: Partial<{Type?: asn1.ObjectIdentifier, Value?: $.Slice<$.Slice<AttributeTypeAndValue>>}>) {
 		this._fields = {
-			Type: $.varRef(init?.Type ?? (null as asn1.ObjectIdentifier)),
-			Value: $.varRef(init?.Value ?? (null as $.Slice<$.Slice<AttributeTypeAndValue>>))
+			Type: $.varRef(init?.Type ?? (null! as asn1.ObjectIdentifier)),
+			Value: $.varRef(init?.Value ?? (null! as $.Slice<$.Slice<AttributeTypeAndValue>>))
 		}
 	}
 
@@ -187,9 +187,9 @@ export class Extension {
 
 	constructor(init?: Partial<{Id?: asn1.ObjectIdentifier, Critical?: boolean, Value?: $.Slice<number>}>) {
 		this._fields = {
-			Id: $.varRef(init?.Id ?? (null as asn1.ObjectIdentifier)),
+			Id: $.varRef(init?.Id ?? (null! as asn1.ObjectIdentifier)),
 			Critical: $.varRef(init?.Critical ?? (false as boolean)),
-			Value: $.varRef(init?.Value ?? (null as $.Slice<number>))
+			Value: $.varRef(init?.Value ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -313,17 +313,17 @@ export class Name {
 
 	constructor(init?: Partial<{Country?: $.Slice<string>, Organization?: $.Slice<string>, OrganizationalUnit?: $.Slice<string>, Locality?: $.Slice<string>, Province?: $.Slice<string>, StreetAddress?: $.Slice<string>, PostalCode?: $.Slice<string>, SerialNumber?: string, CommonName?: string, Names?: $.Slice<AttributeTypeAndValue>, ExtraNames?: $.Slice<AttributeTypeAndValue>}>) {
 		this._fields = {
-			Country: $.varRef(init?.Country ?? (null as $.Slice<string>)),
-			Organization: $.varRef(init?.Organization ?? (null as $.Slice<string>)),
-			OrganizationalUnit: $.varRef(init?.OrganizationalUnit ?? (null as $.Slice<string>)),
-			Locality: $.varRef(init?.Locality ?? (null as $.Slice<string>)),
-			Province: $.varRef(init?.Province ?? (null as $.Slice<string>)),
-			StreetAddress: $.varRef(init?.StreetAddress ?? (null as $.Slice<string>)),
-			PostalCode: $.varRef(init?.PostalCode ?? (null as $.Slice<string>)),
+			Country: $.varRef(init?.Country ?? (null! as $.Slice<string>)),
+			Organization: $.varRef(init?.Organization ?? (null! as $.Slice<string>)),
+			OrganizationalUnit: $.varRef(init?.OrganizationalUnit ?? (null! as $.Slice<string>)),
+			Locality: $.varRef(init?.Locality ?? (null! as $.Slice<string>)),
+			Province: $.varRef(init?.Province ?? (null! as $.Slice<string>)),
+			StreetAddress: $.varRef(init?.StreetAddress ?? (null! as $.Slice<string>)),
+			PostalCode: $.varRef(init?.PostalCode ?? (null! as $.Slice<string>)),
 			SerialNumber: $.varRef(init?.SerialNumber ?? ("" as string)),
 			CommonName: $.varRef(init?.CommonName ?? ("" as string)),
-			Names: $.varRef(init?.Names ?? (null as $.Slice<AttributeTypeAndValue>)),
-			ExtraNames: $.varRef(init?.ExtraNames ?? (null as $.Slice<AttributeTypeAndValue>))
+			Names: $.varRef(init?.Names ?? (null! as $.Slice<AttributeTypeAndValue>)),
+			ExtraNames: $.varRef(init?.ExtraNames ?? (null! as $.Slice<AttributeTypeAndValue>))
 		}
 	}
 
@@ -417,7 +417,7 @@ export class Name {
 
 	public async String(): globalThis.Promise<string> {
 		const n = this
-		let rdns: RDNSequence = null as RDNSequence
+		let rdns: RDNSequence = null! as RDNSequence
 		// If there are no ExtraNames, surface the parsed value (all entries in
 		// Names) instead.
 		if (n.ExtraNames == null) {
@@ -452,7 +452,7 @@ export class Name {
 
 	public ToRDNSequence(): RDNSequence {
 		const n = this
-		let ret: RDNSequence = null as RDNSequence
+		let ret: RDNSequence = null! as RDNSequence
 		ret = ($.markAsStructValue($.cloneStructValue(n)).appendRDNs((ret as RDNSequence), n.Country, (oidCountry as asn1.ObjectIdentifier)) as RDNSequence)
 		ret = ($.markAsStructValue($.cloneStructValue(n)).appendRDNs((ret as RDNSequence), n.Province, (oidProvince as asn1.ObjectIdentifier)) as RDNSequence)
 		ret = ($.markAsStructValue($.cloneStructValue(n)).appendRDNs((ret as RDNSequence), n.Locality, (oidLocality as asn1.ObjectIdentifier)) as RDNSequence)
@@ -569,14 +569,14 @@ export class TBSCertificateList {
 
 	constructor(init?: Partial<{Raw?: asn1.RawContent, Version?: number, Signature?: AlgorithmIdentifier, Issuer?: RDNSequence, ThisUpdate?: time.Time, NextUpdate?: time.Time, RevokedCertificates?: $.Slice<RevokedCertificate>, Extensions?: $.Slice<Extension>}>) {
 		this._fields = {
-			Raw: $.varRef(init?.Raw ?? (null as asn1.RawContent)),
+			Raw: $.varRef(init?.Raw ?? (null! as asn1.RawContent)),
 			Version: $.varRef(init?.Version ?? (0 as number)),
 			Signature: $.varRef(init?.Signature ? $.markAsStructValue($.cloneStructValue(init.Signature)) : $.markAsStructValue(new AlgorithmIdentifier())),
-			Issuer: $.varRef(init?.Issuer ?? (null as RDNSequence)),
+			Issuer: $.varRef(init?.Issuer ?? (null! as RDNSequence)),
 			ThisUpdate: $.varRef(init?.ThisUpdate ? $.markAsStructValue($.cloneStructValue(init.ThisUpdate)) : $.markAsStructValue(new time.Time())),
 			NextUpdate: $.varRef(init?.NextUpdate ? $.markAsStructValue($.cloneStructValue(init.NextUpdate)) : $.markAsStructValue(new time.Time())),
-			RevokedCertificates: $.varRef(init?.RevokedCertificates ?? (null as $.Slice<RevokedCertificate>)),
-			Extensions: $.varRef(init?.Extensions ?? (null as $.Slice<Extension>))
+			RevokedCertificates: $.varRef(init?.RevokedCertificates ?? (null! as $.Slice<RevokedCertificate>)),
+			Extensions: $.varRef(init?.Extensions ?? (null! as $.Slice<Extension>))
 		}
 	}
 
@@ -694,9 +694,9 @@ export class RevokedCertificate {
 
 	constructor(init?: Partial<{SerialNumber?: big.Int | $.VarRef<big.Int> | null, RevocationTime?: time.Time, Extensions?: $.Slice<Extension>}>) {
 		this._fields = {
-			SerialNumber: $.varRef(init?.SerialNumber ?? (null as big.Int | $.VarRef<big.Int> | null)),
+			SerialNumber: $.varRef(init?.SerialNumber ?? (null! as big.Int | $.VarRef<big.Int> | null)),
 			RevocationTime: $.varRef(init?.RevocationTime ? $.markAsStructValue($.cloneStructValue(init.RevocationTime)) : $.markAsStructValue(new time.Time())),
-			Extensions: $.varRef(init?.Extensions ?? (null as $.Slice<Extension>))
+			Extensions: $.varRef(init?.Extensions ?? (null! as $.Slice<Extension>))
 		}
 	}
 

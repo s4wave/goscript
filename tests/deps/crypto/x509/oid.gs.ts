@@ -41,7 +41,7 @@ export class OID {
 
 	constructor(init?: Partial<{der?: $.Slice<number>}>) {
 		this._fields = {
-			der: $.varRef(init?.der ?? (null as $.Slice<number>))
+			der: $.varRef(init?.der ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -134,7 +134,7 @@ export class OID {
 		let start: number = 0
 		let val: bigint = 0n
 		let numBuf: $.Slice<number> = $.makeSlice<number>(0, 21, "byte")
-		let bigVal: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
+		let bigVal: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
 		let overflow: boolean = false
 		for (let __goscriptRangeTarget0 = oid.der, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
 			let v = __goscriptRangeTarget0![i]

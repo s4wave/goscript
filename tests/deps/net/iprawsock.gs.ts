@@ -128,7 +128,7 @@ export class IPAddr {
 
 	constructor(init?: Partial<{IP?: __goscript_ip.IP, Zone?: string}>) {
 		this._fields = {
-			IP: $.varRef(init?.IP ?? (null as __goscript_ip.IP)),
+			IP: $.varRef(init?.IP ?? (null! as __goscript_ip.IP)),
 			Zone: $.varRef(init?.Zone ?? ("" as string))
 		}
 	}
@@ -272,8 +272,8 @@ export class IPConn {
 		let n: number = 0
 		let oobn: number = 0
 		let flags: number = 0
-		let addr: IPAddr | $.VarRef<IPAddr> | null = null as IPAddr | $.VarRef<IPAddr> | null
-		let err: $.GoError = null as $.GoError
+		let addr: IPAddr | $.VarRef<IPAddr> | null = null! as IPAddr | $.VarRef<IPAddr> | null
+		let err: $.GoError = null! as $.GoError
 		if (!$.pointerValue<IPConn>(c).conn.ok()) {
 			return [0, 0, 0, null, $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 		}
@@ -301,7 +301,7 @@ export class IPConn {
 		const c: IPConn | $.VarRef<IPConn> | null = this
 		let n: number = 0
 		let oobn: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if (!$.pointerValue<IPConn>(c).conn.ok()) {
 			return [0, 0, $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 		}
@@ -349,7 +349,7 @@ export class IPConn {
 		const c: IPConn | $.VarRef<IPConn> | null = this
 
 		// Network returns the address's network name, "ip".
-		let addr: IPAddr | $.VarRef<IPAddr> | null = null as IPAddr | $.VarRef<IPAddr> | null
+		let addr: IPAddr | $.VarRef<IPAddr> | null = null! as IPAddr | $.VarRef<IPAddr> | null
 		let [n, sa, err] = await $.pointerValue<__goscript_net_fake.fakeNetFD>($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).fakeNetFD).readFrom(b)
 		{
 			const __goscriptTypeSwitchValue = sa
@@ -377,9 +377,9 @@ export class IPConn {
 		let n: number = 0
 		let oobn: number = 0
 		let flags: number = 0
-		let addr: IPAddr | $.VarRef<IPAddr> | null = null as IPAddr | $.VarRef<IPAddr> | null
-		let err: $.GoError = null as $.GoError
-		let sa: syscall.Sockaddr | null = null as syscall.Sockaddr | null
+		let addr: IPAddr | $.VarRef<IPAddr> | null = null! as IPAddr | $.VarRef<IPAddr> | null
+		let err: $.GoError = null! as $.GoError
+		let sa: syscall.Sockaddr | null = null! as syscall.Sockaddr | null
 		let __goscriptTuple6: any = await $.pointerValue<__goscript_net_fake.fakeNetFD>($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).fakeNetFD).readMsg(b, oob, 0)
 		n = __goscriptTuple6[0]
 		oobn = __goscriptTuple6[1]
@@ -410,7 +410,7 @@ export class IPConn {
 		const c: IPConn | $.VarRef<IPConn> | null = this
 		let n: number = 0
 		let oobn: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<IPConn>(c).conn.fd).isConnected) {
 			return [0, 0, __goscript_net.ErrWriteToConnected]
 		}

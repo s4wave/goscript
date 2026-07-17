@@ -29,7 +29,7 @@ export class sourceStruct {
 	constructor(init?: Partial<{flag?: boolean, data?: $.Slice<number>}>) {
 		this._fields = {
 			flag: $.varRef(init?.flag ?? (false as boolean)),
-			data: $.varRef(init?.data ?? (null as $.Slice<number>))
+			data: $.varRef(init?.data ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -74,7 +74,7 @@ export class viewStruct {
 	constructor(init?: Partial<{flag?: boolean, data?: $.Slice<number>}>) {
 		this._fields = {
 			flag: $.varRef(init?.flag ?? (false as boolean)),
-			data: $.varRef(init?.data ?? (null as $.Slice<number>))
+			data: $.varRef(init?.data ?? (null! as $.Slice<number>))
 		}
 	}
 

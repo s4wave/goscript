@@ -79,7 +79,7 @@ export class BufferPool {
 			return
 		}
 		let idx = $.uint(prevLogBase2($.uint($.uint(capacity, 32), 32)), 32)
-		let bp: bufp | $.VarRef<bufp> | null = null as bufp | $.VarRef<bufp> | null
+		let bp: bufp | $.VarRef<bufp> | null = null! as bufp | $.VarRef<bufp> | null
 		{
 			let ptr = await $.pointerValue<BufferPool>(p).ptrs.Get()
 			if (ptr != null) {
@@ -115,7 +115,7 @@ export class bufp {
 
 	constructor(init?: Partial<{buf?: $.Slice<number>}>) {
 		this._fields = {
-			buf: $.varRef(init?.buf ?? (null as $.Slice<number>))
+			buf: $.varRef(init?.buf ?? (null! as $.Slice<number>))
 		}
 	}
 

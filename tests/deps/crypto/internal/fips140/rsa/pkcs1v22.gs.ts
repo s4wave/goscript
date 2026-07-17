@@ -71,7 +71,7 @@ export function incCounter(c: $.VarRef<Uint8Array> | null): void {
 
 export async function mgf1XOR(out: $.Slice<number>, hash: hash2.Hash | null, seed: $.Slice<number>): globalThis.Promise<void> {
 	let counter: $.VarRef<Uint8Array> = $.varRef(new Uint8Array(4))
-	let digest: $.Slice<number> = null as $.Slice<number>
+	let digest: $.Slice<number> = null! as $.Slice<number>
 
 	let done = 0
 	while (done < $.len(out)) {

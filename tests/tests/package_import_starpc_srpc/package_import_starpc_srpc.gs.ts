@@ -99,7 +99,7 @@ export class embeddedStream {
 
 	constructor(init?: Partial<{Stream?: srpc.Stream | null}>) {
 		this._fields = {
-			Stream: $.varRef(init?.Stream ?? (null as srpc.Stream | null))
+			Stream: $.varRef(init?.Stream ?? (null! as srpc.Stream | null))
 		}
 	}
 
@@ -162,8 +162,8 @@ export class streamOpenResult {
 
 	constructor(init?: Partial<{stream?: srpc.Stream | null, err?: $.GoError}>) {
 		this._fields = {
-			stream: $.varRef(init?.stream ?? (null as srpc.Stream | null)),
-			err: $.varRef(init?.err ?? (null as $.GoError))
+			stream: $.varRef(init?.stream ?? (null! as srpc.Stream | null)),
+			err: $.varRef(init?.err ?? (null! as $.GoError))
 		}
 	}
 
@@ -319,10 +319,10 @@ export class memoryRpcStream {
 
 	constructor(init?: Partial<{ctx?: context.Context | null, cancel?: (() => void) | null, recv?: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null, send?: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null, closeSend?: sync.Once, cancelLocal?: sync.Once}>) {
 		this._fields = {
-			ctx: $.varRef(init?.ctx ?? (null as context.Context | null)),
-			cancel: $.varRef(init?.cancel ?? (null as (() => void) | null)),
-			recv: $.varRef(init?.recv ?? (null as $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null)),
-			send: $.varRef(init?.send ?? (null as $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null)),
+			ctx: $.varRef(init?.ctx ?? (null! as context.Context | null)),
+			cancel: $.varRef(init?.cancel ?? (null! as (() => void) | null)),
+			recv: $.varRef(init?.recv ?? (null! as $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null)),
+			send: $.varRef(init?.send ?? (null! as $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null)),
 			closeSend: $.varRef(init?.closeSend ? $.markAsStructValue($.cloneStructValue(init.closeSend)) : $.markAsStructValue(new sync.Once())),
 			cancelLocal: $.varRef(init?.cancelLocal ? $.markAsStructValue($.cloneStructValue(init.cancelLocal)) : $.markAsStructValue(new sync.Once()))
 		}
@@ -483,7 +483,7 @@ export class memoryRpcContext {
 
 	constructor(init?: Partial<{done?: $.Channel<{}> | null, once?: sync.Once}>) {
 		this._fields = {
-			done: $.varRef(init?.done ?? (null as $.Channel<{}> | null)),
+			done: $.varRef(init?.done ?? (null! as $.Channel<{}> | null)),
 			once: $.varRef(init?.once ? $.markAsStructValue($.cloneStructValue(init.once)) : $.markAsStructValue(new sync.Once()))
 		}
 	}
@@ -982,7 +982,7 @@ export async function exerciseRpcStreamHandle(): globalThis.Promise<boolean> {
 
 export async function exercisePushablePacketWriter(): globalThis.Promise<boolean> {
 	using __defer = new $.DisposableStack()
-	let pushed: $.Slice<$.Slice<number>> = null as $.Slice<$.Slice<number>>
+	let pushed: $.Slice<$.Slice<number>> = null! as $.Slice<$.Slice<number>>
 	let ended = false
 	let pushFn = $.markAsStructValue($.cloneStructValue(js.FuncOf($.functionValue((_this: js.Value, args: $.Slice<js.Value>): any => {
 		if ($.len(args) != 1) {

@@ -36,7 +36,7 @@ export class wrappedAEAD {
 
 	constructor(init?: Partial<{inner?: cipher.AEAD | null}>) {
 		this._fields = {
-			inner: $.varRef(init?.inner ?? (null as cipher.AEAD | null))
+			inner: $.varRef(init?.inner ?? (null! as cipher.AEAD | null))
 		}
 	}
 
@@ -107,9 +107,9 @@ export class nestedSealer {
 
 	constructor(init?: Partial<{aead?: cipher.AEAD | null, nonce?: $.Slice<number>, aad?: $.Slice<number>}>) {
 		this._fields = {
-			aead: $.varRef(init?.aead ?? (null as cipher.AEAD | null)),
-			nonce: $.varRef(init?.nonce ?? (null as $.Slice<number>)),
-			aad: $.varRef(init?.aad ?? (null as $.Slice<number>))
+			aead: $.varRef(init?.aead ?? (null! as cipher.AEAD | null)),
+			nonce: $.varRef(init?.nonce ?? (null! as $.Slice<number>)),
+			aad: $.varRef(init?.aad ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -158,7 +158,7 @@ export async function roundTrip(prefix: $.Slice<number>): globalThis.Promise<voi
 	if (err != null) {
 		$.panic((err as any))
 	}
-	let aead: cipher.AEAD | null = null as cipher.AEAD | null
+	let aead: cipher.AEAD | null = null! as cipher.AEAD | null
 	let __goscriptTuple0: any = cipher.NewGCM($.pointerValueOrNil(block)!)
 	aead = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]

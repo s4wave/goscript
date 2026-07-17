@@ -183,7 +183,7 @@ export class conn {
 
 	constructor(init?: Partial<{fd?: __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null}>) {
 		this._fields = {
-			fd: $.varRef(init?.fd ?? (null as __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null))
+			fd: $.varRef(init?.fd ?? (null! as __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null))
 		}
 	}
 
@@ -209,8 +209,8 @@ export class conn {
 
 	public File(): [os.File | $.VarRef<os.File> | null, $.GoError] {
 		const c: conn | $.VarRef<conn> | null = this
-		let f: os.File | $.VarRef<os.File> | null = null as os.File | $.VarRef<os.File> | null
-		let err: $.GoError = null as $.GoError
+		let f: os.File | $.VarRef<os.File> | null = null! as os.File | $.VarRef<os.File> | null
+		let err: $.GoError = null! as $.GoError
 		let __goscriptTuple0: any = $.pointerValue<__goscript_net_fake.fakeNetFD>($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<conn>(c).fd).fakeNetFD).dup()
 		f = __goscriptTuple0[0]
 		err = __goscriptTuple0[1]
@@ -440,9 +440,9 @@ export class OpError {
 		this._fields = {
 			Op: $.varRef(init?.Op ?? ("" as string)),
 			Net: $.varRef(init?.Net ?? ("" as string)),
-			Source: $.varRef(init?.Source ?? (null as Addr | null)),
-			Addr: $.varRef(init?.Addr ?? (null as Addr | null)),
-			Err: $.varRef(init?.Err ?? (null as $.GoError))
+			Source: $.varRef(init?.Source ?? (null! as Addr | null)),
+			Addr: $.varRef(init?.Addr ?? (null! as Addr | null)),
+			Err: $.varRef(init?.Err ?? (null! as $.GoError))
 		}
 	}
 
@@ -721,7 +721,7 @@ export class DNSConfigError {
 
 	constructor(init?: Partial<{Err?: $.GoError}>) {
 		this._fields = {
-			Err: $.varRef(init?.Err ?? (null as $.GoError))
+			Err: $.varRef(init?.Err ?? (null! as $.GoError))
 		}
 	}
 
@@ -917,7 +917,7 @@ export class DNSError {
 
 	constructor(init?: Partial<{UnwrapErr?: $.GoError, Err?: string, Name?: string, Server?: string, IsTimeout?: boolean, IsTemporary?: boolean, IsNotFound?: boolean}>) {
 		this._fields = {
-			UnwrapErr: $.varRef(init?.UnwrapErr ?? (null as $.GoError)),
+			UnwrapErr: $.varRef(init?.UnwrapErr ?? (null! as $.GoError)),
 			Err: $.varRef(init?.Err ?? ("" as string)),
 			Name: $.varRef(init?.Name ?? ("" as string)),
 			Server: $.varRef(init?.Server ?? ("" as string)),
@@ -1031,7 +1031,7 @@ export class tcpConnWithoutReadFrom {
 	constructor(init?: Partial<{noReadFrom?: noReadFrom, TCPConn?: __goscript_tcpsock.TCPConn | $.VarRef<__goscript_tcpsock.TCPConn> | null}>) {
 		this._fields = {
 			noReadFrom: $.varRef(init?.noReadFrom ? $.markAsStructValue($.cloneStructValue(init.noReadFrom)) : $.markAsStructValue(new noReadFrom())),
-			TCPConn: $.varRef(init?.TCPConn ?? (null as __goscript_tcpsock.TCPConn | $.VarRef<__goscript_tcpsock.TCPConn> | null))
+			TCPConn: $.varRef(init?.TCPConn ?? (null! as __goscript_tcpsock.TCPConn | $.VarRef<__goscript_tcpsock.TCPConn> | null))
 		}
 	}
 
@@ -1206,7 +1206,7 @@ export class tcpConnWithoutWriteTo {
 	constructor(init?: Partial<{noWriteTo?: noWriteTo, TCPConn?: __goscript_tcpsock.TCPConn | $.VarRef<__goscript_tcpsock.TCPConn> | null}>) {
 		this._fields = {
 			noWriteTo: $.varRef(init?.noWriteTo ? $.markAsStructValue($.cloneStructValue(init.noWriteTo)) : $.markAsStructValue(new noWriteTo())),
-			TCPConn: $.varRef(init?.TCPConn ?? (null as __goscript_tcpsock.TCPConn | $.VarRef<__goscript_tcpsock.TCPConn> | null))
+			TCPConn: $.varRef(init?.TCPConn ?? (null! as __goscript_tcpsock.TCPConn | $.VarRef<__goscript_tcpsock.TCPConn> | null))
 		}
 	}
 
@@ -1452,7 +1452,7 @@ export function __goscript_set_errUnknownPort(__goscriptValue: notFoundError | $
 export async function newDNSError(err: $.GoError, name: string, server: string): globalThis.Promise<DNSError | $.VarRef<DNSError> | null> {
 	let isTimeout: boolean = false
 	let isTemporary: boolean = false
-	let unwrapErr: $.GoError = null as $.GoError
+	let unwrapErr: $.GoError = null! as $.GoError
 
 	let __goscriptShadow2 = err
 	{
@@ -1489,19 +1489,19 @@ export function __goscript_set_ErrClosed(__goscriptValue: $.GoError): void {
 
 export async function genericReadFrom(c: __goscript_tcpsock.TCPConn | $.VarRef<__goscript_tcpsock.TCPConn> | null, r: io.Reader | null): globalThis.Promise<[bigint, $.GoError]> {
 	let n: bigint = 0n
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	// Use wrapper to hide existing r.ReadFrom from io.Copy.
 	return io.Copy($.interfaceValue<io.Writer | null>($.markAsStructValue(new tcpConnWithoutReadFrom({TCPConn: c})), "net.tcpConnWithoutReadFrom", "net.tcpConnWithoutReadFrom"), $.pointerValueOrNil(r)!)
 }
 
 export async function genericWriteTo(c: __goscript_tcpsock.TCPConn | $.VarRef<__goscript_tcpsock.TCPConn> | null, w: io.Writer | null): globalThis.Promise<[bigint, $.GoError]> {
 	let n: bigint = 0n
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	// Use wrapper to hide existing w.WriteTo from io.Copy.
 	return io.Copy($.pointerValueOrNil(w)!, $.interfaceValue<io.Reader | null>($.markAsStructValue(new tcpConnWithoutWriteTo({TCPConn: c})), "net.tcpConnWithoutWriteTo", "net.tcpConnWithoutWriteTo"))
 }
 
-export let threadLimit: $.Channel<{}> | null = null as $.Channel<{}> | null
+export let threadLimit: $.Channel<{}> | null = null! as $.Channel<{}> | null
 
 export function __goscript_set_threadLimit(__goscriptValue: $.Channel<{}> | null): void {
 	threadLimit = __goscriptValue
@@ -1549,7 +1549,7 @@ export async function releaseThread(): globalThis.Promise<void> {
 
 export async function Buffers_WriteTo(v: $.VarRef<Buffers> | null, w: io.Writer | null): globalThis.Promise<[bigint, $.GoError]> {
 	let n: bigint = 0n
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	{
 		let [wv, ok] = $.typeAssertTuple<buffersWriter | null>(w, "net.buffersWriter")
 		if (ok) {
@@ -1571,7 +1571,7 @@ export async function Buffers_WriteTo(v: $.VarRef<Buffers> | null, w: io.Writer 
 
 export function Buffers_Read(v: $.VarRef<Buffers> | null, p: $.Slice<number>): [number, $.GoError] {
 	let n: number = 0
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	while (($.len(p) > 0) && ($.len(($.pointerValue<Buffers>(v) as Buffers)) > 0)) {
 		let n0 = $.copy(p, $.arrayIndex(($.pointerValue<Buffers>(v))!, 0))
 		Buffers_consume(v, $.int64(n0))

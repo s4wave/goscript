@@ -27,7 +27,7 @@ export class listProvider {
 
 	constructor(init?: Partial<{items?: $.Slice<Group | $.VarRef<Group> | null>}>) {
 		this._fields = {
-			items: $.varRef(init?.items ?? (null as $.Slice<Group | $.VarRef<Group> | null>))
+			items: $.varRef(init?.items ?? (null! as $.Slice<Group | $.VarRef<Group> | null>))
 		}
 	}
 
@@ -75,7 +75,7 @@ export class Group {
 
 	constructor(init?: Partial<{provider?: provider | null, seen?: boolean}>) {
 		this._fields = {
-			provider: $.varRef(init?.provider ?? (null as provider | null)),
+			provider: $.varRef(init?.provider ?? (null! as provider | null)),
 			seen: $.varRef(init?.seen ?? (false as boolean))
 		}
 	}

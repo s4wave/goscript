@@ -32,7 +32,7 @@ export class RpcStreamWriter {
 
 	constructor(init?: Partial<{RpcStream?: __goscript_rpcstream.RpcStream | null}>) {
 		this._fields = {
-			RpcStream: $.varRef(init?.RpcStream ?? (null as __goscript_rpcstream.RpcStream | null))
+			RpcStream: $.varRef(init?.RpcStream ?? (null! as __goscript_rpcstream.RpcStream | null))
 		}
 	}
 
@@ -52,7 +52,7 @@ export class RpcStreamWriter {
 	public async Write(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const r: RpcStreamWriter | $.VarRef<RpcStreamWriter> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.len(p) == 0) {
 			return [0, null]
 		}

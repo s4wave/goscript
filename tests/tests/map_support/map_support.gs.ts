@@ -59,7 +59,7 @@ export async function main(): globalThis.Promise<void> {
 	let stringMap: globalThis.Map<string, string> | null = new globalThis.Map<string, string>([["Alice", "A+"], ["Bob", "B+"], ["Charlie", "A"]])
 
 	// Note: Map iteration is not ordered in Go, so we will collect the results and sort them for consistent test output.
-	let scoreResults: $.Slice<string> = null as $.Slice<string>
+	let scoreResults: $.Slice<string> = null! as $.Slice<string>
 	for (const [name, grade] of stringMap?.entries() ?? []) {
 		// Using string concatenation to build the output string
 		let result = (("  - Name: " + name) + " Grade: ") + grade

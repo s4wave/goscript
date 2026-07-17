@@ -61,10 +61,10 @@ export class MapFile {
 
 	constructor(init?: Partial<{Data?: $.Slice<number>, Mode?: fs.FileMode, ModTime?: time.Time, Sys?: any}>) {
 		this._fields = {
-			Data: $.varRef(init?.Data ?? (null as $.Slice<number>)),
+			Data: $.varRef(init?.Data ?? (null! as $.Slice<number>)),
 			Mode: $.varRef(init?.Mode ?? (0 as fs.FileMode)),
 			ModTime: $.varRef(init?.ModTime ? $.markAsStructValue($.cloneStructValue(init.ModTime)) : $.markAsStructValue(new time.Time())),
-			Sys: $.varRef(init?.Sys ?? (null as any))
+			Sys: $.varRef(init?.Sys ?? (null! as any))
 		}
 	}
 
@@ -102,7 +102,7 @@ export class fsOnly {
 
 	constructor(init?: Partial<{FS?: fs.FS | null}>) {
 		this._fields = {
-			FS: $.varRef(init?.FS ?? (null as fs.FS | null))
+			FS: $.varRef(init?.FS ?? (null! as fs.FS | null))
 		}
 	}
 
@@ -141,7 +141,7 @@ export class noSub {
 
 	constructor(init?: Partial<{MapFS?: MapFS}>) {
 		this._fields = {
-			MapFS: $.varRef(init?.MapFS ?? (null as MapFS))
+			MapFS: $.varRef(init?.MapFS ?? (null! as MapFS))
 		}
 	}
 
@@ -188,7 +188,7 @@ export class mapFileInfo {
 	constructor(init?: Partial<{name?: string, f?: MapFile | $.VarRef<MapFile> | null}>) {
 		this._fields = {
 			name: $.varRef(init?.name ?? ("" as string)),
-			f: $.varRef(init?.f ?? (null as MapFile | $.VarRef<MapFile> | null))
+			f: $.varRef(init?.f ?? (null! as MapFile | $.VarRef<MapFile> | null))
 		}
 	}
 
@@ -446,7 +446,7 @@ export class mapDir {
 		this._fields = {
 			path: $.varRef(init?.path ?? ("" as string)),
 			mapFileInfo: $.varRef(init?.mapFileInfo ? $.markAsStructValue($.cloneStructValue(init.mapFileInfo)) : $.markAsStructValue(new mapFileInfo())),
-			entry: $.varRef(init?.entry ?? (null as $.Slice<mapFileInfo>)),
+			entry: $.varRef(init?.entry ?? (null! as $.Slice<mapFileInfo>)),
 			offset: $.varRef(init?.offset ?? (0 as number))
 		}
 	}
@@ -558,7 +558,7 @@ export async function MapFS_Open(fsys: MapFS, name: string): globalThis.Promise<
 	// Note that file can be nil here: the map need not contain explicit parent directories for all its files.
 	// But file can also be non-nil, in case the user wants to set metadata for the directory explicitly.
 	// Either way, we need to construct the list of children of this directory.
-	let list: $.Slice<mapFileInfo> = null as $.Slice<mapFileInfo>
+	let list: $.Slice<mapFileInfo> = null! as $.Slice<mapFileInfo>
 	let need: globalThis.Map<string, boolean> | null = $.makeMap<string, boolean>()
 	if ($.stringEqual(realName, ".")) {
 		for (let [fname, f] of fsys?.entries() ?? []) {

@@ -68,7 +68,7 @@ export class ServerRPC {
 	constructor(init?: Partial<{commonRPC?: __goscript_common_rpc.commonRPC, invoker?: __goscript_invoker.Invoker | null}>) {
 		this._fields = {
 			commonRPC: $.varRef(init?.commonRPC ? $.markAsStructValue($.cloneStructValue(init.commonRPC)) : $.markAsStructValue(new __goscript_common_rpc.commonRPC())),
-			invoker: $.varRef(init?.invoker ?? (null as __goscript_invoker.Invoker | null))
+			invoker: $.varRef(init?.invoker ?? (null! as __goscript_invoker.Invoker | null))
 		}
 	}
 
@@ -83,7 +83,7 @@ export class ServerRPC {
 
 	public async HandleCallStart(pkt: __goscript_rpcproto_pb.CallStart | $.VarRef<__goscript_rpcproto_pb.CallStart> | null): globalThis.Promise<$.GoError> {
 		let r: ServerRPC | $.VarRef<ServerRPC> | null = this
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 
 		let locked = $.varRef($.markAsStructValue($.cloneStructValue(await $.pointerValue<ServerRPC>(r).commonRPC.bcast.Lock())))
 		// process start: method and service

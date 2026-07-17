@@ -134,19 +134,19 @@ export class huffmanBitWriter {
 
 	constructor(init?: Partial<{writer?: io.Writer | null, bits?: bigint, nbits?: number, bytes?: Uint8Array, codegenFreq?: number[], nbytes?: number, literalFreq?: $.Slice<number>, offsetFreq?: $.Slice<number>, codegen?: $.Slice<number>, literalEncoding?: __goscript_huffman_code.huffmanEncoder | $.VarRef<__goscript_huffman_code.huffmanEncoder> | null, offsetEncoding?: __goscript_huffman_code.huffmanEncoder | $.VarRef<__goscript_huffman_code.huffmanEncoder> | null, codegenEncoding?: __goscript_huffman_code.huffmanEncoder | $.VarRef<__goscript_huffman_code.huffmanEncoder> | null, err?: $.GoError}>) {
 		this._fields = {
-			writer: $.varRef(init?.writer ?? (null as io.Writer | null)),
+			writer: $.varRef(init?.writer ?? (null! as io.Writer | null)),
 			bits: $.varRef(init?.bits ?? (0n as bigint)),
 			nbits: $.varRef(init?.nbits ?? (0 as number)),
 			bytes: $.varRef(init?.bytes !== undefined ? $.cloneArrayValue(init.bytes) : new Uint8Array(248)),
 			codegenFreq: $.varRef(init?.codegenFreq !== undefined ? $.cloneArrayValue(init.codegenFreq) : Array.from({ length: 19 }, () => 0)),
 			nbytes: $.varRef(init?.nbytes ?? (0 as number)),
-			literalFreq: $.varRef(init?.literalFreq ?? (null as $.Slice<number>)),
-			offsetFreq: $.varRef(init?.offsetFreq ?? (null as $.Slice<number>)),
-			codegen: $.varRef(init?.codegen ?? (null as $.Slice<number>)),
-			literalEncoding: $.varRef(init?.literalEncoding ?? (null as __goscript_huffman_code.huffmanEncoder | $.VarRef<__goscript_huffman_code.huffmanEncoder> | null)),
-			offsetEncoding: $.varRef(init?.offsetEncoding ?? (null as __goscript_huffman_code.huffmanEncoder | $.VarRef<__goscript_huffman_code.huffmanEncoder> | null)),
-			codegenEncoding: $.varRef(init?.codegenEncoding ?? (null as __goscript_huffman_code.huffmanEncoder | $.VarRef<__goscript_huffman_code.huffmanEncoder> | null)),
-			err: $.varRef(init?.err ?? (null as $.GoError))
+			literalFreq: $.varRef(init?.literalFreq ?? (null! as $.Slice<number>)),
+			offsetFreq: $.varRef(init?.offsetFreq ?? (null! as $.Slice<number>)),
+			codegen: $.varRef(init?.codegen ?? (null! as $.Slice<number>)),
+			literalEncoding: $.varRef(init?.literalEncoding ?? (null! as __goscript_huffman_code.huffmanEncoder | $.VarRef<__goscript_huffman_code.huffmanEncoder> | null)),
+			offsetEncoding: $.varRef(init?.offsetEncoding ?? (null! as __goscript_huffman_code.huffmanEncoder | $.VarRef<__goscript_huffman_code.huffmanEncoder> | null)),
+			codegenEncoding: $.varRef(init?.codegenEncoding ?? (null! as __goscript_huffman_code.huffmanEncoder | $.VarRef<__goscript_huffman_code.huffmanEncoder> | null)),
+			err: $.varRef(init?.err ?? (null! as $.GoError))
 		}
 	}
 
@@ -800,7 +800,7 @@ export function newHuffmanBitWriter(w: io.Writer | null): huffmanBitWriter | $.V
 	return (() => { const __goscriptLiteralField0 = __goscript_huffman_code.newHuffmanEncoder(286); const __goscriptLiteralField1 = __goscript_huffman_code.newHuffmanEncoder(19); const __goscriptLiteralField2 = __goscript_huffman_code.newHuffmanEncoder(30); return new huffmanBitWriter({writer: w, literalFreq: $.makeSlice<number>(286, undefined, "number"), offsetFreq: $.makeSlice<number>(30, undefined, "number"), codegen: $.makeSlice<number>((286 + 30) + 1, undefined, "byte"), literalEncoding: __goscriptLiteralField0, codegenEncoding: __goscriptLiteralField1, offsetEncoding: __goscriptLiteralField2}) })()
 }
 
-export let huffOffset: __goscript_huffman_code.huffmanEncoder | $.VarRef<__goscript_huffman_code.huffmanEncoder> | null = null as __goscript_huffman_code.huffmanEncoder | $.VarRef<__goscript_huffman_code.huffmanEncoder> | null
+export let huffOffset: __goscript_huffman_code.huffmanEncoder | $.VarRef<__goscript_huffman_code.huffmanEncoder> | null = null! as __goscript_huffman_code.huffmanEncoder | $.VarRef<__goscript_huffman_code.huffmanEncoder> | null
 
 export function __goscript_set_huffOffset(__goscriptValue: __goscript_huffman_code.huffmanEncoder | $.VarRef<__goscript_huffman_code.huffmanEncoder> | null): void {
 	huffOffset = __goscriptValue

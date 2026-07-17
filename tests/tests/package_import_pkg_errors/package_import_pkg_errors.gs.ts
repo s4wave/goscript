@@ -51,7 +51,7 @@ export async function main(): globalThis.Promise<void> {
 		$.println("Wrap with nil returns nil")
 	}
 
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let nilWrapVar = errors.Wrap($.pointerValueOrNil(err)!, "message")
 	if (nilWrapVar == null) {
 		$.println("Wrap with nil error variable returns nil")

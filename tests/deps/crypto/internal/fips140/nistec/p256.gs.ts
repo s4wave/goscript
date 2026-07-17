@@ -623,7 +623,7 @@ export function NewP256Point(): P256Point | $.VarRef<P256Point> | null {
 	return p
 }
 
-export let _p256B: fiat.P256Element | $.VarRef<fiat.P256Element> | null = null as fiat.P256Element | $.VarRef<fiat.P256Element> | null
+export let _p256B: fiat.P256Element | $.VarRef<fiat.P256Element> | null = null! as fiat.P256Element | $.VarRef<fiat.P256Element> | null
 
 export function __goscript_set__p256B(__goscriptValue: fiat.P256Element | $.VarRef<fiat.P256Element> | null): void {
 	_p256B = __goscriptValue
@@ -761,7 +761,7 @@ export function p256AffineTable_Select(table: $.VarRef<p256AffineTable> | null, 
 	}
 }
 
-export let p256GeneratorTables: $.VarRef<p256AffineTable[]> | null = null as $.VarRef<p256AffineTable[]> | null
+export let p256GeneratorTables: $.VarRef<p256AffineTable[]> | null = null! as $.VarRef<p256AffineTable[]> | null
 
 export function __goscript_set_p256GeneratorTables(__goscriptValue: $.VarRef<p256AffineTable[]> | null): void {
 	p256GeneratorTables = __goscriptValue

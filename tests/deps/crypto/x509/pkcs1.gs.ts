@@ -117,15 +117,15 @@ export class pkcs1PrivateKey {
 	constructor(init?: Partial<{Version?: number, N?: big.Int | $.VarRef<big.Int> | null, E?: number, D?: big.Int | $.VarRef<big.Int> | null, P?: big.Int | $.VarRef<big.Int> | null, Q?: big.Int | $.VarRef<big.Int> | null, Dp?: big.Int | $.VarRef<big.Int> | null, Dq?: big.Int | $.VarRef<big.Int> | null, Qinv?: big.Int | $.VarRef<big.Int> | null, AdditionalPrimes?: $.Slice<pkcs1AdditionalRSAPrime>}>) {
 		this._fields = {
 			Version: $.varRef(init?.Version ?? (0 as number)),
-			N: $.varRef(init?.N ?? (null as big.Int | $.VarRef<big.Int> | null)),
+			N: $.varRef(init?.N ?? (null! as big.Int | $.VarRef<big.Int> | null)),
 			E: $.varRef(init?.E ?? (0 as number)),
-			D: $.varRef(init?.D ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			P: $.varRef(init?.P ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			Q: $.varRef(init?.Q ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			Dp: $.varRef(init?.Dp ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			Dq: $.varRef(init?.Dq ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			Qinv: $.varRef(init?.Qinv ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			AdditionalPrimes: $.varRef(init?.AdditionalPrimes ?? (null as $.Slice<pkcs1AdditionalRSAPrime>))
+			D: $.varRef(init?.D ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			P: $.varRef(init?.P ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			Q: $.varRef(init?.Q ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			Dp: $.varRef(init?.Dp ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			Dq: $.varRef(init?.Dq ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			Qinv: $.varRef(init?.Qinv ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			AdditionalPrimes: $.varRef(init?.AdditionalPrimes ?? (null! as $.Slice<pkcs1AdditionalRSAPrime>))
 		}
 	}
 
@@ -186,9 +186,9 @@ export class pkcs1AdditionalRSAPrime {
 
 	constructor(init?: Partial<{Prime?: big.Int | $.VarRef<big.Int> | null, Exp?: big.Int | $.VarRef<big.Int> | null, Coeff?: big.Int | $.VarRef<big.Int> | null}>) {
 		this._fields = {
-			Prime: $.varRef(init?.Prime ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			Exp: $.varRef(init?.Exp ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			Coeff: $.varRef(init?.Coeff ?? (null as big.Int | $.VarRef<big.Int> | null))
+			Prime: $.varRef(init?.Prime ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			Exp: $.varRef(init?.Exp ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			Coeff: $.varRef(init?.Coeff ?? (null! as big.Int | $.VarRef<big.Int> | null))
 		}
 	}
 
@@ -233,7 +233,7 @@ export class pkcs1PublicKey {
 
 	constructor(init?: Partial<{N?: big.Int | $.VarRef<big.Int> | null, E?: number}>) {
 		this._fields = {
-			N: $.varRef(init?.N ?? (null as big.Int | $.VarRef<big.Int> | null)),
+			N: $.varRef(init?.N ?? (null! as big.Int | $.VarRef<big.Int> | null)),
 			E: $.varRef(init?.E ?? (0 as number))
 		}
 	}

@@ -38,12 +38,12 @@ export async function main(): globalThis.Promise<void> {
 	// UseNumber keeps the exact source literal beyond float64 precision.
 	let und: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"big\":9007199254740993}"), "*strings.Reader", { kind: $.TypeKind.Pointer, elemType: "strings.Reader" }))!)
 	json.Decoder.prototype.UseNumber.call($.pointerValue<json.Decoder>(und))
-	let m: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null as globalThis.Map<string, any> | null)
+	let m: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null! as globalThis.Map<string, any> | null)
 	json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(und), $.interfaceValue<any>(m, "*map[string]any", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Interface, methods: [] } } }))
 	fmt.Println("big", $.mapGet<string, any, any>(m.value, "big", null)[0])
 
 	// A malformed document yields a *json.SyntaxError with the Go byte offset.
-	let v: $.VarRef<any> = $.varRef(null as any)
+	let v: $.VarRef<any> = $.varRef(null! as any)
 	let err = json.Unmarshal(new Uint8Array([91, 49, 44, 93]), $.interfaceValue<any>(v, "*any", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } }))
 	{
 		let __goscriptTuple0: any = $.typeAssertTuple<json.SyntaxError | $.VarRef<json.SyntaxError> | null>(err, { kind: $.TypeKind.Pointer, elemType: "json.SyntaxError" })

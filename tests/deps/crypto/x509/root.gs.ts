@@ -63,13 +63,13 @@ export function __goscript_set_systemRootsMu(__goscriptValue: sync.RWMutex): voi
 	systemRootsMu.value = __goscriptValue
 }
 
-export let systemRoots: __goscript_cert_pool.CertPool | $.VarRef<__goscript_cert_pool.CertPool> | null = null as __goscript_cert_pool.CertPool | $.VarRef<__goscript_cert_pool.CertPool> | null
+export let systemRoots: __goscript_cert_pool.CertPool | $.VarRef<__goscript_cert_pool.CertPool> | null = null! as __goscript_cert_pool.CertPool | $.VarRef<__goscript_cert_pool.CertPool> | null
 
 export function __goscript_set_systemRoots(__goscriptValue: __goscript_cert_pool.CertPool | $.VarRef<__goscript_cert_pool.CertPool> | null): void {
 	systemRoots = __goscriptValue
 }
 
-export let systemRootsErr: $.GoError = null as $.GoError
+export let systemRootsErr: $.GoError = null! as $.GoError
 
 export function __goscript_set_systemRootsErr(__goscriptValue: $.GoError): void {
 	systemRootsErr = __goscriptValue

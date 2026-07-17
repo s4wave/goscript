@@ -45,7 +45,7 @@ export class segmentedReader {
 
 	constructor(init?: Partial<{data?: $.Slice<number>, offset?: number, step?: number}>) {
 		this._fields = {
-			data: $.varRef(init?.data ?? (null as $.Slice<number>)),
+			data: $.varRef(init?.data ?? (null! as $.Slice<number>)),
 			offset: $.varRef(init?.offset ?? (0 as number)),
 			step: $.varRef(init?.step ?? (0 as number))
 		}

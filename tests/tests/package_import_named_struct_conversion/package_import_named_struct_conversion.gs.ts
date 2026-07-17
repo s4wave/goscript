@@ -38,7 +38,7 @@ export class LocalTime {
 		this._fields = {
 			wall: $.varRef(init?.wall ?? (0n as bigint)),
 			ext: $.varRef(init?.ext ?? (0n as bigint)),
-			loc: $.varRef(init?.loc ?? (null as time.Location | $.VarRef<time.Location> | null))
+			loc: $.varRef(init?.loc ?? (null! as time.Location | $.VarRef<time.Location> | null))
 		}
 	}
 

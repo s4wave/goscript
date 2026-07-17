@@ -192,7 +192,7 @@ export function randIntn(n: number): number {
 
 export function reverseaddr(addr: string): [string, $.GoError] {
 	let arpa: string = ""
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let ip: __goscript_ip.IP = (__goscript_ip.ParseIP(addr) as __goscript_ip.IP)
 	if (ip == null) {
 		return ["", $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "unrecognized address", Name: addr}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]

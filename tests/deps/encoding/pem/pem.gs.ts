@@ -52,8 +52,8 @@ export class Block {
 	constructor(init?: Partial<{Type?: string, Headers?: globalThis.Map<string, string> | null, Bytes?: $.Slice<number>}>) {
 		this._fields = {
 			Type: $.varRef(init?.Type ?? ("" as string)),
-			Headers: $.varRef(init?.Headers ?? (null as globalThis.Map<string, string> | null)),
-			Bytes: $.varRef(init?.Bytes ?? (null as $.Slice<number>))
+			Headers: $.varRef(init?.Headers ?? (null! as globalThis.Map<string, string> | null)),
+			Bytes: $.varRef(init?.Bytes ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -108,7 +108,7 @@ export class lineBreaker {
 		this._fields = {
 			line: $.varRef(init?.line !== undefined ? $.cloneArrayValue(init.line) : new Uint8Array(64)),
 			used: $.varRef(init?.used ?? (0 as number)),
-			out: $.varRef(init?.out ?? (null as io.Writer | null))
+			out: $.varRef(init?.out ?? (null! as io.Writer | null))
 		}
 	}
 
@@ -124,7 +124,7 @@ export class lineBreaker {
 
 	public async Close(): globalThis.Promise<$.GoError> {
 		const l: lineBreaker | $.VarRef<lineBreaker> | null = this
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.pointerValue<lineBreaker>(l).used > 0) {
 			let __goscriptTuple5: any = await $.pointerValue<Exclude<io.Writer, null>>($.pointerValue<lineBreaker>(l).out).Write($.goSlice($.pointerValue<lineBreaker>(l).line, 0, $.pointerValue<lineBreaker>(l).used))
 			err = __goscriptTuple5[1]
@@ -141,7 +141,7 @@ export class lineBreaker {
 	public async Write(b: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		let l: lineBreaker | $.VarRef<lineBreaker> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if (($.pointerValue<lineBreaker>(l).used + $.len(b)) < 64) {
 			$.copy($.goSlice($.pointerValue<lineBreaker>(l).line, $.pointerValue<lineBreaker>(l).used, undefined), b)
 			$.pointerValue<lineBreaker>(l).used = $.pointerValue<lineBreaker>(l).used + ($.len(b))
@@ -186,8 +186,8 @@ export class lineBreaker {
 export const pemLineLength: number = 64
 
 export function getLine(data: $.Slice<number>): [$.Slice<number>, $.Slice<number>, number] {
-	let line: $.Slice<number> = null as $.Slice<number>
-	let rest: $.Slice<number> = null as $.Slice<number>
+	let line: $.Slice<number> = null! as $.Slice<number>
+	let rest: $.Slice<number> = null! as $.Slice<number>
 	let consumed: number = 0
 	let i = bytes.IndexByte(data, $.uint(10, 8))
 	let j: number = 0
@@ -249,8 +249,8 @@ export function __goscript_set_colon(__goscriptValue: $.Slice<number>): void {
 }
 
 export function Decode(data: $.Slice<number>): [Block | $.VarRef<Block> | null, $.Slice<number>] {
-	let p: Block | $.VarRef<Block> | null = null as Block | $.VarRef<Block> | null
-	let rest: $.Slice<number> = null as $.Slice<number>
+	let p: Block | $.VarRef<Block> | null = null! as Block | $.VarRef<Block> | null
+	let rest: $.Slice<number> = null! as $.Slice<number>
 	// pemStart begins with a newline. However, at the very beginning of
 	// the byte array, we'll accept the start string without it.
 	rest = data
@@ -280,7 +280,7 @@ export function Decode(data: $.Slice<number>): [Block | $.VarRef<Block> | null, 
 		endIndex = endIndex - ((beginIndex + $.len(pemStart)) - 1)
 		endTrailerIndex = endTrailerIndex - ((beginIndex + $.len(pemStart)) - 1)
 
-		let typeLine: $.Slice<number> = null as $.Slice<number>
+		let typeLine: $.Slice<number> = null! as $.Slice<number>
 		let consumed: number = 0
 		let __goscriptTuple0: any = getLine(rest)
 		typeLine = __goscriptTuple0[0]

@@ -264,7 +264,7 @@ export class publicKeyInfo {
 
 	constructor(init?: Partial<{Raw?: asn1.RawContent, Algorithm?: pkix2.AlgorithmIdentifier, PublicKey?: asn1.BitString}>) {
 		this._fields = {
-			Raw: $.varRef(init?.Raw ?? (null as asn1.RawContent)),
+			Raw: $.varRef(init?.Raw ?? (null! as asn1.RawContent)),
 			Algorithm: $.varRef(init?.Algorithm ? $.markAsStructValue($.cloneStructValue(init.Algorithm)) : $.markAsStructValue(new pkix2.AlgorithmIdentifier())),
 			PublicKey: $.varRef(init?.PublicKey ? $.markAsStructValue($.cloneStructValue(init.PublicKey)) : $.markAsStructValue(new asn1.BitString()))
 		}
@@ -383,9 +383,9 @@ export class tbsCertificate {
 
 	constructor(init?: Partial<{Raw?: asn1.RawContent, Version?: number, SerialNumber?: big.Int | $.VarRef<big.Int> | null, SignatureAlgorithm?: pkix2.AlgorithmIdentifier, Issuer?: asn1.RawValue, Validity?: validity, Subject?: asn1.RawValue, PublicKey?: publicKeyInfo, UniqueId?: asn1.BitString, SubjectUniqueId?: asn1.BitString, Extensions?: $.Slice<pkix2.Extension>}>) {
 		this._fields = {
-			Raw: $.varRef(init?.Raw ?? (null as asn1.RawContent)),
+			Raw: $.varRef(init?.Raw ?? (null! as asn1.RawContent)),
 			Version: $.varRef(init?.Version ?? (0 as number)),
-			SerialNumber: $.varRef(init?.SerialNumber ?? (null as big.Int | $.VarRef<big.Int> | null)),
+			SerialNumber: $.varRef(init?.SerialNumber ?? (null! as big.Int | $.VarRef<big.Int> | null)),
 			SignatureAlgorithm: $.varRef(init?.SignatureAlgorithm ? $.markAsStructValue($.cloneStructValue(init.SignatureAlgorithm)) : $.markAsStructValue(new pkix2.AlgorithmIdentifier())),
 			Issuer: $.varRef(init?.Issuer ? $.markAsStructValue($.cloneStructValue(init.Issuer)) : $.markAsStructValue(new asn1.RawValue())),
 			Validity: $.varRef(init?.Validity ? $.markAsStructValue($.cloneStructValue(init.Validity)) : $.markAsStructValue(new validity())),
@@ -393,7 +393,7 @@ export class tbsCertificate {
 			PublicKey: $.varRef(init?.PublicKey ? $.markAsStructValue($.cloneStructValue(init.PublicKey)) : $.markAsStructValue(new publicKeyInfo())),
 			UniqueId: $.varRef(init?.UniqueId ? $.markAsStructValue($.cloneStructValue(init.UniqueId)) : $.markAsStructValue(new asn1.BitString())),
 			SubjectUniqueId: $.varRef(init?.SubjectUniqueId ? $.markAsStructValue($.cloneStructValue(init.SubjectUniqueId)) : $.markAsStructValue(new asn1.BitString())),
-			Extensions: $.varRef(init?.Extensions ?? (null as $.Slice<pkix2.Extension>))
+			Extensions: $.varRef(init?.Extensions ?? (null! as $.Slice<pkix2.Extension>))
 		}
 	}
 
@@ -509,9 +509,9 @@ export class dsaAlgorithmParameters {
 
 	constructor(init?: Partial<{P?: big.Int | $.VarRef<big.Int> | null, Q?: big.Int | $.VarRef<big.Int> | null, G?: big.Int | $.VarRef<big.Int> | null}>) {
 		this._fields = {
-			P: $.varRef(init?.P ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			Q: $.varRef(init?.Q ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			G: $.varRef(init?.G ?? (null as big.Int | $.VarRef<big.Int> | null))
+			P: $.varRef(init?.P ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			Q: $.varRef(init?.Q ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			G: $.varRef(init?.G ?? (null! as big.Int | $.VarRef<big.Int> | null))
 		}
 	}
 
@@ -548,7 +548,7 @@ export class authKeyId {
 
 	constructor(init?: Partial<{Id?: $.Slice<number>}>) {
 		this._fields = {
-			Id: $.varRef(init?.Id ?? (null as $.Slice<number>))
+			Id: $.varRef(init?.Id ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -1163,58 +1163,58 @@ export class Certificate {
 
 	constructor(init?: Partial<{Raw?: $.Slice<number>, RawTBSCertificate?: $.Slice<number>, RawSubjectPublicKeyInfo?: $.Slice<number>, RawSubject?: $.Slice<number>, RawIssuer?: $.Slice<number>, Signature?: $.Slice<number>, SignatureAlgorithm?: SignatureAlgorithm, PublicKeyAlgorithm?: PublicKeyAlgorithm, PublicKey?: any, Version?: number, SerialNumber?: big.Int | $.VarRef<big.Int> | null, Issuer?: pkix2.Name, Subject?: pkix2.Name, NotBefore?: time.Time, NotAfter?: time.Time, KeyUsage?: KeyUsage, Extensions?: $.Slice<pkix2.Extension>, ExtraExtensions?: $.Slice<pkix2.Extension>, UnhandledCriticalExtensions?: $.Slice<asn1.ObjectIdentifier>, ExtKeyUsage?: $.Slice<ExtKeyUsage>, UnknownExtKeyUsage?: $.Slice<asn1.ObjectIdentifier>, BasicConstraintsValid?: boolean, IsCA?: boolean, MaxPathLen?: number, MaxPathLenZero?: boolean, SubjectKeyId?: $.Slice<number>, AuthorityKeyId?: $.Slice<number>, OCSPServer?: $.Slice<string>, IssuingCertificateURL?: $.Slice<string>, DNSNames?: $.Slice<string>, EmailAddresses?: $.Slice<string>, IPAddresses?: $.Slice<net.IP>, URIs?: $.Slice<url.URL | $.VarRef<url.URL> | null>, PermittedDNSDomainsCritical?: boolean, PermittedDNSDomains?: $.Slice<string>, ExcludedDNSDomains?: $.Slice<string>, PermittedIPRanges?: $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>, ExcludedIPRanges?: $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>, PermittedEmailAddresses?: $.Slice<string>, ExcludedEmailAddresses?: $.Slice<string>, PermittedURIDomains?: $.Slice<string>, ExcludedURIDomains?: $.Slice<string>, CRLDistributionPoints?: $.Slice<string>, PolicyIdentifiers?: $.Slice<asn1.ObjectIdentifier>, Policies?: $.Slice<__goscript_oid.OID>, InhibitAnyPolicy?: number, InhibitAnyPolicyZero?: boolean, InhibitPolicyMapping?: number, InhibitPolicyMappingZero?: boolean, RequireExplicitPolicy?: number, RequireExplicitPolicyZero?: boolean, PolicyMappings?: $.Slice<PolicyMapping>}>) {
 		this._fields = {
-			Raw: $.varRef(init?.Raw ?? (null as $.Slice<number>)),
-			RawTBSCertificate: $.varRef(init?.RawTBSCertificate ?? (null as $.Slice<number>)),
-			RawSubjectPublicKeyInfo: $.varRef(init?.RawSubjectPublicKeyInfo ?? (null as $.Slice<number>)),
-			RawSubject: $.varRef(init?.RawSubject ?? (null as $.Slice<number>)),
-			RawIssuer: $.varRef(init?.RawIssuer ?? (null as $.Slice<number>)),
-			Signature: $.varRef(init?.Signature ?? (null as $.Slice<number>)),
+			Raw: $.varRef(init?.Raw ?? (null! as $.Slice<number>)),
+			RawTBSCertificate: $.varRef(init?.RawTBSCertificate ?? (null! as $.Slice<number>)),
+			RawSubjectPublicKeyInfo: $.varRef(init?.RawSubjectPublicKeyInfo ?? (null! as $.Slice<number>)),
+			RawSubject: $.varRef(init?.RawSubject ?? (null! as $.Slice<number>)),
+			RawIssuer: $.varRef(init?.RawIssuer ?? (null! as $.Slice<number>)),
+			Signature: $.varRef(init?.Signature ?? (null! as $.Slice<number>)),
 			SignatureAlgorithm: $.varRef(init?.SignatureAlgorithm ?? (0 as SignatureAlgorithm)),
 			PublicKeyAlgorithm: $.varRef(init?.PublicKeyAlgorithm ?? (0 as PublicKeyAlgorithm)),
-			PublicKey: $.varRef(init?.PublicKey ?? (null as any)),
+			PublicKey: $.varRef(init?.PublicKey ?? (null! as any)),
 			Version: $.varRef(init?.Version ?? (0 as number)),
-			SerialNumber: $.varRef(init?.SerialNumber ?? (null as big.Int | $.VarRef<big.Int> | null)),
+			SerialNumber: $.varRef(init?.SerialNumber ?? (null! as big.Int | $.VarRef<big.Int> | null)),
 			Issuer: $.varRef(init?.Issuer ? $.markAsStructValue($.cloneStructValue(init.Issuer)) : $.markAsStructValue(new pkix2.Name())),
 			Subject: $.varRef(init?.Subject ? $.markAsStructValue($.cloneStructValue(init.Subject)) : $.markAsStructValue(new pkix2.Name())),
 			NotBefore: $.varRef(init?.NotBefore ? $.markAsStructValue($.cloneStructValue(init.NotBefore)) : $.markAsStructValue(new time.Time())),
 			NotAfter: $.varRef(init?.NotAfter ? $.markAsStructValue($.cloneStructValue(init.NotAfter)) : $.markAsStructValue(new time.Time())),
 			KeyUsage: $.varRef(init?.KeyUsage ?? (0 as KeyUsage)),
-			Extensions: $.varRef(init?.Extensions ?? (null as $.Slice<pkix2.Extension>)),
-			ExtraExtensions: $.varRef(init?.ExtraExtensions ?? (null as $.Slice<pkix2.Extension>)),
-			UnhandledCriticalExtensions: $.varRef(init?.UnhandledCriticalExtensions ?? (null as $.Slice<asn1.ObjectIdentifier>)),
-			ExtKeyUsage: $.varRef(init?.ExtKeyUsage ?? (null as $.Slice<ExtKeyUsage>)),
-			UnknownExtKeyUsage: $.varRef(init?.UnknownExtKeyUsage ?? (null as $.Slice<asn1.ObjectIdentifier>)),
+			Extensions: $.varRef(init?.Extensions ?? (null! as $.Slice<pkix2.Extension>)),
+			ExtraExtensions: $.varRef(init?.ExtraExtensions ?? (null! as $.Slice<pkix2.Extension>)),
+			UnhandledCriticalExtensions: $.varRef(init?.UnhandledCriticalExtensions ?? (null! as $.Slice<asn1.ObjectIdentifier>)),
+			ExtKeyUsage: $.varRef(init?.ExtKeyUsage ?? (null! as $.Slice<ExtKeyUsage>)),
+			UnknownExtKeyUsage: $.varRef(init?.UnknownExtKeyUsage ?? (null! as $.Slice<asn1.ObjectIdentifier>)),
 			BasicConstraintsValid: $.varRef(init?.BasicConstraintsValid ?? (false as boolean)),
 			IsCA: $.varRef(init?.IsCA ?? (false as boolean)),
 			MaxPathLen: $.varRef(init?.MaxPathLen ?? (0 as number)),
 			MaxPathLenZero: $.varRef(init?.MaxPathLenZero ?? (false as boolean)),
-			SubjectKeyId: $.varRef(init?.SubjectKeyId ?? (null as $.Slice<number>)),
-			AuthorityKeyId: $.varRef(init?.AuthorityKeyId ?? (null as $.Slice<number>)),
-			OCSPServer: $.varRef(init?.OCSPServer ?? (null as $.Slice<string>)),
-			IssuingCertificateURL: $.varRef(init?.IssuingCertificateURL ?? (null as $.Slice<string>)),
-			DNSNames: $.varRef(init?.DNSNames ?? (null as $.Slice<string>)),
-			EmailAddresses: $.varRef(init?.EmailAddresses ?? (null as $.Slice<string>)),
-			IPAddresses: $.varRef(init?.IPAddresses ?? (null as $.Slice<net.IP>)),
-			URIs: $.varRef(init?.URIs ?? (null as $.Slice<url.URL | $.VarRef<url.URL> | null>)),
+			SubjectKeyId: $.varRef(init?.SubjectKeyId ?? (null! as $.Slice<number>)),
+			AuthorityKeyId: $.varRef(init?.AuthorityKeyId ?? (null! as $.Slice<number>)),
+			OCSPServer: $.varRef(init?.OCSPServer ?? (null! as $.Slice<string>)),
+			IssuingCertificateURL: $.varRef(init?.IssuingCertificateURL ?? (null! as $.Slice<string>)),
+			DNSNames: $.varRef(init?.DNSNames ?? (null! as $.Slice<string>)),
+			EmailAddresses: $.varRef(init?.EmailAddresses ?? (null! as $.Slice<string>)),
+			IPAddresses: $.varRef(init?.IPAddresses ?? (null! as $.Slice<net.IP>)),
+			URIs: $.varRef(init?.URIs ?? (null! as $.Slice<url.URL | $.VarRef<url.URL> | null>)),
 			PermittedDNSDomainsCritical: $.varRef(init?.PermittedDNSDomainsCritical ?? (false as boolean)),
-			PermittedDNSDomains: $.varRef(init?.PermittedDNSDomains ?? (null as $.Slice<string>)),
-			ExcludedDNSDomains: $.varRef(init?.ExcludedDNSDomains ?? (null as $.Slice<string>)),
-			PermittedIPRanges: $.varRef(init?.PermittedIPRanges ?? (null as $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>)),
-			ExcludedIPRanges: $.varRef(init?.ExcludedIPRanges ?? (null as $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>)),
-			PermittedEmailAddresses: $.varRef(init?.PermittedEmailAddresses ?? (null as $.Slice<string>)),
-			ExcludedEmailAddresses: $.varRef(init?.ExcludedEmailAddresses ?? (null as $.Slice<string>)),
-			PermittedURIDomains: $.varRef(init?.PermittedURIDomains ?? (null as $.Slice<string>)),
-			ExcludedURIDomains: $.varRef(init?.ExcludedURIDomains ?? (null as $.Slice<string>)),
-			CRLDistributionPoints: $.varRef(init?.CRLDistributionPoints ?? (null as $.Slice<string>)),
-			PolicyIdentifiers: $.varRef(init?.PolicyIdentifiers ?? (null as $.Slice<asn1.ObjectIdentifier>)),
-			Policies: $.varRef(init?.Policies ?? (null as $.Slice<__goscript_oid.OID>)),
+			PermittedDNSDomains: $.varRef(init?.PermittedDNSDomains ?? (null! as $.Slice<string>)),
+			ExcludedDNSDomains: $.varRef(init?.ExcludedDNSDomains ?? (null! as $.Slice<string>)),
+			PermittedIPRanges: $.varRef(init?.PermittedIPRanges ?? (null! as $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>)),
+			ExcludedIPRanges: $.varRef(init?.ExcludedIPRanges ?? (null! as $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>)),
+			PermittedEmailAddresses: $.varRef(init?.PermittedEmailAddresses ?? (null! as $.Slice<string>)),
+			ExcludedEmailAddresses: $.varRef(init?.ExcludedEmailAddresses ?? (null! as $.Slice<string>)),
+			PermittedURIDomains: $.varRef(init?.PermittedURIDomains ?? (null! as $.Slice<string>)),
+			ExcludedURIDomains: $.varRef(init?.ExcludedURIDomains ?? (null! as $.Slice<string>)),
+			CRLDistributionPoints: $.varRef(init?.CRLDistributionPoints ?? (null! as $.Slice<string>)),
+			PolicyIdentifiers: $.varRef(init?.PolicyIdentifiers ?? (null! as $.Slice<asn1.ObjectIdentifier>)),
+			Policies: $.varRef(init?.Policies ?? (null! as $.Slice<__goscript_oid.OID>)),
 			InhibitAnyPolicy: $.varRef(init?.InhibitAnyPolicy ?? (0 as number)),
 			InhibitAnyPolicyZero: $.varRef(init?.InhibitAnyPolicyZero ?? (false as boolean)),
 			InhibitPolicyMapping: $.varRef(init?.InhibitPolicyMapping ?? (0 as number)),
 			InhibitPolicyMappingZero: $.varRef(init?.InhibitPolicyMappingZero ?? (false as boolean)),
 			RequireExplicitPolicy: $.varRef(init?.RequireExplicitPolicy ?? (0 as number)),
 			RequireExplicitPolicyZero: $.varRef(init?.RequireExplicitPolicyZero ?? (false as boolean)),
-			PolicyMappings: $.varRef(init?.PolicyMappings ?? (null as $.Slice<PolicyMapping>))
+			PolicyMappings: $.varRef(init?.PolicyMappings ?? (null! as $.Slice<PolicyMapping>))
 		}
 	}
 
@@ -1312,8 +1312,8 @@ export class Certificate {
 
 	public async CreateCRL(rand: io.Reader | null, priv: any, revokedCerts: $.Slice<pkix2.RevokedCertificate>, now: time.Time, expiry: time.Time): globalThis.Promise<[$.Slice<number>, $.GoError]> {
 		const c: Certificate | $.VarRef<Certificate> | null = this
-		let crlBytes: $.Slice<number> = null as $.Slice<number>
-		let err: $.GoError = null as $.GoError
+		let crlBytes: $.Slice<number> = null! as $.Slice<number>
+		let err: $.GoError = null! as $.GoError
 		let [key, ok] = $.typeAssertTuple<crypto.Signer | null>(priv, "crypto.Signer")
 		if (!ok) {
 			return [null, errors.New("x509: certificate private key does not implement crypto.Signer")]
@@ -1431,7 +1431,7 @@ export class Certificate {
 			}
 		}
 		// encipherOnly
-		let candidateChains: $.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>> = null as $.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>>
+		let candidateChains: $.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>> = null! as $.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>>
 		if (await __goscript_cert_pool.CertPool.prototype.contains.call(opts.value.Roots, c)) {
 			candidateChains = $.arrayToSlice<$.Slice<Certificate | $.VarRef<Certificate> | null>>([$.arrayToSlice<Certificate | $.VarRef<Certificate> | null>([c])])
 		} else {
@@ -1459,7 +1459,7 @@ export class Certificate {
 
 		let invalidPoliciesChains: number = 0
 		let incompatibleKeyUsageChains: number = 0
-		let constraintsHintErr: $.GoError = null as $.GoError
+		let constraintsHintErr: $.GoError = null! as $.GoError
 		candidateChains = (await slices.DeleteFunc(candidateChains, $.functionValue(async (chain: $.Slice<Certificate | $.VarRef<Certificate> | null>): globalThis.Promise<boolean> => {
 			if (!await __goscript_verify.policiesValid(chain, $.markAsStructValue($.cloneStructValue(opts.value)))) {
 				invalidPoliciesChains++
@@ -1486,7 +1486,7 @@ export class Certificate {
 			if (constraintsHintErr != null) {
 				return [null, constraintsHintErr]
 			}
-			let details: $.Slice<string> = null as $.Slice<string>
+			let details: $.Slice<string> = null! as $.Slice<string>
 			if (incompatibleKeyUsageChains > 0) {
 				if (invalidPoliciesChains == 0) {
 					return [null, $.interfaceValue<$.GoError>($.markAsStructValue(new __goscript_verify.CertificateInvalidError({Cert: c, Reason: 4, Detail: ""})), "x509.CertificateInvalidError", "x509.CertificateInvalidError")]
@@ -1547,10 +1547,10 @@ export class Certificate {
 
 	public async buildChains(currentChain: $.Slice<Certificate | $.VarRef<Certificate> | null>, sigChecks: $.VarRef<number> | null, opts: __goscript_verify.VerifyOptions | $.VarRef<__goscript_verify.VerifyOptions> | null): globalThis.Promise<[$.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>>, $.GoError]> {
 		const c: Certificate | $.VarRef<Certificate> | null = this
-		let chains: $.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>> = null as $.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>>
-		let err: $.GoError = null as $.GoError
-		let hintErr: $.GoError = null as $.GoError
-		let hintCert: Certificate | $.VarRef<Certificate> | null = null as Certificate | $.VarRef<Certificate> | null
+		let chains: $.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>> = null! as $.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>>
+		let err: $.GoError = null! as $.GoError
+		let hintErr: $.GoError = null! as $.GoError
+		let hintCert: Certificate | $.VarRef<Certificate> | null = null! as Certificate | $.VarRef<Certificate> | null
 
 		let considerCandidate: ((certType: number, candidate: __goscript_cert_pool.potentialParent) => void) | null = $.functionValue(async (certType: number, candidate: __goscript_cert_pool.potentialParent): globalThis.Promise<void> => {
 			if (sigChecks == null) {
@@ -1607,7 +1607,7 @@ export class Certificate {
 				}
 				case 1:
 				{
-					let childChains: $.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>> = null as $.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>>
+					let childChains: $.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>> = null! as $.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>>
 					let __goscriptTuple17: any = await Certificate.prototype.buildChains.call(candidate.cert, __goscript_verify.appendToFreshChain(currentChain, candidate.cert), sigChecks, opts)
 					childChains = __goscriptTuple17[0]
 					err = __goscriptTuple17[1]
@@ -1716,8 +1716,8 @@ export class Certificate {
 
 	public systemVerify(opts: __goscript_verify.VerifyOptions | $.VarRef<__goscript_verify.VerifyOptions> | null): [$.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>>, $.GoError] {
 		const c: Certificate | $.VarRef<Certificate> | null = this
-		let chains: $.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>> = null as $.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>>
-		let err: $.GoError = null as $.GoError
+		let chains: $.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>> = null! as $.Slice<$.Slice<Certificate | $.VarRef<Certificate> | null>>
+		let err: $.GoError = null! as $.GoError
 		return [null, null]
 	}
 
@@ -1897,7 +1897,7 @@ export class policyInformation {
 
 	constructor(init?: Partial<{Policy?: asn1.ObjectIdentifier}>) {
 		this._fields = {
-			Policy: $.varRef(init?.Policy ?? (null as asn1.ObjectIdentifier))
+			Policy: $.varRef(init?.Policy ?? (null! as asn1.ObjectIdentifier))
 		}
 	}
 
@@ -1940,7 +1940,7 @@ export class authorityInfoAccess {
 
 	constructor(init?: Partial<{Method?: asn1.ObjectIdentifier, Location?: asn1.RawValue}>) {
 		this._fields = {
-			Method: $.varRef(init?.Method ?? (null as asn1.ObjectIdentifier)),
+			Method: $.varRef(init?.Method ?? (null! as asn1.ObjectIdentifier)),
 			Location: $.varRef(init?.Location ? $.markAsStructValue($.cloneStructValue(init.Location)) : $.markAsStructValue(new asn1.RawValue()))
 		}
 	}
@@ -1985,8 +1985,8 @@ export class distributionPointName {
 
 	constructor(init?: Partial<{FullName?: $.Slice<asn1.RawValue>, RelativeName?: pkix2.RDNSequence}>) {
 		this._fields = {
-			FullName: $.varRef(init?.FullName ?? (null as $.Slice<asn1.RawValue>)),
-			RelativeName: $.varRef(init?.RelativeName ?? (null as pkix2.RDNSequence))
+			FullName: $.varRef(init?.FullName ?? (null! as $.Slice<asn1.RawValue>)),
+			RelativeName: $.varRef(init?.RelativeName ?? (null! as pkix2.RDNSequence))
 		}
 	}
 
@@ -2221,23 +2221,23 @@ export class CertificateRequest {
 
 	constructor(init?: Partial<{Raw?: $.Slice<number>, RawTBSCertificateRequest?: $.Slice<number>, RawSubjectPublicKeyInfo?: $.Slice<number>, RawSubject?: $.Slice<number>, Version?: number, Signature?: $.Slice<number>, SignatureAlgorithm?: SignatureAlgorithm, PublicKeyAlgorithm?: PublicKeyAlgorithm, PublicKey?: any, Subject?: pkix2.Name, Attributes?: $.Slice<pkix2.AttributeTypeAndValueSET>, Extensions?: $.Slice<pkix2.Extension>, ExtraExtensions?: $.Slice<pkix2.Extension>, DNSNames?: $.Slice<string>, EmailAddresses?: $.Slice<string>, IPAddresses?: $.Slice<net.IP>, URIs?: $.Slice<url.URL | $.VarRef<url.URL> | null>}>) {
 		this._fields = {
-			Raw: $.varRef(init?.Raw ?? (null as $.Slice<number>)),
-			RawTBSCertificateRequest: $.varRef(init?.RawTBSCertificateRequest ?? (null as $.Slice<number>)),
-			RawSubjectPublicKeyInfo: $.varRef(init?.RawSubjectPublicKeyInfo ?? (null as $.Slice<number>)),
-			RawSubject: $.varRef(init?.RawSubject ?? (null as $.Slice<number>)),
+			Raw: $.varRef(init?.Raw ?? (null! as $.Slice<number>)),
+			RawTBSCertificateRequest: $.varRef(init?.RawTBSCertificateRequest ?? (null! as $.Slice<number>)),
+			RawSubjectPublicKeyInfo: $.varRef(init?.RawSubjectPublicKeyInfo ?? (null! as $.Slice<number>)),
+			RawSubject: $.varRef(init?.RawSubject ?? (null! as $.Slice<number>)),
 			Version: $.varRef(init?.Version ?? (0 as number)),
-			Signature: $.varRef(init?.Signature ?? (null as $.Slice<number>)),
+			Signature: $.varRef(init?.Signature ?? (null! as $.Slice<number>)),
 			SignatureAlgorithm: $.varRef(init?.SignatureAlgorithm ?? (0 as SignatureAlgorithm)),
 			PublicKeyAlgorithm: $.varRef(init?.PublicKeyAlgorithm ?? (0 as PublicKeyAlgorithm)),
-			PublicKey: $.varRef(init?.PublicKey ?? (null as any)),
+			PublicKey: $.varRef(init?.PublicKey ?? (null! as any)),
 			Subject: $.varRef(init?.Subject ? $.markAsStructValue($.cloneStructValue(init.Subject)) : $.markAsStructValue(new pkix2.Name())),
-			Attributes: $.varRef(init?.Attributes ?? (null as $.Slice<pkix2.AttributeTypeAndValueSET>)),
-			Extensions: $.varRef(init?.Extensions ?? (null as $.Slice<pkix2.Extension>)),
-			ExtraExtensions: $.varRef(init?.ExtraExtensions ?? (null as $.Slice<pkix2.Extension>)),
-			DNSNames: $.varRef(init?.DNSNames ?? (null as $.Slice<string>)),
-			EmailAddresses: $.varRef(init?.EmailAddresses ?? (null as $.Slice<string>)),
-			IPAddresses: $.varRef(init?.IPAddresses ?? (null as $.Slice<net.IP>)),
-			URIs: $.varRef(init?.URIs ?? (null as $.Slice<url.URL | $.VarRef<url.URL> | null>))
+			Attributes: $.varRef(init?.Attributes ?? (null! as $.Slice<pkix2.AttributeTypeAndValueSET>)),
+			Extensions: $.varRef(init?.Extensions ?? (null! as $.Slice<pkix2.Extension>)),
+			ExtraExtensions: $.varRef(init?.ExtraExtensions ?? (null! as $.Slice<pkix2.Extension>)),
+			DNSNames: $.varRef(init?.DNSNames ?? (null! as $.Slice<string>)),
+			EmailAddresses: $.varRef(init?.EmailAddresses ?? (null! as $.Slice<string>)),
+			IPAddresses: $.varRef(init?.IPAddresses ?? (null! as $.Slice<net.IP>)),
+			URIs: $.varRef(init?.URIs ?? (null! as $.Slice<url.URL | $.VarRef<url.URL> | null>))
 		}
 	}
 
@@ -2325,11 +2325,11 @@ export class tbsCertificateRequest {
 
 	constructor(init?: Partial<{Raw?: asn1.RawContent, Version?: number, Subject?: asn1.RawValue, PublicKey?: publicKeyInfo, RawAttributes?: $.Slice<asn1.RawValue>}>) {
 		this._fields = {
-			Raw: $.varRef(init?.Raw ?? (null as asn1.RawContent)),
+			Raw: $.varRef(init?.Raw ?? (null! as asn1.RawContent)),
 			Version: $.varRef(init?.Version ?? (0 as number)),
 			Subject: $.varRef(init?.Subject ? $.markAsStructValue($.cloneStructValue(init.Subject)) : $.markAsStructValue(new asn1.RawValue())),
 			PublicKey: $.varRef(init?.PublicKey ? $.markAsStructValue($.cloneStructValue(init.PublicKey)) : $.markAsStructValue(new publicKeyInfo())),
-			RawAttributes: $.varRef(init?.RawAttributes ?? (null as $.Slice<asn1.RawValue>))
+			RawAttributes: $.varRef(init?.RawAttributes ?? (null! as $.Slice<asn1.RawValue>))
 		}
 	}
 
@@ -2392,7 +2392,7 @@ export class certificateRequest {
 
 	constructor(init?: Partial<{Raw?: asn1.RawContent, TBSCSR?: tbsCertificateRequest, SignatureAlgorithm?: pkix2.AlgorithmIdentifier, SignatureValue?: asn1.BitString}>) {
 		this._fields = {
-			Raw: $.varRef(init?.Raw ?? (null as asn1.RawContent)),
+			Raw: $.varRef(init?.Raw ?? (null! as asn1.RawContent)),
 			TBSCSR: $.varRef(init?.TBSCSR ? $.markAsStructValue($.cloneStructValue(init.TBSCSR)) : $.markAsStructValue(new tbsCertificateRequest())),
 			SignatureAlgorithm: $.varRef(init?.SignatureAlgorithm ? $.markAsStructValue($.cloneStructValue(init.SignatureAlgorithm)) : $.markAsStructValue(new pkix2.AlgorithmIdentifier())),
 			SignatureValue: $.varRef(init?.SignatureValue ? $.markAsStructValue($.cloneStructValue(init.SignatureValue)) : $.markAsStructValue(new asn1.BitString()))
@@ -2497,12 +2497,12 @@ export class RevocationListEntry {
 
 	constructor(init?: Partial<{Raw?: $.Slice<number>, SerialNumber?: big.Int | $.VarRef<big.Int> | null, RevocationTime?: time.Time, ReasonCode?: number, Extensions?: $.Slice<pkix2.Extension>, ExtraExtensions?: $.Slice<pkix2.Extension>}>) {
 		this._fields = {
-			Raw: $.varRef(init?.Raw ?? (null as $.Slice<number>)),
-			SerialNumber: $.varRef(init?.SerialNumber ?? (null as big.Int | $.VarRef<big.Int> | null)),
+			Raw: $.varRef(init?.Raw ?? (null! as $.Slice<number>)),
+			SerialNumber: $.varRef(init?.SerialNumber ?? (null! as big.Int | $.VarRef<big.Int> | null)),
 			RevocationTime: $.varRef(init?.RevocationTime ? $.markAsStructValue($.cloneStructValue(init.RevocationTime)) : $.markAsStructValue(new time.Time())),
 			ReasonCode: $.varRef(init?.ReasonCode ?? (0 as number)),
-			Extensions: $.varRef(init?.Extensions ?? (null as $.Slice<pkix2.Extension>)),
-			ExtraExtensions: $.varRef(init?.ExtraExtensions ?? (null as $.Slice<pkix2.Extension>))
+			Extensions: $.varRef(init?.Extensions ?? (null! as $.Slice<pkix2.Extension>)),
+			ExtraExtensions: $.varRef(init?.ExtraExtensions ?? (null! as $.Slice<pkix2.Extension>))
 		}
 	}
 
@@ -2681,20 +2681,20 @@ export class RevocationList {
 
 	constructor(init?: Partial<{Raw?: $.Slice<number>, RawTBSRevocationList?: $.Slice<number>, RawIssuer?: $.Slice<number>, Issuer?: pkix2.Name, AuthorityKeyId?: $.Slice<number>, Signature?: $.Slice<number>, SignatureAlgorithm?: SignatureAlgorithm, RevokedCertificateEntries?: $.Slice<RevocationListEntry>, RevokedCertificates?: $.Slice<pkix2.RevokedCertificate>, Number?: big.Int | $.VarRef<big.Int> | null, ThisUpdate?: time.Time, NextUpdate?: time.Time, Extensions?: $.Slice<pkix2.Extension>, ExtraExtensions?: $.Slice<pkix2.Extension>}>) {
 		this._fields = {
-			Raw: $.varRef(init?.Raw ?? (null as $.Slice<number>)),
-			RawTBSRevocationList: $.varRef(init?.RawTBSRevocationList ?? (null as $.Slice<number>)),
-			RawIssuer: $.varRef(init?.RawIssuer ?? (null as $.Slice<number>)),
+			Raw: $.varRef(init?.Raw ?? (null! as $.Slice<number>)),
+			RawTBSRevocationList: $.varRef(init?.RawTBSRevocationList ?? (null! as $.Slice<number>)),
+			RawIssuer: $.varRef(init?.RawIssuer ?? (null! as $.Slice<number>)),
 			Issuer: $.varRef(init?.Issuer ? $.markAsStructValue($.cloneStructValue(init.Issuer)) : $.markAsStructValue(new pkix2.Name())),
-			AuthorityKeyId: $.varRef(init?.AuthorityKeyId ?? (null as $.Slice<number>)),
-			Signature: $.varRef(init?.Signature ?? (null as $.Slice<number>)),
+			AuthorityKeyId: $.varRef(init?.AuthorityKeyId ?? (null! as $.Slice<number>)),
+			Signature: $.varRef(init?.Signature ?? (null! as $.Slice<number>)),
 			SignatureAlgorithm: $.varRef(init?.SignatureAlgorithm ?? (0 as SignatureAlgorithm)),
-			RevokedCertificateEntries: $.varRef(init?.RevokedCertificateEntries ?? (null as $.Slice<RevocationListEntry>)),
-			RevokedCertificates: $.varRef(init?.RevokedCertificates ?? (null as $.Slice<pkix2.RevokedCertificate>)),
-			Number: $.varRef(init?.Number ?? (null as big.Int | $.VarRef<big.Int> | null)),
+			RevokedCertificateEntries: $.varRef(init?.RevokedCertificateEntries ?? (null! as $.Slice<RevocationListEntry>)),
+			RevokedCertificates: $.varRef(init?.RevokedCertificates ?? (null! as $.Slice<pkix2.RevokedCertificate>)),
+			Number: $.varRef(init?.Number ?? (null! as big.Int | $.VarRef<big.Int> | null)),
 			ThisUpdate: $.varRef(init?.ThisUpdate ? $.markAsStructValue($.cloneStructValue(init.ThisUpdate)) : $.markAsStructValue(new time.Time())),
 			NextUpdate: $.varRef(init?.NextUpdate ? $.markAsStructValue($.cloneStructValue(init.NextUpdate)) : $.markAsStructValue(new time.Time())),
-			Extensions: $.varRef(init?.Extensions ?? (null as $.Slice<pkix2.Extension>)),
-			ExtraExtensions: $.varRef(init?.ExtraExtensions ?? (null as $.Slice<pkix2.Extension>))
+			Extensions: $.varRef(init?.Extensions ?? (null! as $.Slice<pkix2.Extension>)),
+			ExtraExtensions: $.varRef(init?.ExtraExtensions ?? (null! as $.Slice<pkix2.Extension>))
 		}
 	}
 
@@ -2815,14 +2815,14 @@ export class tbsCertificateList {
 
 	constructor(init?: Partial<{Raw?: asn1.RawContent, Version?: number, Signature?: pkix2.AlgorithmIdentifier, Issuer?: asn1.RawValue, ThisUpdate?: time.Time, NextUpdate?: time.Time, RevokedCertificates?: $.Slice<pkix2.RevokedCertificate>, Extensions?: $.Slice<pkix2.Extension>}>) {
 		this._fields = {
-			Raw: $.varRef(init?.Raw ?? (null as asn1.RawContent)),
+			Raw: $.varRef(init?.Raw ?? (null! as asn1.RawContent)),
 			Version: $.varRef(init?.Version ?? (0 as number)),
 			Signature: $.varRef(init?.Signature ? $.markAsStructValue($.cloneStructValue(init.Signature)) : $.markAsStructValue(new pkix2.AlgorithmIdentifier())),
 			Issuer: $.varRef(init?.Issuer ? $.markAsStructValue($.cloneStructValue(init.Issuer)) : $.markAsStructValue(new asn1.RawValue())),
 			ThisUpdate: $.varRef(init?.ThisUpdate ? $.markAsStructValue($.cloneStructValue(init.ThisUpdate)) : $.markAsStructValue(new time.Time())),
 			NextUpdate: $.varRef(init?.NextUpdate ? $.markAsStructValue($.cloneStructValue(init.NextUpdate)) : $.markAsStructValue(new time.Time())),
-			RevokedCertificates: $.varRef(init?.RevokedCertificates ?? (null as $.Slice<pkix2.RevokedCertificate>)),
-			Extensions: $.varRef(init?.Extensions ?? (null as $.Slice<pkix2.Extension>))
+			RevokedCertificates: $.varRef(init?.RevokedCertificates ?? (null! as $.Slice<pkix2.RevokedCertificate>)),
+			Extensions: $.varRef(init?.Extensions ?? (null! as $.Slice<pkix2.Extension>))
 		}
 	}
 
@@ -3004,8 +3004,8 @@ export const nameTypeURI: number = 6
 export const nameTypeIP: number = 7
 
 export async function ParsePKIXPublicKey(derBytes: $.Slice<number>): globalThis.Promise<[any, $.GoError]> {
-	let pub: any = null as any
-	let err: $.GoError = null as $.GoError
+	let pub: any = null! as any
+	let err: $.GoError = null! as $.GoError
 	let pki: $.VarRef<publicKeyInfo> = $.varRef($.markAsStructValue(new publicKeyInfo()))
 	{
 		let __goscriptTuple0: any = await asn1.Unmarshal(derBytes, $.interfaceValue<any>(pki, "*x509.publicKeyInfo", { kind: $.TypeKind.Pointer, elemType: "x509.publicKeyInfo" }))
@@ -3029,9 +3029,9 @@ export async function ParsePKIXPublicKey(derBytes: $.Slice<number>): globalThis.
 }
 
 export async function marshalPublicKey(pub: any): globalThis.Promise<[$.Slice<number>, pkix2.AlgorithmIdentifier, $.GoError]> {
-	let publicKeyBytes: $.Slice<number> = null as $.Slice<number>
+	let publicKeyBytes: $.Slice<number> = null! as $.Slice<number>
 	let publicKeyAlgorithm: pkix2.AlgorithmIdentifier = $.markAsStructValue(new pkix2.AlgorithmIdentifier())
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	{
 		const __goscriptTypeSwitchValue = pub
 		switch (true) {
@@ -3066,7 +3066,7 @@ export async function marshalPublicKey(pub: any): globalThis.Promise<[$.Slice<nu
 						return [null, $.markAsStructValue(new pkix2.AlgorithmIdentifier()), err]
 					}
 					publicKeyAlgorithm.Algorithm = (oidPublicKeyECDSA as asn1.ObjectIdentifier)
-					let paramBytes: $.Slice<number> = null as $.Slice<number>
+					let paramBytes: $.Slice<number> = null! as $.Slice<number>
 					let __goscriptTuple4: any = await asn1.Marshal($.namedValueInterfaceValue<any>(oid, "asn1.ObjectIdentifier", {Equal: (receiver: any, ...args: any[]) => (asn1.ObjectIdentifier_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (asn1.ObjectIdentifier_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "asn1.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } }, [{ name: "Equal", args: [{ name: "other", type: { kind: $.TypeKind.Slice, typeName: "asn1.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]))
 					paramBytes = __goscriptTuple4[0]
 					err = __goscriptTuple4[1]
@@ -3097,7 +3097,7 @@ export async function marshalPublicKey(pub: any): globalThis.Promise<[$.Slice<nu
 							return [null, $.markAsStructValue(new pkix2.AlgorithmIdentifier()), errors.New("x509: unsupported elliptic curve")]
 						}
 						publicKeyAlgorithm.Algorithm = (oidPublicKeyECDSA as asn1.ObjectIdentifier)
-						let paramBytes: $.Slice<number> = null as $.Slice<number>
+						let paramBytes: $.Slice<number> = null! as $.Slice<number>
 						let __goscriptTuple6: any = await asn1.Marshal($.namedValueInterfaceValue<any>(oid, "asn1.ObjectIdentifier", {Equal: (receiver: any, ...args: any[]) => (asn1.ObjectIdentifier_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (asn1.ObjectIdentifier_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "asn1.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } }, [{ name: "Equal", args: [{ name: "other", type: { kind: $.TypeKind.Slice, typeName: "asn1.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]))
 						paramBytes = __goscriptTuple6[0]
 						err = __goscriptTuple6[1]
@@ -3121,9 +3121,9 @@ export async function marshalPublicKey(pub: any): globalThis.Promise<[$.Slice<nu
 }
 
 export async function MarshalPKIXPublicKey(pub: any): globalThis.Promise<[$.Slice<number>, $.GoError]> {
-	let publicKeyBytes: $.Slice<number> = null as $.Slice<number>
+	let publicKeyBytes: $.Slice<number> = null! as $.Slice<number>
 	let publicKeyAlgorithm: pkix2.AlgorithmIdentifier = $.markAsStructValue(new pkix2.AlgorithmIdentifier())
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 
 	{
 		let __goscriptTuple7: any = await marshalPublicKey(pub)
@@ -3673,7 +3673,7 @@ export function extKeyUsageFromOID(oid: asn1.ObjectIdentifier): [ExtKeyUsage, bo
 }
 
 export function oidFromExtKeyUsage(eku: ExtKeyUsage): [asn1.ObjectIdentifier, boolean] {
-	let oid: asn1.ObjectIdentifier = null as asn1.ObjectIdentifier
+	let oid: asn1.ObjectIdentifier = null! as asn1.ObjectIdentifier
 	let ok: boolean = false
 	for (let __goscriptRangeTarget5 = extKeyUsageOIDs, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget5); __rangeIndex++) {
 		let pair = __goscriptRangeTarget5![__rangeIndex]
@@ -3713,7 +3713,7 @@ export function signaturePublicKeyAlgoMismatchError(expectedPubKeyAlgo: PublicKe
 }
 
 export async function checkSignature(algo: SignatureAlgorithm, signed: $.Slice<number>, signature: $.Slice<number>, publicKey: crypto.PublicKey | null, allowSHA1: boolean): globalThis.Promise<$.GoError> {
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let hashType: crypto.Hash = 0
 	let pubKeyAlgo: PublicKeyAlgorithm = 0
 
@@ -3921,9 +3921,9 @@ export function oidInExtensions(oid: asn1.ObjectIdentifier, extensions: $.Slice<
 }
 
 export async function marshalSANs(dnsNames: $.Slice<string>, emailAddresses: $.Slice<string>, ipAddresses: $.Slice<net.IP>, uris: $.Slice<url.URL | $.VarRef<url.URL> | null>): globalThis.Promise<[$.Slice<number>, $.GoError]> {
-	let derBytes: $.Slice<number> = null as $.Slice<number>
-	let err: $.GoError = null as $.GoError
-	let rawValues: $.Slice<asn1.RawValue> = null as $.Slice<asn1.RawValue>
+	let derBytes: $.Slice<number> = null! as $.Slice<number>
+	let err: $.GoError = null! as $.GoError
+	let rawValues: $.Slice<asn1.RawValue> = null! as $.Slice<asn1.RawValue>
 	for (let __goscriptRangeTarget16 = dnsNames, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget16); __rangeIndex++) {
 		let name = __goscriptRangeTarget16![__rangeIndex]
 		{
@@ -3985,8 +3985,8 @@ export function __goscript_set_x509usepolicies(__goscriptValue: godebug.Setting 
 }
 
 export async function buildCertExtensions(template: Certificate | $.VarRef<Certificate> | null, subjectIsEmpty: boolean, authorityKeyId: $.Slice<number>, subjectKeyId: $.Slice<number>): globalThis.Promise<[$.Slice<pkix2.Extension>, $.GoError]> {
-	let ret: $.Slice<pkix2.Extension> = null as $.Slice<pkix2.Extension>
-	let err: $.GoError = null as $.GoError
+	let ret: $.Slice<pkix2.Extension> = null! as $.Slice<pkix2.Extension>
+	let err: $.GoError = null! as $.GoError
 	ret = $.makeSlice<pkix2.Extension>(10, undefined, undefined, () => $.markAsStructValue(new pkix2.Extension()))
 	let n = 0
 
@@ -4044,7 +4044,7 @@ export async function buildCertExtensions(template: Certificate | $.VarRef<Certi
 
 	if ((($.len($.pointerValue<Certificate>(template).OCSPServer) > 0) || ($.len($.pointerValue<Certificate>(template).IssuingCertificateURL) > 0)) && !oidInExtensions((oidExtensionAuthorityInfoAccess as asn1.ObjectIdentifier), $.pointerValue<Certificate>(template).ExtraExtensions)) {
 		$.arrayIndex(ret!, n).Id = (oidExtensionAuthorityInfoAccess as asn1.ObjectIdentifier)
-		let aiaValues: $.Slice<authorityInfoAccess> = null as $.Slice<authorityInfoAccess>
+		let aiaValues: $.Slice<authorityInfoAccess> = null! as $.Slice<authorityInfoAccess>
 		for (let __goscriptRangeTarget20 = $.pointerValue<Certificate>(template).OCSPServer, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget20); __rangeIndex++) {
 			let name = __goscriptRangeTarget20![__rangeIndex]
 			aiaValues = $.append(aiaValues, $.markAsStructValue(new authorityInfoAccess({Method: (oidAuthorityInfoAccessOcsp as asn1.ObjectIdentifier), Location: $.markAsStructValue(new asn1.RawValue({Tag: 6, Class: 2, Bytes: $.stringToBytes(name)}))})))
@@ -4101,8 +4101,8 @@ export async function buildCertExtensions(template: Certificate | $.VarRef<Certi
 		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "net.IPNet" }], results: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }] } as $.FunctionTypeInfo))
 
 		let serialiseConstraints: ((dns: $.Slice<string>, ips: $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>, emails: $.Slice<string>, uriDomains: $.Slice<string>) => [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>) | null = $.functionValue(async (dns: $.Slice<string>, ips: $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>, emails: $.Slice<string>, uriDomains: $.Slice<string>): globalThis.Promise<[$.Slice<number>, $.GoError]> => {
-			let der: $.Slice<number> = null as $.Slice<number>
-			let err: $.GoError = null as $.GoError
+			let der: $.Slice<number> = null! as $.Slice<number>
+			let err: $.GoError = null! as $.GoError
 			let b: $.VarRef<cryptobyte.Builder> = $.varRef($.markAsStructValue(new cryptobyte.Builder()))
 
 			for (let __goscriptRangeTarget22 = dns, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget22); __rangeIndex++) {
@@ -4206,7 +4206,7 @@ export async function buildCertExtensions(template: Certificate | $.VarRef<Certi
 	if (($.len($.pointerValue<Certificate>(template).CRLDistributionPoints) > 0) && !oidInExtensions((oidExtensionCRLDistributionPoints as asn1.ObjectIdentifier), $.pointerValue<Certificate>(template).ExtraExtensions)) {
 		$.arrayIndex(ret!, n).Id = (oidExtensionCRLDistributionPoints as asn1.ObjectIdentifier)
 
-		let crlDp: $.Slice<distributionPoint> = null as $.Slice<distributionPoint>
+		let crlDp: $.Slice<distributionPoint> = null! as $.Slice<distributionPoint>
 		for (let __goscriptRangeTarget26 = $.pointerValue<Certificate>(template).CRLDistributionPoints, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget26); __rangeIndex++) {
 			let name = __goscriptRangeTarget26![__rangeIndex]
 			let dp = $.markAsStructValue(new distributionPoint({DistributionPoint: $.markAsStructValue(new distributionPointName({FullName: $.arrayToSlice<asn1.RawValue>([$.markAsStructValue(new asn1.RawValue({Tag: 6, Class: 2, Bytes: $.stringToBytes(name)}))])}))}))
@@ -4242,7 +4242,7 @@ export async function marshalKeyUsage(ku: KeyUsage): globalThis.Promise<[pkix2.E
 	}
 
 	let bitString: $.Slice<number> = $.goSlice(a, undefined, l)
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let __goscriptTuple30: any = await asn1.Marshal($.interfaceValue<any>((() => { const __goscriptLiteralField7 = asn1BitLength(bitString); return $.markAsStructValue(new asn1.BitString({Bytes: bitString, BitLength: __goscriptLiteralField7})) })(), "asn1.BitString", "asn1.BitString"))
 	ext.Value = __goscriptTuple30[0]
 	err = __goscriptTuple30[1]
@@ -4269,7 +4269,7 @@ export async function marshalExtKeyUsage(extUsages: $.Slice<ExtKeyUsage>, unknow
 
 	$.copy($.goSlice(oids, $.len(extUsages), undefined), unknownUsages)
 
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let __goscriptTuple32: any = await asn1.Marshal($.interfaceValue<any>(oids, "[]asn1.ObjectIdentifier", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Slice, typeName: "asn1.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } } }))
 	ext.Value = __goscriptTuple32[0]
 	err = __goscriptTuple32[1]
@@ -4284,7 +4284,7 @@ export async function marshalBasicConstraints(isCA: boolean, maxPathLen: number,
 	if ((maxPathLen == 0) && !maxPathLenZero) {
 		maxPathLen = -1
 	}
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let __goscriptTuple33: any = await asn1.Marshal($.interfaceValue<any>($.markAsStructValue(new basicConstraints({IsCA: isCA, MaxPathLen: maxPathLen})), "x509.basicConstraints", "x509.basicConstraints"))
 	ext.Value = __goscriptTuple33[0]
 	err = __goscriptTuple33[1]
@@ -4320,7 +4320,7 @@ export async function marshalCertificatePolicies(policies: $.Slice<__goscript_oi
 		}
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "cryptobyte.Builder" }], results: [] } as $.FunctionTypeInfo)))
 
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let __goscriptTuple34: any = cryptobyte.Builder.prototype.Bytes.call(b)
 	ext.Value = __goscriptTuple34[0]
 	err = __goscriptTuple34[1]
@@ -4328,7 +4328,7 @@ export async function marshalCertificatePolicies(policies: $.Slice<__goscript_oi
 }
 
 export async function buildCSRExtensions(template: CertificateRequest | $.VarRef<CertificateRequest> | null): globalThis.Promise<[$.Slice<pkix2.Extension>, $.GoError]> {
-	let ret: $.Slice<pkix2.Extension> = null as $.Slice<pkix2.Extension>
+	let ret: $.Slice<pkix2.Extension> = null! as $.Slice<pkix2.Extension>
 
 	if ((((($.len($.pointerValue<CertificateRequest>(template).DNSNames) > 0) || ($.len($.pointerValue<CertificateRequest>(template).EmailAddresses) > 0)) || ($.len($.pointerValue<CertificateRequest>(template).IPAddresses) > 0)) || ($.len($.pointerValue<CertificateRequest>(template).URIs) > 0)) && !oidInExtensions((oidExtensionSubjectAltName as asn1.ObjectIdentifier), $.pointerValue<CertificateRequest>(template).ExtraExtensions)) {
 		let __goscriptTuple35: any = await marshalSANs($.pointerValue<CertificateRequest>(template).DNSNames, $.pointerValue<CertificateRequest>(template).EmailAddresses, $.pointerValue<CertificateRequest>(template).IPAddresses, $.pointerValue<CertificateRequest>(template).URIs)
@@ -4668,7 +4668,7 @@ export function __goscript_set_oidExtensionRequest(__goscriptValue: asn1.ObjectI
 }
 
 export async function newRawAttributes(attributes: $.Slice<pkix2.AttributeTypeAndValueSET>): globalThis.Promise<[$.Slice<asn1.RawValue>, $.GoError]> {
-	let rawAttributes: $.VarRef<$.Slice<asn1.RawValue>> = $.varRef(null as $.Slice<asn1.RawValue>)
+	let rawAttributes: $.VarRef<$.Slice<asn1.RawValue>> = $.varRef(null! as $.Slice<asn1.RawValue>)
 	let __goscriptTuple45: any = await asn1.Marshal($.interfaceValue<any>(attributes, "[]pkix.AttributeTypeAndValueSET", { kind: $.TypeKind.Slice, elemType: "pkix.AttributeTypeAndValueSET" }))
 	let b: $.Slice<number> = __goscriptTuple45[0]
 	let err = __goscriptTuple45[1]
@@ -4688,7 +4688,7 @@ export async function newRawAttributes(attributes: $.Slice<pkix2.AttributeTypeAn
 }
 
 export async function parseRawAttributes(rawAttributes: $.Slice<asn1.RawValue>): globalThis.Promise<$.Slice<pkix2.AttributeTypeAndValueSET>> {
-	let attributes: $.Slice<pkix2.AttributeTypeAndValueSET> = null as $.Slice<pkix2.AttributeTypeAndValueSET>
+	let attributes: $.Slice<pkix2.AttributeTypeAndValueSET> = null! as $.Slice<pkix2.AttributeTypeAndValueSET>
 	for (let __goscriptRangeTarget31 = rawAttributes, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget31); __rangeIndex++) {
 		let rawAttr = __goscriptRangeTarget31![__rangeIndex]
 		let attr: $.VarRef<pkix2.AttributeTypeAndValueSET> = $.varRef($.markAsStructValue(new pkix2.AttributeTypeAndValueSET()))
@@ -4728,8 +4728,8 @@ export async function parseCSRExtensions(rawAttributes: $.Slice<asn1.RawValue>):
 
 		constructor(init?: Partial<{Id?: asn1.ObjectIdentifier, Values?: $.Slice<asn1.RawValue>}>) {
 			this._fields = {
-				Id: $.varRef(init?.Id ?? (null as asn1.ObjectIdentifier)),
-				Values: $.varRef(init?.Values ?? (null as $.Slice<asn1.RawValue>))
+				Id: $.varRef(init?.Id ?? (null! as asn1.ObjectIdentifier)),
+				Values: $.varRef(init?.Values ?? (null! as $.Slice<asn1.RawValue>))
 			}
 		}
 
@@ -4751,7 +4751,7 @@ export async function parseCSRExtensions(rawAttributes: $.Slice<asn1.RawValue>):
 		)
 	}
 
-	let ret: $.Slice<pkix2.Extension> = null as $.Slice<pkix2.Extension>
+	let ret: $.Slice<pkix2.Extension> = null! as $.Slice<pkix2.Extension>
 	let requestedExts: globalThis.Map<string, boolean> | null = $.makeMap<string, boolean>()
 	for (let __goscriptRangeTarget33 = rawAttributes, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget33); __rangeIndex++) {
 		let rawAttr = __goscriptRangeTarget33![__rangeIndex]
@@ -4770,7 +4770,7 @@ export async function parseCSRExtensions(rawAttributes: $.Slice<asn1.RawValue>):
 			continue
 		}
 
-		let extensions: $.VarRef<$.Slice<pkix2.Extension>> = $.varRef(null as $.Slice<pkix2.Extension>)
+		let extensions: $.VarRef<$.Slice<pkix2.Extension>> = $.varRef(null! as $.Slice<pkix2.Extension>)
 		{
 			let [, err] = await asn1.Unmarshal($.arrayIndex(attr.value.Values!, 0).FullBytes, $.interfaceValue<any>(extensions, "*[]pkix.Extension", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: "pkix.Extension" } }))
 			if (err != null) {
@@ -4792,8 +4792,8 @@ export async function parseCSRExtensions(rawAttributes: $.Slice<asn1.RawValue>):
 }
 
 export async function CreateCertificateRequest(rand: io.Reader | null, template: CertificateRequest | $.VarRef<CertificateRequest> | null, priv: any): globalThis.Promise<[$.Slice<number>, $.GoError]> {
-	let csr: $.Slice<number> = null as $.Slice<number>
-	let err: $.GoError = null as $.GoError
+	let csr: $.Slice<number> = null! as $.Slice<number>
+	let err: $.GoError = null! as $.GoError
 	let [key, ok] = $.typeAssertTuple<crypto.Signer | null>(priv, "crypto.Signer")
 	if (!ok) {
 		return [null, errors.New("x509: certificate private key does not implement crypto.Signer")]
@@ -4807,7 +4807,7 @@ export async function CreateCertificateRequest(rand: io.Reader | null, template:
 		return [null, err]
 	}
 
-	let publicKeyBytes: $.Slice<number> = null as $.Slice<number>
+	let publicKeyBytes: $.Slice<number> = null! as $.Slice<number>
 	let publicKeyAlgorithm: pkix2.AlgorithmIdentifier = $.markAsStructValue(new pkix2.AlgorithmIdentifier())
 	let __goscriptTuple50: any = await marshalPublicKey((await $.pointerValue<Exclude<crypto.Signer, null>>(key).Public() as any))
 	publicKeyBytes = __goscriptTuple50[0]
@@ -4954,7 +4954,7 @@ export async function ParseCertificateRequest(asn1Data: $.Slice<number>): global
 export async function parseCertificateRequest(_in: certificateRequest | $.VarRef<certificateRequest> | null): globalThis.Promise<[CertificateRequest | $.VarRef<CertificateRequest> | null, $.GoError]> {
 	let out: CertificateRequest | $.VarRef<CertificateRequest> | null = (await (async () => { const __goscriptLiteralField10 = $.markAsStructValue($.cloneStructValue($.pointerValue<certificateRequest>(_in).SignatureValue)).RightAlign(); const __goscriptLiteralField11 = await getSignatureAlgorithmFromAI($.markAsStructValue($.cloneStructValue($.pointerValue<certificateRequest>(_in).SignatureAlgorithm))); const __goscriptLiteralField12 = getPublicKeyAlgorithmFromOID(($.pointerValue<certificateRequest>(_in).TBSCSR.PublicKey.Algorithm.Algorithm as asn1.ObjectIdentifier)); const __goscriptLiteralField13 = await parseRawAttributes($.pointerValue<certificateRequest>(_in).TBSCSR.RawAttributes); return new CertificateRequest({Raw: $.pointerValue<certificateRequest>(_in).Raw, RawTBSCertificateRequest: $.pointerValue<certificateRequest>(_in).TBSCSR.Raw, RawSubjectPublicKeyInfo: $.pointerValue<certificateRequest>(_in).TBSCSR.PublicKey.Raw, RawSubject: $.pointerValue<certificateRequest>(_in).TBSCSR.Subject.FullBytes, Signature: __goscriptLiteralField10, SignatureAlgorithm: __goscriptLiteralField11, PublicKeyAlgorithm: __goscriptLiteralField12, Version: $.pointerValue<certificateRequest>(_in).TBSCSR.Version, Attributes: __goscriptLiteralField13}) })())
 
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	if ($.pointerValue<CertificateRequest>(out).PublicKeyAlgorithm != 0) {
 		let __goscriptTuple58: any = await __goscript_parser.parsePublicKey($.pointerValue<certificateRequest>(_in).TBSCSR._fields.PublicKey)
 		$.pointerValue<CertificateRequest>(out).PublicKey = __goscriptTuple58[0]
@@ -4964,7 +4964,7 @@ export async function parseCertificateRequest(_in: certificateRequest | $.VarRef
 		}
 	}
 
-	let subject: $.VarRef<pkix2.RDNSequence> = $.varRef(null as pkix2.RDNSequence)
+	let subject: $.VarRef<pkix2.RDNSequence> = $.varRef(null! as pkix2.RDNSequence)
 	{
 		let __goscriptTuple59: any = await asn1.Unmarshal($.pointerValue<certificateRequest>(_in).TBSCSR.Subject.FullBytes, $.namedValueInterfaceValue<any>(subject, "*pkix.RDNSequence", {String: (receiver: any, ...args: any[]) => (pkix2.RDNSequence_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, typeName: "pkix.RDNSequence", elemType: { kind: $.TypeKind.Slice, typeName: "pkix.RelativeDistinguishedNameSET", elemType: "pkix.AttributeTypeAndValue" } } }, [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]))
 		let rest: $.Slice<number> = __goscriptTuple59[0]
@@ -5036,7 +5036,7 @@ export async function CreateRevocationList(rand: io.Reader | null, template: Rev
 		return [null, err]
 	}
 
-	let revokedCerts: $.Slice<pkix2.RevokedCertificate> = null as $.Slice<pkix2.RevokedCertificate>
+	let revokedCerts: $.Slice<pkix2.RevokedCertificate> = null! as $.Slice<pkix2.RevokedCertificate>
 	// Only process the deprecated RevokedCertificates field if it is populated
 	// and the new RevokedCertificateEntries field is not populated.
 	if (($.len($.pointerValue<RevocationList>(template).RevokedCertificates) > 0) && ($.len($.pointerValue<RevocationList>(template).RevokedCertificateEntries) == 0)) {

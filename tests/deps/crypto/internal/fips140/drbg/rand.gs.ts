@@ -116,7 +116,7 @@ export async function Read(b: $.Slice<number>): globalThis.Promise<void> {
 	}
 }
 
-export let testingReader: io.Reader | null = null as io.Reader | null
+export let testingReader: io.Reader | null = null! as io.Reader | null
 
 export function __goscript_set_testingReader(__goscriptValue: io.Reader | null): void {
 	testingReader = __goscriptValue

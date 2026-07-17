@@ -114,14 +114,14 @@ export class Scanner {
 
 	constructor(init?: Partial<{r?: io.Reader | null, split?: ((data: $.Slice<number>, atEOF: boolean) => [number, $.Slice<number>, $.GoError] | globalThis.Promise<[number, $.Slice<number>, $.GoError]>) | null, maxTokenSize?: number, token?: $.Slice<number>, buf?: $.Slice<number>, start?: number, end?: number, err?: $.GoError, empties?: number, scanCalled?: boolean, done?: boolean}>) {
 		this._fields = {
-			r: $.varRef(init?.r ?? (null as io.Reader | null)),
-			split: $.varRef(init?.split ?? (null as ((data: $.Slice<number>, atEOF: boolean) => [number, $.Slice<number>, $.GoError] | globalThis.Promise<[number, $.Slice<number>, $.GoError]>) | null)),
+			r: $.varRef(init?.r ?? (null! as io.Reader | null)),
+			split: $.varRef(init?.split ?? (null! as ((data: $.Slice<number>, atEOF: boolean) => [number, $.Slice<number>, $.GoError] | globalThis.Promise<[number, $.Slice<number>, $.GoError]>) | null)),
 			maxTokenSize: $.varRef(init?.maxTokenSize ?? (0 as number)),
-			token: $.varRef(init?.token ?? (null as $.Slice<number>)),
-			buf: $.varRef(init?.buf ?? (null as $.Slice<number>)),
+			token: $.varRef(init?.token ?? (null! as $.Slice<number>)),
+			buf: $.varRef(init?.buf ?? (null! as $.Slice<number>)),
 			start: $.varRef(init?.start ?? (0 as number)),
 			end: $.varRef(init?.end ?? (0 as number)),
-			err: $.varRef(init?.err ?? (null as $.GoError)),
+			err: $.varRef(init?.err ?? (null! as $.GoError)),
 			empties: $.varRef(init?.empties ?? (0 as number)),
 			scanCalled: $.varRef(init?.scanCalled ?? (false as boolean)),
 			done: $.varRef(init?.done ?? (false as boolean))
@@ -359,8 +359,8 @@ export function __goscript_set_ErrFinalToken(__goscriptValue: $.GoError): void {
 
 export function ScanBytes(data: $.Slice<number>, atEOF: boolean): [number, $.Slice<number>, $.GoError] {
 	let advance: number = 0
-	let token: $.Slice<number> = null as $.Slice<number>
-	let err: $.GoError = null as $.GoError
+	let token: $.Slice<number> = null! as $.Slice<number>
+	let err: $.GoError = null! as $.GoError
 	if (atEOF && ($.len(data) == 0)) {
 		return [0, null, null]
 	}
@@ -375,8 +375,8 @@ export function __goscript_set_errorRune(__goscriptValue: $.Slice<number>): void
 
 export function ScanRunes(data: $.Slice<number>, atEOF: boolean): [number, $.Slice<number>, $.GoError] {
 	let advance: number = 0
-	let token: $.Slice<number> = null as $.Slice<number>
-	let err: $.GoError = null as $.GoError
+	let token: $.Slice<number> = null! as $.Slice<number>
+	let err: $.GoError = null! as $.GoError
 	if (atEOF && ($.len(data) == 0)) {
 		return [0, null, null]
 	}
@@ -417,8 +417,8 @@ export function dropCR(data: $.Slice<number>): $.Slice<number> {
 
 export function ScanLines(data: $.Slice<number>, atEOF: boolean): [number, $.Slice<number>, $.GoError] {
 	let advance: number = 0
-	let token: $.Slice<number> = null as $.Slice<number>
-	let err: $.GoError = null as $.GoError
+	let token: $.Slice<number> = null! as $.Slice<number>
+	let err: $.GoError = null! as $.GoError
 	if (atEOF && ($.len(data) == 0)) {
 		return [0, null, null]
 	}
@@ -481,8 +481,8 @@ export function isSpace(r: number): boolean {
 
 export function ScanWords(data: $.Slice<number>, atEOF: boolean): [number, $.Slice<number>, $.GoError] {
 	let advance: number = 0
-	let token: $.Slice<number> = null as $.Slice<number>
-	let err: $.GoError = null as $.GoError
+	let token: $.Slice<number> = null! as $.Slice<number>
+	let err: $.GoError = null! as $.GoError
 	// Skip leading spaces.
 	let start = 0
 	for (let width = 0; start < $.len(data); start = start + (width)) {

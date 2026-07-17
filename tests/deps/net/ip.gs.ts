@@ -50,8 +50,8 @@ export class IPNet {
 
 	constructor(init?: Partial<{IP?: IP, Mask?: IPMask}>) {
 		this._fields = {
-			IP: $.varRef(init?.IP ?? (null as IP)),
-			Mask: $.varRef(init?.Mask ?? (null as IPMask))
+			IP: $.varRef(init?.IP ?? (null! as IP)),
+			Mask: $.varRef(init?.Mask ?? (null! as IPMask))
 		}
 	}
 
@@ -411,7 +411,7 @@ export function IP_String(ip: IP): string {
 		return "?" + hexString(ip)
 	}
 
-	let buf: $.Slice<number> = null as $.Slice<number>
+	let buf: $.Slice<number> = null! as $.Slice<number>
 	switch ($.len((ip as IP))) {
 		case 4:
 		{
@@ -563,8 +563,8 @@ export function IPMask_String(m: IPMask): string {
 }
 
 export function networkNumberAndMask(n: IPNet | $.VarRef<IPNet> | null): [IP, IPMask] {
-	let ip: IP = null as IP
-	let m: IPMask = null as IPMask
+	let ip: IP = null! as IP
+	let m: IPMask = null! as IPMask
 	{
 		ip = (IP_To4($.pointerValue<IPNet>(n).IP) as IP)
 		if (ip == null) {

@@ -42,8 +42,8 @@ export class PrefixInvoker {
 
 	constructor(init?: Partial<{inv?: __goscript_invoker.Invoker | null, serviceIDPrefixes?: $.Slice<string>}>) {
 		this._fields = {
-			inv: $.varRef(init?.inv ?? (null as __goscript_invoker.Invoker | null)),
-			serviceIDPrefixes: $.varRef(init?.serviceIDPrefixes ?? (null as $.Slice<string>))
+			inv: $.varRef(init?.inv ?? (null! as __goscript_invoker.Invoker | null)),
+			serviceIDPrefixes: $.varRef(init?.serviceIDPrefixes ?? (null! as $.Slice<string>))
 		}
 	}
 

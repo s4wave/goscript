@@ -75,7 +75,7 @@ export class Box {
 
 	constructor(init?: Partial<{Value?: Hooked | $.VarRef<Hooked> | null}>) {
 		this._fields = {
-			Value: $.varRef(init?.Value ?? (null as Hooked | $.VarRef<Hooked> | null))
+			Value: $.varRef(init?.Value ?? (null! as Hooked | $.VarRef<Hooked> | null))
 		}
 	}
 

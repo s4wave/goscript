@@ -168,7 +168,7 @@ export class Float {
 			acc: $.varRef(init?.acc ?? (0 as Accuracy)),
 			form: $.varRef(init?.form ?? (0 as form)),
 			neg: $.varRef(init?.neg ?? (false as boolean)),
-			mant: $.varRef(init?.mant ?? (null as __goscript_nat.nat)),
+			mant: $.varRef(init?.mant ?? (null! as __goscript_nat.nat)),
 			exp: $.varRef(init?.exp ?? (0 as number))
 		}
 	}
@@ -757,7 +757,7 @@ export class Float {
 				break
 			}
 		}
-		let buf: $.Slice<number> = null as $.Slice<number>
+		let buf: $.Slice<number> = null! as $.Slice<number>
 		buf = await Float.prototype.Append.call(x, buf, $.uint($.uint(format, 8), 8), prec)
 		if ($.len(buf) == 0) {
 			buf = new Uint8Array([63])
@@ -1077,8 +1077,8 @@ export class Float {
 
 	public async MarshalText(): globalThis.Promise<[$.Slice<number>, $.GoError]> {
 		const x: Float | $.VarRef<Float> | null = this
-		let text: $.Slice<number> = null as $.Slice<number>
-		let err: $.GoError = null as $.GoError
+		let text: $.Slice<number> = null! as $.Slice<number>
+		let err: $.GoError = null! as $.GoError
 		return Float.prototype.AppendText.call(x, null)
 	}
 
@@ -1146,9 +1146,9 @@ export class Float {
 
 	public async Parse(s: string, base: number): globalThis.Promise<[Float | $.VarRef<Float> | null, number, $.GoError]> {
 		const z: Float | $.VarRef<Float> | null = this
-		let f: Float | $.VarRef<Float> | null = null as Float | $.VarRef<Float> | null
+		let f: Float | $.VarRef<Float> | null = null! as Float | $.VarRef<Float> | null
 		let b: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 
 		if (($.len(s) == 3) && (($.stringEqual(s, "Inf")) || ($.stringEqual(s, "inf")))) {
 			f = Float.prototype.SetInf.call(z, false)
@@ -1994,9 +1994,9 @@ export class Float {
 
 	public async scan(r: io.ByteScanner | null, base: number): globalThis.Promise<[Float | $.VarRef<Float> | null, number, $.GoError]> {
 		let z: Float | $.VarRef<Float> | null = this
-		let f: Float | $.VarRef<Float> | null = null as Float | $.VarRef<Float> | null
+		let f: Float | $.VarRef<Float> | null = null! as Float | $.VarRef<Float> | null
 		let b: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let prec = $.uint($.pointerValue<Float>(z).prec, 32)
 		if ($.uint(prec, 32) == $.uint(0, 32)) {
 			prec = $.uint(64, 32)
@@ -2361,7 +2361,7 @@ export class Float {
 		// divide
 		let stk: __goscript_nat.stack | $.VarRef<__goscript_nat.stack> | null = await __goscript_nat.getStack()
 		__defer.defer(() => { __goscript_nat.stack.prototype.free.call(stk) })
-		let r: __goscript_nat.nat = null as __goscript_nat.nat
+		let r: __goscript_nat.nat = null! as __goscript_nat.nat
 		let __goscriptTuple6: any = await __goscript_natdiv.nat_div($.pointerValue<Float>(z).mant, stk, (null as __goscript_nat.nat), (xadj as __goscript_nat.nat), ($.pointerValue<Float>(y).mant as __goscript_nat.nat))
 		$.pointerValue<Float>(z).mant = (__goscriptTuple6[0] as __goscript_nat.nat)
 		r = (__goscriptTuple6[1] as __goscript_nat.nat)

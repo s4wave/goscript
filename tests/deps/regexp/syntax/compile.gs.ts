@@ -168,7 +168,7 @@ export class compiler {
 
 	constructor(init?: Partial<{p?: __goscript_prog.Prog | $.VarRef<__goscript_prog.Prog> | null}>) {
 		this._fields = {
-			p: $.varRef(init?.p ?? (null as __goscript_prog.Prog | $.VarRef<__goscript_prog.Prog> | null))
+			p: $.varRef(init?.p ?? (null! as __goscript_prog.Prog | $.VarRef<__goscript_prog.Prog> | null))
 		}
 	}
 

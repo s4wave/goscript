@@ -53,9 +53,9 @@ export class P521Point {
 
 	constructor(init?: Partial<{x?: fiat.P521Element | $.VarRef<fiat.P521Element> | null, y?: fiat.P521Element | $.VarRef<fiat.P521Element> | null, z?: fiat.P521Element | $.VarRef<fiat.P521Element> | null}>) {
 		this._fields = {
-			x: $.varRef(init?.x ?? (null as fiat.P521Element | $.VarRef<fiat.P521Element> | null)),
-			y: $.varRef(init?.y ?? (null as fiat.P521Element | $.VarRef<fiat.P521Element> | null)),
-			z: $.varRef(init?.z ?? (null as fiat.P521Element | $.VarRef<fiat.P521Element> | null))
+			x: $.varRef(init?.x ?? (null! as fiat.P521Element | $.VarRef<fiat.P521Element> | null)),
+			y: $.varRef(init?.y ?? (null! as fiat.P521Element | $.VarRef<fiat.P521Element> | null)),
+			z: $.varRef(init?.z ?? (null! as fiat.P521Element | $.VarRef<fiat.P521Element> | null))
 		}
 	}
 
@@ -444,7 +444,7 @@ export function NewP521Point(): P521Point | $.VarRef<P521Point> | null {
 	return (() => { const __goscriptLiteralField0 = fiat.P521Element.prototype.One.call(new fiat.P521Element()); return new P521Point({x: new fiat.P521Element(), y: __goscriptLiteralField0, z: new fiat.P521Element()}) })()
 }
 
-export let _p521B: fiat.P521Element | $.VarRef<fiat.P521Element> | null = null as fiat.P521Element | $.VarRef<fiat.P521Element> | null
+export let _p521B: fiat.P521Element | $.VarRef<fiat.P521Element> | null = null! as fiat.P521Element | $.VarRef<fiat.P521Element> | null
 
 export function __goscript_set__p521B(__goscriptValue: fiat.P521Element | $.VarRef<fiat.P521Element> | null): void {
 	_p521B = __goscriptValue
@@ -496,7 +496,7 @@ export function p521Table_Select(table: $.VarRef<p521Table> | null, p: P521Point
 	}
 }
 
-export let p521GeneratorTable: $.VarRef<p521Table[]> | null = null as $.VarRef<p521Table[]> | null
+export let p521GeneratorTable: $.VarRef<p521Table[]> | null = null! as $.VarRef<p521Table[]> | null
 
 export function __goscript_set_p521GeneratorTable(__goscriptValue: $.VarRef<p521Table[]> | null): void {
 	p521GeneratorTable = __goscriptValue

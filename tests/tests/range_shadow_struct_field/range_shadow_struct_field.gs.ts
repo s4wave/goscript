@@ -52,7 +52,7 @@ export class Matcher {
 
 	constructor(init?: Partial<{matches?: $.Slice<Match>}>) {
 		this._fields = {
-			matches: $.varRef(init?.matches ?? (null as $.Slice<Match>))
+			matches: $.varRef(init?.matches ?? (null! as $.Slice<Match>))
 		}
 	}
 

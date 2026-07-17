@@ -93,8 +93,8 @@ export function __goscript_set_pow5tab(__goscriptValue: bigint[]): void {
 }
 
 export async function ParseFloat(s: string, base: number, prec: number, mode: __goscript_float.RoundingMode): globalThis.Promise<[__goscript_float.Float | $.VarRef<__goscript_float.Float> | null, number, $.GoError]> {
-	let f: __goscript_float.Float | $.VarRef<__goscript_float.Float> | null = null as __goscript_float.Float | $.VarRef<__goscript_float.Float> | null
+	let f: __goscript_float.Float | $.VarRef<__goscript_float.Float> | null = null! as __goscript_float.Float | $.VarRef<__goscript_float.Float> | null
 	let b: number = 0
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	return __goscript_float.Float.prototype.Parse.call(__goscript_float.Float.prototype.SetMode.call(await __goscript_float.Float.prototype.SetPrec.call(new __goscript_float.Float(), prec), $.uint(mode, 8)), s, base)
 }

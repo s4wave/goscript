@@ -192,7 +192,7 @@ export function ParseUint(s: string, base: number, bitSize: number): [bigint, $.
 
 export function ParseInt(s: string, base: number, bitSize: number): [bigint, $.GoError] {
 	let i: bigint = 0n
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	const fnParseInt: string = "ParseInt"
 
 	if ($.stringEqual(s, "")) {

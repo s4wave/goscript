@@ -74,8 +74,8 @@ export class Frame {
 
 	constructor(init?: Partial<{Frame?: wireFrame | null, Handler?: FrameHandler | null}>) {
 		this._fields = {
-			Frame: $.varRef(init?.Frame ?? (null as wireFrame | null)),
-			Handler: $.varRef(init?.Handler ?? (null as FrameHandler | null))
+			Frame: $.varRef(init?.Frame ?? (null! as wireFrame | null)),
+			Handler: $.varRef(init?.Handler ?? (null! as FrameHandler | null))
 		}
 	}
 
@@ -111,7 +111,7 @@ export class packet {
 
 	constructor(init?: Partial<{Frames?: $.Slice<Frame>}>) {
 		this._fields = {
-			Frames: $.varRef(init?.Frames ?? (null as $.Slice<Frame>))
+			Frames: $.varRef(init?.Frames ?? (null! as $.Slice<Frame>))
 		}
 	}
 

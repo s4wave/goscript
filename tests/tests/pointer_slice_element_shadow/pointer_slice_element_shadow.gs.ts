@@ -52,7 +52,7 @@ export class _object {
 
 	constructor(init?: Partial<{entries?: $.Slice<entry>}>) {
 		this._fields = {
-			entries: $.varRef(init?.entries ?? (null as $.Slice<entry>))
+			entries: $.varRef(init?.entries ?? (null! as $.Slice<entry>))
 		}
 	}
 
@@ -110,7 +110,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	let __goscriptShadow1: entry | $.VarRef<entry> | null = _object.prototype.next.call(o)
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let __goscriptTuple0: any = parseKey()
 	$.pointerValue<entry>(__goscriptShadow1).key = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]

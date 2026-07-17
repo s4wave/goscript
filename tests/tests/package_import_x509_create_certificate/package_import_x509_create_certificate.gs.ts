@@ -57,8 +57,8 @@ export class signedKey {
 
 	constructor(init?: Partial<{PubKey?: $.Slice<number>, Signature?: $.Slice<number>}>) {
 		this._fields = {
-			PubKey: $.varRef(init?.PubKey ?? (null as $.Slice<number>)),
-			Signature: $.varRef(init?.Signature ?? (null as $.Slice<number>))
+			PubKey: $.varRef(init?.PubKey ?? (null! as $.Slice<number>)),
+			Signature: $.varRef(init?.Signature ?? (null! as $.Slice<number>))
 		}
 	}
 

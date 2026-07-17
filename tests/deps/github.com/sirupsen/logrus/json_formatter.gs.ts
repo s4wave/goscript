@@ -142,8 +142,8 @@ export class JSONFormatter {
 			DisableTimestamp: $.varRef(init?.DisableTimestamp ?? (false as boolean)),
 			DisableHTMLEscape: $.varRef(init?.DisableHTMLEscape ?? (false as boolean)),
 			DataKey: $.varRef(init?.DataKey ?? ("" as string)),
-			FieldMap: $.varRef(init?.FieldMap ?? (null as FieldMap)),
-			CallerPrettyfier: $.varRef(init?.CallerPrettyfier ?? (null as ((_p0: runtime.Frame | $.VarRef<runtime.Frame> | null) => [string, string] | globalThis.Promise<[string, string]>) | null)),
+			FieldMap: $.varRef(init?.FieldMap ?? (null! as FieldMap)),
+			CallerPrettyfier: $.varRef(init?.CallerPrettyfier ?? (null! as ((_p0: runtime.Frame | $.VarRef<runtime.Frame> | null) => [string, string] | globalThis.Promise<[string, string]>) | null)),
 			PrettyPrint: $.varRef(init?.PrettyPrint ?? (false as boolean))
 		}
 	}

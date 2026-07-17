@@ -36,7 +36,7 @@ export function __goscript_set_rc(__goscriptValue: bigint[]): void {
 
 export function keccakF1600Generic(da: $.VarRef<Uint8Array> | null): void {
 	using __defer = new $.DisposableStack()
-	let a: $.VarRef<bigint[]> | null = null as $.VarRef<bigint[]> | null
+	let a: $.VarRef<bigint[]> | null = null! as $.VarRef<bigint[]> | null
 	if (cpu.BigEndian) {
 		a = $.varRef<bigint[]>(Array.from({ length: 25 }, () => 0n))
 		for (let __goscriptRangeTarget0 = $.pointerValue<bigint[]>(a), i = 0; i < $.len(__goscriptRangeTarget0); i++) {

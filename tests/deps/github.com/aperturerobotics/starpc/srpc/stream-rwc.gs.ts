@@ -60,7 +60,7 @@ export class StreamRwc {
 
 	constructor(init?: Partial<{Stream?: __goscript_stream.Stream | null, buf?: bytes.Buffer, readMsg?: __goscript_message.RawMessage, writeMsg?: __goscript_message.RawMessage}>) {
 		this._fields = {
-			Stream: $.varRef(init?.Stream ?? (null as __goscript_stream.Stream | null)),
+			Stream: $.varRef(init?.Stream ?? (null! as __goscript_stream.Stream | null)),
 			buf: $.varRef(init?.buf ? $.markAsStructValue($.cloneStructValue(init.buf)) : $.markAsStructValue(new bytes.Buffer())),
 			readMsg: $.varRef(init?.readMsg ? $.markAsStructValue($.cloneStructValue(init.readMsg)) : $.markAsStructValue(new __goscript_message.RawMessage())),
 			writeMsg: $.varRef(init?.writeMsg ? $.markAsStructValue($.cloneStructValue(init.writeMsg)) : $.markAsStructValue(new __goscript_message.RawMessage()))
@@ -81,7 +81,7 @@ export class StreamRwc {
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const s: StreamRwc | $.VarRef<StreamRwc> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let readBuf: $.Slice<number> = p
 		while (($.len(readBuf) != 0) && (err == null)) {
 			let rn: number = 0
@@ -131,7 +131,7 @@ export class StreamRwc {
 	public async Write(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const s: StreamRwc | $.VarRef<StreamRwc> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		$.pointerValue<StreamRwc>(s).writeMsg.SetData(p)
 		err = await $.pointerValue<Exclude<__goscript_stream.Stream, null>>($.pointerValue<StreamRwc>(s).Stream).MsgSend($.interfaceValue<__goscript_message.Message>($.pointerValue<StreamRwc>(s)._fields.writeMsg, "*srpc.RawMessage", { kind: $.TypeKind.Pointer, elemType: "srpc.RawMessage" }))
 		$.pointerValue<StreamRwc>(s).writeMsg.Clear()

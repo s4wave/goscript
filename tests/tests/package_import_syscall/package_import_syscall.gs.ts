@@ -36,8 +36,8 @@ export async function main(): globalThis.Promise<void> {
 	fmt.Println("signals:", $.basicInterfaceValue($.int(syscall.SIGINT), "int"), $.basicInterfaceValue($.int(syscall.SIGKILL), "int"), $.basicInterfaceValue($.int(syscall.SIGTERM), "int"))
 	if (false) {
 		let st: $.VarRef<syscall.Stat_t> = $.varRef($.markAsStructValue(new syscall.Stat_t()))
-		let buf: $.Slice<number> = null as $.Slice<number>
-		let iovecs: $.Slice<syscall.Iovec> = null as $.Slice<syscall.Iovec>
+		let buf: $.Slice<number> = null! as $.Slice<number>
+		let iovecs: $.Slice<syscall.Iovec> = null! as $.Slice<syscall.Iovec>
 		syscall.Accept(-1)
 		syscall.Close(-1)
 		syscall.Dup(-1)

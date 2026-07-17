@@ -48,8 +48,8 @@ export class file {
 
 	constructor(init?: Partial<{file?: os.File | $.VarRef<os.File> | null, data?: $.Slice<number>, atEOF?: boolean}>) {
 		this._fields = {
-			file: $.varRef(init?.file ?? (null as os.File | $.VarRef<os.File> | null)),
-			data: $.varRef(init?.data ?? (null as $.Slice<number>)),
+			file: $.varRef(init?.file ?? (null! as os.File | $.VarRef<os.File> | null)),
+			data: $.varRef(init?.data ?? (null! as $.Slice<number>)),
 			atEOF: $.varRef(init?.atEOF ?? (false as boolean))
 		}
 	}
@@ -128,7 +128,7 @@ export class file {
 		const f: file | $.VarRef<file> | null = this
 		let mtime: time.Time = $.markAsStructValue(new time.Time())
 		let size: bigint = 0n
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let __goscriptTuple2: any = os.File.prototype.Stat.call($.pointerValue<os.File>($.pointerValue<file>(f).file))
 		let st = __goscriptTuple2[0]
 		err = __goscriptTuple2[1]
@@ -162,7 +162,7 @@ export function open(name: string): [file | $.VarRef<file> | null, $.GoError] {
 export async function stat(name: string): globalThis.Promise<[time.Time, bigint, $.GoError]> {
 	let mtime: time.Time = $.markAsStructValue(new time.Time())
 	let size: bigint = 0n
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let __goscriptTuple4: any = os.Stat(name)
 	let st = __goscriptTuple4[0]
 	err = __goscriptTuple4[1]

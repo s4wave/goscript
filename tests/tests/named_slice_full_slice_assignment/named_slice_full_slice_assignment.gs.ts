@@ -10,7 +10,7 @@ export function filters_size(f: filters): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let out: filters = null as filters
+	let out: filters = null! as filters
 	let value = $.namedValueInterfaceValue<any>($.arrayToSlice<number>([1, 2, 3]), "main.filters", {size: (receiver: any, ...args: any[]) => (filters_size as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "main.filters", elemType: { kind: $.TypeKind.Basic, name: "int" } }, [{ name: "size", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }])
 	{
 		let __goscriptTuple0: any = $.typeAssertTuple<filters>(value, { kind: $.TypeKind.Slice, typeName: "main.filters", elemType: { kind: $.TypeKind.Basic, name: "int" } })

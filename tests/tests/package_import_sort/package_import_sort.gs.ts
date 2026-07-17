@@ -25,7 +25,7 @@ export class descending {
 
 	constructor(init?: Partial<{values?: $.Slice<number>}>) {
 		this._fields = {
-			values: $.varRef(init?.values ?? (null as $.Slice<number>))
+			values: $.varRef(init?.values ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -157,7 +157,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println("Custom interface sort:", $.arrayIndex(custom.values!, 0), $.arrayIndex(custom.values!, 1), $.arrayIndex(custom.values!, 2))
 
 	let namedSlice: $.Slice<number> = $.arrayToSlice<number>([4, 1, 3])
-	let namedSliceSorter: $.VarRef<byFreq> = $.varRef(null as byFreq)
+	let namedSliceSorter: $.VarRef<byFreq> = $.varRef(null! as byFreq)
 	await byFreq_sort(namedSliceSorter, namedSlice)
 	$.println("Named slice pointer sort:", $.arrayIndex(namedSlice!, 0), $.arrayIndex(namedSlice!, 1), $.arrayIndex(namedSlice!, 2))
 

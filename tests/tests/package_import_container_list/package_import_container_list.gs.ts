@@ -26,7 +26,7 @@ export class pooledElement {
 
 	constructor(init?: Partial<{Value?: any}>) {
 		this._fields = {
-			Value: $.varRef(init?.Value ?? (null as any))
+			Value: $.varRef(init?.Value ?? (null! as any))
 		}
 	}
 

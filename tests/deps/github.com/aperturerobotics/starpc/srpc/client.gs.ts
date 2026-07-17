@@ -73,7 +73,7 @@ export class client {
 
 	constructor(init?: Partial<{openStream?: ((ctx: context.Context | null, msgHandler: ((data: $.Slice<number>) => $.GoError | globalThis.Promise<$.GoError>) | null, closeHandler: ((closeErr: $.GoError) => void) | null) => [__goscript_writer.PacketWriter | null, $.GoError] | globalThis.Promise<[__goscript_writer.PacketWriter | null, $.GoError]>) | null}>) {
 		this._fields = {
-			openStream: $.varRef(init?.openStream ?? (null as ((ctx: context.Context | null, msgHandler: ((data: $.Slice<number>) => $.GoError | globalThis.Promise<$.GoError>) | null, closeHandler: ((closeErr: $.GoError) => void) | null) => [__goscript_writer.PacketWriter | null, $.GoError] | globalThis.Promise<[__goscript_writer.PacketWriter | null, $.GoError]>) | null))
+			openStream: $.varRef(init?.openStream ?? (null! as ((ctx: context.Context | null, msgHandler: ((data: $.Slice<number>) => $.GoError | globalThis.Promise<$.GoError>) | null, closeHandler: ((closeErr: $.GoError) => void) | null) => [__goscript_writer.PacketWriter | null, $.GoError] | globalThis.Promise<[__goscript_writer.PacketWriter | null, $.GoError]>) | null))
 		}
 	}
 
@@ -131,9 +131,9 @@ export class client {
 
 	public async NewStream(ctx: context.Context | null, service: string, method: string, firstMsg: __goscript_message.Message): globalThis.Promise<[__goscript_stream.Stream | null, $.GoError]> {
 		const c: client | $.VarRef<client> | null = this
-		let firstMsgData: $.Slice<number> = null as $.Slice<number>
+		let firstMsgData: $.Slice<number> = null! as $.Slice<number>
 		if (firstMsg != null) {
-			let err: $.GoError = null as $.GoError
+			let err: $.GoError = null! as $.GoError
 			let __goscriptTuple3: any = await $.pointerValue<Exclude<protobuf_go_lite.Message, null>>(firstMsg).MarshalVT()
 			firstMsgData = __goscriptTuple3[0]
 			err = __goscriptTuple3[1]

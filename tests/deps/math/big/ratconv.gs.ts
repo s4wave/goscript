@@ -83,7 +83,7 @@ export function __goscript_set_ratZero(__goscriptValue: __goscript_rat.Rat): voi
 export async function scanExponent(r: io.ByteScanner | null, base2ok: boolean, sepOk: boolean): globalThis.Promise<[bigint, number, $.GoError]> {
 	let exp: bigint = 0n
 	let base: number = 0
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	// one char look-ahead
 	let __goscriptTuple0: any = await $.pointerValue<Exclude<io.ByteScanner, null>>(r).ReadByte()
 	let ch = $.uint(__goscriptTuple0[0], 8)
@@ -120,7 +120,7 @@ export async function scanExponent(r: io.ByteScanner | null, base2ok: boolean, s
 	}
 
 	// sign
-	let digits: $.Slice<number> = null as $.Slice<number>
+	let digits: $.Slice<number> = null! as $.Slice<number>
 	let __goscriptTuple1: any = await $.pointerValue<Exclude<io.ByteScanner, null>>(r).ReadByte()
 	ch = $.uint(__goscriptTuple1[0], 8)
 	err = __goscriptTuple1[1]

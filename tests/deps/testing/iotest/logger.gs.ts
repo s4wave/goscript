@@ -32,7 +32,7 @@ export class writeLogger {
 	constructor(init?: Partial<{prefix?: string, w?: io.Writer | null}>) {
 		this._fields = {
 			prefix: $.varRef(init?.prefix ?? ("" as string)),
-			w: $.varRef(init?.w ?? (null as io.Writer | null))
+			w: $.varRef(init?.w ?? (null! as io.Writer | null))
 		}
 	}
 
@@ -48,7 +48,7 @@ export class writeLogger {
 	public async Write(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const l: writeLogger | $.VarRef<writeLogger> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let __goscriptTuple0: any = await $.pointerValue<Exclude<io.Writer, null>>($.pointerValue<writeLogger>(l).w).Write(p)
 		n = __goscriptTuple0[0]
 		err = __goscriptTuple0[1]
@@ -92,7 +92,7 @@ export class readLogger {
 	constructor(init?: Partial<{prefix?: string, r?: io.Reader | null}>) {
 		this._fields = {
 			prefix: $.varRef(init?.prefix ?? ("" as string)),
-			r: $.varRef(init?.r ?? (null as io.Reader | null))
+			r: $.varRef(init?.r ?? (null! as io.Reader | null))
 		}
 	}
 
@@ -108,7 +108,7 @@ export class readLogger {
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const l: readLogger | $.VarRef<readLogger> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let __goscriptTuple1: any = await $.pointerValue<Exclude<io.Reader, null>>($.pointerValue<readLogger>(l).r).Read(p)
 		n = __goscriptTuple1[0]
 		err = __goscriptTuple1[1]

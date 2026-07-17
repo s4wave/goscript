@@ -39,7 +39,7 @@ export class transport {
 
 	constructor(init?: Partial<{values?: globalThis.Map<number, number> | null}>) {
 		this._fields = {
-			values: $.varRef(init?.values ?? (null as globalThis.Map<number, number> | null))
+			values: $.varRef(init?.values ?? (null! as globalThis.Map<number, number> | null))
 		}
 	}
 
@@ -79,7 +79,7 @@ export class packetHandlerMap {
 
 	constructor(init?: Partial<{values?: globalThis.Map<number, number> | null}>) {
 		this._fields = {
-			values: $.varRef(init?.values ?? (null as globalThis.Map<number, number> | null))
+			values: $.varRef(init?.values ?? (null! as globalThis.Map<number, number> | null))
 		}
 	}
 
@@ -119,7 +119,7 @@ export class connRunnerCallbacks {
 
 	constructor(init?: Partial<{AddConnectionID?: ((_p0: number) => void) | null}>) {
 		this._fields = {
-			AddConnectionID: $.varRef(init?.AddConnectionID ?? (null as ((_p0: number) => void) | null))
+			AddConnectionID: $.varRef(init?.AddConnectionID ?? (null! as ((_p0: number) => void) | null))
 		}
 	}
 

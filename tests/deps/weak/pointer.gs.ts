@@ -37,7 +37,7 @@ export class Pointer {
 	constructor(init?: Partial<{_blank0?: any[], u?: any}>) {
 		this._fields = {
 			_blank0: $.varRef(init?._blank0 !== undefined ? $.cloneArrayValue(init._blank0) : Array.from({ length: 0 }, () => null)),
-			u: $.varRef(init?.u ?? (null as any))
+			u: $.varRef(init?.u ?? (null! as any))
 		}
 	}
 
@@ -71,7 +71,7 @@ export function Make(__typeArgs: $.GenericTypeArgs | undefined, ptr: any): Point
 	// Explicitly force ptr to escape to the heap.
 	ptr = (abi.Escape(ptr) as any)
 
-	let u: any = null as any
+	let u: any = null! as any
 	if (ptr != null) {
 		u = runtime_registerWeakPointer((ptr as any))
 	}
@@ -80,9 +80,9 @@ export function Make(__typeArgs: $.GenericTypeArgs | undefined, ptr: any): Point
 }
 
 export function runtime_registerWeakPointer(_p0: any): any {
-	return null as any
+	return null! as any
 }
 
 export function runtime_makeStrongFromWeak(_p0: any): any {
-	return null as any
+	return null! as any
 }

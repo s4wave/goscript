@@ -18,9 +18,9 @@ import "@goscript/strings/index.js"
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
 	let server: httptest.Server | $.VarRef<httptest.Server> | null = httptest.NewServer($.pointerValueOrNil($.namedValueInterfaceValue<http.Handler | null>($.namedFunction($.functionValue(async (w: http.ResponseWriter | null, r: http.Request | $.VarRef<http.Request> | null): globalThis.Promise<void> => {
-		let data: $.Slice<number> = null as $.Slice<number>
+		let data: $.Slice<number> = null! as $.Slice<number>
 		if ($.pointerValue<http.Request>(r).Body != null) {
-			let readErr: $.GoError = null as $.GoError
+			let readErr: $.GoError = null! as $.GoError
 			let __goscriptTuple0: any = await io.ReadAll($.pointerValueOrNil(($.pointerValue<http.Request>(r).Body as io.Reader | null))!)
 			data = __goscriptTuple0[0]
 			readErr = __goscriptTuple0[1]

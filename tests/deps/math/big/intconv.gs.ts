@@ -57,7 +57,7 @@ export class byteReader {
 
 	constructor(init?: Partial<{ScanState?: fmt.ScanState | null}>) {
 		this._fields = {
-			ScanState: $.varRef(init?.ScanState ?? (null as fmt.ScanState | null))
+			ScanState: $.varRef(init?.ScanState ?? (null! as fmt.ScanState | null))
 		}
 	}
 
@@ -130,7 +130,7 @@ export async function writeMultiple(s: fmt.State | null, text: string, count: nu
 
 export async function scanSign(r: io.ByteScanner | null): globalThis.Promise<[boolean, $.GoError]> {
 	let neg: boolean = false
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let ch: number = 0
 	{
 		let __goscriptTuple0: any = await $.pointerValue<Exclude<io.ByteScanner, null>>(r).ReadByte()

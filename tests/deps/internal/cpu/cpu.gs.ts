@@ -82,7 +82,7 @@ export class option {
 	constructor(init?: Partial<{Name?: string, Feature?: $.VarRef<boolean> | null, Specified?: boolean, Enable?: boolean}>) {
 		this._fields = {
 			Name: $.varRef(init?.Name ?? ("" as string)),
-			Feature: $.varRef(init?.Feature ?? (null as $.VarRef<boolean> | null)),
+			Feature: $.varRef(init?.Feature ?? (null! as $.VarRef<boolean> | null)),
 			Specified: $.varRef(init?.Specified ?? (false as boolean)),
 			Enable: $.varRef(init?.Enable ?? (false as boolean))
 		}
@@ -175,7 +175,7 @@ export function __goscript_set_RISCV64(__goscriptValue: {"_blank0": CacheLinePad
 	RISCV64 = __goscriptValue
 }
 
-export let doDerived: (() => void) | null = null as (() => void) | null
+export let doDerived: (() => void) | null = null! as (() => void) | null
 
 export function __goscript_set_doDerived(__goscriptValue: (() => void) | null): void {
 	doDerived = __goscriptValue
@@ -189,7 +189,7 @@ export async function Initialize(env: string): globalThis.Promise<void> {
 	}
 }
 
-export let options: $.Slice<option> = null as $.Slice<option>
+export let options: $.Slice<option> = null! as $.Slice<option>
 
 export function __goscript_set_options(__goscriptValue: $.Slice<option>): void {
 	options = __goscriptValue

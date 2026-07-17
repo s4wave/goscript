@@ -307,22 +307,22 @@ export class compressor {
 	constructor(init?: Partial<{compressionLevel?: compressionLevel, w?: __goscript_huffman_bit_writer.huffmanBitWriter | $.VarRef<__goscript_huffman_bit_writer.huffmanBitWriter> | null, bulkHasher?: ((_p0: $.Slice<number>, _p1: $.Slice<number>) => void) | null, fill?: ((_p0: compressor | $.VarRef<compressor> | null, _p1: $.Slice<number>) => number | globalThis.Promise<number>) | null, step?: ((_p0: compressor | $.VarRef<compressor> | null) => void) | null, bestSpeed?: __goscript_deflatefast.deflateFast | $.VarRef<__goscript_deflatefast.deflateFast> | null, index?: number, window?: $.Slice<number>, windowEnd?: number, blockStart?: number, byteAvailable?: boolean, sync?: boolean, tokens?: $.Slice<__goscript_token.token>, length?: number, offset?: number, maxInsertIndex?: number, err?: $.GoError, chainHead?: number, hashHead?: number[], hashPrev?: number[], hashOffset?: number, hashMatch?: number[]}>) {
 		this._fields = {
 			compressionLevel: $.varRef(init?.compressionLevel ? $.markAsStructValue($.cloneStructValue(init.compressionLevel)) : $.markAsStructValue(new compressionLevel())),
-			w: $.varRef(init?.w ?? (null as __goscript_huffman_bit_writer.huffmanBitWriter | $.VarRef<__goscript_huffman_bit_writer.huffmanBitWriter> | null)),
-			bulkHasher: $.varRef(init?.bulkHasher ?? (null as ((_p0: $.Slice<number>, _p1: $.Slice<number>) => void) | null)),
-			fill: $.varRef(init?.fill ?? (null as ((_p0: compressor | $.VarRef<compressor> | null, _p1: $.Slice<number>) => number | globalThis.Promise<number>) | null)),
-			step: $.varRef(init?.step ?? (null as ((_p0: compressor | $.VarRef<compressor> | null) => void) | null)),
-			bestSpeed: $.varRef(init?.bestSpeed ?? (null as __goscript_deflatefast.deflateFast | $.VarRef<__goscript_deflatefast.deflateFast> | null)),
+			w: $.varRef(init?.w ?? (null! as __goscript_huffman_bit_writer.huffmanBitWriter | $.VarRef<__goscript_huffman_bit_writer.huffmanBitWriter> | null)),
+			bulkHasher: $.varRef(init?.bulkHasher ?? (null! as ((_p0: $.Slice<number>, _p1: $.Slice<number>) => void) | null)),
+			fill: $.varRef(init?.fill ?? (null! as ((_p0: compressor | $.VarRef<compressor> | null, _p1: $.Slice<number>) => number | globalThis.Promise<number>) | null)),
+			step: $.varRef(init?.step ?? (null! as ((_p0: compressor | $.VarRef<compressor> | null) => void) | null)),
+			bestSpeed: $.varRef(init?.bestSpeed ?? (null! as __goscript_deflatefast.deflateFast | $.VarRef<__goscript_deflatefast.deflateFast> | null)),
 			index: $.varRef(init?.index ?? (0 as number)),
-			window: $.varRef(init?.window ?? (null as $.Slice<number>)),
+			window: $.varRef(init?.window ?? (null! as $.Slice<number>)),
 			windowEnd: $.varRef(init?.windowEnd ?? (0 as number)),
 			blockStart: $.varRef(init?.blockStart ?? (0 as number)),
 			byteAvailable: $.varRef(init?.byteAvailable ?? (false as boolean)),
 			sync: $.varRef(init?.sync ?? (false as boolean)),
-			tokens: $.varRef(init?.tokens ?? (null as $.Slice<__goscript_token.token>)),
+			tokens: $.varRef(init?.tokens ?? (null! as $.Slice<__goscript_token.token>)),
 			length: $.varRef(init?.length ?? (0 as number)),
 			offset: $.varRef(init?.offset ?? (0 as number)),
 			maxInsertIndex: $.varRef(init?.maxInsertIndex ?? (0 as number)),
-			err: $.varRef(init?.err ?? (null as $.GoError)),
+			err: $.varRef(init?.err ?? (null! as $.GoError)),
 			chainHead: $.varRef(init?.chainHead ?? (0 as number)),
 			hashHead: $.varRef(init?.hashHead !== undefined ? $.cloneArrayValue(init.hashHead) : Array.from({ length: 131072 }, () => 0)),
 			hashPrev: $.varRef(init?.hashPrev !== undefined ? $.cloneArrayValue(init.hashPrev) : Array.from({ length: 32768 }, () => 0)),
@@ -733,7 +733,7 @@ export class compressor {
 
 	public init(w: io.Writer | null, level: number): $.GoError {
 		let d: compressor | $.VarRef<compressor> | null = this
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		$.pointerValue<compressor>(d).w = __goscript_huffman_bit_writer.newHuffmanBitWriter(w)
 
 		switch (true) {
@@ -873,7 +873,7 @@ export class compressor {
 	public async write(b: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const d: compressor | $.VarRef<compressor> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.pointerValue<compressor>(d).err != null) {
 			return [0, $.pointerValue<compressor>(d).err]
 		}
@@ -891,7 +891,7 @@ export class compressor {
 	public async writeBlock(tokens: $.Slice<__goscript_token.token>, index: number): globalThis.Promise<$.GoError> {
 		let d: compressor | $.VarRef<compressor> | null = this
 		if (index > 0) {
-			let window: $.Slice<number> = null as $.Slice<number>
+			let window: $.Slice<number> = null! as $.Slice<number>
 			if ($.pointerValue<compressor>(d).blockStart <= index) {
 				window = $.goSlice($.pointerValue<compressor>(d).window, $.pointerValue<compressor>(d).blockStart, index)
 			}
@@ -937,7 +937,7 @@ export class dictWriter {
 
 	constructor(init?: Partial<{w?: io.Writer | null}>) {
 		this._fields = {
-			w: $.varRef(init?.w ?? (null as io.Writer | null))
+			w: $.varRef(init?.w ?? (null! as io.Writer | null))
 		}
 	}
 
@@ -952,7 +952,7 @@ export class dictWriter {
 	public async Write(b: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const w: dictWriter | $.VarRef<dictWriter> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		return $.pointerValue<Exclude<io.Writer, null>>($.pointerValue<dictWriter>(w).w).Write(b)
 	}
 
@@ -988,7 +988,7 @@ export class Writer {
 	constructor(init?: Partial<{d?: compressor, dict?: $.Slice<number>}>) {
 		this._fields = {
 			d: $.varRef(init?.d ? $.markAsStructValue($.cloneStructValue(init.d)) : $.markAsStructValue(new compressor())),
-			dict: $.varRef(init?.dict ?? (null as $.Slice<number>))
+			dict: $.varRef(init?.dict ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -1034,7 +1034,7 @@ export class Writer {
 	public async Write(data: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const w: Writer | $.VarRef<Writer> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		return $.pointerValue<Writer>(w).d.write(data)
 	}
 

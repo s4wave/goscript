@@ -17,7 +17,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println("marshal err nil", err == null)
 	$.println("der len", $.len(der))
 
-	let output: $.VarRef<pkix.RDNSequence> = $.varRef(null as pkix.RDNSequence)
+	let output: $.VarRef<pkix.RDNSequence> = $.varRef(null! as pkix.RDNSequence)
 	let __goscriptTuple1: any = await asn1.Unmarshal(der, $.namedValueInterfaceValue<any>(output, "*pkix.RDNSequence", {String: (receiver: any, ...args: any[]) => (pkix.RDNSequence_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, typeName: "pkix.RDNSequence", elemType: { kind: $.TypeKind.Slice, typeName: "pkix.RelativeDistinguishedNameSET", elemType: "pkix.AttributeTypeAndValue" } } }, [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]))
 	let rest: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]

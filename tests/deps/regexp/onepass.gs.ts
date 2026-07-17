@@ -48,7 +48,7 @@ export class onePassProg {
 
 	constructor(init?: Partial<{Inst?: $.Slice<onePassInst>, Start?: number, NumCap?: number}>) {
 		this._fields = {
-			Inst: $.varRef(init?.Inst ?? (null as $.Slice<onePassInst>)),
+			Inst: $.varRef(init?.Inst ?? (null! as $.Slice<onePassInst>)),
 			Start: $.varRef(init?.Start ?? (0 as number)),
 			NumCap: $.varRef(init?.NumCap ?? (0 as number))
 		}
@@ -96,7 +96,7 @@ export class onePassInst {
 	constructor(init?: Partial<{Inst?: syntax.Inst, Next?: $.Slice<number>}>) {
 		this._fields = {
 			Inst: $.varRef(init?.Inst ? $.markAsStructValue($.cloneStructValue(init.Inst)) : $.markAsStructValue(new syntax.Inst())),
-			Next: $.varRef(init?.Next ?? (null as $.Slice<number>))
+			Next: $.varRef(init?.Next ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -172,8 +172,8 @@ export class queueOnePass {
 
 	constructor(init?: Partial<{sparse?: $.Slice<number>, dense?: $.Slice<number>, size?: number, nextIndex?: number}>) {
 		this._fields = {
-			sparse: $.varRef(init?.sparse ?? (null as $.Slice<number>)),
-			dense: $.varRef(init?.dense ?? (null as $.Slice<number>)),
+			sparse: $.varRef(init?.sparse ?? (null! as $.Slice<number>)),
+			dense: $.varRef(init?.dense ?? (null! as $.Slice<number>)),
 			size: $.varRef(init?.size ?? (0 as number)),
 			nextIndex: $.varRef(init?.nextIndex ?? (0 as number))
 		}
@@ -305,7 +305,7 @@ export function iop(i: syntax.Inst | $.VarRef<syntax.Inst> | null): syntax.InstO
 }
 
 export function newQueue(size: number): queueOnePass | $.VarRef<queueOnePass> | null {
-	let q: queueOnePass | $.VarRef<queueOnePass> | null = null as queueOnePass | $.VarRef<queueOnePass> | null
+	let q: queueOnePass | $.VarRef<queueOnePass> | null = null! as queueOnePass | $.VarRef<queueOnePass> | null
 	return new queueOnePass({sparse: $.makeSlice<number>(size, undefined, "number"), dense: $.makeSlice<number>(size, undefined, "number")})
 }
 
@@ -507,7 +507,7 @@ export async function makeOnePass(p: onePassProg | $.VarRef<onePassProg> | null)
 
 	let instQueue: queueOnePass | $.VarRef<queueOnePass> | null = newQueue($.len($.pointerValue<onePassProg>(p).Inst))
 	let visitQueue: queueOnePass | $.VarRef<queueOnePass> | null = newQueue($.len($.pointerValue<onePassProg>(p).Inst))
-	let check: ((_p0: number, _p1: $.Slice<boolean>) => boolean | globalThis.Promise<boolean>) | null = null as ((_p0: number, _p1: $.Slice<boolean>) => boolean | globalThis.Promise<boolean>) | null
+	let check: ((_p0: number, _p1: $.Slice<boolean>) => boolean | globalThis.Promise<boolean>) | null = null! as ((_p0: number, _p1: $.Slice<boolean>) => boolean | globalThis.Promise<boolean>) | null
 	let onePassRunes: $.Slice<$.Slice<number>> = $.makeSlice<$.Slice<number>>($.len($.pointerValue<onePassProg>(p).Inst))
 
 	// check that paths from Alt instructions are unambiguous, and rebuild the new
@@ -695,7 +695,7 @@ export async function makeOnePass(p: onePassProg | $.VarRef<onePassProg> | null)
 }
 
 export async function compileOnePass(prog: syntax.Prog | $.VarRef<syntax.Prog> | null): globalThis.Promise<onePassProg | $.VarRef<onePassProg> | null> {
-	let p: onePassProg | $.VarRef<onePassProg> | null = null as onePassProg | $.VarRef<onePassProg> | null
+	let p: onePassProg | $.VarRef<onePassProg> | null = null! as onePassProg | $.VarRef<onePassProg> | null
 	if ($.pointerValue<syntax.Prog>(prog).Start == 0) {
 		return null
 	}

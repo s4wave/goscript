@@ -72,8 +72,8 @@ export class Packet {
 
 	constructor(init?: Partial<{unknownFields?: $.Slice<number>, Body?: isPacket_Body | null}>) {
 		this._fields = {
-			unknownFields: $.varRef(init?.unknownFields ?? (null as $.Slice<number>)),
-			Body: $.varRef(init?.Body ?? (null as isPacket_Body | null))
+			unknownFields: $.varRef(init?.unknownFields ?? (null! as $.Slice<number>)),
+			Body: $.varRef(init?.Body ?? (null! as isPacket_Body | null))
 		}
 	}
 
@@ -321,8 +321,8 @@ export class Packet {
 
 	public MarshalVT(): [$.Slice<number>, $.GoError] {
 		const m: Packet | $.VarRef<Packet> | null = this
-		let dAtA: $.Slice<number> = null as $.Slice<number>
-		let err: $.GoError = null as $.GoError
+		let dAtA: $.Slice<number> = null! as $.Slice<number>
+		let err: $.GoError = null! as $.GoError
 		if (m == null) {
 			return [null, null]
 		}
@@ -428,7 +428,7 @@ export class Packet {
 		let m: Packet | $.VarRef<Packet> | null = this
 		let l = $.len(dAtA)
 		let iNdEx = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		while (iNdEx < l) {
 			let preIndex = iNdEx
 			let wire: bigint = 0n
@@ -651,7 +651,7 @@ export class Packet_CallStart {
 
 	constructor(init?: Partial<{CallStart?: CallStart | $.VarRef<CallStart> | null}>) {
 		this._fields = {
-			CallStart: $.varRef(init?.CallStart ?? (null as CallStart | $.VarRef<CallStart> | null))
+			CallStart: $.varRef(init?.CallStart ?? (null! as CallStart | $.VarRef<CallStart> | null))
 		}
 	}
 
@@ -780,7 +780,7 @@ export class Packet_CallData {
 
 	constructor(init?: Partial<{CallData?: CallData | $.VarRef<CallData> | null}>) {
 		this._fields = {
-			CallData: $.varRef(init?.CallData ?? (null as CallData | $.VarRef<CallData> | null))
+			CallData: $.varRef(init?.CallData ?? (null! as CallData | $.VarRef<CallData> | null))
 		}
 	}
 
@@ -1053,10 +1053,10 @@ export class CallStart {
 
 	constructor(init?: Partial<{unknownFields?: $.Slice<number>, RpcService?: string, RpcMethod?: string, Data?: $.Slice<number>, DataIsZero?: boolean}>) {
 		this._fields = {
-			unknownFields: $.varRef(init?.unknownFields ?? (null as $.Slice<number>)),
+			unknownFields: $.varRef(init?.unknownFields ?? (null! as $.Slice<number>)),
 			RpcService: $.varRef(init?.RpcService ?? ("" as string)),
 			RpcMethod: $.varRef(init?.RpcMethod ?? ("" as string)),
-			Data: $.varRef(init?.Data ?? (null as $.Slice<number>)),
+			Data: $.varRef(init?.Data ?? (null! as $.Slice<number>)),
 			DataIsZero: $.varRef(init?.DataIsZero ?? (false as boolean))
 		}
 	}
@@ -1295,8 +1295,8 @@ export class CallStart {
 
 	public MarshalVT(): [$.Slice<number>, $.GoError] {
 		const m: CallStart | $.VarRef<CallStart> | null = this
-		let dAtA: $.Slice<number> = null as $.Slice<number>
-		let err: $.GoError = null as $.GoError
+		let dAtA: $.Slice<number> = null! as $.Slice<number>
+		let err: $.GoError = null! as $.GoError
 		if (m == null) {
 			return [null, null]
 		}
@@ -1403,7 +1403,7 @@ export class CallStart {
 		let m: CallStart | $.VarRef<CallStart> | null = this
 		let l = $.len(dAtA)
 		let iNdEx = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		while (iNdEx < l) {
 			let preIndex = iNdEx
 			let wire: bigint = 0n
@@ -1628,8 +1628,8 @@ export class CallData {
 
 	constructor(init?: Partial<{unknownFields?: $.Slice<number>, Data?: $.Slice<number>, DataIsZero?: boolean, Complete?: boolean, Error?: string}>) {
 		this._fields = {
-			unknownFields: $.varRef(init?.unknownFields ?? (null as $.Slice<number>)),
-			Data: $.varRef(init?.Data ?? (null as $.Slice<number>)),
+			unknownFields: $.varRef(init?.unknownFields ?? (null! as $.Slice<number>)),
+			Data: $.varRef(init?.Data ?? (null! as $.Slice<number>)),
 			DataIsZero: $.varRef(init?.DataIsZero ?? (false as boolean)),
 			Complete: $.varRef(init?.Complete ?? (false as boolean)),
 			Error: $.varRef(init?.Error ?? ("" as string))
@@ -1873,8 +1873,8 @@ export class CallData {
 
 	public MarshalVT(): [$.Slice<number>, $.GoError] {
 		const m: CallData | $.VarRef<CallData> | null = this
-		let dAtA: $.Slice<number> = null as $.Slice<number>
-		let err: $.GoError = null as $.GoError
+		let dAtA: $.Slice<number> = null! as $.Slice<number>
+		let err: $.GoError = null! as $.GoError
 		if (m == null) {
 			return [null, null]
 		}
@@ -1978,7 +1978,7 @@ export class CallData {
 		let m: CallData | $.VarRef<CallData> | null = this
 		let l = $.len(dAtA)
 		let iNdEx = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		while (iNdEx < l) {
 			let preIndex = iNdEx
 			let wire: bigint = 0n

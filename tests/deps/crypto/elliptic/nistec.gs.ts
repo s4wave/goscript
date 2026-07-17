@@ -52,8 +52,8 @@ export class nistCurve {
 
 	constructor(init?: Partial<{newPoint?: (() => any | globalThis.Promise<any>) | null, params?: __goscript_params.CurveParams | $.VarRef<__goscript_params.CurveParams> | null}>) {
 		this._fields = {
-			newPoint: $.varRef(init?.newPoint ?? (null as (() => any | globalThis.Promise<any>) | null)),
-			params: $.varRef(init?.params ?? (null as __goscript_params.CurveParams | $.VarRef<__goscript_params.CurveParams> | null))
+			newPoint: $.varRef(init?.newPoint ?? (null! as (() => any | globalThis.Promise<any>) | null)),
+			params: $.varRef(init?.params ?? (null! as __goscript_params.CurveParams | $.VarRef<__goscript_params.CurveParams> | null))
 		}
 	}
 
@@ -142,8 +142,8 @@ export class nistCurve {
 
 	public async Unmarshal(__typeArgs: $.GenericTypeArgs | undefined, data: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this
-		let x: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-		let y: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
+		let x: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+		let y: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
 		if (($.len(data) == 0) || ($.uint($.arrayIndex(data!, 0), 8) != $.uint(4, 8))) {
 			return [null, null]
 		}
@@ -163,8 +163,8 @@ export class nistCurve {
 
 	public async UnmarshalCompressed(__typeArgs: $.GenericTypeArgs | undefined, data: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this
-		let x: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-		let y: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
+		let x: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+		let y: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
 		if (($.len(data) == 0) || (($.uint($.arrayIndex(data!, 0), 8) != $.uint(2, 8)) && ($.uint($.arrayIndex(data!, 0), 8) != $.uint(3, 8)))) {
 			return [null, null]
 		}
@@ -194,7 +194,7 @@ export class nistCurve {
 	public async pointFromAffine(__typeArgs: $.GenericTypeArgs | undefined, x: big.Int | $.VarRef<big.Int> | null, y: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<[any, $.GoError]> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this
 		let p: any = $.genericZero(__typeArgs, "Point", null)
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		// (0, 0) is by convention the point at infinity, which can't be represented
 		// in affine coordinates. See Issue 37294.
 		if ((big.Int.prototype.Sign.call(x) == 0) && (big.Int.prototype.Sign.call(y) == 0)) {
@@ -220,8 +220,8 @@ export class nistCurve {
 
 	public async pointToAffine(__typeArgs: $.GenericTypeArgs | undefined, p: any): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this
-		let x: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-		let y: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
+		let x: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+		let y: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
 		let out: $.Slice<number> = await $.callGenericMethod(__typeArgs, "Point", "Bytes", p)
 		if (($.len(out) == 1) && ($.uint($.arrayIndex(out!, 0), 8) == $.uint(0, 8))) {
 			// This is the encoding of the point at infinity, which the affine

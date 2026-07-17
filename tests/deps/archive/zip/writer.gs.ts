@@ -111,13 +111,13 @@ export class Writer {
 
 	constructor(init?: Partial<{cw?: countWriter | $.VarRef<countWriter> | null, dir?: $.Slice<header | $.VarRef<header> | null>, last?: fileWriter | $.VarRef<fileWriter> | null, closed?: boolean, compressors?: globalThis.Map<number, __goscript_register.Compressor | null> | null, comment?: string, testHookCloseSizeOffset?: ((size: bigint, offset: bigint) => void) | null}>) {
 		this._fields = {
-			cw: $.varRef(init?.cw ?? (null as countWriter | $.VarRef<countWriter> | null)),
-			dir: $.varRef(init?.dir ?? (null as $.Slice<header | $.VarRef<header> | null>)),
-			last: $.varRef(init?.last ?? (null as fileWriter | $.VarRef<fileWriter> | null)),
+			cw: $.varRef(init?.cw ?? (null! as countWriter | $.VarRef<countWriter> | null)),
+			dir: $.varRef(init?.dir ?? (null! as $.Slice<header | $.VarRef<header> | null>)),
+			last: $.varRef(init?.last ?? (null! as fileWriter | $.VarRef<fileWriter> | null)),
 			closed: $.varRef(init?.closed ?? (false as boolean)),
-			compressors: $.varRef(init?.compressors ?? (null as globalThis.Map<number, __goscript_register.Compressor | null> | null)),
+			compressors: $.varRef(init?.compressors ?? (null! as globalThis.Map<number, __goscript_register.Compressor | null> | null)),
 			comment: $.varRef(init?.comment ?? ("" as string)),
-			testHookCloseSizeOffset: $.varRef(init?.testHookCloseSizeOffset ?? (null as ((size: bigint, offset: bigint) => void) | null))
+			testHookCloseSizeOffset: $.varRef(init?.testHookCloseSizeOffset ?? (null! as ((size: bigint, offset: bigint) => void) | null))
 		}
 	}
 
@@ -447,8 +447,8 @@ export class Writer {
 			$.pointerValue<__goscript_struct.FileHeader>(fh).Extra = $.appendSlice($.pointerValue<__goscript_struct.FileHeader>(fh).Extra, $.goSlice(mbuf, undefined, undefined), $.byteSliceHint)
 		}
 
-		let ow: io.Writer | null = null as io.Writer | null
-		let fw: fileWriter | $.VarRef<fileWriter> | null = null as fileWriter | $.VarRef<fileWriter> | null
+		let ow: io.Writer | null = null! as io.Writer | null
+		let fw: fileWriter | $.VarRef<fileWriter> | null = null! as fileWriter | $.VarRef<fileWriter> | null
 		let h: header | $.VarRef<header> | null = new header({FileHeader: fh, offset: $.uint64($.pointerValue<countWriter>($.pointerValue<Writer>(w).cw).count)})
 
 		if (strings.HasSuffix($.pointerValue<__goscript_struct.FileHeader>(fh).Name, "/")) {
@@ -474,7 +474,7 @@ export class Writer {
 			if (comp == null) {
 				return [null, __goscript_reader.ErrAlgorithm]
 			}
-			let err: $.GoError = null as $.GoError
+			let err: $.GoError = null! as $.GoError
 			let __goscriptTuple8: any = await comp!($.interfaceValue<io.Writer | null>($.pointerValue<fileWriter>(fw).compCount, "*zip.countWriter", { kind: $.TypeKind.Pointer, elemType: "zip.countWriter" }))
 			$.pointerValue<fileWriter>(fw).comp = __goscriptTuple8[0]
 			err = __goscriptTuple8[1]
@@ -623,7 +623,7 @@ export class header {
 
 	constructor(init?: Partial<{FileHeader?: __goscript_struct.FileHeader | $.VarRef<__goscript_struct.FileHeader> | null, offset?: bigint, raw?: boolean}>) {
 		this._fields = {
-			FileHeader: $.varRef(init?.FileHeader ?? (null as __goscript_struct.FileHeader | $.VarRef<__goscript_struct.FileHeader> | null)),
+			FileHeader: $.varRef(init?.FileHeader ?? (null! as __goscript_struct.FileHeader | $.VarRef<__goscript_struct.FileHeader> | null)),
 			offset: $.varRef(init?.offset ?? (0n as bigint)),
 			raw: $.varRef(init?.raw ?? (false as boolean))
 		}
@@ -770,12 +770,12 @@ export class fileWriter {
 
 	constructor(init?: Partial<{header?: header | $.VarRef<header> | null, zipw?: io.Writer | null, rawCount?: countWriter | $.VarRef<countWriter> | null, comp?: io.WriteCloser | null, compCount?: countWriter | $.VarRef<countWriter> | null, crc32?: hash.Hash32 | null, closed?: boolean}>) {
 		this._fields = {
-			header: $.varRef(init?.header ?? (null as header | $.VarRef<header> | null)),
-			zipw: $.varRef(init?.zipw ?? (null as io.Writer | null)),
-			rawCount: $.varRef(init?.rawCount ?? (null as countWriter | $.VarRef<countWriter> | null)),
-			comp: $.varRef(init?.comp ?? (null as io.WriteCloser | null)),
-			compCount: $.varRef(init?.compCount ?? (null as countWriter | $.VarRef<countWriter> | null)),
-			crc32: $.varRef(init?.crc32 ?? (null as hash.Hash32 | null)),
+			header: $.varRef(init?.header ?? (null! as header | $.VarRef<header> | null)),
+			zipw: $.varRef(init?.zipw ?? (null! as io.Writer | null)),
+			rawCount: $.varRef(init?.rawCount ?? (null! as countWriter | $.VarRef<countWriter> | null)),
+			comp: $.varRef(init?.comp ?? (null! as io.WriteCloser | null)),
+			compCount: $.varRef(init?.compCount ?? (null! as countWriter | $.VarRef<countWriter> | null)),
+			crc32: $.varRef(init?.crc32 ?? (null! as hash.Hash32 | null)),
 			closed: $.varRef(init?.closed ?? (false as boolean))
 		}
 	}
@@ -850,7 +850,7 @@ export class fileWriter {
 		// https://bugs.openjdk.org/browse/JDK-7073588.
 		// The approach here is to write 8 byte sizes if needed without
 		// adding a zip64 extra in the local header (too late anyway).
-		let buf: $.Slice<number> = null as $.Slice<number>
+		let buf: $.Slice<number> = null! as $.Slice<number>
 		if ($.pointerValue<__goscript_struct.FileHeader>($.pointerValue<header>($.pointerValue<fileWriter>(w).header).FileHeader).isZip64()) {
 			buf = $.makeSlice<number>(24, undefined, "byte")
 		} else {
@@ -929,7 +929,7 @@ export class countWriter {
 
 	constructor(init?: Partial<{w?: io.Writer | null, count?: bigint}>) {
 		this._fields = {
-			w: $.varRef(init?.w ?? (null as io.Writer | null)),
+			w: $.varRef(init?.w ?? (null! as io.Writer | null)),
 			count: $.varRef(init?.count ?? (0n as bigint))
 		}
 	}
@@ -973,7 +973,7 @@ export class nopCloser {
 
 	constructor(init?: Partial<{Writer?: io.Writer | null}>) {
 		this._fields = {
-			Writer: $.varRef(init?.Writer ?? (null as io.Writer | null))
+			Writer: $.varRef(init?.Writer ?? (null! as io.Writer | null))
 		}
 	}
 

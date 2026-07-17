@@ -55,7 +55,7 @@ export class arena {
 
 	constructor(init?: Partial<{data?: $.Slice<any>}>) {
 		this._fields = {
-			data: $.varRef(init?.data ?? (null as $.Slice<any>))
+			data: $.varRef(init?.data ?? (null! as $.Slice<any>))
 		}
 	}
 

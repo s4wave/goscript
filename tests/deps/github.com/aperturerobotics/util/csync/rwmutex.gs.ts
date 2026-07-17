@@ -85,7 +85,7 @@ export class RWMutex {
 		// 1: locked
 		// 2: unlocked (released)
 		let status: $.VarRef<atomic.Int32> = $.varRef($.markAsStructValue(new atomic.Int32()))
-		let waitCh: $.Channel<{}> | null = null as $.Channel<{}> | null
+		let waitCh: $.Channel<{}> | null = null! as $.Channel<{}> | null
 		await $.pointerValue<RWMutex>(m).bcast.HoldLock($.functionValue(async (_p0: (() => void) | null, getWaitCh: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null): globalThis.Promise<void> => {
 			if (write) {
 				if (($.pointerValue<RWMutex>(m).nreaders != 0) || $.pointerValue<RWMutex>(m).writing) {
@@ -281,10 +281,10 @@ export class RWMutexLocker {
 
 	constructor(init?: Partial<{m?: RWMutex | $.VarRef<RWMutex> | null, write?: boolean, mtx?: sync.Mutex, rels?: $.Slice<(() => void) | null>}>) {
 		this._fields = {
-			m: $.varRef(init?.m ?? (null as RWMutex | $.VarRef<RWMutex> | null)),
+			m: $.varRef(init?.m ?? (null! as RWMutex | $.VarRef<RWMutex> | null)),
 			write: $.varRef(init?.write ?? (false as boolean)),
 			mtx: $.varRef(init?.mtx ? $.markAsStructValue($.cloneStructValue(init.mtx)) : $.markAsStructValue(new sync.Mutex())),
-			rels: $.varRef(init?.rels ?? (null as $.Slice<(() => void) | null>))
+			rels: $.varRef(init?.rels ?? (null! as $.Slice<(() => void) | null>))
 		}
 	}
 

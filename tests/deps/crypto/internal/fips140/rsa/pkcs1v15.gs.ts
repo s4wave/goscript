@@ -61,7 +61,7 @@ export function signPKCS1v15(priv: __goscript_rsa.PrivateKey | $.VarRef<__goscri
 
 export function pkcs1v15ConstructEM(pub: __goscript_rsa.PublicKey | $.VarRef<__goscript_rsa.PublicKey> | null, hash: string, hashed: $.Slice<number>): [$.Slice<number>, $.GoError] {
 	// Special case: "" is used to indicate that the data is signed directly.
-	let prefix: $.Slice<number> = null as $.Slice<number>
+	let prefix: $.Slice<number> = null! as $.Slice<number>
 	if (!$.stringEqual(hash, "")) {
 		let ok: boolean = false
 		let __goscriptTuple1: any = $.mapGet<string, $.Slice<number>, $.Slice<number>>(__goscript_get_hashPrefixes(), hash, null)

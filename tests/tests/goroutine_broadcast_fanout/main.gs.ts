@@ -37,7 +37,7 @@ export async function main(): globalThis.Promise<void> {
 	let ctx = context.Background()
 	while (true) {
 		let done: boolean = false
-		let waitCh: $.Channel<{}> | null = null as $.Channel<{}> | null
+		let waitCh: $.Channel<{}> | null = null! as $.Channel<{}> | null
 		await bcast.value.HoldLock($.functionValue(async (_p0: (() => void) | null, getWaitCh: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null): globalThis.Promise<void> => {
 			done = completed == 16
 			if (!done) {

@@ -55,7 +55,7 @@ export class byName {
 
 	constructor(init?: Partial<{addrs?: $.Slice<string>, canonicalName?: string}>) {
 		this._fields = {
-			addrs: $.varRef(init?.addrs ?? (null as $.Slice<string>)),
+			addrs: $.varRef(init?.addrs ?? (null! as $.Slice<string>)),
 			canonicalName: $.varRef(init?.canonicalName ?? ("" as string))
 		}
 	}

@@ -50,9 +50,9 @@ export async function nat_probablyPrimeMillerRabin(n: __goscript_nat.nat, stk: _
 	let nm3: __goscript_nat.nat = (__goscript_nat.nat_sub((null as __goscript_nat.nat), (nm1 as __goscript_nat.nat), (__goscript_nat.natTwo as __goscript_nat.nat)) as __goscript_nat.nat)
 	let __goscriptShadow0: rand2.Rand | $.VarRef<rand2.Rand> | null = rand2.New(rand2.NewSource($.int64($.arrayIndex(n!, 0))))
 
-	let x: __goscript_nat.nat = null as __goscript_nat.nat
-	let y: __goscript_nat.nat = null as __goscript_nat.nat
-	let quotient: __goscript_nat.nat = null as __goscript_nat.nat
+	let x: __goscript_nat.nat = null! as __goscript_nat.nat
+	let y: __goscript_nat.nat = null! as __goscript_nat.nat
+	let quotient: __goscript_nat.nat = null! as __goscript_nat.nat
 	let nm3Len = __goscript_nat.nat_bitLen(nm3)
 
 	NextRandom: for (let i = 0; i < reps; i++) {

@@ -41,7 +41,7 @@ export class Broadcast {
 	constructor(init?: Partial<{mtx?: sync.Mutex, ch?: broadcastWaitCh | $.VarRef<broadcastWaitCh> | null}>) {
 		this._fields = {
 			mtx: $.varRef(init?.mtx ? $.markAsStructValue($.cloneStructValue(init.mtx)) : $.markAsStructValue(new sync.Mutex())),
-			ch: $.varRef(init?.ch ?? (null as broadcastWaitCh | $.VarRef<broadcastWaitCh> | null))
+			ch: $.varRef(init?.ch ?? (null! as broadcastWaitCh | $.VarRef<broadcastWaitCh> | null))
 		}
 	}
 
@@ -120,9 +120,9 @@ export class Broadcast {
 				return context.Canceled
 			}
 
-			let waitCh: $.Channel<{}> | null = null as $.Channel<{}> | null
+			let waitCh: $.Channel<{}> | null = null! as $.Channel<{}> | null
 			let done: boolean = false
-			let err: $.GoError = null as $.GoError
+			let err: $.GoError = null! as $.GoError
 			let locked = $.varRef($.markAsStructValue($.cloneStructValue(await Broadcast.prototype.Lock.call(c))))
 			let __goscriptTuple1: any = await cb!($.functionValue(((__receiver) => () => __receiver.Broadcast())(locked.value), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)), $.functionValue(((__receiver) => () => __receiver.WaitCh())(locked.value), ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Channel, direction: "receive", elemType: { kind: $.TypeKind.Struct, methods: [], fields: [] } }] } as $.FunctionTypeInfo)))
 			done = __goscriptTuple1[0]
@@ -192,7 +192,7 @@ export class broadcastWaitCh {
 	constructor(init?: Partial<{once?: sync.Once, ch?: $.Channel<{}> | null}>) {
 		this._fields = {
 			once: $.varRef(init?.once ? $.markAsStructValue($.cloneStructValue(init.once)) : $.markAsStructValue(new sync.Once())),
-			ch: $.varRef(init?.ch ?? (null as $.Channel<{}> | null))
+			ch: $.varRef(init?.ch ?? (null! as $.Channel<{}> | null))
 		}
 	}
 

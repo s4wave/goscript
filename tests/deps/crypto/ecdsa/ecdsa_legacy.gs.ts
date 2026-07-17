@@ -77,9 +77,9 @@ export function __goscript_set_errZeroParam(__goscriptValue: $.GoError): void {
 }
 
 export async function Sign(rand: io.Reader | null, priv: __goscript_ecdsa.PrivateKey | $.VarRef<__goscript_ecdsa.PrivateKey> | null, hash: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null, $.GoError]> {
-	let r: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-	let s: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-	let err: $.GoError = null as $.GoError
+	let r: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+	let s: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+	let err: $.GoError = null! as $.GoError
 	let __goscriptTuple2: any = await __goscript_ecdsa.SignASN1(rand, priv, hash)
 	let sig: $.Slice<number> = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
@@ -91,7 +91,7 @@ export async function Sign(rand: io.Reader | null, priv: __goscript_ecdsa.Privat
 	let __goscriptAssign0_1: big.Int | $.VarRef<big.Int> | null = new big.Int()
 	r = __goscriptAssign0_0
 	s = __goscriptAssign0_1
-	let inner: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let inner: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	let input: $.VarRef<cryptobyte.String> = $.varRef(((sig as cryptobyte.String) as cryptobyte.String))
 	if ((((!cryptobyte.String_ReadASN1(input, inner, $.uint(asn1.SEQUENCE, 8)) || !cryptobyte.String_Empty(input.value)) || !cryptobyte.String_ReadASN1Integer(inner, $.interfaceValue<any>(r, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) || !cryptobyte.String_ReadASN1Integer(inner, $.interfaceValue<any>(s, "*big.Int", { kind: $.TypeKind.Pointer, elemType: "big.Int" }))) || !cryptobyte.String_Empty(inner.value)) {
 		return [null, null, errors.New("invalid ASN.1 from SignASN1")]
@@ -100,8 +100,8 @@ export async function Sign(rand: io.Reader | null, priv: __goscript_ecdsa.Privat
 }
 
 export async function signLegacy(priv: __goscript_ecdsa.PrivateKey | $.VarRef<__goscript_ecdsa.PrivateKey> | null, csprng: io.Reader | null, hash: $.Slice<number>): globalThis.Promise<[$.Slice<number>, $.GoError]> {
-	let sig: $.Slice<number> = null as $.Slice<number>
-	let err: $.GoError = null as $.GoError
+	let sig: $.Slice<number> = null! as $.Slice<number>
+	let err: $.GoError = null! as $.GoError
 	if (fips140only.Enforced()) {
 		return [null, errors.New("crypto/ecdsa: use of custom curves is not allowed in FIPS 140-only mode")]
 	}
@@ -131,10 +131,10 @@ export async function signLegacy(priv: __goscript_ecdsa.PrivateKey | $.VarRef<__
 	if (big.Int.prototype.Sign.call(N) == 0) {
 		return [null, errZeroParam]
 	}
-	let k: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-	let kInv: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-	let r: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-	let s: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
+	let k: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+	let kInv: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+	let r: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+	let s: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
 	while (true) {
 		while (true) {
 			let __goscriptTuple3: any = await randFieldElement(c, csprng)
@@ -238,8 +238,8 @@ export function __goscript_set_one(__goscriptValue: big.Int | $.VarRef<big.Int> 
 }
 
 export async function randFieldElement(c: elliptic.Curve | null, rand: io.Reader | null): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, $.GoError]> {
-	let k: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-	let err: $.GoError = null as $.GoError
+	let k: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+	let err: $.GoError = null! as $.GoError
 	while (true) {
 		let N: big.Int | $.VarRef<big.Int> | null = $.pointerValue<elliptic.CurveParams>(await $.pointerValue<Exclude<elliptic.Curve, null>>(c).Params()).N
 		let b: $.Slice<number> = $.makeSlice<number>(Math.trunc((big.Int.prototype.BitLen.call(N) + 7) / 8), undefined, "byte")

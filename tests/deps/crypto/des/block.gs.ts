@@ -200,7 +200,7 @@ export function permuteFinalBlock(block: bigint): bigint {
 }
 
 export function ksRotate(_in: number): $.Slice<number> {
-	let out: $.Slice<number> = null as $.Slice<number>
+	let out: $.Slice<number> = null! as $.Slice<number>
 	out = $.makeSlice<number>(16, undefined, "number")
 	let last = $.uint(_in, 32)
 	for (let i = 0; i < 16; i++) {

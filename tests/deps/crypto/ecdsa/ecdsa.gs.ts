@@ -114,9 +114,9 @@ export class PublicKey {
 
 	constructor(init?: Partial<{Curve?: elliptic.Curve | null, X?: big.Int | $.VarRef<big.Int> | null, Y?: big.Int | $.VarRef<big.Int> | null}>) {
 		this._fields = {
-			Curve: $.varRef(init?.Curve ?? (null as elliptic.Curve | null)),
-			X: $.varRef(init?.X ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			Y: $.varRef(init?.Y ?? (null as big.Int | $.VarRef<big.Int> | null))
+			Curve: $.varRef(init?.Curve ?? (null! as elliptic.Curve | null)),
+			X: $.varRef(init?.X ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			Y: $.varRef(init?.Y ?? (null! as big.Int | $.VarRef<big.Int> | null))
 		}
 	}
 
@@ -255,7 +255,7 @@ export class PrivateKey {
 	constructor(init?: Partial<{PublicKey?: PublicKey, D?: big.Int | $.VarRef<big.Int> | null}>) {
 		this._fields = {
 			PublicKey: $.varRef(init?.PublicKey ? $.markAsStructValue($.cloneStructValue(init.PublicKey)) : $.markAsStructValue(new PublicKey())),
-			D: $.varRef(init?.D ?? (null as big.Int | $.VarRef<big.Int> | null))
+			D: $.varRef(init?.D ?? (null! as big.Int | $.VarRef<big.Int> | null))
 		}
 	}
 
@@ -800,10 +800,10 @@ export async function verifyFIPS(__typeArgs: $.GenericTypeArgs | undefined, c: e
 }
 
 export function parseSignature(sig: $.Slice<number>): [$.Slice<number>, $.Slice<number>, $.GoError] {
-	let r: $.VarRef<$.Slice<number>> = $.varRef(null as $.Slice<number>)
-	let s: $.VarRef<$.Slice<number>> = $.varRef(null as $.Slice<number>)
-	let err: $.GoError = null as $.GoError
-	let inner: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let r: $.VarRef<$.Slice<number>> = $.varRef(null! as $.Slice<number>)
+	let s: $.VarRef<$.Slice<number>> = $.varRef(null! as $.Slice<number>)
+	let err: $.GoError = null! as $.GoError
+	let inner: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	let input: $.VarRef<cryptobyte.String> = $.varRef(((sig as cryptobyte.String) as cryptobyte.String))
 	if ((((!cryptobyte.String_ReadASN1(input, inner, $.uint(asn1.SEQUENCE, 8)) || !cryptobyte.String_Empty(input.value)) || !cryptobyte.String_ReadASN1Integer(inner, $.interfaceValue<any>(r, "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }))) || !cryptobyte.String_ReadASN1Integer(inner, $.interfaceValue<any>(s, "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }))) || !cryptobyte.String_Empty(inner.value)) {
 		return [null, null, errors.New("invalid ASN.1")]
@@ -899,9 +899,9 @@ export async function pointFromAffine(curve: elliptic.Curve | null, x: big.Int |
 }
 
 export async function pointToAffine(curve: elliptic.Curve | null, p: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null, $.GoError]> {
-	let x: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-	let y: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-	let err: $.GoError = null as $.GoError
+	let x: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+	let y: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+	let err: $.GoError = null! as $.GoError
 	if (($.len(p) == 1) && ($.uint($.arrayIndex(p!, 0), 8) == $.uint(0, 8))) {
 		// This is the encoding of the point at infinity.
 		return [null, null, errors.New("ecdsa: public key point is the infinity")]

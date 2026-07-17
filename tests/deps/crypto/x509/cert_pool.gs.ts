@@ -109,9 +109,9 @@ export class CertPool {
 
 	constructor(init?: Partial<{byName?: globalThis.Map<string, $.Slice<number>> | null, lazyCerts?: $.Slice<lazyCert>, haveSum?: globalThis.Map<sum224, boolean> | null, systemPool?: boolean}>) {
 		this._fields = {
-			byName: $.varRef(init?.byName ?? (null as globalThis.Map<string, $.Slice<number>> | null)),
-			lazyCerts: $.varRef(init?.lazyCerts ?? (null as $.Slice<lazyCert>)),
-			haveSum: $.varRef(init?.haveSum ?? (null as globalThis.Map<sum224, boolean> | null)),
+			byName: $.varRef(init?.byName ?? (null! as globalThis.Map<string, $.Slice<number>> | null)),
+			lazyCerts: $.varRef(init?.lazyCerts ?? (null! as $.Slice<lazyCert>)),
+			haveSum: $.varRef(init?.haveSum ?? (null! as globalThis.Map<sum224, boolean> | null)),
 			systemPool: $.varRef(init?.systemPool ?? (false as boolean))
 		}
 	}
@@ -151,7 +151,7 @@ export class CertPool {
 		const s: CertPool | $.VarRef<CertPool> | null = this
 		let ok: boolean = false
 		while ($.len(pemCerts) > 0) {
-			let block: pem.Block | $.VarRef<pem.Block> | null = null as pem.Block | $.VarRef<pem.Block> | null
+			let block: pem.Block | $.VarRef<pem.Block> | null = null! as pem.Block | $.VarRef<pem.Block> | null
 			let __goscriptTuple0: any = pem.Decode(pemCerts)
 			block = __goscriptTuple0[0]
 			pemCerts = __goscriptTuple0[1]
@@ -270,9 +270,9 @@ export class CertPool {
 		//   AKID and SKID match
 		//   AKID present, SKID missing / AKID missing, SKID present
 		//   AKID and SKID don't match
-		let matchingKeyID: $.Slice<potentialParent> = null as $.Slice<potentialParent>
-		let oneKeyID: $.Slice<potentialParent> = null as $.Slice<potentialParent>
-		let mismatchKeyID: $.Slice<potentialParent> = null as $.Slice<potentialParent>
+		let matchingKeyID: $.Slice<potentialParent> = null! as $.Slice<potentialParent>
+		let oneKeyID: $.Slice<potentialParent> = null! as $.Slice<potentialParent>
+		let mismatchKeyID: $.Slice<potentialParent> = null! as $.Slice<potentialParent>
 		for (let __goscriptRangeTarget1 = $.mapGet<string, $.Slice<number>, $.Slice<number>>($.pointerValue<CertPool>(s).byName, $.bytesToString($.pointerValue<__goscript_x509.Certificate>(cert).RawIssuer), null)[0], __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
 			let c = __goscriptRangeTarget1![__rangeIndex]
 			let __goscriptTuple4: any = await CertPool.prototype.cert.call(s, c)
@@ -375,9 +375,9 @@ export class lazyCert {
 
 	constructor(init?: Partial<{rawSubject?: $.Slice<number>, constraint?: ((_p0: $.Slice<__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null>) => $.GoError | globalThis.Promise<$.GoError>) | null, getCert?: (() => [__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null, $.GoError] | globalThis.Promise<[__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null, $.GoError]>) | null}>) {
 		this._fields = {
-			rawSubject: $.varRef(init?.rawSubject ?? (null as $.Slice<number>)),
-			constraint: $.varRef(init?.constraint ?? (null as ((_p0: $.Slice<__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null>) => $.GoError | globalThis.Promise<$.GoError>) | null)),
-			getCert: $.varRef(init?.getCert ?? (null as (() => [__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null, $.GoError] | globalThis.Promise<[__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null, $.GoError]>) | null))
+			rawSubject: $.varRef(init?.rawSubject ?? (null! as $.Slice<number>)),
+			constraint: $.varRef(init?.constraint ?? (null! as ((_p0: $.Slice<__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null>) => $.GoError | globalThis.Promise<$.GoError>) | null)),
+			getCert: $.varRef(init?.getCert ?? (null! as (() => [__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null, $.GoError] | globalThis.Promise<[__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null, $.GoError]>) | null))
 		}
 	}
 
@@ -422,8 +422,8 @@ export class potentialParent {
 
 	constructor(init?: Partial<{cert?: __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null, constraint?: ((_p0: $.Slice<__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null>) => $.GoError | globalThis.Promise<$.GoError>) | null}>) {
 		this._fields = {
-			cert: $.varRef(init?.cert ?? (null as __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null)),
-			constraint: $.varRef(init?.constraint ?? (null as ((_p0: $.Slice<__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null>) => $.GoError | globalThis.Promise<$.GoError>) | null))
+			cert: $.varRef(init?.cert ?? (null! as __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null)),
+			constraint: $.varRef(init?.constraint ?? (null! as ((_p0: $.Slice<__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null>) => $.GoError | globalThis.Promise<$.GoError>) | null))
 		}
 	}
 

@@ -74,7 +74,7 @@ export class Logger {
 	constructor(init?: Partial<{outMu?: sync.Mutex, out?: io.Writer | null, prefix?: atomic.Pointer<string>, flag?: atomic.Int32, isDiscard?: atomic.Bool}>) {
 		this._fields = {
 			outMu: $.varRef(init?.outMu ? $.markAsStructValue($.cloneStructValue(init.outMu)) : $.markAsStructValue(new sync.Mutex())),
-			out: $.varRef(init?.out ?? (null as io.Writer | null)),
+			out: $.varRef(init?.out ?? (null! as io.Writer | null)),
 			prefix: $.varRef(init?.prefix ? $.markAsStructValue($.cloneStructValue(init.prefix)) : $.markAsStructValue(new atomic.Pointer<string>())),
 			flag: $.varRef(init?.flag ? $.markAsStructValue($.cloneStructValue(init.flag)) : $.markAsStructValue(new atomic.Int32())),
 			isDiscard: $.varRef(init?.isDiscard ? $.markAsStructValue($.cloneStructValue(init.isDiscard)) : $.markAsStructValue(new atomic.Bool()))
@@ -380,7 +380,7 @@ export function formatHeader(buf: $.VarRef<$.Slice<number>> | null, t: time.Time
 }
 
 export let bufferPool: $.VarRef<sync.Pool> = $.varRef($.markAsStructValue(new sync.Pool({New: $.functionValue((): any => {
-	return $.interfaceValue<any>($.varRef<$.Slice<number>>(null as $.Slice<number>), "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } })
+	return $.interfaceValue<any>($.varRef<$.Slice<number>>(null! as $.Slice<number>), "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } })
 }, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))})))
 
 export function __goscript_set_bufferPool(__goscriptValue: sync.Pool): void {

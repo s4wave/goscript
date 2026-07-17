@@ -5,7 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 
 export function IsNonblock(fd: number): [boolean, $.GoError] {
 	let nonblocking: boolean = false
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	return [false, null]
 }
 

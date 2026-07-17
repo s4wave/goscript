@@ -117,7 +117,7 @@ export async function EncryptPKCS1v15(random: io.Reader | null, pub: __goscript_
 	$.copy(mm, msg)
 
 	if (boring.Enabled) {
-		let bkey: boring.PublicKeyRSA | $.VarRef<boring.PublicKeyRSA> | null = null as boring.PublicKeyRSA | $.VarRef<boring.PublicKeyRSA> | null
+		let bkey: boring.PublicKeyRSA | $.VarRef<boring.PublicKeyRSA> | null = null! as boring.PublicKeyRSA | $.VarRef<boring.PublicKeyRSA> | null
 		let __goscriptTuple1: any = __goscript_notboring.boringPublicKey(pub)
 		bkey = __goscriptTuple1[0]
 		err = __goscriptTuple1[1]
@@ -209,9 +209,9 @@ export async function DecryptPKCS1v15SessionKey(random: io.Reader | null, priv: 
 
 export async function decryptPKCS1v15(priv: __goscript_rsa.PrivateKey | $.VarRef<__goscript_rsa.PrivateKey> | null, ciphertext: $.Slice<number>): globalThis.Promise<[number, $.Slice<number>, number, $.GoError]> {
 	let valid: number = 0
-	let em: $.Slice<number> = null as $.Slice<number>
+	let em: $.Slice<number> = null! as $.Slice<number>
 	let index: number = 0
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	if (fips140only.Enforced()) {
 		return [0, null, 0, errors.New("crypto/rsa: use of PKCS#1 v1.5 encryption is not allowed in FIPS 140-only mode")]
 	}
@@ -223,7 +223,7 @@ export async function decryptPKCS1v15(priv: __goscript_rsa.PrivateKey | $.VarRef
 	}
 
 	if (boring.Enabled) {
-		let bkey: boring.PrivateKeyRSA | $.VarRef<boring.PrivateKeyRSA> | null = null as boring.PrivateKeyRSA | $.VarRef<boring.PrivateKeyRSA> | null
+		let bkey: boring.PrivateKeyRSA | $.VarRef<boring.PrivateKeyRSA> | null = null! as boring.PrivateKeyRSA | $.VarRef<boring.PrivateKeyRSA> | null
 		let __goscriptTuple7: any = __goscript_notboring.boringPrivateKey(priv)
 		bkey = __goscriptTuple7[0]
 		err = __goscriptTuple7[1]
@@ -276,7 +276,7 @@ export async function decryptPKCS1v15(priv: __goscript_rsa.PrivateKey | $.VarRef
 }
 
 export async function nonZeroRandomBytes(s: $.Slice<number>, random: io.Reader | null): globalThis.Promise<$.GoError> {
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let __goscriptTuple11: any = await io.ReadFull($.pointerValueOrNil(random)!, s)
 	err = __goscriptTuple11[1]
 	if (err != null) {

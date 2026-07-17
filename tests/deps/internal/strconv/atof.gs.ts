@@ -397,7 +397,7 @@ export function atofHex(s: string, flt: __goscript_ftoa.floatInfo | $.VarRef<__g
 	if (($.uint64Shr(mantissa, $.pointerValue<__goscript_ftoa.floatInfo>(flt).mantbits)) == 0n) {
 		exp = $.pointerValue<__goscript_ftoa.floatInfo>(flt).bias
 	}
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	if (exp > maxExp) {
 		mantissa = $.uint64Shl(1n, $.pointerValue<__goscript_ftoa.floatInfo>(flt).mantbits)
 		exp = maxExp + 1
@@ -418,7 +418,7 @@ export function atofHex(s: string, flt: __goscript_ftoa.floatInfo | $.VarRef<__g
 export function atof32(s: string): [number, number, $.GoError] {
 	let f: number = 0
 	let n: number = 0
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	{
 		let [val, __goscriptShadow1, ok] = special(s)
 		if (ok) {
@@ -485,7 +485,7 @@ export function atof32(s: string): [number, number, $.GoError] {
 export function atof64(s: string): [number, number, $.GoError] {
 	let f: number = 0
 	let n: number = 0
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	{
 		let [val, __goscriptShadow9, ok] = special(s)
 		if (ok) {

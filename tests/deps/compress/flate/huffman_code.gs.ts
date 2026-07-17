@@ -116,11 +116,11 @@ export class huffmanEncoder {
 
 	constructor(init?: Partial<{codes?: $.Slice<hcode>, freqcache?: $.Slice<literalNode>, bitCount?: number[], lns?: byLiteral, lfs?: byFreq}>) {
 		this._fields = {
-			codes: $.varRef(init?.codes ?? (null as $.Slice<hcode>)),
-			freqcache: $.varRef(init?.freqcache ?? (null as $.Slice<literalNode>)),
+			codes: $.varRef(init?.codes ?? (null! as $.Slice<hcode>)),
+			freqcache: $.varRef(init?.freqcache ?? (null! as $.Slice<literalNode>)),
 			bitCount: $.varRef(init?.bitCount !== undefined ? $.cloneArrayValue(init.bitCount) : Array.from({ length: 17 }, () => 0)),
-			lns: $.varRef(init?.lns ?? (null as byLiteral)),
-			lfs: $.varRef(init?.lfs ?? (null as byFreq))
+			lns: $.varRef(init?.lns ?? (null! as byLiteral)),
+			lfs: $.varRef(init?.lfs ?? (null! as byFreq))
 		}
 	}
 

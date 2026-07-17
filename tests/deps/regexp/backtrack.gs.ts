@@ -131,10 +131,10 @@ export class bitState {
 	constructor(init?: Partial<{end?: number, cap?: $.Slice<number>, matchcap?: $.Slice<number>, jobs?: $.Slice<job>, visited?: $.Slice<number>, inputs?: __goscript_exec.inputs}>) {
 		this._fields = {
 			end: $.varRef(init?.end ?? (0 as number)),
-			cap: $.varRef(init?.cap ?? (null as $.Slice<number>)),
-			matchcap: $.varRef(init?.matchcap ?? (null as $.Slice<number>)),
-			jobs: $.varRef(init?.jobs ?? (null as $.Slice<job>)),
-			visited: $.varRef(init?.visited ?? (null as $.Slice<number>)),
+			cap: $.varRef(init?.cap ?? (null! as $.Slice<number>)),
+			matchcap: $.varRef(init?.matchcap ?? (null! as $.Slice<number>)),
+			jobs: $.varRef(init?.jobs ?? (null! as $.Slice<job>)),
+			visited: $.varRef(init?.visited ?? (null! as $.Slice<number>)),
 			inputs: $.varRef(init?.inputs ? $.markAsStructValue($.cloneStructValue(init.inputs)) : $.markAsStructValue(new __goscript_exec.inputs()))
 		}
 	}

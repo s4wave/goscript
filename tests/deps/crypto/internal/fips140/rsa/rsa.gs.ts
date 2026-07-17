@@ -37,7 +37,7 @@ export class PublicKey {
 
 	constructor(init?: Partial<{N?: bigmod.Modulus | $.VarRef<bigmod.Modulus> | null, E?: number}>) {
 		this._fields = {
-			N: $.varRef(init?.N ?? (null as bigmod.Modulus | $.VarRef<bigmod.Modulus> | null)),
+			N: $.varRef(init?.N ?? (null! as bigmod.Modulus | $.VarRef<bigmod.Modulus> | null)),
 			E: $.varRef(init?.E ?? (0 as number))
 		}
 	}
@@ -149,12 +149,12 @@ export class PrivateKey {
 	constructor(init?: Partial<{pub?: PublicKey, d?: bigmod.Nat | $.VarRef<bigmod.Nat> | null, p?: bigmod.Modulus | $.VarRef<bigmod.Modulus> | null, q?: bigmod.Modulus | $.VarRef<bigmod.Modulus> | null, dP?: $.Slice<number>, dQ?: $.Slice<number>, qInv?: bigmod.Nat | $.VarRef<bigmod.Nat> | null, fipsApproved?: boolean}>) {
 		this._fields = {
 			pub: $.varRef(init?.pub ? $.markAsStructValue($.cloneStructValue(init.pub)) : $.markAsStructValue(new PublicKey())),
-			d: $.varRef(init?.d ?? (null as bigmod.Nat | $.VarRef<bigmod.Nat> | null)),
-			p: $.varRef(init?.p ?? (null as bigmod.Modulus | $.VarRef<bigmod.Modulus> | null)),
-			q: $.varRef(init?.q ?? (null as bigmod.Modulus | $.VarRef<bigmod.Modulus> | null)),
-			dP: $.varRef(init?.dP ?? (null as $.Slice<number>)),
-			dQ: $.varRef(init?.dQ ?? (null as $.Slice<number>)),
-			qInv: $.varRef(init?.qInv ?? (null as bigmod.Nat | $.VarRef<bigmod.Nat> | null)),
+			d: $.varRef(init?.d ?? (null! as bigmod.Nat | $.VarRef<bigmod.Nat> | null)),
+			p: $.varRef(init?.p ?? (null! as bigmod.Modulus | $.VarRef<bigmod.Modulus> | null)),
+			q: $.varRef(init?.q ?? (null! as bigmod.Modulus | $.VarRef<bigmod.Modulus> | null)),
+			dP: $.varRef(init?.dP ?? (null! as $.Slice<number>)),
+			dQ: $.varRef(init?.dQ ?? (null! as $.Slice<number>)),
+			qInv: $.varRef(init?.qInv ?? (null! as bigmod.Nat | $.VarRef<bigmod.Nat> | null)),
 			fipsApproved: $.varRef(init?.fipsApproved ?? (false as boolean))
 		}
 	}
@@ -176,14 +176,14 @@ export class PrivateKey {
 
 	public Export(): [$.Slice<number>, number, $.Slice<number>, $.Slice<number>, $.Slice<number>, $.Slice<number>, $.Slice<number>, $.Slice<number>] {
 		const priv: PrivateKey | $.VarRef<PrivateKey> | null = this
-		let N: $.Slice<number> = null as $.Slice<number>
+		let N: $.Slice<number> = null! as $.Slice<number>
 		let e: number = 0
-		let d: $.Slice<number> = null as $.Slice<number>
-		let P: $.Slice<number> = null as $.Slice<number>
-		let Q: $.Slice<number> = null as $.Slice<number>
-		let dP: $.Slice<number> = null as $.Slice<number>
-		let dQ: $.Slice<number> = null as $.Slice<number>
-		let qInv: $.Slice<number> = null as $.Slice<number>
+		let d: $.Slice<number> = null! as $.Slice<number>
+		let P: $.Slice<number> = null! as $.Slice<number>
+		let Q: $.Slice<number> = null! as $.Slice<number>
+		let dP: $.Slice<number> = null! as $.Slice<number>
+		let dQ: $.Slice<number> = null! as $.Slice<number>
+		let qInv: $.Slice<number> = null! as $.Slice<number>
 		N = bigmod.Nat.prototype.Bytes.call(bigmod.Modulus.prototype.Nat.call($.pointerValue<PrivateKey>(priv).pub.N), $.pointerValue<PrivateKey>(priv).pub.N)
 		e = $.pointerValue<PrivateKey>(priv).pub.E
 		d = bigmod.Nat.prototype.Bytes.call($.pointerValue<PrivateKey>(priv).d, $.pointerValue<PrivateKey>(priv).pub.N)
@@ -512,7 +512,7 @@ export function checkPrivateKey(priv: PrivateKey | $.VarRef<PrivateKey> | null):
 
 export function checkPublicKey(pub: PublicKey | $.VarRef<PublicKey> | null): [boolean, $.GoError] {
 	let fipsApproved: boolean = false
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	fipsApproved = true
 	if ($.pointerValue<PublicKey>(pub).N == null) {
 		return [false, errors.New("crypto/rsa: missing public modulus")]
@@ -606,7 +606,7 @@ export function decrypt(priv: PrivateKey | $.VarRef<PrivateKey> | null, cipherte
 		fips140.RecordNonApproved()
 	}
 
-	let m: bigmod.Nat | $.VarRef<bigmod.Nat> | null = null as bigmod.Nat | $.VarRef<bigmod.Nat> | null
+	let m: bigmod.Nat | $.VarRef<bigmod.Nat> | null = null! as bigmod.Nat | $.VarRef<bigmod.Nat> | null
 	let N: bigmod.Modulus | $.VarRef<bigmod.Modulus> | null = $.pointerValue<PrivateKey>(priv).pub.N
 	let E = $.pointerValue<PrivateKey>(priv).pub.E
 

@@ -56,8 +56,8 @@ export class VMux {
 
 	constructor(init?: Partial<{mx?: __goscript_mux.Mux | null, le?: logrus.Entry | $.VarRef<logrus.Entry> | null, veryVerbose?: boolean}>) {
 		this._fields = {
-			mx: $.varRef(init?.mx ?? (null as __goscript_mux.Mux | null)),
-			le: $.varRef(init?.le ?? (null as logrus.Entry | $.VarRef<logrus.Entry> | null)),
+			mx: $.varRef(init?.mx ?? (null! as __goscript_mux.Mux | null)),
+			le: $.varRef(init?.le ?? (null! as logrus.Entry | $.VarRef<logrus.Entry> | null)),
 			veryVerbose: $.varRef(init?.veryVerbose ?? (false as boolean))
 		}
 	}
@@ -109,7 +109,7 @@ export class VMux {
 	public async InvokeMethod(serviceID: string, methodID: string, strm: __goscript_stream.Stream | null): globalThis.Promise<[boolean, $.GoError]> {
 		const v: VMux | $.VarRef<VMux> | null = this
 		let done: boolean = false
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		await using __defer = new $.AsyncDisposableStack()
 		let t1 = $.markAsStructValue($.cloneStructValue(time.Now()))
 		await logrus.Entry.prototype.Debugf.call($.pointerValue<VMux>(v).le, "InvokeMethod(serviceID(%s), methodID(%s)) => started", $.arrayToSlice<any>([serviceID, methodID]))
@@ -126,7 +126,7 @@ export class VMux {
 
 	public async Register(handler: __goscript_handler.Handler | null): globalThis.Promise<$.GoError> {
 		const v: VMux | $.VarRef<VMux> | null = this
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		await using __defer = new $.AsyncDisposableStack()
 		if ($.pointerValue<VMux>(v).veryVerbose) {
 			let t1 = $.markAsStructValue($.cloneStructValue(time.Now()))

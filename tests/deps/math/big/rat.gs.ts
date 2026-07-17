@@ -217,7 +217,7 @@ export class Rat {
 
 		let d: __goscript_nat.nat = ($.pointerValue<__goscript_int.Int>(Rat.prototype.Denom.call(x)).abs as __goscript_nat.nat)
 
-		let q: __goscript_nat.nat = null as __goscript_nat.nat
+		let q: __goscript_nat.nat = null! as __goscript_nat.nat
 		let p2 = __goscript_nat.nat_trailingZeroBits(d)
 		q = (__goscript_nat.nat_rsh(q, (d as __goscript_nat.nat), p2) as __goscript_nat.nat)
 		// Note: If this proves problematic, we could
@@ -225,10 +225,10 @@ export class Rat {
 		//       be explicitly initialized.
 
 		const fp: number = 13
-		let tab: $.Slice<__goscript_nat.nat> = null as $.Slice<__goscript_nat.nat>
+		let tab: $.Slice<__goscript_nat.nat> = null! as $.Slice<__goscript_nat.nat>
 		let f: __goscript_nat.nat = ($.arrayToSlice<__goscript_arith.Word>([1220703125]) as __goscript_nat.nat)
-		let t: __goscript_nat.nat = null as __goscript_nat.nat
-		let r: __goscript_nat.nat = null as __goscript_nat.nat
+		let t: __goscript_nat.nat = null! as __goscript_nat.nat
+		let r: __goscript_nat.nat = null! as __goscript_nat.nat
 		while (true) {
 			{
 				let __goscriptTuple2: any = await __goscript_natdiv.nat_div(t, stk, (r as __goscript_nat.nat), (q as __goscript_nat.nat), (f as __goscript_nat.nat))
@@ -280,7 +280,7 @@ export class Rat {
 	public async FloatString(prec: number): globalThis.Promise<string> {
 		const x: Rat | $.VarRef<Rat> | null = this
 		using __defer = new $.DisposableStack()
-		let buf: $.Slice<number> = null as $.Slice<number>
+		let buf: $.Slice<number> = null! as $.Slice<number>
 		// SetInt sets z to x (by making a copy of x) and returns z.
 		if (Rat.prototype.IsInt.call(x)) {
 			buf = await $.pointerValue<Rat>(x).a.Append(buf, 10)
@@ -407,8 +407,8 @@ export class Rat {
 
 	public async MarshalText(): globalThis.Promise<[$.Slice<number>, $.GoError]> {
 		const x: Rat | $.VarRef<Rat> | null = this
-		let text: $.Slice<number> = null as $.Slice<number>
-		let err: $.GoError = null as $.GoError
+		let text: $.Slice<number> = null! as $.Slice<number>
+		let err: $.GoError = null! as $.GoError
 		return Rat.prototype.AppendText.call(x, null)
 	}
 
@@ -610,7 +610,7 @@ export class Rat {
 					}
 				}
 				let r: strings.Reader | $.VarRef<strings.Reader> | null = strings.NewReader($.sliceStringOrBytes(s, sep + 1, undefined))
-				let err: $.GoError = null as $.GoError
+				let err: $.GoError = null! as $.GoError
 				{
 					let __goscriptTuple8: any = await __goscript_natconv.nat_scan($.pointerValue<Rat>(z).b.abs, $.interfaceValue<io.ByteScanner | null>(r, "*strings.Reader", { kind: $.TypeKind.Pointer, elemType: "strings.Reader" }), 0, false)
 					$.pointerValue<Rat>(z).b.abs = (__goscriptTuple8[0] as __goscript_nat.nat)
@@ -914,8 +914,8 @@ export async function quotToFloat32(stk: __goscript_nat.stack | $.VarRef<__goscr
 	// - the high-order 1 is omitted in "normal" representation;
 	// - the low-order 1 will be used during rounding then discarded.
 	let exp = alen - blen
-	let a2: __goscript_nat.nat = null as __goscript_nat.nat
-	let b2: __goscript_nat.nat = null as __goscript_nat.nat
+	let a2: __goscript_nat.nat = null! as __goscript_nat.nat
+	let b2: __goscript_nat.nat = null! as __goscript_nat.nat
 	a2 = (__goscript_nat.nat__set(a2, (a as __goscript_nat.nat)) as __goscript_nat.nat)
 	b2 = (__goscript_nat.nat__set(b2, (b as __goscript_nat.nat)) as __goscript_nat.nat)
 	{
@@ -932,7 +932,7 @@ export async function quotToFloat32(stk: __goscript_nat.stack | $.VarRef<__goscr
 	// 2. Compute quotient and remainder (q, r).  NB: due to the
 	// extra shift, the low-order bit of q is logically the
 	// high-order bit of r.
-	let q: __goscript_nat.nat = null as __goscript_nat.nat
+	let q: __goscript_nat.nat = null! as __goscript_nat.nat
 	let __goscriptTuple15: any = await __goscript_natdiv.nat_div(q, stk, (a2 as __goscript_nat.nat), (a2 as __goscript_nat.nat), (b2 as __goscript_nat.nat))
 	q = (__goscriptTuple15[0] as __goscript_nat.nat)
 	let r: __goscript_nat.nat = (__goscriptTuple15[1] as __goscript_nat.nat)
@@ -1014,8 +1014,8 @@ export async function quotToFloat64(stk: __goscript_nat.stack | $.VarRef<__goscr
 	// - the high-order 1 is omitted in "normal" representation;
 	// - the low-order 1 will be used during rounding then discarded.
 	let exp = alen - blen
-	let a2: __goscript_nat.nat = null as __goscript_nat.nat
-	let b2: __goscript_nat.nat = null as __goscript_nat.nat
+	let a2: __goscript_nat.nat = null! as __goscript_nat.nat
+	let b2: __goscript_nat.nat = null! as __goscript_nat.nat
 	a2 = (__goscript_nat.nat__set(a2, (a as __goscript_nat.nat)) as __goscript_nat.nat)
 	b2 = (__goscript_nat.nat__set(b2, (b as __goscript_nat.nat)) as __goscript_nat.nat)
 	{
@@ -1032,7 +1032,7 @@ export async function quotToFloat64(stk: __goscript_nat.stack | $.VarRef<__goscr
 	// 2. Compute quotient and remainder (q, r).  NB: due to the
 	// extra shift, the low-order bit of q is logically the
 	// high-order bit of r.
-	let q: __goscript_nat.nat = null as __goscript_nat.nat
+	let q: __goscript_nat.nat = null! as __goscript_nat.nat
 	let __goscriptTuple16: any = await __goscript_natdiv.nat_div(q, stk, (a2 as __goscript_nat.nat), (a2 as __goscript_nat.nat), (b2 as __goscript_nat.nat))
 	q = (__goscriptTuple16[0] as __goscript_nat.nat)
 	let r: __goscript_nat.nat = (__goscriptTuple16[1] as __goscript_nat.nat)

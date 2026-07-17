@@ -7,7 +7,7 @@ import * as bytes from "@goscript/bytes/index.js"
 import "@goscript/bytes/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let nilBytes: $.Slice<number> = null as $.Slice<number>
+	let nilBytes: $.Slice<number> = null! as $.Slice<number>
 	let backing: $.Slice<number> = new Uint8Array([1]) as $.Slice<number>
 	let emptyView: $.Slice<number> = $.goSlice(backing, undefined, 0)
 	let otherBacking: $.Slice<number> = new Uint8Array([2]) as $.Slice<number>

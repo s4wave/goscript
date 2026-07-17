@@ -100,7 +100,7 @@ export class Encoding {
 	public Decode(dst: $.Slice<number>, src: $.Slice<number>): [number, $.GoError] {
 		const enc: Encoding | $.VarRef<Encoding> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.len(src) == 0) {
 			return [0, null]
 		}
@@ -285,7 +285,7 @@ export class Encoding {
 		const enc: Encoding | $.VarRef<Encoding> | null = this
 		let nsi: number = 0
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		// Decode quantum using the base64 alphabet
 		let dbuf: Uint8Array = new Uint8Array(4)
 		let dlen = 4
@@ -466,9 +466,9 @@ export class encoder {
 
 	constructor(init?: Partial<{err?: $.GoError, enc?: Encoding | $.VarRef<Encoding> | null, w?: io.Writer | null, buf?: Uint8Array, nbuf?: number, out?: Uint8Array}>) {
 		this._fields = {
-			err: $.varRef(init?.err ?? (null as $.GoError)),
-			enc: $.varRef(init?.enc ?? (null as Encoding | $.VarRef<Encoding> | null)),
-			w: $.varRef(init?.w ?? (null as io.Writer | null)),
+			err: $.varRef(init?.err ?? (null! as $.GoError)),
+			enc: $.varRef(init?.enc ?? (null! as Encoding | $.VarRef<Encoding> | null)),
+			w: $.varRef(init?.w ?? (null! as io.Writer | null)),
 			buf: $.varRef(init?.buf !== undefined ? $.cloneArrayValue(init.buf) : new Uint8Array(3)),
 			nbuf: $.varRef(init?.nbuf ?? (0 as number)),
 			out: $.varRef(init?.out !== undefined ? $.cloneArrayValue(init.out) : new Uint8Array(1024))
@@ -503,7 +503,7 @@ export class encoder {
 	public async Write(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		let e: encoder | $.VarRef<encoder> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.pointerValue<encoder>(e).err != null) {
 			return [0, $.pointerValue<encoder>(e).err]
 		}
@@ -636,13 +636,13 @@ export class decoder {
 
 	constructor(init?: Partial<{err?: $.GoError, readErr?: $.GoError, enc?: Encoding | $.VarRef<Encoding> | null, r?: io.Reader | null, buf?: Uint8Array, nbuf?: number, out?: $.Slice<number>, outbuf?: Uint8Array}>) {
 		this._fields = {
-			err: $.varRef(init?.err ?? (null as $.GoError)),
-			readErr: $.varRef(init?.readErr ?? (null as $.GoError)),
-			enc: $.varRef(init?.enc ?? (null as Encoding | $.VarRef<Encoding> | null)),
-			r: $.varRef(init?.r ?? (null as io.Reader | null)),
+			err: $.varRef(init?.err ?? (null! as $.GoError)),
+			readErr: $.varRef(init?.readErr ?? (null! as $.GoError)),
+			enc: $.varRef(init?.enc ?? (null! as Encoding | $.VarRef<Encoding> | null)),
+			r: $.varRef(init?.r ?? (null! as io.Reader | null)),
 			buf: $.varRef(init?.buf !== undefined ? $.cloneArrayValue(init.buf) : new Uint8Array(1024)),
 			nbuf: $.varRef(init?.nbuf ?? (0 as number)),
-			out: $.varRef(init?.out ?? (null as $.Slice<number>)),
+			out: $.varRef(init?.out ?? (null! as $.Slice<number>)),
 			outbuf: $.varRef(init?.outbuf !== undefined ? $.cloneArrayValue(init.outbuf) : new Uint8Array(768))
 		}
 	}
@@ -665,7 +665,7 @@ export class decoder {
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		let d: decoder | $.VarRef<decoder> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		// Use leftover decoded output from last read.
 		if ($.len($.pointerValue<decoder>(d).out) > 0) {
 			n = $.copy(p, $.pointerValue<decoder>(d).out)
@@ -762,7 +762,7 @@ export class newlineFilteringReader {
 
 	constructor(init?: Partial<{wrapped?: io.Reader | null}>) {
 		this._fields = {
-			wrapped: $.varRef(init?.wrapped ?? (null as io.Reader | null))
+			wrapped: $.varRef(init?.wrapped ?? (null! as io.Reader | null))
 		}
 	}
 

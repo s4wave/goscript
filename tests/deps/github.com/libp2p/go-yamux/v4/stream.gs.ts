@@ -181,9 +181,9 @@ export class Stream {
 	constructor(init?: Partial<{sendWindow?: number, memorySpan?: __goscript_session.MemoryManager | null, id?: number, session?: __goscript_session.Session | $.VarRef<__goscript_session.Session> | null, recvWindow?: number, epochStart?: time.Time, state?: streamState, writeState?: halfStreamState, readState?: halfStreamState, stateLock?: sync.Mutex, recvBuf?: __goscript_util.segmentedBuffer, recvNotifyCh?: $.Channel<{}> | null, sendNotifyCh?: $.Channel<{}> | null, readDeadline?: __goscript_deadline.pipeDeadline, writeDeadline?: __goscript_deadline.pipeDeadline}>) {
 		this._fields = {
 			sendWindow: $.varRef(init?.sendWindow ?? (0 as number)),
-			memorySpan: $.varRef(init?.memorySpan ?? (null as __goscript_session.MemoryManager | null)),
+			memorySpan: $.varRef(init?.memorySpan ?? (null! as __goscript_session.MemoryManager | null)),
 			id: $.varRef(init?.id ?? (0 as number)),
-			session: $.varRef(init?.session ?? (null as __goscript_session.Session | $.VarRef<__goscript_session.Session> | null)),
+			session: $.varRef(init?.session ?? (null! as __goscript_session.Session | $.VarRef<__goscript_session.Session> | null)),
 			recvWindow: $.varRef(init?.recvWindow ?? (0 as number)),
 			epochStart: $.varRef(init?.epochStart ? $.markAsStructValue($.cloneStructValue(init.epochStart)) : $.markAsStructValue(new time.Time())),
 			state: $.varRef(init?.state ?? (0 as streamState)),
@@ -191,8 +191,8 @@ export class Stream {
 			readState: $.varRef(init?.readState ?? (0 as halfStreamState)),
 			stateLock: $.varRef(init?.stateLock ? $.markAsStructValue($.cloneStructValue(init.stateLock)) : $.markAsStructValue(new sync.Mutex())),
 			recvBuf: $.varRef(init?.recvBuf ? $.markAsStructValue($.cloneStructValue(init.recvBuf)) : $.markAsStructValue(new __goscript_util.segmentedBuffer())),
-			recvNotifyCh: $.varRef(init?.recvNotifyCh ?? (null as $.Channel<{}> | null)),
-			sendNotifyCh: $.varRef(init?.sendNotifyCh ?? (null as $.Channel<{}> | null)),
+			recvNotifyCh: $.varRef(init?.recvNotifyCh ?? (null! as $.Channel<{}> | null)),
+			sendNotifyCh: $.varRef(init?.sendNotifyCh ?? (null! as $.Channel<{}> | null)),
 			readDeadline: $.varRef(init?.readDeadline ? $.markAsStructValue($.cloneStructValue(init.readDeadline)) : $.markAsStructValue(new __goscript_deadline.pipeDeadline())),
 			writeDeadline: $.varRef(init?.writeDeadline ? $.markAsStructValue($.cloneStructValue(init.writeDeadline)) : $.markAsStructValue(new __goscript_deadline.pipeDeadline()))
 		}
@@ -314,7 +314,7 @@ export class Stream {
 	public async Read(b: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const s: Stream | $.VarRef<Stream> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		START: while (true) {
 			await $.pointerValue<Stream>(s).stateLock.Lock()
 
@@ -702,7 +702,7 @@ export class Stream {
 	public async write(b: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const s: Stream | $.VarRef<Stream> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let flags: number = 0
 		let max: number = 0
 		let hdr: __goscript__const.header = new Uint8Array(12)

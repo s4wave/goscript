@@ -56,9 +56,9 @@ export class P224Point {
 
 	constructor(init?: Partial<{x?: fiat.P224Element | $.VarRef<fiat.P224Element> | null, y?: fiat.P224Element | $.VarRef<fiat.P224Element> | null, z?: fiat.P224Element | $.VarRef<fiat.P224Element> | null}>) {
 		this._fields = {
-			x: $.varRef(init?.x ?? (null as fiat.P224Element | $.VarRef<fiat.P224Element> | null)),
-			y: $.varRef(init?.y ?? (null as fiat.P224Element | $.VarRef<fiat.P224Element> | null)),
-			z: $.varRef(init?.z ?? (null as fiat.P224Element | $.VarRef<fiat.P224Element> | null))
+			x: $.varRef(init?.x ?? (null! as fiat.P224Element | $.VarRef<fiat.P224Element> | null)),
+			y: $.varRef(init?.y ?? (null! as fiat.P224Element | $.VarRef<fiat.P224Element> | null)),
+			z: $.varRef(init?.z ?? (null! as fiat.P224Element | $.VarRef<fiat.P224Element> | null))
 		}
 	}
 
@@ -447,7 +447,7 @@ export function NewP224Point(): P224Point | $.VarRef<P224Point> | null {
 	return (() => { const __goscriptLiteralField0 = fiat.P224Element.prototype.One.call(new fiat.P224Element()); return new P224Point({x: new fiat.P224Element(), y: __goscriptLiteralField0, z: new fiat.P224Element()}) })()
 }
 
-export let _p224B: fiat.P224Element | $.VarRef<fiat.P224Element> | null = null as fiat.P224Element | $.VarRef<fiat.P224Element> | null
+export let _p224B: fiat.P224Element | $.VarRef<fiat.P224Element> | null = null! as fiat.P224Element | $.VarRef<fiat.P224Element> | null
 
 export function __goscript_set__p224B(__goscriptValue: fiat.P224Element | $.VarRef<fiat.P224Element> | null): void {
 	_p224B = __goscriptValue
@@ -499,7 +499,7 @@ export function p224Table_Select(table: $.VarRef<p224Table> | null, p: P224Point
 	}
 }
 
-export let p224GeneratorTable: $.VarRef<p224Table[]> | null = null as $.VarRef<p224Table[]> | null
+export let p224GeneratorTable: $.VarRef<p224Table[]> | null = null! as $.VarRef<p224Table[]> | null
 
 export function __goscript_set_p224GeneratorTable(__goscriptValue: $.VarRef<p224Table[]> | null): void {
 	p224GeneratorTable = __goscriptValue

@@ -79,7 +79,7 @@ export async function main(): globalThis.Promise<void> {
 	let [asserted, ok] = $.typeAssertTuple<MyInt>(ret, { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyInt" })
 	$.println("Interface assertion:", $.int(asserted), ok)
 
-	let vals: $.Slice<Doubler | null> = null as $.Slice<Doubler | null>
+	let vals: $.Slice<Doubler | null> = null! as $.Slice<Doubler | null>
 	vals = $.append(vals, $.namedValueInterfaceValue<Doubler | null>(14, "main.MyInt", {Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyInt" }, [{ name: "Double", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]), $.namedValueInterfaceValue<Doubler | null>(15, "main.MyInt", {Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyInt" }, [{ name: "Double", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]), $.appendZeros.nil)
 	$.println("Interface slice append:", await sumDoublers(vals))
 

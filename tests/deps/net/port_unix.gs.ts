@@ -71,7 +71,7 @@ export async function readServices(): globalThis.Promise<void> {
 
 export async function goLookupPort(network: string, service: string): globalThis.Promise<[number, $.GoError]> {
 	let port: number = 0
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	await onceReadServices.value.Do(readServices)
 	return __goscript_lookup.lookupPortMap(network, service)
 }

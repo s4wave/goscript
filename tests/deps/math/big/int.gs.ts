@@ -99,7 +99,7 @@ export class Int {
 	constructor(init?: Partial<{neg?: boolean, abs?: __goscript_nat.nat}>) {
 		this._fields = {
 			neg: $.varRef(init?.neg ?? (false as boolean)),
-			abs: $.varRef(init?.abs ?? (null as __goscript_nat.nat))
+			abs: $.varRef(init?.abs ?? (null! as __goscript_nat.nat))
 		}
 	}
 
@@ -216,8 +216,8 @@ export class Int {
 
 	public async AppendText(b: $.Slice<number>): globalThis.Promise<[$.Slice<number>, $.GoError]> {
 		const x: Int | $.VarRef<Int> | null = this
-		let text: $.Slice<number> = null as $.Slice<number>
-		let err: $.GoError = null as $.GoError
+		let text: $.Slice<number> = null! as $.Slice<number>
+		let err: $.GoError = null! as $.GoError
 		return [await Int.prototype.Append.call(x, b, 10), null]
 	}
 
@@ -681,8 +681,8 @@ export class Int {
 
 	public async MarshalText(): globalThis.Promise<[$.Slice<number>, $.GoError]> {
 		const x: Int | $.VarRef<Int> | null = this
-		let text: $.Slice<number> = null as $.Slice<number>
-		let err: $.GoError = null as $.GoError
+		let text: $.Slice<number> = null! as $.Slice<number>
+		let err: $.GoError = null! as $.GoError
 		return Int.prototype.AppendText.call(x, null)
 	}
 
@@ -1227,7 +1227,7 @@ export class Int {
 		}
 		let yWords: __goscript_nat.nat = ($.pointerValue<Int>(y).abs as __goscript_nat.nat)
 
-		let mWords: __goscript_nat.nat = null as __goscript_nat.nat
+		let mWords: __goscript_nat.nat = null! as __goscript_nat.nat
 		if (m != null) {
 			if (($.pointerEqual(z, m)) || __goscript_nat.alias(($.pointerValue<Int>(z).abs as __goscript_nat.nat), ($.pointerValue<Int>(m).abs as __goscript_nat.nat))) {
 				m = Int.prototype.Set.call(new Int(), m)
@@ -1253,10 +1253,10 @@ export class Int {
 
 	public async lehmerGCD(x: Int | $.VarRef<Int> | null, y: Int | $.VarRef<Int> | null, a: Int | $.VarRef<Int> | null, b: Int | $.VarRef<Int> | null): globalThis.Promise<Int | $.VarRef<Int> | null> {
 		const z: Int | $.VarRef<Int> | null = this
-		let A: Int | $.VarRef<Int> | null = null as Int | $.VarRef<Int> | null
-		let B: Int | $.VarRef<Int> | null = null as Int | $.VarRef<Int> | null
-		let Ua: Int | $.VarRef<Int> | null = null as Int | $.VarRef<Int> | null
-		let Ub: Int | $.VarRef<Int> | null = null as Int | $.VarRef<Int> | null
+		let A: Int | $.VarRef<Int> | null = null! as Int | $.VarRef<Int> | null
+		let B: Int | $.VarRef<Int> | null = null! as Int | $.VarRef<Int> | null
+		let Ua: Int | $.VarRef<Int> | null = null! as Int | $.VarRef<Int> | null
+		let Ub: Int | $.VarRef<Int> | null = null! as Int | $.VarRef<Int> | null
 
 		A = Int.prototype.Abs.call(new Int(), a)
 		B = Int.prototype.Abs.call(new Int(), b)
@@ -1581,7 +1581,7 @@ export function NewInt(x: bigint): Int | $.VarRef<Int> | null {
 	if (x < 0n) {
 		u = -u
 	}
-	let abs: $.Slice<__goscript_arith.Word> = null as $.Slice<__goscript_arith.Word>
+	let abs: $.Slice<__goscript_arith.Word> = null! as $.Slice<__goscript_arith.Word>
 	if (x == 0n) {
 	} else {
 		if (((64 as number) == 32) && (($.uint64Shr(u, 32n)) != 0n)) {
@@ -1711,11 +1711,11 @@ export function mulW(z: Int | $.VarRef<Int> | null, x: Int | $.VarRef<Int> | nul
 }
 
 export async function euclidUpdate(A: Int | $.VarRef<Int> | null, B: Int | $.VarRef<Int> | null, Ua: Int | $.VarRef<Int> | null, Ub: Int | $.VarRef<Int> | null, q: Int | $.VarRef<Int> | null, r: Int | $.VarRef<Int> | null, extended: boolean): globalThis.Promise<[Int | $.VarRef<Int> | null, Int | $.VarRef<Int> | null, Int | $.VarRef<Int> | null, Int | $.VarRef<Int> | null, Int | $.VarRef<Int> | null]> {
-	let nA: Int | $.VarRef<Int> | null = null as Int | $.VarRef<Int> | null
-	let nB: Int | $.VarRef<Int> | null = null as Int | $.VarRef<Int> | null
-	let nr: Int | $.VarRef<Int> | null = null as Int | $.VarRef<Int> | null
-	let nUa: Int | $.VarRef<Int> | null = null as Int | $.VarRef<Int> | null
-	let nUb: Int | $.VarRef<Int> | null = null as Int | $.VarRef<Int> | null
+	let nA: Int | $.VarRef<Int> | null = null! as Int | $.VarRef<Int> | null
+	let nB: Int | $.VarRef<Int> | null = null! as Int | $.VarRef<Int> | null
+	let nr: Int | $.VarRef<Int> | null = null! as Int | $.VarRef<Int> | null
+	let nUa: Int | $.VarRef<Int> | null = null! as Int | $.VarRef<Int> | null
+	let nUb: Int | $.VarRef<Int> | null = null! as Int | $.VarRef<Int> | null
 	await Int.prototype.QuoRem.call(q, A, B, r)
 
 	if (extended) {

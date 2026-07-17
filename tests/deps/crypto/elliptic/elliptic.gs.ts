@@ -54,10 +54,10 @@ export function __goscript_set_mask(__goscriptValue: $.Slice<number>): void {
 }
 
 export async function GenerateKey(curve: Curve | null, rand: io.Reader | null): globalThis.Promise<[$.Slice<number>, big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null, $.GoError]> {
-	let priv: $.Slice<number> = null as $.Slice<number>
-	let x: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-	let y: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-	let err: $.GoError = null as $.GoError
+	let priv: $.Slice<number> = null! as $.Slice<number>
+	let x: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+	let y: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+	let err: $.GoError = null! as $.GoError
 	let N: big.Int | $.VarRef<big.Int> | null = $.pointerValue<__goscript_params.CurveParams>(await $.pointerValue<Exclude<Curve, null>>(curve).Params()).N
 	let bitSize = big.Int.prototype.BitLen.call(N)
 	let byteLen = Math.trunc((bitSize + 7) / 8)
@@ -112,8 +112,8 @@ export async function MarshalCompressed(curve: Curve | null, x: big.Int | $.VarR
 }
 
 export async function Unmarshal(curve: Curve | null, data: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
-	let x: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-	let y: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
+	let x: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+	let y: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
 	{
 		let [c, ok] = $.typeAssertTuple<unmarshaler | null>(curve, "elliptic.unmarshaler")
 		if (ok) {
@@ -141,8 +141,8 @@ export async function Unmarshal(curve: Curve | null, data: $.Slice<number>): glo
 }
 
 export async function UnmarshalCompressed(curve: Curve | null, data: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
-	let x: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-	let y: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
+	let x: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+	let y: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
 	{
 		let [c, ok] = $.typeAssertTuple<unmarshaler | null>(curve, "elliptic.unmarshaler")
 		if (ok) {

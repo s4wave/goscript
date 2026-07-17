@@ -1136,7 +1136,7 @@ func TestCompilePackagesAnnotatesNewPointerShortDecls(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"let oid: $.VarRef<OID> | null = $.varRef<OID>(null as OID)",
+		"let oid: $.VarRef<OID> | null = $.varRef<OID>(null! as OID)",
 		"oid = null",
 		"use(oid)",
 	} {
@@ -2411,7 +2411,7 @@ func TestCompilePackagesEmitsArraySliceMapStringAndNamedMethods(t *testing.T) {
 		"let [value, ok] = $.mapGet<string, number, number>(m, \"missing\", 0)",
 		"slice![0]",
 		"$.arrayIndex(literal!, 2)",
-		"let list: $.VarRef<MySlice> = $.varRef(null as MySlice)",
+		"let list: $.VarRef<MySlice> = $.varRef(null! as MySlice)",
 		"MySlice_Add(list, 7)",
 		"$.indexStringOrBytes(text, 0)",
 		"MyInt_Double(5)",
@@ -2719,7 +2719,7 @@ func TestCompilePackagesPreservesBlankNamedResultSlots(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	text := string(content)
-	if !strings.Contains(text, "return [first, second, null as $.GoError]") {
+	if !strings.Contains(text, "return [first, second, null! as $.GoError]") {
 		t.Fatalf("blank named result slot was not preserved in naked return:\n%s", text)
 	}
 }
@@ -3322,7 +3322,7 @@ func TestCompilePackagesAttachesFunctionLiteralTypeInfo(t *testing.T) {
 	for _, want := range []string{
 		"export type Callback = ((value: number) => string | globalThis.Promise<string>) | null",
 		"export async function call(cb: ((value: number) => string | globalThis.Promise<string>) | null): globalThis.Promise<string> {\n\treturn cb!(1)",
-		"let zero: Callback | null = null as Callback | null",
+		"let zero: Callback | null = null! as Callback | null",
 		"let cb: Callback | null = (null as Callback | null)",
 		"$.functionValue((value: number): string => {",
 		"kind: $.TypeKind.Function",
@@ -5113,7 +5113,7 @@ func TestCompilePackagesAddsUnreachableReturnFallback(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"export async function wait(ctx: context.Context | null, ch: $.Channel<$.GoError> | null): globalThis.Promise<$.GoError>",
-		"let rerr: $.GoError = null as $.GoError",
+		"let rerr: $.GoError = null! as $.GoError",
 		"throw new globalThis.Error(\"goscript: unreachable return\")",
 	} {
 		if !strings.Contains(text, want) {
@@ -5697,7 +5697,7 @@ func TestCompilePackagesQualifiesImportedTypesInSignaturesAndZeroValues(t *testi
 		"Header: $.VarRef<lib.Header>",
 		"Fn: $.VarRef<((_p0: lib.Box) => [lib.Box, $.GoError] | globalThis.Promise<[lib.Box, $.GoError]>) | null>",
 		"Ptr: $.VarRef<atomic.Pointer<(() => void) | null>>",
-		"Header: $.varRef(init?.Header ?? (null as lib.Header))",
+		"Header: $.varRef(init?.Header ?? (null! as lib.Header))",
 		"$.markAsStructValue(new lib.Box())",
 		"$.markAsStructValue(new atomic.Pointer<(() => void) | null>())",
 		"export async function Use(fn: ((_p0: lib.Box) => [lib.Box, $.GoError] | globalThis.Promise<[lib.Box, $.GoError]>) | null, box: lib.Box): globalThis.Promise<[lib.Box, $.GoError]>",

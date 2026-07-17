@@ -404,32 +404,32 @@ export class Session {
 			remoteGoAway: $.varRef(init?.remoteGoAway ?? (0 as number)),
 			localGoAway: $.varRef(init?.localGoAway ?? (0 as number)),
 			nextStreamID: $.varRef(init?.nextStreamID ?? (0 as number)),
-			config: $.varRef(init?.config ?? (null as __goscript_mux.Config | $.VarRef<__goscript_mux.Config> | null)),
-			logger: $.varRef(init?.logger ?? (null as log.Logger | $.VarRef<log.Logger> | null)),
-			conn: $.varRef(init?.conn ?? (null as net.Conn | null)),
-			reader: $.varRef(init?.reader ?? (null as io.Reader | null)),
-			newMemoryManager: $.varRef(init?.newMemoryManager ?? (null as (() => [MemoryManager | null, $.GoError] | globalThis.Promise<[MemoryManager | null, $.GoError]>) | null)),
+			config: $.varRef(init?.config ?? (null! as __goscript_mux.Config | $.VarRef<__goscript_mux.Config> | null)),
+			logger: $.varRef(init?.logger ?? (null! as log.Logger | $.VarRef<log.Logger> | null)),
+			conn: $.varRef(init?.conn ?? (null! as net.Conn | null)),
+			reader: $.varRef(init?.reader ?? (null! as io.Reader | null)),
+			newMemoryManager: $.varRef(init?.newMemoryManager ?? (null! as (() => [MemoryManager | null, $.GoError] | globalThis.Promise<[MemoryManager | null, $.GoError]>) | null)),
 			pingLock: $.varRef(init?.pingLock ? $.markAsStructValue($.cloneStructValue(init.pingLock)) : $.markAsStructValue(new sync.Mutex())),
 			pingID: $.varRef(init?.pingID ?? (0 as number)),
-			activePing: $.varRef(init?.activePing ?? (null as __goscript_ping.ping | $.VarRef<__goscript_ping.ping> | null)),
+			activePing: $.varRef(init?.activePing ?? (null! as __goscript_ping.ping | $.VarRef<__goscript_ping.ping> | null)),
 			numIncomingStreams: $.varRef(init?.numIncomingStreams ?? (0 as number)),
-			streams: $.varRef(init?.streams ?? (null as globalThis.Map<number, __goscript_stream.Stream | $.VarRef<__goscript_stream.Stream> | null> | null)),
-			inflight: $.varRef(init?.inflight ?? (null as globalThis.Map<number, {}> | null)),
+			streams: $.varRef(init?.streams ?? (null! as globalThis.Map<number, __goscript_stream.Stream | $.VarRef<__goscript_stream.Stream> | null> | null)),
+			inflight: $.varRef(init?.inflight ?? (null! as globalThis.Map<number, {}> | null)),
 			streamLock: $.varRef(init?.streamLock ? $.markAsStructValue($.cloneStructValue(init.streamLock)) : $.markAsStructValue(new sync.Mutex())),
-			synCh: $.varRef(init?.synCh ?? (null as $.Channel<{}> | null)),
-			acceptCh: $.varRef(init?.acceptCh ?? (null as $.Channel<__goscript_stream.Stream | $.VarRef<__goscript_stream.Stream> | null> | null)),
-			sendCh: $.varRef(init?.sendCh ?? (null as $.Channel<$.Slice<number>> | null)),
-			pongCh: $.varRef(init?.pongCh ?? (null as $.Channel<number> | null)),
-			pingCh: $.varRef(init?.pingCh ?? (null as $.Channel<number> | null)),
-			recvDoneCh: $.varRef(init?.recvDoneCh ?? (null as $.Channel<{}> | null)),
-			sendDoneCh: $.varRef(init?.sendDoneCh ?? (null as $.Channel<{}> | null)),
+			synCh: $.varRef(init?.synCh ?? (null! as $.Channel<{}> | null)),
+			acceptCh: $.varRef(init?.acceptCh ?? (null! as $.Channel<__goscript_stream.Stream | $.VarRef<__goscript_stream.Stream> | null> | null)),
+			sendCh: $.varRef(init?.sendCh ?? (null! as $.Channel<$.Slice<number>> | null)),
+			pongCh: $.varRef(init?.pongCh ?? (null! as $.Channel<number> | null)),
+			pingCh: $.varRef(init?.pingCh ?? (null! as $.Channel<number> | null)),
+			recvDoneCh: $.varRef(init?.recvDoneCh ?? (null! as $.Channel<{}> | null)),
+			sendDoneCh: $.varRef(init?.sendDoneCh ?? (null! as $.Channel<{}> | null)),
 			client: $.varRef(init?.client ?? (false as boolean)),
 			shutdown: $.varRef(init?.shutdown ?? (false as boolean)),
-			shutdownErr: $.varRef(init?.shutdownErr ?? (null as $.GoError)),
-			shutdownCh: $.varRef(init?.shutdownCh ?? (null as $.Channel<{}> | null)),
+			shutdownErr: $.varRef(init?.shutdownErr ?? (null! as $.GoError)),
+			shutdownCh: $.varRef(init?.shutdownCh ?? (null! as $.Channel<{}> | null)),
 			shutdownLock: $.varRef(init?.shutdownLock ? $.markAsStructValue($.cloneStructValue(init.shutdownLock)) : $.markAsStructValue(new sync.Mutex())),
 			keepaliveLock: $.varRef(init?.keepaliveLock ? $.markAsStructValue($.cloneStructValue(init.keepaliveLock)) : $.markAsStructValue(new sync.Mutex())),
-			keepaliveTimer: $.varRef(init?.keepaliveTimer ?? (null as time.Timer | $.VarRef<time.Timer> | null)),
+			keepaliveTimer: $.varRef(init?.keepaliveTimer ?? (null! as time.Timer | $.VarRef<time.Timer> | null)),
 			keepaliveActive: $.varRef(init?.keepaliveActive ?? (false as boolean))
 		}
 	}
@@ -738,7 +738,7 @@ export class Session {
 	public async Ping(): globalThis.Promise<[time.Duration, $.GoError]> {
 		let s: Session | $.VarRef<Session> | null = this
 		let dur: time.Duration = 0n
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		await using __defer = new $.AsyncDisposableStack()
 		// Prepare a ping.
 		await $.pointerValue<Session>(s).pingLock.Lock()
@@ -1264,7 +1264,7 @@ export class Session {
 
 	public async recvLoop(): globalThis.Promise<$.GoError> {
 		const s: Session | $.VarRef<Session> | null = this
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		const __defer = new $.AsyncDisposableStack()
 		try {
 			__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
@@ -1349,7 +1349,7 @@ export class Session {
 
 	public async sendLoop(): globalThis.Promise<$.GoError> {
 		const s: Session | $.VarRef<Session> | null = this
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		const __defer = new $.AsyncDisposableStack()
 		try {
 			__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
@@ -1425,7 +1425,7 @@ export class Session {
 					return __goscriptSelect11Value
 				}
 
-				let buf: $.Slice<number> = null as $.Slice<number>
+				let buf: $.Slice<number> = null! as $.Slice<number>
 				// Make sure to send any pings & pongs first so they don't get stuck behind writes.
 				const [__goscriptSelect12HasReturn, __goscriptSelect12Value] = await $.selectStatement<any, $.GoError>([
 					{

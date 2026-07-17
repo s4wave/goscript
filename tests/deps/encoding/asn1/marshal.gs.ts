@@ -91,8 +91,8 @@ export class taggedEncoder {
 	constructor(init?: Partial<{scratch?: Uint8Array, tag?: encoder | null, body?: encoder | null}>) {
 		this._fields = {
 			scratch: $.varRef(init?.scratch !== undefined ? $.cloneArrayValue(init.scratch) : new Uint8Array(8)),
-			tag: $.varRef(init?.tag ?? (null as encoder | null)),
-			body: $.varRef(init?.body ?? (null as encoder | null))
+			tag: $.varRef(init?.tag ?? (null! as encoder | null)),
+			body: $.varRef(init?.body ?? (null! as encoder | null))
 		}
 	}
 
@@ -148,7 +148,7 @@ export class bitStringEncoder {
 
 	constructor(init?: Partial<{Bytes?: $.Slice<number>, BitLength?: number}>) {
 		this._fields = {
-			Bytes: $.varRef(init?.Bytes ?? (null as $.Slice<number>)),
+			Bytes: $.varRef(init?.Bytes ?? (null! as $.Slice<number>)),
 			BitLength: $.varRef(init?.BitLength ?? (0 as number))
 		}
 	}
@@ -434,8 +434,8 @@ export function oidEncoder_Encode(oid: oidEncoder, dst: $.Slice<number>): void {
 }
 
 export function makeObjectIdentifier(oid: $.Slice<number>): [encoder | null, $.GoError] {
-	let e: encoder | null = null as encoder | null
-	let err: $.GoError = null as $.GoError
+	let e: encoder | null = null! as encoder | null
+	let err: $.GoError = null! as $.GoError
 	if ((($.len(oid) < 2) || ($.arrayIndex(oid!, 0) > 2)) || (($.arrayIndex(oid!, 0) < 2) && ($.arrayIndex(oid!, 1) >= 40))) {
 		return [null, $.interfaceValue<$.GoError>($.markAsStructValue(new __goscript_asn1.StructuralError({Msg: "invalid object identifier"})), "asn1.StructuralError", "asn1.StructuralError")]
 	}
@@ -444,8 +444,8 @@ export function makeObjectIdentifier(oid: $.Slice<number>): [encoder | null, $.G
 }
 
 export function makePrintableString(s: string): [encoder | null, $.GoError] {
-	let e: encoder | null = null as encoder | null
-	let err: $.GoError = null as $.GoError
+	let e: encoder | null = null! as encoder | null
+	let err: $.GoError = null! as $.GoError
 	for (let i = 0; i < $.len(s); i++) {
 		// The asterisk is often used in PrintableString, even though
 		// it is invalid. If a PrintableString was specifically
@@ -462,8 +462,8 @@ export function makePrintableString(s: string): [encoder | null, $.GoError] {
 }
 
 export function makeIA5String(s: string): [encoder | null, $.GoError] {
-	let e: encoder | null = null as encoder | null
-	let err: $.GoError = null as $.GoError
+	let e: encoder | null = null! as encoder | null
+	let err: $.GoError = null! as $.GoError
 	for (let i = 0; i < $.len(s); i++) {
 		if ($.uint($.indexStringOrBytes(s, i), 8) > $.uint(127, 8)) {
 			return [null, $.interfaceValue<$.GoError>($.markAsStructValue(new __goscript_asn1.StructuralError({Msg: "IA5String contains invalid character"})), "asn1.StructuralError", "asn1.StructuralError")]
@@ -474,8 +474,8 @@ export function makeIA5String(s: string): [encoder | null, $.GoError] {
 }
 
 export function makeNumericString(s: string): [encoder | null, $.GoError] {
-	let e: encoder | null = null as encoder | null
-	let err: $.GoError = null as $.GoError
+	let e: encoder | null = null! as encoder | null
+	let err: $.GoError = null! as $.GoError
 	for (let i = 0; i < $.len(s); i++) {
 		if (!__goscript_asn1.isNumeric($.uint($.indexStringOrBytes(s, i), 8))) {
 			return [null, $.interfaceValue<$.GoError>($.markAsStructValue(new __goscript_asn1.StructuralError({Msg: "NumericString contains invalid character"})), "asn1.StructuralError", "asn1.StructuralError")]
@@ -503,8 +503,8 @@ export function outsideUTCRange(t: time.Time): boolean {
 }
 
 export function makeUTCTime(t: time.Time): [encoder | null, $.GoError] {
-	let e: encoder | null = null as encoder | null
-	let err: $.GoError = null as $.GoError
+	let e: encoder | null = null! as encoder | null
+	let err: $.GoError = null! as $.GoError
 	let dst: $.Slice<number> = $.makeSlice<number>(0, 18, "byte")
 
 	let __goscriptTuple0: any = appendUTCTime(dst, $.markAsStructValue($.cloneStructValue(t)))
@@ -518,8 +518,8 @@ export function makeUTCTime(t: time.Time): [encoder | null, $.GoError] {
 }
 
 export function makeGeneralizedTime(t: time.Time): [encoder | null, $.GoError] {
-	let e: encoder | null = null as encoder | null
-	let err: $.GoError = null as $.GoError
+	let e: encoder | null = null! as encoder | null
+	let err: $.GoError = null! as $.GoError
 	let dst: $.Slice<number> = $.makeSlice<number>(0, 20, "byte")
 
 	let __goscriptTuple1: any = appendGeneralizedTime(dst, $.markAsStructValue($.cloneStructValue(t)))
@@ -533,8 +533,8 @@ export function makeGeneralizedTime(t: time.Time): [encoder | null, $.GoError] {
 }
 
 export function appendUTCTime(dst: $.Slice<number>, t: time.Time): [$.Slice<number>, $.GoError] {
-	let ret: $.Slice<number> = null as $.Slice<number>
-	let err: $.GoError = null as $.GoError
+	let ret: $.Slice<number> = null! as $.Slice<number>
+	let err: $.GoError = null! as $.GoError
 	let year = $.markAsStructValue($.cloneStructValue(t)).Year()
 
 	switch (true) {
@@ -559,8 +559,8 @@ export function appendUTCTime(dst: $.Slice<number>, t: time.Time): [$.Slice<numb
 }
 
 export function appendGeneralizedTime(dst: $.Slice<number>, t: time.Time): [$.Slice<number>, $.GoError] {
-	let ret: $.Slice<number> = null as $.Slice<number>
-	let err: $.GoError = null as $.GoError
+	let ret: $.Slice<number> = null! as $.Slice<number>
+	let err: $.GoError = null! as $.GoError
 	let year = $.markAsStructValue($.cloneStructValue(t)).Year()
 	if ((year < 0) || (year > 9999)) {
 		return [null, $.interfaceValue<$.GoError>($.markAsStructValue(new __goscript_asn1.StructuralError({Msg: "cannot represent time as GeneralizedTime"})), "asn1.StructuralError", "asn1.StructuralError")]
@@ -623,8 +623,8 @@ export function stripTagAndLength(_in: $.Slice<number>): $.Slice<number> {
 }
 
 export async function makeBody(value: reflect.Value, params: __goscript_common.fieldParameters): globalThis.Promise<[encoder | null, $.GoError]> {
-	let e: encoder | null = null as encoder | null
-	let err: $.GoError = null as $.GoError
+	let e: encoder | null = null! as encoder | null
+	let err: $.GoError = null! as $.GoError
 	{
 		let __goscriptSwitch0 = $.markAsStructValue($.cloneStructValue(value)).Type()
 		switch (true) {
@@ -830,8 +830,8 @@ export async function makeBody(value: reflect.Value, params: __goscript_common.f
 }
 
 export async function makeField(v: reflect.Value, params: __goscript_common.fieldParameters): globalThis.Promise<[encoder | null, $.GoError]> {
-	let e: encoder | null = null as encoder | null
-	let err: $.GoError = null as $.GoError
+	let e: encoder | null = null! as encoder | null
+	let err: $.GoError = null! as $.GoError
 	if (!$.markAsStructValue($.cloneStructValue(v)).IsValid()) {
 		return [null, fmt.Errorf("asn1: cannot marshal nil value")]
 	}

@@ -53,10 +53,10 @@ export class Element {
 
 	constructor(init?: Partial<{next?: Element | $.VarRef<Element> | null, prev?: Element | $.VarRef<Element> | null, list?: List | $.VarRef<List> | null, Value?: any}>) {
 		this._fields = {
-			next: $.varRef(init?.next ?? (null as Element | $.VarRef<Element> | null)),
-			prev: $.varRef(init?.prev ?? (null as Element | $.VarRef<Element> | null)),
-			list: $.varRef(init?.list ?? (null as List | $.VarRef<List> | null)),
-			Value: $.varRef(init?.Value ?? (null as any))
+			next: $.varRef(init?.next ?? (null! as Element | $.VarRef<Element> | null)),
+			prev: $.varRef(init?.prev ?? (null! as Element | $.VarRef<Element> | null)),
+			list: $.varRef(init?.list ?? (null! as List | $.VarRef<List> | null)),
+			Value: $.varRef(init?.Value ?? (null! as any))
 		}
 	}
 

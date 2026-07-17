@@ -75,7 +75,7 @@ export class nameConstraintsSet {
 
 	constructor(init?: Partial<{_set?: $.Slice<any>}>) {
 		this._fields = {
-			_set: $.varRef(init?._set ?? (null as $.Slice<any>))
+			_set: $.varRef(init?._set ?? (null! as $.Slice<any>))
 		}
 	}
 
@@ -169,8 +169,8 @@ export class ipConstraints {
 
 	constructor(init?: Partial<{ipv4?: nameConstraintsSet | $.VarRef<nameConstraintsSet> | null, ipv6?: nameConstraintsSet | $.VarRef<nameConstraintsSet> | null}>) {
 		this._fields = {
-			ipv4: $.varRef(init?.ipv4 ?? (null as nameConstraintsSet | $.VarRef<nameConstraintsSet> | null)),
-			ipv6: $.varRef(init?.ipv6 ?? (null as nameConstraintsSet | $.VarRef<nameConstraintsSet> | null))
+			ipv4: $.varRef(init?.ipv4 ?? (null! as nameConstraintsSet | $.VarRef<nameConstraintsSet> | null)),
+			ipv6: $.varRef(init?.ipv6 ?? (null! as nameConstraintsSet | $.VarRef<nameConstraintsSet> | null))
 		}
 	}
 
@@ -185,7 +185,7 @@ export class ipConstraints {
 
 	public async query(ip: net.IP): globalThis.Promise<[net.IPNet | $.VarRef<net.IPNet> | null, boolean]> {
 		const ipc: ipConstraints | $.VarRef<ipConstraints> | null = this
-		let c: nameConstraintsSet | $.VarRef<nameConstraintsSet> | null = null as nameConstraintsSet | $.VarRef<nameConstraintsSet> | null
+		let c: nameConstraintsSet | $.VarRef<nameConstraintsSet> | null = null! as nameConstraintsSet | $.VarRef<nameConstraintsSet> | null
 		if ($.len((ip as net.IP)) == net.IPv4len) {
 			c = $.pointerValue<ipConstraints>(ipc).ipv4
 		} else {
@@ -256,8 +256,8 @@ export class dnsConstraints {
 		this._fields = {
 			all: $.varRef(init?.all ?? (false as boolean)),
 			permitted: $.varRef(init?.permitted ?? (false as boolean)),
-			constraints: $.varRef(init?.constraints ?? (null as nameConstraintsSet | $.VarRef<nameConstraintsSet> | null)),
-			parentConstraints: $.varRef(init?.parentConstraints ?? (null as globalThis.Map<string, string> | null))
+			constraints: $.varRef(init?.constraints ?? (null! as nameConstraintsSet | $.VarRef<nameConstraintsSet> | null)),
+			parentConstraints: $.varRef(init?.parentConstraints ?? (null! as globalThis.Map<string, string> | null))
 		}
 	}
 
@@ -335,8 +335,8 @@ export class emailConstraints {
 
 	constructor(init?: Partial<{dnsConstraints?: any, fullEmails?: globalThis.Map<__goscript_verify.rfc2821Mailbox, {}> | null}>) {
 		this._fields = {
-			dnsConstraints: $.varRef(init?.dnsConstraints ?? (null as any)),
-			fullEmails: $.varRef(init?.fullEmails ?? (null as globalThis.Map<__goscript_verify.rfc2821Mailbox, {}> | null))
+			dnsConstraints: $.varRef(init?.dnsConstraints ?? (null! as any)),
+			fullEmails: $.varRef(init?.fullEmails ?? (null! as globalThis.Map<__goscript_verify.rfc2821Mailbox, {}> | null))
 		}
 	}
 
@@ -406,8 +406,8 @@ export class constraints {
 	constructor(init?: Partial<{constraintType?: string, permitted?: any, excluded?: any}>) {
 		this._fields = {
 			constraintType: $.varRef(init?.constraintType ?? ("" as string)),
-			permitted: $.varRef(init?.permitted ?? (null as any)),
-			excluded: $.varRef(init?.excluded ?? (null as any))
+			permitted: $.varRef(init?.permitted ?? (null! as any)),
+			excluded: $.varRef(init?.excluded ?? (null! as any))
 		}
 	}
 
@@ -489,7 +489,7 @@ export class chainConstraints {
 			uri: $.varRef(init?.uri ? $.markAsStructValue($.cloneStructValue(init.uri)) : $.markAsStructValue(new constraints())),
 			email: $.varRef(init?.email ? $.markAsStructValue($.cloneStructValue(init.email)) : $.markAsStructValue(new constraints())),
 			index: $.varRef(init?.index ?? (0 as number)),
-			next: $.varRef(init?.next ?? (null as chainConstraints | $.VarRef<chainConstraints> | null))
+			next: $.varRef(init?.next ?? (null! as chainConstraints | $.VarRef<chainConstraints> | null))
 		}
 	}
 
@@ -587,7 +587,7 @@ export class parsedURI {
 
 	constructor(init?: Partial<{uri?: url.URL | $.VarRef<url.URL> | null, domain?: string}>) {
 		this._fields = {
-			uri: $.varRef(init?.uri ?? (null as url.URL | $.VarRef<url.URL> | null)),
+			uri: $.varRef(init?.uri ?? (null! as url.URL | $.VarRef<url.URL> | null)),
 			domain: $.varRef(init?.domain ?? ("" as string))
 		}
 	}
@@ -646,8 +646,8 @@ export async function newIPNetConstraints(l: $.Slice<net.IPNet | $.VarRef<net.IP
 	if ($.len(l) == 0) {
 		return null
 	}
-	let ipv4: $.Slice<net.IPNet | $.VarRef<net.IPNet> | null> = null as $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>
-	let ipv6: $.Slice<net.IPNet | $.VarRef<net.IPNet> | null> = null as $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>
+	let ipv4: $.Slice<net.IPNet | $.VarRef<net.IPNet> | null> = null! as $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>
+	let ipv6: $.Slice<net.IPNet | $.VarRef<net.IPNet> | null> = null! as $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>
 	for (let __goscriptRangeTarget1 = l, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
 		let n = __goscriptRangeTarget1![__rangeIndex]
 		if ($.len(($.pointerValue<net.IPNet>(n).IP as net.IP)) == net.IPv4len) {
@@ -656,8 +656,8 @@ export async function newIPNetConstraints(l: $.Slice<net.IPNet | $.VarRef<net.IP
 			ipv6 = $.append(ipv6, n, $.appendZeros.nil)
 		}
 	}
-	let v4c: nameConstraintsSet | $.VarRef<nameConstraintsSet> | null = null as nameConstraintsSet | $.VarRef<nameConstraintsSet> | null
-	let v6c: nameConstraintsSet | $.VarRef<nameConstraintsSet> | null = null as nameConstraintsSet | $.VarRef<nameConstraintsSet> | null
+	let v4c: nameConstraintsSet | $.VarRef<nameConstraintsSet> | null = null! as nameConstraintsSet | $.VarRef<nameConstraintsSet> | null
+	let v6c: nameConstraintsSet | $.VarRef<nameConstraintsSet> | null = null! as nameConstraintsSet | $.VarRef<nameConstraintsSet> | null
 	if ($.len(ipv4) > 0) {
 		v4c = new nameConstraintsSet({_set: ipv4})
 		await nameConstraintsSet.prototype.sortAndPrune.call(v4c, {[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Pointer, elemType: "net.IPNet" }, zero: () => null, methods: {Contains: (receiver: any, ...args: any[]) => receiver.Contains(...$.stripGenericTypeArgs(args)), Network: (receiver: any, ...args: any[]) => receiver.Network(...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => receiver.String(...$.stripGenericTypeArgs(args))} }, V: { type: { kind: $.TypeKind.Slice, typeName: "net.IP", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, zero: () => null, methods: {AppendText: (receiver: any, ...args: any[]) => (net.IP_AppendText as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), DefaultMask: (receiver: any, ...args: any[]) => (net.IP_DefaultMask as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Equal: (receiver: any, ...args: any[]) => (net.IP_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), IsGlobalUnicast: (receiver: any, ...args: any[]) => (net.IP_IsGlobalUnicast as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), IsInterfaceLocalMulticast: (receiver: any, ...args: any[]) => (net.IP_IsInterfaceLocalMulticast as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), IsLinkLocalMulticast: (receiver: any, ...args: any[]) => (net.IP_IsLinkLocalMulticast as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), IsLinkLocalUnicast: (receiver: any, ...args: any[]) => (net.IP_IsLinkLocalUnicast as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), IsLoopback: (receiver: any, ...args: any[]) => (net.IP_IsLoopback as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), IsMulticast: (receiver: any, ...args: any[]) => (net.IP_IsMulticast as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), IsPrivate: (receiver: any, ...args: any[]) => (net.IP_IsPrivate as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), IsUnspecified: (receiver: any, ...args: any[]) => (net.IP_IsUnspecified as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), MarshalText: (receiver: any, ...args: any[]) => (net.IP_MarshalText as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Mask: (receiver: any, ...args: any[]) => (net.IP_Mask as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (net.IP_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), To16: (receiver: any, ...args: any[]) => (net.IP_To16 as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), To4: (receiver: any, ...args: any[]) => (net.IP_To4 as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), appendTo: (receiver: any, ...args: any[]) => (net.IP_appendTo as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), matchAddrFamily: (receiver: any, ...args: any[]) => (net.IP_matchAddrFamily as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: "AppendText", args: [{ name: "b", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "_r1", type: "error" }] }, { name: "DefaultMask", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, typeName: "net.IPMask", elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Equal", args: [{ name: "x", type: { kind: $.TypeKind.Slice, typeName: "net.IP", elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsGlobalUnicast", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsInterfaceLocalMulticast", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsLinkLocalMulticast", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsLinkLocalUnicast", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsLoopback", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsMulticast", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsPrivate", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsUnspecified", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "MarshalText", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "_r1", type: "error" }] }, { name: "Mask", args: [{ name: "mask", type: { kind: $.TypeKind.Slice, typeName: "net.IPMask", elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, typeName: "net.IP", elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "To16", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, typeName: "net.IP", elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "To4", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, typeName: "net.IP", elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "appendTo", args: [{ name: "b", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "matchAddrFamily", args: [{ name: "x", type: { kind: $.TypeKind.Slice, typeName: "net.IP", elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }] }}, ipNetworkCompare, ipNetworkSubset)
@@ -804,7 +804,7 @@ export async function newEmailConstraints(l: $.Slice<string>, permitted: boolean
 		return null
 	}
 	let exactMap: globalThis.Map<__goscript_verify.rfc2821Mailbox, {}> | null = new globalThis.Map<__goscript_verify.rfc2821Mailbox, {}>([])
-	let domains: $.Slice<string> = null as $.Slice<string>
+	let domains: $.Slice<string> = null! as $.Slice<string>
 	for (let __goscriptRangeTarget4 = l, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget4); __rangeIndex++) {
 		let c = __goscriptRangeTarget4![__rangeIndex]
 		if (!strings.ContainsRune(c, $.int(64, 32))) {
@@ -852,8 +852,8 @@ export async function checkConstraints(__typeArgs: $.GenericTypeArgs | undefined
 }
 
 export async function checkChainConstraints(chain: $.Slice<__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null>): globalThis.Promise<$.GoError> {
-	let currentConstraints: chainConstraints | $.VarRef<chainConstraints> | null = null as chainConstraints | $.VarRef<chainConstraints> | null
-	let last: chainConstraints | $.VarRef<chainConstraints> | null = null as chainConstraints | $.VarRef<chainConstraints> | null
+	let currentConstraints: chainConstraints | $.VarRef<chainConstraints> | null = null! as chainConstraints | $.VarRef<chainConstraints> | null
+	let last: chainConstraints | $.VarRef<chainConstraints> | null = null! as chainConstraints | $.VarRef<chainConstraints> | null
 	for (let __goscriptRangeTarget9 = chain, i = 0; i < $.len(__goscriptRangeTarget9); i++) {
 		let c = __goscriptRangeTarget9![i]
 		if (!__goscript_x509.Certificate.prototype.hasNameConstraints.call(c)) {
@@ -923,7 +923,7 @@ export async function parseURIs(uris: $.Slice<url.URL | $.VarRef<url.URL> | null
 			return [null, fmt.Errorf("URI with empty host (%q) cannot be matched against constraints", url.URL.prototype.String.call(uri))]
 		}
 		if (strings.Contains(host, ":") && !strings.HasSuffix(host, "]")) {
-			let err: $.GoError = null as $.GoError
+			let err: $.GoError = null! as $.GoError
 			let __goscriptTuple4: any = await net.SplitHostPort($.pointerValue<url.URL>(uri).Host)
 			host = __goscriptTuple4[0]
 			err = __goscriptTuple4[2]

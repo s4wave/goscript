@@ -102,7 +102,7 @@ export class outer {
 
 	constructor(init?: Partial<{inner?: inner | $.VarRef<inner> | null}>) {
 		this._fields = {
-			inner: $.varRef(init?.inner ?? (null as inner | $.VarRef<inner> | null))
+			inner: $.varRef(init?.inner ?? (null! as inner | $.VarRef<inner> | null))
 		}
 	}
 

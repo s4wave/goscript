@@ -13,7 +13,7 @@ export var table: $.Slice<number>
 
 export function __goscript_init_table(): void {
 	if (((table) as any) === undefined) {
-		table = null as $.Slice<number>
+		table = null! as $.Slice<number>
 	}
 }
 

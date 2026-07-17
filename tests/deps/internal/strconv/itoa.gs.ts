@@ -76,7 +76,7 @@ export function AppendUint(dst: $.Slice<number>, i: bigint, base: number): $.Sli
 }
 
 export function formatBits(dst: $.Slice<number>, u: bigint, base: number, neg: boolean, append_: boolean): [$.Slice<number>, string] {
-	let d: $.Slice<number> = null as $.Slice<number>
+	let d: $.Slice<number> = null! as $.Slice<number>
 	let s: string = ""
 	if (((base < 2) || (base == 10)) || (base > 36)) {
 		$.panic("strconv: illegal AppendInt/FormatInt base")

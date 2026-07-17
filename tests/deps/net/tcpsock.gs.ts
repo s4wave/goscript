@@ -156,7 +156,7 @@ export class TCPAddr {
 
 	constructor(init?: Partial<{IP?: __goscript_ip.IP, Port?: number, Zone?: string}>) {
 		this._fields = {
-			IP: $.varRef(init?.IP ?? (null as __goscript_ip.IP)),
+			IP: $.varRef(init?.IP ?? (null! as __goscript_ip.IP)),
 			Port: $.varRef(init?.Port ?? (0 as number)),
 			Zone: $.varRef(init?.Zone ?? ("" as string))
 		}
@@ -613,7 +613,7 @@ export class TCPListener {
 
 	constructor(init?: Partial<{fd?: __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null, lc?: __goscript_dial.ListenConfig}>) {
 		this._fields = {
-			fd: $.varRef(init?.fd ?? (null as __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null)),
+			fd: $.varRef(init?.fd ?? (null! as __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null)),
 			lc: $.varRef(init?.lc ? $.markAsStructValue($.cloneStructValue(init.lc)) : $.markAsStructValue(new __goscript_dial.ListenConfig()))
 		}
 	}
@@ -676,8 +676,8 @@ export class TCPListener {
 
 	public File(): [os.File | $.VarRef<os.File> | null, $.GoError] {
 		const l: TCPListener | $.VarRef<TCPListener> | null = this
-		let f: os.File | $.VarRef<os.File> | null = null as os.File | $.VarRef<os.File> | null
-		let err: $.GoError = null as $.GoError
+		let f: os.File | $.VarRef<os.File> | null = null! as os.File | $.VarRef<os.File> | null
+		let err: $.GoError = null! as $.GoError
 		if (!TCPListener.prototype.ok.call(l)) {
 			return [null, $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 		}
@@ -819,8 +819,8 @@ export async function dialTCP(ctx: context.Context | null, dialer: __goscript_di
 		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField6 = TCPAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField6, Addr: null, Err: __goscript_net.errMissingAddress}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
 	}
 	let sd: __goscript_dial.sysDialer | $.VarRef<__goscript_dial.sysDialer> | null = (() => { const __goscriptLiteralField7 = TCPAddr.prototype.String.call(raddr); return new __goscript_dial.sysDialer({network: network, address: __goscriptLiteralField7}) })()
-	let c: TCPConn | $.VarRef<TCPConn> | null = null as TCPConn | $.VarRef<TCPConn> | null
-	let err: $.GoError = null as $.GoError
+	let c: TCPConn | $.VarRef<TCPConn> | null = null! as TCPConn | $.VarRef<TCPConn> | null
+	let err: $.GoError = null! as $.GoError
 	if (dialer != null) {
 		$.pointerValue<__goscript_dial.sysDialer>(sd).Dialer = $.markAsStructValue($.cloneStructValue($.pointerValue<__goscript_dial.Dialer>(dialer)))
 	}
@@ -857,8 +857,8 @@ export async function ListenTCP(network: string, laddr: TCPAddr | $.VarRef<TCPAd
 		laddr = new TCPAddr()
 	}
 	let sl: __goscript_dial.sysListener | $.VarRef<__goscript_dial.sysListener> | null = (() => { const __goscriptLiteralField11 = TCPAddr.prototype.String.call(laddr); return new __goscript_dial.sysListener({network: network, address: __goscriptLiteralField11}) })()
-	let ln: TCPListener | $.VarRef<TCPListener> | null = null as TCPListener | $.VarRef<TCPListener> | null
-	let err: $.GoError = null as $.GoError
+	let ln: TCPListener | $.VarRef<TCPListener> | null = null! as TCPListener | $.VarRef<TCPListener> | null
+	let err: $.GoError = null! as $.GoError
 	if ($.pointerValue<__goscript_dial.sysListener>(sl).ListenConfig.MultipathTCP()) {
 		let __goscriptTuple8: any = await __goscript_dial.sysListener.prototype.listenMPTCP.call(sl, context.Background(), laddr)
 		ln = __goscriptTuple8[0]

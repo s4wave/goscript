@@ -93,8 +93,8 @@ export class Rand {
 
 	constructor(init?: Partial<{src?: Source | null, s64?: Source64 | null, readVal?: bigint, readPos?: number}>) {
 		this._fields = {
-			src: $.varRef(init?.src ?? (null as Source | null)),
-			s64: $.varRef(init?.s64 ?? (null as Source64 | null)),
+			src: $.varRef(init?.src ?? (null! as Source | null)),
+			s64: $.varRef(init?.s64 ?? (null! as Source64 | null)),
 			readVal: $.varRef(init?.readVal ?? (0n as bigint)),
 			readPos: $.varRef(init?.readPos ?? (0 as number))
 		}
@@ -287,7 +287,7 @@ export class Rand {
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const r: Rand | $.VarRef<Rand> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		{
 			const __goscriptTypeSwitchValue = $.pointerValue<Rand>(r).src
 			switch (true) {
@@ -427,7 +427,7 @@ export class runtimeSource {
 	public async read(p: $.Slice<number>, readVal: $.VarRef<bigint> | null, readPos: $.VarRef<number> | null): globalThis.Promise<[number, $.GoError]> {
 		const fs: runtimeSource | $.VarRef<runtimeSource> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		await $.pointerValue<runtimeSource>(fs).mu.Lock()
 		let __goscriptTuple2: any = await read(p, $.interfaceValue<Source | null>(fs, "*rand.runtimeSource", { kind: $.TypeKind.Pointer, elemType: "rand.runtimeSource" }), readVal, readPos)
 		n = __goscriptTuple2[0]
@@ -468,7 +468,7 @@ export class lockedSource {
 	constructor(init?: Partial<{lk?: sync.Mutex, s?: __goscript_rng.rngSource | $.VarRef<__goscript_rng.rngSource> | null}>) {
 		this._fields = {
 			lk: $.varRef(init?.lk ? $.markAsStructValue($.cloneStructValue(init.lk)) : $.markAsStructValue(new sync.Mutex())),
-			s: $.varRef(init?.s ?? (null as __goscript_rng.rngSource | $.VarRef<__goscript_rng.rngSource> | null))
+			s: $.varRef(init?.s ?? (null! as __goscript_rng.rngSource | $.VarRef<__goscript_rng.rngSource> | null))
 		}
 	}
 
@@ -509,7 +509,7 @@ export class lockedSource {
 	public async read(p: $.Slice<number>, readVal: $.VarRef<bigint> | null, readPos: $.VarRef<number> | null): globalThis.Promise<[number, $.GoError]> {
 		const r: lockedSource | $.VarRef<lockedSource> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		await $.pointerValue<lockedSource>(r).lk.Lock()
 		let __goscriptTuple3: any = await read(p, $.interfaceValue<Source | null>($.pointerValue<lockedSource>(r).s, "*rand.rngSource", { kind: $.TypeKind.Pointer, elemType: "rand.rngSource" }), readVal, readPos)
 		n = __goscriptTuple3[0]
@@ -561,7 +561,7 @@ export function New(src: Source | null): Rand | $.VarRef<Rand> | null {
 
 export async function read(p: $.Slice<number>, src: Source | null, readVal: $.VarRef<bigint> | null, readPos: $.VarRef<number> | null): globalThis.Promise<[number, $.GoError]> {
 	let n: number = 0
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let pos = $.int($.pointerValue<number>(readPos), 8)
 	let val = $.pointerValue<bigint>(readVal)
 	let __goscriptTuple1: any = $.typeAssertTuple<__goscript_rng.rngSource | $.VarRef<__goscript_rng.rngSource> | null>(src, { kind: $.TypeKind.Pointer, elemType: "rand.rngSource" })
@@ -611,7 +611,7 @@ export async function globalRand(): globalThis.Promise<Rand | $.VarRef<Rand> | n
 	}
 
 	// This is the first call. Initialize based on GODEBUG.
-	let r: Rand | $.VarRef<Rand> | null = null as Rand | $.VarRef<Rand> | null
+	let r: Rand | $.VarRef<Rand> | null = null! as Rand | $.VarRef<Rand> | null
 	if ($.stringEqual(godebug.Setting.prototype.Value.call($.pointerValue<godebug.Setting>(randautoseed)), "0")) {
 		godebug.Setting.prototype.IncNonDefault.call($.pointerValue<godebug.Setting>(randautoseed))
 		r = New($.interfaceValue<Source | null>(new lockedSource(), "*rand.lockedSource", { kind: $.TypeKind.Pointer, elemType: "rand.lockedSource" }))
@@ -722,7 +722,7 @@ export async function Shuffle(n: number, swap: ((i: number, j: number) => void) 
 
 export async function Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 	let n: number = 0
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	return Rand.prototype.Read.call(await globalRand(), p)
 }
 

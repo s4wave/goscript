@@ -82,7 +82,7 @@ export class PublicKey {
 	constructor(init?: Partial<{curve?: curveID, q?: $.Slice<number>}>) {
 		this._fields = {
 			curve: $.varRef(init?.curve ?? ("" as curveID)),
-			q: $.varRef(init?.q ?? (null as $.Slice<number>))
+			q: $.varRef(init?.q ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -132,7 +132,7 @@ export class PrivateKey {
 	constructor(init?: Partial<{pub?: PublicKey, d?: $.Slice<number>}>) {
 		this._fields = {
 			pub: $.varRef(init?.pub ? $.markAsStructValue($.cloneStructValue(init.pub)) : $.markAsStructValue(new PublicKey())),
-			d: $.varRef(init?.d ?? (null as $.Slice<number>))
+			d: $.varRef(init?.d ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -211,10 +211,10 @@ export class Curve {
 	constructor(init?: Partial<{curve?: curveID, newPoint?: (() => any | globalThis.Promise<any>) | null, ordInverse?: ((_p0: $.Slice<number>) => [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>) | null, N?: bigmod.Modulus | $.VarRef<bigmod.Modulus> | null, nMinus2?: $.Slice<number>}>) {
 		this._fields = {
 			curve: $.varRef(init?.curve ?? ("" as curveID)),
-			newPoint: $.varRef(init?.newPoint ?? (null as (() => any | globalThis.Promise<any>) | null)),
-			ordInverse: $.varRef(init?.ordInverse ?? (null as ((_p0: $.Slice<number>) => [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>) | null)),
-			N: $.varRef(init?.N ?? (null as bigmod.Modulus | $.VarRef<bigmod.Modulus> | null)),
-			nMinus2: $.varRef(init?.nMinus2 ?? (null as $.Slice<number>))
+			newPoint: $.varRef(init?.newPoint ?? (null! as (() => any | globalThis.Promise<any>) | null)),
+			ordInverse: $.varRef(init?.ordInverse ?? (null! as ((_p0: $.Slice<number>) => [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>) | null)),
+			N: $.varRef(init?.N ?? (null! as bigmod.Modulus | $.VarRef<bigmod.Modulus> | null)),
+			nMinus2: $.varRef(init?.nMinus2 ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -261,8 +261,8 @@ export class Signature {
 
 	constructor(init?: Partial<{R?: $.Slice<number>, S?: $.Slice<number>}>) {
 		this._fields = {
-			R: $.varRef(init?.R ?? (null as $.Slice<number>)),
-			S: $.varRef(init?.S ?? (null as $.Slice<number>))
+			R: $.varRef(init?.R ?? (null! as $.Slice<number>)),
+			S: $.varRef(init?.S ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -293,7 +293,7 @@ export const p384: curveID = "P-384"
 export const p521: curveID = "P-521"
 
 export function precomputeParams(__typeArgs: $.GenericTypeArgs | undefined, c: Curve | $.VarRef<Curve> | null, order: $.Slice<number>): void {
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let __goscriptTuple0: any = bigmod.NewModulus(order)
 	$.pointerValue<Curve>(c).N = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
@@ -442,9 +442,9 @@ export async function GenerateKey(__typeArgs: $.GenericTypeArgs | undefined, c: 
 }
 
 export async function randomPoint(__typeArgs: $.GenericTypeArgs | undefined, c: Curve | $.VarRef<Curve> | null, generate: ((_p0: $.Slice<number>) => $.GoError | globalThis.Promise<$.GoError>) | null): globalThis.Promise<[bigmod.Nat | $.VarRef<bigmod.Nat> | null, any, $.GoError]> {
-	let k: bigmod.Nat | $.VarRef<bigmod.Nat> | null = null as bigmod.Nat | $.VarRef<bigmod.Nat> | null
+	let k: bigmod.Nat | $.VarRef<bigmod.Nat> | null = null! as bigmod.Nat | $.VarRef<bigmod.Nat> | null
 	let p: any = $.genericZero(__typeArgs, "P", null)
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	while (true) {
 		let b: $.Slice<number> = $.makeSlice<number>(bigmod.Modulus.prototype.Size.call($.pointerValue<Curve>(c).N), undefined, "byte")
 		{
@@ -503,7 +503,7 @@ export var testingOnlyRejectionSamplingLooped: (() => void) | null
 
 export function __goscript_init_testingOnlyRejectionSamplingLooped(): void {
 	if (((testingOnlyRejectionSamplingLooped) as any) === undefined) {
-		testingOnlyRejectionSamplingLooped = null as (() => void) | null
+		testingOnlyRejectionSamplingLooped = null! as (() => void) | null
 	}
 }
 

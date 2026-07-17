@@ -49,7 +49,7 @@ export class pollDesc {
 
 	constructor(init?: Partial<{fd?: __goscript_fd_unix.FD | $.VarRef<__goscript_fd_unix.FD> | null, closing?: boolean}>) {
 		this._fields = {
-			fd: $.varRef(init?.fd ?? (null as __goscript_fd_unix.FD | $.VarRef<__goscript_fd_unix.FD> | null)),
+			fd: $.varRef(init?.fd ?? (null! as __goscript_fd_unix.FD | $.VarRef<__goscript_fd_unix.FD> | null)),
 			closing: $.varRef(init?.closing ?? (false as boolean))
 		}
 	}

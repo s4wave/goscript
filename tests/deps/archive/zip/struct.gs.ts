@@ -213,7 +213,7 @@ export class FileHeader {
 			UncompressedSize: $.varRef(init?.UncompressedSize ?? (0 as number)),
 			CompressedSize64: $.varRef(init?.CompressedSize64 ?? (0n as bigint)),
 			UncompressedSize64: $.varRef(init?.UncompressedSize64 ?? (0n as bigint)),
-			Extra: $.varRef(init?.Extra ?? (null as $.Slice<number>)),
+			Extra: $.varRef(init?.Extra ?? (null! as $.Slice<number>)),
 			ExternalAttrs: $.varRef(init?.ExternalAttrs ?? (0 as number))
 		}
 	}
@@ -332,7 +332,7 @@ export class headerFileInfo {
 
 	constructor(init?: Partial<{fh?: FileHeader | $.VarRef<FileHeader> | null}>) {
 		this._fields = {
-			fh: $.varRef(init?.fh ?? (null as FileHeader | $.VarRef<FileHeader> | null))
+			fh: $.varRef(init?.fh ?? (null! as FileHeader | $.VarRef<FileHeader> | null))
 		}
 	}
 

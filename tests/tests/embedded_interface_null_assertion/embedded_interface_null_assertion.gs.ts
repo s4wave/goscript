@@ -35,7 +35,7 @@ export class MyReader {
 
 	constructor(init?: Partial<{Reader?: Reader | null, name?: string}>) {
 		this._fields = {
-			Reader: $.varRef(init?.Reader ?? (null as Reader | null)),
+			Reader: $.varRef(init?.Reader ?? (null! as Reader | null)),
 			name: $.varRef(init?.name ?? ("" as string))
 		}
 	}

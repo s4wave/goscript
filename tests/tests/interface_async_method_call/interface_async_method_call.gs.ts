@@ -38,7 +38,7 @@ export class ChannelProcessor {
 
 	constructor(init?: Partial<{ch?: $.Channel<number> | null}>) {
 		this._fields = {
-			ch: $.varRef(init?.ch ?? (null as $.Channel<number> | null))
+			ch: $.varRef(init?.ch ?? (null! as $.Channel<number> | null))
 		}
 	}
 
@@ -141,8 +141,8 @@ export class GenericChannelStore {
 
 	constructor(init?: Partial<{ch?: $.Channel<any> | null, value?: any}>) {
 		this._fields = {
-			ch: $.varRef(init?.ch ?? (null as $.Channel<any> | null)),
-			value: $.varRef(init?.value ?? (null as any))
+			ch: $.varRef(init?.ch ?? (null! as $.Channel<any> | null)),
+			value: $.varRef(init?.value ?? (null! as any))
 		}
 	}
 

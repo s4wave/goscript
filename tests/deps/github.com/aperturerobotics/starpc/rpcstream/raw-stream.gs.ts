@@ -88,7 +88,7 @@ export async function HandleRawRpcStream(stream: __goscript_rpcstream.RpcStream 
 	queueMicrotask(async () => { await copyRwcTo($.interfaceValue<io.ReadWriteCloser | null>(srw, "*rpcstream.RpcStreamReadWriter", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamReadWriter" }), remoteRwc, errCh) })
 
 	// wait for both errors
-	let outErr: $.GoError = null as $.GoError
+	let outErr: $.GoError = null! as $.GoError
 	for (let __rangeIndex = 0; __rangeIndex < 2; __rangeIndex++) {
 		{
 			let __goscriptShadow0 = await $.chanRecv(errCh)

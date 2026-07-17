@@ -173,20 +173,20 @@ export class commonRPC {
 
 	constructor(init?: Partial<{ctx?: context.Context | null, ctxCancel?: (() => void) | null, ctxCanceled?: atomic.Bool, service?: string, method?: string, localCompleted?: atomic.Bool, bcast?: broadcast.Broadcast, writer?: __goscript_writer.PacketWriter | null, writerClosed?: boolean, localCompleting?: boolean, localDone?: boolean, dataQueue?: $.Slice<$.Slice<number>>, dataClosed?: boolean, remoteErr?: $.GoError}>) {
 		this._fields = {
-			ctx: $.varRef(init?.ctx ?? (null as context.Context | null)),
-			ctxCancel: $.varRef(init?.ctxCancel ?? (null as (() => void) | null)),
+			ctx: $.varRef(init?.ctx ?? (null! as context.Context | null)),
+			ctxCancel: $.varRef(init?.ctxCancel ?? (null! as (() => void) | null)),
 			ctxCanceled: $.varRef(init?.ctxCanceled ? $.markAsStructValue($.cloneStructValue(init.ctxCanceled)) : $.markAsStructValue(new atomic.Bool())),
 			service: $.varRef(init?.service ?? ("" as string)),
 			method: $.varRef(init?.method ?? ("" as string)),
 			localCompleted: $.varRef(init?.localCompleted ? $.markAsStructValue($.cloneStructValue(init.localCompleted)) : $.markAsStructValue(new atomic.Bool())),
 			bcast: $.varRef(init?.bcast ? $.markAsStructValue($.cloneStructValue(init.bcast)) : $.markAsStructValue(new broadcast.Broadcast())),
-			writer: $.varRef(init?.writer ?? (null as __goscript_writer.PacketWriter | null)),
+			writer: $.varRef(init?.writer ?? (null! as __goscript_writer.PacketWriter | null)),
 			writerClosed: $.varRef(init?.writerClosed ?? (false as boolean)),
 			localCompleting: $.varRef(init?.localCompleting ?? (false as boolean)),
 			localDone: $.varRef(init?.localDone ?? (false as boolean)),
-			dataQueue: $.varRef(init?.dataQueue ?? (null as $.Slice<$.Slice<number>>)),
+			dataQueue: $.varRef(init?.dataQueue ?? (null! as $.Slice<$.Slice<number>>)),
 			dataClosed: $.varRef(init?.dataClosed ?? (false as boolean)),
-			remoteErr: $.varRef(init?.remoteErr ?? (null as $.GoError))
+			remoteErr: $.varRef(init?.remoteErr ?? (null! as $.GoError))
 		}
 	}
 
@@ -224,7 +224,7 @@ export class commonRPC {
 
 	public async HandleCallData(pkt: __goscript_rpcproto_pb.CallData | $.VarRef<__goscript_rpcproto_pb.CallData> | null): globalThis.Promise<$.GoError> {
 		let c: commonRPC | $.VarRef<commonRPC> | null = this
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let locked = $.varRef($.markAsStructValue($.cloneStructValue(await $.pointerValue<commonRPC>(c).bcast.Lock())))
 		if ($.pointerValue<commonRPC>(c).dataClosed) {
 			// If the packet is just indicating the call is complete, ignore it.
@@ -264,7 +264,7 @@ export class commonRPC {
 
 	public async HandleStreamClose(closeErr: $.GoError): globalThis.Promise<void> {
 		let c: commonRPC | $.VarRef<commonRPC> | null = this
-		let writer: __goscript_writer.PacketWriter | null = null as __goscript_writer.PacketWriter | null
+		let writer: __goscript_writer.PacketWriter | null = null! as __goscript_writer.PacketWriter | null
 		let locked = $.varRef($.markAsStructValue($.cloneStructValue(await $.pointerValue<commonRPC>(c).bcast.Lock())))
 		if ($.pointerValue<commonRPC>(c).dataClosed && $.pointerValue<commonRPC>(c).writerClosed) {
 			locked.value.Unlock()
@@ -290,7 +290,7 @@ export class commonRPC {
 		let c: commonRPC | $.VarRef<commonRPC> | null = this
 		let ctxDone: boolean = false
 		while (true) {
-			let waitCh: $.Channel<{}> | null = null as $.Channel<{}> | null
+			let waitCh: $.Channel<{}> | null = null! as $.Channel<{}> | null
 			let locked = $.varRef($.markAsStructValue($.cloneStructValue(await $.pointerValue<commonRPC>(c).bcast.Lock())))
 			if (ctxDone && !$.pointerValue<commonRPC>(c).dataClosed) {
 				// context must have been canceled locally
@@ -349,8 +349,8 @@ export class commonRPC {
 	public async Wait(ctx: context.Context | null): globalThis.Promise<$.GoError> {
 		const c: commonRPC | $.VarRef<commonRPC> | null = this
 		while (true) {
-			let err: $.GoError = null as $.GoError
-			let waitCh: $.Channel<{}> | null = null as $.Channel<{}> | null
+			let err: $.GoError = null! as $.GoError
+			let waitCh: $.Channel<{}> | null = null! as $.Channel<{}> | null
 			let rpcCanceled: boolean = false
 			let localDone: boolean = false
 			let locked = $.varRef($.markAsStructValue($.cloneStructValue(await $.pointerValue<commonRPC>(c).bcast.Lock())))

@@ -27,7 +27,7 @@ export async function ReadData(r: io.Reader | null, n: bigint): globalThis.Promi
 		return [buf, null]
 	}
 
-	let buf: $.Slice<number> = null as $.Slice<number>
+	let buf: $.Slice<number> = null! as $.Slice<number>
 	let buf1: $.Slice<number> = $.makeSlice<number>(10485760, undefined, "byte")
 	while (n > 0n) {
 		let next = n
@@ -67,7 +67,7 @@ export async function ReadDataAt(r: io.ReaderAt | null, n: bigint, off: bigint):
 		return [buf, null]
 	}
 
-	let buf: $.Slice<number> = null as $.Slice<number>
+	let buf: $.Slice<number> = null! as $.Slice<number>
 	let buf1: $.Slice<number> = $.makeSlice<number>(10485760, undefined, "byte")
 	while (n > 0n) {
 		let next = n

@@ -74,7 +74,7 @@ export class pkcs8 {
 		this._fields = {
 			Version: $.varRef(init?.Version ?? (0 as number)),
 			Algo: $.varRef(init?.Algo ? $.markAsStructValue($.cloneStructValue(init.Algo)) : $.markAsStructValue(new pkix.AlgorithmIdentifier())),
-			PrivateKey: $.varRef(init?.PrivateKey ?? (null as $.Slice<number>))
+			PrivateKey: $.varRef(init?.PrivateKey ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -98,8 +98,8 @@ export class pkcs8 {
 }
 
 export async function ParsePKCS8PrivateKey(der: $.Slice<number>): globalThis.Promise<[any, $.GoError]> {
-	let key: any = null as any
-	let err: $.GoError = null as $.GoError
+	let key: any = null! as any
+	let err: $.GoError = null! as $.GoError
 	let privKey: $.VarRef<pkcs8> = $.varRef($.markAsStructValue(new pkcs8()))
 	{
 		let [, __goscriptShadow0] = await asn1.Unmarshal(der, $.interfaceValue<any>(privKey, "*x509.pkcs8", { kind: $.TypeKind.Pointer, elemType: "x509.pkcs8" }))
@@ -134,7 +134,7 @@ export async function ParsePKCS8PrivateKey(der: $.Slice<number>): globalThis.Pro
 		case asn1.ObjectIdentifier_Equal(privKey.value.Algo.Algorithm, (__goscript_x509.oidPublicKeyECDSA as asn1.ObjectIdentifier)):
 		{
 			let bytes: $.Slice<number> = privKey.value.Algo.Parameters.FullBytes
-			let namedCurveOID: $.VarRef<asn1.ObjectIdentifier> | null = $.varRef<asn1.ObjectIdentifier>(null as asn1.ObjectIdentifier)
+			let namedCurveOID: $.VarRef<asn1.ObjectIdentifier> | null = $.varRef<asn1.ObjectIdentifier>(null! as asn1.ObjectIdentifier)
 			{
 				let [, __goscriptShadow3] = await asn1.Unmarshal(bytes, $.namedValueInterfaceValue<any>(namedCurveOID, "*asn1.ObjectIdentifier", {Equal: (receiver: any, ...args: any[]) => (asn1.ObjectIdentifier_Equal as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (asn1.ObjectIdentifier_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, typeName: "asn1.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } } }, [{ name: "Equal", args: [{ name: "other", type: { kind: $.TypeKind.Slice, typeName: "asn1.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]))
 				if (__goscriptShadow3 != null) {
@@ -158,7 +158,7 @@ export async function ParsePKCS8PrivateKey(der: $.Slice<number>): globalThis.Pro
 					return [null, errors.New("x509: invalid Ed25519 private key parameters")]
 				}
 			}
-			let curvePrivateKey: $.VarRef<$.Slice<number>> = $.varRef(null as $.Slice<number>)
+			let curvePrivateKey: $.VarRef<$.Slice<number>> = $.varRef(null! as $.Slice<number>)
 			{
 				let [, __goscriptShadow4] = await asn1.Unmarshal(privKey.value.PrivateKey, $.interfaceValue<any>(curvePrivateKey, "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }))
 				if (__goscriptShadow4 != null) {
@@ -182,7 +182,7 @@ export async function ParsePKCS8PrivateKey(der: $.Slice<number>): globalThis.Pro
 					return [null, errors.New("x509: invalid X25519 private key parameters")]
 				}
 			}
-			let curvePrivateKey: $.VarRef<$.Slice<number>> = $.varRef(null as $.Slice<number>)
+			let curvePrivateKey: $.VarRef<$.Slice<number>> = $.varRef(null! as $.Slice<number>)
 			{
 				let [, __goscriptShadow5] = await asn1.Unmarshal(privKey.value.PrivateKey, $.interfaceValue<any>(curvePrivateKey, "*[]byte", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }))
 				if (__goscriptShadow5 != null) {
@@ -266,7 +266,7 @@ export async function MarshalPKCS8PrivateKey(key: any): globalThis.Promise<[$.Sl
 					let k: ecdh.PrivateKey | $.VarRef<ecdh.PrivateKey> | null = $.typeAssert<ecdh.PrivateKey | $.VarRef<ecdh.PrivateKey> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "ecdh.PrivateKey" }).value
 					if ($.comparableEqual(ecdh.PrivateKey.prototype.Curve.call($.pointerValue<ecdh.PrivateKey>(k)), ecdh.X25519())) {
 						privKey.Algo = $.markAsStructValue(new pkix.AlgorithmIdentifier({Algorithm: (__goscript_x509.oidPublicKeyX25519 as asn1.ObjectIdentifier)}))
-						let err: $.GoError = null as $.GoError
+						let err: $.GoError = null! as $.GoError
 						{
 							let __goscriptTuple6: any = await asn1.Marshal($.interfaceValue<any>(ecdh.PrivateKey.prototype.Bytes.call($.pointerValue<ecdh.PrivateKey>(k)), "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))
 							privKey.PrivateKey = __goscriptTuple6[0]

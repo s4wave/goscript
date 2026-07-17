@@ -17,7 +17,7 @@ export class node {
 
 	constructor(init?: Partial<{next?: node | $.VarRef<node> | null}>) {
 		this._fields = {
-			next: $.varRef(init?.next ?? (null as node | $.VarRef<node> | null))
+			next: $.varRef(init?.next ?? (null! as node | $.VarRef<node> | null))
 		}
 	}
 
@@ -46,7 +46,7 @@ export function clone(n: node | $.VarRef<node> | null): node | $.VarRef<node> | 
 }
 
 export async function main(): globalThis.Promise<void> {
-	let n: node | $.VarRef<node> | null = null as node | $.VarRef<node> | null
+	let n: node | $.VarRef<node> | null = null! as node | $.VarRef<node> | null
 	let cloned: node | $.VarRef<node> | null = clone(n)
 	$.println(cloned == null)
 

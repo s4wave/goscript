@@ -26,7 +26,7 @@ export class writerHolder {
 
 	constructor(init?: Partial<{w?: io.Writer | null}>) {
 		this._fields = {
-			w: $.varRef(init?.w ?? (null as io.Writer | null))
+			w: $.varRef(init?.w ?? (null! as io.Writer | null))
 		}
 	}
 
@@ -192,7 +192,7 @@ export class asyncReaderAt {
 
 	constructor(init?: Partial<{data?: $.Slice<number>}>) {
 		this._fields = {
-			data: $.varRef(init?.data ?? (null as $.Slice<number>))
+			data: $.varRef(init?.data ?? (null! as $.Slice<number>))
 		}
 	}
 

@@ -309,10 +309,10 @@ export function NewGCMTLS13(_p0: cipher.Block | null): [cipher.AEAD | null, $.Go
 }
 
 export function GenerateKeyECDSA(curve: string): [__goscript_doc.BigInt, __goscript_doc.BigInt, __goscript_doc.BigInt, $.GoError] {
-	let X: __goscript_doc.BigInt = null as __goscript_doc.BigInt
-	let Y: __goscript_doc.BigInt = null as __goscript_doc.BigInt
-	let D: __goscript_doc.BigInt = null as __goscript_doc.BigInt
-	let err: $.GoError = null as $.GoError
+	let X: __goscript_doc.BigInt = null! as __goscript_doc.BigInt
+	let Y: __goscript_doc.BigInt = null! as __goscript_doc.BigInt
+	let D: __goscript_doc.BigInt = null! as __goscript_doc.BigInt
+	let err: $.GoError = null! as $.GoError
 	$.panic("boringcrypto: not available")
 	throw new globalThis.Error("goscript: unreachable return")
 }
@@ -368,15 +368,15 @@ export function EncryptRSANoPadding(pub: PublicKeyRSA | $.VarRef<PublicKeyRSA> |
 }
 
 export function GenerateKeyRSA(bits: number): [__goscript_doc.BigInt, __goscript_doc.BigInt, __goscript_doc.BigInt, __goscript_doc.BigInt, __goscript_doc.BigInt, __goscript_doc.BigInt, __goscript_doc.BigInt, __goscript_doc.BigInt, $.GoError] {
-	let N: __goscript_doc.BigInt = null as __goscript_doc.BigInt
-	let E: __goscript_doc.BigInt = null as __goscript_doc.BigInt
-	let D: __goscript_doc.BigInt = null as __goscript_doc.BigInt
-	let P: __goscript_doc.BigInt = null as __goscript_doc.BigInt
-	let Q: __goscript_doc.BigInt = null as __goscript_doc.BigInt
-	let Dp: __goscript_doc.BigInt = null as __goscript_doc.BigInt
-	let Dq: __goscript_doc.BigInt = null as __goscript_doc.BigInt
-	let Qinv: __goscript_doc.BigInt = null as __goscript_doc.BigInt
-	let err: $.GoError = null as $.GoError
+	let N: __goscript_doc.BigInt = null! as __goscript_doc.BigInt
+	let E: __goscript_doc.BigInt = null! as __goscript_doc.BigInt
+	let D: __goscript_doc.BigInt = null! as __goscript_doc.BigInt
+	let P: __goscript_doc.BigInt = null! as __goscript_doc.BigInt
+	let Q: __goscript_doc.BigInt = null! as __goscript_doc.BigInt
+	let Dp: __goscript_doc.BigInt = null! as __goscript_doc.BigInt
+	let Dq: __goscript_doc.BigInt = null! as __goscript_doc.BigInt
+	let Qinv: __goscript_doc.BigInt = null! as __goscript_doc.BigInt
+	let err: $.GoError = null! as $.GoError
 	$.panic("boringcrypto: not available")
 	throw new globalThis.Error("goscript: unreachable return")
 }

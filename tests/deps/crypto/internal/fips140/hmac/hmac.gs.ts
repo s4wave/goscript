@@ -103,10 +103,10 @@ export class HMAC {
 
 	constructor(init?: Partial<{opad?: $.Slice<number>, ipad?: $.Slice<number>, outer?: hash.Hash | null, inner?: hash.Hash | null, marshaled?: boolean, forHKDF?: boolean, keyLen?: number}>) {
 		this._fields = {
-			opad: $.varRef(init?.opad ?? (null as $.Slice<number>)),
-			ipad: $.varRef(init?.ipad ?? (null as $.Slice<number>)),
-			outer: $.varRef(init?.outer ?? (null as hash.Hash | null)),
-			inner: $.varRef(init?.inner ?? (null as hash.Hash | null)),
+			opad: $.varRef(init?.opad ?? (null! as $.Slice<number>)),
+			ipad: $.varRef(init?.ipad ?? (null! as $.Slice<number>)),
+			outer: $.varRef(init?.outer ?? (null! as hash.Hash | null)),
+			inner: $.varRef(init?.inner ?? (null! as hash.Hash | null)),
 			marshaled: $.varRef(init?.marshaled ?? (false as boolean)),
 			forHKDF: $.varRef(init?.forHKDF ?? (false as boolean)),
 			keyLen: $.varRef(init?.keyLen ?? (0 as number))
@@ -145,7 +145,7 @@ export class HMAC {
 		if (!ok) {
 			return [null, $.interfaceValue<$.GoError>($.markAsStructValue(new errCloneUnsupported()), "hmac.errCloneUnsupported", "hmac.errCloneUnsupported")]
 		}
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let __goscriptTuple1: any = await $.pointerValue<Exclude<hash.Cloner, null>>(ic).Clone()
 		r.value.inner = (__goscriptTuple1[0] as hash.Hash | null)
 		err = __goscriptTuple1[1]
@@ -269,7 +269,7 @@ export class HMAC {
 	public async Write(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const h: HMAC | $.VarRef<HMAC> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		return $.pointerValue<Exclude<hash.Hash, null>>($.pointerValue<HMAC>(h).inner).Write(p)
 	}
 

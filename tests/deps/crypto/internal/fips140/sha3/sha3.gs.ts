@@ -243,7 +243,7 @@ export class Digest {
 	public Write(p: $.Slice<number>): [number, $.GoError] {
 		const d: Digest | $.VarRef<Digest> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		return Digest.prototype.write.call(d, p)
 	}
 
@@ -272,14 +272,14 @@ export class Digest {
 	public read(out: $.Slice<number>): [number, $.GoError] {
 		const d: Digest | $.VarRef<Digest> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		return Digest.prototype.readGeneric.call(d, out)
 	}
 
 	public readGeneric(out: $.Slice<number>): [number, $.GoError] {
 		let d: Digest | $.VarRef<Digest> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		// If we're still absorbing, pad and apply the permutation.
 		if ($.pointerValue<Digest>(d).state == 0) {
 			Digest.prototype.padAndPermute.call(d)
@@ -324,14 +324,14 @@ export class Digest {
 	public write(p: $.Slice<number>): [number, $.GoError] {
 		const d: Digest | $.VarRef<Digest> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		return Digest.prototype.writeGeneric.call(d, p)
 	}
 
 	public writeGeneric(p: $.Slice<number>): [number, $.GoError] {
 		let d: Digest | $.VarRef<Digest> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.pointerValue<Digest>(d).state != 0) {
 			$.panic("sha3: Write after Read")
 		}

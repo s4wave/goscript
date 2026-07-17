@@ -77,11 +77,11 @@ export class CurveParams {
 
 	constructor(init?: Partial<{P?: big.Int | $.VarRef<big.Int> | null, N?: big.Int | $.VarRef<big.Int> | null, B?: big.Int | $.VarRef<big.Int> | null, Gx?: big.Int | $.VarRef<big.Int> | null, Gy?: big.Int | $.VarRef<big.Int> | null, BitSize?: number, Name?: string}>) {
 		this._fields = {
-			P: $.varRef(init?.P ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			N: $.varRef(init?.N ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			B: $.varRef(init?.B ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			Gx: $.varRef(init?.Gx ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			Gy: $.varRef(init?.Gy ?? (null as big.Int | $.VarRef<big.Int> | null)),
+			P: $.varRef(init?.P ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			N: $.varRef(init?.N ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			B: $.varRef(init?.B ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			Gx: $.varRef(init?.Gx ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			Gy: $.varRef(init?.Gy ?? (null! as big.Int | $.VarRef<big.Int> | null)),
 			BitSize: $.varRef(init?.BitSize ?? (0 as number)),
 			Name: $.varRef(init?.Name ?? ("" as string))
 		}
@@ -294,8 +294,8 @@ export class CurveParams {
 
 	public async affineFromJacobian(x: big.Int | $.VarRef<big.Int> | null, y: big.Int | $.VarRef<big.Int> | null, z: big.Int | $.VarRef<big.Int> | null): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]> {
 		const curve: CurveParams | $.VarRef<CurveParams> | null = this
-		let xOut: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-		let yOut: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
+		let xOut: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+		let yOut: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
 		if (big.Int.prototype.Sign.call(z) == 0) {
 			return [new big.Int(), new big.Int()]
 		}

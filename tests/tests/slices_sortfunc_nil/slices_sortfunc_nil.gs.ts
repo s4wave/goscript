@@ -42,7 +42,7 @@ export class field {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let fields: $.Slice<field> = null as $.Slice<field>
+	let fields: $.Slice<field> = null! as $.Slice<field>
 	$.println("fields before:", fields)
 
 	await slices.SortFunc(fields, $.functionValue((a: field, b: field): number => {

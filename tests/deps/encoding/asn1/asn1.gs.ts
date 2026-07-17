@@ -156,7 +156,7 @@ export class BitString {
 
 	constructor(init?: Partial<{Bytes?: $.Slice<number>, BitLength?: number}>) {
 		this._fields = {
-			Bytes: $.varRef(init?.Bytes ?? (null as $.Slice<number>)),
+			Bytes: $.varRef(init?.Bytes ?? (null! as $.Slice<number>)),
 			BitLength: $.varRef(init?.BitLength ?? (0 as number))
 		}
 	}
@@ -255,8 +255,8 @@ export class RawValue {
 			Class: $.varRef(init?.Class ?? (0 as number)),
 			Tag: $.varRef(init?.Tag ?? (0 as number)),
 			IsCompound: $.varRef(init?.IsCompound ?? (false as boolean)),
-			Bytes: $.varRef(init?.Bytes ?? (null as $.Slice<number>)),
-			FullBytes: $.varRef(init?.FullBytes ?? (null as $.Slice<number>))
+			Bytes: $.varRef(init?.Bytes ?? (null! as $.Slice<number>)),
+			FullBytes: $.varRef(init?.FullBytes ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -295,7 +295,7 @@ export class invalidUnmarshalError {
 
 	constructor(init?: Partial<{Type?: reflect.Type | null}>) {
 		this._fields = {
-			Type: $.varRef(init?.Type ?? (null as reflect.Type | null))
+			Type: $.varRef(init?.Type ?? (null! as reflect.Type | null))
 		}
 	}
 
@@ -338,7 +338,7 @@ export const rejectAmpersand: ampersandFlag = false
 
 export function parseBool(bytes: $.Slice<number>): [boolean, $.GoError] {
 	let ret: boolean = false
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	if ($.len(bytes) != 1) {
 		err = $.interfaceValue<$.GoError>($.markAsStructValue(new SyntaxError({Msg: "invalid boolean"})), "asn1.SyntaxError", "asn1.SyntaxError")
 		return [ret, err]
@@ -383,7 +383,7 @@ export function checkInteger(bytes: $.Slice<number>): $.GoError {
 
 export function parseInt64(bytes: $.Slice<number>): [bigint, $.GoError] {
 	let ret: bigint = 0n
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	err = checkInteger(bytes)
 	if (err != null) {
 		return [ret, err]
@@ -452,7 +452,7 @@ export function parseBigInt(bytes: $.Slice<number>): [big.Int | $.VarRef<big.Int
 
 export function parseBitString(bytes: $.Slice<number>): [BitString, $.GoError] {
 	let ret: BitString = $.markAsStructValue(new BitString())
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	if ($.len(bytes) == 0) {
 		err = $.interfaceValue<$.GoError>($.markAsStructValue(new SyntaxError({Msg: "zero length BIT STRING"})), "asn1.SyntaxError", "asn1.SyntaxError")
 		return [ret, err]
@@ -526,8 +526,8 @@ export function ObjectIdentifier_String(oi: ObjectIdentifier): string {
 }
 
 export function parseObjectIdentifier(bytes: $.Slice<number>): [ObjectIdentifier, $.GoError] {
-	let s: ObjectIdentifier = null as ObjectIdentifier
-	let err: $.GoError = null as $.GoError
+	let s: ObjectIdentifier = null! as ObjectIdentifier
+	let err: $.GoError = null! as $.GoError
 	if ($.len(bytes) == 0) {
 		err = $.interfaceValue<$.GoError>($.markAsStructValue(new SyntaxError({Msg: "zero length OBJECT IDENTIFIER"})), "asn1.SyntaxError", "asn1.SyntaxError")
 		return [s, err]
@@ -574,7 +574,7 @@ export function parseObjectIdentifier(bytes: $.Slice<number>): [ObjectIdentifier
 export function parseBase128Int(bytes: $.Slice<number>, initOffset: number): [number, number, $.GoError] {
 	let ret: number = 0
 	let offset: number = 0
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	offset = initOffset
 	let ret64: bigint = 0n
 	for (let shifted = 0; offset < $.len(bytes); shifted++) {
@@ -609,7 +609,7 @@ export function parseBase128Int(bytes: $.Slice<number>, initOffset: number): [nu
 
 export function parseUTCTime(bytes: $.Slice<number>): [time.Time, $.GoError] {
 	let ret: time.Time = $.markAsStructValue(new time.Time())
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let s = $.bytesToString(bytes)
 
 	let formatStr = "0601021504Z0700"
@@ -644,7 +644,7 @@ export function parseUTCTime(bytes: $.Slice<number>): [time.Time, $.GoError] {
 
 export function parseGeneralizedTime(bytes: $.Slice<number>): [time.Time, $.GoError] {
 	let ret: time.Time = $.markAsStructValue(new time.Time())
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	const formatStr: string = "20060102150405.999999999Z0700"
 	let s = $.bytesToString(bytes)
 
@@ -669,7 +669,7 @@ export function parseGeneralizedTime(bytes: $.Slice<number>): [time.Time, $.GoEr
 
 export function parseNumericString(bytes: $.Slice<number>): [string, $.GoError] {
 	let ret: string = ""
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	for (let __goscriptRangeTarget2 = bytes, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget2); __rangeIndex++) {
 		let b = __goscriptRangeTarget2![__rangeIndex]
 		if (!isNumeric($.uint(b, 8))) {
@@ -685,7 +685,7 @@ export function isNumeric(b: number): boolean {
 
 export function parsePrintableString(bytes: $.Slice<number>): [string, $.GoError] {
 	let ret: string = ""
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	for (let __goscriptRangeTarget3 = bytes, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget3); __rangeIndex++) {
 		let b = __goscriptRangeTarget3![__rangeIndex]
 		if (!isPrintable($.uint(b, 8), true, true)) {
@@ -703,7 +703,7 @@ export function isPrintable(b: number, asterisk: asteriskFlag, ampersand: ampers
 
 export function parseIA5String(bytes: $.Slice<number>): [string, $.GoError] {
 	let ret: string = ""
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	for (let __goscriptRangeTarget4 = bytes, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget4); __rangeIndex++) {
 		let b = __goscriptRangeTarget4![__rangeIndex]
 		if ($.uint(b, 8) >= $.uint(utf8.RuneSelf, 8)) {
@@ -717,7 +717,7 @@ export function parseIA5String(bytes: $.Slice<number>): [string, $.GoError] {
 
 export function parseT61String(bytes: $.Slice<number>): [string, $.GoError] {
 	let ret: string = ""
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	// T.61 is a defunct ITU 8-bit character encoding which preceded Unicode.
 	// T.61 uses a code page layout that _almost_ exactly maps to the code
 	// page layout of the ISO 8859-1 (Latin-1) character encoding, with the
@@ -738,7 +738,7 @@ export function parseT61String(bytes: $.Slice<number>): [string, $.GoError] {
 
 export function parseUTF8String(bytes: $.Slice<number>): [string, $.GoError] {
 	let ret: string = ""
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	if (!utf8.Valid(bytes)) {
 		return ["", errors.New("asn1: invalid UTF-8 string")]
 	}
@@ -785,7 +785,7 @@ export function parseBMPString(bmpString: $.Slice<number>): [string, $.GoError] 
 export function parseTagAndLength(bytes: $.Slice<number>, initOffset: number): [__goscript_common.tagAndLength, number, $.GoError] {
 	let ret: __goscript_common.tagAndLength = $.markAsStructValue(new __goscript_common.tagAndLength())
 	let offset: number = 0
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	offset = initOffset
 	// parseTagAndLength should not be called without at least a single
 	// byte to read. Thus this check is for robustness:
@@ -865,7 +865,7 @@ export function parseTagAndLength(bytes: $.Slice<number>, initOffset: number): [
 
 export async function parseSequenceOf(bytes: $.Slice<number>, sliceType: reflect.Type | null, elemType: reflect.Type | null): globalThis.Promise<[reflect.Value, $.GoError]> {
 	let ret: reflect.Value = $.markAsStructValue(new reflect.Value())
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let [matchAny, expectedTag, compoundType, ok] = await __goscript_common.getUniversalType(elemType)
 	if (!ok) {
 		err = $.interfaceValue<$.GoError>($.markAsStructValue(new StructuralError({Msg: "unknown Go type for slice"})), "asn1.StructuralError", "asn1.StructuralError")
@@ -989,7 +989,7 @@ export function invalidLength(offset: number, length: number, sliceLength: numbe
 
 export async function parseField(v: reflect.Value, bytes: $.Slice<number>, initOffset: number, params: __goscript_common.fieldParameters): globalThis.Promise<[number, $.GoError]> {
 	let offset: number = 0
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	offset = initOffset
 	let fieldType = $.markAsStructValue($.cloneStructValue(v)).Type()
 
@@ -1017,7 +1017,7 @@ export async function parseField(v: reflect.Value, bytes: $.Slice<number>, initO
 				err = $.interfaceValue<$.GoError>($.markAsStructValue(new SyntaxError({Msg: "data truncated"})), "asn1.SyntaxError", "asn1.SyntaxError")
 				return [offset, err]
 			}
-			let result: any = null as any
+			let result: any = null! as any
 			if (!t.isCompound && (t._class == 0)) {
 				let innerBytes: $.Slice<number> = $.goSlice(bytes, offset, offset + t.length)
 				switch (t.tag) {
@@ -1536,14 +1536,14 @@ export function setDefaultValue(v: reflect.Value, params: __goscript_common.fiel
 }
 
 export async function Unmarshal(b: $.Slice<number>, val: any): globalThis.Promise<[$.Slice<number>, $.GoError]> {
-	let rest: $.Slice<number> = null as $.Slice<number>
-	let err: $.GoError = null as $.GoError
+	let rest: $.Slice<number> = null! as $.Slice<number>
+	let err: $.GoError = null! as $.GoError
 	return UnmarshalWithParams(b, val, "")
 }
 
 export async function UnmarshalWithParams(b: $.Slice<number>, val: any, params: string): globalThis.Promise<[$.Slice<number>, $.GoError]> {
-	let rest: $.Slice<number> = null as $.Slice<number>
-	let err: $.GoError = null as $.GoError
+	let rest: $.Slice<number> = null! as $.Slice<number>
+	let err: $.GoError = null! as $.GoError
 	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf(val)))
 	if (($.markAsStructValue($.cloneStructValue(v)).Kind() != reflect.Pointer) || $.markAsStructValue($.cloneStructValue(v)).IsNil()) {
 		return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField5 = reflect.TypeOf(val); return new invalidUnmarshalError({Type: __goscriptLiteralField5}) })(), "*asn1.invalidUnmarshalError", { kind: $.TypeKind.Pointer, elemType: "asn1.invalidUnmarshalError" })]

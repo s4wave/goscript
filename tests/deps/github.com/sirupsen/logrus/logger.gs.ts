@@ -225,15 +225,15 @@ export class Logger {
 
 	constructor(init?: Partial<{Out?: io.Writer | null, Hooks?: __goscript_hooks.LevelHooks, Formatter?: __goscript_formatter.Formatter | null, ReportCaller?: boolean, Level?: __goscript_logrus.Level, mu?: MutexWrap, entryPool?: sync.Pool, ExitFunc?: ((_p0: number) => void) | null, BufferPool?: __goscript_buffer_pool.BufferPool | null}>) {
 		this._fields = {
-			Out: $.varRef(init?.Out ?? (null as io.Writer | null)),
-			Hooks: $.varRef(init?.Hooks ?? (null as __goscript_hooks.LevelHooks)),
-			Formatter: $.varRef(init?.Formatter ?? (null as __goscript_formatter.Formatter | null)),
+			Out: $.varRef(init?.Out ?? (null! as io.Writer | null)),
+			Hooks: $.varRef(init?.Hooks ?? (null! as __goscript_hooks.LevelHooks)),
+			Formatter: $.varRef(init?.Formatter ?? (null! as __goscript_formatter.Formatter | null)),
 			ReportCaller: $.varRef(init?.ReportCaller ?? (false as boolean)),
 			Level: $.varRef(init?.Level ?? (0 as __goscript_logrus.Level)),
 			mu: $.varRef(init?.mu ? $.markAsStructValue($.cloneStructValue(init.mu)) : $.markAsStructValue(new MutexWrap())),
 			entryPool: $.varRef(init?.entryPool ? $.markAsStructValue($.cloneStructValue(init.entryPool)) : $.markAsStructValue(new sync.Pool())),
-			ExitFunc: $.varRef(init?.ExitFunc ?? (null as ((_p0: number) => void) | null)),
-			BufferPool: $.varRef(init?.BufferPool ?? (null as __goscript_buffer_pool.BufferPool | null))
+			ExitFunc: $.varRef(init?.ExitFunc ?? (null! as ((_p0: number) => void) | null)),
+			BufferPool: $.varRef(init?.BufferPool ?? (null! as __goscript_buffer_pool.BufferPool | null))
 		}
 	}
 

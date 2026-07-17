@@ -10,7 +10,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let month = 0
 	let value = "someValue"
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 
 	let getnum: ((v: string, flag: boolean) => [number, string, $.GoError] | globalThis.Promise<[number, string, $.GoError]>) | null = $.functionValue((v: string, flag: boolean): [number, string, $.GoError] => {
 		if (flag) {

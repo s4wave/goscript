@@ -51,7 +51,7 @@ export class RpcStreamReadWriter {
 
 	constructor(init?: Partial<{stream?: __goscript_rpcstream.RpcStream | null, buf?: bytes.Buffer}>) {
 		this._fields = {
-			stream: $.varRef(init?.stream ?? (null as __goscript_rpcstream.RpcStream | null)),
+			stream: $.varRef(init?.stream ?? (null! as __goscript_rpcstream.RpcStream | null)),
 			buf: $.varRef(init?.buf ? $.markAsStructValue($.cloneStructValue(init.buf)) : $.markAsStructValue(new bytes.Buffer()))
 		}
 	}
@@ -73,7 +73,7 @@ export class RpcStreamReadWriter {
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const r: RpcStreamReadWriter | $.VarRef<RpcStreamReadWriter> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let readBuf: $.Slice<number> = p
 		while (($.len(readBuf) != 0) && (err == null)) {
 			let rn: number = 0
@@ -89,7 +89,7 @@ export class RpcStreamReadWriter {
 					break
 				}
 
-				let pkt: __goscript_rpcstream_pb.RpcStreamPacket | $.VarRef<__goscript_rpcstream_pb.RpcStreamPacket> | null = null as __goscript_rpcstream_pb.RpcStreamPacket | $.VarRef<__goscript_rpcstream_pb.RpcStreamPacket> | null
+				let pkt: __goscript_rpcstream_pb.RpcStreamPacket | $.VarRef<__goscript_rpcstream_pb.RpcStreamPacket> | null = null! as __goscript_rpcstream_pb.RpcStreamPacket | $.VarRef<__goscript_rpcstream_pb.RpcStreamPacket> | null
 				let __goscriptTuple1: any = await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream, null>>($.pointerValue<RpcStreamReadWriter>(r).stream).Recv()
 				pkt = __goscriptTuple1[0]
 				err = __goscriptTuple1[1]
@@ -127,7 +127,7 @@ export class RpcStreamReadWriter {
 	public async Write(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const r: RpcStreamReadWriter | $.VarRef<RpcStreamReadWriter> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.len(p) == 0) {
 			return [0, null]
 		}

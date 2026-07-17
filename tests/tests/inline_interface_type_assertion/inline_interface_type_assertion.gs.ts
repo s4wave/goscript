@@ -74,7 +74,7 @@ export class MyStringer {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let i: any = null as any
+	let i: any = null! as any
 	i = $.interfaceValue<any>($.markAsStructValue(new Greeter()), "main.Greeter", "main.Greeter")
 
 	// Successful type assertion to an inline interface
@@ -94,7 +94,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Successful type assertion to a named interface, where the asserted value also implements an inline interface method
-	let j: any = null as any
+	let j: any = null! as any
 	j = $.interfaceValue<any>($.markAsStructValue(new MyStringer()), "main.MyStringer", "main.MyStringer")
 
 	// Assert 'j' (which holds MyStringer) to an inline interface that MyStringer satisfies.
@@ -106,7 +106,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Test case: variable of named interface type, asserted to inline interface
-	let k: Stringer | null = null as Stringer | null
+	let k: Stringer | null = null! as Stringer | null
 	k = $.interfaceValue<Stringer | null>($.markAsStructValue(new MyStringer()), "main.MyStringer", "main.MyStringer")
 
 	let [inlineK, ok5] = $.typeAssertTuple<any>(k, { kind: $.TypeKind.Interface, methods: [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] })

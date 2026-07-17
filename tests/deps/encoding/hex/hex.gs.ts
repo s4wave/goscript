@@ -50,8 +50,8 @@ export class encoder {
 
 	constructor(init?: Partial<{w?: io.Writer | null, err?: $.GoError, out?: Uint8Array}>) {
 		this._fields = {
-			w: $.varRef(init?.w ?? (null as io.Writer | null)),
-			err: $.varRef(init?.err ?? (null as $.GoError)),
+			w: $.varRef(init?.w ?? (null! as io.Writer | null)),
+			err: $.varRef(init?.err ?? (null! as $.GoError)),
 			out: $.varRef(init?.out !== undefined ? $.cloneArrayValue(init.out) : new Uint8Array(1024))
 		}
 	}
@@ -69,7 +69,7 @@ export class encoder {
 	public async Write(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		let e: encoder | $.VarRef<encoder> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		while (($.len(p) > 0) && ($.pointerValue<encoder>(e).err == null)) {
 			let chunkSize = Math.trunc(1024 / 2)
 			if ($.len(p) < chunkSize) {
@@ -134,9 +134,9 @@ export class decoder {
 
 	constructor(init?: Partial<{r?: io.Reader | null, err?: $.GoError, _in?: $.Slice<number>, arr?: Uint8Array}>) {
 		this._fields = {
-			r: $.varRef(init?.r ?? (null as io.Reader | null)),
-			err: $.varRef(init?.err ?? (null as $.GoError)),
-			_in: $.varRef(init?._in ?? (null as $.Slice<number>)),
+			r: $.varRef(init?.r ?? (null! as io.Reader | null)),
+			err: $.varRef(init?.err ?? (null! as $.GoError)),
+			_in: $.varRef(init?._in ?? (null! as $.Slice<number>)),
 			arr: $.varRef(init?.arr !== undefined ? $.cloneArrayValue(init.arr) : new Uint8Array(1024))
 		}
 	}
@@ -155,7 +155,7 @@ export class decoder {
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		let d: decoder | $.VarRef<decoder> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		// Fill internal buffer with sufficient bytes to decode
 		if (($.len($.pointerValue<decoder>(d)._in) < 2) && ($.pointerValue<decoder>(d).err == null)) {
 			let numCopy: number = 0
@@ -265,7 +265,7 @@ export class dumper {
 
 	constructor(init?: Partial<{w?: io.Writer | null, rightChars?: Uint8Array, buf?: Uint8Array, used?: number, n?: number, closed?: boolean}>) {
 		this._fields = {
-			w: $.varRef(init?.w ?? (null as io.Writer | null)),
+			w: $.varRef(init?.w ?? (null! as io.Writer | null)),
 			rightChars: $.varRef(init?.rightChars !== undefined ? $.cloneArrayValue(init.rightChars) : new Uint8Array(18)),
 			buf: $.varRef(init?.buf !== undefined ? $.cloneArrayValue(init.buf) : new Uint8Array(14)),
 			used: $.varRef(init?.used ?? (0 as number)),
@@ -289,7 +289,7 @@ export class dumper {
 
 	public async Close(): globalThis.Promise<$.GoError> {
 		let h: dumper | $.VarRef<dumper> | null = this
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		// See the comments in Write() for the details of this format.
 		if ($.pointerValue<dumper>(h).closed) {
 			return err
@@ -330,7 +330,7 @@ export class dumper {
 	public async Write(data: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		let h: dumper | $.VarRef<dumper> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.pointerValue<dumper>(h).closed) {
 			return [0, errors.New("encoding/hex: dumper closed")]
 		}

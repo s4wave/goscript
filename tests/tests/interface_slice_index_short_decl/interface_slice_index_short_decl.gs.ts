@@ -43,7 +43,7 @@ export class Action {
 	constructor(init?: Partial<{Result?: number, Filter?: globalThis.Map<number, dep.Ref | null> | null}>) {
 		this._fields = {
 			Result: $.varRef(init?.Result ?? (0 as number)),
-			Filter: $.varRef(init?.Filter ?? (null as globalThis.Map<number, dep.Ref | null> | null))
+			Filter: $.varRef(init?.Filter ?? (null! as globalThis.Map<number, dep.Ref | null> | null))
 		}
 	}
 
@@ -88,7 +88,7 @@ export function Fixed_Mark(f: Fixed): boolean {
 
 export async function main(): globalThis.Promise<void> {
 	let shapes: $.Slice<Shape | null> = $.arrayToSlice<Shape | null>([$.namedValueInterfaceValue<Shape | null>($.arrayToSlice<dep.Ref | null>([$.namedValueInterfaceValue<dep.Ref | null>(new Uint8Array([$.uint(1, 8), $.uint(2, 8)]), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [{ name: "Key", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }])]), "main.Fixed", {Mark: (receiver: any, ...args: any[]) => (Fixed_Mark as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "main.Fixed", elemType: "dep.Ref" }, [{ name: "Mark", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }]), $.interfaceValue<Shape | null>($.markAsStructValue(new Action({Result: 1, Filter: new globalThis.Map<number, dep.Ref | null>([[1, $.namedValueInterfaceValue<dep.Ref | null>(new Uint8Array([$.uint(1, 8), $.uint(2, 8)]), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [{ name: "Key", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }])]])})), "main.Action", "main.Action")])
-	let fixed: $.Slice<Fixed> = null as $.Slice<Fixed>
+	let fixed: $.Slice<Fixed> = null! as $.Slice<Fixed>
 	for (let __goscriptRangeTarget0 = shapes, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let shape = __goscriptRangeTarget0![__rangeIndex]
 		{

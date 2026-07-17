@@ -82,14 +82,14 @@ export class Payload {
 
 	constructor(init?: Partial<{Ptr?: $.VarRef<number> | null, IfaceZero?: any, IfaceFalse?: any, IfaceEmptyString?: any, IfaceEmptySlice?: any, IfaceEmptyMap?: any, PtrNilIface?: $.VarRef<any> | null, PtrBool?: $.VarRef<boolean> | null}>) {
 		this._fields = {
-			Ptr: $.varRef(init?.Ptr ?? (null as $.VarRef<number> | null)),
-			IfaceZero: $.varRef(init?.IfaceZero ?? (null as any)),
-			IfaceFalse: $.varRef(init?.IfaceFalse ?? (null as any)),
-			IfaceEmptyString: $.varRef(init?.IfaceEmptyString ?? (null as any)),
-			IfaceEmptySlice: $.varRef(init?.IfaceEmptySlice ?? (null as any)),
-			IfaceEmptyMap: $.varRef(init?.IfaceEmptyMap ?? (null as any)),
-			PtrNilIface: $.varRef(init?.PtrNilIface ?? (null as $.VarRef<any> | null)),
-			PtrBool: $.varRef(init?.PtrBool ?? (null as $.VarRef<boolean> | null))
+			Ptr: $.varRef(init?.Ptr ?? (null! as $.VarRef<number> | null)),
+			IfaceZero: $.varRef(init?.IfaceZero ?? (null! as any)),
+			IfaceFalse: $.varRef(init?.IfaceFalse ?? (null! as any)),
+			IfaceEmptyString: $.varRef(init?.IfaceEmptyString ?? (null! as any)),
+			IfaceEmptySlice: $.varRef(init?.IfaceEmptySlice ?? (null! as any)),
+			IfaceEmptyMap: $.varRef(init?.IfaceEmptyMap ?? (null! as any)),
+			PtrNilIface: $.varRef(init?.PtrNilIface ?? (null! as $.VarRef<any> | null)),
+			PtrBool: $.varRef(init?.PtrBool ?? (null! as $.VarRef<boolean> | null))
 		}
 	}
 
@@ -120,7 +120,7 @@ export class Payload {
 export async function main(): globalThis.Promise<void> {
 	let zero = $.varRef(0)
 	let falseValue = $.varRef(false)
-	let nilIface: $.VarRef<any> = $.varRef(null as any)
+	let nilIface: $.VarRef<any> = $.varRef(null! as any)
 	let __goscriptTuple0: any = json.Marshal($.interfaceValue<any>($.markAsStructValue(new Payload({Ptr: zero, IfaceZero: $.basicInterfaceValue(0, "int"), IfaceFalse: false, IfaceEmptyString: "", IfaceEmptySlice: $.interfaceValue<any>($.arrayToSlice<number>([]), "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }), IfaceEmptyMap: $.interfaceValue<any>(new globalThis.Map<string, number>([]), "map[string]int", { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } }), PtrNilIface: nilIface, PtrBool: falseValue})), "main.Payload", "main.Payload"))
 	let out: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]

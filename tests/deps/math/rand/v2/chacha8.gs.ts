@@ -78,7 +78,7 @@ export class ChaCha8 {
 	public Read(p: $.Slice<number>): [number, $.GoError] {
 		let c: ChaCha8 | $.VarRef<ChaCha8> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.pointerValue<ChaCha8>(c).readLen > 0) {
 			n = $.copy(p, $.goSlice($.pointerValue<ChaCha8>(c).readBuf, $.len($.pointerValue<ChaCha8>(c).readBuf) - $.pointerValue<ChaCha8>(c).readLen, undefined))
 			$.pointerValue<ChaCha8>(c).readLen = $.pointerValue<ChaCha8>(c).readLen - (n)
@@ -122,7 +122,7 @@ export class ChaCha8 {
 		data = __goscriptTuple0[0]
 		let ok = __goscriptTuple0[1]
 		if (ok) {
-			let buf: $.Slice<number> = null as $.Slice<number>
+			let buf: $.Slice<number> = null! as $.Slice<number>
 			let __goscriptTuple1: any = readUint8LengthPrefixed(data)
 			buf = __goscriptTuple1[0]
 			data = __goscriptTuple1[1]
@@ -151,7 +151,7 @@ export function NewChaCha8(seed: Uint8Array): ChaCha8 | $.VarRef<ChaCha8> | null
 }
 
 export function cutPrefix(s: $.Slice<number>, prefix: $.Slice<number>): [$.Slice<number>, boolean] {
-	let after: $.Slice<number> = null as $.Slice<number>
+	let after: $.Slice<number> = null! as $.Slice<number>
 	let found: boolean = false
 	if (($.len(s) < $.len(prefix)) || (!$.stringEqual($.bytesToString($.goSlice(s, undefined, $.len(prefix))), $.bytesToString(prefix)))) {
 		return [s, false]
@@ -160,8 +160,8 @@ export function cutPrefix(s: $.Slice<number>, prefix: $.Slice<number>): [$.Slice
 }
 
 export function readUint8LengthPrefixed(b: $.Slice<number>): [$.Slice<number>, $.Slice<number>, boolean] {
-	let buf: $.Slice<number> = null as $.Slice<number>
-	let rest: $.Slice<number> = null as $.Slice<number>
+	let buf: $.Slice<number> = null! as $.Slice<number>
+	let rest: $.Slice<number> = null! as $.Slice<number>
 	let ok: boolean = false
 	if (($.len(b) == 0) || ($.len(b) < $.int(1 + $.arrayIndex(b!, 0)))) {
 		return [null, null, false]

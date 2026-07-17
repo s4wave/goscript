@@ -195,15 +195,15 @@ export function parseName(__goscriptParam0: cryptobyte.String): [$.VarRef<pkix.R
 		return [null, errors.New("x509: invalid RDNSequence")]
 	}
 
-	let rdnSeq: $.VarRef<pkix.RDNSequence> = $.varRef(null as pkix.RDNSequence)
+	let rdnSeq: $.VarRef<pkix.RDNSequence> = $.varRef(null! as pkix.RDNSequence)
 	while (!cryptobyte.String_Empty(raw.value)) {
-		let rdnSet: pkix.RelativeDistinguishedNameSET = null as pkix.RelativeDistinguishedNameSET
-		let _set: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+		let rdnSet: pkix.RelativeDistinguishedNameSET = null! as pkix.RelativeDistinguishedNameSET
+		let _set: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 		if (!cryptobyte.String_ReadASN1(raw, _set, $.uint(cryptobyte_asn1.SET, 8))) {
 			return [null, errors.New("x509: invalid RDNSequence")]
 		}
 		while (!cryptobyte.String_Empty(_set.value)) {
-			let atav: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+			let atav: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 			if (!cryptobyte.String_ReadASN1(_set, atav, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 				return [null, errors.New("x509: invalid RDNSequence: invalid attribute")]
 			}
@@ -211,12 +211,12 @@ export function parseName(__goscriptParam0: cryptobyte.String): [$.VarRef<pkix.R
 			if (!cryptobyte.String_ReadASN1ObjectIdentifier(atav, attr._fields.Type)) {
 				return [null, errors.New("x509: invalid RDNSequence: invalid attribute type")]
 			}
-			let rawValue: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+			let rawValue: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 			let valueTag: $.VarRef<cryptobyte_asn1.Tag> = $.varRef(0)
 			if (!cryptobyte.String_ReadAnyASN1(atav, rawValue, valueTag)) {
 				return [null, errors.New("x509: invalid RDNSequence: invalid attribute value")]
 			}
-			let err: $.GoError = null as $.GoError
+			let err: $.GoError = null! as $.GoError
 			let __goscriptTuple0: any = parseASN1String($.uint(valueTag.value, 8), rawValue.value)
 			attr.Value = __goscriptTuple0[0]
 			err = __goscriptTuple0[1]
@@ -241,7 +241,7 @@ export function parseAI(__goscriptParam1: cryptobyte.String): [pkix.AlgorithmIde
 	if (cryptobyte.String_Empty(der.value)) {
 		return [$.markAsStructValue($.cloneStructValue(ai)), null]
 	}
-	let params: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let params: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	let tag: $.VarRef<cryptobyte_asn1.Tag> = $.varRef(0)
 	if (!cryptobyte.String_ReadAnyASN1Element(der, params, tag)) {
 		return [$.markAsStructValue($.cloneStructValue(ai)), errors.New("x509: malformed parameters")]
@@ -304,7 +304,7 @@ export function parseExtension(__goscriptParam3: cryptobyte.String): [pkix.Exten
 			return [$.markAsStructValue($.cloneStructValue(ext)), errors.New("x509: malformed extension critical field")]
 		}
 	}
-	let val: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let val: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	if (!cryptobyte.String_ReadASN1(der, val, $.uint(cryptobyte_asn1.OCTET_STRING, 8))) {
 		return [$.markAsStructValue($.cloneStructValue(ext)), errors.New("x509: malformed extension value field")]
 	}
@@ -349,7 +349,7 @@ export async function parsePublicKey(keyData: __goscript_x509.publicKeyInfo | $.
 		case asn1.ObjectIdentifier_Equal(oid, (__goscript_x509.oidPublicKeyECDSA as asn1.ObjectIdentifier)):
 		{
 			let paramsDer: $.VarRef<cryptobyte.String> = $.varRef(((params.FullBytes as cryptobyte.String) as cryptobyte.String))
-			let namedCurveOID: $.VarRef<asn1.ObjectIdentifier> | null = $.varRef<asn1.ObjectIdentifier>(null as asn1.ObjectIdentifier)
+			let namedCurveOID: $.VarRef<asn1.ObjectIdentifier> | null = $.varRef<asn1.ObjectIdentifier>(null! as asn1.ObjectIdentifier)
 			if (!cryptobyte.String_ReadASN1ObjectIdentifier(paramsDer, namedCurveOID)) {
 				return [null, errors.New("x509: invalid ECDSA parameters")]
 			}
@@ -454,7 +454,7 @@ export async function forEachSAN(__goscriptParam6: cryptobyte.String, callback: 
 		return errors.New("x509: invalid subject alternative names")
 	}
 	while (!cryptobyte.String_Empty(der.value)) {
-		let san: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+		let san: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 		let tag: $.VarRef<cryptobyte_asn1.Tag> = $.varRef(0)
 		if (!cryptobyte.String_ReadAnyASN1(der, san, tag)) {
 			return errors.New("x509: invalid subject alternative name")
@@ -471,11 +471,11 @@ export async function forEachSAN(__goscriptParam6: cryptobyte.String, callback: 
 }
 
 export async function parseSANExtension(der: cryptobyte.String): globalThis.Promise<[$.Slice<string>, $.Slice<string>, $.Slice<net.IP>, $.Slice<url.URL | $.VarRef<url.URL> | null>, $.GoError]> {
-	let dnsNames: $.Slice<string> = null as $.Slice<string>
-	let emailAddresses: $.Slice<string> = null as $.Slice<string>
-	let ipAddresses: $.Slice<net.IP> = null as $.Slice<net.IP>
-	let uris: $.Slice<url.URL | $.VarRef<url.URL> | null> = null as $.Slice<url.URL | $.VarRef<url.URL> | null>
-	let err: $.GoError = null as $.GoError
+	let dnsNames: $.Slice<string> = null! as $.Slice<string>
+	let emailAddresses: $.Slice<string> = null! as $.Slice<string>
+	let ipAddresses: $.Slice<net.IP> = null! as $.Slice<net.IP>
+	let uris: $.Slice<url.URL | $.VarRef<url.URL> | null> = null! as $.Slice<url.URL | $.VarRef<url.URL> | null>
+	let err: $.GoError = null! as $.GoError
 	err = await forEachSAN((der as cryptobyte.String), $.functionValue((tag: number, data: $.Slice<number>): $.GoError => {
 		switch (tag) {
 			case 1:
@@ -555,7 +555,7 @@ export function parseAuthorityKeyIdentifier(e: pkix.Extension): [$.Slice<number>
 		return [null, errors.New("x509: authority key identifier incorrectly marked critical")]
 	}
 	let val: $.VarRef<cryptobyte.String> = $.varRef(((e.Value as cryptobyte.String) as cryptobyte.String))
-	let akid: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let akid: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	if (!cryptobyte.String_ReadASN1(val, akid, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 		return [null, errors.New("x509: invalid authority key identifier")]
 	}
@@ -570,13 +570,13 @@ export function parseAuthorityKeyIdentifier(e: pkix.Extension): [$.Slice<number>
 
 export function parseExtKeyUsageExtension(__goscriptParam7: cryptobyte.String): [$.Slice<__goscript_x509.ExtKeyUsage>, $.Slice<asn1.ObjectIdentifier>, $.GoError] {
 	let der: $.VarRef<cryptobyte.String> = $.varRef(__goscriptParam7)
-	let extKeyUsages: $.Slice<__goscript_x509.ExtKeyUsage> = null as $.Slice<__goscript_x509.ExtKeyUsage>
-	let unknownUsages: $.Slice<asn1.ObjectIdentifier> = null as $.Slice<asn1.ObjectIdentifier>
+	let extKeyUsages: $.Slice<__goscript_x509.ExtKeyUsage> = null! as $.Slice<__goscript_x509.ExtKeyUsage>
+	let unknownUsages: $.Slice<asn1.ObjectIdentifier> = null! as $.Slice<asn1.ObjectIdentifier>
 	if (!cryptobyte.String_ReadASN1(der, der, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 		return [null, null, errors.New("x509: invalid extended key usages")]
 	}
 	while (!cryptobyte.String_Empty(der.value)) {
-		let eku: $.VarRef<asn1.ObjectIdentifier> = $.varRef(null as asn1.ObjectIdentifier)
+		let eku: $.VarRef<asn1.ObjectIdentifier> = $.varRef(null! as asn1.ObjectIdentifier)
 		if (!cryptobyte.String_ReadASN1ObjectIdentifier(der, eku)) {
 			return [null, null, errors.New("x509: invalid extended key usages")]
 		}
@@ -594,14 +594,14 @@ export function parseExtKeyUsageExtension(__goscriptParam7: cryptobyte.String): 
 
 export function parseCertificatePoliciesExtension(__goscriptParam8: cryptobyte.String): [$.Slice<__goscript_oid.OID>, $.GoError] {
 	let der: $.VarRef<cryptobyte.String> = $.varRef(__goscriptParam8)
-	let oids: $.Slice<__goscript_oid.OID> = null as $.Slice<__goscript_oid.OID>
+	let oids: $.Slice<__goscript_oid.OID> = null! as $.Slice<__goscript_oid.OID>
 	let seenOIDs: globalThis.Map<string, boolean> | null = new globalThis.Map<string, boolean>([])
 	if (!cryptobyte.String_ReadASN1(der, der, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 		return [null, errors.New("x509: invalid certificate policies")]
 	}
 	while (!cryptobyte.String_Empty(der.value)) {
-		let cp: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
-		let OIDBytes: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+		let cp: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
+		let OIDBytes: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 		if (!cryptobyte.String_ReadASN1(der, cp, $.uint(cryptobyte_asn1.SEQUENCE, 8)) || !cryptobyte.String_ReadASN1(cp, OIDBytes, $.uint(cryptobyte_asn1.OBJECT_IDENTIFIER, 8))) {
 			return [null, errors.New("x509: invalid certificate policies")]
 		}
@@ -661,7 +661,7 @@ export function isValidIPMask(mask: $.Slice<number>): boolean {
 
 export async function parseNameConstraintsExtension(out: __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null, e: pkix.Extension): globalThis.Promise<[boolean, $.GoError]> {
 	let unhandled: boolean = false
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	// RFC 5280, 4.2.1.10
 
 	// NameConstraints ::= SEQUENCE {
@@ -678,9 +678,9 @@ export async function parseNameConstraintsExtension(out: __goscript_x509.Certifi
 	// BaseDistance ::= INTEGER (0..MAX)
 
 	let outer: $.VarRef<cryptobyte.String> = $.varRef(((e.Value as cryptobyte.String) as cryptobyte.String))
-	let toplevel: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
-	let permitted: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
-	let excluded: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let toplevel: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
+	let permitted: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
+	let excluded: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	let havePermitted: $.VarRef<boolean> = $.varRef(false)
 	let haveExcluded: $.VarRef<boolean> = $.varRef(false)
 	if ((((!cryptobyte.String_ReadASN1(outer, toplevel, $.uint(cryptobyte_asn1.SEQUENCE, 8)) || !cryptobyte.String_Empty(outer.value)) || !cryptobyte.String_ReadOptionalASN1(toplevel, permitted, havePermitted, $.uint(cryptobyte_asn1.Tag_Constructed(cryptobyte_asn1.Tag_ContextSpecific(0)), 8))) || !cryptobyte.String_ReadOptionalASN1(toplevel, excluded, haveExcluded, $.uint(cryptobyte_asn1.Tag_Constructed(cryptobyte_asn1.Tag_ContextSpecific(1)), 8))) || !cryptobyte.String_Empty(toplevel.value)) {
@@ -697,14 +697,14 @@ export async function parseNameConstraintsExtension(out: __goscript_x509.Certifi
 
 	let getValues: ((subtrees: cryptobyte.String) => [$.Slice<string>, $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>, $.Slice<string>, $.Slice<string>, $.GoError] | globalThis.Promise<[$.Slice<string>, $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>, $.Slice<string>, $.Slice<string>, $.GoError]>) | null = $.functionValue((__goscriptParam9: cryptobyte.String): [$.Slice<string>, $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>, $.Slice<string>, $.Slice<string>, $.GoError] => {
 		let subtrees: $.VarRef<cryptobyte.String> = $.varRef(__goscriptParam9)
-		let dnsNames: $.Slice<string> = null as $.Slice<string>
-		let ips: $.Slice<net.IPNet | $.VarRef<net.IPNet> | null> = null as $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>
-		let emails: $.Slice<string> = null as $.Slice<string>
-		let uriDomains: $.Slice<string> = null as $.Slice<string>
-		let err: $.GoError = null as $.GoError
+		let dnsNames: $.Slice<string> = null! as $.Slice<string>
+		let ips: $.Slice<net.IPNet | $.VarRef<net.IPNet> | null> = null! as $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>
+		let emails: $.Slice<string> = null! as $.Slice<string>
+		let uriDomains: $.Slice<string> = null! as $.Slice<string>
+		let err: $.GoError = null! as $.GoError
 		while (!cryptobyte.String_Empty(subtrees.value)) {
-			let seq: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
-			let value: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+			let seq: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
+			let value: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 			let tag: $.VarRef<cryptobyte_asn1.Tag> = $.varRef(0)
 			if (!cryptobyte.String_ReadASN1(subtrees, seq, $.uint(cryptobyte_asn1.SEQUENCE, 8)) || !cryptobyte.String_ReadAnyASN1(seq, value, tag)) {
 				return [null, null, null, null, fmt.Errorf("x509: invalid NameConstraints extension")]
@@ -735,8 +735,8 @@ export async function parseNameConstraintsExtension(out: __goscript_x509.Certifi
 				case ipTag:
 				{
 					let l = $.len((value.value as cryptobyte.String))
-					let ip: $.Slice<number> = null as $.Slice<number>
-					let mask: $.Slice<number> = null as $.Slice<number>
+					let ip: $.Slice<number> = null! as $.Slice<number>
+					let mask: $.Slice<number> = null! as $.Slice<number>
 
 					switch (l) {
 						case 8:
@@ -851,7 +851,7 @@ export async function parseNameConstraintsExtension(out: __goscript_x509.Certifi
 }
 
 export async function processExtensions(out: __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null): globalThis.Promise<$.GoError> {
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	for (let __goscriptRangeTarget5 = $.pointerValue<__goscript_x509.Certificate>(out).Extensions, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget5); __rangeIndex++) {
 		let e = __goscriptRangeTarget5![__rangeIndex]
 		let unhandled = false
@@ -916,11 +916,11 @@ export async function processExtensions(out: __goscript_x509.Certificate | $.Var
 						return errors.New("x509: invalid CRL distribution points")
 					}
 					while (!cryptobyte.String_Empty(val.value)) {
-						let dpDER: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+						let dpDER: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 						if (!cryptobyte.String_ReadASN1(val, dpDER, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 							return errors.New("x509: invalid CRL distribution point")
 						}
-						let dpNameDER: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+						let dpNameDER: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 						let dpNamePresent: $.VarRef<boolean> = $.varRef(false)
 						if (!cryptobyte.String_ReadOptionalASN1(dpDER, dpNameDER, dpNamePresent, $.uint(cryptobyte_asn1.Tag_ContextSpecific(cryptobyte_asn1.Tag_Constructed(0)), 8))) {
 							return errors.New("x509: invalid CRL distribution point")
@@ -935,7 +935,7 @@ export async function processExtensions(out: __goscript_x509.Certificate | $.Var
 							if (!cryptobyte.String_PeekASN1Tag(dpNameDER.value, $.uint(cryptobyte_asn1.Tag_ContextSpecific(6), 8))) {
 								break
 							}
-							let uri: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+							let uri: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 							if (!cryptobyte.String_ReadASN1(dpNameDER, uri, $.uint(cryptobyte_asn1.Tag_ContextSpecific(6), 8))) {
 								return errors.New("x509: invalid CRL distribution point")
 							}
@@ -1004,7 +1004,7 @@ export async function processExtensions(out: __goscript_x509.Certificate | $.Var
 						return errors.New("x509: subject key identifier incorrectly marked critical")
 					}
 					let val: $.VarRef<cryptobyte.String> = $.varRef(((e.Value as cryptobyte.String) as cryptobyte.String))
-					let skid: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+					let skid: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 					if (!cryptobyte.String_ReadASN1(val, skid, $.uint(cryptobyte_asn1.OCTET_STRING, 8))) {
 						return errors.New("x509: invalid subject key identifier")
 					}
@@ -1041,9 +1041,9 @@ export async function processExtensions(out: __goscript_x509.Certificate | $.Var
 						return errors.New("x509: invalid policy mappings extension")
 					}
 					while (!cryptobyte.String_Empty(val.value)) {
-						let s: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
-						let issuer: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
-						let subject: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+						let s: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
+						let issuer: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
+						let subject: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 						if ((!cryptobyte.String_ReadASN1(val, s, $.uint(cryptobyte_asn1.SEQUENCE, 8)) || !cryptobyte.String_ReadASN1(s, issuer, $.uint(cryptobyte_asn1.OBJECT_IDENTIFIER, 8))) || !cryptobyte.String_ReadASN1(s, subject, $.uint(cryptobyte_asn1.OBJECT_IDENTIFIER, 8))) {
 							return errors.New("x509: invalid policy mappings extension")
 						}
@@ -1078,11 +1078,11 @@ export async function processExtensions(out: __goscript_x509.Certificate | $.Var
 					return errors.New("x509: invalid authority info access")
 				}
 				while (!cryptobyte.String_Empty(val.value)) {
-					let aiaDER: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+					let aiaDER: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 					if (!cryptobyte.String_ReadASN1(val, aiaDER, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 						return errors.New("x509: invalid authority info access")
 					}
-					let method: $.VarRef<asn1.ObjectIdentifier> = $.varRef(null as asn1.ObjectIdentifier)
+					let method: $.VarRef<asn1.ObjectIdentifier> = $.varRef(null! as asn1.ObjectIdentifier)
 					if (!cryptobyte.String_ReadASN1ObjectIdentifier(aiaDER, method)) {
 						return errors.New("x509: invalid authority info access")
 					}
@@ -1140,7 +1140,7 @@ export async function parseCertificate(der: $.Slice<number>): globalThis.Promise
 		return [null, errors.New("x509: malformed certificate")]
 	}
 
-	let tbs: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let tbs: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	// do the same trick again as above to extract the raw
 	// bytes for Certificate.RawTBSCertificate
 	if (!cryptobyte.String_ReadASN1Element(input, tbs, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
@@ -1177,14 +1177,14 @@ export async function parseCertificate(der: $.Slice<number>): globalThis.Promise
 	}
 	$.pointerValue<__goscript_x509.Certificate>(cert).SerialNumber = serial
 
-	let sigAISeq: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let sigAISeq: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	if (!cryptobyte.String_ReadASN1(tbs, sigAISeq, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 		return [null, errors.New("x509: malformed signature algorithm identifier")]
 	}
 	// Before parsing the inner algorithm identifier, extract
 	// the outer algorithm identifier and make sure that they
 	// match.
-	let outerSigAISeq: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let outerSigAISeq: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	if (!cryptobyte.String_ReadASN1(input, outerSigAISeq, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 		return [null, errors.New("x509: malformed algorithm identifier")]
 	}
@@ -1197,7 +1197,7 @@ export async function parseCertificate(der: $.Slice<number>): globalThis.Promise
 	}
 	$.pointerValue<__goscript_x509.Certificate>(cert).SignatureAlgorithm = await __goscript_x509.getSignatureAlgorithmFromAI($.markAsStructValue($.cloneStructValue(sigAI)))
 
-	let issuerSeq: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let issuerSeq: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	if (!cryptobyte.String_ReadASN1Element(tbs, issuerSeq, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 		return [null, errors.New("x509: malformed issuer")]
 	}
@@ -1210,7 +1210,7 @@ export async function parseCertificate(der: $.Slice<number>): globalThis.Promise
 	}
 	$.pointerValue<__goscript_x509.Certificate>(cert).Issuer.FillFromRDNSequence(issuerRDNs)
 
-	let __goscriptShadow9: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let __goscriptShadow9: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	if (!cryptobyte.String_ReadASN1(tbs, __goscriptShadow9, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 		return [null, errors.New("x509: malformed validity")]
 	}
@@ -1222,7 +1222,7 @@ export async function parseCertificate(der: $.Slice<number>): globalThis.Promise
 		return [null, err]
 	}
 
-	let subjectSeq: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let subjectSeq: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	if (!cryptobyte.String_ReadASN1Element(tbs, subjectSeq, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 		return [null, errors.New("x509: malformed issuer")]
 	}
@@ -1235,7 +1235,7 @@ export async function parseCertificate(der: $.Slice<number>): globalThis.Promise
 	}
 	$.pointerValue<__goscript_x509.Certificate>(cert).Subject.FillFromRDNSequence(subjectRDNs)
 
-	let spki: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let spki: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	if (!cryptobyte.String_ReadASN1Element(tbs, spki, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 		return [null, errors.New("x509: malformed spki")]
 	}
@@ -1243,7 +1243,7 @@ export async function parseCertificate(der: $.Slice<number>): globalThis.Promise
 	if (!cryptobyte.String_ReadASN1(spki, spki, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 		return [null, errors.New("x509: malformed spki")]
 	}
-	let pkAISeq: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let pkAISeq: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	if (!cryptobyte.String_ReadASN1(spki, pkAISeq, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 		return [null, errors.New("x509: malformed public key algorithm identifier")]
 	}
@@ -1275,7 +1275,7 @@ export async function parseCertificate(der: $.Slice<number>): globalThis.Promise
 			return [null, errors.New("x509: malformed subjectUniqueID")]
 		}
 		if ($.pointerValue<__goscript_x509.Certificate>(cert).Version == 3) {
-			let extensions: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+			let extensions: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 			let present: $.VarRef<boolean> = $.varRef(false)
 			if (!cryptobyte.String_ReadOptionalASN1(tbs, extensions, present, $.uint(cryptobyte_asn1.Tag_ContextSpecific(cryptobyte_asn1.Tag_Constructed(3)), 8))) {
 				return [null, errors.New("x509: malformed extensions")]
@@ -1286,7 +1286,7 @@ export async function parseCertificate(der: $.Slice<number>): globalThis.Promise
 					return [null, errors.New("x509: malformed extensions")]
 				}
 				while (!cryptobyte.String_Empty(extensions.value)) {
-					let extension: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+					let extension: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 					if (!cryptobyte.String_ReadASN1(extensions, extension, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 						return [null, errors.New("x509: malformed extension")]
 					}
@@ -1332,7 +1332,7 @@ export async function ParseCertificate(der: $.Slice<number>): globalThis.Promise
 }
 
 export async function ParseCertificates(der: $.Slice<number>): globalThis.Promise<[$.Slice<__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null>, $.GoError]> {
-	let certs: $.Slice<__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null> = null as $.Slice<__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null>
+	let certs: $.Slice<__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null> = null! as $.Slice<__goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null>
 	while ($.len(der) > 0) {
 		let __goscriptTuple19: any = await parseCertificate(der)
 		let cert: __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null = __goscriptTuple19[0]
@@ -1361,7 +1361,7 @@ export async function ParseRevocationList(der: $.Slice<number>): globalThis.Prom
 		return [null, errors.New("x509: malformed crl")]
 	}
 
-	let tbs: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let tbs: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	// do the same trick again as above to extract the raw
 	// bytes for Certificate.RawTBSCertificate
 	if (!cryptobyte.String_ReadASN1Element(input, tbs, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
@@ -1383,14 +1383,14 @@ export async function ParseRevocationList(der: $.Slice<number>): globalThis.Prom
 		return [null, fmt.Errorf("x509: unsupported crl version: %d", $.basicInterfaceValue(version.value, "int"))]
 	}
 
-	let sigAISeq: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let sigAISeq: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	if (!cryptobyte.String_ReadASN1(tbs, sigAISeq, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 		return [null, errors.New("x509: malformed signature algorithm identifier")]
 	}
 	// Before parsing the inner algorithm identifier, extract
 	// the outer algorithm identifier and make sure that they
 	// match.
-	let outerSigAISeq: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let outerSigAISeq: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	if (!cryptobyte.String_ReadASN1(input, outerSigAISeq, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 		return [null, errors.New("x509: malformed algorithm identifier")]
 	}
@@ -1409,7 +1409,7 @@ export async function ParseRevocationList(der: $.Slice<number>): globalThis.Prom
 	}
 	$.pointerValue<__goscript_x509.RevocationList>(rl).Signature = $.markAsStructValue($.cloneStructValue(signature.value)).RightAlign()
 
-	let issuerSeq: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let issuerSeq: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	if (!cryptobyte.String_ReadASN1Element(tbs, issuerSeq, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 		return [null, errors.New("x509: malformed issuer")]
 	}
@@ -1438,14 +1438,14 @@ export async function ParseRevocationList(der: $.Slice<number>): globalThis.Prom
 	}
 
 	if (cryptobyte.String_PeekASN1Tag(tbs.value, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
-		let revokedSeq: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+		let revokedSeq: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 		if (!cryptobyte.String_ReadASN1(tbs, revokedSeq, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 			return [null, errors.New("x509: malformed crl")]
 		}
 		while (!cryptobyte.String_Empty(revokedSeq.value)) {
 			let rce = $.markAsStructValue(new __goscript_x509.RevocationListEntry())
 
-			let certSeq: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+			let certSeq: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 			if (!cryptobyte.String_ReadASN1Element(revokedSeq, certSeq, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 				return [null, errors.New("x509: malformed crl")]
 			}
@@ -1464,14 +1464,14 @@ export async function ParseRevocationList(der: $.Slice<number>): globalThis.Prom
 			if (err != null) {
 				return [null, err]
 			}
-			let extensions: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+			let extensions: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 			let present: $.VarRef<boolean> = $.varRef(false)
 			if (!cryptobyte.String_ReadOptionalASN1(certSeq, extensions, present, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 				return [null, errors.New("x509: malformed extensions")]
 			}
 			if (present.value) {
 				while (!cryptobyte.String_Empty(extensions.value)) {
-					let extension: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+					let extension: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 					if (!cryptobyte.String_ReadASN1(extensions, extension, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 						return [null, errors.New("x509: malformed extension")]
 					}
@@ -1495,7 +1495,7 @@ export async function ParseRevocationList(der: $.Slice<number>): globalThis.Prom
 		}
 	}
 
-	let extensions: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+	let extensions: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 	let present: $.VarRef<boolean> = $.varRef(false)
 	if (!cryptobyte.String_ReadOptionalASN1(tbs, extensions, present, $.uint(cryptobyte_asn1.Tag_ContextSpecific(cryptobyte_asn1.Tag_Constructed(0)), 8))) {
 		return [null, errors.New("x509: malformed extensions")]
@@ -1505,7 +1505,7 @@ export async function ParseRevocationList(der: $.Slice<number>): globalThis.Prom
 			return [null, errors.New("x509: malformed extensions")]
 		}
 		while (!cryptobyte.String_Empty(extensions.value)) {
-			let extension: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)
+			let extension: $.VarRef<cryptobyte.String> = $.varRef(null! as cryptobyte.String)
 			if (!cryptobyte.String_ReadASN1(extensions, extension, $.uint(cryptobyte_asn1.SEQUENCE, 8))) {
 				return [null, errors.New("x509: malformed extension")]
 			}

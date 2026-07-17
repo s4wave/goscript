@@ -53,9 +53,9 @@ export class P384Point {
 
 	constructor(init?: Partial<{x?: fiat.P384Element | $.VarRef<fiat.P384Element> | null, y?: fiat.P384Element | $.VarRef<fiat.P384Element> | null, z?: fiat.P384Element | $.VarRef<fiat.P384Element> | null}>) {
 		this._fields = {
-			x: $.varRef(init?.x ?? (null as fiat.P384Element | $.VarRef<fiat.P384Element> | null)),
-			y: $.varRef(init?.y ?? (null as fiat.P384Element | $.VarRef<fiat.P384Element> | null)),
-			z: $.varRef(init?.z ?? (null as fiat.P384Element | $.VarRef<fiat.P384Element> | null))
+			x: $.varRef(init?.x ?? (null! as fiat.P384Element | $.VarRef<fiat.P384Element> | null)),
+			y: $.varRef(init?.y ?? (null! as fiat.P384Element | $.VarRef<fiat.P384Element> | null)),
+			z: $.varRef(init?.z ?? (null! as fiat.P384Element | $.VarRef<fiat.P384Element> | null))
 		}
 	}
 
@@ -444,7 +444,7 @@ export function NewP384Point(): P384Point | $.VarRef<P384Point> | null {
 	return (() => { const __goscriptLiteralField0 = fiat.P384Element.prototype.One.call(new fiat.P384Element()); return new P384Point({x: new fiat.P384Element(), y: __goscriptLiteralField0, z: new fiat.P384Element()}) })()
 }
 
-export let _p384B: fiat.P384Element | $.VarRef<fiat.P384Element> | null = null as fiat.P384Element | $.VarRef<fiat.P384Element> | null
+export let _p384B: fiat.P384Element | $.VarRef<fiat.P384Element> | null = null! as fiat.P384Element | $.VarRef<fiat.P384Element> | null
 
 export function __goscript_set__p384B(__goscriptValue: fiat.P384Element | $.VarRef<fiat.P384Element> | null): void {
 	_p384B = __goscriptValue
@@ -496,7 +496,7 @@ export function p384Table_Select(table: $.VarRef<p384Table> | null, p: P384Point
 	}
 }
 
-export let p384GeneratorTable: $.VarRef<p384Table[]> | null = null as $.VarRef<p384Table[]> | null
+export let p384GeneratorTable: $.VarRef<p384Table[]> | null = null! as $.VarRef<p384Table[]> | null
 
 export function __goscript_set_p384GeneratorTable(__goscriptValue: $.VarRef<p384Table[]> | null): void {
 	p384GeneratorTable = __goscriptValue

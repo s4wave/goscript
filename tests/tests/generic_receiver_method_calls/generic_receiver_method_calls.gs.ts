@@ -27,7 +27,7 @@ export class box {
 
 	constructor(init?: Partial<{value?: any}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? (null as any))
+			value: $.varRef(init?.value ?? (null! as any))
 		}
 	}
 

@@ -8276,7 +8276,7 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 						zero := o.lowerDeclarationZeroValueExpr(ctx, slice.Elem())
 						zeroHint := ""
 						switch {
-						case zero == "null" || strings.HasPrefix(zero, "null as "):
+						case zero == "null" || strings.HasPrefix(zero, "null as ") || strings.HasPrefix(zero, "null! as "):
 							zeroHint = o.runtimeOwner.QualifiedHelper(RuntimeHelperAppendZeros) + ".nil"
 						case isComplexType(slice.Elem()):
 							zeroHint = o.runtimeOwner.QualifiedHelper(RuntimeHelperAppendZeros) + ".complex"
@@ -11751,13 +11751,13 @@ func (o *LoweringOwner) lowerZeroValueExprFor(ctx lowerFileContext, typ types.Ty
 
 func (o *LoweringOwner) lowerDeclarationZeroValueExpr(ctx lowerFileContext, typ types.Type) string {
 	if isFunctionType(typ) {
-		return "null as " + o.tsFunctionZeroValueTypeFor(ctx, typ)
+		return "null! as " + o.tsFunctionZeroValueTypeFor(ctx, typ)
 	}
 	typeParam, ok := types.Unalias(typ).(*types.TypeParam)
 	if !ok {
 		value := o.lowerZeroValueExprFor(ctx, typ)
 		if value == "null" {
-			return "null as " + o.tsTypeFor(ctx, typ)
+			return "null! as " + o.tsTypeFor(ctx, typ)
 		}
 		return value
 	}

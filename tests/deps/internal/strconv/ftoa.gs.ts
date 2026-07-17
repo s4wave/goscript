@@ -112,7 +112,7 @@ export class decimalSlice {
 
 	constructor(init?: Partial<{d?: $.Slice<number>, nd?: number, dp?: number}>) {
 		this._fields = {
-			d: $.varRef(init?.d ?? (null as $.Slice<number>)),
+			d: $.varRef(init?.d ?? (null! as $.Slice<number>)),
 			nd: $.varRef(init?.nd ?? (0 as number)),
 			dp: $.varRef(init?.dp ?? (0 as number))
 		}
@@ -175,7 +175,7 @@ export function AppendFloat(dst: $.Slice<number>, f: number, fmt: number, prec: 
 
 export function genericFtoa(dst: $.Slice<number>, val: number, fmt: number, prec: number, bitSize: number): $.Slice<number> {
 	let bits: bigint = 0n
-	let flt: floatInfo | $.VarRef<floatInfo> | null = null as floatInfo | $.VarRef<floatInfo> | null
+	let flt: floatInfo | $.VarRef<floatInfo> | null = null! as floatInfo | $.VarRef<floatInfo> | null
 	switch (bitSize) {
 		case 32:
 		{

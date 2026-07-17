@@ -14,7 +14,7 @@ import "@goscript/go/token/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	// Use scanner package functionality that should generate imports
-	let errorList: $.VarRef<scanner.ErrorList> = $.varRef(null as scanner.ErrorList)
+	let errorList: $.VarRef<scanner.ErrorList> = $.varRef(null! as scanner.ErrorList)
 
 	// This should require importing both scanner and token packages
 	let pos = $.markAsStructValue(new token.Position({Filename: "test.go", Line: 1, Column: 1}))

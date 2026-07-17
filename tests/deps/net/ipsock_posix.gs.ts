@@ -97,8 +97,8 @@ export async function favoriteAddrFamily(network: string, laddr: __goscript_sock
 }
 
 export async function internetSocket(ctx: context.Context | null, net: string, laddr: __goscript_sockaddr_posix.sockaddr | null, raddr: __goscript_sockaddr_posix.sockaddr | null, sotype: number, proto: number, mode: string, ctrlCtxFn: ((_p0: context.Context | null, _p1: string, _p2: string, _p3: syscall.RawConn | null) => $.GoError | globalThis.Promise<$.GoError>) | null): globalThis.Promise<[__goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null, $.GoError]> {
-	let fd: __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null = null as __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null
-	let err: $.GoError = null as $.GoError
+	let fd: __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null = null! as __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null
+	let err: $.GoError = null! as $.GoError
 	switch ((runtime.GOOS as string)) {
 		case "aix":
 		case "windows":

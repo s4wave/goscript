@@ -48,7 +48,7 @@ export class pooledFlateWriter {
 	constructor(init?: Partial<{mu?: sync.Mutex, fw?: flate.Writer | $.VarRef<flate.Writer> | null}>) {
 		this._fields = {
 			mu: $.varRef(init?.mu ? $.markAsStructValue($.cloneStructValue(init.mu)) : $.markAsStructValue(new sync.Mutex())),
-			fw: $.varRef(init?.fw ?? (null as flate.Writer | $.VarRef<flate.Writer> | null))
+			fw: $.varRef(init?.fw ?? (null! as flate.Writer | $.VarRef<flate.Writer> | null))
 		}
 	}
 
@@ -66,7 +66,7 @@ export class pooledFlateWriter {
 		using __defer = new $.DisposableStack()
 		await $.pointerValue<pooledFlateWriter>(w).mu.Lock()
 		__defer.defer(() => { $.pointerValue<pooledFlateWriter>(w).mu.Unlock() })
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.pointerValue<pooledFlateWriter>(w).fw != null) {
 			err = await flate.Writer.prototype.Close.call($.pointerValue<pooledFlateWriter>(w).fw)
 			flateWriterPool.value.Put($.interfaceValue<any>($.pointerValue<pooledFlateWriter>(w).fw, "*flate.Writer", { kind: $.TypeKind.Pointer, elemType: "flate.Writer" }))
@@ -78,7 +78,7 @@ export class pooledFlateWriter {
 	public async Write(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const w: pooledFlateWriter | $.VarRef<pooledFlateWriter> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		using __defer = new $.DisposableStack()
 		await $.pointerValue<pooledFlateWriter>(w).mu.Lock()
 		__defer.defer(() => { $.pointerValue<pooledFlateWriter>(w).mu.Unlock() })
@@ -129,7 +129,7 @@ export class pooledFlateReader {
 	constructor(init?: Partial<{mu?: sync.Mutex, fr?: io.ReadCloser | null}>) {
 		this._fields = {
 			mu: $.varRef(init?.mu ? $.markAsStructValue($.cloneStructValue(init.mu)) : $.markAsStructValue(new sync.Mutex())),
-			fr: $.varRef(init?.fr ?? (null as io.ReadCloser | null))
+			fr: $.varRef(init?.fr ?? (null! as io.ReadCloser | null))
 		}
 	}
 
@@ -147,7 +147,7 @@ export class pooledFlateReader {
 		using __defer = new $.DisposableStack()
 		await $.pointerValue<pooledFlateReader>(r).mu.Lock()
 		__defer.defer(() => { $.pointerValue<pooledFlateReader>(r).mu.Unlock() })
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.pointerValue<pooledFlateReader>(r).fr != null) {
 			err = await $.pointerValue<Exclude<io.ReadCloser, null>>($.pointerValue<pooledFlateReader>(r).fr).Close()
 			flateReaderPool.value.Put(($.pointerValue<pooledFlateReader>(r).fr as any))
@@ -159,7 +159,7 @@ export class pooledFlateReader {
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const r: pooledFlateReader | $.VarRef<pooledFlateReader> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		using __defer = new $.DisposableStack()
 		await $.pointerValue<pooledFlateReader>(r).mu.Lock()
 		__defer.defer(() => { $.pointerValue<pooledFlateReader>(r).mu.Unlock() })

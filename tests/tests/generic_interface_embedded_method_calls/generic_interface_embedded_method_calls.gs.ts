@@ -46,8 +46,8 @@ export class impl {
 
 	constructor(init?: Partial<{value?: any, other?: any}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? (null as any)),
-			other: $.varRef(init?.other ?? (null as any))
+			value: $.varRef(init?.value ?? (null! as any)),
+			other: $.varRef(init?.other ?? (null! as any))
 		}
 	}
 

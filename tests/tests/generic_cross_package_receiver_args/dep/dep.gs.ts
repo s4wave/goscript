@@ -27,7 +27,7 @@ export class Impl {
 
 	constructor(init?: Partial<{Item?: any}>) {
 		this._fields = {
-			Item: $.varRef(init?.Item ?? (null as any))
+			Item: $.varRef(init?.Item ?? (null! as any))
 		}
 	}
 
@@ -98,7 +98,7 @@ export class Wrapper {
 
 	constructor(init?: Partial<{Keyed?: Keyed | $.VarRef<Keyed> | null}>) {
 		this._fields = {
-			Keyed: $.varRef(init?.Keyed ?? (null as Keyed | $.VarRef<Keyed> | null))
+			Keyed: $.varRef(init?.Keyed ?? (null! as Keyed | $.VarRef<Keyed> | null))
 		}
 	}
 

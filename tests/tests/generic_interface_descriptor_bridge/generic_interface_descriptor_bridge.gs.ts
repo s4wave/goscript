@@ -132,7 +132,7 @@ export async function main(): globalThis.Promise<void> {
 	let samePointerB: IntWaiter | null = $.interfaceValue<IntWaiter | null>(samePointer, "*main.intBox", { kind: $.TypeKind.Pointer, elemType: "main.intBox" })
 	let differentPointer: IntWaiter | null = $.interfaceValue<IntWaiter | null>(new intBox(), "*main.intBox", { kind: $.TypeKind.Pointer, elemType: "main.intBox" })
 	$.println("pointer-equal", $.comparableEqual(samePointerA, samePointerB), $.comparableEqual(samePointerA, differentPointer))
-	let nilPointer: intBox | $.VarRef<intBox> | null = null as intBox | $.VarRef<intBox> | null
+	let nilPointer: intBox | $.VarRef<intBox> | null = null! as intBox | $.VarRef<intBox> | null
 	let nilInterface: IntWaiter | null = $.interfaceValue<IntWaiter | null>(nilPointer, "*main.intBox", { kind: $.TypeKind.Pointer, elemType: "main.intBox" })
 	let __goscriptTuple0: any = $.typeAssertTuple<intBox | $.VarRef<intBox> | null>(nilInterface, { kind: $.TypeKind.Pointer, elemType: "main.intBox" })
 	let assertedPointer: intBox | $.VarRef<intBox> | null = __goscriptTuple0[0]

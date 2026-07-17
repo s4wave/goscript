@@ -30,8 +30,8 @@ export function HardwareAddr_String(a: HardwareAddr): string {
 }
 
 export function ParseMAC(s: string): [HardwareAddr, $.GoError] {
-	let hw: HardwareAddr = null as HardwareAddr
-	let err: $.GoError = null as $.GoError
+	let hw: HardwareAddr = null! as HardwareAddr
+	let err: $.GoError = null! as $.GoError
 	error: {
 		if ($.len(s) < 12) {
 			break error

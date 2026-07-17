@@ -108,7 +108,7 @@ export async function roundShortest(d: __goscript_decimal.decimal | $.VarRef<__g
 
 	// 2) Compute lower bound by subtracting 1/2 ulp.
 	let lower: $.VarRef<__goscript_decimal.decimal> = $.varRef($.markAsStructValue(new __goscript_decimal.decimal()))
-	let tmp: __goscript_nat.nat = null as __goscript_nat.nat
+	let tmp: __goscript_nat.nat = null! as __goscript_nat.nat
 	await lower.value.init((__goscript_nat.nat_sub(tmp, (mant as __goscript_nat.nat), (__goscript_nat.__goscript_get_natOne() as __goscript_nat.nat)) as __goscript_nat.nat), exp)
 
 	// 3) Compute upper bound by adding 1/2 ulp.

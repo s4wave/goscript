@@ -9,7 +9,7 @@ import * as sync from "@goscript/sync/index.js"
 import "@goscript/crypto/internal/fips140/nistec/fiat/index.js"
 import "@goscript/sync/index.js"
 
-export let p224GG: $.VarRef<fiat.P224Element[]> | null = null as $.VarRef<fiat.P224Element[]> | null
+export let p224GG: $.VarRef<fiat.P224Element[]> | null = null! as $.VarRef<fiat.P224Element[]> | null
 
 export function __goscript_set_p224GG(__goscriptValue: $.VarRef<fiat.P224Element[]> | null): void {
 	p224GG = __goscriptValue

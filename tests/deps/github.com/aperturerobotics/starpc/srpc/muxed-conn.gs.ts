@@ -73,8 +73,8 @@ export async function NewMuxedConn(conn: net.Conn | null, outbound: boolean, yam
 		yamuxConf = NewYamuxConfig()
 	}
 
-	let sess: yamux.Session | $.VarRef<yamux.Session> | null = null as yamux.Session | $.VarRef<yamux.Session> | null
-	let err: $.GoError = null as $.GoError
+	let sess: yamux.Session | $.VarRef<yamux.Session> | null = null! as yamux.Session | $.VarRef<yamux.Session> | null
+	let err: $.GoError = null! as $.GoError
 	if (outbound) {
 		let __goscriptTuple0: any = await yamux.Client(conn, yamuxConf, (null as (() => [yamux.MemoryManager | null, $.GoError] | globalThis.Promise<[yamux.MemoryManager | null, $.GoError]>) | null))
 		sess = __goscriptTuple0[0]

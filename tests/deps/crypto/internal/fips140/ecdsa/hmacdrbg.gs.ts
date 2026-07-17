@@ -69,9 +69,9 @@ export class hmacDRBG {
 
 	constructor(init?: Partial<{newHMAC?: ((key: $.Slice<number>) => hmac.HMAC | $.VarRef<hmac.HMAC> | null | globalThis.Promise<hmac.HMAC | $.VarRef<hmac.HMAC> | null>) | null, hK?: hmac.HMAC | $.VarRef<hmac.HMAC> | null, V?: $.Slice<number>, reseedCounter?: bigint}>) {
 		this._fields = {
-			newHMAC: $.varRef(init?.newHMAC ?? (null as ((key: $.Slice<number>) => hmac.HMAC | $.VarRef<hmac.HMAC> | null | globalThis.Promise<hmac.HMAC | $.VarRef<hmac.HMAC> | null>) | null)),
-			hK: $.varRef(init?.hK ?? (null as hmac.HMAC | $.VarRef<hmac.HMAC> | null)),
-			V: $.varRef(init?.V ?? (null as $.Slice<number>)),
+			newHMAC: $.varRef(init?.newHMAC ?? (null! as ((key: $.Slice<number>) => hmac.HMAC | $.VarRef<hmac.HMAC> | null | globalThis.Promise<hmac.HMAC | $.VarRef<hmac.HMAC> | null>) | null)),
+			hK: $.varRef(init?.hK ?? (null! as hmac.HMAC | $.VarRef<hmac.HMAC> | null)),
+			V: $.varRef(init?.V ?? (null! as $.Slice<number>)),
 			reseedCounter: $.varRef(init?.reseedCounter ?? (0n as bigint))
 		}
 	}

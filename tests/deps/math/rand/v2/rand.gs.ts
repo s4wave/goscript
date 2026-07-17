@@ -49,7 +49,7 @@ export class Rand {
 
 	constructor(init?: Partial<{src?: Source | null}>) {
 		this._fields = {
-			src: $.varRef(init?.src ?? (null as Source | null))
+			src: $.varRef(init?.src ?? (null! as Source | null))
 		}
 	}
 

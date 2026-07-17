@@ -17,7 +17,7 @@ import "@goscript/crypto/sha3/index.js"
 import "@goscript/hash/index.js"
 
 export function sha3Unwrap(_p0: sha32.SHA3 | $.VarRef<sha32.SHA3> | null): fsha3.Digest | $.VarRef<fsha3.Digest> | null {
-	return null as fsha3.Digest | $.VarRef<fsha3.Digest> | null
+	return null! as fsha3.Digest | $.VarRef<fsha3.Digest> | null
 }
 
 export function Unwrap(h: hash.Hash | null): hash.Hash | null {

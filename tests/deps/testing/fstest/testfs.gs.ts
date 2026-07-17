@@ -73,10 +73,10 @@ export class fsTester {
 
 	constructor(init?: Partial<{fsys?: fs.FS | null, errors?: $.Slice<$.GoError>, dirs?: $.Slice<string>, files?: $.Slice<string>}>) {
 		this._fields = {
-			fsys: $.varRef(init?.fsys ?? (null as fs.FS | null)),
-			errors: $.varRef(init?.errors ?? (null as $.Slice<$.GoError>)),
-			dirs: $.varRef(init?.dirs ?? (null as $.Slice<string>)),
-			files: $.varRef(init?.files ?? (null as $.Slice<string>))
+			fsys: $.varRef(init?.fsys ?? (null! as fs.FS | null)),
+			errors: $.varRef(init?.errors ?? (null! as $.Slice<$.GoError>)),
+			dirs: $.varRef(init?.dirs ?? (null! as $.Slice<string>)),
+			files: $.varRef(init?.files ?? (null! as $.Slice<string>))
 		}
 	}
 
@@ -339,7 +339,7 @@ export class fsTester {
 			await checkMode!(entry1)
 		}
 
-		let diffs: $.Slice<string> = null as $.Slice<string>
+		let diffs: $.Slice<string> = null! as $.Slice<string>
 		for (let __goscriptRangeTarget8 = list2, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget8); __rangeIndex++) {
 			let entry2 = __goscriptRangeTarget8![__rangeIndex]
 			let entry1 = $.mapGet<string, fs.DirEntry | null, fs.DirEntry | null>(old, await $.pointerValue<Exclude<fs.DirEntry, null>>(entry2).Name(), null)[0]
@@ -489,7 +489,7 @@ export class fsTester {
 			let elem: $.Slice<string> = strings.Split(dir, "/")
 			for (let __goscriptRangeTarget10 = elem, i = 0; i < $.len(__goscriptRangeTarget10); i++) {
 				let e = __goscriptRangeTarget10![i]
-				let pattern: $.Slice<number> = null as $.Slice<number>
+				let pattern: $.Slice<number> = null! as $.Slice<number>
 				for (const [j, r] of $.rangeString(e)) {
 					if ((((($.int(r, 32) == $.int(42, 32)) || ($.int(r, 32) == $.int(63, 32))) || ($.int(r, 32) == $.int(92, 32))) || ($.int(r, 32) == $.int(91, 32))) || ($.int(r, 32) == $.int(45, 32))) {
 						pattern = $.append(pattern, $.int(92, 32), $.int(r, 32))
@@ -559,7 +559,7 @@ export class fsTester {
 		}
 		glob = glob + (("*" + String.fromCodePoint(c)) + "*")
 
-		let want: $.Slice<string> = null as $.Slice<string>
+		let want: $.Slice<string> = null! as $.Slice<string>
 		for (let __goscriptRangeTarget12 = list, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget12); __rangeIndex++) {
 			let d = __goscriptRangeTarget12![__rangeIndex]
 			if (strings.ContainsRune(await $.pointerValue<Exclude<fs.DirEntry, null>>(d).Name(), $.int(c, 32))) {
@@ -583,7 +583,7 @@ export class fsTester {
 			slices.Sort(names)
 		}
 
-		let problems: $.Slice<string> = null as $.Slice<string>
+		let problems: $.Slice<string> = null! as $.Slice<string>
 		while (($.len(want) > 0) || ($.len(names) > 0)) {
 			switch (true) {
 				case (($.len(want) > 0) && ($.len(names) > 0)) && ($.stringEqual($.arrayIndex(want!, 0), $.arrayIndex(names!, 0))):
@@ -763,7 +763,7 @@ export async function TestFS(fsys: fs.FS | null, expected: $.Slice<string>): glo
 			if (i >= 0) {
 				let dir = $.sliceStringOrBytes(name, undefined, i)
 				let dirSlash = $.sliceStringOrBytes(name, undefined, i + 1)
-				let subExpected: $.Slice<string> = null as $.Slice<string>
+				let subExpected: $.Slice<string> = null! as $.Slice<string>
 				for (let __goscriptRangeTarget0 = expected, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 					let name = __goscriptRangeTarget0![__rangeIndex]
 					if (strings.HasPrefix(name, dirSlash)) {

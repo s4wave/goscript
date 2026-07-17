@@ -21,7 +21,7 @@ export class FuncContainer {
 
 	constructor(init?: Partial<{myFunc?: any}>) {
 		this._fields = {
-			myFunc: $.varRef(init?.myFunc ?? (null as any))
+			myFunc: $.varRef(init?.myFunc ?? (null! as any))
 		}
 	}
 
@@ -188,7 +188,7 @@ export async function main(): globalThis.Promise<void> {
 	// println("This line should not be reached if panic test is active")
 
 	// Test with nil interface
-	let nilInterface: any = null as any
+	let nilInterface: any = null! as any
 	let [nilFn, okNil] = $.typeAssertTuple<((name: string) => string | globalThis.Promise<string>) | null>(nilInterface, ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo))
 	if (!okNil && (nilFn == null)) {
 		$.println("Nil interface assertion correct")

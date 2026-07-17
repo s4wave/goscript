@@ -37,7 +37,7 @@ export class ClientInvoker {
 
 	constructor(init?: Partial<{client?: __goscript_client.Client | null}>) {
 		this._fields = {
-			client: $.varRef(init?.client ?? (null as __goscript_client.Client | null))
+			client: $.varRef(init?.client ?? (null! as __goscript_client.Client | null))
 		}
 	}
 
@@ -71,7 +71,7 @@ export class ClientInvoker {
 		queueMicrotask(async () => { await proxyStreamTo(remoteStrm, strm, errCh) })
 
 		// Wait for both directions to complete
-		let outErr: $.GoError = null as $.GoError
+		let outErr: $.GoError = null! as $.GoError
 		for (let __rangeIndex = 0; __rangeIndex < 2; __rangeIndex++) {
 			{
 				let __goscriptShadow0 = await $.chanRecv(errCh)

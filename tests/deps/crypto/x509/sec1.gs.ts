@@ -75,8 +75,8 @@ export class ecPrivateKey {
 	constructor(init?: Partial<{Version?: number, PrivateKey?: $.Slice<number>, NamedCurveOID?: asn1.ObjectIdentifier, PublicKey?: asn1.BitString}>) {
 		this._fields = {
 			Version: $.varRef(init?.Version ?? (0 as number)),
-			PrivateKey: $.varRef(init?.PrivateKey ?? (null as $.Slice<number>)),
-			NamedCurveOID: $.varRef(init?.NamedCurveOID ?? (null as asn1.ObjectIdentifier)),
+			PrivateKey: $.varRef(init?.PrivateKey ?? (null! as $.Slice<number>)),
+			NamedCurveOID: $.varRef(init?.NamedCurveOID ?? (null! as asn1.ObjectIdentifier)),
 			PublicKey: $.varRef(init?.PublicKey ? $.markAsStructValue($.cloneStructValue(init.PublicKey)) : $.markAsStructValue(new asn1.BitString()))
 		}
 	}
@@ -139,8 +139,8 @@ export async function marshalECDHPrivateKey(key: ecdh.PrivateKey | $.VarRef<ecdh
 }
 
 export async function parseECPrivateKey(namedCurveOID: $.VarRef<asn1.ObjectIdentifier> | null, der: $.Slice<number>): globalThis.Promise<[ecdsa.PrivateKey | $.VarRef<ecdsa.PrivateKey> | null, $.GoError]> {
-	let key: ecdsa.PrivateKey | $.VarRef<ecdsa.PrivateKey> | null = null as ecdsa.PrivateKey | $.VarRef<ecdsa.PrivateKey> | null
-	let err: $.GoError = null as $.GoError
+	let key: ecdsa.PrivateKey | $.VarRef<ecdsa.PrivateKey> | null = null! as ecdsa.PrivateKey | $.VarRef<ecdsa.PrivateKey> | null
+	let err: $.GoError = null! as $.GoError
 	let privKey: $.VarRef<ecPrivateKey> = $.varRef($.markAsStructValue(new ecPrivateKey()))
 	{
 		let [, __goscriptShadow0] = await asn1.Unmarshal(der, $.interfaceValue<any>(privKey, "*x509.ecPrivateKey", { kind: $.TypeKind.Pointer, elemType: "x509.ecPrivateKey" }))
@@ -164,7 +164,7 @@ export async function parseECPrivateKey(namedCurveOID: $.VarRef<asn1.ObjectIdent
 		return [null, fmt.Errorf("x509: unknown EC private key version %d", $.basicInterfaceValue(privKey.value.Version, "int"))]
 	}
 
-	let curve: elliptic.Curve | null = null as elliptic.Curve | null
+	let curve: elliptic.Curve | null = null! as elliptic.Curve | null
 	if (namedCurveOID != null) {
 		curve = await __goscript_x509.namedCurveFromOID(($.pointerValue<asn1.ObjectIdentifier>(namedCurveOID) as asn1.ObjectIdentifier))
 	} else {

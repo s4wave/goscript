@@ -93,7 +93,7 @@ export class Zipf {
 
 	constructor(init?: Partial<{r?: __goscript_rand.Rand | $.VarRef<__goscript_rand.Rand> | null, imax?: number, v?: number, q?: number, s?: number, oneminusQ?: number, oneminusQinv?: number, hxm?: number, hx0minusHxm?: number}>) {
 		this._fields = {
-			r: $.varRef(init?.r ?? (null as __goscript_rand.Rand | $.VarRef<__goscript_rand.Rand> | null)),
+			r: $.varRef(init?.r ?? (null! as __goscript_rand.Rand | $.VarRef<__goscript_rand.Rand> | null)),
 			imax: $.varRef(init?.imax ?? (0 as number)),
 			v: $.varRef(init?.v ?? (0 as number)),
 			q: $.varRef(init?.q ?? (0 as number)),

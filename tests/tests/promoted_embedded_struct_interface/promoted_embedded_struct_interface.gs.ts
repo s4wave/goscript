@@ -106,7 +106,7 @@ export class pointerStopStream {
 
 	constructor(init?: Partial<{stream?: stream | $.VarRef<stream> | null}>) {
 		this._fields = {
-			stream: $.varRef(init?.stream ?? (null as stream | $.VarRef<stream> | null))
+			stream: $.varRef(init?.stream ?? (null! as stream | $.VarRef<stream> | null))
 		}
 	}
 

@@ -77,7 +77,7 @@ export class divisor {
 
 	constructor(init?: Partial<{bbb?: __goscript_nat.nat, nbits?: number, ndigits?: number}>) {
 		this._fields = {
-			bbb: $.varRef(init?.bbb ?? (null as __goscript_nat.nat)),
+			bbb: $.varRef(init?.bbb ?? (null! as __goscript_nat.nat)),
 			nbits: $.varRef(init?.nbits ?? (0 as number)),
 			ndigits: $.varRef(init?.ndigits ?? (0 as number))
 		}
@@ -153,10 +153,10 @@ export function __goscript_set_errInvalSep(__goscriptValue: $.GoError): void {
 }
 
 export async function nat_scan(z: __goscript_nat.nat, r: io.ByteScanner | null, base: number, fracOk: boolean): globalThis.Promise<[__goscript_nat.nat, number, number, $.GoError]> {
-	let res: __goscript_nat.nat = null as __goscript_nat.nat
+	let res: __goscript_nat.nat = null! as __goscript_nat.nat
 	let b: number = 0
 	let count: number = 0
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	// Reject invalid bases.
 	let baseOk = ((base == 0) || ((!fracOk && (2 <= base)) && (base <= 62))) || (fracOk && ((((base == 2) || (base == 8)) || (base == 10)) || (base == 16)))
 	if (!baseOk) {
@@ -503,7 +503,7 @@ export async function nat_convertWords(q: __goscript_nat.nat, stk: __goscript_na
 	// split larger blocks recursively
 	if (table != null) {
 		// len(q) > leafSize > 0
-		let r: __goscript_nat.nat = null as __goscript_nat.nat
+		let r: __goscript_nat.nat = null! as __goscript_nat.nat
 		let index = $.len(table) - 1
 		while ($.len((q as __goscript_nat.nat)) > __goscript_get_leafSize()) {
 			// find divisor close to sqrt(q) if possible, but in any case < q
@@ -627,7 +627,7 @@ export async function divisors(stk: __goscript_nat.stack | $.VarRef<__goscript_n
 	}
 
 	// reuse and extend existing table of divisors or create new table as appropriate
-	let table: $.Slice<divisor> = null as $.Slice<divisor>
+	let table: $.Slice<divisor> = null! as $.Slice<divisor>
 	if (b == 10) {
 		await __goscript_get_cacheBase10().value.Mutex.Lock()
 		table = $.goSlice(__goscript_get_cacheBase10().value.table, 0, k)
@@ -638,7 +638,7 @@ export async function divisors(stk: __goscript_nat.stack | $.VarRef<__goscript_n
 	// extend table
 	if ($.arrayIndex(table!, k - 1).ndigits == 0) {
 		// add new entries as needed
-		let larger: __goscript_nat.nat = null as __goscript_nat.nat
+		let larger: __goscript_nat.nat = null! as __goscript_nat.nat
 		for (let i = 0; i < k; i++) {
 			if ($.arrayIndex(table!, i).ndigits == 0) {
 				if (i == 0) {

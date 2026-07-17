@@ -196,7 +196,7 @@ export class Config {
 			MaxIncomingStreams: $.varRef(init?.MaxIncomingStreams ?? (0 as number)),
 			InitialStreamWindowSize: $.varRef(init?.InitialStreamWindowSize ?? (0 as number)),
 			MaxStreamWindowSize: $.varRef(init?.MaxStreamWindowSize ?? (0 as number)),
-			LogOutput: $.varRef(init?.LogOutput ?? (null as io.Writer | null)),
+			LogOutput: $.varRef(init?.LogOutput ?? (null! as io.Writer | null)),
 			ReadBufSize: $.varRef(init?.ReadBufSize ?? (0 as number)),
 			WriteCoalesceDelay: $.varRef(init?.WriteCoalesceDelay ?? (0n as time.Duration)),
 			MaxMessageSize: $.varRef(init?.MaxMessageSize ?? (0 as number))

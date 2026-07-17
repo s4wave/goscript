@@ -26,7 +26,7 @@ export class Format {
 	constructor(init?: Partial<{Name?: string, Ext?: $.Slice<string>}>) {
 		this._fields = {
 			Name: $.varRef(init?.Name ?? ("" as string)),
-			Ext: $.varRef(init?.Ext ?? (null as $.Slice<string>))
+			Ext: $.varRef(init?.Ext ?? (null! as $.Slice<string>))
 		}
 	}
 

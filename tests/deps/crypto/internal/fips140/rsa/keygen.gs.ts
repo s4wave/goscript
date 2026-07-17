@@ -54,9 +54,9 @@ export class millerRabin {
 
 	constructor(init?: Partial<{w?: bigmod.Modulus | $.VarRef<bigmod.Modulus> | null, a?: number, m?: $.Slice<number>}>) {
 		this._fields = {
-			w: $.varRef(init?.w ?? (null as bigmod.Modulus | $.VarRef<bigmod.Modulus> | null)),
+			w: $.varRef(init?.w ?? (null! as bigmod.Modulus | $.VarRef<bigmod.Modulus> | null)),
 			a: $.varRef(init?.a ?? (0 as number)),
-			m: $.varRef(init?.m ?? (null as $.Slice<number>))
+			m: $.varRef(init?.m ?? (null! as $.Slice<number>))
 		}
 	}
 

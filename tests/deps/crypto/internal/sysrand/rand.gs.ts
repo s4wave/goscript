@@ -68,13 +68,13 @@ export function __goscript_set_urandomOnce(__goscriptValue: sync.Once): void {
 	urandomOnce.value = __goscriptValue
 }
 
-export let urandomFile: os.File | $.VarRef<os.File> | null = null as os.File | $.VarRef<os.File> | null
+export let urandomFile: os.File | $.VarRef<os.File> | null = null! as os.File | $.VarRef<os.File> | null
 
 export function __goscript_set_urandomFile(__goscriptValue: os.File | $.VarRef<os.File> | null): void {
 	urandomFile = __goscriptValue
 }
 
-export let urandomErr: $.GoError = null as $.GoError
+export let urandomErr: $.GoError = null! as $.GoError
 
 export function __goscript_set_urandomErr(__goscriptValue: $.GoError): void {
 	urandomErr = __goscriptValue

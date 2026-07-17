@@ -40,7 +40,7 @@ export class MyStruct {
 
 export async function main(): globalThis.Promise<void> {
 	let s1 = $.markAsStructValue(new MyStruct({Value: 10}))
-	let p: MyStruct | $.VarRef<MyStruct> | null = null as MyStruct | $.VarRef<MyStruct> | null
+	let p: MyStruct | $.VarRef<MyStruct> | null = null! as MyStruct | $.VarRef<MyStruct> | null
 	p = new MyStruct({Value: 20})
 
 	// This assignment should trigger the .clone() on s1

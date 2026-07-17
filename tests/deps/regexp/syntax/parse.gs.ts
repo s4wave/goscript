@@ -179,16 +179,16 @@ export class parser {
 	constructor(init?: Partial<{flags?: Flags, stack?: $.Slice<__goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null>, free?: __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null, numCap?: number, wholeRegexp?: string, tmpClass?: $.Slice<number>, numRegexp?: number, numRunes?: number, repeats?: bigint, height?: globalThis.Map<__goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null, number> | null, size?: globalThis.Map<__goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null, bigint> | null}>) {
 		this._fields = {
 			flags: $.varRef(init?.flags ?? (0 as Flags)),
-			stack: $.varRef(init?.stack ?? (null as $.Slice<__goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null>)),
-			free: $.varRef(init?.free ?? (null as __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null)),
+			stack: $.varRef(init?.stack ?? (null! as $.Slice<__goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null>)),
+			free: $.varRef(init?.free ?? (null! as __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null)),
 			numCap: $.varRef(init?.numCap ?? (0 as number)),
 			wholeRegexp: $.varRef(init?.wholeRegexp ?? ("" as string)),
-			tmpClass: $.varRef(init?.tmpClass ?? (null as $.Slice<number>)),
+			tmpClass: $.varRef(init?.tmpClass ?? (null! as $.Slice<number>)),
 			numRegexp: $.varRef(init?.numRegexp ?? (0 as number)),
 			numRunes: $.varRef(init?.numRunes ?? (0 as number)),
 			repeats: $.varRef(init?.repeats ?? (0n as bigint)),
-			height: $.varRef(init?.height ?? (null as globalThis.Map<__goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null, number> | null)),
-			size: $.varRef(init?.size ?? (null as globalThis.Map<__goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null, bigint> | null))
+			height: $.varRef(init?.height ?? (null! as globalThis.Map<__goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null, number> | null)),
+			size: $.varRef(init?.size ?? (null! as globalThis.Map<__goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null, bigint> | null))
 		}
 	}
 
@@ -477,7 +477,7 @@ export class parser {
 		}
 
 		// Round 1: Factor out common literal prefixes.
-		let str: $.Slice<number> = null as $.Slice<number>
+		let str: $.Slice<number> = null! as $.Slice<number>
 		let strflags: Flags = 0
 		let start = 0
 		let out: $.Slice<__goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null> = $.goSlice(sub, undefined, 0)
@@ -488,7 +488,7 @@ export class parser {
 			//
 			// Invariant: sub[start:i] consists of regexps that all begin
 			// with str as modified by strflags.
-			let istr: $.Slice<number> = null as $.Slice<number>
+			let istr: $.Slice<number> = null! as $.Slice<number>
 			let iflags: Flags = 0
 			if (i < $.len(sub)) {
 				let __goscriptTuple1: any = parser.prototype.leadingString.call(p, $.arrayIndex(sub!, i))
@@ -553,14 +553,14 @@ export class parser {
 		// correctness in some cases.
 		start = 0
 		out = $.goSlice(sub, undefined, 0)
-		let first: __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null = null as __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null
+		let first: __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null = null! as __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null
 		for (let i = 0; i <= $.len(sub); i++) {
 			// Invariant: the Regexps that were in sub[0:start] have been
 			// used or marked for reuse, and the slice space has been reused
 			// for out (len(out) <= start).
 			//
 			// Invariant: sub[start:i] consists of regexps that all begin with ifirst.
-			let ifirst: __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null = null as __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null
+			let ifirst: __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null = null! as __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null
 			if (i < $.len(sub)) {
 				ifirst = parser.prototype.leadingRegexp.call(p, $.arrayIndex(sub!, i))
 				if (((first != null) && __goscript_regexp.Regexp.prototype.Equal.call(first, ifirst)) && (isCharClass(first) || ((($.uint($.pointerValue<__goscript_regexp.Regexp>(first).Op, 8) == $.uint(17, 8)) && ($.pointerValue<__goscript_regexp.Regexp>(first).Min == $.pointerValue<__goscript_regexp.Regexp>(first).Max)) && isCharClass($.arrayIndex($.pointerValue<__goscript_regexp.Regexp>(first).Sub!, 0))))) {
@@ -755,7 +755,7 @@ export class parser {
 	public async parseClass(s: string): globalThis.Promise<[string, $.GoError]> {
 		const p: parser | $.VarRef<parser> | null = this
 		let rest: string = ""
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let t = $.sliceStringOrBytes(s, 1, undefined)
 		let re: __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null = parser.prototype.newRegexp.call(p, $.uint(4, 8))
 		$.pointerValue<__goscript_regexp.Regexp>(re).Flags = $.uint($.pointerValue<parser>(p).flags, 16)
@@ -886,7 +886,7 @@ export class parser {
 		const p: parser | $.VarRef<parser> | null = this
 		let r: number = 0
 		let rest: string = ""
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.stringEqual(s, "")) {
 			return [$.int(0, 32), "", $.interfaceValue<$.GoError>(new Error({Code: "missing closing ]", Expr: wholeClass}), "*syntax.Error", { kind: $.TypeKind.Pointer, elemType: "syntax.Error" })]
 		}
@@ -907,7 +907,7 @@ export class parser {
 		const p: parser | $.VarRef<parser> | null = this
 		let r: number = 0
 		let rest: string = ""
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let t = $.sliceStringOrBytes(s, 1, undefined)
 		if ($.stringEqual(t, "")) {
 			return [$.int(0, 32), "", $.interfaceValue<$.GoError>(new Error({Code: "trailing backslash at end of expression", Expr: ""}), "*syntax.Error", { kind: $.TypeKind.Pointer, elemType: "syntax.Error" })]
@@ -1097,9 +1097,9 @@ export class parser {
 
 	public async parseNamedClass(s: string, r: $.Slice<number>): globalThis.Promise<[$.Slice<number>, string, $.GoError]> {
 		const p: parser | $.VarRef<parser> | null = this
-		let out: $.Slice<number> = null as $.Slice<number>
+		let out: $.Slice<number> = null! as $.Slice<number>
 		let rest: string = ""
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ((($.len(s) < 2) || ($.uint($.indexStringOrBytes(s, 0), 8) != $.uint(91, 8))) || ($.uint($.indexStringOrBytes(s, 1), 8) != $.uint(58, 8))) {
 			return [out, rest, err]
 		}
@@ -1120,7 +1120,7 @@ export class parser {
 
 	public async parsePerlClassEscape(s: string, r: $.Slice<number>): globalThis.Promise<[$.Slice<number>, string]> {
 		const p: parser | $.VarRef<parser> | null = this
-		let out: $.Slice<number> = null as $.Slice<number>
+		let out: $.Slice<number> = null! as $.Slice<number>
 		let rest: string = ""
 		if ((($.uint(($.pointerValue<parser>(p).flags & 64), 16) == $.uint(0, 16)) || ($.len(s) < 2)) || ($.uint($.indexStringOrBytes(s, 0), 8) != $.uint(92, 8))) {
 			return [out, rest]
@@ -1135,7 +1135,7 @@ export class parser {
 	public parsePerlFlags(s: string): [string, $.GoError] {
 		let p: parser | $.VarRef<parser> | null = this
 		let rest: string = ""
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let t = s
 
 		// Check for named captures, first introduced in Python's regexp library.
@@ -1368,9 +1368,9 @@ export class parser {
 
 	public async parseUnicodeClass(s: string, r: $.Slice<number>): globalThis.Promise<[$.Slice<number>, string, $.GoError]> {
 		let p: parser | $.VarRef<parser> | null = this
-		let out: $.Slice<number> = null as $.Slice<number>
+		let out: $.Slice<number> = null! as $.Slice<number>
 		let rest: string = ""
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if (((($.uint(($.pointerValue<parser>(p).flags & 128), 16) == $.uint(0, 16)) || ($.len(s) < 2)) || ($.uint($.indexStringOrBytes(s, 0), 8) != $.uint(92, 8))) || (($.uint($.indexStringOrBytes(s, 1), 8) != $.uint(112, 8)) && ($.uint($.indexStringOrBytes(s, 1), 8) != $.uint(80, 8)))) {
 			return [out, rest, err]
 		}
@@ -1701,7 +1701,7 @@ export class charGroup {
 	constructor(init?: Partial<{sign?: number, _class?: $.Slice<number>}>) {
 		this._fields = {
 			sign: $.varRef(init?.sign ?? (0 as number)),
-			_class: $.varRef(init?._class ?? (null as $.Slice<number>))
+			_class: $.varRef(init?._class ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -1737,7 +1737,7 @@ export class ranges {
 
 	constructor(init?: Partial<{p?: $.VarRef<$.Slice<number>> | null}>) {
 		this._fields = {
-			p: $.varRef(init?.p ?? (null as $.VarRef<$.Slice<number>> | null))
+			p: $.varRef(init?.p ?? (null! as $.VarRef<$.Slice<number>> | null))
 		}
 	}
 
@@ -1948,7 +1948,7 @@ export async function Parse(s: string, flags: Flags): globalThis.Promise<[__gosc
 }
 
 export async function parse(s: string, flags: Flags): globalThis.Promise<[__goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null, $.GoError]> {
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	const __defer = new $.DisposableStack()
 	try {
 		__defer.defer(() => { ((): void => {
@@ -2332,7 +2332,7 @@ export async function parse(s: string, flags: Flags): globalThis.Promise<[__gosc
 			throw e
 		}
 	}
-	return [null as __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null, err]
+	return [null! as __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null, err]
 }
 
 export function isValidCaptureName(name: string): boolean {
@@ -2449,7 +2449,7 @@ export function initCategoryAliases(): void {
 }
 
 export function canonicalName(name: string): string {
-	let b: $.Slice<number> = null as $.Slice<number>
+	let b: $.Slice<number> = null! as $.Slice<number>
 	let first = true
 	for (let i = 0; i < $.len(name); i++) {
 		let c = $.uint($.indexStringOrBytes(name, i), 8)
@@ -2495,8 +2495,8 @@ export function canonicalName(name: string): string {
 }
 
 export async function unicodeTable(name: string): globalThis.Promise<[unicode.RangeTable | $.VarRef<unicode.RangeTable> | null, unicode.RangeTable | $.VarRef<unicode.RangeTable> | null, number]> {
-	let tab: unicode.RangeTable | $.VarRef<unicode.RangeTable> | null = null as unicode.RangeTable | $.VarRef<unicode.RangeTable> | null
-	let fold: unicode.RangeTable | $.VarRef<unicode.RangeTable> | null = null as unicode.RangeTable | $.VarRef<unicode.RangeTable> | null
+	let tab: unicode.RangeTable | $.VarRef<unicode.RangeTable> | null = null! as unicode.RangeTable | $.VarRef<unicode.RangeTable> | null
+	let fold: unicode.RangeTable | $.VarRef<unicode.RangeTable> | null = null! as unicode.RangeTable | $.VarRef<unicode.RangeTable> | null
 	let sign: number = 0
 	name = canonicalName(name)
 
@@ -2806,7 +2806,7 @@ export function checkUTF8(s: string): $.GoError {
 export function nextRune(s: string): [number, string, $.GoError] {
 	let c: number = 0
 	let t: string = ""
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let __goscriptTuple27: any = utf8.DecodeRuneInString(s)
 	c = $.int(__goscriptTuple27[0], 32)
 	let size = __goscriptTuple27[1]

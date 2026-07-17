@@ -260,13 +260,13 @@ export class TextFormatter {
 			FullTimestamp: $.varRef(init?.FullTimestamp ?? (false as boolean)),
 			TimestampFormat: $.varRef(init?.TimestampFormat ?? ("" as string)),
 			DisableSorting: $.varRef(init?.DisableSorting ?? (false as boolean)),
-			SortingFunc: $.varRef(init?.SortingFunc ?? (null as ((_p0: $.Slice<string>) => void) | null)),
+			SortingFunc: $.varRef(init?.SortingFunc ?? (null! as ((_p0: $.Slice<string>) => void) | null)),
 			DisableLevelTruncation: $.varRef(init?.DisableLevelTruncation ?? (false as boolean)),
 			PadLevelText: $.varRef(init?.PadLevelText ?? (false as boolean)),
 			QuoteEmptyFields: $.varRef(init?.QuoteEmptyFields ?? (false as boolean)),
 			terminal: $.varRef(init?.terminal ?? (false as boolean)),
-			FieldMap: $.varRef(init?.FieldMap ?? (null as __goscript_json_formatter.FieldMap)),
-			CallerPrettyfier: $.varRef(init?.CallerPrettyfier ?? (null as ((_p0: runtime.Frame | $.VarRef<runtime.Frame> | null) => [string, string] | globalThis.Promise<[string, string]>) | null)),
+			FieldMap: $.varRef(init?.FieldMap ?? (null! as __goscript_json_formatter.FieldMap)),
+			CallerPrettyfier: $.varRef(init?.CallerPrettyfier ?? (null! as ((_p0: runtime.Frame | $.VarRef<runtime.Frame> | null) => [string, string] | globalThis.Promise<[string, string]>) | null)),
 			terminalInitOnce: $.varRef(init?.terminalInitOnce ? $.markAsStructValue($.cloneStructValue(init.terminalInitOnce)) : $.markAsStructValue(new sync.Once()))
 		}
 	}
@@ -422,7 +422,7 @@ export class TextFormatter {
 
 		// Handle common primitives.
 		let raw: Uint8Array = new Uint8Array(64)
-		let num: $.Slice<number> = null as $.Slice<number>
+		let num: $.Slice<number> = null! as $.Slice<number>
 
 		{
 			const __goscriptTypeSwitchValue = value
@@ -691,7 +691,7 @@ export class TextFormatter {
 
 		for (let __goscriptRangeTarget1 = fixedKeys, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
 			let key = __goscriptRangeTarget1![__rangeIndex]
-			let value: any = null as any
+			let value: any = null! as any
 			switch (true) {
 				case $.stringEqual(key, __goscript_json_formatter.FieldMap_resolve($.pointerValue<TextFormatter>(f).FieldMap, "time")):
 				{

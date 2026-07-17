@@ -26,7 +26,7 @@ export async function WatchBroadcast(__typeArgs: $.GenericTypeArgs | undefined, 
 }
 
 export async function WatchBroadcastWithEqual(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, bcast: __goscript_broadcast.Broadcast | $.VarRef<__goscript_broadcast.Broadcast> | null, snapshot: (() => any | globalThis.Promise<any>) | null, send: ((_p0: any) => $.GoError | globalThis.Promise<$.GoError>) | null, equal: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<$.GoError> {
-	let ch: $.Channel<{}> | null = null as $.Channel<{}> | null
+	let ch: $.Channel<{}> | null = null! as $.Channel<{}> | null
 	let val: any = $.genericZero(__typeArgs, "T", null)
 	let locked = $.varRef($.markAsStructValue($.cloneStructValue(await __goscript_broadcast.Broadcast.prototype.Lock.call(bcast))))
 	ch = locked.value.WaitCh()

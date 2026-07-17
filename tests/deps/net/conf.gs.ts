@@ -165,7 +165,7 @@ export class conf {
 	public async addrLookupOrder(r: __goscript_lookup.Resolver | $.VarRef<__goscript_lookup.Resolver> | null, addr: string): globalThis.Promise<[__goscript_dnsclient_unix.hostLookupOrder, __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null]> {
 		const c: conf | $.VarRef<conf> | null = this
 		let ret: __goscript_dnsclient_unix.hostLookupOrder = 0
-		let dnsConf: __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null = null as __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null
+		let dnsConf: __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null = null! as __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null
 		using __defer = new $.DisposableStack()
 		if ($.pointerValue<conf>(c).dnsDebugLevel > 1) {
 			__defer.defer(() => { ((): void => {
@@ -183,7 +183,7 @@ export class conf {
 	public async hostLookupOrder(r: __goscript_lookup.Resolver | $.VarRef<__goscript_lookup.Resolver> | null, hostname: string): globalThis.Promise<[__goscript_dnsclient_unix.hostLookupOrder, __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null]> {
 		const c: conf | $.VarRef<conf> | null = this
 		let ret: __goscript_dnsclient_unix.hostLookupOrder = 0
-		let dnsConf: __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null = null as __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null
+		let dnsConf: __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null = null! as __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null
 		using __defer = new $.DisposableStack()
 		if ($.pointerValue<conf>(c).dnsDebugLevel > 1) {
 			__defer.defer(() => { ((): void => {
@@ -201,7 +201,7 @@ export class conf {
 	public async lookupOrder(r: __goscript_lookup.Resolver | $.VarRef<__goscript_lookup.Resolver> | null, hostname: string): globalThis.Promise<[__goscript_dnsclient_unix.hostLookupOrder, __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null]> {
 		const c: conf | $.VarRef<conf> | null = this
 		let ret: __goscript_dnsclient_unix.hostLookupOrder = 0
-		let dnsConf: __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null = null as __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null
+		let dnsConf: __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null = null! as __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null
 		// fallbackOrder is the order we return if we can't figure it out.
 		let fallbackOrder: __goscript_dnsclient_unix.hostLookupOrder = 0
 

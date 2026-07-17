@@ -170,8 +170,8 @@ export class printer {
 
 	constructor(init?: Partial<{buf?: $.Slice<number>, arg?: any, fmt?: formatter}>) {
 		this._fields = {
-			buf: $.varRef(init?.buf ?? (null as $.Slice<number>)),
-			arg: $.varRef(init?.arg ?? (null as any)),
+			buf: $.varRef(init?.buf ?? (null! as $.Slice<number>)),
+			arg: $.varRef(init?.arg ?? (null! as any)),
 			fmt: $.varRef(init?.fmt ? $.markAsStructValue($.cloneStructValue(init.fmt)) : $.markAsStructValue(new formatter()))
 		}
 	}

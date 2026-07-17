@@ -286,7 +286,7 @@ export class Digest {
 	public Write(p: $.Slice<number>): [number, $.GoError] {
 		let d: Digest | $.VarRef<Digest> | null = this
 		let nn: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		nn = $.len(p)
 		$.pointerValue<Digest>(d).len = $.uint64Add($.pointerValue<Digest>(d).len, $.uint64(nn))
 		if ($.pointerValue<Digest>(d).nx > 0) {

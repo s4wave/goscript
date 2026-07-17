@@ -34,7 +34,7 @@ export class WebSocket {
 
 	public async Close(code: number, reason: string): globalThis.Promise<$.GoError> {
 		const c = this
-		let err: $.VarRef<$.GoError> = $.varRef(null as $.GoError)
+		let err: $.VarRef<$.GoError> = $.varRef(null! as $.GoError)
 		const __defer = new $.AsyncDisposableStack()
 		try {
 			__defer.defer(async () => { await handleJSError(err, (null as (() => void) | null)) })
@@ -55,7 +55,7 @@ export class WebSocket {
 
 	public async OnClose(fn: ((_p0: CloseEvent) => void) | null): globalThis.Promise<(() => void) | null> {
 		const c = this
-		let remove: (() => void) | null = null as (() => void) | null
+		let remove: (() => void) | null = null! as (() => void) | null
 		return $.markAsStructValue($.cloneStructValue(c)).addEventListener("close", $.functionValue(async (e: js.Value): globalThis.Promise<void> => {
 			let ce = (() => { const __goscriptLiteralField1 = $.uint($.uint($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Get("code"))).Int(), 16), 16); const __goscriptLiteralField2 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Get("reason"))).String(); const __goscriptLiteralField3 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Get("wasClean"))).Bool(); return $.markAsStructValue(new CloseEvent({Code: __goscriptLiteralField1, Reason: __goscriptLiteralField2, WasClean: __goscriptLiteralField3})) })()
 			await fn!($.markAsStructValue($.cloneStructValue(ce)))
@@ -64,15 +64,15 @@ export class WebSocket {
 
 	public async OnError(fn: ((e: js.Value) => void) | null): globalThis.Promise<(() => void) | null> {
 		const c = this
-		let remove: (() => void) | null = null as (() => void) | null
+		let remove: (() => void) | null = null! as (() => void) | null
 		return $.markAsStructValue($.cloneStructValue(c)).addEventListener("error", fn)
 	}
 
 	public async OnMessage(fn: ((m: MessageEvent) => void) | null): globalThis.Promise<(() => void) | null> {
 		const c = this
-		let remove: (() => void) | null = null as (() => void) | null
+		let remove: (() => void) | null = null! as (() => void) | null
 		return $.markAsStructValue($.cloneStructValue(c)).addEventListener("message", $.functionValue(async (e: js.Value): globalThis.Promise<void> => {
-			let data: any = null as any
+			let data: any = null! as any
 
 			let arrayBuffer = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Get("data")))
 			if ($.markAsStructValue($.cloneStructValue(arrayBuffer)).Type() == js.TypeString) {
@@ -88,13 +88,13 @@ export class WebSocket {
 
 	public async OnOpen(fn: ((e: js.Value) => void) | null): globalThis.Promise<(() => void) | null> {
 		const c = this
-		let remove: (() => void) | null = null as (() => void) | null
+		let remove: (() => void) | null = null! as (() => void) | null
 		return $.markAsStructValue($.cloneStructValue(c)).addEventListener("open", fn)
 	}
 
 	public async SendBytes(v: $.Slice<number>): globalThis.Promise<$.GoError> {
 		const c = this
-		let err: $.VarRef<$.GoError> = $.varRef(null as $.GoError)
+		let err: $.VarRef<$.GoError> = $.varRef(null! as $.GoError)
 		const __defer = new $.AsyncDisposableStack()
 		try {
 			__defer.defer(async () => { await handleJSError(err, (null as (() => void) | null)) })
@@ -115,7 +115,7 @@ export class WebSocket {
 
 	public async SendText(v: string): globalThis.Promise<$.GoError> {
 		const c = this
-		let err: $.VarRef<$.GoError> = $.varRef(null as $.GoError)
+		let err: $.VarRef<$.GoError> = $.varRef(null! as $.GoError)
 		const __defer = new $.AsyncDisposableStack()
 		try {
 			__defer.defer(async () => { await handleJSError(err, (null as (() => void) | null)) })
@@ -237,7 +237,7 @@ export class MessageEvent {
 
 	constructor(init?: Partial<{Data?: any}>) {
 		this._fields = {
-			Data: $.varRef(init?.Data ?? (null as any))
+			Data: $.varRef(init?.Data ?? (null! as any))
 		}
 	}
 
@@ -280,7 +280,7 @@ export async function handleJSError(err: $.VarRef<$.GoError> | null, onErr: (() 
 
 export async function New(url: string, protocols: $.Slice<string>): globalThis.Promise<[WebSocket, $.GoError]> {
 	let c: WebSocket = $.markAsStructValue(new WebSocket())
-	let err: $.VarRef<$.GoError> = $.varRef(null as $.GoError)
+	let err: $.VarRef<$.GoError> = $.varRef(null! as $.GoError)
 	const __defer = new $.AsyncDisposableStack()
 	try {
 		__defer.defer(async () => { await handleJSError(err, $.functionValue((): void => {

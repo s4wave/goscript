@@ -50,9 +50,9 @@ export class Parameters {
 
 	constructor(init?: Partial<{P?: big.Int | $.VarRef<big.Int> | null, Q?: big.Int | $.VarRef<big.Int> | null, G?: big.Int | $.VarRef<big.Int> | null}>) {
 		this._fields = {
-			P: $.varRef(init?.P ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			Q: $.varRef(init?.Q ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			G: $.varRef(init?.G ?? (null as big.Int | $.VarRef<big.Int> | null))
+			P: $.varRef(init?.P ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			Q: $.varRef(init?.Q ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			G: $.varRef(init?.G ?? (null! as big.Int | $.VarRef<big.Int> | null))
 		}
 	}
 
@@ -98,7 +98,7 @@ export class PublicKey {
 	constructor(init?: Partial<{Parameters?: Parameters, Y?: big.Int | $.VarRef<big.Int> | null}>) {
 		this._fields = {
 			Parameters: $.varRef(init?.Parameters ? $.markAsStructValue($.cloneStructValue(init.Parameters)) : $.markAsStructValue(new Parameters())),
-			Y: $.varRef(init?.Y ?? (null as big.Int | $.VarRef<big.Int> | null))
+			Y: $.varRef(init?.Y ?? (null! as big.Int | $.VarRef<big.Int> | null))
 		}
 	}
 
@@ -143,7 +143,7 @@ export class PrivateKey {
 	constructor(init?: Partial<{PublicKey?: PublicKey, X?: big.Int | $.VarRef<big.Int> | null}>) {
 		this._fields = {
 			PublicKey: $.varRef(init?.PublicKey ? $.markAsStructValue($.cloneStructValue(init.PublicKey)) : $.markAsStructValue(new PublicKey())),
-			X: $.varRef(init?.X ?? (null as big.Int | $.VarRef<big.Int> | null))
+			X: $.varRef(init?.X ?? (null! as big.Int | $.VarRef<big.Int> | null))
 		}
 	}
 
@@ -335,9 +335,9 @@ export async function fermatInverse(k: big.Int | $.VarRef<big.Int> | null, P: bi
 }
 
 export async function Sign(random: io.Reader | null, priv: PrivateKey | $.VarRef<PrivateKey> | null, hash: $.Slice<number>): globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null, $.GoError]> {
-	let r: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-	let s: big.Int | $.VarRef<big.Int> | null = null as big.Int | $.VarRef<big.Int> | null
-	let err: $.GoError = null as $.GoError
+	let r: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+	let s: big.Int | $.VarRef<big.Int> | null = null! as big.Int | $.VarRef<big.Int> | null
+	let err: $.GoError = null! as $.GoError
 	if (fips140only.Enforced()) {
 		return [null, null, errors.New("crypto/dsa: use of DSA is not allowed in FIPS 140-only mode")]
 	}

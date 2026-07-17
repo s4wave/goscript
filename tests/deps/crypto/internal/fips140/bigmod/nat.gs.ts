@@ -34,7 +34,7 @@ export class Nat {
 
 	constructor(init?: Partial<{limbs?: $.Slice<number>}>) {
 		this._fields = {
-			limbs: $.varRef(init?.limbs ?? (null as $.Slice<number>))
+			limbs: $.varRef(init?.limbs ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -409,7 +409,7 @@ export class Nat {
 		let shift = $.int($.uint($.uint64Mod(n, 64n), 64))
 		let shiftLimbs = $.int($.uint($.uint64Div(n, 64n), 64))
 
-		let shiftedLimbs: $.Slice<number> = null as $.Slice<number>
+		let shiftedLimbs: $.Slice<number> = null! as $.Slice<number>
 		if (shiftLimbs < size) {
 			shiftedLimbs = $.goSlice(xLimbs, shiftLimbs, undefined)
 		}
@@ -861,10 +861,10 @@ export class Modulus {
 
 	constructor(init?: Partial<{nat?: Nat | $.VarRef<Nat> | null, odd?: boolean, m0inv?: number, rr?: Nat | $.VarRef<Nat> | null}>) {
 		this._fields = {
-			nat: $.varRef(init?.nat ?? (null as Nat | $.VarRef<Nat> | null)),
+			nat: $.varRef(init?.nat ?? (null! as Nat | $.VarRef<Nat> | null)),
 			odd: $.varRef(init?.odd ?? (false as boolean)),
 			m0inv: $.varRef(init?.m0inv ?? (0 as number)),
-			rr: $.varRef(init?.rr ?? (null as Nat | $.VarRef<Nat> | null))
+			rr: $.varRef(init?.rr ?? (null! as Nat | $.VarRef<Nat> | null))
 		}
 	}
 
@@ -1070,9 +1070,9 @@ export function addMulVVW(z: $.Slice<number>, x: $.Slice<number>, y: number): nu
 }
 
 export function extendedGCD(a: Nat | $.VarRef<Nat> | null, m: Nat | $.VarRef<Nat> | null): [Nat | $.VarRef<Nat> | null, Nat | $.VarRef<Nat> | null, $.GoError] {
-	let u: Nat | $.VarRef<Nat> | null = null as Nat | $.VarRef<Nat> | null
-	let A: Nat | $.VarRef<Nat> | null = null as Nat | $.VarRef<Nat> | null
-	let err: $.GoError = null as $.GoError
+	let u: Nat | $.VarRef<Nat> | null = null! as Nat | $.VarRef<Nat> | null
+	let A: Nat | $.VarRef<Nat> | null = null! as Nat | $.VarRef<Nat> | null
+	let err: $.GoError = null! as $.GoError
 	// This is the extended binary GCD algorithm described in the Handbook of
 	// Applied Cryptography, Algorithm 14.61, adapted by BoringSSL to bound
 	// coefficients and avoid negative numbers. For more details and proof of

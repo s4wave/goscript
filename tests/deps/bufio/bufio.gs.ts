@@ -80,11 +80,11 @@ export class Reader {
 
 	constructor(init?: Partial<{buf?: $.Slice<number>, rd?: io.Reader | null, r?: number, w?: number, err?: $.GoError, lastByte?: number, lastRuneSize?: number}>) {
 		this._fields = {
-			buf: $.varRef(init?.buf ?? (null as $.Slice<number>)),
-			rd: $.varRef(init?.rd ?? (null as io.Reader | null)),
+			buf: $.varRef(init?.buf ?? (null! as $.Slice<number>)),
+			rd: $.varRef(init?.rd ?? (null! as io.Reader | null)),
 			r: $.varRef(init?.r ?? (0 as number)),
 			w: $.varRef(init?.w ?? (0 as number)),
-			err: $.varRef(init?.err ?? (null as $.GoError)),
+			err: $.varRef(init?.err ?? (null! as $.GoError)),
 			lastByte: $.varRef(init?.lastByte ?? (0 as number)),
 			lastRuneSize: $.varRef(init?.lastRuneSize ?? (0 as number))
 		}
@@ -112,7 +112,7 @@ export class Reader {
 	public async Discard(n: number): globalThis.Promise<[number, $.GoError]> {
 		let b: Reader | $.VarRef<Reader> | null = this
 		let discarded: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if (n < 0) {
 			return [0, ErrNegativeCount]
 		}
@@ -163,7 +163,7 @@ export class Reader {
 		}
 
 		// 0 <= n <= len(b.buf)
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		{
 			let avail = $.pointerValue<Reader>(b).w - $.pointerValue<Reader>(b).r
 			if (avail < n) {
@@ -181,7 +181,7 @@ export class Reader {
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		let b: Reader | $.VarRef<Reader> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		n = $.len(p)
 		if (n == 0) {
 			if (Reader.prototype.Buffered.call(b) > 0) {
@@ -269,9 +269,9 @@ export class Reader {
 
 	public async ReadLine(): globalThis.Promise<[$.Slice<number>, boolean, $.GoError]> {
 		let b: Reader | $.VarRef<Reader> | null = this
-		let line: $.Slice<number> = null as $.Slice<number>
+		let line: $.Slice<number> = null! as $.Slice<number>
 		let isPrefix: boolean = false
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let __goscriptTuple3: any = await Reader.prototype.ReadSlice.call(b, $.uint(10, 8))
 		line = __goscriptTuple3[0]
 		err = __goscriptTuple3[1]
@@ -312,7 +312,7 @@ export class Reader {
 		let b: Reader | $.VarRef<Reader> | null = this
 		let r: number = 0
 		let size: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		while ((((($.pointerValue<Reader>(b).r + utf8.UTFMax) > $.pointerValue<Reader>(b).w) && !utf8.FullRune($.goSlice($.pointerValue<Reader>(b).buf, $.pointerValue<Reader>(b).r, $.pointerValue<Reader>(b).w))) && ($.pointerValue<Reader>(b).err == null)) && (($.pointerValue<Reader>(b).w - $.pointerValue<Reader>(b).r) < $.len($.pointerValue<Reader>(b).buf))) {
 			await Reader.prototype.fill.call(b)
 		}
@@ -331,8 +331,8 @@ export class Reader {
 
 	public async ReadSlice(delim: number): globalThis.Promise<[$.Slice<number>, $.GoError]> {
 		let b: Reader | $.VarRef<Reader> | null = this
-		let line: $.Slice<number> = null as $.Slice<number>
-		let err: $.GoError = null as $.GoError
+		let line: $.Slice<number> = null! as $.Slice<number>
+		let err: $.GoError = null! as $.GoError
 		let s = 0
 		while (true) {
 			// Search buffer.
@@ -449,7 +449,7 @@ export class Reader {
 	public async WriteTo(w: io.Writer | null): globalThis.Promise<[bigint, $.GoError]> {
 		let b: Reader | $.VarRef<Reader> | null = this
 		let n: bigint = 0n
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		$.pointerValue<Reader>(b).lastByte = -1
 		$.pointerValue<Reader>(b).lastRuneSize = -1
 
@@ -506,14 +506,14 @@ export class Reader {
 
 	public async collectFragments(delim: number): globalThis.Promise<[$.Slice<$.Slice<number>>, $.Slice<number>, number, $.GoError]> {
 		const b: Reader | $.VarRef<Reader> | null = this
-		let fullBuffers: $.Slice<$.Slice<number>> = null as $.Slice<$.Slice<number>>
-		let finalFragment: $.Slice<number> = null as $.Slice<number>
+		let fullBuffers: $.Slice<$.Slice<number>> = null! as $.Slice<$.Slice<number>>
+		let finalFragment: $.Slice<number> = null! as $.Slice<number>
 		let totalLen: number = 0
-		let err: $.GoError = null as $.GoError
-		let frag: $.Slice<number> = null as $.Slice<number>
+		let err: $.GoError = null! as $.GoError
+		let frag: $.Slice<number> = null! as $.Slice<number>
 		// Use ReadSlice to look for delim, accumulating full buffers.
 		while (true) {
-			let e: $.GoError = null as $.GoError
+			let e: $.GoError = null! as $.GoError
 			let __goscriptTuple8: any = await Reader.prototype.ReadSlice.call(b, $.uint(delim, 8))
 			frag = __goscriptTuple8[0]
 			e = __goscriptTuple8[1]
@@ -635,10 +635,10 @@ export class Writer {
 
 	constructor(init?: Partial<{err?: $.GoError, buf?: $.Slice<number>, n?: number, wr?: io.Writer | null}>) {
 		this._fields = {
-			err: $.varRef(init?.err ?? (null as $.GoError)),
-			buf: $.varRef(init?.buf ?? (null as $.Slice<number>)),
+			err: $.varRef(init?.err ?? (null! as $.GoError)),
+			buf: $.varRef(init?.buf ?? (null! as $.Slice<number>)),
 			n: $.varRef(init?.n ?? (0 as number)),
-			wr: $.varRef(init?.wr ?? (null as io.Writer | null))
+			wr: $.varRef(init?.wr ?? (null! as io.Writer | null))
 		}
 	}
 
@@ -697,7 +697,7 @@ export class Writer {
 	public async ReadFrom(r: io.Reader | null): globalThis.Promise<[bigint, $.GoError]> {
 		let b: Writer | $.VarRef<Writer> | null = this
 		let n: bigint = 0n
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.pointerValue<Writer>(b).err != null) {
 			return [0n, $.pointerValue<Writer>(b).err]
 		}
@@ -772,7 +772,7 @@ export class Writer {
 	public async Write(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		let b: Writer | $.VarRef<Writer> | null = this
 		let nn: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		while (($.len(p) > Writer.prototype.Available.call(b)) && ($.pointerValue<Writer>(b).err == null)) {
 			let n: number = 0
 			if (Writer.prototype.Buffered.call(b) == 0) {
@@ -814,7 +814,7 @@ export class Writer {
 	public async WriteRune(r: number): globalThis.Promise<[number, $.GoError]> {
 		let b: Writer | $.VarRef<Writer> | null = this
 		let size: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		// Compare as uint32 to correctly handle negative runes.
 		if ($.uint($.uint(r, 32), 32) < $.uint(utf8.RuneSelf, 32)) {
 			err = await Writer.prototype.WriteByte.call(b, $.uint($.uint(r, 8), 8))
@@ -847,7 +847,7 @@ export class Writer {
 
 	public async WriteString(s: string): globalThis.Promise<[number, $.GoError]> {
 		let b: Writer | $.VarRef<Writer> | null = this
-		let sw: io.StringWriter | null = null as io.StringWriter | null
+		let sw: io.StringWriter | null = null! as io.StringWriter | null
 		let tryStringWriter = true
 
 		let nn = 0
@@ -914,8 +914,8 @@ export class ReadWriter {
 
 	constructor(init?: Partial<{Reader?: Reader | $.VarRef<Reader> | null, Writer?: Writer | $.VarRef<Writer> | null}>) {
 		this._fields = {
-			Reader: $.varRef(init?.Reader ?? (null as Reader | $.VarRef<Reader> | null)),
-			Writer: $.varRef(init?.Writer ?? (null as Writer | $.VarRef<Writer> | null))
+			Reader: $.varRef(init?.Reader ?? (null! as Reader | $.VarRef<Reader> | null)),
+			Writer: $.varRef(init?.Writer ?? (null! as Writer | $.VarRef<Writer> | null))
 		}
 	}
 

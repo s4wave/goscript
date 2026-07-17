@@ -26,7 +26,7 @@ export class file {
 	constructor(init?: Partial<{name?: string, data?: $.Slice<number>}>) {
 		this._fields = {
 			name: $.varRef(init?.name ?? ("" as string)),
-			data: $.varRef(init?.data ?? (null as $.Slice<number>))
+			data: $.varRef(init?.data ?? (null! as $.Slice<number>))
 		}
 	}
 

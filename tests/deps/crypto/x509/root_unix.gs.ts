@@ -70,7 +70,7 @@ export async function loadSystemRoots(): globalThis.Promise<[__goscript_cert_poo
 		}
 	}
 
-	let firstErr: $.GoError = null as $.GoError
+	let firstErr: $.GoError = null! as $.GoError
 	for (let __goscriptRangeTarget0 = files, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let file = __goscriptRangeTarget0![__rangeIndex]
 		let __goscriptTuple0: any = os.ReadFile(file)

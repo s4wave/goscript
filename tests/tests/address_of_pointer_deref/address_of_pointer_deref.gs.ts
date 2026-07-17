@@ -26,7 +26,7 @@ export class Col {
 	constructor(init?: Partial<{Name?: string, Default?: $.VarRef<number> | null}>) {
 		this._fields = {
 			Name: $.varRef(init?.Name ?? ("" as string)),
-			Default: $.varRef(init?.Default ?? (null as $.VarRef<number> | null))
+			Default: $.varRef(init?.Default ?? (null! as $.VarRef<number> | null))
 		}
 	}
 

@@ -52,7 +52,7 @@ export class Prog {
 
 	constructor(init?: Partial<{Inst?: $.Slice<Inst>, Start?: number, NumCap?: number}>) {
 		this._fields = {
-			Inst: $.varRef(init?.Inst ?? (null as $.Slice<Inst>)),
+			Inst: $.varRef(init?.Inst ?? (null! as $.Slice<Inst>)),
 			Start: $.varRef(init?.Start ?? (0 as number)),
 			NumCap: $.varRef(init?.NumCap ?? (0 as number))
 		}
@@ -188,7 +188,7 @@ export class Inst {
 			Op: $.varRef(init?.Op ?? (0 as InstOp)),
 			Out: $.varRef(init?.Out ?? (0 as number)),
 			Arg: $.varRef(init?.Arg ?? (0 as number)),
-			Rune: $.varRef(init?.Rune ?? (null as $.Slice<number>))
+			Rune: $.varRef(init?.Rune ?? (null! as $.Slice<number>))
 		}
 	}
 

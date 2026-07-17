@@ -8,13 +8,13 @@ export async function main(): globalThis.Promise<void> {
 
 	// Protobuf idiom: append a sub-slice onto a truncated nil []byte. The
 	// result must stay byte-specialized regardless of the nil destination.
-	let dst: $.Slice<number> = null as $.Slice<number>
+	let dst: $.Slice<number> = null! as $.Slice<number>
 	dst = $.appendSlice($.goSlice(dst, undefined, 0), $.goSlice(dAtA, 1, 4), $.byteSliceHint)
 	$.println("spread nil:", dst)
 	$.println("spread len:", $.len(dst))
 
 	// Individual-element append onto a nil []byte stays byte-specialized.
-	let single: $.Slice<number> = null as $.Slice<number>
+	let single: $.Slice<number> = null! as $.Slice<number>
 	single = $.append(single, $.uint(65, 8), $.uint(66, 8), $.uint(67, 8), $.byteSliceHint)
 	$.println("single nil:", single)
 
@@ -25,7 +25,7 @@ export async function main(): globalThis.Promise<void> {
 	$.println("reused:", buf)
 
 	// Appending a string onto a nil []byte also stays byte-specialized.
-	let text: $.Slice<number> = null as $.Slice<number>
+	let text: $.Slice<number> = null! as $.Slice<number>
 	text = $.appendSlice(text, $.stringToBytes("Hi"), $.byteSliceHint)
 	$.println("string nil:", text)
 }

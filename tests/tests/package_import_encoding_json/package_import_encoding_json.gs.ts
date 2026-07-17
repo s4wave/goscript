@@ -71,7 +71,7 @@ export class Person {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let results: $.Slice<string> = null as $.Slice<string>
+	let results: $.Slice<string> = null! as $.Slice<string>
 
 	// Marshal a simple struct
 	let p = $.markAsStructValue(new Person({Name: "Alice", Age: 30, Active: true}))
@@ -104,7 +104,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Unmarshal into a map[string]any
-	let m: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null as globalThis.Map<string, any> | null)
+	let m: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null! as globalThis.Map<string, any> | null)
 	{
 		let __goscriptShadow1 = json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 67, 97, 114, 111, 108, 34, 44, 34, 97, 103, 101, 34, 58, 50, 50, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 116, 114, 117, 101, 125]), $.interfaceValue<any>(m, "*map[string]any", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Interface, methods: [] } } }))
 		if (__goscriptShadow1 != null) {

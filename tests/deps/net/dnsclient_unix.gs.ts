@@ -137,7 +137,7 @@ export class resolverConfig {
 	constructor(init?: Partial<{initOnce?: sync.Once, ch?: $.Channel<{}> | null, lastChecked?: time.Time, dnsConfig?: atomic.Pointer<__goscript_dnsconfig.dnsConfig>}>) {
 		this._fields = {
 			initOnce: $.varRef(init?.initOnce ? $.markAsStructValue($.cloneStructValue(init.initOnce)) : $.markAsStructValue(new sync.Once())),
-			ch: $.varRef(init?.ch ?? (null as $.Channel<{}> | null)),
+			ch: $.varRef(init?.ch ?? (null! as $.Channel<{}> | null)),
 			lastChecked: $.varRef(init?.lastChecked ? $.markAsStructValue($.cloneStructValue(init.lastChecked)) : $.markAsStructValue(new time.Time())),
 			dnsConfig: $.varRef(init?.dnsConfig ? $.markAsStructValue($.cloneStructValue(init.dnsConfig)) : $.markAsStructValue(new atomic.Pointer<__goscript_dnsconfig.dnsConfig>()))
 		}
@@ -333,9 +333,9 @@ export function __goscript_set_netedns0(__goscriptValue: godebug.Setting | $.Var
 
 export function newRequest(q: dnsmessage.Question, ad: boolean): [number, $.Slice<number>, $.Slice<number>, $.GoError] {
 	let id: number = 0
-	let udpReq: $.Slice<number> = null as $.Slice<number>
-	let tcpReq: $.Slice<number> = null as $.Slice<number>
-	let err: $.GoError = null as $.GoError
+	let udpReq: $.Slice<number> = null! as $.Slice<number>
+	let tcpReq: $.Slice<number> = null! as $.Slice<number>
+	let err: $.GoError = null! as $.GoError
 	id = $.uint($.uint(__goscript_dnsclient.randInt(), 16), 16)
 	let b = $.varRef($.markAsStructValue($.cloneStructValue(dnsmessage.NewBuilder($.makeSlice<number>(2, 514, "byte"), $.markAsStructValue(new dnsmessage.Header({ID: $.uint(id, 16), RecursionDesired: true, AuthenticData: ad}))))))
 	{
@@ -598,7 +598,7 @@ export function hostLookupOrder_String(o: hostLookupOrder): string {
 }
 
 export async function goLookupIPFiles(name: string): globalThis.Promise<[$.Slice<__goscript_iprawsock.IPAddr>, string]> {
-	let addrs: $.Slice<__goscript_iprawsock.IPAddr> = null as $.Slice<__goscript_iprawsock.IPAddr>
+	let addrs: $.Slice<__goscript_iprawsock.IPAddr> = null! as $.Slice<__goscript_iprawsock.IPAddr>
 	let canonical: string = ""
 	let __goscriptTuple7: any = await __goscript_hosts.lookupStaticHost(name)
 	let addr: $.Slice<string> = __goscriptTuple7[0]

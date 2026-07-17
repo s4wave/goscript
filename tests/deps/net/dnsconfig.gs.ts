@@ -177,15 +177,15 @@ export class dnsConfig {
 
 	constructor(init?: Partial<{servers?: $.Slice<string>, search?: $.Slice<string>, ndots?: number, timeout?: time.Duration, attempts?: number, rotate?: boolean, unknownOpt?: boolean, lookup?: $.Slice<string>, err?: $.GoError, mtime?: time.Time, soffset?: number, singleRequest?: boolean, useTCP?: boolean, trustAD?: boolean, noReload?: boolean}>) {
 		this._fields = {
-			servers: $.varRef(init?.servers ?? (null as $.Slice<string>)),
-			search: $.varRef(init?.search ?? (null as $.Slice<string>)),
+			servers: $.varRef(init?.servers ?? (null! as $.Slice<string>)),
+			search: $.varRef(init?.search ?? (null! as $.Slice<string>)),
 			ndots: $.varRef(init?.ndots ?? (0 as number)),
 			timeout: $.varRef(init?.timeout ?? (0n as time.Duration)),
 			attempts: $.varRef(init?.attempts ?? (0 as number)),
 			rotate: $.varRef(init?.rotate ?? (false as boolean)),
 			unknownOpt: $.varRef(init?.unknownOpt ?? (false as boolean)),
-			lookup: $.varRef(init?.lookup ?? (null as $.Slice<string>)),
-			err: $.varRef(init?.err ?? (null as $.GoError)),
+			lookup: $.varRef(init?.lookup ?? (null! as $.Slice<string>)),
+			err: $.varRef(init?.err ?? (null! as $.GoError)),
 			mtime: $.varRef(init?.mtime ? $.markAsStructValue($.cloneStructValue(init.mtime)) : $.markAsStructValue(new time.Time())),
 			soffset: $.varRef(init?.soffset ?? (0 as number)),
 			singleRequest: $.varRef(init?.singleRequest ?? (false as boolean)),

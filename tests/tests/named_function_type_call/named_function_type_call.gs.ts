@@ -196,7 +196,7 @@ export class MorphismHolder {
 
 	constructor(init?: Partial<{morphism?: ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null}>) {
 		this._fields = {
-			morphism: $.varRef(init?.morphism ?? (null as ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null))
+			morphism: $.varRef(init?.morphism ?? (null! as ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null))
 		}
 	}
 
@@ -241,7 +241,7 @@ export class morphismWorker {
 
 	constructor(init?: Partial<{ready?: $.Channel<boolean> | null}>) {
 		this._fields = {
-			ready: $.varRef(init?.ready ?? (null as $.Channel<boolean> | null))
+			ready: $.varRef(init?.ready ?? (null! as $.Channel<boolean> | null))
 		}
 	}
 

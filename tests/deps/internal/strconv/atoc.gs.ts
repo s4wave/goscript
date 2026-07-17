@@ -20,7 +20,7 @@ export function ParseComplex(s: string, bitSize: number): [$.Complex, $.GoError]
 		s = $.sliceStringOrBytes(s, 1, $.len(s) - 1)
 	}
 
-	let pending: $.GoError = null as $.GoError
+	let pending: $.GoError = null! as $.GoError
 
 	// Read real part (possibly imaginary part if followed by 'i').
 	let [re, n, err] = __goscript_atof.parseFloatPrefix(s, size)

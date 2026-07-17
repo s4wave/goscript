@@ -182,7 +182,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	$.println("type switch count", count)
 
-	let oid: $.VarRef<ObjectIdentifier> = $.varRef(null as ObjectIdentifier)
+	let oid: $.VarRef<ObjectIdentifier> = $.varRef(null! as ObjectIdentifier)
 	let ok = false
 	let oidValue: any = $.interfaceValue<any>(oid, "*main.ObjectIdentifier", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, typeName: "main.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } } })
 	{

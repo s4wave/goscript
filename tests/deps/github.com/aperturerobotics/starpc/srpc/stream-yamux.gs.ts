@@ -149,9 +149,9 @@ export class yamuxStream {
 	constructor(init?: Partial<{sendWindow?: number, memorySpan?: yamux2.MemoryManager | null, id?: number, session?: yamux2.Session | $.VarRef<yamux2.Session> | null, recvWindow?: number, epochStart?: time.Time, state?: yamux2.streamState, writeState?: yamux2.halfStreamState, readState?: yamux2.halfStreamState, stateLock?: sync.Mutex, recvBuf?: yamux2.segmentedBuffer, recvNotifyCh?: $.Channel<{}> | null, sendNotifyCh?: $.Channel<{}> | null, readDeadline?: yamux2.pipeDeadline, writeDeadline?: yamux2.pipeDeadline}>) {
 		this._fields = {
 			sendWindow: $.varRef(init?.sendWindow ?? (0 as number)),
-			memorySpan: $.varRef(init?.memorySpan ?? (null as yamux2.MemoryManager | null)),
+			memorySpan: $.varRef(init?.memorySpan ?? (null! as yamux2.MemoryManager | null)),
 			id: $.varRef(init?.id ?? (0 as number)),
-			session: $.varRef(init?.session ?? (null as yamux2.Session | $.VarRef<yamux2.Session> | null)),
+			session: $.varRef(init?.session ?? (null! as yamux2.Session | $.VarRef<yamux2.Session> | null)),
 			recvWindow: $.varRef(init?.recvWindow ?? (0 as number)),
 			epochStart: $.varRef(init?.epochStart ? $.markAsStructValue($.cloneStructValue(init.epochStart)) : $.markAsStructValue(new time.Time())),
 			state: $.varRef(init?.state ?? (0 as yamux2.streamState)),
@@ -159,8 +159,8 @@ export class yamuxStream {
 			readState: $.varRef(init?.readState ?? (0 as yamux2.halfStreamState)),
 			stateLock: $.varRef(init?.stateLock ? $.markAsStructValue($.cloneStructValue(init.stateLock)) : $.markAsStructValue(new sync.Mutex())),
 			recvBuf: $.varRef(init?.recvBuf ? $.markAsStructValue($.cloneStructValue(init.recvBuf)) : $.markAsStructValue(new yamux2.segmentedBuffer())),
-			recvNotifyCh: $.varRef(init?.recvNotifyCh ?? (null as $.Channel<{}> | null)),
-			sendNotifyCh: $.varRef(init?.sendNotifyCh ?? (null as $.Channel<{}> | null)),
+			recvNotifyCh: $.varRef(init?.recvNotifyCh ?? (null! as $.Channel<{}> | null)),
+			sendNotifyCh: $.varRef(init?.sendNotifyCh ?? (null! as $.Channel<{}> | null)),
 			readDeadline: $.varRef(init?.readDeadline ? $.markAsStructValue($.cloneStructValue(init.readDeadline)) : $.markAsStructValue(new yamux2.pipeDeadline())),
 			writeDeadline: $.varRef(init?.writeDeadline ? $.markAsStructValue($.cloneStructValue(init.writeDeadline)) : $.markAsStructValue(new yamux2.pipeDeadline()))
 		}

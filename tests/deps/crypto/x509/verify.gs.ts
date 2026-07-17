@@ -106,7 +106,7 @@ export class CertificateInvalidError {
 
 	constructor(init?: Partial<{Cert?: __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null, Reason?: InvalidReason, Detail?: string}>) {
 		this._fields = {
-			Cert: $.varRef(init?.Cert ?? (null as __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null)),
+			Cert: $.varRef(init?.Cert ?? (null! as __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null)),
 			Reason: $.varRef(init?.Reason ?? (0 as InvalidReason)),
 			Detail: $.varRef(init?.Detail ?? ("" as string))
 		}
@@ -214,7 +214,7 @@ export class HostnameError {
 
 	constructor(init?: Partial<{Certificate?: __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null, Host?: string}>) {
 		this._fields = {
-			Certificate: $.varRef(init?.Certificate ?? (null as __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null)),
+			Certificate: $.varRef(init?.Certificate ?? (null! as __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null)),
 			Host: $.varRef(init?.Host ?? ("" as string))
 		}
 	}
@@ -312,9 +312,9 @@ export class UnknownAuthorityError {
 
 	constructor(init?: Partial<{Cert?: __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null, hintErr?: $.GoError, hintCert?: __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null}>) {
 		this._fields = {
-			Cert: $.varRef(init?.Cert ?? (null as __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null)),
-			hintErr: $.varRef(init?.hintErr ?? (null as $.GoError)),
-			hintCert: $.varRef(init?.hintCert ?? (null as __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null))
+			Cert: $.varRef(init?.Cert ?? (null! as __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null)),
+			hintErr: $.varRef(init?.hintErr ?? (null! as $.GoError)),
+			hintCert: $.varRef(init?.hintCert ?? (null! as __goscript_x509.Certificate | $.VarRef<__goscript_x509.Certificate> | null))
 		}
 	}
 
@@ -368,7 +368,7 @@ export class SystemRootsError {
 
 	constructor(init?: Partial<{Err?: $.GoError}>) {
 		this._fields = {
-			Err: $.varRef(init?.Err ?? (null as $.GoError))
+			Err: $.varRef(init?.Err ?? (null! as $.GoError))
 		}
 	}
 
@@ -516,12 +516,12 @@ export class VerifyOptions {
 	constructor(init?: Partial<{DNSName?: string, Intermediates?: __goscript_cert_pool.CertPool | $.VarRef<__goscript_cert_pool.CertPool> | null, Roots?: __goscript_cert_pool.CertPool | $.VarRef<__goscript_cert_pool.CertPool> | null, CurrentTime?: time.Time, KeyUsages?: $.Slice<__goscript_x509.ExtKeyUsage>, MaxConstraintComparisions?: number, CertificatePolicies?: $.Slice<__goscript_oid.OID>, inhibitPolicyMapping?: boolean, requireExplicitPolicy?: boolean, inhibitAnyPolicy?: boolean}>) {
 		this._fields = {
 			DNSName: $.varRef(init?.DNSName ?? ("" as string)),
-			Intermediates: $.varRef(init?.Intermediates ?? (null as __goscript_cert_pool.CertPool | $.VarRef<__goscript_cert_pool.CertPool> | null)),
-			Roots: $.varRef(init?.Roots ?? (null as __goscript_cert_pool.CertPool | $.VarRef<__goscript_cert_pool.CertPool> | null)),
+			Intermediates: $.varRef(init?.Intermediates ?? (null! as __goscript_cert_pool.CertPool | $.VarRef<__goscript_cert_pool.CertPool> | null)),
+			Roots: $.varRef(init?.Roots ?? (null! as __goscript_cert_pool.CertPool | $.VarRef<__goscript_cert_pool.CertPool> | null)),
 			CurrentTime: $.varRef(init?.CurrentTime ? $.markAsStructValue($.cloneStructValue(init.CurrentTime)) : $.markAsStructValue(new time.Time())),
-			KeyUsages: $.varRef(init?.KeyUsages ?? (null as $.Slice<__goscript_x509.ExtKeyUsage>)),
+			KeyUsages: $.varRef(init?.KeyUsages ?? (null! as $.Slice<__goscript_x509.ExtKeyUsage>)),
 			MaxConstraintComparisions: $.varRef(init?.MaxConstraintComparisions ?? (0 as number)),
-			CertificatePolicies: $.varRef(init?.CertificatePolicies ?? (null as $.Slice<__goscript_oid.OID>)),
+			CertificatePolicies: $.varRef(init?.CertificatePolicies ?? (null! as $.Slice<__goscript_oid.OID>)),
 			inhibitPolicyMapping: $.varRef(init?.inhibitPolicyMapping ?? (false as boolean)),
 			requireExplicitPolicy: $.varRef(init?.requireExplicitPolicy ?? (false as boolean)),
 			inhibitAnyPolicy: $.varRef(init?.inhibitAnyPolicy ?? (false as boolean))
@@ -643,9 +643,9 @@ export class policyGraphNode {
 	constructor(init?: Partial<{validPolicy?: __goscript_oid.OID, expectedPolicySet?: $.Slice<__goscript_oid.OID>, parents?: globalThis.Map<policyGraphNode | $.VarRef<policyGraphNode> | null, boolean> | null, children?: globalThis.Map<policyGraphNode | $.VarRef<policyGraphNode> | null, boolean> | null}>) {
 		this._fields = {
 			validPolicy: $.varRef(init?.validPolicy ? $.markAsStructValue($.cloneStructValue(init.validPolicy)) : $.markAsStructValue(new __goscript_oid.OID())),
-			expectedPolicySet: $.varRef(init?.expectedPolicySet ?? (null as $.Slice<__goscript_oid.OID>)),
-			parents: $.varRef(init?.parents ?? (null as globalThis.Map<policyGraphNode | $.VarRef<policyGraphNode> | null, boolean> | null)),
-			children: $.varRef(init?.children ?? (null as globalThis.Map<policyGraphNode | $.VarRef<policyGraphNode> | null, boolean> | null))
+			expectedPolicySet: $.varRef(init?.expectedPolicySet ?? (null! as $.Slice<__goscript_oid.OID>)),
+			parents: $.varRef(init?.parents ?? (null! as globalThis.Map<policyGraphNode | $.VarRef<policyGraphNode> | null, boolean> | null)),
+			children: $.varRef(init?.children ?? (null! as globalThis.Map<policyGraphNode | $.VarRef<policyGraphNode> | null, boolean> | null))
 		}
 	}
 
@@ -700,8 +700,8 @@ export class policyGraph {
 
 	constructor(init?: Partial<{strata?: $.Slice<globalThis.Map<string, policyGraphNode | $.VarRef<policyGraphNode> | null> | null>, parentIndex?: globalThis.Map<string, $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null>> | null, depth?: number}>) {
 		this._fields = {
-			strata: $.varRef(init?.strata ?? (null as $.Slice<globalThis.Map<string, policyGraphNode | $.VarRef<policyGraphNode> | null> | null>)),
-			parentIndex: $.varRef(init?.parentIndex ?? (null as globalThis.Map<string, $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null>> | null)),
+			strata: $.varRef(init?.strata ?? (null! as $.Slice<globalThis.Map<string, policyGraphNode | $.VarRef<policyGraphNode> | null> | null>)),
+			parentIndex: $.varRef(init?.parentIndex ?? (null! as globalThis.Map<string, $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null>> | null)),
 			depth: $.varRef(init?.depth ?? (0 as number))
 		}
 	}
@@ -800,7 +800,7 @@ export class policyGraph {
 
 	public async validPolicyNodes(): globalThis.Promise<$.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null>> {
 		const pg: policyGraph | $.VarRef<policyGraph> | null = this
-		let validNodes: $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null> = null as $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null>
+		let validNodes: $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null> = null! as $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null>
 		for (let i = $.pointerValue<policyGraph>(pg).depth; i >= 0; i--) {
 			for (const [__rangeKey, n] of $.arrayIndex($.pointerValue<policyGraph>(pg).strata!, i)?.entries() ?? []) {
 				if ($.markAsStructValue($.cloneStructValue($.pointerValue<policyGraphNode>(n).validPolicy)).Equal($.markAsStructValue($.cloneStructValue((await __goscript_init_anyPolicyOID(), __goscript_get_anyPolicyOID()))))) {
@@ -986,7 +986,7 @@ export function parseRFC2821Mailbox(_in: string): [rfc2821Mailbox, boolean] {
 }
 
 export function domainToReverseLabels(domain: string): [$.Slice<string>, boolean] {
-	let reverseLabels: $.Slice<string> = null as $.Slice<string>
+	let reverseLabels: $.Slice<string> = null! as $.Slice<string>
 	let ok: boolean = false
 	reverseLabels = $.makeSlice<string>(0, strings.Count(domain, ".") + 1, "string")
 	while ($.len(domain) > 0) {
@@ -1048,7 +1048,7 @@ export function alreadyInChain(candidate: __goscript_x509.Certificate | $.VarRef
 		[{ name: "Equal", args: [{ name: "_p0", type: "crypto.PublicKey" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }]
 	);
 
-	let candidateSAN: pkix.Extension | $.VarRef<pkix.Extension> | null = null as pkix.Extension | $.VarRef<pkix.Extension> | null
+	let candidateSAN: pkix.Extension | $.VarRef<pkix.Extension> | null = null! as pkix.Extension | $.VarRef<pkix.Extension> | null
 	for (let __goscriptRangeTarget2 = $.pointerValue<__goscript_x509.Certificate>(candidate).Extensions, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget2); __rangeIndex++) {
 		let ext = $.varRef(__goscriptRangeTarget2![__rangeIndex])
 		if (asn1.ObjectIdentifier_Equal(ext.value.Id, (__goscript_x509.oidExtensionSubjectAltName as asn1.ObjectIdentifier))) {
@@ -1068,7 +1068,7 @@ export function alreadyInChain(candidate: __goscript_x509.Certificate | $.VarRef
 		if (!bytes.Equal($.pointerValue<__goscript_x509.Certificate>(candidate).RawSubjectPublicKeyInfo, $.pointerValue<__goscript_x509.Certificate>(cert).RawSubjectPublicKeyInfo)) {
 			continue
 		}
-		let certSAN: pkix.Extension | $.VarRef<pkix.Extension> | null = null as pkix.Extension | $.VarRef<pkix.Extension> | null
+		let certSAN: pkix.Extension | $.VarRef<pkix.Extension> | null = null! as pkix.Extension | $.VarRef<pkix.Extension> | null
 		for (let __goscriptRangeTarget3 = $.pointerValue<__goscript_x509.Certificate>(cert).Extensions, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget3); __rangeIndex++) {
 			let ext = $.varRef(__goscriptRangeTarget3![__rangeIndex])
 			if (asn1.ObjectIdentifier_Equal(ext.value.Id, (__goscript_x509.oidExtensionSubjectAltName as asn1.ObjectIdentifier))) {
@@ -1524,7 +1524,7 @@ export async function policiesValid(chain: $.Slice<__goscript_x509.Certificate |
 	}
 
 	// 6.1.5 (g) (1) -- as updated by RFC 9618
-	let validPolicyNodeSet: $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null> = null as $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null>
+	let validPolicyNodeSet: $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null> = null! as $.Slice<policyGraphNode | $.VarRef<policyGraphNode> | null>
 	// 6.1.5 (g) (2) -- as updated by RFC 9618
 	if (pg != null) {
 		validPolicyNodeSet = await policyGraph.prototype.validPolicyNodes.call(pg)

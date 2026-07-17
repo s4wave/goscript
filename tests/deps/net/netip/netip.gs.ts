@@ -594,7 +594,7 @@ export class Addr {
 			$.assignStruct($.pointerValue<Addr>(ip), $.markAsStructValue(new Addr()))
 			return null
 		}
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let __goscriptTuple0: any = ParseAddr($.bytesToString(text))
 		$.assignStruct($.pointerValue<Addr>(ip), __goscriptTuple0[0])
 		err = __goscriptTuple0[1]
@@ -1034,7 +1034,7 @@ export class AddrPort {
 
 	public String(): string {
 		const p = this
-		let b: $.Slice<number> = null as $.Slice<number>
+		let b: $.Slice<number> = null! as $.Slice<number>
 		switch (p.ip.z) {
 			case z0:
 			{
@@ -1090,7 +1090,7 @@ export class AddrPort {
 			$.assignStruct($.pointerValue<AddrPort>(p), $.markAsStructValue(new AddrPort()))
 			return null
 		}
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let __goscriptTuple2: any = ParseAddrPort($.bytesToString(text))
 		$.assignStruct($.pointerValue<AddrPort>(p), __goscriptTuple2[0])
 		err = __goscriptTuple2[1]
@@ -1323,7 +1323,7 @@ export class Prefix {
 		// that p and o values are normalized (via Prefix.Masked) first,
 		// so the Prefix call on the one that's already minBits serves to zero
 		// out any remaining bits in IP.
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		{
 			let __goscriptTuple6: any = $.markAsStructValue($.cloneStructValue(p.ip)).Prefix(minBits)
 			p = __goscriptTuple6[0]
@@ -1371,7 +1371,7 @@ export class Prefix {
 			$.assignStruct($.pointerValue<Prefix>(p), $.markAsStructValue(new Prefix()))
 			return null
 		}
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let __goscriptTuple8: any = ParsePrefix($.bytesToString(text))
 		$.assignStruct($.pointerValue<Prefix>(p), __goscriptTuple8[0])
 		err = __goscriptTuple8[1]
@@ -1566,7 +1566,7 @@ export function parseIPv4Fields(_in: string, off: number, end: number, fields: $
 
 export function parseIPv4(s: string): [Addr, $.GoError] {
 	let ip: Addr = $.markAsStructValue(new Addr())
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let fields: Uint8Array = new Uint8Array(4)
 	err = parseIPv4Fields(s, 0, $.len(s), $.goSlice(fields, undefined, undefined))
 	if (err != null) {
@@ -1785,7 +1785,7 @@ export function splitAddrPort(s: string): [string, string, boolean, $.GoError] {
 	let ip: string = ""
 	let port: string = ""
 	let v6: boolean = false
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let i = bytealg.LastIndexByteString(s, $.uint(58, 8))
 	if (i == -1) {
 		return ["", "", false, errors.New("not an ip:port")]

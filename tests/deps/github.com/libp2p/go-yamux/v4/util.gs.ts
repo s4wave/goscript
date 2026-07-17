@@ -81,7 +81,7 @@ export class segmentedBuffer {
 			bm: $.varRef(init?.bm ? $.markAsStructValue($.cloneStructValue(init.bm)) : $.markAsStructValue(new sync.Mutex())),
 			readPos: $.varRef(init?.readPos ?? (0 as number)),
 			bPos: $.varRef(init?.bPos ?? (0 as number)),
-			b: $.varRef(init?.b ?? (null as $.Slice<$.Slice<number>>))
+			b: $.varRef(init?.b ?? (null! as $.Slice<$.Slice<number>>))
 		}
 	}
 

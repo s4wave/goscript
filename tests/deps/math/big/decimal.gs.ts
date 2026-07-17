@@ -50,7 +50,7 @@ export class decimal {
 
 	constructor(init?: Partial<{mant?: $.Slice<number>, exp?: number}>) {
 		this._fields = {
-			mant: $.varRef(init?.mant ?? (null as $.Slice<number>)),
+			mant: $.varRef(init?.mant ?? (null! as $.Slice<number>)),
 			exp: $.varRef(init?.exp ?? (0 as number))
 		}
 	}
@@ -70,7 +70,7 @@ export class decimal {
 			return "0"
 		}
 
-		let buf: $.Slice<number> = null as $.Slice<number>
+		let buf: $.Slice<number> = null! as $.Slice<number>
 		switch (true) {
 			case $.pointerValue<decimal>(x).exp <= 0:
 			{

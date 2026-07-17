@@ -58,10 +58,10 @@ export class call {
 	constructor(init?: Partial<{wg?: sync.WaitGroup, val?: any, err?: $.GoError, dups?: number, chans?: $.Slice<$.Channel<Result> | null>}>) {
 		this._fields = {
 			wg: $.varRef(init?.wg ? $.markAsStructValue($.cloneStructValue(init.wg)) : $.markAsStructValue(new sync.WaitGroup())),
-			val: $.varRef(init?.val ?? (null as any)),
-			err: $.varRef(init?.err ?? (null as $.GoError)),
+			val: $.varRef(init?.val ?? (null! as any)),
+			err: $.varRef(init?.err ?? (null! as $.GoError)),
 			dups: $.varRef(init?.dups ?? (0 as number)),
-			chans: $.varRef(init?.chans ?? (null as $.Slice<$.Channel<Result> | null>))
+			chans: $.varRef(init?.chans ?? (null! as $.Slice<$.Channel<Result> | null>))
 		}
 	}
 
@@ -109,7 +109,7 @@ export class Group {
 	constructor(init?: Partial<{mu?: sync.Mutex, m?: globalThis.Map<string, call | $.VarRef<call> | null> | null}>) {
 		this._fields = {
 			mu: $.varRef(init?.mu ? $.markAsStructValue($.cloneStructValue(init.mu)) : $.markAsStructValue(new sync.Mutex())),
-			m: $.varRef(init?.m ?? (null as globalThis.Map<string, call | $.VarRef<call> | null> | null))
+			m: $.varRef(init?.m ?? (null! as globalThis.Map<string, call | $.VarRef<call> | null> | null))
 		}
 	}
 
@@ -124,8 +124,8 @@ export class Group {
 
 	public async Do(key: string, fn: (() => [any, $.GoError] | globalThis.Promise<[any, $.GoError]>) | null): globalThis.Promise<[any, $.GoError, boolean]> {
 		let g: Group | $.VarRef<Group> | null = this
-		let v: any = null as any
-		let err: $.GoError = null as $.GoError
+		let v: any = null! as any
+		let err: $.GoError = null! as $.GoError
 		let shared: boolean = false
 		await $.pointerValue<Group>(g).mu.Lock()
 		if ($.pointerValue<Group>(g).m == null) {
@@ -254,8 +254,8 @@ export class Result {
 
 	constructor(init?: Partial<{Val?: any, Err?: $.GoError, Shared?: boolean}>) {
 		this._fields = {
-			Val: $.varRef(init?.Val ?? (null as any)),
-			Err: $.varRef(init?.Err ?? (null as $.GoError)),
+			Val: $.varRef(init?.Val ?? (null! as any)),
+			Err: $.varRef(init?.Err ?? (null! as $.GoError)),
 			Shared: $.varRef(init?.Shared ?? (false as boolean))
 		}
 	}

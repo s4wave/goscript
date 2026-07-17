@@ -66,7 +66,7 @@ export class ConcurrentQueue {
 			bcast: $.varRef(init?.bcast ? $.markAsStructValue($.cloneStructValue(init.bcast)) : $.markAsStructValue(new broadcast2.Broadcast())),
 			maxConcurrency: $.varRef(init?.maxConcurrency ?? (0 as number)),
 			running: $.varRef(init?.running ?? (0 as number)),
-			jobQueue: $.varRef(init?.jobQueue ?? (null as linkedlist.LinkedList | $.VarRef<linkedlist.LinkedList> | null)),
+			jobQueue: $.varRef(init?.jobQueue ?? (null! as linkedlist.LinkedList | $.VarRef<linkedlist.LinkedList> | null)),
 			jobQueueSize: $.varRef(init?.jobQueueSize ?? (0 as number))
 		}
 	}
@@ -115,7 +115,7 @@ export class ConcurrentQueue {
 		const s: ConcurrentQueue | $.VarRef<ConcurrentQueue> | null = this
 		while (true) {
 			let idle: boolean = false
-			let wait: $.Channel<{}> | null = null as $.Channel<{}> | null
+			let wait: $.Channel<{}> | null = null! as $.Channel<{}> | null
 			await $.pointerValue<ConcurrentQueue>(s).bcast.HoldLock($.functionValue(async (broadcast: (() => void) | null, getWaitCh: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null): globalThis.Promise<void> => {
 				idle = ($.pointerValue<ConcurrentQueue>(s).running == 0) && ($.pointerValue<ConcurrentQueue>(s).jobQueueSize == 0)
 				if (!idle) {
@@ -175,7 +175,7 @@ export class ConcurrentQueue {
 		while (true) {
 			let queued: number = 0
 			let running: number = 0
-			let waitCh: $.Channel<{}> | null = null as $.Channel<{}> | null
+			let waitCh: $.Channel<{}> | null = null! as $.Channel<{}> | null
 			await $.pointerValue<ConcurrentQueue>(s).bcast.HoldLock($.functionValue(async (broadcast: (() => void) | null, getWaitCh: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null): globalThis.Promise<void> => {
 				let __goscriptAssign1_0: number = $.pointerValue<ConcurrentQueue>(s).jobQueueSize
 				let __goscriptAssign1_1: number = $.pointerValue<ConcurrentQueue>(s).running

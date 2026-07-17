@@ -32,7 +32,7 @@ import "./natmul.gs.ts"
 import "./prime.gs.ts"
 
 export async function nat_rem(z: __goscript_nat.nat, stk: __goscript_nat.stack | $.VarRef<__goscript_nat.stack> | null, u: __goscript_nat.nat, v: __goscript_nat.nat): globalThis.Promise<__goscript_nat.nat> {
-	let r: __goscript_nat.nat = null as __goscript_nat.nat
+	let r: __goscript_nat.nat = null! as __goscript_nat.nat
 	using __defer = new $.DisposableStack()
 	if (__goscript_nat.alias((z as __goscript_nat.nat), (u as __goscript_nat.nat))) {
 		z = (null as __goscript_nat.nat)
@@ -49,8 +49,8 @@ export async function nat_rem(z: __goscript_nat.nat, stk: __goscript_nat.stack |
 }
 
 export async function nat_div(z: __goscript_nat.nat, stk: __goscript_nat.stack | $.VarRef<__goscript_nat.stack> | null, z2: __goscript_nat.nat, u: __goscript_nat.nat, v: __goscript_nat.nat): globalThis.Promise<[__goscript_nat.nat, __goscript_nat.nat]> {
-	let q: __goscript_nat.nat = null as __goscript_nat.nat
-	let r: __goscript_nat.nat = null as __goscript_nat.nat
+	let q: __goscript_nat.nat = null! as __goscript_nat.nat
+	let r: __goscript_nat.nat = null! as __goscript_nat.nat
 	using __defer = new $.DisposableStack()
 	if ($.len((v as __goscript_nat.nat)) == 0) {
 		$.panic("division by zero")
@@ -87,7 +87,7 @@ export async function nat_div(z: __goscript_nat.nat, stk: __goscript_nat.stack |
 }
 
 export function nat_divW(z: __goscript_nat.nat, x: __goscript_nat.nat, y: __goscript_arith.Word): [__goscript_nat.nat, __goscript_arith.Word] {
-	let q: __goscript_nat.nat = null as __goscript_nat.nat
+	let q: __goscript_nat.nat = null! as __goscript_nat.nat
 	let r: __goscript_arith.Word = 0
 	let m = $.len((x as __goscript_nat.nat))
 	switch (true) {
@@ -119,7 +119,7 @@ export function nat_divW(z: __goscript_nat.nat, x: __goscript_nat.nat, y: __gosc
 export function nat_modW(x: __goscript_nat.nat, d: __goscript_arith.Word): __goscript_arith.Word {
 	let r: __goscript_arith.Word = 0
 	// TODO(agl): we don't actually need to store the q value.
-	let q: __goscript_nat.nat = null as __goscript_nat.nat
+	let q: __goscript_nat.nat = null! as __goscript_nat.nat
 	q = (__goscript_nat.nat_make(q, $.len((x as __goscript_nat.nat))) as __goscript_nat.nat)
 	return divWVW(q, 0, x, d)
 }
@@ -142,8 +142,8 @@ export function divWVW(z: $.Slice<__goscript_arith.Word>, xn: __goscript_arith.W
 }
 
 export async function nat_divLarge(z: __goscript_nat.nat, stk: __goscript_nat.stack | $.VarRef<__goscript_nat.stack> | null, u: __goscript_nat.nat, uIn: __goscript_nat.nat, vIn: __goscript_nat.nat): globalThis.Promise<[__goscript_nat.nat, __goscript_nat.nat]> {
-	let q: __goscript_nat.nat = null as __goscript_nat.nat
-	let r: __goscript_nat.nat = null as __goscript_nat.nat
+	let q: __goscript_nat.nat = null! as __goscript_nat.nat
+	let r: __goscript_nat.nat = null! as __goscript_nat.nat
 	using __defer = new $.DisposableStack()
 	let n = $.len((vIn as __goscript_nat.nat))
 	let m = $.len((uIn as __goscript_nat.nat)) - n

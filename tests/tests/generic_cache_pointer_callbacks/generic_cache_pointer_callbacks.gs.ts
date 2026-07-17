@@ -17,7 +17,7 @@ export class cache {
 
 	constructor(init?: Partial<{stored?: any}>) {
 		this._fields = {
-			stored: $.varRef(init?.stored ?? (null as any))
+			stored: $.varRef(init?.stored ?? (null! as any))
 		}
 	}
 

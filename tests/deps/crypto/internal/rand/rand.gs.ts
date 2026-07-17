@@ -37,7 +37,7 @@ export class reader {
 
 	constructor(init?: Partial<{DefaultReader?: drbg.DefaultReader | null}>) {
 		this._fields = {
-			DefaultReader: $.varRef(init?.DefaultReader ?? (null as drbg.DefaultReader | null))
+			DefaultReader: $.varRef(init?.DefaultReader ?? (null! as drbg.DefaultReader | null))
 		}
 	}
 
@@ -52,7 +52,7 @@ export class reader {
 	public async Read(b: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const r = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if (boring.Enabled) {
 			{
 				let [, __goscriptShadow0] = boring.randReader_Read(boring.RandReader, b)

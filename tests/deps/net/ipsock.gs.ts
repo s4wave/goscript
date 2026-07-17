@@ -315,8 +315,8 @@ export async function addrList_first(addrs: addrList, strategy: ((_p0: __goscrip
 }
 
 export async function addrList_partition(addrs: addrList, strategy: ((_p0: __goscript_net.Addr | null) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<[addrList, addrList]> {
-	let primaries: addrList = null as addrList
-	let fallbacks: addrList = null as addrList
+	let primaries: addrList = null! as addrList
+	let fallbacks: addrList = null! as addrList
 	let primaryLabel: boolean = false
 	for (let __goscriptRangeTarget2 = addrs, i = 0; i < $.len(__goscriptRangeTarget2); i++) {
 		let addr = __goscriptRangeTarget2![i]
@@ -332,7 +332,7 @@ export async function addrList_partition(addrs: addrList, strategy: ((_p0: __gos
 }
 
 export async function filterAddrList(filter: ((_p0: __goscript_iprawsock.IPAddr) => boolean | globalThis.Promise<boolean>) | null, ips: $.Slice<__goscript_iprawsock.IPAddr>, inetaddr: ((_p0: __goscript_iprawsock.IPAddr) => __goscript_net.Addr | null | globalThis.Promise<__goscript_net.Addr | null>) | null, originalAddr: string): globalThis.Promise<[addrList, $.GoError]> {
-	let addrs: addrList = null as addrList
+	let addrs: addrList = null! as addrList
 	for (let __goscriptRangeTarget3 = ips, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget3); __rangeIndex++) {
 		let ip = __goscriptRangeTarget3![__rangeIndex]
 		if ((filter == null) || await filter!($.markAsStructValue($.cloneStructValue(ip)))) {
@@ -356,13 +356,13 @@ export function ipv6only(addr: __goscript_iprawsock.IPAddr): boolean {
 export async function SplitHostPort(hostport: string): globalThis.Promise<[string, string, $.GoError]> {
 	let host: string = ""
 	let port: string = ""
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	const missingPort: string = "missing port in address"
 	const tooManyColons: string = "too many colons in address"
 	let addrErr: ((addr: string, why: string) => [string, string, $.GoError] | globalThis.Promise<[string, string, $.GoError]>) | null = $.functionValue((addr: string, why: string): [string, string, $.GoError] => {
 		let host: string = ""
 		let port: string = ""
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		return ["", "", $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: why, Addr: addr}), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "error"] } as $.FunctionTypeInfo))
 	let j = 0

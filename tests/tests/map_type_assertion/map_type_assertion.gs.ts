@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let i: any = null as any
+	let i: any = null! as any
 	i = $.interfaceValue<any>(new globalThis.Map<string, number>([["age", 30]]), "map[string]int", { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } })
 
 	let __goscriptTuple0: any = $.typeAssertTuple<globalThis.Map<string, number> | null>(i, { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } })

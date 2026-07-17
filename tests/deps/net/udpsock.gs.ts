@@ -139,7 +139,7 @@ export class UDPAddr {
 
 	constructor(init?: Partial<{IP?: __goscript_ip.IP, Port?: number, Zone?: string}>) {
 		this._fields = {
-			IP: $.varRef(init?.IP ?? (null as __goscript_ip.IP)),
+			IP: $.varRef(init?.IP ?? (null! as __goscript_ip.IP)),
 			Port: $.varRef(init?.Port ?? (0 as number)),
 			Zone: $.varRef(init?.Zone ?? ("" as string))
 		}
@@ -360,8 +360,8 @@ export class UDPConn {
 	public async ReadFromUDP(b: $.Slice<number>): globalThis.Promise<[number, UDPAddr | $.VarRef<UDPAddr> | null, $.GoError]> {
 		const c: UDPConn | $.VarRef<UDPConn> | null = this
 		let n: number = 0
-		let addr: UDPAddr | $.VarRef<UDPAddr> | null = null as UDPAddr | $.VarRef<UDPAddr> | null
-		let err: $.GoError = null as $.GoError
+		let addr: UDPAddr | $.VarRef<UDPAddr> | null = null! as UDPAddr | $.VarRef<UDPAddr> | null
+		let err: $.GoError = null! as $.GoError
 		// This function is designed to allow the caller to control the lifetime
 		// of the returned *UDPAddr and thereby prevent an allocation.
 		// See https://blog.filippo.io/efficient-go-apis-with-the-inliner/.
@@ -373,7 +373,7 @@ export class UDPConn {
 		const c: UDPConn | $.VarRef<UDPConn> | null = this
 		let n: number = 0
 		let addr: netip.AddrPort = $.markAsStructValue(new netip.AddrPort())
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if (!$.pointerValue<UDPConn>(c).conn.ok()) {
 			return [0, $.markAsStructValue(new netip.AddrPort()), $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 		}
@@ -392,8 +392,8 @@ export class UDPConn {
 		let n: number = 0
 		let oobn: number = 0
 		let flags: number = 0
-		let addr: UDPAddr | $.VarRef<UDPAddr> | null = null as UDPAddr | $.VarRef<UDPAddr> | null
-		let err: $.GoError = null as $.GoError
+		let addr: UDPAddr | $.VarRef<UDPAddr> | null = null! as UDPAddr | $.VarRef<UDPAddr> | null
+		let err: $.GoError = null! as $.GoError
 		let ap: netip.AddrPort = $.markAsStructValue(new netip.AddrPort())
 		let __goscriptTuple3: any = await UDPConn.prototype.ReadMsgUDPAddrPort.call(c, b, oob)
 		n = __goscriptTuple3[0]
@@ -413,7 +413,7 @@ export class UDPConn {
 		let oobn: number = 0
 		let flags: number = 0
 		let addr: netip.AddrPort = $.markAsStructValue(new netip.AddrPort())
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if (!$.pointerValue<UDPConn>(c).conn.ok()) {
 			return [0, 0, 0, $.markAsStructValue(new netip.AddrPort()), $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 		}
@@ -441,7 +441,7 @@ export class UDPConn {
 		const c: UDPConn | $.VarRef<UDPConn> | null = this
 		let n: number = 0
 		let oobn: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if (!$.pointerValue<UDPConn>(c).conn.ok()) {
 			return [0, 0, $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 		}
@@ -459,7 +459,7 @@ export class UDPConn {
 		const c: UDPConn | $.VarRef<UDPConn> | null = this
 		let n: number = 0
 		let oobn: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if (!$.pointerValue<UDPConn>(c).conn.ok()) {
 			return [0, 0, $.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })]
 		}
@@ -518,7 +518,7 @@ export class UDPConn {
 	public async readFrom(b: $.Slice<number>, addr: UDPAddr | $.VarRef<UDPAddr> | null): globalThis.Promise<[number, UDPAddr | $.VarRef<UDPAddr> | null, $.GoError]> {
 		const c: UDPConn | $.VarRef<UDPConn> | null = this
 		let n: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		switch ($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).family) {
 			case syscall.AF_INET:
 			{
@@ -556,7 +556,7 @@ export class UDPConn {
 		const c: UDPConn | $.VarRef<UDPConn> | null = this
 		let n: number = 0
 		let addr: netip.AddrPort = $.markAsStructValue(new netip.AddrPort())
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		let ip: netip.Addr = $.markAsStructValue(new netip.Addr())
 		let port: number = 0
 		switch ($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).family) {
@@ -612,7 +612,7 @@ export class UDPConn {
 		let oobn: number = 0
 		let flags: number = 0
 		let addr: netip.AddrPort = $.markAsStructValue(new netip.AddrPort())
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		switch ($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).family) {
 			case syscall.AF_INET:
 			{
@@ -646,7 +646,7 @@ export class UDPConn {
 		const c: UDPConn | $.VarRef<UDPConn> | null = this
 		let n: number = 0
 		let oobn: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).isConnected && (addr != null)) {
 			return [0, 0, __goscript_net.ErrWriteToConnected]
 		}
@@ -666,7 +666,7 @@ export class UDPConn {
 		const c: UDPConn | $.VarRef<UDPConn> | null = this
 		let n: number = 0
 		let oobn: number = 0
-		let err: $.GoError = null as $.GoError
+		let err: $.GoError = null! as $.GoError
 		if ($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).isConnected && $.markAsStructValue($.cloneStructValue(addr)).IsValid()) {
 			return [0, 0, __goscript_net.ErrWriteToConnected]
 		}
@@ -677,7 +677,7 @@ export class UDPConn {
 		switch ($.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<UDPConn>(c).conn.fd).family) {
 			case syscall.AF_INET:
 			{
-				let sap: syscall.SockaddrInet4 | $.VarRef<syscall.SockaddrInet4> | null = null as syscall.SockaddrInet4 | $.VarRef<syscall.SockaddrInet4> | null
+				let sap: syscall.SockaddrInet4 | $.VarRef<syscall.SockaddrInet4> | null = null! as syscall.SockaddrInet4 | $.VarRef<syscall.SockaddrInet4> | null
 				if ($.markAsStructValue($.cloneStructValue(addr)).IsValid()) {
 					let __goscriptTuple16: any = __goscript_ipsock_posix.addrPortToSockaddrInet4($.markAsStructValue($.cloneStructValue(addr)))
 					let sa = $.varRef(__goscriptTuple16[0])
@@ -692,7 +692,7 @@ export class UDPConn {
 			}
 			case syscall.AF_INET6:
 			{
-				let sap: syscall.SockaddrInet6 | $.VarRef<syscall.SockaddrInet6> | null = null as syscall.SockaddrInet6 | $.VarRef<syscall.SockaddrInet6> | null
+				let sap: syscall.SockaddrInet6 | $.VarRef<syscall.SockaddrInet6> | null = null! as syscall.SockaddrInet6 | $.VarRef<syscall.SockaddrInet6> | null
 				if ($.markAsStructValue($.cloneStructValue(addr)).IsValid()) {
 					let __goscriptTuple17: any = await __goscript_ipsock_posix.addrPortToSockaddrInet6($.markAsStructValue($.cloneStructValue(addr)))
 					let sa = $.varRef(__goscriptTuple17[0])

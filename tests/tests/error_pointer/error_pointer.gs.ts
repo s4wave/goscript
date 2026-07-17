@@ -14,7 +14,7 @@ export function setErr(err: $.VarRef<$.GoError> | null): void {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let err: $.VarRef<$.GoError> = $.varRef(null as $.GoError)
+	let err: $.VarRef<$.GoError> = $.varRef(null! as $.GoError)
 	setErr(err)
 	if (err.value != null) {
 		$.println($.pointerValue<Exclude<$.GoError, null>>(err.value).Error())

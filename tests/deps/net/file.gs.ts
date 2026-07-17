@@ -25,8 +25,8 @@ export function fileAddr_String(f: fileAddr): string {
 }
 
 export function FileConn(f: os.File | $.VarRef<os.File> | null): [__goscript_net.Conn | null, $.GoError] {
-	let c: __goscript_net.Conn | null = null as __goscript_net.Conn | null
-	let err: $.GoError = null as $.GoError
+	let c: __goscript_net.Conn | null = null! as __goscript_net.Conn | null
+	let err: $.GoError = null! as $.GoError
 	let __goscriptTuple0: any = __goscript_file_stub.fileConn(f)
 	c = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
@@ -37,8 +37,8 @@ export function FileConn(f: os.File | $.VarRef<os.File> | null): [__goscript_net
 }
 
 export function FileListener(f: os.File | $.VarRef<os.File> | null): [__goscript_net.Listener | null, $.GoError] {
-	let ln: __goscript_net.Listener | null = null as __goscript_net.Listener | null
-	let err: $.GoError = null as $.GoError
+	let ln: __goscript_net.Listener | null = null! as __goscript_net.Listener | null
+	let err: $.GoError = null! as $.GoError
 	let __goscriptTuple1: any = __goscript_file_stub.fileListener(f)
 	ln = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
@@ -49,8 +49,8 @@ export function FileListener(f: os.File | $.VarRef<os.File> | null): [__goscript
 }
 
 export function FilePacketConn(f: os.File | $.VarRef<os.File> | null): [__goscript_net.PacketConn | null, $.GoError] {
-	let c: __goscript_net.PacketConn | null = null as __goscript_net.PacketConn | null
-	let err: $.GoError = null as $.GoError
+	let c: __goscript_net.PacketConn | null = null! as __goscript_net.PacketConn | null
+	let err: $.GoError = null! as $.GoError
 	let __goscriptTuple2: any = __goscript_file_stub.filePacketConn(f)
 	c = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]

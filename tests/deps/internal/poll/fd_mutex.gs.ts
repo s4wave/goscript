@@ -144,7 +144,7 @@ export class fdMutex {
 		let mutexBit: bigint = 0n
 		let mutexWait: bigint = 0n
 		let mutexMask: bigint = 0n
-		let mutexSema: $.VarRef<number> | null = null as $.VarRef<number> | null
+		let mutexSema: $.VarRef<number> | null = null! as $.VarRef<number> | null
 		if (read) {
 			mutexBit = 2n
 			mutexWait = 8388608n
@@ -190,7 +190,7 @@ export class fdMutex {
 		let mutexBit: bigint = 0n
 		let mutexWait: bigint = 0n
 		let mutexMask: bigint = 0n
-		let mutexSema: $.VarRef<number> | null = null as $.VarRef<number> | null
+		let mutexSema: $.VarRef<number> | null = null! as $.VarRef<number> | null
 		if (read) {
 			mutexBit = 2n
 			mutexWait = 8388608n

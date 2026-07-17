@@ -37,7 +37,7 @@ export class blockType {
 	constructor(init?: Partial<{typeID?: string, _constructor?: (() => any | globalThis.Promise<any>) | null}>) {
 		this._fields = {
 			typeID: $.varRef(init?.typeID ?? ("" as string)),
-			_constructor: $.varRef(init?._constructor ?? (null as (() => any | globalThis.Promise<any>) | null))
+			_constructor: $.varRef(init?._constructor ?? (null! as (() => any | globalThis.Promise<any>) | null))
 		}
 	}
 

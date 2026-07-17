@@ -73,10 +73,10 @@ export class nsswitchConfig {
 	constructor(init?: Partial<{initOnce?: sync.Once, ch?: $.Channel<{}> | null, lastChecked?: time.Time, mu?: sync.Mutex, nssConf?: nssConf | $.VarRef<nssConf> | null}>) {
 		this._fields = {
 			initOnce: $.varRef(init?.initOnce ? $.markAsStructValue($.cloneStructValue(init.initOnce)) : $.markAsStructValue(new sync.Once())),
-			ch: $.varRef(init?.ch ?? (null as $.Channel<{}> | null)),
+			ch: $.varRef(init?.ch ?? (null! as $.Channel<{}> | null)),
 			lastChecked: $.varRef(init?.lastChecked ? $.markAsStructValue($.cloneStructValue(init.lastChecked)) : $.markAsStructValue(new time.Time())),
 			mu: $.varRef(init?.mu ? $.markAsStructValue($.cloneStructValue(init.mu)) : $.markAsStructValue(new sync.Mutex())),
-			nssConf: $.varRef(init?.nssConf ?? (null as nssConf | $.VarRef<nssConf> | null))
+			nssConf: $.varRef(init?.nssConf ?? (null! as nssConf | $.VarRef<nssConf> | null))
 		}
 	}
 
@@ -211,8 +211,8 @@ export class nssConf {
 	constructor(init?: Partial<{mtime?: time.Time, err?: $.GoError, sources?: globalThis.Map<string, $.Slice<nssSource>> | null}>) {
 		this._fields = {
 			mtime: $.varRef(init?.mtime ? $.markAsStructValue($.cloneStructValue(init.mtime)) : $.markAsStructValue(new time.Time())),
-			err: $.varRef(init?.err ?? (null as $.GoError)),
-			sources: $.varRef(init?.sources ?? (null as globalThis.Map<string, $.Slice<nssSource>> | null))
+			err: $.varRef(init?.err ?? (null! as $.GoError)),
+			sources: $.varRef(init?.sources ?? (null! as globalThis.Map<string, $.Slice<nssSource>> | null))
 		}
 	}
 
@@ -258,7 +258,7 @@ export class nssSource {
 	constructor(init?: Partial<{source?: string, criteria?: $.Slice<nssCriterion>}>) {
 		this._fields = {
 			source: $.varRef(init?.source ?? ("" as string)),
-			criteria: $.varRef(init?.criteria ?? (null as $.Slice<nssCriterion>))
+			criteria: $.varRef(init?.criteria ?? (null! as $.Slice<nssCriterion>))
 		}
 	}
 
@@ -442,7 +442,7 @@ export async function parseNSSConf(f: __goscript_parse.file | $.VarRef<__goscrip
 				src = $.sliceStringOrBytes(srcs, undefined, sp)
 				srcs = __goscript_parse.trimSpace($.sliceStringOrBytes(srcs, sp + 1, undefined))
 			}
-			let criteria: $.Slice<nssCriterion> = null as $.Slice<nssCriterion>
+			let criteria: $.Slice<nssCriterion> = null! as $.Slice<nssCriterion>
 			// See if there's a criteria block in brackets.
 			if (($.len(srcs) > 0) && ($.uint($.indexStringOrBytes(srcs, 0), 8) == $.uint(91, 8))) {
 				let bclose = bytealg.IndexByteString(srcs, $.uint(93, 8))
@@ -450,7 +450,7 @@ export async function parseNSSConf(f: __goscript_parse.file | $.VarRef<__goscrip
 					$.pointerValue<nssConf>(__goscriptShadow3).err = errors.New("unclosed criterion bracket")
 					return __goscriptShadow3
 				}
-				let err: $.GoError = null as $.GoError
+				let err: $.GoError = null! as $.GoError
 				let __goscriptTuple2: any = await parseCriteria($.sliceStringOrBytes(srcs, 1, bclose))
 				criteria = __goscriptTuple2[0]
 				err = __goscriptTuple2[1]
@@ -470,8 +470,8 @@ export async function parseNSSConf(f: __goscript_parse.file | $.VarRef<__goscrip
 }
 
 export async function parseCriteria(x: string): globalThis.Promise<[$.Slice<nssCriterion>, $.GoError]> {
-	let c: $.Slice<nssCriterion> = null as $.Slice<nssCriterion>
-	let err: $.GoError = null as $.GoError
+	let c: $.Slice<nssCriterion> = null! as $.Slice<nssCriterion>
+	let err: $.GoError = null! as $.GoError
 	err = await __goscript_parse.foreachField(x, $.functionValue((f: string): $.GoError => {
 		let not = false
 		if (($.len(f) > 0) && ($.uint($.indexStringOrBytes(f, 0), 8) == $.uint(33, 8))) {

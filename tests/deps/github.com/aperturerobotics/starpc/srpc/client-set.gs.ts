@@ -35,7 +35,7 @@ export class ClientSet {
 
 	constructor(init?: Partial<{clients?: $.Slice<__goscript_client.Client | null>}>) {
 		this._fields = {
-			clients: $.varRef(init?.clients ?? (null as $.Slice<__goscript_client.Client | null>))
+			clients: $.varRef(init?.clients ?? (null! as $.Slice<__goscript_client.Client | null>))
 		}
 	}
 
@@ -56,9 +56,9 @@ export class ClientSet {
 
 	public async NewStream(ctx: context.Context | null, service: string, method: string, firstMsg: __goscript_message.Message): globalThis.Promise<[__goscript_stream.Stream | null, $.GoError]> {
 		const c: ClientSet | $.VarRef<ClientSet> | null = this
-		let strm: __goscript_stream.Stream | null = null as __goscript_stream.Stream | null
+		let strm: __goscript_stream.Stream | null = null! as __goscript_stream.Stream | null
 		let err = await ClientSet.prototype.execCall.call(c, ctx, $.functionValue(async (client: __goscript_client.Client | null): globalThis.Promise<$.GoError> => {
-			let __goscriptShadow0: $.GoError = null as $.GoError
+			let __goscriptShadow0: $.GoError = null! as $.GoError
 			let __goscriptTuple0: any = await $.pointerValue<Exclude<__goscript_client.Client, null>>(client).NewStream(ctx, service, method, firstMsg)
 			strm = __goscriptTuple0[0]
 			__goscriptShadow0 = __goscriptTuple0[1]

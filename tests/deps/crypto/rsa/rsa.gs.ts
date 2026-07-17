@@ -79,7 +79,7 @@ export class PublicKey {
 
 	constructor(init?: Partial<{N?: big.Int | $.VarRef<big.Int> | null, E?: number}>) {
 		this._fields = {
-			N: $.varRef(init?.N ?? (null as big.Int | $.VarRef<big.Int> | null)),
+			N: $.varRef(init?.N ?? (null! as big.Int | $.VarRef<big.Int> | null)),
 			E: $.varRef(init?.E ?? (0 as number))
 		}
 	}
@@ -155,7 +155,7 @@ export class OAEPOptions {
 		this._fields = {
 			Hash: $.varRef(init?.Hash ?? (0 as crypto.Hash)),
 			MGFHash: $.varRef(init?.MGFHash ?? (0 as crypto.Hash)),
-			Label: $.varRef(init?.Label ?? (null as $.Slice<number>))
+			Label: $.varRef(init?.Label ?? (null! as $.Slice<number>))
 		}
 	}
 
@@ -233,11 +233,11 @@ export class PrecomputedValues {
 
 	constructor(init?: Partial<{Dp?: big.Int | $.VarRef<big.Int> | null, Dq?: big.Int | $.VarRef<big.Int> | null, Qinv?: big.Int | $.VarRef<big.Int> | null, CRTValues?: $.Slice<CRTValue>, fips?: rsa.PrivateKey | $.VarRef<rsa.PrivateKey> | null}>) {
 		this._fields = {
-			Dp: $.varRef(init?.Dp ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			Dq: $.varRef(init?.Dq ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			Qinv: $.varRef(init?.Qinv ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			CRTValues: $.varRef(init?.CRTValues ?? (null as $.Slice<CRTValue>)),
-			fips: $.varRef(init?.fips ?? (null as rsa.PrivateKey | $.VarRef<rsa.PrivateKey> | null))
+			Dp: $.varRef(init?.Dp ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			Dq: $.varRef(init?.Dq ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			Qinv: $.varRef(init?.Qinv ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			CRTValues: $.varRef(init?.CRTValues ?? (null! as $.Slice<CRTValue>)),
+			fips: $.varRef(init?.fips ?? (null! as rsa.PrivateKey | $.VarRef<rsa.PrivateKey> | null))
 		}
 	}
 
@@ -304,8 +304,8 @@ export class PrivateKey {
 	constructor(init?: Partial<{PublicKey?: PublicKey, D?: big.Int | $.VarRef<big.Int> | null, Primes?: $.Slice<big.Int | $.VarRef<big.Int> | null>, Precomputed?: PrecomputedValues}>) {
 		this._fields = {
 			PublicKey: $.varRef(init?.PublicKey ? $.markAsStructValue($.cloneStructValue(init.PublicKey)) : $.markAsStructValue(new PublicKey())),
-			D: $.varRef(init?.D ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			Primes: $.varRef(init?.Primes ?? (null as $.Slice<big.Int | $.VarRef<big.Int> | null>)),
+			D: $.varRef(init?.D ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			Primes: $.varRef(init?.Primes ?? (null! as $.Slice<big.Int | $.VarRef<big.Int> | null>)),
 			Precomputed: $.varRef(init?.Precomputed ? $.markAsStructValue($.cloneStructValue(init.Precomputed)) : $.markAsStructValue(new PrecomputedValues()))
 		}
 	}
@@ -323,8 +323,8 @@ export class PrivateKey {
 
 	public async Decrypt(rand: io.Reader | null, ciphertext: $.Slice<number>, opts: crypto.DecrypterOpts | null): globalThis.Promise<[$.Slice<number>, $.GoError]> {
 		const priv: PrivateKey | $.VarRef<PrivateKey> | null = this
-		let plaintext: $.Slice<number> = null as $.Slice<number>
-		let err: $.GoError = null as $.GoError
+		let plaintext: $.Slice<number> = null! as $.Slice<number>
+		let err: $.GoError = null! as $.GoError
 		if (opts == null) {
 			return __goscript_pkcs1v15.DecryptPKCS1v15(rand, priv, ciphertext)
 		}
@@ -634,9 +634,9 @@ export class CRTValue {
 
 	constructor(init?: Partial<{Exp?: big.Int | $.VarRef<big.Int> | null, Coeff?: big.Int | $.VarRef<big.Int> | null, R?: big.Int | $.VarRef<big.Int> | null}>) {
 		this._fields = {
-			Exp: $.varRef(init?.Exp ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			Coeff: $.varRef(init?.Coeff ?? (null as big.Int | $.VarRef<big.Int> | null)),
-			R: $.varRef(init?.R ?? (null as big.Int | $.VarRef<big.Int> | null))
+			Exp: $.varRef(init?.Exp ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			Coeff: $.varRef(init?.Coeff ?? (null! as big.Int | $.VarRef<big.Int> | null)),
+			R: $.varRef(init?.R ?? (null! as big.Int | $.VarRef<big.Int> | null))
 		}
 	}
 
@@ -839,7 +839,7 @@ export async function GenerateMultiPrimeKey(random: io.Reader | null, nprimes: n
 			todo = todo + (Math.trunc((nprimes - 2) / 5))
 		}
 		for (let i = 0; i < nprimes; i++) {
-			let err: $.GoError = null as $.GoError
+			let err: $.GoError = null! as $.GoError
 			let __goscriptTuple12: any = await cryptorand.Prime($.pointerValueOrNil(random)!, Math.trunc(todo / (nprimes - i)))
 			primes![i] = __goscriptTuple12[0]
 			err = __goscriptTuple12[1]

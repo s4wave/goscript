@@ -70,7 +70,7 @@ export class Error {
 		this._fields = {
 			Op: $.varRef(init?.Op ?? ("" as string)),
 			URL: $.varRef(init?.URL ?? ("" as string)),
-			Err: $.varRef(init?.Err ?? (null as $.GoError))
+			Err: $.varRef(init?.Err ?? (null! as $.GoError))
 		}
 	}
 
@@ -225,7 +225,7 @@ export class URL {
 		this._fields = {
 			Scheme: $.varRef(init?.Scheme ?? ("" as string)),
 			Opaque: $.varRef(init?.Opaque ?? ("" as string)),
-			User: $.varRef(init?.User ?? (null as Userinfo | $.VarRef<Userinfo> | null)),
+			User: $.varRef(init?.User ?? (null! as Userinfo | $.VarRef<Userinfo> | null)),
 			Host: $.varRef(init?.Host ?? ("" as string)),
 			Path: $.varRef(init?.Path ?? ("" as string)),
 			Fragment: $.varRef(init?.Fragment ?? ("" as string)),
@@ -305,8 +305,8 @@ export class URL {
 
 	public MarshalBinary(): [$.Slice<number>, $.GoError] {
 		const u: URL | $.VarRef<URL> | null = this
-		let text: $.Slice<number> = null as $.Slice<number>
-		let err: $.GoError = null as $.GoError
+		let text: $.Slice<number> = null! as $.Slice<number>
+		let err: $.GoError = null! as $.GoError
 		return URL.prototype.AppendBinary.call(u, null)
 	}
 
@@ -816,7 +816,7 @@ export function escape(s: string, mode: __goscript_encoding_table.encoding): str
 	}
 
 	let buf: Uint8Array = new Uint8Array(64)
-	let t: $.Slice<number> = null as $.Slice<number>
+	let t: $.Slice<number> = null! as $.Slice<number>
 
 	let required = $.len(s) + (2 * hexCount)
 	if (required <= $.len(buf)) {
@@ -875,7 +875,7 @@ export function UserPassword(username: string, password: string): Userinfo | $.V
 export function getScheme(rawURL: string): [string, string, $.GoError] {
 	let scheme: string = ""
 	let path: string = ""
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	for (let i = 0; i < $.len(rawURL); i++) {
 		let c = $.uint($.indexStringOrBytes(rawURL, i), 8)
 		switch (true) {
@@ -941,7 +941,7 @@ export function ParseRequestURI(rawURL: string): [URL | $.VarRef<URL> | null, $.
 
 export function parse(rawURL: string, viaRequest: boolean): [URL | $.VarRef<URL> | null, $.GoError] {
 	let rest: string = ""
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 
 	if (stringContainsCTLByte(rawURL)) {
 		return [null, errors.New("net/url: invalid control character in URL")]
@@ -1048,9 +1048,9 @@ export function parse(rawURL: string, viaRequest: boolean): [URL | $.VarRef<URL>
 }
 
 export function parseAuthority(scheme: string, authority: string): [Userinfo | $.VarRef<Userinfo> | null, string, $.GoError] {
-	let user: Userinfo | $.VarRef<Userinfo> | null = null as Userinfo | $.VarRef<Userinfo> | null
+	let user: Userinfo | $.VarRef<Userinfo> | null = null! as Userinfo | $.VarRef<Userinfo> | null
 	let host: string = ""
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let i = strings.LastIndex(authority, "@")
 	if (i < 0) {
 		let __goscriptTuple9: any = parseHost(scheme, authority)
@@ -1149,7 +1149,7 @@ export function parseHost(scheme: string, host: string): [string, $.GoError] {
 					}
 					unescapedHostname = hostPart + zonePart
 				} else {
-					let __goscriptShadow4: $.GoError = null as $.GoError
+					let __goscriptShadow4: $.GoError = null! as $.GoError
 					let __goscriptTuple15: any = unescape(hostname, $.uint(4, 8))
 					unescapedHostname = __goscriptTuple15[0]
 					__goscriptShadow4 = __goscriptTuple15[1]
@@ -1206,7 +1206,7 @@ export function parseHost(scheme: string, host: string): [string, $.GoError] {
 		}
 	}
 
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	{
 		let __goscriptTuple17: any = unescape(host, $.uint(4, 8))
 		host = __goscriptTuple17[0]
@@ -1219,7 +1219,7 @@ export function parseHost(scheme: string, host: string): [string, $.GoError] {
 }
 
 export function badSetPath(_p0: URL | $.VarRef<URL> | null, _p1: string): $.GoError {
-	return null as $.GoError
+	return null! as $.GoError
 }
 
 export function validEncoded(s: string, mode: __goscript_encoding_table.encoding): boolean {
@@ -1336,7 +1336,7 @@ export function urlParamsWithinMax(params: number): boolean {
 }
 
 export function parseQuery(m: Values, query: string): $.GoError {
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	if (!urlParamsWithinMax(strings.Count(query, "&") + 1)) {
 		return errors.New("number of URL query parameters exceeded limit")
 	}
@@ -1556,7 +1556,7 @@ export function stringContainsCTLByte(s: string): boolean {
 
 export function JoinPath(base: string, elem: $.Slice<string>): [string, $.GoError] {
 	let result: string = ""
-	let err: $.GoError = null as $.GoError
+	let err: $.GoError = null! as $.GoError
 	let __goscriptTuple23: any = Parse(base)
 	let url: URL | $.VarRef<URL> | null = __goscriptTuple23[0]
 	err = __goscriptTuple23[1]
