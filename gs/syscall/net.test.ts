@@ -25,6 +25,7 @@ import {
   IPPROTO_IPV6,
   IPPROTO_TCP,
   IPV6_V6ONLY,
+  Kill,
   Listen,
   Pread,
   Pwrite,
@@ -88,6 +89,10 @@ describe('syscall network stubs', () => {
     expect(SetReadDeadline(-1, 0)).toBe(ENOSYS)
     expect(SetWriteDeadline(-1, 0)).toBe(ENOSYS)
     expect(Shutdown(-1, 0)).toBe(ENOSYS)
+  })
+
+  test('reports unsupported process operations as syscall errors', () => {
+    expect(Kill(123, 9)).toBe(ENOSYS)
   })
 
   test('exports JavaScript no-op descriptor flag helpers', () => {

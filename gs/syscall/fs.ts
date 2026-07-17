@@ -59,6 +59,9 @@ export function Sysctl(_name: string): [string, $.GoError] {
 export function Unlink(_path: string): $.GoError {
   return ENOSYS
 }
+export function Kill(_pid: number, _sig: number): $.GoError {
+  return ENOSYS
+}
 
 export const ForkLock = new RWMutex()
 

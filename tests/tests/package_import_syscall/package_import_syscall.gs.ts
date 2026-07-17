@@ -34,6 +34,14 @@ export async function main(): globalThis.Promise<void> {
 		fmt.Println("cloexec supported")
 	}
 	fmt.Println("signals:", $.basicInterfaceValue($.int(syscall.SIGINT), "int"), $.basicInterfaceValue($.int(syscall.SIGKILL), "int"), $.basicInterfaceValue($.int(syscall.SIGTERM), "int"))
+	{
+		let err = syscall.Kill(1, syscall.SIGKILL)
+		if (err == null) {
+			fmt.Println("kill unexpectedly succeeded")
+		} else {
+			fmt.Println("kill:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		}
+	}
 	if (false) {
 		let st: $.VarRef<syscall.Stat_t> = $.varRef($.markAsStructValue(new syscall.Stat_t()))
 		let buf: $.Slice<number> = null! as $.Slice<number>

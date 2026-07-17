@@ -1,3 +1,4 @@
 cloexec supported
 signals: 2 9 15
+kill: function not implemented
 set nonblock ok

@@ -20,6 +20,11 @@ func main() {
 		fmt.Println("cloexec supported")
 	}
 	fmt.Println("signals:", int(syscall.SIGINT), int(syscall.SIGKILL), int(syscall.SIGTERM))
+	if err := syscall.Kill(1, syscall.SIGKILL); err == nil {
+		fmt.Println("kill unexpectedly succeeded")
+	} else {
+		fmt.Println("kill:", err.Error())
+	}
 	if false {
 		var st syscall.Stat_t
 		var buf []byte
