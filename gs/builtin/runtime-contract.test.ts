@@ -4,6 +4,7 @@ import {
   append,
   appendSlice,
   assignStruct,
+  basicInterfaceValue,
   bytesToUint8Array,
   type Bytes,
   byte,
@@ -483,6 +484,25 @@ describe('builtin runtime contract helpers', () => {
         kind: TypeKind.Basic,
         name: 'int',
         typeName: 'main.MyInt',
+      }),
+    ).toEqual([13, true])
+  })
+
+  it('boxes basic interface values with compact runtime metadata', () => {
+    const boxed = basicInterfaceValue(13, 'int32')
+
+    expect(
+      typeAssertTuple<number>(boxed, {
+        kind: TypeKind.Basic,
+        name: 'int32',
+      }),
+    ).toEqual([13, true])
+
+    const rune = basicInterfaceValue(13, 'rune', 'int32')
+    expect(
+      typeAssertTuple<number>(rune, {
+        kind: TypeKind.Basic,
+        name: 'int32',
       }),
     ).toEqual([13, true])
   })

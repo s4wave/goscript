@@ -160,7 +160,7 @@ export async function nat_scan(z: __goscript_nat.nat, r: io.ByteScanner | null, 
 	// Reject invalid bases.
 	let baseOk = ((base == 0) || ((!fracOk && (2 <= base)) && (base <= 62))) || (fracOk && ((((base == 2) || (base == 8)) || (base == 10)) || (base == 16)))
 	if (!baseOk) {
-		$.panic(await fmt.Sprintf("invalid number base %d", $.namedValueInterfaceValue<any>(base, "int", {}, { kind: $.TypeKind.Basic, name: "int" })))
+		$.panic(await fmt.Sprintf("invalid number base %d", $.basicInterfaceValue(base, "int")))
 	}
 
 	// prev encodes the previously seen char: it is one

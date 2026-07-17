@@ -691,7 +691,7 @@ export function checkKeySize(size: number): $.GoError {
 		godebug.Setting.prototype.IncNonDefault.call($.pointerValue<godebug.Setting>(rsa1024min))
 		return null
 	}
-	return fmt.Errorf("crypto/rsa: %d-bit keys are insecure (see https://go.dev/pkg/crypto/rsa#hdr-Minimum_key_size)", $.namedValueInterfaceValue<any>(size, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+	return fmt.Errorf("crypto/rsa: %d-bit keys are insecure (see https://go.dev/pkg/crypto/rsa#hdr-Minimum_key_size)", $.basicInterfaceValue(size, "int"))
 }
 
 export function checkPublicKeySize(k: PublicKey | $.VarRef<PublicKey> | null): $.GoError {

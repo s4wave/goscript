@@ -438,7 +438,7 @@ export function __goscript_set_ErrLength(__goscriptValue: $.GoError): void {
 }
 
 export async function InvalidByteError_Error(e: InvalidByteError): globalThis.Promise<string> {
-	return fmt.Sprintf("encoding/hex: invalid byte: %#U", $.namedValueInterfaceValue<any>($.int(e, 32), "rune", {}, { kind: $.TypeKind.Basic, name: "int32" }))
+	return fmt.Sprintf("encoding/hex: invalid byte: %#U", $.basicInterfaceValue($.int(e, 32), "rune", "int32"))
 }
 
 export function DecodedLen(x: number): number {

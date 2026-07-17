@@ -22,7 +22,7 @@ export async function getFromCacheInline(key: string): globalThis.Promise<[any, 
 }
 
 export async function main(): globalThis.Promise<void> {
-	await cache.value.Store("test", $.namedValueInterfaceValue<any>(42, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+	await cache.value.Store("test", $.basicInterfaceValue(42, "int"))
 
 	let [val1, ok1] = await getFromCache("test")
 	if (ok1) {

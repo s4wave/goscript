@@ -78,9 +78,9 @@ export class VClient {
 		await using __defer = new $.AsyncDisposableStack()
 		let t1 = $.markAsStructValue($.cloneStructValue(time.Now()))
 		let id = $.int($.pointerValue<VClient>(c).execID.Add($.int(1, 32)) - 1, 32)
-		await logrus.Entry.prototype.Debugf.call($.pointerValue<VClient>(c).le, "ExecCall(service(%s), method(%s)) => id(%d) started", $.arrayToSlice<any>([service, method, $.namedValueInterfaceValue<any>(id, "int32", {}, { kind: $.TypeKind.Basic, name: "int32" })]))
+		await logrus.Entry.prototype.Debugf.call($.pointerValue<VClient>(c).le, "ExecCall(service(%s), method(%s)) => id(%d) started", $.arrayToSlice<any>([service, method, $.basicInterfaceValue(id, "int32")]))
 		__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
-			await logrus.Entry.prototype.Debugf.call($.pointerValue<VClient>(c).le, "ExecCall(service(%s), method(%s)) => id(%d) dur(%v) err(%v)", $.arrayToSlice<any>([service, method, $.namedValueInterfaceValue<any>(id, "int32", {}, { kind: $.TypeKind.Basic, name: "int32" }), time.Duration_String(time.Since($.markAsStructValue($.cloneStructValue(t1)))), (err as any)]))
+			await logrus.Entry.prototype.Debugf.call($.pointerValue<VClient>(c).le, "ExecCall(service(%s), method(%s)) => id(%d) dur(%v) err(%v)", $.arrayToSlice<any>([service, method, $.basicInterfaceValue(id, "int32"), time.Duration_String(time.Since($.markAsStructValue($.cloneStructValue(t1)))), (err as any)]))
 		})() })
 
 		err = await $.pointerValue<Exclude<__goscript_client.Client, null>>($.pointerValue<VClient>(c).client).ExecCall(ctx, service, method, _in, out)

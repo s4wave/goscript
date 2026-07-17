@@ -107,7 +107,7 @@ export async function main(): globalThis.Promise<void> {
 			return
 		}
 	}
-	fmt.Printf("calls=%d seen=%s\n", $.namedValueInterfaceValue<any>($.pointerValue<Hooked>(box.value.Value).Calls, "int", {}, { kind: $.TypeKind.Basic, name: "int" }), $.pointerValue<Hooked>(box.value.Value).Seen)
+	fmt.Printf("calls=%d seen=%s\n", $.basicInterfaceValue($.pointerValue<Hooked>(box.value.Value).Calls, "int"), $.pointerValue<Hooked>(box.value.Value).Seen)
 }
 
 if ($.isMainScript(import.meta)) {

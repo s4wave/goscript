@@ -753,7 +753,7 @@ export async function parseNameConstraintsExtension(out: __goscript_x509.Certifi
 						}
 						default:
 						{
-							return [null, null, null, null, fmt.Errorf("x509: IP constraint contained value of length %d", $.namedValueInterfaceValue<any>(l, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))]
+							return [null, null, null, null, fmt.Errorf("x509: IP constraint contained value of length %d", $.basicInterfaceValue(l, "int"))]
 							break
 						}
 					}
@@ -1151,7 +1151,7 @@ export async function parseCertificate(der: $.Slice<number>): globalThis.Promise
 		return [null, errors.New("x509: malformed tbs certificate")]
 	}
 
-	if (!cryptobyte.String_ReadOptionalASN1Integer(tbs, $.interfaceValue<any>($.pointerValue<__goscript_x509.Certificate>(cert)._fields.Version, "*int", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "int" } }), $.uint(cryptobyte_asn1.Tag_ContextSpecific(cryptobyte_asn1.Tag_Constructed(0)), 8), $.namedValueInterfaceValue<any>(0, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))) {
+	if (!cryptobyte.String_ReadOptionalASN1Integer(tbs, $.interfaceValue<any>($.pointerValue<__goscript_x509.Certificate>(cert)._fields.Version, "*int", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "int" } }), $.uint(cryptobyte_asn1.Tag_ContextSpecific(cryptobyte_asn1.Tag_Constructed(0)), 8), $.basicInterfaceValue(0, "int"))) {
 		return [null, errors.New("x509: malformed version")]
 	}
 	if ($.pointerValue<__goscript_x509.Certificate>(cert).Version < 0) {
@@ -1380,7 +1380,7 @@ export async function ParseRevocationList(der: $.Slice<number>): globalThis.Prom
 		return [null, errors.New("x509: malformed crl")]
 	}
 	if (version.value != 1) {
-		return [null, fmt.Errorf("x509: unsupported crl version: %d", $.namedValueInterfaceValue<any>(version.value, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))]
+		return [null, fmt.Errorf("x509: unsupported crl version: %d", $.basicInterfaceValue(version.value, "int"))]
 	}
 
 	let sigAISeq: $.VarRef<cryptobyte.String> = $.varRef(null as cryptobyte.String)

@@ -161,7 +161,7 @@ export async function parseECPrivateKey(namedCurveOID: $.VarRef<asn1.ObjectIdent
 		}
 	}
 	if (privKey.value.Version != 1) {
-		return [null, fmt.Errorf("x509: unknown EC private key version %d", $.namedValueInterfaceValue<any>(privKey.value.Version, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))]
+		return [null, fmt.Errorf("x509: unknown EC private key version %d", $.basicInterfaceValue(privKey.value.Version, "int"))]
 	}
 
 	let curve: elliptic.Curve | null = null as elliptic.Curve | null

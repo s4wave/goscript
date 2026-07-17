@@ -1491,10 +1491,10 @@ export class Certificate {
 				if (invalidPoliciesChains == 0) {
 					return [null, $.interfaceValue<$.GoError>($.markAsStructValue(new __goscript_verify.CertificateInvalidError({Cert: c, Reason: 4, Detail: ""})), "x509.CertificateInvalidError", "x509.CertificateInvalidError")]
 				}
-				details = $.append(details, await fmt.Sprintf("%d candidate chains with incompatible key usage", $.namedValueInterfaceValue<any>(incompatibleKeyUsageChains, "int", {}, { kind: $.TypeKind.Basic, name: "int" })))
+				details = $.append(details, await fmt.Sprintf("%d candidate chains with incompatible key usage", $.basicInterfaceValue(incompatibleKeyUsageChains, "int")))
 			}
 			if (invalidPoliciesChains > 0) {
-				details = $.append(details, await fmt.Sprintf("%d candidate chains with invalid policies", $.namedValueInterfaceValue<any>(invalidPoliciesChains, "int", {}, { kind: $.TypeKind.Basic, name: "int" })))
+				details = $.append(details, await fmt.Sprintf("%d candidate chains with invalid policies", $.basicInterfaceValue(invalidPoliciesChains, "int")))
 			}
 			err = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField4 = strings.Join(details, ", "); return $.markAsStructValue(new __goscript_verify.CertificateInvalidError({Cert: c, Reason: 10, Detail: __goscriptLiteralField4})) })(), "x509.CertificateInvalidError", "x509.CertificateInvalidError")
 			return [null, err]

@@ -199,7 +199,7 @@ export class fsTester {
 		err = __goscriptTuple1[1]
 		if (($.len(list2) > 0) || (err != null)) {
 			await $.pointerValue<Exclude<fs.ReadDirFile, null>>(d).Close()
-			fsTester.prototype.errorf.call(t, "%s: ReadDir(-1) at EOF = %d entries, %w, wanted 0 entries, nil", $.arrayToSlice<any>([dir, $.namedValueInterfaceValue<any>($.len(list2), "int", {}, { kind: $.TypeKind.Basic, name: "int" }), (err as any)]))
+			fsTester.prototype.errorf.call(t, "%s: ReadDir(-1) at EOF = %d entries, %w, wanted 0 entries, nil", $.arrayToSlice<any>([dir, $.basicInterfaceValue($.len(list2), "int"), (err as any)]))
 			return
 		}
 
@@ -209,7 +209,7 @@ export class fsTester {
 		err = __goscriptTuple2[1]
 		if (($.len(list2) > 0) || (!$.comparableEqual(err, io.EOF))) {
 			await $.pointerValue<Exclude<fs.ReadDirFile, null>>(d).Close()
-			fsTester.prototype.errorf.call(t, "%s: ReadDir(1) at EOF = %d entries, %w, wanted 0 entries, EOF", $.arrayToSlice<any>([dir, $.namedValueInterfaceValue<any>($.len(list2), "int", {}, { kind: $.TypeKind.Basic, name: "int" }), (err as any)]))
+			fsTester.prototype.errorf.call(t, "%s: ReadDir(1) at EOF = %d entries, %w, wanted 0 entries, EOF", $.arrayToSlice<any>([dir, $.basicInterfaceValue($.len(list2), "int"), (err as any)]))
 			return
 		}
 
@@ -260,7 +260,7 @@ export class fsTester {
 			let frag: $.Slice<fs.DirEntry | null> = __goscriptTuple4[0]
 			let __goscriptShadow3 = __goscriptTuple4[1]
 			if ($.len(frag) > n) {
-				fsTester.prototype.errorf.call(t, "%s: third Open: ReadDir(%d) after %d: %d entries (too many)", $.arrayToSlice<any>([dir, $.namedValueInterfaceValue<any>(n, "int", {}, { kind: $.TypeKind.Basic, name: "int" }), $.namedValueInterfaceValue<any>($.len(list2), "int", {}, { kind: $.TypeKind.Basic, name: "int" }), $.namedValueInterfaceValue<any>($.len(frag), "int", {}, { kind: $.TypeKind.Basic, name: "int" })]))
+				fsTester.prototype.errorf.call(t, "%s: third Open: ReadDir(%d) after %d: %d entries (too many)", $.arrayToSlice<any>([dir, $.basicInterfaceValue(n, "int"), $.basicInterfaceValue($.len(list2), "int"), $.basicInterfaceValue($.len(frag), "int")]))
 				return
 			}
 			list2 = $.appendSlice(list2, frag, $.appendZeros.nil)
@@ -268,11 +268,11 @@ export class fsTester {
 				break
 			}
 			if (__goscriptShadow3 != null) {
-				fsTester.prototype.errorf.call(t, "%s: third Open: ReadDir(%d) after %d: %w", $.arrayToSlice<any>([dir, $.namedValueInterfaceValue<any>(n, "int", {}, { kind: $.TypeKind.Basic, name: "int" }), $.namedValueInterfaceValue<any>($.len(list2), "int", {}, { kind: $.TypeKind.Basic, name: "int" }), (__goscriptShadow3 as any)]))
+				fsTester.prototype.errorf.call(t, "%s: third Open: ReadDir(%d) after %d: %w", $.arrayToSlice<any>([dir, $.basicInterfaceValue(n, "int"), $.basicInterfaceValue($.len(list2), "int"), (__goscriptShadow3 as any)]))
 				return
 			}
 			if (n == 0) {
-				fsTester.prototype.errorf.call(t, "%s: third Open: ReadDir(%d) after %d: 0 entries but nil error", $.arrayToSlice<any>([dir, $.namedValueInterfaceValue<any>(n, "int", {}, { kind: $.TypeKind.Basic, name: "int" }), $.namedValueInterfaceValue<any>($.len(list2), "int", {}, { kind: $.TypeKind.Basic, name: "int" })]))
+				fsTester.prototype.errorf.call(t, "%s: third Open: ReadDir(%d) after %d: 0 entries but nil error", $.arrayToSlice<any>([dir, $.basicInterfaceValue(n, "int"), $.basicInterfaceValue($.len(list2), "int")]))
 				return
 			}
 		}
@@ -829,5 +829,5 @@ export async function formatInfoEntry(info: fs.FileInfo | null): globalThis.Prom
 }
 
 export async function formatInfo(info: fs.FileInfo | null): globalThis.Promise<string> {
-	return fmt.Sprintf("%s IsDir=%v Mode=%v Size=%d ModTime=%v", await $.pointerValue<Exclude<fs.FileInfo, null>>(info).Name(), await $.pointerValue<Exclude<fs.FileInfo, null>>(info).IsDir(), $.namedValueInterfaceValue<any>(await $.pointerValue<Exclude<fs.FileInfo, null>>(info).Mode(), "fs.FileMode", {IsDir: (receiver: any, ...args: any[]) => (fs.FileMode_IsDir as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), IsRegular: (receiver: any, ...args: any[]) => (fs.FileMode_IsRegular as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Perm: (receiver: any, ...args: any[]) => (fs.FileMode_Perm as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (fs.FileMode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Type: (receiver: any, ...args: any[]) => (fs.FileMode_Type as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Basic, name: "uint32", typeName: "fs.FileMode" }, [{ name: "IsDir", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsRegular", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Perm", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint32", typeName: "fs.FileMode" } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Type", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint32", typeName: "fs.FileMode" } }] }]), $.namedValueInterfaceValue<any>(await $.pointerValue<Exclude<fs.FileInfo, null>>(info).Size(), "int64", {}, { kind: $.TypeKind.Basic, name: "int64" }), $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(await $.pointerValue<Exclude<fs.FileInfo, null>>(info).ModTime())), "time.Time", "time.Time"))
+	return fmt.Sprintf("%s IsDir=%v Mode=%v Size=%d ModTime=%v", await $.pointerValue<Exclude<fs.FileInfo, null>>(info).Name(), await $.pointerValue<Exclude<fs.FileInfo, null>>(info).IsDir(), $.namedValueInterfaceValue<any>(await $.pointerValue<Exclude<fs.FileInfo, null>>(info).Mode(), "fs.FileMode", {IsDir: (receiver: any, ...args: any[]) => (fs.FileMode_IsDir as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), IsRegular: (receiver: any, ...args: any[]) => (fs.FileMode_IsRegular as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Perm: (receiver: any, ...args: any[]) => (fs.FileMode_Perm as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (fs.FileMode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Type: (receiver: any, ...args: any[]) => (fs.FileMode_Type as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Basic, name: "uint32", typeName: "fs.FileMode" }, [{ name: "IsDir", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "IsRegular", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Perm", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint32", typeName: "fs.FileMode" } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Type", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint32", typeName: "fs.FileMode" } }] }]), $.basicInterfaceValue(await $.pointerValue<Exclude<fs.FileInfo, null>>(info).Size(), "int64"), $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(await $.pointerValue<Exclude<fs.FileInfo, null>>(info).ModTime())), "time.Time", "time.Time"))
 }

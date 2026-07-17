@@ -445,7 +445,7 @@ export async function N(__typeArgs: $.GenericTypeArgs | undefined, n: any): glob
 	if ((n as any) <= (0 as any)) {
 		$.panic("invalid argument to N")
 	}
-	return $.namedValueInterfaceValue<any>(await Rand.prototype.uint64n.call(globalRand, $.uint64(n)), "uint64", {}, { kind: $.TypeKind.Basic, name: "uint64" })
+	return $.basicInterfaceValue(await Rand.prototype.uint64n.call(globalRand, $.uint64(n)), "uint64")
 }
 
 export async function Float64(): globalThis.Promise<number> {

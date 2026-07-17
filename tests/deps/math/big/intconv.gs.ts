@@ -76,7 +76,7 @@ export class byteReader {
 		let size = __goscriptTuple1[1]
 		let err = __goscriptTuple1[2]
 		if ((size != 1) && (err == null)) {
-			err = fmt.Errorf("invalid rune %#U", $.namedValueInterfaceValue<any>(ch, "rune", {}, { kind: $.TypeKind.Basic, name: "int32" }))
+			err = fmt.Errorf("invalid rune %#U", $.basicInterfaceValue(ch, "rune", "int32"))
 		}
 		return [$.uint($.uint(ch, 8), 8), err]
 	}

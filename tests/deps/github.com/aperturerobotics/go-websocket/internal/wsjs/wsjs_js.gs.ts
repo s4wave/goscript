@@ -38,7 +38,7 @@ export class WebSocket {
 		const __defer = new $.AsyncDisposableStack()
 		try {
 			__defer.defer(async () => { await handleJSError(err, (null as (() => void) | null)) })
-			$.markAsStructValue($.cloneStructValue(c.v)).Call("close", $.namedValueInterfaceValue<any>(code, "int", {}, { kind: $.TypeKind.Basic, name: "int" }), reason)
+			$.markAsStructValue($.cloneStructValue(c.v)).Call("close", $.basicInterfaceValue(code, "int"), reason)
 			const __goscriptReturn1: $.GoError = err.value
 			err.value = __goscriptReturn1
 			await __defer.dispose()
@@ -320,7 +320,7 @@ export function extractArrayBuffer(arrayBuffer: js.Value): $.Slice<number> {
 }
 
 export function uint8Array(src: $.Slice<number>): js.Value {
-	let __goscriptShadow0 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(js.Global())).Get("Uint8Array"))).New($.namedValueInterfaceValue<any>($.len(src), "int", {}, { kind: $.TypeKind.Basic, name: "int" }))))
+	let __goscriptShadow0 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(js.Global())).Get("Uint8Array"))).New($.basicInterfaceValue($.len(src), "int"))))
 	js.CopyBytesToJS($.markAsStructValue($.cloneStructValue(__goscriptShadow0)), src)
 	return $.markAsStructValue($.cloneStructValue(__goscriptShadow0))
 }

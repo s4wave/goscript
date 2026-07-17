@@ -155,7 +155,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Scenario 6: Type Switch with Mixed Types
 	$.println("\n--- Scenario 6: Type Switch ---")
-	let testItems: $.Slice<any> = $.arrayToSlice<any>([$.interfaceValue<any>($.markAsStructValue(new MyStruct({Value: 100})), "main.MyStruct", "main.MyStruct"), $.interfaceValue<any>(new MyStruct({Value: 200}), "*main.MyStruct", { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" }), $.namedValueInterfaceValue<any>(300, "int", {}, { kind: $.TypeKind.Basic, name: "int" }), "string"])
+	let testItems: $.Slice<any> = $.arrayToSlice<any>([$.interfaceValue<any>($.markAsStructValue(new MyStruct({Value: 100})), "main.MyStruct", "main.MyStruct"), $.interfaceValue<any>(new MyStruct({Value: 200}), "*main.MyStruct", { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" }), $.basicInterfaceValue(300, "int"), "string"])
 
 	for (let __goscriptRangeTarget1 = testItems, i = 0; i < $.len(__goscriptRangeTarget1); i++) {
 		let item = __goscriptRangeTarget1![i]

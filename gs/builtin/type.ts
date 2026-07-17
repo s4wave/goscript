@@ -1839,6 +1839,22 @@ export function callInterfaceMethod(
   return methodValue.call(receiver, ...args)
 }
 
+export function basicInterfaceValue<T = any>(
+  value: unknown,
+  typeName: string,
+  valueTypeName = typeName,
+): T {
+  return namedValueInterfaceValue<T>(
+    value,
+    typeName,
+    {},
+    {
+      kind: TypeKind.Basic,
+      name: valueTypeName,
+    },
+  )
+}
+
 export function namedValueInterfaceValue<T>(
   value: unknown,
   typeName: string,

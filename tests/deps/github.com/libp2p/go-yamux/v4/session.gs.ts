@@ -1302,7 +1302,7 @@ export class Session {
 
 				// Verify the version
 				if ($.uint(__goscript__const.header_Version(hdr), 8) != $.uint(0, 8)) {
-					await log.Logger.prototype.Printf.call($.pointerValue<Session>(s).logger, "[ERR] yamux: Invalid protocol version: %d", $.arrayToSlice<any>([$.namedValueInterfaceValue<any>(__goscript__const.header_Version(hdr), "uint8", {}, { kind: $.TypeKind.Basic, name: "uint8" })]))
+					await log.Logger.prototype.Printf.call($.pointerValue<Session>(s).logger, "[ERR] yamux: Invalid protocol version: %d", $.arrayToSlice<any>([$.basicInterfaceValue(__goscript__const.header_Version(hdr), "uint8")]))
 					const __goscriptReturn7: $.GoError = $.interfaceValue<$.GoError>(__goscript__const.ErrInvalidVersion, "*yamux.Error", { kind: $.TypeKind.Pointer, elemType: "yamux.Error" })
 					err = __goscriptReturn7
 					await __defer.dispose()

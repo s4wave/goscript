@@ -39,6 +39,7 @@ func TestRuntimeContractOwnsBuiltinImportAndHelpers(t *testing.T) {
 		RuntimeHelperTypeAssert:               RuntimeHelperCategoryType,
 		RuntimeHelperTypedNil:                 RuntimeHelperCategoryType,
 		RuntimeHelperInterfaceValue:           RuntimeHelperCategoryType,
+		RuntimeHelperBasicInterfaceValue:      RuntimeHelperCategoryType,
 		RuntimeHelperNamedValueInterfaceValue: RuntimeHelperCategoryType,
 		RuntimeHelperFunctionValue:            RuntimeHelperCategoryType,
 		RuntimeHelperNamedFunction:            RuntimeHelperCategoryType,

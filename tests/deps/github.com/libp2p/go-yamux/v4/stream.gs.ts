@@ -611,7 +611,7 @@ export class Stream {
 		{
 			let err = await $.pointerValue<Stream>(s).recvBuf.Append(conn, $.uint(length, 32))
 			if (err != null) {
-				await log.Logger.prototype.Printf.call($.pointerValue<__goscript_session.Session>($.pointerValue<Stream>(s).session).logger, "[ERR] yamux: Failed to read stream data on stream %d: %v", $.arrayToSlice<any>([$.namedValueInterfaceValue<any>($.pointerValue<Stream>(s).id, "uint32", {}, { kind: $.TypeKind.Basic, name: "uint32" }), (err as any)]))
+				await log.Logger.prototype.Printf.call($.pointerValue<__goscript_session.Session>($.pointerValue<Stream>(s).session).logger, "[ERR] yamux: Failed to read stream data on stream %d: %v", $.arrayToSlice<any>([$.basicInterfaceValue($.pointerValue<Stream>(s).id, "uint32"), (err as any)]))
 				return err
 			}
 		}

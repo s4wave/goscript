@@ -304,7 +304,7 @@ export class fakeNetFD {
 		}
 
 		if ($.pointerValue<fakeNetFD>(ffd).assignedPort != 0) {
-			await fakePorts.value.CompareAndDelete($.namedValueInterfaceValue<any>($.pointerValue<fakeNetFD>(ffd).assignedPort, "int", {}, { kind: $.TypeKind.Basic, name: "int" }), $.interfaceValue<any>($.pointerValue<fakeNetFD>(ffd).fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }))
+			await fakePorts.value.CompareAndDelete($.basicInterfaceValue($.pointerValue<fakeNetFD>(ffd).assignedPort, "int"), $.interfaceValue<any>($.pointerValue<fakeNetFD>(ffd).fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }))
 		}
 
 		return err
@@ -605,7 +605,7 @@ export class fakeNetFD {
 
 					$.pointerValue<fakeNetFD>(ffd).assignedPort = $.int(port)
 					{
-						let [, dup] = await fakePorts.value.LoadOrStore($.namedValueInterfaceValue<any>($.pointerValue<fakeNetFD>(ffd).assignedPort, "int", {}, { kind: $.TypeKind.Basic, name: "int" }), $.interfaceValue<any>($.pointerValue<fakeNetFD>(ffd).fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }))
+						let [, dup] = await fakePorts.value.LoadOrStore($.basicInterfaceValue($.pointerValue<fakeNetFD>(ffd).assignedPort, "int"), $.interfaceValue<any>($.pointerValue<fakeNetFD>(ffd).fd, "*net.netFD", { kind: $.TypeKind.Pointer, elemType: "net.netFD" }))
 						if (!dup) {
 							break
 						}

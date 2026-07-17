@@ -174,7 +174,7 @@ export class PacketReadWriter {
 						return errors.New("unexpected zero len prefix")
 					}
 					if ($.uint(currLen, 32) > $.uint($.uint(10000000, 32), 32)) {
-						return errors.Errorf("message size %v greater than maximum %v", $.namedValueInterfaceValue<any>(currLen, "uint32", {}, { kind: $.TypeKind.Basic, name: "uint32" }), $.namedValueInterfaceValue<any>(10000000, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+						return errors.Errorf("message size %v greater than maximum %v", $.basicInterfaceValue(currLen, "uint32"), $.basicInterfaceValue(10000000, "int"))
 					}
 				}
 
@@ -223,7 +223,7 @@ export class PacketReadWriter {
 
 		let msgSize = __goscript_rpcproto_pb.Packet.prototype.SizeVT.call(p)
 		if ((msgSize < 0) || (msgSize > 10000000)) {
-			return errors.Errorf("message size %v greater than maximum %v", $.namedValueInterfaceValue<any>(msgSize, "int", {}, { kind: $.TypeKind.Basic, name: "int" }), $.namedValueInterfaceValue<any>(10000000, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+			return errors.Errorf("message size %v greater than maximum %v", $.basicInterfaceValue(msgSize, "int"), $.basicInterfaceValue(10000000, "int"))
 		}
 
 		let writeBuf: writeBuffer | $.VarRef<writeBuffer> | null = await getWriteBuffer(4 + msgSize)

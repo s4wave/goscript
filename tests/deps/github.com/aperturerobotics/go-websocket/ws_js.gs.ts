@@ -340,7 +340,7 @@ export class Conn {
 		}
 		let readLimit = $.pointerValue<Conn>(c).msgReadLimit.Load()
 		if ((readLimit >= 0n) && ($.int64($.len(p)) > readLimit)) {
-			let reason = fmt.Errorf("read limited at %d bytes", $.namedValueInterfaceValue<any>($.pointerValue<Conn>(c).msgReadLimit.Load(), "int64", {}, { kind: $.TypeKind.Basic, name: "int64" }))
+			let reason = fmt.Errorf("read limited at %d bytes", $.basicInterfaceValue($.pointerValue<Conn>(c).msgReadLimit.Load(), "int64"))
 			await Conn.prototype.Close.call(c, 1009, $.pointerValue<Exclude<$.GoError, null>>(reason).Error())
 			return [0, null, fmt.Errorf("%w: %v", (__goscript_errors.ErrMessageTooBig as any), (reason as any))]
 		}

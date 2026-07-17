@@ -90,7 +90,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	await selectResultRedeclare()
-	typeSwitchCaseRedeclare($.namedValueInterfaceValue<any>(1, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+	typeSwitchCaseRedeclare($.basicInterfaceValue(1, "int"))
 	typeSwitchCaseRedeclare("two")
 }
 

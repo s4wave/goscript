@@ -445,13 +445,13 @@ export class Packet {
 				return fmt.Errorf("proto: Packet: wiretype end group for non-group")
 			}
 			if ($.int(fieldNum, 32) <= $.int(0, 32)) {
-				return fmt.Errorf("proto: Packet: illegal tag %d (wire type %d)", $.namedValueInterfaceValue<any>(fieldNum, "int32", {}, { kind: $.TypeKind.Basic, name: "int32" }), $.namedValueInterfaceValue<any>(wire, "uint64", {}, { kind: $.TypeKind.Basic, name: "uint64" }))
+				return fmt.Errorf("proto: Packet: illegal tag %d (wire type %d)", $.basicInterfaceValue(fieldNum, "int32"), $.basicInterfaceValue(wire, "uint64"))
 			}
 			switch (fieldNum) {
 				case 1:
 				{
 					if (wireType != 2) {
-						return fmt.Errorf("proto: wrong wireType = %d for field CallStart", $.namedValueInterfaceValue<any>(wireType, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+						return fmt.Errorf("proto: wrong wireType = %d for field CallStart", $.basicInterfaceValue(wireType, "int"))
 					}
 					let msglen: number = 0
 					let _v: bigint = 0n
@@ -501,7 +501,7 @@ export class Packet {
 				case 2:
 				{
 					if (wireType != 2) {
-						return fmt.Errorf("proto: wrong wireType = %d for field CallData", $.namedValueInterfaceValue<any>(wireType, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+						return fmt.Errorf("proto: wrong wireType = %d for field CallData", $.basicInterfaceValue(wireType, "int"))
 					}
 					let msglen: number = 0
 					let _v: bigint = 0n
@@ -551,7 +551,7 @@ export class Packet {
 				case 3:
 				{
 					if (wireType != 0) {
-						return fmt.Errorf("proto: wrong wireType = %d for field CallCancel", $.namedValueInterfaceValue<any>(wireType, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+						return fmt.Errorf("proto: wrong wireType = %d for field CallCancel", $.basicInterfaceValue(wireType, "int"))
 					}
 					let v: number = 0
 					let _v: bigint = 0n
@@ -1420,13 +1420,13 @@ export class CallStart {
 				return fmt.Errorf("proto: CallStart: wiretype end group for non-group")
 			}
 			if ($.int(fieldNum, 32) <= $.int(0, 32)) {
-				return fmt.Errorf("proto: CallStart: illegal tag %d (wire type %d)", $.namedValueInterfaceValue<any>(fieldNum, "int32", {}, { kind: $.TypeKind.Basic, name: "int32" }), $.namedValueInterfaceValue<any>(wire, "uint64", {}, { kind: $.TypeKind.Basic, name: "uint64" }))
+				return fmt.Errorf("proto: CallStart: illegal tag %d (wire type %d)", $.basicInterfaceValue(fieldNum, "int32"), $.basicInterfaceValue(wire, "uint64"))
 			}
 			switch (fieldNum) {
 				case 1:
 				{
 					if (wireType != 2) {
-						return fmt.Errorf("proto: wrong wireType = %d for field RpcService", $.namedValueInterfaceValue<any>(wireType, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+						return fmt.Errorf("proto: wrong wireType = %d for field RpcService", $.basicInterfaceValue(wireType, "int"))
 					}
 					let stringLen: bigint = 0n
 					let __goscriptTuple17: any = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
@@ -1454,7 +1454,7 @@ export class CallStart {
 				case 2:
 				{
 					if (wireType != 2) {
-						return fmt.Errorf("proto: wrong wireType = %d for field RpcMethod", $.namedValueInterfaceValue<any>(wireType, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+						return fmt.Errorf("proto: wrong wireType = %d for field RpcMethod", $.basicInterfaceValue(wireType, "int"))
 					}
 					let stringLen: bigint = 0n
 					let __goscriptTuple18: any = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
@@ -1482,7 +1482,7 @@ export class CallStart {
 				case 3:
 				{
 					if (wireType != 2) {
-						return fmt.Errorf("proto: wrong wireType = %d for field Data", $.namedValueInterfaceValue<any>(wireType, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+						return fmt.Errorf("proto: wrong wireType = %d for field Data", $.basicInterfaceValue(wireType, "int"))
 					}
 					let byteLen: number = 0
 					let _v: bigint = 0n
@@ -1514,7 +1514,7 @@ export class CallStart {
 				case 4:
 				{
 					if (wireType != 0) {
-						return fmt.Errorf("proto: wrong wireType = %d for field DataIsZero", $.namedValueInterfaceValue<any>(wireType, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+						return fmt.Errorf("proto: wrong wireType = %d for field DataIsZero", $.basicInterfaceValue(wireType, "int"))
 					}
 					let v: number = 0
 					let _v: bigint = 0n
@@ -1995,13 +1995,13 @@ export class CallData {
 				return fmt.Errorf("proto: CallData: wiretype end group for non-group")
 			}
 			if ($.int(fieldNum, 32) <= $.int(0, 32)) {
-				return fmt.Errorf("proto: CallData: illegal tag %d (wire type %d)", $.namedValueInterfaceValue<any>(fieldNum, "int32", {}, { kind: $.TypeKind.Basic, name: "int32" }), $.namedValueInterfaceValue<any>(wire, "uint64", {}, { kind: $.TypeKind.Basic, name: "uint64" }))
+				return fmt.Errorf("proto: CallData: illegal tag %d (wire type %d)", $.basicInterfaceValue(fieldNum, "int32"), $.basicInterfaceValue(wire, "uint64"))
 			}
 			switch (fieldNum) {
 				case 1:
 				{
 					if (wireType != 2) {
-						return fmt.Errorf("proto: wrong wireType = %d for field Data", $.namedValueInterfaceValue<any>(wireType, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+						return fmt.Errorf("proto: wrong wireType = %d for field Data", $.basicInterfaceValue(wireType, "int"))
 					}
 					let byteLen: number = 0
 					let _v: bigint = 0n
@@ -2033,7 +2033,7 @@ export class CallData {
 				case 2:
 				{
 					if (wireType != 0) {
-						return fmt.Errorf("proto: wrong wireType = %d for field DataIsZero", $.namedValueInterfaceValue<any>(wireType, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+						return fmt.Errorf("proto: wrong wireType = %d for field DataIsZero", $.basicInterfaceValue(wireType, "int"))
 					}
 					let v: number = 0
 					let _v: bigint = 0n
@@ -2051,7 +2051,7 @@ export class CallData {
 				case 3:
 				{
 					if (wireType != 0) {
-						return fmt.Errorf("proto: wrong wireType = %d for field Complete", $.namedValueInterfaceValue<any>(wireType, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+						return fmt.Errorf("proto: wrong wireType = %d for field Complete", $.basicInterfaceValue(wireType, "int"))
 					}
 					let v: number = 0
 					let _v: bigint = 0n
@@ -2069,7 +2069,7 @@ export class CallData {
 				case 4:
 				{
 					if (wireType != 2) {
-						return fmt.Errorf("proto: wrong wireType = %d for field Error", $.namedValueInterfaceValue<any>(wireType, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+						return fmt.Errorf("proto: wrong wireType = %d for field Error", $.basicInterfaceValue(wireType, "int"))
 					}
 					let stringLen: bigint = 0n
 					let __goscriptTuple27: any = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)

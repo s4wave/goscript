@@ -449,7 +449,7 @@ export class Int {
 			}
 			default:
 			{
-				await fmt.Fprintf($.pointerValueOrNil((s as io.Writer | null))!, "%%!%c(big.Int=%s)", $.namedValueInterfaceValue<any>(ch, "rune", {}, { kind: $.TypeKind.Basic, name: "int32" }), await Int.prototype.String.call(x))
+				await fmt.Fprintf($.pointerValueOrNil((s as io.Writer | null))!, "%%!%c(big.Int=%s)", $.basicInterfaceValue(ch, "rune", "int32"), await Int.prototype.String.call(x))
 				return
 				break
 			}
@@ -619,7 +619,7 @@ export class Int {
 		}
 		let b = $.uint($.arrayIndex(buf!, 0), 8)
 		if ($.uint(($.uintShr(b, 1, 8)), 8) != $.uint(1, 8)) {
-			return fmt.Errorf("Int.GobDecode: encoding version %d not supported", $.namedValueInterfaceValue<any>($.uintShr(b, 1, 8), "byte", {}, { kind: $.TypeKind.Basic, name: "uint8" }))
+			return fmt.Errorf("Int.GobDecode: encoding version %d not supported", $.basicInterfaceValue($.uintShr(b, 1, 8), "byte", "uint8"))
 		}
 		$.pointerValue<Int>(z).neg = $.uint((b & 1), 8) != $.uint(0, 8)
 		$.pointerValue<Int>(z).abs = (__goscript_nat.nat_setBytes($.pointerValue<Int>(z).abs, $.goSlice(buf, 1, undefined)) as __goscript_nat.nat)

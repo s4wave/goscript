@@ -200,7 +200,7 @@ export class segmentedBuffer {
 		await $.pointerValue<segmentedBuffer>(s).bm.Lock()
 		__defer.defer(() => { $.pointerValue<segmentedBuffer>(s).bm.Unlock() })
 		if ($.uint($.pointerValue<segmentedBuffer>(s).cap, 32) < $.uint(l, 32)) {
-			return fmt.Errorf("receive window exceeded (remain: %d, recv: %d)", $.namedValueInterfaceValue<any>($.pointerValue<segmentedBuffer>(s).cap, "uint32", {}, { kind: $.TypeKind.Basic, name: "uint32" }), $.namedValueInterfaceValue<any>(l, "uint32", {}, { kind: $.TypeKind.Basic, name: "uint32" }))
+			return fmt.Errorf("receive window exceeded (remain: %d, recv: %d)", $.basicInterfaceValue($.pointerValue<segmentedBuffer>(s).cap, "uint32"), $.basicInterfaceValue(l, "uint32"))
 		}
 		return null
 	}

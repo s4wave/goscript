@@ -246,7 +246,7 @@ export class HostnameError {
 					return ("x509: cannot validate certificate for " + h.Host) + " because it doesn't contain any IP SANs"
 				}
 				if ($.len($.pointerValue<__goscript_x509.Certificate>(c).IPAddresses) >= maxNamesIncluded) {
-					return fmt.Sprintf("x509: certificate is valid for %d IP SANs, but none matched %s", $.namedValueInterfaceValue<any>($.len($.pointerValue<__goscript_x509.Certificate>(c).IPAddresses), "int", {}, { kind: $.TypeKind.Basic, name: "int" }), h.Host)
+					return fmt.Sprintf("x509: certificate is valid for %d IP SANs, but none matched %s", $.basicInterfaceValue($.len($.pointerValue<__goscript_x509.Certificate>(c).IPAddresses), "int"), h.Host)
 				}
 				for (let __goscriptRangeTarget0 = $.pointerValue<__goscript_x509.Certificate>(c).IPAddresses, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 					let san = __goscriptRangeTarget0![__rangeIndex]
@@ -257,7 +257,7 @@ export class HostnameError {
 				}
 			} else {
 				if ($.len($.pointerValue<__goscript_x509.Certificate>(c).DNSNames) >= maxNamesIncluded) {
-					return fmt.Sprintf("x509: certificate is valid for %d names, but none matched %s", $.namedValueInterfaceValue<any>($.len($.pointerValue<__goscript_x509.Certificate>(c).DNSNames), "int", {}, { kind: $.TypeKind.Basic, name: "int" }), h.Host)
+					return fmt.Sprintf("x509: certificate is valid for %d names, but none matched %s", $.basicInterfaceValue($.len($.pointerValue<__goscript_x509.Certificate>(c).DNSNames), "int"), h.Host)
 				}
 				valid.value.WriteString(strings.Join($.pointerValue<__goscript_x509.Certificate>(c).DNSNames, ", "))
 			}

@@ -436,13 +436,13 @@ export class RpcStreamPacket {
 				return fmt.Errorf("proto: RpcStreamPacket: wiretype end group for non-group")
 			}
 			if ($.int(fieldNum, 32) <= $.int(0, 32)) {
-				return fmt.Errorf("proto: RpcStreamPacket: illegal tag %d (wire type %d)", $.namedValueInterfaceValue<any>(fieldNum, "int32", {}, { kind: $.TypeKind.Basic, name: "int32" }), $.namedValueInterfaceValue<any>(wire, "uint64", {}, { kind: $.TypeKind.Basic, name: "uint64" }))
+				return fmt.Errorf("proto: RpcStreamPacket: illegal tag %d (wire type %d)", $.basicInterfaceValue(fieldNum, "int32"), $.basicInterfaceValue(wire, "uint64"))
 			}
 			switch (fieldNum) {
 				case 1:
 				{
 					if (wireType != 2) {
-						return fmt.Errorf("proto: wrong wireType = %d for field Init", $.namedValueInterfaceValue<any>(wireType, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+						return fmt.Errorf("proto: wrong wireType = %d for field Init", $.basicInterfaceValue(wireType, "int"))
 					}
 					let msglen: number = 0
 					let _v: bigint = 0n
@@ -492,7 +492,7 @@ export class RpcStreamPacket {
 				case 2:
 				{
 					if (wireType != 2) {
-						return fmt.Errorf("proto: wrong wireType = %d for field Ack", $.namedValueInterfaceValue<any>(wireType, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+						return fmt.Errorf("proto: wrong wireType = %d for field Ack", $.basicInterfaceValue(wireType, "int"))
 					}
 					let msglen: number = 0
 					let _v: bigint = 0n
@@ -542,7 +542,7 @@ export class RpcStreamPacket {
 				case 3:
 				{
 					if (wireType != 2) {
-						return fmt.Errorf("proto: wrong wireType = %d for field Data", $.namedValueInterfaceValue<any>(wireType, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+						return fmt.Errorf("proto: wrong wireType = %d for field Data", $.basicInterfaceValue(wireType, "int"))
 					}
 					let byteLen: number = 0
 					let _v: bigint = 0n
@@ -1224,13 +1224,13 @@ export class RpcStreamInit {
 				return fmt.Errorf("proto: RpcStreamInit: wiretype end group for non-group")
 			}
 			if ($.int(fieldNum, 32) <= $.int(0, 32)) {
-				return fmt.Errorf("proto: RpcStreamInit: illegal tag %d (wire type %d)", $.namedValueInterfaceValue<any>(fieldNum, "int32", {}, { kind: $.TypeKind.Basic, name: "int32" }), $.namedValueInterfaceValue<any>(wire, "uint64", {}, { kind: $.TypeKind.Basic, name: "uint64" }))
+				return fmt.Errorf("proto: RpcStreamInit: illegal tag %d (wire type %d)", $.basicInterfaceValue(fieldNum, "int32"), $.basicInterfaceValue(wire, "uint64"))
 			}
 			switch (fieldNum) {
 				case 1:
 				{
 					if (wireType != 2) {
-						return fmt.Errorf("proto: wrong wireType = %d for field ComponentId", $.namedValueInterfaceValue<any>(wireType, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+						return fmt.Errorf("proto: wrong wireType = %d for field ComponentId", $.basicInterfaceValue(wireType, "int"))
 					}
 					let stringLen: bigint = 0n
 					let __goscriptTuple17: any = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)
@@ -1539,13 +1539,13 @@ export class RpcAck {
 				return fmt.Errorf("proto: RpcAck: wiretype end group for non-group")
 			}
 			if ($.int(fieldNum, 32) <= $.int(0, 32)) {
-				return fmt.Errorf("proto: RpcAck: illegal tag %d (wire type %d)", $.namedValueInterfaceValue<any>(fieldNum, "int32", {}, { kind: $.TypeKind.Basic, name: "int32" }), $.namedValueInterfaceValue<any>(wire, "uint64", {}, { kind: $.TypeKind.Basic, name: "uint64" }))
+				return fmt.Errorf("proto: RpcAck: illegal tag %d (wire type %d)", $.basicInterfaceValue(fieldNum, "int32"), $.basicInterfaceValue(wire, "uint64"))
 			}
 			switch (fieldNum) {
 				case 1:
 				{
 					if (wireType != 2) {
-						return fmt.Errorf("proto: wrong wireType = %d for field Error", $.namedValueInterfaceValue<any>(wireType, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+						return fmt.Errorf("proto: wrong wireType = %d for field Error", $.basicInterfaceValue(wireType, "int"))
 					}
 					let stringLen: bigint = 0n
 					let __goscriptTuple21: any = protobuf_go_lite.DecodeVarint(dAtA, iNdEx)

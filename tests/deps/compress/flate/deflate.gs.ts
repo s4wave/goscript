@@ -775,7 +775,7 @@ export class compressor {
 			}
 			default:
 			{
-				return fmt.Errorf("flate: invalid compression level %d: want value in range [-2, 9]", $.namedValueInterfaceValue<any>(level, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+				return fmt.Errorf("flate: invalid compression level %d: want value in range [-2, 9]", $.basicInterfaceValue(level, "int"))
 				break
 			}
 		}

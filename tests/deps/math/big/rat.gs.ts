@@ -347,7 +347,7 @@ export class Rat {
 		}
 		let b = $.uint($.arrayIndex(buf!, 0), 8)
 		if ($.uint(($.uintShr(b, 1, 8)), 8) != $.uint(1, 8)) {
-			return fmt.Errorf("Rat.GobDecode: encoding version %d not supported", $.namedValueInterfaceValue<any>($.uintShr(b, 1, 8), "byte", {}, { kind: $.TypeKind.Basic, name: "uint8" }))
+			return fmt.Errorf("Rat.GobDecode: encoding version %d not supported", $.basicInterfaceValue($.uintShr(b, 1, 8), "byte", "uint8"))
 		}
 		const j: number = 5
 		let ln = $.uint(byteorder.BEUint32($.goSlice(buf, 5 - 4, 5)), 32)
@@ -949,7 +949,7 @@ export async function quotToFloat32(stk: __goscript_nat.stack | $.VarRef<__goscr
 		exp++
 	}
 	if ($.uint(($.uintShr(mantissa, 24, 32)), 32) != $.uint(1, 32)) {
-		$.panic(await fmt.Sprintf("expected exactly %d bits of result", $.namedValueInterfaceValue<any>(25, "int", {}, { kind: $.TypeKind.Basic, name: "int" })))
+		$.panic(await fmt.Sprintf("expected exactly %d bits of result", $.basicInterfaceValue(25, "int")))
 	}
 
 	// 4. Rounding.
@@ -1049,7 +1049,7 @@ export async function quotToFloat64(stk: __goscript_nat.stack | $.VarRef<__goscr
 		exp++
 	}
 	if (($.uint64Shr(mantissa, 53n)) != 1n) {
-		$.panic(await fmt.Sprintf("expected exactly %d bits of result", $.namedValueInterfaceValue<any>(54, "int", {}, { kind: $.TypeKind.Basic, name: "int" })))
+		$.panic(await fmt.Sprintf("expected exactly %d bits of result", $.basicInterfaceValue(54, "int")))
 	}
 
 	// 4. Rounding.

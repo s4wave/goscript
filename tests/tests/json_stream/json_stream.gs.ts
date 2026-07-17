@@ -32,7 +32,7 @@ export async function main(): globalThis.Promise<void> {
 	let dec: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("1 2 3"), "*strings.Reader", { kind: $.TypeKind.Pointer, elemType: "strings.Reader" }))!)
 	let n: $.VarRef<number> = $.varRef(0)
 	while (json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.interfaceValue<any>(n, "*int", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "int" } })) == null) {
-		fmt.Println("decoded", $.namedValueInterfaceValue<any>(n.value, "int", {}, { kind: $.TypeKind.Basic, name: "int" }))
+		fmt.Println("decoded", $.basicInterfaceValue(n.value, "int"))
 	}
 
 	// UseNumber keeps the exact source literal beyond float64 precision.
@@ -50,7 +50,7 @@ export async function main(): globalThis.Promise<void> {
 		let se: json.SyntaxError | $.VarRef<json.SyntaxError> | null = __goscriptTuple0[0]
 		let ok = __goscriptTuple0[1]
 		if (ok) {
-			fmt.Println("offset", $.namedValueInterfaceValue<any>($.pointerValue<json.SyntaxError>(se).Offset, "int64", {}, { kind: $.TypeKind.Basic, name: "int64" }))
+			fmt.Println("offset", $.basicInterfaceValue($.pointerValue<json.SyntaxError>(se).Offset, "int64"))
 		}
 	}
 

@@ -3494,7 +3494,7 @@ func TestCompilePackagesBoxesNumericVariadicInterfaceArgs(t *testing.T) {
 			"func collect(values ...any) {}",
 			"func main() {",
 			"  var version int32 = 2",
-			"  collect(version, uint32(3))",
+			"  collect(version, uint32(3), rune(4))",
 			"}",
 			"",
 		}, "\n"),
@@ -3515,8 +3515,9 @@ func TestCompilePackagesBoxesNumericVariadicInterfaceArgs(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"$.namedValueInterfaceValue<any>(version, \"int32\", {}, { kind: $.TypeKind.Basic, name: \"int32\" })",
-		"$.namedValueInterfaceValue<any>($.uint(3, 32), \"uint32\", {}, { kind: $.TypeKind.Basic, name: \"uint32\" })",
+		"$.basicInterfaceValue(version, \"int32\")",
+		"$.basicInterfaceValue($.uint(3, 32), \"uint32\")",
+		"$.basicInterfaceValue($.int(4, 32), \"rune\", \"int32\")",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)

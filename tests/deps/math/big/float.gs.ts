@@ -752,7 +752,7 @@ export class Float {
 			}
 			default:
 			{
-				await fmt2.Fprintf($.pointerValueOrNil((s as io.Writer | null))!, "%%!%c(*big.Float=%s)", $.namedValueInterfaceValue<any>(format, "rune", {}, { kind: $.TypeKind.Basic, name: "int32" }), await Float.prototype.String.call(x))
+				await fmt2.Fprintf($.pointerValueOrNil((s as io.Writer | null))!, "%%!%c(*big.Float=%s)", $.basicInterfaceValue(format, "rune", "int32"), await Float.prototype.String.call(x))
 				return
 				break
 			}
@@ -837,7 +837,7 @@ export class Float {
 		}
 
 		if ($.uint($.arrayIndex(buf!, 0), 8) != $.uint(1, 8)) {
-			return fmt2.Errorf("Float.GobDecode: encoding version %d not supported", $.namedValueInterfaceValue<any>($.arrayIndex(buf!, 0), "byte", {}, { kind: $.TypeKind.Basic, name: "uint8" }))
+			return fmt2.Errorf("Float.GobDecode: encoding version %d not supported", $.basicInterfaceValue($.arrayIndex(buf!, 0), "byte", "uint8"))
 		}
 
 		let oldPrec = $.uint($.pointerValue<Float>(z).prec, 32)
@@ -1175,7 +1175,7 @@ export class Float {
 			let ch = $.uint(__goscriptTuple1[0], 8)
 			let err2 = __goscriptTuple1[1]
 			if (err2 == null) {
-				err = fmt2.Errorf("expected end of string, found %q", $.namedValueInterfaceValue<any>(ch, "byte", {}, { kind: $.TypeKind.Basic, name: "uint8" }))
+				err = fmt2.Errorf("expected end of string, found %q", $.basicInterfaceValue(ch, "byte", "uint8"))
 			} else {
 				if (!$.comparableEqual(err2, io.EOF)) {
 					err = err2

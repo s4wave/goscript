@@ -917,7 +917,7 @@ export async function parseSequenceOf(bytes: $.Slice<number>, sliceType: reflect
 	let elemSize = $.uint64(await $.pointerValue<Exclude<reflect.Type, null>>(elemType).Size())
 	let safeCap = saferio.SliceCapWithSize(elemSize, $.uint64(numElements))
 	if (safeCap < 0) {
-		err = $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField0 = await fmt.Sprintf("%s slice too big: %d elements of %d bytes", $.namedValueInterfaceValue<any>(await $.pointerValue<Exclude<reflect.Type, null>>(elemType).Kind(), "reflect.Kind", {String: (receiver: any, ...args: any[]) => (reflect.Kind_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Basic, name: "uint", typeName: "reflect.Kind" }, [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]), $.namedValueInterfaceValue<any>(numElements, "int", {}, { kind: $.TypeKind.Basic, name: "int" }), $.namedValueInterfaceValue<any>(elemSize, "uint64", {}, { kind: $.TypeKind.Basic, name: "uint64" })); return $.markAsStructValue(new SyntaxError({Msg: __goscriptLiteralField0})) })()), "asn1.SyntaxError", "asn1.SyntaxError")
+		err = $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField0 = await fmt.Sprintf("%s slice too big: %d elements of %d bytes", $.namedValueInterfaceValue<any>(await $.pointerValue<Exclude<reflect.Type, null>>(elemType).Kind(), "reflect.Kind", {String: (receiver: any, ...args: any[]) => (reflect.Kind_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Basic, name: "uint", typeName: "reflect.Kind" }, [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]), $.basicInterfaceValue(numElements, "int"), $.basicInterfaceValue(elemSize, "uint64")); return $.markAsStructValue(new SyntaxError({Msg: __goscriptLiteralField0})) })()), "asn1.SyntaxError", "asn1.SyntaxError")
 		return [ret, err]
 	}
 	ret = $.markAsStructValue($.cloneStructValue(reflect.MakeSlice($.pointerValueOrNil(sliceType)!, 0, safeCap)))
@@ -1066,7 +1066,7 @@ export async function parseField(v: reflect.Value, bytes: $.Slice<number>, initO
 					case 2:
 					{
 						let __goscriptTuple15: any = parseInt64(innerBytes)
-						result = $.namedValueInterfaceValue<any>(__goscriptTuple15[0], "int64", {}, { kind: $.TypeKind.Basic, name: "int64" })
+						result = $.basicInterfaceValue(__goscriptTuple15[0], "int64")
 						err = __goscriptTuple15[1]
 						break
 					}
@@ -1256,7 +1256,7 @@ export async function parseField(v: reflect.Value, bytes: $.Slice<number>, initO
 		if (ok) {
 			offset = initOffset
 		} else {
-			err = $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField2 = await fmt.Sprintf("tags don't match (%d vs %+v) %+v %s @%d", $.namedValueInterfaceValue<any>(expectedTag, "int", {}, { kind: $.TypeKind.Basic, name: "int" }), $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(t)), "asn1.tagAndLength", "asn1.tagAndLength"), $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(params)), "asn1.fieldParameters", "asn1.fieldParameters"), await $.pointerValue<Exclude<reflect.Type, null>>(fieldType).Name(), $.namedValueInterfaceValue<any>(offset, "int", {}, { kind: $.TypeKind.Basic, name: "int" })); return $.markAsStructValue(new StructuralError({Msg: __goscriptLiteralField2})) })()), "asn1.StructuralError", "asn1.StructuralError")
+			err = $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField2 = await fmt.Sprintf("tags don't match (%d vs %+v) %+v %s @%d", $.basicInterfaceValue(expectedTag, "int"), $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(t)), "asn1.tagAndLength", "asn1.tagAndLength"), $.interfaceValue<any>($.markAsStructValue($.cloneStructValue(params)), "asn1.fieldParameters", "asn1.fieldParameters"), await $.pointerValue<Exclude<reflect.Type, null>>(fieldType).Name(), $.basicInterfaceValue(offset, "int")); return $.markAsStructValue(new StructuralError({Msg: __goscriptLiteralField2})) })()), "asn1.StructuralError", "asn1.StructuralError")
 		}
 		return [offset, err]
 	}
@@ -1488,7 +1488,7 @@ export async function parseField(v: reflect.Value, bytes: $.Slice<number>, initO
 					}
 					default:
 					{
-						err = $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField3 = await fmt.Sprintf("internal error: unknown string type %d", $.namedValueInterfaceValue<any>(universalTag, "int", {}, { kind: $.TypeKind.Basic, name: "int" })); return $.markAsStructValue(new SyntaxError({Msg: __goscriptLiteralField3})) })()), "asn1.SyntaxError", "asn1.SyntaxError")
+						err = $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField3 = await fmt.Sprintf("internal error: unknown string type %d", $.basicInterfaceValue(universalTag, "int")); return $.markAsStructValue(new SyntaxError({Msg: __goscriptLiteralField3})) })()), "asn1.SyntaxError", "asn1.SyntaxError")
 						break
 					}
 				}
