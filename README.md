@@ -1,8 +1,8 @@
 <div align="center">
-  <h3>GoScript: Go to TypeScript Compiler</h3>
+  <h3>GoScript: a Go to TypeScript compiler</h3>
 
   <p>
-    Compile Go to readable TypeScript for Node, Bun, and modern browsers.
+    Your Go code runs anywhere TypeScript runs: Node, Bun, and the browser.
   </p>
 
 
@@ -23,16 +23,15 @@
 
 ## Overview
 
-**GoScript** is an experimental Go-to-TypeScript compiler for sharing real Go
-code with TypeScript projects. It loads packages from a Go module, type-checks
-them with the Go toolchain, and emits deterministic TypeScript packages under
+**GoScript** is a Go to TypeScript compiler, so Go can run anywhere TypeScript
+runs. It loads packages from a Go module, type-checks them with the Go
+toolchain, and emits deterministic TypeScript packages under
 `@goscript/<go-package>/`.
 
-GoScript handles package graphs, generics, interfaces, pointer and value
+GoScript compiles package graphs, generics, interfaces, pointer and value
 semantics, goroutines, channels, `select`, `defer`, async call propagation,
-package tests, and a practical standard-library override surface. The generated
-TypeScript stays readable enough to inspect, bundle, and debug like normal
-application code.
+package tests, and a practical standard-library override surface. The output
+stays readable enough to inspect, bundle, and debug like code you wrote.
 
 GoScript is developed and tuned against
 [Spacewave](https://github.com/s4wave/spacewave), a large Go and TypeScript app
@@ -50,10 +49,10 @@ runtime channel helpers instead of implementing a full goroutine scheduler.
 
 ### Why GoScript?
 
-Use GoScript when your Go code is the source of truth, but part of your product
-needs to run in a TypeScript runtime. GoScript compiles real application code:
-database engines, git implementations, cryptography, and concurrent framework
-code, not just self-contained algorithms.
+Use GoScript when Go is the source of truth and part of the product must run
+in a TypeScript runtime. It compiles real application code: database engines,
+git implementations, cryptography, and concurrent framework code, not just
+self-contained algorithms.
 
 Good fits today include:
 
