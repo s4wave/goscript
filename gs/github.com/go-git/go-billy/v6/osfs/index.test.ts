@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { New } from './index.js'
+import { FromRoot, New } from './index.js'
 
 const roots: string[] = []
 
@@ -38,6 +38,30 @@ describe('go-billy osfs override', () => {
     expect(file!.Close()).toBeNull()
 
     expect(readFileSync(join(root, 'README.md'), 'utf8')).toBe('hello\n')
+  })
+
+  it('wraps a caller-managed os.Root', () => {
+    const root = tempRoot()
+    const [openedRoot, openErr] = os.OpenRoot(root)
+    expect(openErr).toBeNull()
+
+    const [fsys, fromErr] = FromRoot(openedRoot)
+    expect(fromErr).toBeNull()
+    const [file, createErr] = fsys!.Create('from-root.txt')
+    expect(createErr).toBeNull()
+    const [, writeErr] = file!.Write($.stringToBytes('from root'))
+    expect(writeErr).toBeNull()
+    expect(file!.Close()).toBeNull()
+    expect(openedRoot!.Close()).toBeNull()
+
+    expect(readFileSync(join(root, 'from-root.txt'), 'utf8')).toBe('from root')
+  })
+
+  it('rejects a nil os.Root', () => {
+    const [fsys, err] = FromRoot(null)
+
+    expect(fsys).toBeNull()
+    expect(err?.Error()).toBe('root must not be nil')
   })
 
   it('keeps chrooted writes under the child host directory', () => {

@@ -22,7 +22,11 @@ type Filesystem = {
   Lstat(filename: string): [fs.FileInfo, $.GoError]
   MkdirAll(filename: string, perm: fs.FileMode): $.GoError
   Open(filename: string): [os.File | null, $.GoError]
-  OpenFile(filename: string, flag: number, perm: fs.FileMode): [os.File | null, $.GoError]
+  OpenFile(
+    filename: string,
+    flag: number,
+    perm: fs.FileMode,
+  ): [os.File | null, $.GoError]
   ReadDir(path: string): [$.Slice<fs.DirEntry | null>, $.GoError]
   Readlink(link: string): [string, $.GoError]
   Remove(filename: string): $.GoError
@@ -49,6 +53,17 @@ export function New(
     opt(o)
   }
   return new BoundOS({ baseDir, mmap: o.mmap })
+}
+
+export function FromRoot(
+  root: os.Root | $.VarRef<os.Root> | null,
+  ...opts: Array<Option | $.Slice<Option> | undefined>
+): [BoundOS | null, $.GoError] {
+  const value = $.pointerValueOrNil(root)
+  if (value === null) {
+    return [null, $.newError('root must not be nil')]
+  }
+  return [New(value.Name(), ...opts), null]
 }
 
 function normalizeOptions(
