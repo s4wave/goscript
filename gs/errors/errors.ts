@@ -123,9 +123,70 @@ export function Is(err: $.GoError, target: $.GoError): boolean {
     return false
   }
 
-  // Match by identity only. Go's errors.Is never matches by message text:
-  // two distinct errors.New values with the same string are not equal.
-  if (err === target) {
+  return isInTree(err, target, isTargetComparable(target))
+}
+
+// isTargetComparable reports whether target's dynamic type supports ==, matching
+// the standard library's reflectlite.TypeOf(target).Comparable() gate. A boxed
+// named value carries its dynamic type descriptor; errors.New pointers and other
+// untyped error objects carry none and are comparable by identity.
+function isTargetComparable(target: Exclude<$.GoError, null>): boolean {
+  const typeInfo =
+    (
+      typeof target === 'object' &&
+      target !== null &&
+      '__goTypeInfo' in target &&
+      (typeof target.__goTypeInfo === 'string' ||
+        isTypeInfo(target.__goTypeInfo))
+    ) ?
+      target.__goTypeInfo
+    : undefined
+  if (typeInfo === undefined) {
+    return !$.isNamedValueBox(target) && !$.isTypedNilValue(target)
+  }
+  if (typeof typeInfo === 'string' && $.getTypeByName(typeInfo) === undefined) {
+    return false
+  }
+  return $.isTypeInfoComparable(typeInfo)
+}
+
+function isTypeInfo(value: unknown): value is $.TypeInfo {
+  if (typeof value !== 'object' || value === null || !('kind' in value)) {
+    return false
+  }
+  switch (value.kind) {
+    case $.TypeKind.Basic:
+    case $.TypeKind.Map:
+    case $.TypeKind.Slice:
+    case $.TypeKind.Pointer:
+    case $.TypeKind.Function:
+    case $.TypeKind.Channel:
+      return true
+    case $.TypeKind.Struct:
+      return 'fields' in value && Array.isArray(value.fields)
+    case $.TypeKind.Interface:
+      return 'methods' in value && Array.isArray(value.methods)
+    default:
+      return false
+  }
+}
+
+// isInTree walks err's tree looking for target, carrying target's precomputed
+// comparability so it is decided once, as in the standard library's
+// is(err, target, targetComparable).
+function isInTree(
+  err: Exclude<$.GoError, null>,
+  target: Exclude<$.GoError, null>,
+  targetComparable: boolean,
+): boolean {
+  // Go compares err against target with == only when target's dynamic type is
+  // comparable, then matches on equal dynamic type and equal underlying value.
+  // comparableEqual is the runtime's interface-== implementation: two distinct
+  // errors.New values stay unequal *errorString pointers, while two separately
+  // boxed comparable named values (e.g. a named string error) with the same
+  // dynamic type and value compare equal. Uncomparable targets are never
+  // compared, matching the standard library and never risking a panic.
+  if (targetComparable && $.comparableEqual(err, target)) {
     return true
   }
 
@@ -143,12 +204,15 @@ export function Is(err: $.GoError, target: $.GoError): boolean {
     const result = (err as any).Unwrap()
     if (Array.isArray(result)) {
       for (const wrappedErr of result) {
-        if (wrappedErr !== null && Is(wrappedErr, target)) {
+        if (
+          wrappedErr !== null &&
+          isInTree(wrappedErr, target, targetComparable)
+        ) {
           return true
         }
       }
     } else if (result !== null && typeof result?.Error === 'function') {
-      return Is(result, target)
+      return isInTree(result, target, targetComparable)
     }
   }
 
@@ -218,9 +282,7 @@ function assignAsTarget(err: Exclude<$.GoError, null>, target: any): boolean {
     if (!ok) {
       return false
     }
-    const destination = $.isNamedValueBox(target)
-      ? target.__goValue
-      : target
+    const destination = $.isNamedValueBox(target) ? target.__goValue : target
     if ($.isVarRef(destination)) {
       destination.value = matched
       return true

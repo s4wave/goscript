@@ -126,3 +126,95 @@ describe('errors.Is identity semantics', () => {
     expect(matched).toBe(dns)
   })
 })
+
+// pairingError models a comparable named string error such as Spacewave's
+// `type ConfirmPairingError string`. The compiler boxes each conversion of a
+// named value to the error interface separately, so a returned error and its
+// sentinel constant are distinct JS objects that carry the same dynamic type
+// name and underlying value.
+function pairingError(value: string): $.GoError {
+  return $.namedValueInterfaceValue<$.GoError>(
+    value,
+    'provider_local.ConfirmPairingError',
+    { Error: (recv: string) => recv },
+    { kind: $.TypeKind.Basic, name: 'string' },
+  )
+}
+
+// sliceError models a comparable-looking box over an uncomparable dynamic type
+// such as `type SliceError []int`: Go never compares it with == in errors.Is.
+function sliceError(value: number[]): $.GoError {
+  return $.namedValueInterfaceValue<$.GoError>(
+    value,
+    'main.SliceError',
+    { Error: () => 'slice error' },
+    { kind: $.TypeKind.Slice, elemType: 'int' },
+  )
+}
+function mapError(
+  value: Map<string, number>,
+  typeInfo?: $.TypeInfo | string,
+): $.GoError {
+  return $.namedValueInterfaceValue<$.GoError>(
+    value,
+    'main.MapError',
+    { Error: () => 'map error' },
+    typeInfo,
+  )
+}
+
+class PairingWrapper {
+  constructor(private readonly err: $.GoError) {}
+
+  public Error(): string {
+    return 'confirm pairing failed'
+  }
+
+  public Unwrap(): $.GoError {
+    return this.err
+  }
+}
+
+describe('errors.Is comparable named values', () => {
+  it('matches separately boxed named values with equal dynamic type and value', () => {
+    expect(Is(pairingError('consumed'), pairingError('consumed'))).toBe(true)
+  })
+
+  it('does not match named values with different underlying value', () => {
+    expect(Is(pairingError('consumed'), pairingError('missing'))).toBe(false)
+  })
+
+  it('does not match named values of different dynamic type', () => {
+    const other = $.namedValueInterfaceValue<$.GoError>(
+      'consumed',
+      'provider_local.OtherError',
+      { Error: (recv: string) => recv },
+      { kind: $.TypeKind.Basic, name: 'string' },
+    )
+    expect(Is(pairingError('consumed'), other)).toBe(false)
+  })
+
+  it('keeps errors.New identity semantics for equal text', () => {
+    expect(Is(New('consumed'), New('consumed'))).toBe(false)
+    expect(Is(New('consumed'), pairingError('consumed'))).toBe(false)
+  })
+
+  it('never compares an uncomparable target and never throws', () => {
+    expect(() => Is(sliceError([1, 2, 3]), sliceError([1, 2, 3]))).not.toThrow()
+    expect(Is(sliceError([1, 2, 3]), sliceError([1, 2, 3]))).toBe(false)
+  })
+
+  it('does not compare an uncomparable named map without known metadata', () => {
+    const values = new Map([['same', 1]])
+    expect(Is(mapError(values), mapError(values))).toBe(false)
+    expect(
+      Is(mapError(values, 'main.MapError'), mapError(values, 'main.MapError')),
+    ).toBe(false)
+  })
+
+  it('finds a comparable named target through a custom Unwrap chain', () => {
+    const target = pairingError('mismatch')
+    const wrapped = new PairingWrapper(pairingError('mismatch'))
+    expect(Is(wrapped, target)).toBe(true)
+  })
+})
