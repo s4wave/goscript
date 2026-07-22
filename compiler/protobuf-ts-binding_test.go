@@ -528,6 +528,35 @@ type Foo struct{}
 	t.Fatalf("missing protobuf binding diagnostic not found: %#v", result.Diagnostics)
 }
 
+func TestProtobufTypeScriptBindingSkipsMissingSiblingForHelperFile(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, dir, "go.mod", "module example.test/helperpb\n\ngo 1.25\n")
+	writeTestFile(t, dir, "message.go", `package helperpb
+
+type Message struct{}
+`)
+	writeTestFile(t, dir, "message_helper.pb.go", `package helperpb
+
+func (m *Message) Helper() {}
+
+func IsHelper() bool {
+	return true
+}
+`)
+
+	comp, err := NewCompiler(&Config{
+		Dir:                       dir,
+		OutputPath:                filepath.Join(dir, "out"),
+		ProtobufTypeScriptBinding: true,
+	}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatalf("compile helper-only .pb.go file: %v", err)
+	}
+}
+
 func TestProtobufTypeScriptBindingSkipsFilesOutsideSourceRoot(t *testing.T) {
 	dir := t.TempDir()
 	outside := filepath.Join(t.TempDir(), "outside.pb.go")

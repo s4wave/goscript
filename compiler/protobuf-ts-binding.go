@@ -42,8 +42,12 @@ func protobufTypeScriptBindings(semPkg *semanticPackage, options LoweringOptions
 			continue
 		}
 		tsPath := strings.TrimSuffix(sourcePath, ".go") + ".ts"
+		messageNames := protobufTypeScriptBindingMessageNames(syntax, tsPath)
 		if _, err := os.Stat(tsPath); err != nil {
 			if os.IsNotExist(err) {
+				if len(messageNames) == 0 {
+					continue
+				}
 				diagnostics = append(diagnostics, Diagnostic{
 					Severity: DiagnosticSeverityError,
 					Code:     "goscript/protobuf-ts-binding:missing",
@@ -74,7 +78,7 @@ func protobufTypeScriptBindings(semPkg *semanticPackage, options LoweringOptions
 			sourcePath:   sourcePath,
 			outputName:   strings.TrimSuffix(filepath.Base(sourcePath), ".go") + ".ts",
 			importSource: importSource,
-			messageNames: protobufTypeScriptBindingMessageNames(syntax, tsPath),
+			messageNames: messageNames,
 			hasOneof:     protobufTypeScriptBindingHasOneof(syntax),
 		}
 	}
