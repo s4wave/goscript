@@ -79,7 +79,16 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph) (*S
 	if diagnosticsHaveErrors(diagnostics) {
 		return model, diagnostics
 	}
-	diagnostics = append(diagnostics, o.propagateAsyncFunctionArguments(ctx, model)...)
+	// The calls that can make a callee async are fixed by the syntax trees, so
+	// they are collected once here and threaded through every propagation pass
+	// below instead of rewalking every file each time.
+	asyncArgumentSites, siteDiagnostics := o.collectAsyncArgumentCallSites(ctx, model)
+	diagnostics = append(diagnostics, siteDiagnostics...)
+	if diagnosticsHaveErrors(diagnostics) {
+		return model, diagnostics
+	}
+	asyncArgumentSites, argumentDiagnostics := o.propagateAsyncFunctionArguments(ctx, model, asyncArgumentSites)
+	diagnostics = append(diagnostics, argumentDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
 		return model, diagnostics
 	}
@@ -114,7 +123,9 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph) (*S
 			return model, diagnostics
 		}
 		// Interface coloring can reveal async calls inside function arguments.
-		diagnostics = append(diagnostics, o.propagateAsyncFunctionArguments(ctx, model)...)
+		var loopDiagnostics []Diagnostic
+		asyncArgumentSites, loopDiagnostics = o.propagateAsyncFunctionArguments(ctx, model, asyncArgumentSites)
+		diagnostics = append(diagnostics, loopDiagnostics...)
 		if diagnosticsHaveErrors(diagnostics) {
 			return model, diagnostics
 		}
@@ -870,61 +881,103 @@ func recordImmediateFuncLitAsyncFacts(
 	})
 }
 
-func (o *SemanticModelOwner) propagateAsyncFunctionArguments(
+// asyncFunctionArgumentReason marks a function async because a call passes an
+// async function as one of its arguments.
+const asyncFunctionArgumentReason = "async-function-argument"
+
+// asyncArgumentCallSite is a call whose arguments may make its callee async.
+// Which calls exist is fixed by the syntax tree; only the async marks change as
+// the fixpoint runs, so the sites are collected once and reused.
+type asyncArgumentCallSite struct {
+	pkg       *packages.Package
+	semFn     *semanticFunction
+	signature *types.Signature
+	args      []ast.Expr
+}
+
+func (o *SemanticModelOwner) collectAsyncArgumentCallSites(
 	ctx context.Context,
 	model *SemanticModel,
-) []Diagnostic {
-	changed := true
-	for changed {
+) ([]asyncArgumentCallSite, []Diagnostic) {
+	var sites []asyncArgumentCallSite
+	for _, semPkg := range model.packages {
 		if err := ctx.Err(); err != nil {
-			return []Diagnostic{contextCanceledDiagnostic(err)}
+			return nil, []Diagnostic{contextCanceledDiagnostic(err)}
 		}
-		changed = false
-		for _, semPkg := range model.packages {
-			if err := ctx.Err(); err != nil {
-				return []Diagnostic{contextCanceledDiagnostic(err)}
-			}
-			pkg := semPkg.source
-			if pkg == nil {
-				continue
-			}
-			for _, file := range pkg.Syntax {
-				if err := ctx.Err(); err != nil {
-					return []Diagnostic{contextCanceledDiagnostic(err)}
+		pkg := semPkg.source
+		if pkg == nil {
+			continue
+		}
+		for _, file := range pkg.Syntax {
+			var inspectErr error
+			ast.Inspect(file, func(node ast.Node) bool {
+				if inspectErr = ctx.Err(); inspectErr != nil {
+					return false
 				}
-				var inspectErr error
-				ast.Inspect(file, func(node ast.Node) bool {
-					if inspectErr = ctx.Err(); inspectErr != nil {
-						return false
-					}
-					switch typed := node.(type) {
-					case *ast.CallExpr:
-						called := calledFunction(pkg, typed.Fun)
-						semFn := semanticFunctionFor(model, called)
-						if semFn == nil || !semFn.hasBody {
-							return true
-						}
-						signature, _ := called.Type().(*types.Signature)
-						if callPassesAsyncFunctionArgument(model, pkg, signature, typed.Args) {
-							if markFunctionAsync(semFn, "async-function-argument") {
-								changed = true
-							}
-						}
-					}
+				call, ok := node.(*ast.CallExpr)
+				if !ok {
 					return true
-				})
-				if inspectErr != nil {
-					return []Diagnostic{contextCanceledDiagnostic(inspectErr)}
 				}
-			}
-		}
-		if changed {
-			if diagnostics := o.propagateFunctionAsync(ctx, model); diagnosticsHaveErrors(diagnostics) {
-				return diagnostics
+				called := calledFunction(pkg, call.Fun)
+				semFn := semanticFunctionFor(model, called)
+				if semFn == nil || !semFn.hasBody {
+					return true
+				}
+				signature, _ := called.Type().(*types.Signature)
+				sites = append(sites, asyncArgumentCallSite{
+					pkg:       pkg,
+					semFn:     semFn,
+					signature: signature,
+					args:      call.Args,
+				})
+				return true
+			})
+			if inspectErr != nil {
+				return nil, []Diagnostic{contextCanceledDiagnostic(inspectErr)}
 			}
 		}
 	}
-	return nil
+	return sites, nil
+}
+
+// propagateAsyncFunctionArguments runs the async-argument fixpoint over the
+// supplied call sites and returns the sites that can still report a change.
+// Build collects the sites once and threads them through every round of the
+// outer interface-coloring fixpoint, so the syntax trees are walked once per
+// compile rather than once per propagation pass.
+func (o *SemanticModelOwner) propagateAsyncFunctionArguments(
+	ctx context.Context,
+	model *SemanticModel,
+	sites []asyncArgumentCallSite,
+) ([]asyncArgumentCallSite, []Diagnostic) {
+	for len(sites) != 0 {
+		if err := ctx.Err(); err != nil {
+			return sites, []Diagnostic{contextCanceledDiagnostic(err)}
+		}
+		changed := false
+		remaining := sites[:0]
+		for _, site := range sites {
+			if callPassesAsyncFunctionArgument(model, site.pkg, site.signature, site.args) {
+				if markFunctionAsync(site.semFn, asyncFunctionArgumentReason) {
+					changed = true
+				}
+			}
+			// A callee already carrying this reason can never report a change
+			// again, so drop the site instead of rescanning its arguments.
+			if site.semFn.async && slices.Contains(site.semFn.asyncReasons, asyncFunctionArgumentReason) {
+				continue
+			}
+			remaining = append(remaining, site)
+		}
+		sites = remaining
+		if !changed {
+			break
+		}
+		if diagnostics := o.propagateFunctionAsync(ctx, model); diagnosticsHaveErrors(diagnostics) {
+			return sites, diagnostics
+		}
+	}
+	return sites, nil
 }
 
 func overrideCallPackage(pkg *packages.Package, expr ast.Expr) string {
