@@ -71,12 +71,14 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph) (*S
 		diagnostics = append(diagnostics, o.buildPackage(ctx, model, node, pkg)...)
 	}
 	if diagnosticsHaveErrors(diagnostics) {
+		model.freeze()
 		return model, diagnostics
 	}
 
 	model.functionCallers = semanticFunctionCallers(model)
 	diagnostics = append(diagnostics, o.propagateFunctionAsync(ctx, model)...)
 	if diagnosticsHaveErrors(diagnostics) {
+		model.freeze()
 		return model, diagnostics
 	}
 	// The calls that can make a callee async are fixed by the syntax trees, so
@@ -85,26 +87,31 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph) (*S
 	asyncArgumentSites, siteDiagnostics := o.collectAsyncArgumentCallSites(ctx, model)
 	diagnostics = append(diagnostics, siteDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
+		model.freeze()
 		return model, diagnostics
 	}
 	asyncArgumentSites, argumentDiagnostics := o.propagateAsyncFunctionArguments(ctx, model, asyncArgumentSites)
 	diagnostics = append(diagnostics, argumentDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
+		model.freeze()
 		return model, diagnostics
 	}
 	methodSets, methodSetDiagnostics := o.resolveImplementationMethodSets(ctx, model)
 	diagnostics = append(diagnostics, methodSetDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
+		model.freeze()
 		return model, diagnostics
 	}
 	interfaceGraph, interfaceDiagnostics := o.resolveInterfaceImplementationGraph(ctx, model, methodSets)
 	diagnostics = append(diagnostics, interfaceDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
+		model.freeze()
 		return model, diagnostics
 	}
 	anonymousInterfaceGraph, anonymousInterfaceDiagnostics := o.resolveAnonymousInterfaceImplementationGraph(ctx, model, methodSets)
 	diagnostics = append(diagnostics, anonymousInterfaceDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
+		model.freeze()
 		return model, diagnostics
 	}
 	o.applyUnknownInterfaceAsyncMethods(model, interfaceGraph, anonymousInterfaceGraph)
@@ -112,14 +119,17 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph) (*S
 		asyncCount := semanticAsyncFunctionCount(model)
 		diagnostics = append(diagnostics, o.applyInterfaceAsyncMethods(ctx, model, interfaceGraph)...)
 		if diagnosticsHaveErrors(diagnostics) {
+			model.freeze()
 			return model, diagnostics
 		}
 		diagnostics = append(diagnostics, o.applyAnonymousInterfaceAsyncMethods(ctx, model, anonymousInterfaceGraph)...)
 		if diagnosticsHaveErrors(diagnostics) {
+			model.freeze()
 			return model, diagnostics
 		}
 		diagnostics = append(diagnostics, o.propagateFunctionAsync(ctx, model)...)
 		if diagnosticsHaveErrors(diagnostics) {
+			model.freeze()
 			return model, diagnostics
 		}
 		// Interface coloring can reveal async calls inside function arguments.
@@ -127,12 +137,14 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph) (*S
 		asyncArgumentSites, loopDiagnostics = o.propagateAsyncFunctionArguments(ctx, model, asyncArgumentSites)
 		diagnostics = append(diagnostics, loopDiagnostics...)
 		if diagnosticsHaveErrors(diagnostics) {
+			model.freeze()
 			return model, diagnostics
 		}
 		if semanticAsyncFunctionCount(model) == asyncCount {
 			break
 		}
 	}
+	model.freeze()
 	return model, diagnostics
 }
 
@@ -144,6 +156,9 @@ func newSemanticModel() *SemanticModel {
 		functions:                make(map[*types.Func]*semanticFunction),
 		functionCallers:          make(map[*types.Func][]*semanticFunction),
 		functionsByFullName:      make(map[string]*semanticFunction),
+		functionFullNames:        make(map[*types.Func]string),
+		functionAliases:          make(map[*types.Func]*semanticFunction),
+		lateMemo:                 newModelLateMemo(),
 		types:                    make(map[*types.Named]*semanticType),
 		values:                   make(map[types.Object]*semanticValue),
 		generatedImports:         make(map[string]map[string]bool),
@@ -1085,9 +1100,13 @@ func semanticFunctionFor(model *SemanticModel, fn *types.Func) *semanticFunction
 	// afterwards, so anything resolved from here on lands in an overlay that
 	// packages lowered concurrently can share. The result is derived only from
 	// fn, so whichever goroutine stores it first stores the same answer.
-	if cached, ok := model.functionAliases.Load(fn); ok {
-		semFn, _ := cached.(*semanticFunction)
+	if semFn, ok := model.functionAliases[fn]; ok {
 		return semFn
+	}
+	if model.frozen {
+		if semFn, ok := model.lateMemo.loadAlias(fn); ok {
+			return semFn
+		}
 	}
 	var resolved *semanticFunction
 	if origin := fn.Origin(); origin != nil {
@@ -1103,7 +1122,7 @@ func semanticFunctionFor(model *SemanticModel, fn *types.Func) *semanticFunction
 		// added later, and a later lookup has to find it.
 		return nil
 	}
-	model.functionAliases.Store(fn, resolved)
+	model.recordFunctionAlias(fn, resolved)
 	return resolved
 }
 
@@ -1822,25 +1841,60 @@ func implementationMethodSetCandidates(
 	return candidates
 }
 
+// freeze marks the end of model construction. Lowering reads the model from
+// many goroutines afterwards, so later memo entries go to the guarded overlay
+// instead of the plain maps the builder filled without a lock.
+func (m *SemanticModel) freeze() {
+	if m != nil {
+		m.frozen = true
+	}
+}
+
+func (m *SemanticModel) lookupFunctionFullName(fn *types.Func) (string, bool) {
+	if fullName, ok := m.functionFullNames[fn]; ok {
+		return fullName, true
+	}
+	if m.frozen {
+		return m.lateMemo.loadFullName(fn)
+	}
+	return "", false
+}
+
+func (m *SemanticModel) recordFunctionFullName(fn *types.Func, fullName string) {
+	if m.frozen {
+		m.lateMemo.storeFullName(fn, fullName)
+		return
+	}
+	m.functionFullNames[fn] = fullName
+}
+
+func (m *SemanticModel) recordFunctionAlias(fn *types.Func, semFn *semanticFunction) {
+	if m.frozen {
+		m.lateMemo.storeAlias(fn, semFn)
+		return
+	}
+	m.functionAliases[fn] = semFn
+}
+
 func (m *SemanticModel) functionFullName(fn *types.Func) string {
 	if m == nil || fn == nil {
 		return ""
 	}
 	original := fn
-	if cached, ok := m.functionFullNames.Load(original); ok {
-		return cached.(string)
+	if fullName, ok := m.lookupFunctionFullName(original); ok {
+		return fullName
 	}
 	if origin := fn.Origin(); origin != nil && origin != fn {
-		if cached, ok := m.functionFullNames.Load(origin); ok {
-			m.functionFullNames.Store(original, cached)
-			return cached.(string)
+		if fullName, ok := m.lookupFunctionFullName(origin); ok {
+			m.recordFunctionFullName(original, fullName)
+			return fullName
 		}
 		fn = origin
 	}
 	fullName := fn.FullName()
-	m.functionFullNames.Store(fn, fullName)
+	m.recordFunctionFullName(fn, fullName)
 	if original != fn {
-		m.functionFullNames.Store(original, fullName)
+		m.recordFunctionFullName(original, fullName)
 	}
 	return fullName
 }

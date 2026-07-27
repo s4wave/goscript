@@ -18,8 +18,13 @@ type SemanticModel struct {
 	// functionFullNames and functionAliases memoize lookups that lowering
 	// performs concurrently. Both derive their value from the key alone, so a
 	// racing store writes the same answer.
-	functionFullNames        sync.Map
-	functionAliases          sync.Map
+	functionFullNames map[*types.Func]string
+	functionAliases   map[*types.Func]*semanticFunction
+	// lateMemo receives entries added after freeze, when lowering reads the
+	// model from many goroutines at once. Before that the maps above are
+	// written by one goroutine and need no lock.
+	lateMemo                 *modelLateMemo
+	frozen                   bool
 	types                    map[*types.Named]*semanticType
 	values                   map[types.Object]*semanticValue
 	generatedImports         map[string]map[string]bool
@@ -143,4 +148,50 @@ type sourcePosition struct {
 	file   string
 	line   int
 	column int
+}
+
+// modelLateMemo holds memo entries discovered after the model is frozen, when
+// lowering reads it concurrently. Both values are derived from the key alone,
+// so a racing store writes the same answer.
+//
+// A plain map behind a mutex rather than a sync.Map: sync.Map is built for
+// read-mostly or disjoint-key access, and storing a string through it boxes the
+// value on every write.
+type modelLateMemo struct {
+	mu        sync.Mutex
+	fullNames map[*types.Func]string
+	aliases   map[*types.Func]*semanticFunction
+}
+
+func newModelLateMemo() *modelLateMemo {
+	return &modelLateMemo{
+		fullNames: make(map[*types.Func]string),
+		aliases:   make(map[*types.Func]*semanticFunction),
+	}
+}
+
+func (m *modelLateMemo) loadFullName(fn *types.Func) (string, bool) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	fullName, ok := m.fullNames[fn]
+	return fullName, ok
+}
+
+func (m *modelLateMemo) storeFullName(fn *types.Func, fullName string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.fullNames[fn] = fullName
+}
+
+func (m *modelLateMemo) loadAlias(fn *types.Func) (*semanticFunction, bool) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	semFn, ok := m.aliases[fn]
+	return semFn, ok
+}
+
+func (m *modelLateMemo) storeAlias(fn *types.Func, semFn *semanticFunction) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.aliases[fn] = semFn
 }
