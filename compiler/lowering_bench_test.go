@@ -86,6 +86,7 @@ func BenchmarkLoweringFile(b *testing.B) {
 			fixture.file.sourcePath,
 			fixture.file.declFiles,
 			fixture.file.outputNames,
+			buildPackageMethodIndex(fixture.semPkg),
 			fixture.file.lazyPackageVars,
 			fixture.lazyPackageVarsByPkg,
 			make(map[*types.Func]bool),
@@ -180,12 +181,14 @@ func newLoweringBenchFixture(tb testing.TB) *loweringBenchFixture {
 	lazyPackageVarsByPkg := make(map[string]map[types.Object]bool)
 	lazyPackageVars := owner.packageLazyVars(semPkg, lazyPackageVarsByPkg, declFiles)
 
+	methodIndex := buildPackageMethodIndex(semPkg)
+
 	var benchFile loweringBenchFile
 	var genDecls []loweringBenchGenDecl
 	var stmtLists []loweringBenchStmtList
 	for idx, file := range semPkg.source.Syntax {
 		sourcePath := sourceFilePath(semPkg, idx, file)
-		associated := owner.methodDeclsForFileTypes(semPkg, file)
+		associated := owner.methodDeclsForFileTypes(semPkg, file, methodIndex)
 		localRefs := owner.analyzeLocalFileReferences(semPkg, file, sourcePath, associated, declFiles, outputNames, make(runtimeMethodSetCache))
 		ctx := lowerFileContext{
 			model:                model,

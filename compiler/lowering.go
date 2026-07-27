@@ -134,6 +134,7 @@ func (o *LoweringOwner) lowerPackage(
 	for sourcePath, binding := range protobufBindings {
 		outputNames[sourcePath] = binding.outputName
 	}
+	methodIndex := buildPackageMethodIndex(semPkg)
 	lazyPackageVars := o.packageLazyVars(semPkg, lazyPackageVarsByPkg, declFiles)
 	diagnostics := append([]Diagnostic(nil), bindingDiagnostics...)
 	for idx, file := range semPkg.source.Syntax {
@@ -155,6 +156,7 @@ func (o *LoweringOwner) lowerPackage(
 				sourcePath,
 				declFiles,
 				outputNames,
+				methodIndex,
 				lazyPackageVars,
 				lazyPackageVarsByPkg,
 				asyncLazyFunctionCache,
@@ -178,6 +180,7 @@ func (o *LoweringOwner) lowerPackage(
 			sourcePath,
 			declFiles,
 			outputNames,
+			methodIndex,
 			lazyPackageVars,
 			lazyPackageVarsByPkg,
 			asyncLazyFunctionCache,
@@ -217,6 +220,7 @@ func (o *LoweringOwner) lowerFile(
 	sourcePath string,
 	declFiles map[types.Object]string,
 	outputNames map[string]string,
+	methodIndex packageMethodIndex,
 	lazyPackageVars map[types.Object]bool,
 	lazyPackageVarsByPkg map[string]map[types.Object]bool,
 	asyncLazyFunctionCache map[*types.Func]bool,
@@ -226,7 +230,7 @@ func (o *LoweringOwner) lowerFile(
 	trimTypeInfo bool,
 	displayRoot string,
 ) (*loweredFile, []Diagnostic) {
-	associatedMethods := o.methodDeclsForFileTypes(semPkg, file)
+	associatedMethods := o.methodDeclsForFileTypes(semPkg, file, methodIndex)
 	relevantImportFiles := map[string]bool{sourcePath: true}
 	for _, methodDecl := range associatedMethods {
 		methodPath := sourcePos(semPkg.source, methodDecl.Pos()).file
@@ -541,7 +545,7 @@ func uniqueImportAlias(alias string, pkgPath string, importAliases map[string]st
 	}
 }
 
-func (o *LoweringOwner) methodDeclsForFileTypes(semPkg *semanticPackage, file *ast.File) []*ast.FuncDecl {
+func (o *LoweringOwner) methodDeclsForFileTypes(semPkg *semanticPackage, file *ast.File, methodIndex packageMethodIndex) []*ast.FuncDecl {
 	if semPkg == nil || semPkg.source == nil || file == nil {
 		return nil
 	}
@@ -569,7 +573,43 @@ func (o *LoweringOwner) methodDeclsForFileTypes(semPkg *semanticPackage, file *a
 	if len(fileTypes) == 0 {
 		return nil
 	}
-	var methods []*ast.FuncDecl
+	var indexed []indexedMethodDecl
+	for named := range fileTypes {
+		indexed = append(indexed, methodIndex[named]...)
+	}
+	if len(indexed) == 0 {
+		return nil
+	}
+	// The index groups methods by receiver, so restore the package-wide
+	// declaration order the caller relies on.
+	slices.SortFunc(indexed, func(a, b indexedMethodDecl) int {
+		return cmp.Compare(a.order, b.order)
+	})
+	methods := make([]*ast.FuncDecl, len(indexed))
+	for idx, entry := range indexed {
+		methods[idx] = entry.decl
+	}
+	return methods
+}
+
+// indexedMethodDecl keeps a method declaration alongside its position in the
+// package-wide declaration order.
+type indexedMethodDecl struct {
+	order int
+	decl  *ast.FuncDecl
+}
+
+// packageMethodIndex maps a receiver type to its method declarations. Building
+// it once per package keeps method lookup linear in the package size instead of
+// rescanning every declaration for every file.
+type packageMethodIndex map[*types.Named][]indexedMethodDecl
+
+func buildPackageMethodIndex(semPkg *semanticPackage) packageMethodIndex {
+	index := make(packageMethodIndex)
+	if semPkg == nil || semPkg.source == nil {
+		return index
+	}
+	order := 0
 	for _, syntax := range semPkg.source.Syntax {
 		for _, decl := range syntax.Decls {
 			funcDecl, ok := decl.(*ast.FuncDecl)
@@ -585,12 +625,15 @@ func (o *LoweringOwner) methodDeclsForFileTypes(semPkg *semanticPackage, file *a
 				continue
 			}
 			receiver := receiverNamedType(signature.Recv().Type())
-			if receiver != nil && fileTypes[receiver.Origin()] {
-				methods = append(methods, funcDecl)
+			if receiver == nil {
+				continue
 			}
+			origin := receiver.Origin()
+			index[origin] = append(index[origin], indexedMethodDecl{order: order, decl: funcDecl})
+			order++
 		}
 	}
-	return methods
+	return index
 }
 
 type localFileReferenceAnalysis struct {
