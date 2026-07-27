@@ -13,7 +13,7 @@ type loweringBenchFixture struct {
 	model                *SemanticModel
 	owner                *LoweringOwner
 	semPkg               *semanticPackage
-	lazyPackageVarsByPkg map[string]map[types.Object]bool
+	lazyPackageVarsByPkg *lazyPackageVarCache
 	file                 loweringBenchFile
 	genDecls             []loweringBenchGenDecl
 	stmtLists            []loweringBenchStmtList
@@ -46,10 +46,9 @@ func BenchmarkLoweringPackage(b *testing.B) {
 		if _, diagnostics := fixture.owner.lowerPackage(
 			fixture.model,
 			fixture.semPkg,
-			make(map[string]map[types.Object]bool),
-			make(map[*types.Func]bool),
-			make(map[*types.Func]bool),
-			make(runtimeMethodSetCache),
+			newLazyPackageVarCache(0),
+			newAsyncLazyState(newAsyncLazyCache()),
+			newRuntimeMethodSetCache(),
 			LoweringOptions{},
 		); diagnosticsHaveErrors(diagnostics) {
 			b.Fatal(diagnostics)
@@ -69,7 +68,7 @@ func BenchmarkLoweringAnalyzeLocalFileReferences(b *testing.B) {
 			fixture.file.associated,
 			fixture.file.declFiles,
 			fixture.file.outputNames,
-			make(runtimeMethodSetCache),
+			newRuntimeMethodSetCache(),
 		)
 	}
 }
@@ -89,9 +88,8 @@ func BenchmarkLoweringFile(b *testing.B) {
 			buildPackageMethodIndex(fixture.semPkg),
 			fixture.file.lazyPackageVars,
 			fixture.lazyPackageVarsByPkg,
-			make(map[*types.Func]bool),
-			make(map[*types.Func]bool),
-			make(runtimeMethodSetCache),
+			newAsyncLazyState(newAsyncLazyCache()),
+			newRuntimeMethodSetCache(),
 			false,
 			false,
 			"",
@@ -178,7 +176,7 @@ func newLoweringBenchFixture(tb testing.TB) *loweringBenchFixture {
 	owner := service.LoweringOwner()
 	declFiles := packageDeclFiles(semPkg)
 	outputNames := packageOutputNames(semPkg)
-	lazyPackageVarsByPkg := make(map[string]map[types.Object]bool)
+	lazyPackageVarsByPkg := newLazyPackageVarCache(0)
 	lazyPackageVars := owner.packageLazyVars(semPkg, lazyPackageVarsByPkg, declFiles)
 
 	methodIndex := buildPackageMethodIndex(semPkg)
@@ -189,7 +187,7 @@ func newLoweringBenchFixture(tb testing.TB) *loweringBenchFixture {
 	for idx, file := range semPkg.source.Syntax {
 		sourcePath := sourceFilePath(semPkg, idx, file)
 		associated := owner.methodDeclsForFileTypes(semPkg, file, methodIndex)
-		localRefs := owner.analyzeLocalFileReferences(semPkg, file, sourcePath, associated, declFiles, outputNames, make(runtimeMethodSetCache))
+		localRefs := owner.analyzeLocalFileReferences(semPkg, file, sourcePath, associated, declFiles, outputNames, newRuntimeMethodSetCache())
 		ctx := lowerFileContext{
 			model:                model,
 			semPkg:               semPkg,

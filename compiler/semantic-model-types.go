@@ -2,20 +2,24 @@ package compiler
 
 import (
 	"go/types"
+	"sync"
 
 	"golang.org/x/tools/go/packages"
 )
 
 // SemanticModel is the immutable compiler semantic surface consumed by lowering.
 type SemanticModel struct {
-	packages                 map[string]*semanticPackage
-	addressTaken             map[types.Object]bool
-	needsVarRef              map[types.Object]bool
-	functions                map[*types.Func]*semanticFunction
-	functionCallers          map[*types.Func][]*semanticFunction
-	functionsByFullName      map[string]*semanticFunction
-	functionLookupMisses     map[*types.Func]bool
-	functionFullNames        map[*types.Func]string
+	packages            map[string]*semanticPackage
+	addressTaken        map[types.Object]bool
+	needsVarRef         map[types.Object]bool
+	functions           map[*types.Func]*semanticFunction
+	functionCallers     map[*types.Func][]*semanticFunction
+	functionsByFullName map[string]*semanticFunction
+	// functionFullNames and functionAliases memoize lookups that lowering
+	// performs concurrently. Both derive their value from the key alone, so a
+	// racing store writes the same answer.
+	functionFullNames        sync.Map
+	functionAliases          sync.Map
 	types                    map[*types.Named]*semanticType
 	values                   map[types.Object]*semanticValue
 	generatedImports         map[string]map[string]bool

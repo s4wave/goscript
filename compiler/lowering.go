@@ -12,10 +12,14 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 	"unicode/utf8"
+
+	"golang.org/x/sync/errgroup"
 
 	"golang.org/x/tools/go/packages"
 )
@@ -77,10 +81,9 @@ func (o *LoweringOwner) Build(ctx context.Context, model *SemanticModel, opts ..
 	}
 
 	program := &LoweredProgram{trimTypeInfo: options.TrimTypeInfo}
-	lazyPackageVars := make(map[string]map[types.Object]bool, len(model.packages))
-	asyncLazyFunctionCache := make(map[*types.Func]bool)
-	asyncLazyFunctionVisiting := make(map[*types.Func]bool)
-	runtimeMethodSets := make(runtimeMethodSetCache)
+	lazyPackageVars := newLazyPackageVarCache(len(model.packages))
+	asyncLazyCache := newAsyncLazyCache()
+	runtimeMethodSets := newRuntimeMethodSetCache()
 	semPkgs := make([]*semanticPackage, 0, len(model.packages))
 	for _, semPkg := range model.packages {
 		semPkgs = append(semPkgs, semPkg)
@@ -89,24 +92,52 @@ func (o *LoweringOwner) Build(ctx context.Context, model *SemanticModel, opts ..
 		return cmp.Compare(a.pkgPath, b.pkgPath)
 	})
 
-	var diagnostics []Diagnostic
-	for _, semPkg := range semPkgs {
+	// Lowering reads the semantic model without changing it and writes only
+	// into the per-package result below, so packages lower independently. Each
+	// worker keeps its own call-graph traversal state and shares only the
+	// caches above, which are guarded and hold entry-independent answers.
+	// Results are collected by index and assembled in sorted package order
+	// afterwards, so diagnostics and emitted packages stay deterministic.
+	type packageResult struct {
+		pkg         *loweredPackage
+		diagnostics []Diagnostic
+	}
+	results := make([]packageResult, len(semPkgs))
+	group := errgroup.Group{}
+	group.SetLimit(runtime.GOMAXPROCS(0))
+	for idx, semPkg := range semPkgs {
 		if semPkg.source == nil {
-			diagnostics = append(diagnostics, loweringUnsupported("package", semPkg.pkgPath, "missing semantic source package"))
+			results[idx].diagnostics = []Diagnostic{
+				loweringUnsupported("package", semPkg.pkgPath, "missing semantic source package"),
+			}
 			continue
 		}
-		loweredPkg, pkgDiagnostics := o.lowerPackage(
-			model,
-			semPkg,
-			lazyPackageVars,
-			asyncLazyFunctionCache,
-			asyncLazyFunctionVisiting,
-			runtimeMethodSets,
-			options,
-		)
-		diagnostics = append(diagnostics, pkgDiagnostics...)
-		if loweredPkg != nil {
-			program.packages = append(program.packages, loweredPkg)
+		group.Go(func() error {
+			loweredPkg, pkgDiagnostics := o.lowerPackage(
+				model,
+				semPkg,
+				lazyPackageVars,
+				newAsyncLazyState(asyncLazyCache),
+				runtimeMethodSets,
+				options,
+			)
+			results[idx] = packageResult{pkg: loweredPkg, diagnostics: pkgDiagnostics}
+			return nil
+		})
+	}
+	if err := group.Wait(); err != nil {
+		return nil, []Diagnostic{{
+			Severity: DiagnosticSeverityError,
+			Code:     "goscript/lowering:failed",
+			Message:  err.Error(),
+		}}
+	}
+
+	var diagnostics []Diagnostic
+	for _, result := range results {
+		diagnostics = append(diagnostics, result.diagnostics...)
+		if result.pkg != nil {
+			program.packages = append(program.packages, result.pkg)
 		}
 	}
 	if diagnosticsHaveErrors(diagnostics) {
@@ -118,10 +149,9 @@ func (o *LoweringOwner) Build(ctx context.Context, model *SemanticModel, opts ..
 func (o *LoweringOwner) lowerPackage(
 	model *SemanticModel,
 	semPkg *semanticPackage,
-	lazyPackageVarsByPkg map[string]map[types.Object]bool,
-	asyncLazyFunctionCache map[*types.Func]bool,
-	asyncLazyFunctionVisiting map[*types.Func]bool,
-	runtimeMethodSets runtimeMethodSetCache,
+	lazyPackageVarsByPkg *lazyPackageVarCache,
+	asyncLazy *asyncLazyState,
+	runtimeMethodSets *runtimeMethodSetCache,
 	options LoweringOptions,
 ) (*loweredPackage, []Diagnostic) {
 	loweredPkg := &loweredPackage{
@@ -159,8 +189,7 @@ func (o *LoweringOwner) lowerPackage(
 				methodIndex,
 				lazyPackageVars,
 				lazyPackageVarsByPkg,
-				asyncLazyFunctionCache,
-				asyncLazyFunctionVisiting,
+				asyncLazy,
 				runtimeMethodSets,
 				protobufAdapter,
 				options.TrimTypeInfo,
@@ -183,8 +212,7 @@ func (o *LoweringOwner) lowerPackage(
 			methodIndex,
 			lazyPackageVars,
 			lazyPackageVarsByPkg,
-			asyncLazyFunctionCache,
-			asyncLazyFunctionVisiting,
+			asyncLazy,
 			runtimeMethodSets,
 			false,
 			options.TrimTypeInfo,
@@ -222,10 +250,9 @@ func (o *LoweringOwner) lowerFile(
 	outputNames map[string]string,
 	methodIndex packageMethodIndex,
 	lazyPackageVars map[types.Object]bool,
-	lazyPackageVarsByPkg map[string]map[types.Object]bool,
-	asyncLazyFunctionCache map[*types.Func]bool,
-	asyncLazyFunctionVisiting map[*types.Func]bool,
-	runtimeMethodSets runtimeMethodSetCache,
+	lazyPackageVarsByPkg *lazyPackageVarCache,
+	asyncLazy *asyncLazyState,
+	runtimeMethodSets *runtimeMethodSetCache,
 	protobufTypeScriptAdapter bool,
 	trimTypeInfo bool,
 	displayRoot string,
@@ -378,24 +405,23 @@ func (o *LoweringOwner) lowerFile(
 	loweredFile.imports = append(loweredFile.imports, localImports...)
 
 	ctx := lowerFileContext{
-		model:                     model,
-		semPkg:                    semPkg,
-		file:                      file,
-		importAliases:             importAliases,
-		importPaths:               importPaths,
-		importNames:               importNames,
-		importObjects:             importObjects,
-		sourcePath:                sourcePath,
-		localAliases:              localRefs.aliases,
-		lazyPackageVars:           lazyPackageVars,
-		lazyPackageVarsByPkg:      lazyPackageVarsByPkg,
-		asyncLazyFunctionCache:    asyncLazyFunctionCache,
-		asyncLazyFunctionVisiting: asyncLazyFunctionVisiting,
-		tempNames:                 newTempNameOwner(),
-		topLevel:                  true,
-		protobufTSAdapter:         protobufTypeScriptAdapter,
-		trimTypeInfo:              trimTypeInfo,
-		displayRoot:               displayRoot,
+		model:                model,
+		semPkg:               semPkg,
+		file:                 file,
+		importAliases:        importAliases,
+		importPaths:          importPaths,
+		importNames:          importNames,
+		importObjects:        importObjects,
+		sourcePath:           sourcePath,
+		localAliases:         localRefs.aliases,
+		lazyPackageVars:      lazyPackageVars,
+		lazyPackageVarsByPkg: lazyPackageVarsByPkg,
+		asyncLazy:            asyncLazy,
+		tempNames:            newTempNameOwner(),
+		topLevel:             true,
+		protobufTSAdapter:    protobufTypeScriptAdapter,
+		trimTypeInfo:         trimTypeInfo,
+		displayRoot:          displayRoot,
 	}
 	var diagnostics []Diagnostic
 	var packageInitCalls []string
@@ -645,13 +671,26 @@ type localFileReferenceAnalysis struct {
 	implicitRuntime map[string]bool
 }
 
-type runtimeMethodSetCache map[*types.Named][]types.Object
+// runtimeMethodSetCache memoizes each named type's runtime method set. The set
+// is a function of the type alone, so packages lowered concurrently share one
+// cache. go/types resolves a named type lazily, which mutates it, so the lock
+// covers the computation and not just the map.
+type runtimeMethodSetCache struct {
+	mu      sync.Mutex
+	methods map[*types.Named][]types.Object
+}
 
-func (c runtimeMethodSetCache) methods(named *types.Named) []types.Object {
+func newRuntimeMethodSetCache() *runtimeMethodSetCache {
+	return &runtimeMethodSetCache{methods: make(map[*types.Named][]types.Object)}
+}
+
+func (c *runtimeMethodSetCache) methodsFor(named *types.Named) []types.Object {
 	if named == nil {
 		return nil
 	}
-	if methods, ok := c[named]; ok {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if methods, ok := c.methods[named]; ok {
 		return methods
 	}
 	methodSet := types.NewMethodSet(types.NewPointer(named))
@@ -659,7 +698,7 @@ func (c runtimeMethodSetCache) methods(named *types.Named) []types.Object {
 	for method := range methodSet.Methods() {
 		methods = append(methods, method.Obj())
 	}
-	c[named] = methods
+	c.methods[named] = methods
 	return methods
 }
 
@@ -670,7 +709,7 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 	associatedMethods []*ast.FuncDecl,
 	declFiles map[types.Object]string,
 	outputNames map[string]string,
-	runtimeMethodSets runtimeMethodSetCache,
+	runtimeMethodSets *runtimeMethodSetCache,
 ) localFileReferenceAnalysis {
 	analysis := localFileReferenceAnalysis{
 		reservedNames:   make(map[string]bool),
@@ -870,7 +909,7 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 			for method := range named.Methods() {
 				addObject(method, true)
 			}
-			for _, method := range runtimeMethodSets.methods(named) {
+			for _, method := range runtimeMethodSets.methodsFor(named) {
 				addObject(method, true)
 			}
 			if args := named.TypeArgs(); args != nil {
@@ -1219,9 +1258,8 @@ type lowerFileContext struct {
 	sourcePath                    string
 	localAliases                  map[types.Object]string
 	lazyPackageVars               map[types.Object]bool
-	lazyPackageVarsByPkg          map[string]map[types.Object]bool
-	asyncLazyFunctionCache        map[*types.Func]bool
-	asyncLazyFunctionVisiting     map[*types.Func]bool
+	lazyPackageVarsByPkg          *lazyPackageVarCache
+	asyncLazy                     *asyncLazyState
 	identAliases                  map[types.Object]string
 	identAliasRefs                map[types.Object]bool
 	tempNames                     *tempNameOwner
@@ -1732,7 +1770,7 @@ func packageOutputNames(semPkg *semanticPackage) map[string]string {
 
 func (o *LoweringOwner) packageLazyVars(
 	semPkg *semanticPackage,
-	cache map[string]map[types.Object]bool,
+	cache *lazyPackageVarCache,
 	declFiles map[types.Object]string,
 ) map[types.Object]bool {
 	if semPkg == nil {
@@ -1744,15 +1782,41 @@ func (o *LoweringOwner) packageLazyVars(
 		}
 		return o.lazyPackageVars(semPkg, declFiles)
 	}
-	if lazy, ok := cache[semPkg.pkgPath]; ok {
+	if lazy, ok := cache.load(semPkg.pkgPath); ok {
 		return lazy
 	}
 	if declFiles == nil {
 		declFiles = packageDeclFiles(semPkg)
 	}
 	lazy := o.lazyPackageVars(semPkg, declFiles)
-	cache[semPkg.pkgPath] = lazy
+	cache.store(semPkg.pkgPath, lazy)
 	return lazy
+}
+
+// lazyPackageVarCache memoizes which of a package's variables are initialized
+// lazily. The answer depends only on that package's own syntax and
+// initialization order, never on which package is being lowered, so packages
+// lowered concurrently share one cache.
+type lazyPackageVarCache struct {
+	mu    sync.Mutex
+	byPkg map[string]map[types.Object]bool
+}
+
+func newLazyPackageVarCache(size int) *lazyPackageVarCache {
+	return &lazyPackageVarCache{byPkg: make(map[string]map[types.Object]bool, size)}
+}
+
+func (c *lazyPackageVarCache) load(pkgPath string) (map[types.Object]bool, bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	lazy, ok := c.byPkg[pkgPath]
+	return lazy, ok
+}
+
+func (c *lazyPackageVarCache) store(pkgPath string, lazy map[types.Object]bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.byPkg[pkgPath] = lazy
 }
 
 func (o *LoweringOwner) lazyPackageVars(semPkg *semanticPackage, declFiles map[types.Object]string) map[types.Object]bool {
@@ -1968,12 +2032,11 @@ func (o *LoweringOwner) packageVarNameHasAsyncLazyInit(ctx lowerFileContext, pkg
 		return false
 	}
 	initCtx := lowerFileContext{
-		model:                     ctx.model,
-		semPkg:                    semPkg,
-		lazyPackageVarsByPkg:      ctx.lazyPackageVarsByPkg,
-		asyncLazyFunctionCache:    ctx.asyncLazyFunctionCache,
-		asyncLazyFunctionVisiting: ctx.asyncLazyFunctionVisiting,
-		topLevel:                  true,
+		model:                ctx.model,
+		semPkg:               semPkg,
+		lazyPackageVarsByPkg: ctx.lazyPackageVarsByPkg,
+		asyncLazy:            ctx.asyncLazy,
+		topLevel:             true,
 	}
 	for _, file := range semPkg.source.Syntax {
 		for _, decl := range file.Decls {
@@ -13390,6 +13453,61 @@ func (o *LoweringOwner) functionAsync(ctx lowerFileContext, fn *types.Func) bool
 	return o.functionReferencesAsyncLazyPackageVar(ctx, fn, make(map[*types.Func]bool))
 }
 
+// asyncLazyState carries one traversal of the call graph looking for async lazy
+// package variables, plus the answers it has proven along the way.
+//
+// The call graph contains cycles, so a back edge has to assume an answer for a
+// function that is still being computed. Any result resting on that assumption
+// depends on where the traversal happened to start, and memoizing it would let
+// one entry point poison the answer a later query receives. Each frame
+// therefore tracks the shallowest back edge reached anywhere in its subtree,
+// the lowlink of Tarjan's algorithm, and only a frame that no back edge escaped
+// has an answer worth keeping.
+type asyncLazyState struct {
+	// cache holds proven answers and is shared by every traversal, because the
+	// underlying question is reachability in the call graph and so does not
+	// depend on where a traversal started.
+	cache *asyncLazyCache
+	// visiting maps each function on this traversal's stack to its frame depth,
+	// and belongs to the traversal alone.
+	visiting map[*types.Func]int
+	depth    int
+	lowlink  int
+}
+
+// asyncLazyCache holds the proven answers shared across concurrently lowered
+// packages. Only results that no back edge escaped are stored, so every entry
+// is the true reachability answer and readers cannot observe a value that
+// depended on another traversal's entry point.
+type asyncLazyCache struct {
+	mu     sync.Mutex
+	result map[*types.Func]bool
+}
+
+func newAsyncLazyCache() *asyncLazyCache {
+	return &asyncLazyCache{result: make(map[*types.Func]bool)}
+}
+
+func (c *asyncLazyCache) load(fn *types.Func) (bool, bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	cached, ok := c.result[fn]
+	return cached, ok
+}
+
+func (c *asyncLazyCache) store(fn *types.Func, references bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.result[fn] = references
+}
+
+func newAsyncLazyState(cache *asyncLazyCache) *asyncLazyState {
+	return &asyncLazyState{
+		cache:    cache,
+		visiting: make(map[*types.Func]int),
+	}
+}
+
 func (o *LoweringOwner) functionReferencesAsyncLazyPackageVar(
 	ctx lowerFileContext,
 	fn *types.Func,
@@ -13399,27 +13517,55 @@ func (o *LoweringOwner) functionReferencesAsyncLazyPackageVar(
 	if fn == nil || ctx.model == nil {
 		return false
 	}
-	if cached, ok := ctx.asyncLazyFunctionCache[fn]; ok {
-		return cached
-	}
-	if ctx.asyncLazyFunctionVisiting != nil {
-		if ctx.asyncLazyFunctionVisiting[fn] {
-			return false
-		}
-		ctx.asyncLazyFunctionVisiting[fn] = true
-		defer delete(ctx.asyncLazyFunctionVisiting, fn)
-	} else {
+	state := ctx.asyncLazy
+	if state == nil {
 		if seen[fn] {
 			return false
 		}
 		seen[fn] = true
+		return o.walkAsyncLazyFunctionBody(ctx, fn, seen)
 	}
-	references := false
-	defer func() {
-		if ctx.asyncLazyFunctionCache != nil {
-			ctx.asyncLazyFunctionCache[fn] = references
-		}
-	}()
+	if cached, ok := state.cache.load(fn); ok {
+		return cached
+	}
+	if depth, ok := state.visiting[fn]; ok {
+		// A back edge: fn is still being answered further up the stack, so
+		// assume false to break the cycle. Record how shallow the edge
+		// reached, because every frame from here up to that depth is now
+		// resting on the assumption.
+		state.lowlink = min(state.lowlink, depth)
+		return false
+	}
+
+	state.depth++
+	frameDepth := state.depth
+	state.visiting[fn] = frameDepth
+	parentLowlink := state.lowlink
+	state.lowlink = frameDepth
+
+	references := o.walkAsyncLazyFunctionBody(ctx, fn, seen)
+
+	frameLowlink := state.lowlink
+	delete(state.visiting, fn)
+	state.depth--
+	if frameLowlink >= frameDepth {
+		// No back edge escaped this frame, so nothing it assumed is still
+		// pending and the answer no longer depends on where the traversal
+		// started. Only then is it safe to memoize.
+		state.cache.store(fn, references)
+	}
+	state.lowlink = min(parentLowlink, frameLowlink)
+	return references
+}
+
+// walkAsyncLazyFunctionBody reports whether fn's own body reaches an async lazy
+// package variable, either directly or through a call. Cycle handling and
+// memoization belong to the caller.
+func (o *LoweringOwner) walkAsyncLazyFunctionBody(
+	ctx lowerFileContext,
+	fn *types.Func,
+	seen map[*types.Func]bool,
+) bool {
 	if fn.Pkg() == nil {
 		return false
 	}
@@ -13432,13 +13578,13 @@ func (o *LoweringOwner) functionReferencesAsyncLazyPackageVar(
 		return false
 	}
 	analysisCtx := lowerFileContext{
-		model:                     ctx.model,
-		semPkg:                    semPkg,
-		lazyPackageVarsByPkg:      ctx.lazyPackageVarsByPkg,
-		asyncLazyFunctionCache:    ctx.asyncLazyFunctionCache,
-		asyncLazyFunctionVisiting: ctx.asyncLazyFunctionVisiting,
-		topLevel:                  true,
+		model:                ctx.model,
+		semPkg:               semPkg,
+		lazyPackageVarsByPkg: ctx.lazyPackageVarsByPkg,
+		asyncLazy:            ctx.asyncLazy,
+		topLevel:             true,
 	}
+	references := false
 	ast.Inspect(decl.Body, func(node ast.Node) bool {
 		if references {
 			return false

@@ -144,8 +144,6 @@ func newSemanticModel() *SemanticModel {
 		functions:                make(map[*types.Func]*semanticFunction),
 		functionCallers:          make(map[*types.Func][]*semanticFunction),
 		functionsByFullName:      make(map[string]*semanticFunction),
-		functionLookupMisses:     make(map[*types.Func]bool),
-		functionFullNames:        make(map[*types.Func]string),
 		types:                    make(map[*types.Named]*semanticType),
 		values:                   make(map[types.Object]*semanticValue),
 		generatedImports:         make(map[string]map[string]bool),
@@ -1083,23 +1081,30 @@ func semanticFunctionFor(model *SemanticModel, fn *types.Func) *semanticFunction
 	if semFn := model.functions[fn]; semFn != nil {
 		return semFn
 	}
+	// functions is fully populated while the model is built and stays read-only
+	// afterwards, so anything resolved from here on lands in an overlay that
+	// packages lowered concurrently can share. The result is derived only from
+	// fn, so whichever goroutine stores it first stores the same answer.
+	if cached, ok := model.functionAliases.Load(fn); ok {
+		semFn, _ := cached.(*semanticFunction)
+		return semFn
+	}
+	var resolved *semanticFunction
 	if origin := fn.Origin(); origin != nil {
-		if semFn := model.functions[origin]; semFn != nil {
-			model.functions[fn] = semFn
-			return semFn
+		resolved = model.functions[origin]
+	}
+	if resolved == nil {
+		if fullName := model.functionFullName(fn); fullName != "" {
+			resolved = model.functionsByFullName[fullName]
 		}
 	}
-	if fullName := model.functionFullName(fn); fullName != "" {
-		if semFn := model.functionsByFullName[fullName]; semFn != nil {
-			model.functions[fn] = semFn
-			return semFn
-		}
-	}
-	if model.functionLookupMisses[fn] {
+	if resolved == nil {
+		// A miss stays uncached: a function that is not indexed yet may be
+		// added later, and a later lookup has to find it.
 		return nil
 	}
-	model.functionLookupMisses[fn] = true
-	return nil
+	model.functionAliases.Store(fn, resolved)
+	return resolved
 }
 
 func calledFunction(pkg *packages.Package, expr ast.Expr) *types.Func {
@@ -1822,20 +1827,20 @@ func (m *SemanticModel) functionFullName(fn *types.Func) string {
 		return ""
 	}
 	original := fn
-	if fullName, ok := m.functionFullNames[original]; ok {
-		return fullName
+	if cached, ok := m.functionFullNames.Load(original); ok {
+		return cached.(string)
 	}
 	if origin := fn.Origin(); origin != nil && origin != fn {
-		if fullName, ok := m.functionFullNames[origin]; ok {
-			m.functionFullNames[original] = fullName
-			return fullName
+		if cached, ok := m.functionFullNames.Load(origin); ok {
+			m.functionFullNames.Store(original, cached)
+			return cached.(string)
 		}
 		fn = origin
 	}
 	fullName := fn.FullName()
-	m.functionFullNames[fn] = fullName
+	m.functionFullNames.Store(fn, fullName)
 	if original != fn {
-		m.functionFullNames[original] = fullName
+		m.functionFullNames.Store(original, fullName)
 	}
 	return fullName
 }
