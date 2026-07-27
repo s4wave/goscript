@@ -115,9 +115,17 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph) (*S
 		return model, diagnostics
 	}
 	o.applyUnknownInterfaceAsyncMethods(model, interfaceGraph, anonymousInterfaceGraph)
+	interfaceAsyncMarks, markDiagnostics := o.buildInterfaceAsyncMarks(ctx, model, interfaceGraph)
+	diagnostics = append(diagnostics, markDiagnostics...)
+	if diagnosticsHaveErrors(diagnostics) {
+		model.freeze()
+		return model, diagnostics
+	}
 	for {
 		asyncCount := semanticAsyncFunctionCount(model)
-		diagnostics = append(diagnostics, o.applyInterfaceAsyncMethods(ctx, model, interfaceGraph)...)
+		var applyDiagnostics []Diagnostic
+		interfaceAsyncMarks, applyDiagnostics = o.applyInterfaceAsyncMethods(ctx, model, interfaceAsyncMarks)
+		diagnostics = append(diagnostics, applyDiagnostics...)
 		if diagnosticsHaveErrors(diagnostics) {
 			model.freeze()
 			return model, diagnostics
@@ -1622,42 +1630,72 @@ func (o *SemanticModelOwner) applyUnknownInterfaceAsyncMethods(
 	}
 }
 
-func (o *SemanticModelOwner) applyInterfaceAsyncMethods(
+// interfaceAsyncMark is one interface method waiting on its implementation to
+// become async. The async coloring loop reruns until it reaches a fixpoint, and
+// the pairs it has to consider never change, so they are flattened once here
+// instead of rewalking the whole implementation graph on every pass.
+type interfaceAsyncMark struct {
+	ifaceMethod *types.Func
+	implFn      *semanticFunction
+}
+
+// buildInterfaceAsyncMarks records the implementation graph on the model and
+// returns the interface methods whose async coloring is still undecided.
+func (o *SemanticModelOwner) buildInterfaceAsyncMarks(
 	ctx context.Context,
 	model *SemanticModel,
 	interfaceGraph []semanticInterfaceImplementationGraphEntry,
-) []Diagnostic {
-	if cap(model.interfaceImplementations) < len(interfaceGraph) {
-		model.interfaceImplementations = make([]semanticInterfaceImplementation, 0, len(interfaceGraph))
-	} else {
-		model.interfaceImplementations = model.interfaceImplementations[:0]
-	}
+) ([]interfaceAsyncMark, []Diagnostic) {
+	model.interfaceImplementations = make([]semanticInterfaceImplementation, 0, len(interfaceGraph))
+	var marks []interfaceAsyncMark
 	for _, graphEntry := range interfaceGraph {
 		if err := ctx.Err(); err != nil {
-			return []Diagnostic{contextCanceledDiagnostic(err)}
-		}
-		implementation := semanticInterfaceImplementation{
-			typ:     graphEntry.typ,
-			iface:   graphEntry.iface,
-			pointer: graphEntry.pointer,
+			return nil, []Diagnostic{contextCanceledDiagnostic(err)}
 		}
 		for methodName, ifaceMethod := range graphEntry.ifaceMethods {
 			implMethod := graphEntry.implMethods[methodName]
 			if isSyncErrorMethodFunc(ifaceMethod) || isSyncErrorMethodFunc(implMethod) {
 				continue
 			}
-			implFn := semanticFunctionFor(model, implMethod)
-			if implFn != nil && implFn.async {
-				model.markInterfaceMethodAsync(ifaceMethod)
-				if ifaceFn := semanticFunctionFor(model, ifaceMethod); ifaceFn != nil {
-					markFunctionAsync(ifaceFn, "interface-implementation")
-				}
-				markFunctionAsync(implFn, "interface-method")
+			// A pair with no semantic implementation can never fire, so it is
+			// dropped here rather than resolved again on every pass.
+			if implFn := semanticFunctionFor(model, implMethod); implFn != nil {
+				marks = append(marks, interfaceAsyncMark{ifaceMethod: ifaceMethod, implFn: implFn})
 			}
 		}
-		model.interfaceImplementations = append(model.interfaceImplementations, implementation)
+		model.interfaceImplementations = append(model.interfaceImplementations, semanticInterfaceImplementation{
+			typ:     graphEntry.typ,
+			iface:   graphEntry.iface,
+			pointer: graphEntry.pointer,
+		})
 	}
-	return nil
+	return marks, nil
+}
+
+// applyInterfaceAsyncMethods colors the interface methods whose implementation
+// is now async and returns the marks still waiting. Async coloring only ever
+// adds, so a mark that fires is done and drops out of every later pass.
+func (o *SemanticModelOwner) applyInterfaceAsyncMethods(
+	ctx context.Context,
+	model *SemanticModel,
+	marks []interfaceAsyncMark,
+) ([]interfaceAsyncMark, []Diagnostic) {
+	pending := marks[:0]
+	for _, mark := range marks {
+		if err := ctx.Err(); err != nil {
+			return nil, []Diagnostic{contextCanceledDiagnostic(err)}
+		}
+		if !mark.implFn.async {
+			pending = append(pending, mark)
+			continue
+		}
+		model.markInterfaceMethodAsync(mark.ifaceMethod)
+		if ifaceFn := semanticFunctionFor(model, mark.ifaceMethod); ifaceFn != nil {
+			markFunctionAsync(ifaceFn, "interface-implementation")
+		}
+		markFunctionAsync(mark.implFn, "interface-method")
+	}
+	return pending, nil
 }
 
 func (o *SemanticModelOwner) applyAnonymousInterfaceAsyncMethods(
