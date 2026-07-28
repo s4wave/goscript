@@ -76,7 +76,8 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph) (*S
 	}
 
 	model.functionCallers = semanticFunctionCallers(model)
-	diagnostics = append(diagnostics, o.propagateFunctionAsync(ctx, model)...)
+	propagatedCallers := make(map[*types.Func]bool)
+	diagnostics = append(diagnostics, o.propagateFunctionAsync(ctx, model, propagatedCallers)...)
 	if diagnosticsHaveErrors(diagnostics) {
 		model.freeze()
 		return model, diagnostics
@@ -90,7 +91,7 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph) (*S
 		model.freeze()
 		return model, diagnostics
 	}
-	asyncArgumentSites, argumentDiagnostics := o.propagateAsyncFunctionArguments(ctx, model, asyncArgumentSites)
+	asyncArgumentSites, argumentDiagnostics := o.propagateAsyncFunctionArguments(ctx, model, asyncArgumentSites, propagatedCallers)
 	diagnostics = append(diagnostics, argumentDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
 		model.freeze()
@@ -135,14 +136,14 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph) (*S
 			model.freeze()
 			return model, diagnostics
 		}
-		diagnostics = append(diagnostics, o.propagateFunctionAsync(ctx, model)...)
+		diagnostics = append(diagnostics, o.propagateFunctionAsync(ctx, model, propagatedCallers)...)
 		if diagnosticsHaveErrors(diagnostics) {
 			model.freeze()
 			return model, diagnostics
 		}
 		// Interface coloring can reveal async calls inside function arguments.
 		var loopDiagnostics []Diagnostic
-		asyncArgumentSites, loopDiagnostics = o.propagateAsyncFunctionArguments(ctx, model, asyncArgumentSites)
+		asyncArgumentSites, loopDiagnostics = o.propagateAsyncFunctionArguments(ctx, model, asyncArgumentSites, propagatedCallers)
 		diagnostics = append(diagnostics, loopDiagnostics...)
 		if diagnosticsHaveErrors(diagnostics) {
 			model.freeze()
@@ -970,6 +971,7 @@ func (o *SemanticModelOwner) propagateAsyncFunctionArguments(
 	ctx context.Context,
 	model *SemanticModel,
 	sites []asyncArgumentCallSite,
+	propagatedCallers map[*types.Func]bool,
 ) ([]asyncArgumentCallSite, []Diagnostic) {
 	for len(sites) != 0 {
 		if err := ctx.Err(); err != nil {
@@ -994,7 +996,7 @@ func (o *SemanticModelOwner) propagateAsyncFunctionArguments(
 		if !changed {
 			break
 		}
-		if diagnostics := o.propagateFunctionAsync(ctx, model); diagnosticsHaveErrors(diagnostics) {
+		if diagnostics := o.propagateFunctionAsync(ctx, model, propagatedCallers); diagnosticsHaveErrors(diagnostics) {
 			return sites, diagnostics
 		}
 	}
@@ -1300,18 +1302,24 @@ func receiverNamedType(typ types.Type) *types.Named {
 	return named
 }
 
-func (o *SemanticModelOwner) propagateFunctionAsync(ctx context.Context, model *SemanticModel) []Diagnostic {
+// propagateFunctionAsync walks the caller edges of newly async functions.
+// The caller graph is fixed before propagation and async state only grows, so a
+// function's caller edges need to be traversed once per model build.
+func (o *SemanticModelOwner) propagateFunctionAsync(
+	ctx context.Context,
+	model *SemanticModel,
+	propagated map[*types.Func]bool,
+) []Diagnostic {
 	if err := ctx.Err(); err != nil {
 		return []Diagnostic{contextCanceledDiagnostic(err)}
 	}
-	queued := make(map[*types.Func]bool)
 	queue := make([]*types.Func, 0)
 	enqueue := func(fn *types.Func) {
 		fn = functionOriginOrSelf(fn)
-		if fn == nil || queued[fn] {
+		if fn == nil || propagated[fn] {
 			return
 		}
-		queued[fn] = true
+		propagated[fn] = true
 		queue = append(queue, fn)
 	}
 	for called := range model.functionCallers {
