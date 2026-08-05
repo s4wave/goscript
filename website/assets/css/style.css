@@ -433,22 +433,21 @@ pre {
   line-height: 1.6;
 }
 
-/* Doc Links */
-.doc-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
+.feature-card a {
+  color: var(--color-text-main);
+  text-decoration: underline;
+  text-decoration-color: var(--color-border-hover);
+  text-underline-offset: 0.18em;
+  transition:
+    color 0.15s ease,
+    text-decoration-color 0.15s ease;
 }
 
-.doc-links a {
-  font-size: 0.9375rem;
-  color: var(--color-text-muted);
-  transition: color 0.15s ease;
-}
-
-.doc-links a:hover {
+.feature-card a:hover {
   color: var(--color-primary);
+  text-decoration-color: currentColor;
 }
+
 
 /* Install Section */
 .install-section {
