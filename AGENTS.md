@@ -17,6 +17,7 @@
 - NEVER hardcode things: examples include function names, builtins, etc.
 - Actively improve touched code and design docs when the opportunity is clear: if you find a stale or contradictory design note in the area you are changing, update the doc to match the source/tests instead of preserving the contradiction.
 - Never use `as unknown as ...`. It is a red flag for a type-system escape hatch hiding a bad runtime contract; return the actual runtime type or fix the owner type signature so the checker catches mismatches.
+- NEVER collect a byte stream with one-byte `Reader` calls when the `Reader` accepts a caller-sized buffer. Read in bounded chunks (32 KiB by default for runtime overrides), then parse bytes from the buffer. Cover bulk-input paths with a regression test that caps `Reader` calls.
 - Go standard library sources are located at "go env GOROOT" (shell command)
 - Leverage adding more tests (e.g., `compiler/analysis_test.go`) instead of debug logging for diagnosing issues. If the new test case is temporary, add a `tmp_test.go` file to keep things separated.
 - AVOID type arguments unless necessary (prefer type inference)
