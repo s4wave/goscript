@@ -57,6 +57,38 @@ describe('compress/gzip override', () => {
     expect($.bytesToString(out)).toBe('hello gzip world')
   })
 
+  test('reader collects bulk input in chunks', async () => {
+    const input = $.makeSlice<number>(128 * 1024, undefined, 'byte')
+    let state = 0x12345678
+    for (let idx = 0; idx < input.length; idx++) {
+      state ^= state << 13
+      state ^= state >>> 17
+      state ^= state << 5
+      input[idx] = state & 0xff
+    }
+
+    const compressed = $.markAsStructValue(new bytes.Buffer())
+    const writer = NewWriter(compressed)
+    expect(writer.Write(input)[1]).toBeNull()
+    expect(await writer.Close()).toBeNull()
+
+    const source = bytes.NewReader(compressed.Bytes())
+    let readCalls = 0
+    const observedReader = {
+      Read(p: $.Bytes): [number, $.GoError] {
+        readCalls++
+        return source.Read(p)
+      },
+    }
+
+    const [reader, readerErr] = NewReader(observedReader as io.Reader)
+    expect(readerErr).toBeNull()
+    const [out, readErr] = await io.ReadAll(reader!)
+    expect(readErr).toBeNull()
+    expect($.bytesToUint8Array(out)).toEqual($.bytesToUint8Array(input))
+    expect(readCalls).toBeLessThanOrEqual(6)
+  })
+
   test('reader reset accepts async generated readers', async () => {
     const compressed = $.markAsStructValue(new bytes.Buffer())
     const writer = NewWriter(compressed)

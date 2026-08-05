@@ -11,6 +11,8 @@ type compressionRuntime = {
   gunzipSync?: (data: Uint8Array) => Uint8Array
 }
 
+const readerBufferSize = 32 * 1024
+
 export const NoCompression = 0
 export const BestSpeed = 1
 export const BestCompression = 9
@@ -174,9 +176,7 @@ async function gzipBytes(data: Uint8Array, level: number): Promise<Uint8Array> {
   return streamTransform(data, new CompressionStreamCtor('gzip'))
 }
 
-function gunzipBytes(
-  data: Uint8Array,
-): Uint8Array | Promise<Uint8Array> {
+function gunzipBytes(data: Uint8Array): Uint8Array | Promise<Uint8Array> {
   const runtime = nodeCompressionRuntime()
   if (runtime?.gunzipSync != null) {
     return runtime.gunzipSync(data)
@@ -207,7 +207,7 @@ function readGunzipped(
   | { data: Uint8Array | null; err: $.GoError }
   | Promise<{ data: Uint8Array | null; err: $.GoError }> {
   const chunks: Uint8Array[] = []
-  const buf = $.makeSlice<number>(1, undefined, 'byte')
+  const buf = $.makeSlice<number>(readerBufferSize, undefined, 'byte')
   while (true) {
     const read = r.Read(buf)
     if (read instanceof Promise) {
@@ -249,12 +249,12 @@ function recordChunk(chunks: Uint8Array[], buf: $.Bytes, n: number): void {
   }
 }
 
-function inflateRecorded(
-  chunks: Uint8Array[],
-): { data: Uint8Array | null; err: $.GoError } | Promise<{
-  data: Uint8Array | null
-  err: $.GoError
-}> {
+function inflateRecorded(chunks: Uint8Array[]):
+  | { data: Uint8Array | null; err: $.GoError }
+  | Promise<{
+      data: Uint8Array | null
+      err: $.GoError
+    }> {
   try {
     const inflated = gunzipBytes(concat(chunks))
     if (inflated instanceof Promise) {
