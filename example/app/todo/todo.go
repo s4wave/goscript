@@ -7,13 +7,20 @@ import "time"
 
 // Todo represents a single todo item.
 type Todo struct {
-	ID          int64
-	Title       string
+	// ID is the list-assigned todo identifier.
+	ID int64
+	// Title is the todo summary.
+	Title string
+	// Description is the optional todo detail.
 	Description string
-	Completed   bool
-	Priority    Priority
-	CreatedAt   int64 // Unix timestamp
-	UpdatedAt   int64 // Unix timestamp
+	// Completed reports whether the todo is complete.
+	Completed bool
+	// Priority is the todo priority level.
+	Priority Priority
+	// CreatedAt is the Unix timestamp when the todo was created.
+	CreatedAt int64
+	// UpdatedAt is the Unix timestamp when the todo last changed.
+	UpdatedAt int64
 }
 
 // Priority represents the priority level of a todo item.
@@ -101,158 +108,6 @@ func (t *Todo) IsOverdue(deadline int64) bool {
 		return false
 	}
 	return !t.Completed && time.Now().Unix() > deadline
-}
-
-// TodoList manages a collection of todos.
-type TodoList struct {
-	todos  []*Todo
-	nextID int64
-}
-
-// NewTodoList creates a new empty TodoList.
-func NewTodoList() *TodoList {
-	return &TodoList{
-		todos:  make([]*Todo, 0),
-		nextID: 1,
-	}
-}
-
-// Add adds a new todo to the list and assigns it an ID.
-func (tl *TodoList) Add(todo *Todo) *Todo {
-	todo.ID = tl.nextID
-	tl.nextID++
-	tl.todos = append(tl.todos, todo)
-	return todo
-}
-
-// Get retrieves a todo by ID. Returns nil if not found.
-func (tl *TodoList) Get(id int64) *Todo {
-	for _, t := range tl.todos {
-		if t.ID == id {
-			return t
-		}
-	}
-	return nil
-}
-
-// Remove removes a todo by ID. Returns true if removed, false if not found.
-func (tl *TodoList) Remove(id int64) bool {
-	for i, t := range tl.todos {
-		if t.ID == id {
-			tl.todos = append(tl.todos[:i], tl.todos[i+1:]...)
-			return true
-		}
-	}
-	return false
-}
-
-// All returns all todos in the list.
-func (tl *TodoList) All() []*Todo {
-	return tl.todos
-}
-
-// Active returns only incomplete todos.
-func (tl *TodoList) Active() []*Todo {
-	result := make([]*Todo, 0)
-	for _, t := range tl.todos {
-		if !t.Completed {
-			result = append(result, t)
-		}
-	}
-	return result
-}
-
-// Completed returns only completed todos.
-func (tl *TodoList) Completed() []*Todo {
-	result := make([]*Todo, 0)
-	for _, t := range tl.todos {
-		if t.Completed {
-			result = append(result, t)
-		}
-	}
-	return result
-}
-
-// ByPriority returns todos filtered by priority.
-func (tl *TodoList) ByPriority(p Priority) []*Todo {
-	result := make([]*Todo, 0)
-	for _, t := range tl.todos {
-		if t.Priority == p {
-			result = append(result, t)
-		}
-	}
-	return result
-}
-
-// Count returns the total number of todos.
-func (tl *TodoList) Count() int {
-	return len(tl.todos)
-}
-
-// ActiveCount returns the number of incomplete todos.
-func (tl *TodoList) ActiveCount() int {
-	count := 0
-	for _, t := range tl.todos {
-		if !t.Completed {
-			count++
-		}
-	}
-	return count
-}
-
-// CompletedCount returns the number of completed todos.
-func (tl *TodoList) CompletedCount() int {
-	count := 0
-	for _, t := range tl.todos {
-		if t.Completed {
-			count++
-		}
-	}
-	return count
-}
-
-// ClearCompleted removes all completed todos.
-func (tl *TodoList) ClearCompleted() int {
-	removed := 0
-	newTodos := make([]*Todo, 0)
-	for _, t := range tl.todos {
-		if t.Completed {
-			removed++
-		} else {
-			newTodos = append(newTodos, t)
-		}
-	}
-	tl.todos = newTodos
-	return removed
-}
-
-// Stats holds statistics about the todo list.
-type Stats struct {
-	Total      int
-	Active     int
-	Completed  int
-	ByPriority map[string]int
-}
-
-// GetStats returns statistics about the todo list.
-func (tl *TodoList) GetStats() Stats {
-	stats := Stats{
-		Total:      len(tl.todos),
-		ByPriority: make(map[string]int),
-	}
-
-	for _, t := range tl.todos {
-		if t.Completed {
-			stats.Completed++
-		} else {
-			stats.Active++
-		}
-
-		priorityStr := PriorityString(t.Priority)
-		stats.ByPriority[priorityStr]++
-	}
-
-	return stats
 }
 
 // Validate validates a todo and returns an error message if invalid.

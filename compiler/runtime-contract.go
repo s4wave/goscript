@@ -170,19 +170,6 @@ const (
 	RuntimeHelperIsMainScript        RuntimeHelper = "host.isMainScript"
 )
 
-// RuntimeImport is a generated TypeScript import owned by the runtime contract.
-type RuntimeImport struct {
-	Alias  string
-	Source string
-}
-
-// RuntimeHelperContract describes one helper exported by the runtime package.
-type RuntimeHelperContract struct {
-	Helper   RuntimeHelper
-	Export   string
-	Category RuntimeHelperCategory
-}
-
 // RuntimeContractOwner owns generated-code helper names and runtime capabilities.
 type RuntimeContractOwner struct {
 	helpers map[RuntimeHelper]RuntimeHelperContract
