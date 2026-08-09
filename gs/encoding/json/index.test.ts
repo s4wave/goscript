@@ -1136,16 +1136,75 @@ describe('encoding/json override', () => {
     }
   })
 
-  it('decodes one value per Decode and buffers the rest of the stream', () => {
-    const decoder = NewDecoder(bytes.NewBufferString('1 2')!)
-    const first = $.varRef<unknown>(null)
-    const second = $.varRef<unknown>(null)
+  it('accepts exactly the JSON number grammar through Unmarshal', () => {
+    const validCases: Array<[string, number]> = [
+      ['0', 0],
+      ['-0', -0],
+      ['10', 10],
+      ['-10', -10],
+      ['0.125', 0.125],
+      ['-10.5', -10.5],
+      ['1e3', 1000],
+      ['1E+3', 1000],
+      ['1e-3', 0.001],
+      ['-1.5e+2', -150],
+    ]
+    for (const [input, want] of validCases) {
+      const target = $.varRef<unknown>(null)
+      expect(Unmarshal($.stringToBytes(input), target)).toBeNull()
+      expect(Object.is(target.value, want)).toBe(true)
+    }
 
-    expect(decoder.Decode(first)).toBeNull()
-    expect(first.value).toBe(1)
-    expect(decoder.Decode(second)).toBeNull()
-    expect(second.value).toBe(2)
+    const invalidCases = [
+      '+1',
+      '01',
+      '-01',
+      '.5',
+      '-.5',
+      '1.',
+      '1e',
+      '1e+',
+      '1e-',
+      '--1',
+      '1..2',
+      '1e2.3',
+      '-',
+      'NaN',
+      'Infinity',
+    ]
+    for (const input of invalidCases) {
+      const target = $.varRef<unknown>(null)
+      expect(Unmarshal($.stringToBytes(input), target)).toBeInstanceOf(
+        JSONSyntaxError,
+      )
+    }
+  })
+
+  it('decodes one number per Decode without consuming neighboring syntax', () => {
+    const decoder = NewDecoder(bytes.NewBufferString('1-2 0.5 3e+2')!)
+    const cases: Array<[number, bigint]> = [
+      [1, 1n],
+      [-2, 3n],
+      [0.5, 7n],
+      [300, 12n],
+    ]
+
+    for (const [want, offset] of cases) {
+      const target = $.varRef<unknown>(null)
+      expect(decoder.Decode(target)).toBeNull()
+      expect(target.value).toBe(want)
+      expect(decoder.InputOffset()).toBe(offset)
+    }
     expect(decoder.Decode($.varRef<unknown>(null))?.Error()).toBe('EOF')
+  })
+
+  it('rejects malformed numbers in a streaming JSON value', () => {
+    for (const input of ['[+1]', '[01]', '[-01]', '[1.]', '[1e]', '[1e+]']) {
+      const decoder = NewDecoder(bytes.NewBufferString(input)!)
+      expect(decoder.Decode($.varRef<unknown>(null))).toBeInstanceOf(
+        JSONSyntaxError,
+      )
+    }
   })
 
   it('streams delimiters and values through Token and reports More', () => {

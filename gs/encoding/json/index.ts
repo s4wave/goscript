@@ -612,11 +612,36 @@ function scanJSONValue(
     if (c === '-') {
       i++
     }
-    while (i < text.length && '0123456789.eE+-'.includes(text[i])) {
+    if (text[i] === '0') {
       i++
+    } else {
+      if (text[i] === undefined || text[i] < '1' || text[i] > '9') {
+        return fail('invalid numeric literal')
+      }
+      do {
+        i++
+      } while (text[i] !== undefined && text[i] >= '0' && text[i] <= '9')
     }
-    if (i === numStart) {
-      return fail()
+    if (text[i] === '.') {
+      i++
+      if (text[i] === undefined || text[i] < '0' || text[i] > '9') {
+        return fail('invalid decimal point in numeric literal')
+      }
+      do {
+        i++
+      } while (text[i] !== undefined && text[i] >= '0' && text[i] <= '9')
+    }
+    if (text[i] === 'e' || text[i] === 'E') {
+      i++
+      if (text[i] === '+' || text[i] === '-') {
+        i++
+      }
+      if (text[i] === undefined || text[i] < '0' || text[i] > '9') {
+        return fail('invalid exponent in numeric literal')
+      }
+      do {
+        i++
+      } while (text[i] !== undefined && text[i] >= '0' && text[i] <= '9')
     }
     const literal = text.slice(numStart, i)
     return useNumber ? literal : Number(literal)
