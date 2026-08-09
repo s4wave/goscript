@@ -1,11 +1,9 @@
 import * as $ from "@goscript/builtin/index.js";
-const { copy } = $;
-
 import * as errors from "@goscript/errors/index.js"
-
 import * as io from "@goscript/io/index.js"
-
 import * as utf8 from "@goscript/unicode/utf8/index.js"
+
+const { copy } = $;
 
 export class Reader {
 	public get s(): $.Bytes {

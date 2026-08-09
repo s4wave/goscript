@@ -1,10 +1,6 @@
 import * as $ from "@goscript/builtin/index.js";
-
-
 import * as unicode from "@goscript/unicode/index.js"
-
 import * as utf8 from "@goscript/unicode/utf8/index.js"
-
 // for linkname
 import * as _ from "@goscript/unsafe/index.js"
 
@@ -42,7 +38,6 @@ export function explode(s: $.Bytes, n: number): $.Slice<$.Bytes> {
 	while (i < $.len(s) && (n < 0 || result.length < n)) {
 		const [, size] = utf8.DecodeRune($.goSlice(s, i, undefined))
 		if (size <= 0) {
-			// Invalid UTF-8, take single byte
 			result.push($.goSlice(s, i, i + 1))
 			i++
 		} else {
@@ -51,7 +46,6 @@ export function explode(s: $.Bytes, n: number): $.Slice<$.Bytes> {
 		}
 	}
 	
-	// If we have remaining bytes and haven't reached n limit, add the rest
 	if (i < $.len(s) && (n < 0 || result.length < n)) {
 		result.push($.goSlice(s, i, undefined))
 	}
@@ -62,18 +56,15 @@ export function explode(s: $.Bytes, n: number): $.Slice<$.Bytes> {
 // Count counts the number of non-overlapping instances of sep in s.
 // If sep is an empty slice, Count returns 1 + the number of UTF-8-encoded code points in s.
 export function Count(s: $.Bytes, sep: $.Bytes): number {
-	// Special case for empty separator
 	if (sep === null || $.len(sep) === 0) {
-		if (s === null) return 1
-		// For now, use simple byte count + 1 (TODO: proper UTF-8 rune counting)
-		return $.len(s) + 1
+		let count = 1
+		for (let i = 0; i < $.len(s); count++) {
+			const [, size] = utf8.DecodeRune($.goSlice(s, i, undefined))
+			i += size
+		}
+		return count
 	}
-	
-	// Single byte separator - optimized path
-	if ($.len(sep) === 1) {
-		return $.bytesCount(s, sep)
-	}
-	
+
 	return $.bytesCount(s, sep)
 }
 
@@ -173,7 +164,6 @@ export function IndexAny(s: $.Bytes, chars: string): number {
 		return -1
 	}
 	
-	// Check if all chars are ASCII for optimization
 	let allASCII = true
 	for (let i = 0; i < chars.length; i++) {
 		if (chars.charCodeAt(i) >= utf8.RuneSelf) {
@@ -183,7 +173,6 @@ export function IndexAny(s: $.Bytes, chars: string): number {
 	}
 	
 	if (allASCII) {
-		// ASCII optimization
 		for (let i = 0; i < $.len(s); i++) {
 			const b = s![i]
 			if (b < utf8.RuneSelf && chars.indexOf(String.fromCharCode(b)) >= 0) {
@@ -193,7 +182,6 @@ export function IndexAny(s: $.Bytes, chars: string): number {
 		return -1
 	}
 	
-	// Full UTF-8 handling
 	for (let i = 0; i < $.len(s); ) {
 		const [r, size] = utf8.DecodeRune($.goSlice(s, i, undefined))
 		if (size <= 0) {
@@ -201,7 +189,6 @@ export function IndexAny(s: $.Bytes, chars: string): number {
 			continue
 		}
 		
-		// Check if this rune is in chars
 		if (containsRune(chars, r)) {
 			return i
 		}
@@ -221,7 +208,6 @@ export function LastIndexAny(s: $.Bytes, chars: string): number {
 		return -1
 	}
 	
-	// Check if all chars are ASCII for optimization
 	let allASCII = true
 	for (let i = 0; i < chars.length; i++) {
 		if (chars.charCodeAt(i) >= utf8.RuneSelf) {
@@ -231,7 +217,6 @@ export function LastIndexAny(s: $.Bytes, chars: string): number {
 	}
 	
 	if (allASCII) {
-		// ASCII optimization - search backwards
 		for (let i = $.len(s) - 1; i >= 0; i--) {
 			const b = s![i]
 			if (b < utf8.RuneSelf && chars.indexOf(String.fromCharCode(b)) >= 0) {
@@ -241,7 +226,6 @@ export function LastIndexAny(s: $.Bytes, chars: string): number {
 		return -1
 	}
 	
-	// Full UTF-8 handling - need to scan forward to find rune boundaries
 	let lastIndex = -1
 	for (let i = 0; i < $.len(s); ) {
 		const [r, size] = utf8.DecodeRune($.goSlice(s, i, undefined))
@@ -250,7 +234,6 @@ export function LastIndexAny(s: $.Bytes, chars: string): number {
 			continue
 		}
 		
-		// Check if this rune is in chars
 		if (containsRune(chars, r)) {
 			lastIndex = i
 		}
@@ -293,7 +276,6 @@ export function genSplit(s: $.Bytes, sep: $.Bytes, sepSave: number, n: number): 
 		start += m + $.len(sep)
 	}
 	
-	// Add the remaining part
 	result.push($.goSlice(s, start, undefined))
 	
 	return $.arrayToSlice(result)
@@ -378,20 +360,17 @@ export function FieldsFunc(s: $.Bytes, f: ((p0: number) => boolean) | null): $.S
 		}
 		
 		if (f(r)) {
-			// Found separator
 			if (start >= 0) {
 				result.push($.goSlice(s, start, i))
 				start = -1
 			}
 		} else if (start < 0) {
-			// Start of new field
 			start = i
 		}
 		
 		i += size
 	}
 	
-	// Add final field if any
 	if (start >= 0) {
 		result.push($.goSlice(s, start, undefined))
 	}
@@ -406,13 +385,11 @@ export function Join(s: $.Slice<$.Bytes>, sep: $.Bytes): $.Bytes {
 		return new Uint8Array(0)
 	}
 
-	// Just return a copy for single element
 	if ($.len(s) === 1) {
 		if (s![0] === null) return new Uint8Array(0)
 		return $.bytesToUint8Array(s![0]).slice()
 	}
 
-	// Calculate total length needed
 	let totalLen = 0
 	const sepLen = sep === null ? 0 : $.len(sep)
 	
@@ -427,7 +404,6 @@ export function Join(s: $.Slice<$.Bytes>, sep: $.Bytes): $.Bytes {
 		totalLen += sepLen * ($.len(s) - 1)
 	}
 
-	// Build result
 	const result = new Uint8Array(totalLen)
 	let pos = 0
 	const sepBytes = sepLen === 0 ? null : $.bytesToUint8Array(sep)
@@ -498,17 +474,14 @@ export function Map(mapping: ((r: number) => number) | null, s: $.Bytes): $.Byte
 	for (let i = 0; i < $.len(s); ) {
 		const [r, size] = utf8.DecodeRune($.goSlice(s, i, undefined))
 		if (size <= 0) {
-			// Invalid UTF-8, copy the byte as-is
 			result.push(s![i])
 			i++
 		} else {
 			const mappedR = mapping(r)
 			if (mappedR >= 0) {
-				// Encode the mapped rune back to bytes
 				const runeBytes = new Uint8Array(utf8.UTFMax)
 				const n = utf8.EncodeRune(runeBytes, mappedR)
 				
-				// Add the encoded bytes to result
 				for (let j = 0; j < n; j++) {
 					result.push(runeBytes[j])
 				}
@@ -570,18 +543,14 @@ export function ToUpper(s: $.Bytes): $.Bytes {
 	for (let i = 0; i < $.len(s); ) {
 		const [r, size] = utf8.DecodeRune($.goSlice(s, i, undefined))
 		if (size <= 0) {
-			// Invalid UTF-8, copy the byte as-is
 			result.push(s![i])
 			i++
 		} else {
-			// Convert rune to uppercase
 			const upperR = unicode.ToUpper(r)
 			
-			// Encode the uppercase rune back to bytes
 			const runeBytes = new Uint8Array(utf8.UTFMax)
 			const n = utf8.EncodeRune(runeBytes, upperR)
 			
-			// Add the encoded bytes to result
 			for (let j = 0; j < n; j++) {
 				result.push(runeBytes[j])
 			}
@@ -605,18 +574,14 @@ export function ToLower(s: $.Bytes): $.Bytes {
 	for (let i = 0; i < $.len(s); ) {
 		const [r, size] = utf8.DecodeRune($.goSlice(s, i, undefined))
 		if (size <= 0) {
-			// Invalid UTF-8, copy the byte as-is
 			result.push(s![i])
 			i++
 		} else {
-			// Convert rune to lowercase
 			const lowerR = unicode.ToLower(r)
 			
-			// Encode the lowercase rune back to bytes
 			const runeBytes = new Uint8Array(utf8.UTFMax)
 			const n = utf8.EncodeRune(runeBytes, lowerR)
 			
-			// Add the encoded bytes to result
 			for (let j = 0; j < n; j++) {
 				result.push(runeBytes[j])
 			}
@@ -697,7 +662,7 @@ export function isSeparator(r: number): boolean {
 	if (unicode.IsLetter(r) || unicode.IsDigit(r)) {
 		return false
 	}
-	// Otherwise, all we can do for now is treat spaces as separators.
+	// Non-ASCII separators are Unicode spaces unless they are letters or digits.
 	return unicode.IsSpace(r)
 }
 
@@ -712,12 +677,11 @@ export function Title(s: $.Bytes): $.Bytes {
 	}
 	
 	const result: number[] = []
-	let prevIsSep = true  // Start of string counts as separator
+	let prevIsSep = true
 	
 	for (let i = 0; i < $.len(s); ) {
 		const [r, size] = utf8.DecodeRune($.goSlice(s, i, undefined))
 		if (size <= 0) {
-			// Invalid UTF-8, copy the byte as-is
 			result.push(s![i])
 			i++
 			prevIsSep = true
@@ -727,11 +691,9 @@ export function Title(s: $.Bytes): $.Bytes {
 				transformedR = unicode.ToTitle(r)
 			}
 			
-			// Encode the (possibly transformed) rune back to bytes
 			const runeBytes = new Uint8Array(utf8.UTFMax)
 			const n = utf8.EncodeRune(runeBytes, transformedR)
 			
-			// Add the encoded bytes to result
 			for (let j = 0; j < n; j++) {
 				result.push(runeBytes[j])
 			}
@@ -1049,13 +1011,12 @@ export function trimRightASCII(s: $.Bytes, _as: asciiSet): $.Bytes {
 export function trimRightUnicode(s: $.Bytes, cutset: string): $.Bytes {
 	if (s === null) return null
 	
-	// Need to scan from left to find rune boundaries, but track the last non-cutset position
+	// Forward scanning records the final rune boundary not in cutset.
 	let lastKeep = -1
 	
 	for (let i = 0; i < $.len(s); ) {
 		const [r, size] = utf8.DecodeRune($.goSlice(s, i, undefined))
 		if (size <= 0) {
-			// Invalid UTF-8, keep everything up to here
 			return $.goSlice(s, undefined, i + 1)
 		}
 		
@@ -1110,89 +1071,41 @@ export function Runes(s: $.Bytes): $.Slice<number> {
 // for a k-rune slice.
 // If n < 0, there is no limit on the number of replacements.
 export function Replace(s: $.Bytes, old: $.Bytes, _new: $.Bytes, n: number): $.Bytes {
-	if (s === null) {
-		return new Uint8Array(0)
+	let replacements = n === 0 ? 0 : Count(s, old)
+	if (replacements === 0) {
+		return $.len(s) === 0 ? null : new Uint8Array($.bytesToArray(s))
 	}
-	
-	if (n === 0) {
-		// Make a copy without any replacements
-		return new Uint8Array($.bytesToArray(s))
+	if (n >= 0 && n < replacements) {
+		replacements = n
 	}
-	
-	// Handle empty old pattern - matches at the start and after each UTF-8
-	// sequence, yielding up to runeCount+1 insertions. After the insertion
-	// limit is reached the untouched remainder of s is appended, as in Go.
-	if (old === null || $.len(old) === 0) {
-		const result: number[] = []
-		const newBytes = _new === null ? [] : $.bytesToArray(_new)
 
-		// Count runes to bound n the way Go's Count does for an empty pattern.
-		let runeCount = 0
-		for (let i = 0; i < $.len(s); ) {
-			const [, size] = utf8.DecodeRune($.goSlice(s, i, undefined))
-			i += size > 0 ? size : 1
-			runeCount++
-		}
-		const limit = n < 0 ? runeCount + 1 : Math.min(n, runeCount + 1)
-
-		let start = 0
-		for (let ins = 0; ins < limit; ins++) {
-			if (ins > 0) {
-				const [, size] = utf8.DecodeRune($.goSlice(s, start, undefined))
-				const wid = size > 0 ? size : 1
-				for (let j = 0; j < wid; j++) {
-					result.push(s![start + j])
-				}
-				start += wid
-			}
-			result.push(...newBytes)
-		}
-
-		// Append the untouched remainder after the last insertion.
-		for (let j = start; j < $.len(s); j++) {
-			result.push(s![j])
-		}
-
-		return new Uint8Array(result)
-	}
-	
-	// Normal case - replace occurrences of old with new
 	const result: number[] = []
-	const sBytes = $.bytesToArray(s)
-	const oldBytes = $.bytesToArray(old)
-	const newBytes = _new === null ? [] : $.bytesToArray(_new)
-	
-	let i = 0
-	let replacements = 0
-	
-	while (i <= sBytes.length - oldBytes.length && (n < 0 || replacements < n)) {
-		// Check if old pattern matches at current position
-		let matches = true
-		for (let j = 0; j < oldBytes.length; j++) {
-			if (sBytes[i + j] !== oldBytes[j]) {
-				matches = false
-				break
+	const newBytes = $.bytesToArray(_new)
+	let start = 0
+	if ($.len(old) > 0) {
+		for (let replaced = 0; replaced < replacements; replaced++) {
+			const offset = Index($.goSlice(s, start, undefined), old)
+			for (let i = start; i < start + offset; i++) {
+				result.push(s![i])
 			}
-		}
-		
-		if (matches) {
-			// Replace with new bytes
 			result.push(...newBytes)
-			i += oldBytes.length
-			replacements++
-		} else {
-			// Copy one byte and advance
-			result.push(sBytes[i])
-			i++
+			start += offset + $.len(old)
+		}
+	} else {
+		result.push(...newBytes)
+		for (let replaced = 1; replaced < replacements; replaced++) {
+			const [, size] = utf8.DecodeRune($.goSlice(s, start, undefined))
+			for (let i = start; i < start + size; i++) {
+				result.push(s![i])
+			}
+			result.push(...newBytes)
+			start += size
 		}
 	}
-	
-	// Copy remaining bytes
-	while (i < sBytes.length) {
-		result.push(sBytes[i])
-		i++
+
+	for (let i = start; i < $.len(s); i++) {
+		result.push(s![i])
 	}
-	
 	return new Uint8Array(result)
 }
 

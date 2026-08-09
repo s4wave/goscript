@@ -27,22 +27,18 @@ export function AppendRune(p: $.Bytes, r: number): Uint8Array {
 
 // DecodeLastRune unpacks the last UTF-8 encoding in p and returns the rune and its width in bytes.
 export function DecodeLastRune(p: $.Bytes): [number, number] {
-  const bytes = $.bytesToUint8Array(p)
-  if (bytes.length === 0) {
-    return [RuneError, 0]
-  }
+  const bytes = $.normalizeBytes(p)
+  const end = bytes.length
+  if (end === 0) return [RuneError, 0]
+  if (bytes[end - 1] < RuneSelf) return [bytes[end - 1], 1]
 
-  // Simple implementation - find the start of the last rune
-  let start = bytes.length - 1
-  while (start > 0 && !RuneStart(bytes[start])) {
-    start--
-  }
+  const limit = Math.max(0, end - UTFMax)
+  let start = end - 1
+  while (start >= limit && !RuneStart(bytes[start])) start--
+  if (start < 0) start = 0
 
-  const [r, size] = DecodeRune(bytes.slice(start))
-  if (start + size !== bytes.length) {
-    return [RuneError, 1]
-  }
-  return [r, size]
+  const [rune, width] = DecodeRune(bytes.slice(start))
+  return start + width === end ? [rune, width] : [RuneError, 1]
 }
 
 // DecodeLastRuneInString is like DecodeLastRune but its input is a string.
@@ -66,29 +62,64 @@ export function DecodeLastRuneInString(s: string): [number, number] {
 
 // DecodeRune unpacks the first UTF-8 encoding in p and returns the rune and its width in bytes.
 export function DecodeRune(p: $.Bytes): [number, number] {
-  if (!p?.length) {
+  const bytes = $.normalizeBytes(p)
+  if (bytes.length === 0) {
     return [RuneError, 0]
   }
 
-  if (p![0] < RuneSelf) {
-    return [p![0], 1]
+  const b0 = bytes[0]
+  if (b0 < RuneSelf) {
+    return [b0, 1]
   }
 
-  // Convert p to Uint8Array to satisfy AllowsSharedBufferSource requirement
-  const bytes = $.normalizeBytes(p)
-
-  // Convert bytes to string and decode
-  const decoder = new TextDecoder('utf-8', { fatal: false })
-  const str = decoder.decode(bytes.slice(0, Math.min(4, bytes.length)))
-  if (str.length === 0 || str === '\uFFFD') {
-    return [RuneError, 1]
+  if (b0 >= 0xc2 && b0 <= 0xdf) {
+    if (bytes.length < 2 || bytes[1] < 0x80 || bytes[1] > 0xbf) {
+      return [RuneError, 1]
+    }
+    return [((b0 & 0x1f) << 6) | (bytes[1] & 0x3f), 2]
   }
 
-  const codePoint = str.codePointAt(0) || RuneError
-  const char = String.fromCodePoint(codePoint)
-  const encoder = new TextEncoder()
-  const encoded = encoder.encode(char)
-  return [codePoint, encoded.length]
+  if (b0 >= 0xe0 && b0 <= 0xef) {
+    const b1 = bytes[1]
+    const lower = b0 === 0xe0 ? 0xa0 : 0x80
+    const upper = b0 === 0xed ? 0x9f : 0xbf
+    if (
+      bytes.length < 3 ||
+      b1 < lower ||
+      b1 > upper ||
+      bytes[2] < 0x80 ||
+      bytes[2] > 0xbf
+    ) {
+      return [RuneError, 1]
+    }
+    return [((b0 & 0x0f) << 12) | ((b1 & 0x3f) << 6) | (bytes[2] & 0x3f), 3]
+  }
+
+  if (b0 >= 0xf0 && b0 <= 0xf4) {
+    const b1 = bytes[1]
+    const lower = b0 === 0xf0 ? 0x90 : 0x80
+    const upper = b0 === 0xf4 ? 0x8f : 0xbf
+    if (
+      bytes.length < 4 ||
+      b1 < lower ||
+      b1 > upper ||
+      bytes[2] < 0x80 ||
+      bytes[2] > 0xbf ||
+      bytes[3] < 0x80 ||
+      bytes[3] > 0xbf
+    ) {
+      return [RuneError, 1]
+    }
+    return [
+      ((b0 & 0x07) << 18) |
+        ((b1 & 0x3f) << 12) |
+        ((bytes[2] & 0x3f) << 6) |
+        (bytes[3] & 0x3f),
+      4,
+    ]
+  }
+
+  return [RuneError, 1]
 }
 
 // DecodeRuneInString is like DecodeRune but its input is a string.
@@ -143,27 +174,40 @@ export function EncodeRune(p: Uint8Array | $.Slice<number>, r: number): number {
 
 // FullRune reports whether the bytes in p begin with a full UTF-8 encoding of a rune.
 export function FullRune(p: $.Bytes): boolean {
-  if ($.len(p) === 0) {
+  const bytes = $.normalizeBytes(p)
+  if (bytes.length === 0) {
     return false
   }
 
-  const first = $.indexStringOrBytes(p, 0)
-  if (first < RuneSelf) {
+  const b0 = bytes[0]
+  if (b0 < RuneSelf || b0 < 0xc2 || b0 > 0xf4) {
     return true
   }
-  if (first < 0xc0) {
+
+  let size = 2
+  let lower = 0x80
+  let upper = 0xbf
+  if (b0 >= 0xe0) {
+    size = b0 < 0xf0 ? 3 : 4
+    lower =
+      b0 === 0xe0 ? 0xa0
+      : b0 === 0xf0 ? 0x90
+      : 0x80
+    upper =
+      b0 === 0xed ? 0x9f
+      : b0 === 0xf4 ? 0x8f
+      : 0xbf
+  }
+  if (bytes.length >= size) {
     return true
   }
-  if (first < 0xe0) {
-    return $.len(p) >= 2
+  if (bytes.length > 1 && (bytes[1] < lower || bytes[1] > upper)) {
+    return true
   }
-  if (first < 0xf0) {
-    return $.len(p) >= 3
+  if (bytes.length > 2 && (bytes[2] < 0x80 || bytes[2] > 0xbf)) {
+    return true
   }
-  if (first < 0xf8) {
-    return $.len(p) >= 4
-  }
-  return true
+  return false
 }
 
 // FullRuneInString is like FullRune but its input is a string.

@@ -1,13 +1,11 @@
 import * as $ from "@goscript/builtin/index.js";
-const { copy, recover } = $;
+import * as errors from "@goscript/errors/index.js"
+import * as io from "@goscript/io/index.js"
+import * as utf8 from "@goscript/unicode/utf8/index.js"
 
 import { IndexByte } from "./bytes.gs.js";
 
-import * as errors from "@goscript/errors/index.js"
-
-import * as io from "@goscript/io/index.js"
-
-import * as utf8 from "@goscript/unicode/utf8/index.js"
+const { copy, recover } = $;
 
 let smallBufferSize: number = 64
 
@@ -181,7 +179,6 @@ export class Buffer {
 			}
 		}
 		if (b.buf == null) {
-			// Handle null buffer case - create new buffer
 			const capacity = n <= 64 ? 64 : n
 			b.buf = $.makeSlice<number>(n, capacity, 'byte')
 			return 0

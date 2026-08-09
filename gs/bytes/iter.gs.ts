@@ -1,11 +1,9 @@
 import * as $ from "@goscript/builtin/index.js";
-import { Index, IndexByte, asciiSpace } from "./bytes.gs.js";
-
 import * as iter from "@goscript/iter/index.js"
-
 import * as unicode from "@goscript/unicode/index.js"
-
 import * as utf8 from "@goscript/unicode/utf8/index.js"
+
+import { Index, IndexByte, asciiSpace } from "./bytes.gs.js";
 
 // Lines returns an iterator over the newline-terminated lines in the byte slice s.
 // The lines yielded by the iterator include their terminating newlines.
