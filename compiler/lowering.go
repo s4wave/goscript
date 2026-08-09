@@ -3,7 +3,6 @@ package compiler
 import (
 	"cmp"
 	"context"
-	"fmt"
 	"go/ast"
 	"go/constant"
 	"go/token"
@@ -19,8 +18,8 @@ import (
 	"sync"
 	"unicode/utf8"
 
+	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
-
 	"golang.org/x/tools/go/packages"
 )
 
@@ -2964,7 +2963,7 @@ func collectGoEmbedPath(ctx lowerFileContext, diagPos token.Pos, pkgDir, absPath
 		}
 		file, diagnostics := readGoEmbedAbsFile(ctx, pkgDir, path)
 		if len(diagnostics) != 0 {
-			return fmt.Errorf("%s", diagnostics[0].Detail)
+			return errors.New(diagnostics[0].Detail)
 		}
 		files = append(files, file)
 		return nil
@@ -8540,9 +8539,9 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 			call := o.lowerCallableExpr(ctx, expr.Fun, callee) + "(" + strings.Join(args, ", ") + ")"
 			return o.awaitCallIfNeeded(ctx, expr.Fun, call), append(diagnostics, calleeDiagnostics...)
 		}
-		return "undefined", append(diagnostics, loweringUnsupportedAt(ctx, expr.Fun, "call", ctx.semPkg.pkgPath, fmt.Sprintf("unsupported call target %T", expr.Fun)))
+		return "undefined", append(diagnostics, loweringUnsupportedAt(ctx, expr.Fun, "call", ctx.semPkg.pkgPath, errors.Errorf("unsupported call target %T", expr.Fun).Error()))
 	}
-	return "undefined", append(diagnostics, loweringUnsupportedAt(ctx, expr.Fun, "call", ctx.semPkg.pkgPath, fmt.Sprintf("unsupported call target %T", expr.Fun)))
+	return "undefined", append(diagnostics, loweringUnsupportedAt(ctx, expr.Fun, "call", ctx.semPkg.pkgPath, errors.Errorf("unsupported call target %T", expr.Fun).Error()))
 }
 
 func (o *LoweringOwner) lowerCallableExpr(ctx lowerFileContext, expr ast.Expr, callee string) string {

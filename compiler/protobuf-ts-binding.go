@@ -1,7 +1,6 @@
 package compiler
 
 import (
-	"fmt"
 	"go/ast"
 	"os"
 	"path/filepath"
@@ -52,7 +51,7 @@ func protobufTypeScriptBindings(semPkg *semanticPackage, options LoweringOptions
 					Severity: DiagnosticSeverityError,
 					Code:     "goscript/protobuf-ts-binding:missing",
 					Message:  "protobuf TypeScript binding is missing sibling .pb.ts",
-					Detail:   fmt.Sprintf("%s requires %s", sourcePath, tsPath),
+					Detail:   sourcePath + " requires " + tsPath,
 				})
 				continue
 			}

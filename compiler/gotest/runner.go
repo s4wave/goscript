@@ -9,7 +9,6 @@ import (
 	"slices"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/pkg/errors"
@@ -85,11 +84,11 @@ func (r *Runner) Run(ctx context.Context, req *Request) (*Result, error) {
 	}
 
 	testGraphReq := &compiler.CompileRequest{
-		Patterns:                  append([]string(nil), norm.Patterns...),
+		Patterns:                  slices.Clone(norm.Patterns),
 		Dir:                       norm.Dir,
 		OutputPath:                norm.OutputRoot,
-		BuildFlags:                append([]string(nil), norm.BuildFlags...),
-		OverrideDirs:              append([]string(nil), norm.OverrideDirs...),
+		BuildFlags:                slices.Clone(norm.BuildFlags),
+		OverrideDirs:              slices.Clone(norm.OverrideDirs),
 		ProtobufTypeScriptBinding: req.ProtobufTypeScriptBinding,
 		DependencyMode:            compiler.DependencyModeRequested,
 		RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
@@ -219,24 +218,20 @@ func (r *Runner) runPackageTypeChecksAndRuntimes(
 	outputRoots []string,
 	indexes []int,
 ) {
-	parallelism := max(req.Parallelism, 1)
-	sem := make(chan struct{}, parallelism)
-	var wg sync.WaitGroup
-	for _, idx := range packageExecutionIndexes(result, indexes) {
-		wg.Go(func() {
-			select {
-			case sem <- struct{}{}:
-				defer func() { <-sem }()
-			case <-ctx.Done():
-				result.Packages[idx].Owner = OwnerTestRunner
-				result.Packages[idx].Phases.TypeCheck = PhaseStatusFail
-				result.Packages[idx].Error = ctx.Err().Error()
-				return
-			}
+	runPackageTasks(
+		ctx,
+		req.Parallelism,
+		packageExecutionIndexes(result, indexes),
+		func(ctx context.Context, idx int) bool {
 			r.runPackageTypeCheckAndRuntime(ctx, req, workspace, result, outputRoots, idx)
-		})
-	}
-	wg.Wait()
+			return true
+		},
+		func(idx int) {
+			result.Packages[idx].Owner = OwnerTestRunner
+			result.Packages[idx].Phases.TypeCheck = PhaseStatusFail
+			result.Packages[idx].Error = ctx.Err().Error()
+		},
+	)
 }
 
 func (r *Runner) runPackageTypeCheckAndRuntime(
@@ -393,24 +388,20 @@ func (r *Runner) runPackageRuntimesIndividually(
 	outputRoots []string,
 	indexes []int,
 ) {
-	parallelism := max(req.Parallelism, 1)
-	sem := make(chan struct{}, parallelism)
-	var wg sync.WaitGroup
-	for _, idx := range packageExecutionIndexes(result, indexes) {
-		wg.Go(func() {
-			select {
-			case sem <- struct{}{}:
-				defer func() { <-sem }()
-			case <-ctx.Done():
-				result.Packages[idx].Owner = OwnerTestRunner
-				result.Packages[idx].Phases.Runtime = PhaseStatusFail
-				result.Packages[idx].Error = ctx.Err().Error()
-				return
-			}
+	runPackageTasks(
+		ctx,
+		req.Parallelism,
+		packageExecutionIndexes(result, indexes),
+		func(ctx context.Context, idx int) bool {
 			r.runPackageRuntime(ctx, req, workspace, result, outputRootAt(outputRoots, idx), idx)
-		})
-	}
-	wg.Wait()
+			return true
+		},
+		func(idx int) {
+			result.Packages[idx].Owner = OwnerTestRunner
+			result.Packages[idx].Phases.Runtime = PhaseStatusFail
+			result.Packages[idx].Error = ctx.Err().Error()
+		},
+	)
 }
 
 func (r *Runner) runCombinedPackageRuntimes(
@@ -429,22 +420,21 @@ func (r *Runner) runCombinedPackageRuntimes(
 		return r.runCombinedPackageRuntime(ctx, req, workspace, result, "runner-all.ts", chunks[0])
 	}
 
-	var mu sync.Mutex
-	ok := true
-	var wg sync.WaitGroup
-	for chunkIdx, chunk := range chunks {
-		runnerFile := "runner-all-" + strconv.Itoa(chunkIdx) + ".ts"
-		wg.Go(func() {
-			if r.runCombinedPackageRuntime(ctx, req, workspace, result, runnerFile, chunk) {
-				return
-			}
-			mu.Lock()
-			ok = false
-			mu.Unlock()
-		})
+	chunkIndexes := make([]int, len(chunks))
+	for chunkIdx := range chunks {
+		chunkIndexes[chunkIdx] = chunkIdx
 	}
-	wg.Wait()
-	return ok
+
+	return runPackageTasks(
+		ctx,
+		len(chunks),
+		chunkIndexes,
+		func(ctx context.Context, chunkIdx int) bool {
+			runnerFile := "runner-all-" + strconv.Itoa(chunkIdx) + ".ts"
+			return r.runCombinedPackageRuntime(ctx, req, workspace, result, runnerFile, chunks[chunkIdx])
+		},
+		func(int) {},
+	)
 }
 
 func packageRuntimeChunks(indexes []int, parallelism int) [][]int {
@@ -620,7 +610,7 @@ func (r *Runner) compileTestImports(
 	pkg *PackageResult,
 	result *Result,
 ) bool {
-	imports := append([]string(nil), pkg.TestImports...)
+	imports := slices.Clone(pkg.TestImports)
 	slices.Sort(imports)
 	imports = slices.Compact(imports)
 	for _, importPath := range imports {
@@ -631,8 +621,8 @@ func (r *Runner) compileTestImports(
 			Patterns:                  []string{importPath},
 			Dir:                       req.Dir,
 			OutputPath:                outputRoot,
-			BuildFlags:                append([]string(nil), req.BuildFlags...),
-			OverrideDirs:              append([]string(nil), req.OverrideDirs...),
+			BuildFlags:                slices.Clone(req.BuildFlags),
+			OverrideDirs:              slices.Clone(req.OverrideDirs),
 			ProtobufTypeScriptBinding: req.ProtobufTypeScriptBinding,
 			DependencyMode:            compiler.DependencyModeAll,
 			RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
@@ -674,8 +664,8 @@ func (r *Runner) compilePackageBatch(ctx context.Context, req *normalizedRequest
 		Patterns:                  packagePaths,
 		Dir:                       req.Dir,
 		OutputPath:                req.OutputRoot,
-		BuildFlags:                append([]string(nil), req.BuildFlags...),
-		OverrideDirs:              append([]string(nil), req.OverrideDirs...),
+		BuildFlags:                slices.Clone(req.BuildFlags),
+		OverrideDirs:              slices.Clone(req.OverrideDirs),
 		ProtobufTypeScriptBinding: req.ProtobufTypeScriptBinding,
 		DependencyMode:            compiler.DependencyModeAll,
 		RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
@@ -711,8 +701,8 @@ func (r *Runner) compilePackageOutputsIndividually(ctx context.Context, req *nor
 			Patterns:                  []string{result.Packages[idx].PackagePath},
 			Dir:                       req.Dir,
 			OutputPath:                outputRoot,
-			BuildFlags:                append([]string(nil), req.BuildFlags...),
-			OverrideDirs:              append([]string(nil), req.OverrideDirs...),
+			BuildFlags:                slices.Clone(req.BuildFlags),
+			OverrideDirs:              slices.Clone(req.OverrideDirs),
 			ProtobufTypeScriptBinding: req.ProtobufTypeScriptBinding,
 			DependencyMode:            compiler.DependencyModeAll,
 			RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
@@ -739,8 +729,8 @@ func (r *Runner) compilePackageOutputsIndividually(ctx context.Context, req *nor
 			Patterns:                  []string{result.Packages[idx].PackagePath},
 			Dir:                       req.Dir,
 			OutputPath:                outputRoot,
-			BuildFlags:                append([]string(nil), req.BuildFlags...),
-			OverrideDirs:              append([]string(nil), req.OverrideDirs...),
+			BuildFlags:                slices.Clone(req.BuildFlags),
+			OverrideDirs:              slices.Clone(req.OverrideDirs),
 			ProtobufTypeScriptBinding: req.ProtobufTypeScriptBinding,
 			DependencyMode:            compiler.DependencyModeAll,
 			RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,

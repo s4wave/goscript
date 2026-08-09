@@ -2,7 +2,7 @@ import { mkdtemp, mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, it, expect } from 'vitest'
-import { compile } from './index'
+import { compile } from './index.js'
 
 describe('GoScript Compiler API', () => {
   it('compiles a simple package through the CLI adapter', async () => {

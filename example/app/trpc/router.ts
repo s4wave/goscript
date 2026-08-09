@@ -1,7 +1,7 @@
 import { initTRPC } from '@trpc/server'
 import { z } from 'zod'
 import { eq } from 'drizzle-orm'
-import { db, todos } from '../db'
+import { db, todos } from '../db/index.js'
 
 // Import GoScript-compiled todo logic
 import {

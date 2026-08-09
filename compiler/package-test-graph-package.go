@@ -1,6 +1,10 @@
 package compiler
 
-import "golang.org/x/tools/go/packages"
+import (
+	"slices"
+
+	"golang.org/x/tools/go/packages"
+)
 
 // PackageTestGraphPackage describes one requested package under test.
 type PackageTestGraphPackage struct {
@@ -35,6 +39,6 @@ func (p *PackageTestGraphPackage) setPackage(pkg *packages.Package) {
 	p.PackagePath = packagePath(pkg)
 	p.PackageName = pkg.Name
 	p.PackageID = pkg.ID
-	p.GoFiles = append([]string(nil), pkg.GoFiles...)
-	p.CompiledGoFiles = append([]string(nil), pkg.CompiledGoFiles...)
+	p.GoFiles = slices.Clone(pkg.GoFiles)
+	p.CompiledGoFiles = slices.Clone(pkg.CompiledGoFiles)
 }

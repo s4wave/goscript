@@ -3,6 +3,7 @@ package compiler
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 )
 
@@ -85,8 +86,8 @@ func (o *CompileRequestOwner) NewRequest(conf Config, patterns []string) *Compil
 		Dir:                       strings.TrimSpace(dir),
 		OutputPath:                strings.TrimSpace(conf.OutputPath),
 		CacheRoot:                 strings.TrimSpace(conf.CacheRoot),
-		BuildFlags:                append([]string(nil), conf.BuildFlags...),
-		OverrideDirs:              append([]string(nil), conf.OverrideDirs...),
+		BuildFlags:                slices.Clone(conf.BuildFlags),
+		OverrideDirs:              slices.Clone(conf.OverrideDirs),
 		PackageBlocklist:          normalizePackageBlocklist(conf.PackageBlocklist),
 		DependencyMode:            dependencyMode,
 		RuntimeEmissionMode:       runtimeEmissionMode,

@@ -1,6 +1,6 @@
 import { createHTTPServer } from '@trpc/server/adapters/standalone'
-import { appRouter } from './trpc/router'
-import { db } from './db'
+import { appRouter } from './trpc/router.js'
+import { db } from './db/index.js'
 import { sql } from 'drizzle-orm'
 
 // Initialize the database table

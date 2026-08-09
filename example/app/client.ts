@@ -2,7 +2,7 @@
 // This demonstrates how to use the API from a TypeScript client
 
 import { createTRPCClient, httpBatchLink } from '@trpc/client'
-import type { AppRouter } from './trpc/router'
+import type { AppRouter } from './trpc/router.js'
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000
 

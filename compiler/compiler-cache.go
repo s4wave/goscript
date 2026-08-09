@@ -752,7 +752,7 @@ func formatCompilerCacheManifest(manifest compilerCacheManifest) []byte {
 	if stream.Error != nil {
 		return nil
 	}
-	return append([]byte(nil), stream.Buffer()...)
+	return bytes.Clone(stream.Buffer())
 }
 
 func writeStringArray(stream *jsoniter.Stream, field string, values []string) {

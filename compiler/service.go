@@ -83,7 +83,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 
 	result := &CompilationResult{}
 	if req != nil {
-		result.OriginalPackages = append([]string(nil), req.Patterns...)
+		result.OriginalPackages = slices.Clone(req.Patterns)
 	}
 
 	diagnostics := s.requestOwner.Validate(req)
@@ -101,7 +101,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		graph, graphDiagnostics := s.graphOwner.LoadIdentity(ctx, req)
 		diagnostics = append(diagnostics, graphDiagnostics...)
 		if graph != nil {
-			result.OriginalPackages = append([]string(nil), graph.RequestedPackagePaths...)
+			result.OriginalPackages = slices.Clone(graph.RequestedPackagePaths)
 		}
 		if diagnosticsHaveErrors(diagnostics) {
 			result.Diagnostics = diagnostics
@@ -125,7 +125,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 			}
 			cacheEntries := s.cacheOwner.Entries(req, graph, overridePlan)
 			if cached, ok := s.cacheOwner.Replay(ctx, req, cacheEntries); ok {
-				cached.OriginalPackages = append([]string(nil), result.OriginalPackages...)
+				cached.OriginalPackages = slices.Clone(result.OriginalPackages)
 				cached.Diagnostics = diagnostics
 				return cached, nil
 			}
@@ -136,7 +136,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 	graph, graphDiagnostics := s.graphOwner.Load(ctx, req)
 	diagnostics = append(diagnostics, graphDiagnostics...)
 	if graph != nil {
-		result.OriginalPackages = append([]string(nil), graph.RequestedPackagePaths...)
+		result.OriginalPackages = slices.Clone(graph.RequestedPackagePaths)
 	}
 	if diagnosticsHaveErrors(diagnostics) {
 		result.Diagnostics = diagnostics
@@ -172,7 +172,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		cacheEntries = s.cacheOwner.Entries(req, graph, overridePlan)
 		if !cacheReplayTried {
 			if cached, ok := s.cacheOwner.Replay(ctx, req, cacheEntries); ok {
-				cached.OriginalPackages = append([]string(nil), result.OriginalPackages...)
+				cached.OriginalPackages = slices.Clone(result.OriginalPackages)
 				cached.Diagnostics = diagnostics
 				return cached, nil
 			}

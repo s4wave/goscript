@@ -2,8 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { httpBatchLink } from '@trpc/client'
-import { trpc } from './trpc'
-import App from './App'
+import { trpc } from './trpc.js'
+import App from './App.js'
 import './index.css'
 
 const queryClient = new QueryClient()

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { trpc } from './trpc'
+import { trpc } from './trpc.js'
 
 type Filter = 'all' | 'active' | 'completed'
 type Priority = 'low' | 'medium' | 'high'

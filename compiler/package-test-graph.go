@@ -62,7 +62,7 @@ func (o *PackageGraphOwner) LoadTestGraph(ctx context.Context, req *CompileReque
 	}
 
 	graph := &PackageTestGraph{
-		RequestedPatterns: append([]string(nil), req.Patterns...),
+		RequestedPatterns: slices.Clone(req.Patterns),
 		packagesByPath:    make(map[string]*PackageTestGraphPackage),
 	}
 	var diagnostics []Diagnostic
