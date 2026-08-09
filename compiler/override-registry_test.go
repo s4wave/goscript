@@ -269,6 +269,49 @@ func TestCompilePackagesCopiesRuntimeOverrides(t *testing.T) {
 	}
 }
 
+func TestCompilePackagesUsesTypedArrayCRC32Override(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/crc32override\n\ngo 1.25.3\n",
+		"main.go": strings.Join([]string{
+			"package main",
+			"import \"hash/crc32\"",
+			"func main() { println(crc32.ChecksumIEEE([]byte(\"drive\"))) }",
+			"",
+		}, "\n"),
+	})
+	out := filepath.Join(t.TempDir(), "out")
+	comp, err := NewCompiler(&Config{
+		Dir:             moduleDir,
+		OutputPath:      out,
+		AllDependencies: true,
+	}, nil, nil)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	result, err := comp.CompilePackages(context.Background(), ".")
+	if err != nil {
+		t.Fatalf("compile failed: %v\n%#v", err, result.Diagnostics)
+	}
+	if !slices.Contains(result.CopiedPackages, "hash/crc32") {
+		t.Fatalf("hash/crc32 was generically lowered instead of copied: %#v", result.CopiedPackages)
+	}
+
+	content, err := os.ReadFile(filepath.Join(out, "@goscript", "hash", "crc32", "index.ts"))
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	text := string(content)
+	if !strings.Contains(text, "$.bytesToUint8Array(data)") {
+		t.Fatalf("hash/crc32 override does not enter through a typed-array view:\n%s", text)
+	}
+	for _, helper := range []string{"$.arrayIndex(", "$.goSlice("} {
+		if strings.Contains(text, helper) {
+			t.Fatalf("hash/crc32 override reintroduced generic hot-loop helper %q:\n%s", helper, text)
+		}
+	}
+}
+
 func TestCompilePackagesAwaitsOverrideAsyncMethods(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod": "module example.test/overrideasync\n\ngo 1.25.3\n",
