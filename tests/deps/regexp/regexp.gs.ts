@@ -19,11 +19,11 @@ import * as unicode from "@goscript/unicode/index.js"
 
 import * as utf8 from "@goscript/unicode/utf8/index.js"
 
-import * as __goscript_backtrack from "./backtrack.gs.ts"
+import * as __goscript_backtrack from "./backtrack.gs.js"
 
-import * as __goscript_exec from "./exec.gs.ts"
+import * as __goscript_exec from "./exec.gs.js"
 
-import * as __goscript_onepass from "./onepass.gs.ts"
+import * as __goscript_onepass from "./onepass.gs.js"
 import "@goscript/regexp/syntax/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/io/index.js"
@@ -32,9 +32,9 @@ import "@goscript/strconv/index.js"
 import "@goscript/strings/index.js"
 import "@goscript/unicode/index.js"
 import "@goscript/unicode/utf8/index.js"
-import "./backtrack.gs.ts"
-import "./exec.gs.ts"
-import "./onepass.gs.ts"
+import "./backtrack.gs.js"
+import "./exec.gs.js"
+import "./onepass.gs.js"
 
 export type input = {
 	canCheckPrefix(): boolean
@@ -864,7 +864,6 @@ export class Regexp {
 							$.pointerValue<__goscript_exec.onePassMachine>(m).matchcap![1] = pos
 						}
 						break Return
-						break
 					}
 					case syntax.InstRune:
 					{
@@ -896,17 +895,14 @@ export class Regexp {
 					{
 						pc = $.int(__goscript_onepass.onePassNext(inst, $.int(r, 32)))
 						continue
-						break
 					}
 					case syntax.InstFail:
 					{
 						break Return
-						break
 					}
 					case syntax.InstNop:
 					{
 						continue
-						break
 					}
 					case syntax.InstEmptyWidth:
 					{
@@ -914,7 +910,6 @@ export class Regexp {
 							break Return
 						}
 						continue
-						break
 					}
 					case syntax.InstCapture:
 					{
@@ -922,7 +917,6 @@ export class Regexp {
 							$.pointerValue<__goscript_exec.onePassMachine>(m).matchcap![$.pointerValue<__goscript_onepass.onePassInst>(inst).Inst.Arg] = pos
 						}
 						continue
-						break
 					}
 				}
 				if (width == 0) {
@@ -1147,7 +1141,6 @@ export class Regexp {
 						continue __goscriptGotoLoop0
 						__goscriptGotoState0 = "CheckAndLoop"
 						continue __goscriptGotoLoop0
-						break
 					}
 					case "CheckAndLoop":
 					{
@@ -1156,7 +1149,6 @@ export class Regexp {
 						}
 						__goscriptGotoState0 = "Skip"
 						continue __goscriptGotoLoop0
-						break
 					}
 					case "Skip":
 					{
@@ -1188,7 +1180,6 @@ export class Regexp {
 									__goscriptGotoState0 = "CheckAndLoop"
 									continue __goscriptGotoLoop0
 								}
-								break
 							}
 							case syntax.InstAltMatch:
 							{
@@ -1203,7 +1194,6 @@ export class Regexp {
 										__goscriptShadow2 = $.pointerValue<__goscript_backtrack.bitState>(b).end
 										__goscriptGotoState0 = "CheckAndLoop"
 										continue __goscriptGotoLoop0
-										break
 									}
 								}
 
@@ -1211,7 +1201,6 @@ export class Regexp {
 								__goscriptShadow1 = $.uint($.pointerValue<syntax.Inst>(inst).Out, 32)
 								__goscriptGotoState0 = "CheckAndLoop"
 								continue __goscriptGotoLoop0
-								break
 							}
 							case syntax.InstRune:
 							{
@@ -1225,7 +1214,6 @@ export class Regexp {
 								__goscriptShadow1 = $.uint($.pointerValue<syntax.Inst>(inst).Out, 32)
 								__goscriptGotoState0 = "CheckAndLoop"
 								continue __goscriptGotoLoop0
-								break
 							}
 							case syntax.InstRune1:
 							{
@@ -1239,7 +1227,6 @@ export class Regexp {
 								__goscriptShadow1 = $.uint($.pointerValue<syntax.Inst>(inst).Out, 32)
 								__goscriptGotoState0 = "CheckAndLoop"
 								continue __goscriptGotoLoop0
-								break
 							}
 							case syntax.InstRuneAnyNotNL:
 							{
@@ -1253,7 +1240,6 @@ export class Regexp {
 								__goscriptShadow1 = $.uint($.pointerValue<syntax.Inst>(inst).Out, 32)
 								__goscriptGotoState0 = "CheckAndLoop"
 								continue __goscriptGotoLoop0
-								break
 							}
 							case syntax.InstRuneAny:
 							{
@@ -1267,7 +1253,6 @@ export class Regexp {
 								__goscriptShadow1 = $.uint($.pointerValue<syntax.Inst>(inst).Out, 32)
 								__goscriptGotoState0 = "CheckAndLoop"
 								continue __goscriptGotoLoop0
-								break
 							}
 							case syntax.InstCapture:
 							{
@@ -1285,7 +1270,6 @@ export class Regexp {
 									__goscriptGotoState0 = "CheckAndLoop"
 									continue __goscriptGotoLoop0
 								}
-								break
 							}
 							case syntax.InstEmptyWidth:
 							{
@@ -1296,14 +1280,12 @@ export class Regexp {
 								__goscriptShadow1 = $.uint($.pointerValue<syntax.Inst>(inst).Out, 32)
 								__goscriptGotoState0 = "CheckAndLoop"
 								continue __goscriptGotoLoop0
-								break
 							}
 							case syntax.InstNop:
 							{
 								__goscriptShadow1 = $.uint($.pointerValue<syntax.Inst>(inst).Out, 32)
 								__goscriptGotoState0 = "CheckAndLoop"
 								continue __goscriptGotoLoop0
-								break
 							}
 							case syntax.InstMatch:
 							{
@@ -1330,11 +1312,9 @@ export class Regexp {
 								}
 
 								continue __goscriptLoop0
-								break
 							}
 						}
 						break __goscriptGotoLoop0
-						break
 					}
 				}
 				break
@@ -1677,14 +1657,12 @@ export function minInputLen(re: syntax.Regexp | $.VarRef<syntax.Regexp> | null):
 		default:
 		{
 			return 0
-			break
 		}
 		case syntax.OpAnyChar:
 		case syntax.OpAnyCharNotNL:
 		case syntax.OpCharClass:
 		{
 			return 1
-			break
 		}
 		case syntax.OpLiteral:
 		{
@@ -1698,18 +1676,15 @@ export function minInputLen(re: syntax.Regexp | $.VarRef<syntax.Regexp> | null):
 				}
 			}
 			return l
-			break
 		}
 		case syntax.OpCapture:
 		case syntax.OpPlus:
 		{
 			return minInputLen($.arrayIndex($.pointerValue<syntax.Regexp>(re).Sub!, 0))
-			break
 		}
 		case syntax.OpRepeat:
 		{
 			return $.pointerValue<syntax.Regexp>(re).Min * minInputLen($.arrayIndex($.pointerValue<syntax.Regexp>(re).Sub!, 0))
-			break
 		}
 		case syntax.OpConcat:
 		{
@@ -1719,7 +1694,6 @@ export function minInputLen(re: syntax.Regexp | $.VarRef<syntax.Regexp> | null):
 				l = l + (minInputLen(sub))
 			}
 			return l
-			break
 		}
 		case syntax.OpAlternate:
 		{
@@ -1733,7 +1707,6 @@ export function minInputLen(re: syntax.Regexp | $.VarRef<syntax.Regexp> | null):
 				}
 			}
 			return l
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")

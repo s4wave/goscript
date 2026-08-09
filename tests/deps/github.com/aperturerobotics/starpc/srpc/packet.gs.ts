@@ -7,11 +7,11 @@ import type * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/pr
 
 import type * as json from "@goscript/github.com/aperturerobotics/protobuf-go-lite/json/index.js"
 
-import * as __goscript_errors from "./errors.gs.ts"
+import * as __goscript_errors from "./errors.gs.js"
 
-import * as __goscript_rpcproto_pb from "./rpcproto.pb.gs.ts"
-import "./errors.gs.ts"
-import "./rpcproto.pb.gs.ts"
+import * as __goscript_rpcproto_pb from "./rpcproto.pb.gs.js"
+import "./errors.gs.js"
+import "./rpcproto.pb.gs.js"
 
 export type CloseHandler = ((closeErr: $.GoError) => void) | null
 

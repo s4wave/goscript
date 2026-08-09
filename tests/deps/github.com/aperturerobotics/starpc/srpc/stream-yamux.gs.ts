@@ -13,14 +13,14 @@ import type * as io from "@goscript/io/index.js"
 
 import * as sync from "@goscript/sync/index.js"
 
-import * as __goscript_errors from "./errors.gs.ts"
+import * as __goscript_errors from "./errors.gs.js"
 
-import type * as __goscript_muxed from "./muxed.gs.ts"
+import type * as __goscript_muxed from "./muxed.gs.js"
 import "@goscript/errors/index.js"
 import "@goscript/time/index.js"
 import "@goscript/github.com/libp2p/go-yamux/v4/index.js"
 import "@goscript/sync/index.js"
-import "./errors.gs.ts"
+import "./errors.gs.js"
 
 export class yamuxStream {
 	public get sendWindow(): number {

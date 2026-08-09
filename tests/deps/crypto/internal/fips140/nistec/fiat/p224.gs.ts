@@ -7,13 +7,13 @@ import * as subtle from "@goscript/crypto/internal/fips140/subtle/index.js"
 
 import * as errors from "@goscript/errors/index.js"
 
-import * as __goscript_p224_fiat64 from "./p224_fiat64.gs.ts"
+import * as __goscript_p224_fiat64 from "./p224_fiat64.gs.js"
 
-import * as __goscript_p224_invert from "./p224_invert.gs.ts"
+import * as __goscript_p224_invert from "./p224_invert.gs.js"
 import "@goscript/crypto/internal/fips140/subtle/index.js"
 import "@goscript/errors/index.js"
-import "./p224_fiat64.gs.ts"
-import "./p224_invert.gs.ts"
+import "./p224_fiat64.gs.js"
+import "./p224_invert.gs.js"
 
 export type p224UntypedFieldElement = bigint[]
 

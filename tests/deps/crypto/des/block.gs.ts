@@ -7,12 +7,12 @@ import * as byteorder from "@goscript/internal/byteorder/index.js"
 
 import * as sync from "@goscript/sync/index.js"
 
-import * as __goscript__const from "./const.gs.ts"
+import * as __goscript__const from "./const.gs.js"
 
-import type * as __goscript_cipher from "./cipher.gs.ts"
+import type * as __goscript_cipher from "./cipher.gs.js"
 import "@goscript/internal/byteorder/index.js"
 import "@goscript/sync/index.js"
-import "./const.gs.ts"
+import "./const.gs.js"
 
 export function cryptBlock(subkeys: $.Slice<bigint>, dst: $.Slice<number>, src: $.Slice<number>, decrypt: boolean): void {
 	let b = byteorder.BEUint64(src)

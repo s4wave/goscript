@@ -3,7 +3,7 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import type * as __goscript_cross_file_method_owner from "./cross_file_method_owner.gs.ts"
+import type * as __goscript_cross_file_method_owner from "./cross_file_method_owner.gs.js"
 
 export type box = number
 

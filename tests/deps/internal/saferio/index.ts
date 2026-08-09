@@ -1,1 +1,1 @@
-export { ReadData, ReadDataAt, SliceCap, SliceCapWithSize } from "./io.gs.ts"
+export { ReadData, ReadDataAt, SliceCap, SliceCapWithSize } from './io.gs.js'

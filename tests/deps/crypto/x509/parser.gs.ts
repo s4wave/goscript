@@ -53,19 +53,19 @@ import * as elliptic from "@goscript/crypto/elliptic/index.js"
 
 import type * as io from "@goscript/io/index.js"
 
-import * as __goscript_cert_pool from "./cert_pool.gs.ts"
+import * as __goscript_cert_pool from "./cert_pool.gs.js"
 
-import * as __goscript_oid from "./oid.gs.ts"
+import * as __goscript_oid from "./oid.gs.js"
 
-import * as __goscript_pkcs1 from "./pkcs1.gs.ts"
+import * as __goscript_pkcs1 from "./pkcs1.gs.js"
 
-import * as __goscript_root_unix from "./root_unix.gs.ts"
+import * as __goscript_root_unix from "./root_unix.gs.js"
 
-import * as __goscript_verify from "./verify.gs.ts"
+import * as __goscript_verify from "./verify.gs.js"
 
-import * as __goscript_x509 from "./x509.gs.ts"
+import * as __goscript_x509 from "./x509.gs.js"
 
-import * as __goscript_x509_string from "./x509_string.gs.ts"
+import * as __goscript_x509_string from "./x509_string.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/crypto/dsa/index.js"
 import "@goscript/crypto/ecdh/index.js"
@@ -89,13 +89,13 @@ import "@goscript/unicode/utf8/index.js"
 import "@goscript/vendor/golang.org/x/crypto/cryptobyte/index.js"
 import "@goscript/vendor/golang.org/x/crypto/cryptobyte/asn1/index.js"
 import "@goscript/crypto/elliptic/index.js"
-import "./cert_pool.gs.ts"
-import "./oid.gs.ts"
-import "./pkcs1.gs.ts"
-import "./root_unix.gs.ts"
-import "./verify.gs.ts"
-import "./x509.gs.ts"
-import "./x509_string.gs.ts"
+import "./cert_pool.gs.js"
+import "./oid.gs.js"
+import "./pkcs1.gs.js"
+import "./root_unix.gs.js"
+import "./verify.gs.js"
+import "./x509.gs.js"
+import "./x509_string.gs.js"
 
 export const x509v2Version: number = 1
 
@@ -114,7 +114,6 @@ export function parseASN1String(tag: cryptobyte_asn1.Tag, value: $.Slice<number>
 				buf = utf8.AppendRune(buf, $.int($.int(v, 32), 32))
 			}
 			return [$.bytesToString(buf), null]
-			break
 		}
 		case cryptobyte_asn1.PrintableString:
 		{
@@ -125,7 +124,6 @@ export function parseASN1String(tag: cryptobyte_asn1.Tag, value: $.Slice<number>
 				}
 			}
 			return [$.bytesToString(value), null]
-			break
 		}
 		case cryptobyte_asn1.UTF8String:
 		{
@@ -133,7 +131,6 @@ export function parseASN1String(tag: cryptobyte_asn1.Tag, value: $.Slice<number>
 				return ["", errors.New("invalid UTF-8 string")]
 			}
 			return [$.bytesToString(value), null]
-			break
 		}
 		case $.uint(asn1.TagBMPString, 8):
 		{
@@ -163,7 +160,6 @@ export function parseASN1String(tag: cryptobyte_asn1.Tag, value: $.Slice<number>
 			}
 
 			return [$.runesToString(utf16.Decode(s)), null]
-			break
 		}
 		case cryptobyte_asn1.IA5String:
 		{
@@ -172,7 +168,6 @@ export function parseASN1String(tag: cryptobyte_asn1.Tag, value: $.Slice<number>
 				return ["", errors.New("invalid IA5String")]
 			}
 			return [s, null]
-			break
 		}
 		case $.uint(asn1.TagNumericString, 8):
 		{
@@ -183,7 +178,6 @@ export function parseASN1String(tag: cryptobyte_asn1.Tag, value: $.Slice<number>
 				}
 			}
 			return [$.bytesToString(value), null]
-			break
 		}
 	}
 	return ["", fmt.Errorf("unsupported string type: %v", $.namedValueInterfaceValue<any>(tag, "asn1.Tag", {Constructed: (receiver: any, ...args: any[]) => (cryptobyte_asn1.Tag_Constructed as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), ContextSpecific: (receiver: any, ...args: any[]) => (cryptobyte_asn1.Tag_ContextSpecific as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Basic, name: "uint8", typeName: "asn1.Tag" }, [{ name: "Constructed", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint8", typeName: "asn1.Tag" } }] }, { name: "ContextSpecific", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "uint8", typeName: "asn1.Tag" } }] }]))]
@@ -271,7 +265,6 @@ export function parseTime(der: $.VarRef<cryptobyte.String> | null): [time.Time, 
 		default:
 		{
 			return [$.markAsStructValue($.cloneStructValue(t.value)), errors.New("x509: unsupported time format")]
-			break
 		}
 	}
 	return [$.markAsStructValue($.cloneStructValue(t.value)), null]
@@ -344,7 +337,6 @@ export async function parsePublicKey(keyData: __goscript_x509.publicKeyInfo | $.
 
 			let pub: rsa.PublicKey | $.VarRef<rsa.PublicKey> | null = new rsa.PublicKey({E: $.pointerValue<__goscript_pkcs1.pkcs1PublicKey>(p).E, N: $.pointerValue<__goscript_pkcs1.pkcs1PublicKey>(p).N})
 			return [$.interfaceValue(pub, "*rsa.PublicKey", { kind: $.TypeKind.Pointer, elemType: "rsa.PublicKey" }), null]
-			break
 		}
 		case asn1.ObjectIdentifier_Equal(oid, (__goscript_x509.oidPublicKeyECDSA as asn1.ObjectIdentifier)):
 		{
@@ -370,7 +362,6 @@ export async function parsePublicKey(keyData: __goscript_x509.publicKeyInfo | $.
 				return [null, errors.New("x509: wrong Ed25519 public key size")]
 			}
 			return [$.namedValueInterfaceValue<any>((data as ed25519.PublicKey), "ed25519.PublicKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PublicKey" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }]), null]
-			break
 		}
 		case asn1.ObjectIdentifier_Equal(oid, (__goscript_x509.oidPublicKeyX25519 as asn1.ObjectIdentifier)):
 		{
@@ -397,12 +388,10 @@ export async function parsePublicKey(keyData: __goscript_x509.publicKeyInfo | $.
 				return [null, errors.New("x509: zero or negative DSA parameter")]
 			}
 			return [$.interfaceValue(pub, "*dsa.PublicKey", { kind: $.TypeKind.Pointer, elemType: "dsa.PublicKey" }), null]
-			break
 		}
 		default:
 		{
 			return [null, errors.New("x509: unknown public key algorithm")]
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")
@@ -535,7 +524,6 @@ export async function parseSANExtension(der: cryptobyte.String): globalThis.Prom
 					default:
 					{
 						return errors.New("x509: cannot parse IP address of length " + strconv.Itoa($.len(data)))
-						break
 					}
 				}
 				break
@@ -651,7 +639,6 @@ export function isValidIPMask(mask: $.Slice<number>): boolean {
 			default:
 			{
 				return false
-				break
 			}
 		}
 	}
@@ -754,7 +741,6 @@ export async function parseNameConstraintsExtension(out: __goscript_x509.Certifi
 						default:
 						{
 							return [null, null, null, null, fmt.Errorf("x509: IP constraint contained value of length %d", $.basicInterfaceValue(l, "int"))]
-							break
 						}
 					}
 

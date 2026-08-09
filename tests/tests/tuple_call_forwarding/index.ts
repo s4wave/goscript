@@ -1,1 +1,1 @@
-export { point } from "./tuple_call_forwarding.gs.ts"
+export { point } from './tuple_call_forwarding.gs.js'

@@ -11,18 +11,18 @@ import * as stringslite from "@goscript/internal/stringslite/index.js"
 
 import * as netip from "@goscript/net/netip/index.js"
 
-import * as __goscript_mac from "./mac.gs.ts"
+import * as __goscript_mac from "./mac.gs.js"
 
-import * as __goscript_net from "./net.gs.ts"
+import * as __goscript_net from "./net.gs.js"
 
-import * as __goscript_parse from "./parse.gs.ts"
+import * as __goscript_parse from "./parse.gs.js"
 import "@goscript/internal/bytealg/index.js"
 import "@goscript/internal/strconv/index.js"
 import "@goscript/internal/stringslite/index.js"
 import "@goscript/net/netip/index.js"
-import "./mac.gs.ts"
-import "./net.gs.ts"
-import "./parse.gs.ts"
+import "./mac.gs.js"
+import "./net.gs.js"
+import "./parse.gs.js"
 
 export type IP = $.Slice<number>
 
@@ -358,17 +358,14 @@ export function IP_DefaultMask(ip: IP): IPMask {
 		case $.uint($.arrayIndex(ip!, 0), 8) < $.uint(0x80, 8):
 		{
 			return (classAMask as IPMask)
-			break
 		}
 		case $.uint($.arrayIndex(ip!, 0), 8) < $.uint(0xC0, 8):
 		{
 			return (classBMask as IPMask)
-			break
 		}
 		default:
 		{
 			return (classCMask as IPMask)
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")
@@ -593,7 +590,6 @@ export function networkNumberAndMask(n: IPNet | $.VarRef<IPNet> | null): [IP, IP
 		default:
 		{
 			return [(null as IP), (null as IPMask)]
-			break
 		}
 	}
 	return [ip, m]

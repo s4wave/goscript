@@ -25,45 +25,45 @@ import * as sync from "@goscript/sync/index.js"
 
 import type * as rand from "@goscript/math/rand/index.js"
 
-import * as __goscript_accuracy_string from "./accuracy_string.gs.ts"
+import * as __goscript_accuracy_string from "./accuracy_string.gs.js"
 
-import * as __goscript_arith from "./arith.gs.ts"
+import * as __goscript_arith from "./arith.gs.js"
 
-import * as __goscript_arith_decl from "./arith_decl.gs.ts"
+import * as __goscript_arith_decl from "./arith_decl.gs.js"
 
-import * as __goscript_decimal from "./decimal.gs.ts"
+import * as __goscript_decimal from "./decimal.gs.js"
 
-import * as __goscript_floatconv from "./floatconv.gs.ts"
+import * as __goscript_floatconv from "./floatconv.gs.js"
 
-import * as __goscript_floatmarsh from "./floatmarsh.gs.ts"
+import * as __goscript_floatmarsh from "./floatmarsh.gs.js"
 
-import * as __goscript_ftoa from "./ftoa.gs.ts"
+import * as __goscript_ftoa from "./ftoa.gs.js"
 
-import * as __goscript_int from "./int.gs.ts"
+import * as __goscript_int from "./int.gs.js"
 
-import * as __goscript_intconv from "./intconv.gs.ts"
+import * as __goscript_intconv from "./intconv.gs.js"
 
-import * as __goscript_intmarsh from "./intmarsh.gs.ts"
+import * as __goscript_intmarsh from "./intmarsh.gs.js"
 
-import * as __goscript_nat from "./nat.gs.ts"
+import * as __goscript_nat from "./nat.gs.js"
 
-import * as __goscript_natconv from "./natconv.gs.ts"
+import * as __goscript_natconv from "./natconv.gs.js"
 
-import * as __goscript_natdiv from "./natdiv.gs.ts"
+import * as __goscript_natdiv from "./natdiv.gs.js"
 
-import * as __goscript_natmul from "./natmul.gs.ts"
+import * as __goscript_natmul from "./natmul.gs.js"
 
-import * as __goscript_prime from "./prime.gs.ts"
+import * as __goscript_prime from "./prime.gs.js"
 
-import * as __goscript_rat from "./rat.gs.ts"
+import * as __goscript_rat from "./rat.gs.js"
 
-import * as __goscript_ratconv from "./ratconv.gs.ts"
+import * as __goscript_ratconv from "./ratconv.gs.js"
 
-import * as __goscript_ratmarsh from "./ratmarsh.gs.ts"
+import * as __goscript_ratmarsh from "./ratmarsh.gs.js"
 
-import * as __goscript_roundingmode_string from "./roundingmode_string.gs.ts"
+import * as __goscript_roundingmode_string from "./roundingmode_string.gs.js"
 
-import * as __goscript_sqrt from "./sqrt.gs.ts"
+import * as __goscript_sqrt from "./sqrt.gs.js"
 import "@goscript/strconv/index.js"
 import "@goscript/fmt/index.js"
 import "@goscript/math/index.js"
@@ -74,26 +74,26 @@ import "@goscript/errors/index.js"
 import "@goscript/internal/byteorder/index.js"
 import "@goscript/bytes/index.js"
 import "@goscript/sync/index.js"
-import "./accuracy_string.gs.ts"
-import "./arith.gs.ts"
-import "./arith_decl.gs.ts"
-import "./decimal.gs.ts"
-import "./floatconv.gs.ts"
-import "./floatmarsh.gs.ts"
-import "./ftoa.gs.ts"
-import "./int.gs.ts"
-import "./intconv.gs.ts"
-import "./intmarsh.gs.ts"
-import "./nat.gs.ts"
-import "./natconv.gs.ts"
-import "./natdiv.gs.ts"
-import "./natmul.gs.ts"
-import "./prime.gs.ts"
-import "./rat.gs.ts"
-import "./ratconv.gs.ts"
-import "./ratmarsh.gs.ts"
-import "./roundingmode_string.gs.ts"
-import "./sqrt.gs.ts"
+import "./accuracy_string.gs.js"
+import "./arith.gs.js"
+import "./arith_decl.gs.js"
+import "./decimal.gs.js"
+import "./floatconv.gs.js"
+import "./floatmarsh.gs.js"
+import "./ftoa.gs.js"
+import "./int.gs.js"
+import "./intconv.gs.js"
+import "./intmarsh.gs.js"
+import "./nat.gs.js"
+import "./natconv.gs.js"
+import "./natdiv.gs.js"
+import "./natmul.gs.js"
+import "./prime.gs.js"
+import "./rat.gs.js"
+import "./ratconv.gs.js"
+import "./ratmarsh.gs.js"
+import "./roundingmode_string.gs.js"
+import "./sqrt.gs.js"
 
 export type form = number
 
@@ -288,17 +288,14 @@ export class Float {
 			case 98:
 			{
 				return Float.prototype.fmtB.call(x, buf)
-				break
 			}
 			case 112:
 			{
 				return Float.prototype.fmtP.call(x, buf)
-				break
 			}
 			case 120:
 			{
 				return Float.prototype.fmtX.call(x, buf, prec)
-				break
 			}
 		}
 
@@ -364,12 +361,10 @@ export class Float {
 			case 69:
 			{
 				return __goscript_ftoa.fmtE(buf, $.uint(fmt, 8), prec, $.markAsStructValue($.cloneStructValue(d.value)))
-				break
 			}
 			case 102:
 			{
 				return __goscript_ftoa.fmtF(buf, prec, $.markAsStructValue($.cloneStructValue(d.value)))
-				break
 			}
 			case 103:
 			case 71:
@@ -395,7 +390,6 @@ export class Float {
 					prec = $.len(d.value.mant)
 				}
 				return __goscript_ftoa.fmtF(buf, $.max(prec - d.value.exp, 0), $.markAsStructValue($.cloneStructValue(d.value)))
-				break
 			}
 		}
 
@@ -426,12 +420,10 @@ export class Float {
 			case mx < my:
 			{
 				return -1
-				break
 			}
 			case mx > my:
 			{
 				return +1
-				break
 			}
 		}
 		// mx == my
@@ -441,12 +433,10 @@ export class Float {
 			case -1:
 			{
 				return Float.prototype.ucmp.call(y, x)
-				break
 			}
 			case +1:
 			{
 				return Float.prototype.ucmp.call(x, y)
-				break
 			}
 		}
 
@@ -569,7 +559,6 @@ export class Float {
 				}
 
 				return [math.Float32frombits($.uint((sign | bexp) | mant, 32)), $.int(r.value.acc, 8)]
-				break
 			}
 			case 0:
 			{
@@ -578,7 +567,6 @@ export class Float {
 					return [-z, $.int(0, 8)]
 				}
 				return [0.0, $.int(0, 8)]
-				break
 			}
 			case 2:
 			{
@@ -586,7 +574,6 @@ export class Float {
 					return [$.float32(math.Inf(-1)), $.int(0, 8)]
 				}
 				return [$.float32(math.Inf(+1)), $.int(0, 8)]
-				break
 			}
 		}
 
@@ -691,7 +678,6 @@ export class Float {
 				}
 
 				return [math.Float64frombits($.uint64Or(($.uint64Or(sign, bexp)), mant)), $.int(r.value.acc, 8)]
-				break
 			}
 			case 0:
 			{
@@ -700,7 +686,6 @@ export class Float {
 					return [-z, $.int(0, 8)]
 				}
 				return [0.0, $.int(0, 8)]
-				break
 			}
 			case 2:
 			{
@@ -708,7 +693,6 @@ export class Float {
 					return [math.Inf(-1), $.int(0, 8)]
 				}
 				return [math.Inf(+1), $.int(0, 8)]
-				break
 			}
 		}
 
@@ -754,7 +738,6 @@ export class Float {
 			{
 				await fmt2.Fprintf($.pointerValueOrNil((s as io.Writer | null))!, "%%!%c(*big.Float=%s)", $.basicInterfaceValue(format, "rune", "int32"), await Float.prototype.String.call(x))
 				return
-				break
 			}
 		}
 		let buf: $.Slice<number> = null! as $.Slice<number>
@@ -959,17 +942,14 @@ export class Float {
 					}
 				}
 				return [z, $.int(acc, 8)]
-				break
 			}
 			case 0:
 			{
 				return [__goscript_int.Int.prototype.SetInt64.call(z, 0n), $.int(0, 8)]
-				break
 			}
 			case 2:
 			{
 				return [null, $.int(makeAcc($.pointerValue<Float>(x).neg), 8)]
-				break
 			}
 		}
 
@@ -1014,12 +994,10 @@ export class Float {
 				}
 				// x too large
 				return [9223372036854775807n, $.int(-1, 8)]
-				break
 			}
 			case 0:
 			{
 				return [0n, $.int(0, 8)]
-				break
 			}
 			case 2:
 			{
@@ -1027,7 +1005,6 @@ export class Float {
 					return [-9223372036854775808n, $.int(1, 8)]
 				}
 				return [9223372036854775807n, $.int(-1, 8)]
-				break
 			}
 		}
 
@@ -1272,17 +1249,14 @@ export class Float {
 					}
 				}
 				return [z, $.int(0, 8)]
-				break
 			}
 			case 0:
 			{
 				return [__goscript_rat.Rat.prototype.SetInt64.call(z, 0n), $.int(0, 8)]
-				break
 			}
 			case 2:
 			{
 				return [null, $.int(makeAcc($.pointerValue<Float>(x).neg), 8)]
-				break
 			}
 		}
 
@@ -1649,12 +1623,10 @@ export class Float {
 				}
 				// x too large
 				return [18446744073709551615n, $.int(-1, 8)]
-				break
 			}
 			case 0:
 			{
 				return [0n, $.int(0, 8)]
-				break
 			}
 			case 2:
 			{
@@ -1662,7 +1634,6 @@ export class Float {
 					return [0n, $.int(1, 8)]
 				}
 				return [18446744073709551615n, $.int(-1, 8)]
-				break
 			}
 		}
 
@@ -1825,7 +1796,6 @@ export class Float {
 			case 0:
 			{
 				return 0
-				break
 			}
 			case 2:
 			{
@@ -2266,12 +2236,10 @@ export class Float {
 			case $.int($.pointerValue<Float>(x).exp, 32) < $.int($.pointerValue<Float>(y).exp, 32):
 			{
 				return -1
-				break
 			}
 			case $.int($.pointerValue<Float>(x).exp, 32) > $.int($.pointerValue<Float>(y).exp, 32):
 			{
 				return +1
-				break
 			}
 		}
 		// x.exp == y.exp
@@ -2294,12 +2262,10 @@ export class Float {
 				case xm < ym:
 				{
 					return -1
-					break
 				}
 				case xm > ym:
 				{
 					return +1
-					break
 				}
 			}
 		}
@@ -2592,12 +2558,10 @@ export function msb32(x: __goscript_nat.nat): number {
 		case 32:
 		{
 			return $.uint($.uint($.arrayIndex(x!, i), 32), 32)
-			break
 		}
 		case 64:
 		{
 			return $.uint($.uint($.uint($.uint64Shr($.arrayIndex(x!, i), 32n), 64), 32), 32)
-			break
 		}
 	}
 	$.panic("unreachable")
@@ -2620,12 +2584,10 @@ export function msb64(x: __goscript_nat.nat): bigint {
 				v = $.uint64Or(v, $.uint64($.arrayIndex(x!, i - 1)))
 			}
 			return v
-			break
 		}
 		case 64:
 		{
 			return $.uint64($.arrayIndex(x!, i))
-			break
 		}
 	}
 	$.panic("unreachable")

@@ -19,17 +19,17 @@ import * as sync from "@goscript/sync/index.js"
 
 import * as time from "@goscript/time/index.js"
 
-import * as __goscript_buffer_pool from "./buffer_pool.gs.ts"
+import * as __goscript_buffer_pool from "./buffer_pool.gs.js"
 
-import * as __goscript_entry from "./entry.gs.ts"
+import * as __goscript_entry from "./entry.gs.js"
 
-import * as __goscript_formatter from "./formatter.gs.ts"
+import * as __goscript_formatter from "./formatter.gs.js"
 
-import * as __goscript_hooks from "./hooks.gs.ts"
+import * as __goscript_hooks from "./hooks.gs.js"
 
-import * as __goscript_logger from "./logger.gs.ts"
+import * as __goscript_logger from "./logger.gs.js"
 
-import * as __goscript_writer from "./writer.gs.ts"
+import * as __goscript_writer from "./writer.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/fmt/index.js"
 import "@goscript/log/index.js"
@@ -38,12 +38,12 @@ import "@goscript/io/index.js"
 import "@goscript/runtime/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/time/index.js"
-import "./buffer_pool.gs.ts"
-import "./entry.gs.ts"
-import "./formatter.gs.ts"
-import "./hooks.gs.ts"
-import "./logger.gs.ts"
-import "./writer.gs.ts"
+import "./buffer_pool.gs.js"
+import "./entry.gs.js"
+import "./formatter.gs.js"
+import "./hooks.gs.js"
+import "./logger.gs.js"
+import "./writer.gs.js"
 
 export type Fields = globalThis.Map<string, any> | null
 
@@ -161,42 +161,34 @@ export function Level_String(level: Level): string {
 		case 6:
 		{
 			return "trace"
-			break
 		}
 		case 5:
 		{
 			return "debug"
-			break
 		}
 		case 4:
 		{
 			return "info"
-			break
 		}
 		case 3:
 		{
 			return "warning"
-			break
 		}
 		case 2:
 		{
 			return "error"
-			break
 		}
 		case 1:
 		{
 			return "fatal"
-			break
 		}
 		case 0:
 		{
 			return "panic"
-			break
 		}
 		default:
 		{
 			return "unknown"
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")
@@ -213,43 +205,35 @@ export function parseLevel(b: $.Slice<number>): [Level, $.GoError] {
 		case bytes.EqualFold(b, new Uint8Array([112, 97, 110, 105, 99])):
 		{
 			return [$.uint(0, 32), null]
-			break
 		}
 		case bytes.EqualFold(b, new Uint8Array([102, 97, 116, 97, 108])):
 		{
 			return [$.uint(1, 32), null]
-			break
 		}
 		case bytes.EqualFold(b, new Uint8Array([101, 114, 114, 111, 114])):
 		{
 			return [$.uint(2, 32), null]
-			break
 		}
 		case bytes.EqualFold(b, new Uint8Array([119, 97, 114, 110])):
 		case bytes.EqualFold(b, new Uint8Array([119, 97, 114, 110, 105, 110, 103])):
 		{
 			return [$.uint(3, 32), null]
-			break
 		}
 		case bytes.EqualFold(b, new Uint8Array([105, 110, 102, 111])):
 		{
 			return [$.uint(4, 32), null]
-			break
 		}
 		case bytes.EqualFold(b, new Uint8Array([100, 101, 98, 117, 103])):
 		{
 			return [$.uint(5, 32), null]
-			break
 		}
 		case bytes.EqualFold(b, new Uint8Array([116, 114, 97, 99, 101])):
 		{
 			return [$.uint(6, 32), null]
-			break
 		}
 		default:
 		{
 			return [$.uint(0, 32), fmt.Errorf("not a valid logrus Level: %q", $.interfaceValue(b, "[]byte", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }))]
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")
@@ -279,12 +263,10 @@ export function Level_MarshalText(level: Level): [$.Slice<number>, $.GoError] {
 		case 0:
 		{
 			return [$.stringToBytes(Level_String(level)), null]
-			break
 		}
 		default:
 		{
 			return [null, fmt.Errorf("not a valid logrus level %d", $.namedValueInterfaceValue<any>(level, "logrus.Level", {MarshalText: (receiver: any, ...args: any[]) => (Level_MarshalText as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (Level_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Basic, name: "uint32", typeName: "logrus.Level" }, [{ name: "MarshalText", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "_r1", type: "error" }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]))]
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")

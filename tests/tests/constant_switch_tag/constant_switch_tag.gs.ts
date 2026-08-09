@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_constants from "./constants.gs.ts"
-import "./constants.gs.ts"
+import * as __goscript_constants from "./constants.gs.js"
+import "./constants.gs.js"
 
 export async function main(): globalThis.Promise<void> {
 	switch ((64 as number)) {

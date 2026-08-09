@@ -3,11 +3,11 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_sha3 from "./sha3.gs.ts"
+import * as __goscript_sha3 from "./sha3.gs.js"
 
-import * as __goscript_sha3_noasm from "./sha3_noasm.gs.ts"
-import "./sha3.gs.ts"
-import "./sha3_noasm.gs.ts"
+import * as __goscript_sha3_noasm from "./sha3_noasm.gs.js"
+import "./sha3.gs.js"
+import "./sha3_noasm.gs.js"
 
 export const dsbyteSHA3: number = 6
 

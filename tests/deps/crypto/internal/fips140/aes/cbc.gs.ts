@@ -9,17 +9,17 @@ import * as alias from "@goscript/crypto/internal/fips140/alias/index.js"
 
 import * as subtle from "@goscript/crypto/internal/fips140/subtle/index.js"
 
-import * as __goscript_aes from "./aes.gs.ts"
+import * as __goscript_aes from "./aes.gs.js"
 
-import * as __goscript_aes_noasm from "./aes_noasm.gs.ts"
+import * as __goscript_aes_noasm from "./aes_noasm.gs.js"
 
-import * as __goscript_cbc_noasm from "./cbc_noasm.gs.ts"
+import * as __goscript_cbc_noasm from "./cbc_noasm.gs.js"
 import "@goscript/crypto/internal/fips140/index.js"
 import "@goscript/crypto/internal/fips140/alias/index.js"
 import "@goscript/crypto/internal/fips140/subtle/index.js"
-import "./aes.gs.ts"
-import "./aes_noasm.gs.ts"
-import "./cbc_noasm.gs.ts"
+import "./aes.gs.js"
+import "./aes_noasm.gs.js"
+import "./cbc_noasm.gs.js"
 
 export class CBCEncrypter {
 	public get b(): __goscript_aes.Block {

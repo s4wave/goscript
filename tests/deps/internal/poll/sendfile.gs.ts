@@ -7,24 +7,24 @@ import * as syscall from "@goscript/syscall/index.js"
 
 import type * as time from "@goscript/time/index.js"
 
-import * as __goscript_fd_fsync_posix from "./fd_fsync_posix.gs.ts"
+import * as __goscript_fd_fsync_posix from "./fd_fsync_posix.gs.js"
 
-import * as __goscript_fd_mutex from "./fd_mutex.gs.ts"
+import * as __goscript_fd_mutex from "./fd_mutex.gs.js"
 
-import * as __goscript_fd_poll_js from "./fd_poll_js.gs.ts"
+import * as __goscript_fd_poll_js from "./fd_poll_js.gs.js"
 
-import * as __goscript_fd_posix from "./fd_posix.gs.ts"
+import * as __goscript_fd_posix from "./fd_posix.gs.js"
 
-import * as __goscript_fd_unix from "./fd_unix.gs.ts"
+import * as __goscript_fd_unix from "./fd_unix.gs.js"
 
-import * as __goscript_fd_unixjs from "./fd_unixjs.gs.ts"
+import * as __goscript_fd_unixjs from "./fd_unixjs.gs.js"
 import "@goscript/syscall/index.js"
-import "./fd_fsync_posix.gs.ts"
-import "./fd_mutex.gs.ts"
-import "./fd_poll_js.gs.ts"
-import "./fd_posix.gs.ts"
-import "./fd_unix.gs.ts"
-import "./fd_unixjs.gs.ts"
+import "./fd_fsync_posix.gs.js"
+import "./fd_mutex.gs.js"
+import "./fd_poll_js.gs.js"
+import "./fd_posix.gs.js"
+import "./fd_unix.gs.js"
+import "./fd_unixjs.gs.js"
 
 export var TestHookDidSendFile: ((dstFD: __goscript_fd_unix.FD | $.VarRef<__goscript_fd_unix.FD> | null, src: number, written: bigint, err: $.GoError, handled: boolean) => void) | null
 

@@ -1,3 +1,3 @@
-export type { Directive } from "./dep.gs.ts"
-export { Accept, Use } from "./dep.gs.ts"
-import "./dep.gs.ts"
+export type { Directive } from './dep.gs.js'
+export { Accept, Use } from './dep.gs.js'
+import './dep.gs.js'

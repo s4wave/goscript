@@ -430,7 +430,6 @@ export function onePassCopy(prog: syntax.Prog | $.VarRef<syntax.Prog> | null): o
 			default:
 			{
 				continue
-				break
 			}
 			case syntax.InstAlt:
 			case syntax.InstAltMatch:

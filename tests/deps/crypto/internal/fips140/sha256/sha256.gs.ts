@@ -11,12 +11,12 @@ import * as errors from "@goscript/errors/index.js"
 
 import * as hash2 from "@goscript/hash/index.js"
 
-import * as __goscript_sha256block_noasm from "./sha256block_noasm.gs.ts"
+import * as __goscript_sha256block_noasm from "./sha256block_noasm.gs.js"
 import "@goscript/crypto/internal/fips140/index.js"
 import "@goscript/crypto/internal/fips140deps/byteorder/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/hash/index.js"
-import "./sha256block_noasm.gs.ts"
+import "./sha256block_noasm.gs.js"
 
 export class Digest {
 	public get h(): number[] {

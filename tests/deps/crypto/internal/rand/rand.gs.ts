@@ -15,13 +15,13 @@ import * as io from "@goscript/io/index.js"
 
 import "@goscript/unsafe/index.js"
 
-import * as __goscript_rand_fips140v1_26 from "./rand_fips140v1.26.gs.ts"
+import * as __goscript_rand_fips140v1_26 from "./rand_fips140v1.26.gs.js"
 import "@goscript/crypto/internal/boring/index.js"
 import "@goscript/crypto/internal/fips140/drbg/index.js"
 import "@goscript/crypto/internal/randutil/index.js"
 import "@goscript/internal/godebug/index.js"
 import "@goscript/io/index.js"
-import "./rand_fips140v1.26.gs.ts"
+import "./rand_fips140v1.26.gs.js"
 
 export class reader {
 	public get DefaultReader(): drbg.DefaultReader | null {

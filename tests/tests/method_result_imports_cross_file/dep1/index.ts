@@ -1,1 +1,1 @@
-export { Make, maker } from "./dep1.gs.ts"
+export { Make, maker } from './dep1.gs.js'

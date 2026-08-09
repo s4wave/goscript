@@ -3,14 +3,14 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_op_string from "./op_string.gs.ts"
+import * as __goscript_op_string from "./op_string.gs.js"
 
-import * as __goscript_parse from "./parse.gs.ts"
+import * as __goscript_parse from "./parse.gs.js"
 
-import * as __goscript_regexp from "./regexp.gs.ts"
-import "./op_string.gs.ts"
-import "./parse.gs.ts"
-import "./regexp.gs.ts"
+import * as __goscript_regexp from "./regexp.gs.js"
+import "./op_string.gs.js"
+import "./parse.gs.js"
+import "./regexp.gs.js"
 
 export function simplify1(op: __goscript_regexp.Op, flags: __goscript_parse.Flags, sub: __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null, re: __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null): __goscript_regexp.Regexp | $.VarRef<__goscript_regexp.Regexp> | null {
 	// Special case: repeat the empty string as much as

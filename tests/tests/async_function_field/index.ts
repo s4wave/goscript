@@ -1,1 +1,1 @@
-export { loader } from "./async_function_field.gs.ts"
+export { loader } from './async_function_field.gs.js'

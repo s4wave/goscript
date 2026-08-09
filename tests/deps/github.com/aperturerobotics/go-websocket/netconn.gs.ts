@@ -21,11 +21,11 @@ import * as wsjs from "@goscript/github.com/aperturerobotics/go-websocket/intern
 
 import * as sync from "@goscript/sync/index.js"
 
-import * as __goscript_netconn_js from "./netconn_js.gs.ts"
+import * as __goscript_netconn_js from "./netconn_js.gs.js"
 
-import * as __goscript_stringer from "./stringer.gs.ts"
+import * as __goscript_stringer from "./stringer.gs.js"
 
-import * as __goscript_ws_js from "./ws_js.gs.ts"
+import * as __goscript_ws_js from "./ws_js.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/fmt/index.js"
 import "@goscript/io/index.js"
@@ -35,9 +35,9 @@ import "@goscript/sync/atomic/index.js"
 import "@goscript/time/index.js"
 import "@goscript/github.com/aperturerobotics/go-websocket/internal/wsjs/index.js"
 import "@goscript/sync/index.js"
-import "./netconn_js.gs.ts"
-import "./stringer.gs.ts"
-import "./ws_js.gs.ts"
+import "./netconn_js.gs.js"
+import "./stringer.gs.js"
+import "./ws_js.gs.js"
 
 export class netConn {
 	public get c(): __goscript_ws_js.Conn | $.VarRef<__goscript_ws_js.Conn> | null {
@@ -306,7 +306,6 @@ export class netConn {
 					{
 						$.pointerValue<netConn>(nc).readEOFed = true
 						return [0, io.EOF]
-						break
 					}
 				}
 				return [0, err]

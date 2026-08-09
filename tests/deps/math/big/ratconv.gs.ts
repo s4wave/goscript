@@ -15,47 +15,47 @@ import * as strings from "@goscript/strings/index.js"
 
 import type * as rand from "@goscript/math/rand/index.js"
 
-import type * as __goscript_accuracy_string from "./accuracy_string.gs.ts"
+import type * as __goscript_accuracy_string from "./accuracy_string.gs.js"
 
-import * as __goscript_arith from "./arith.gs.ts"
+import * as __goscript_arith from "./arith.gs.js"
 
-import type * as __goscript_float from "./float.gs.ts"
+import type * as __goscript_float from "./float.gs.js"
 
-import * as __goscript_int from "./int.gs.ts"
+import * as __goscript_int from "./int.gs.js"
 
-import * as __goscript_intconv from "./intconv.gs.ts"
+import * as __goscript_intconv from "./intconv.gs.js"
 
-import * as __goscript_intmarsh from "./intmarsh.gs.ts"
+import * as __goscript_intmarsh from "./intmarsh.gs.js"
 
-import * as __goscript_nat from "./nat.gs.ts"
+import * as __goscript_nat from "./nat.gs.js"
 
-import * as __goscript_natconv from "./natconv.gs.ts"
+import * as __goscript_natconv from "./natconv.gs.js"
 
-import * as __goscript_natdiv from "./natdiv.gs.ts"
+import * as __goscript_natdiv from "./natdiv.gs.js"
 
-import * as __goscript_natmul from "./natmul.gs.ts"
+import * as __goscript_natmul from "./natmul.gs.js"
 
-import * as __goscript_prime from "./prime.gs.ts"
+import * as __goscript_prime from "./prime.gs.js"
 
-import * as __goscript_rat from "./rat.gs.ts"
+import * as __goscript_rat from "./rat.gs.js"
 
-import * as __goscript_ratmarsh from "./ratmarsh.gs.ts"
+import * as __goscript_ratmarsh from "./ratmarsh.gs.js"
 import "@goscript/errors/index.js"
 import "@goscript/fmt/index.js"
 import "@goscript/io/index.js"
 import "@goscript/strconv/index.js"
 import "@goscript/strings/index.js"
-import "./arith.gs.ts"
-import "./int.gs.ts"
-import "./intconv.gs.ts"
-import "./intmarsh.gs.ts"
-import "./nat.gs.ts"
-import "./natconv.gs.ts"
-import "./natdiv.gs.ts"
-import "./natmul.gs.ts"
-import "./prime.gs.ts"
-import "./rat.gs.ts"
-import "./ratmarsh.gs.ts"
+import "./arith.gs.js"
+import "./int.gs.js"
+import "./intconv.gs.js"
+import "./intmarsh.gs.js"
+import "./nat.gs.js"
+import "./natconv.gs.js"
+import "./natdiv.gs.js"
+import "./natmul.gs.js"
+import "./prime.gs.js"
+import "./rat.gs.js"
+import "./ratmarsh.gs.js"
 
 export function ratTok(ch: number): boolean {
 	return strings.ContainsRune("+-/0123456789.eE", $.int(ch, 32))
@@ -115,7 +115,6 @@ export async function scanExponent(r: io.ByteScanner | null, base2ok: boolean, s
 		{
 			await $.pointerValue<Exclude<io.ByteScanner, null>>(r).UnreadByte()
 			return [0n, 10, null]
-			break
 		}
 	}
 

@@ -25,55 +25,55 @@ import * as time from "@goscript/time/index.js"
 
 import type * as dnsmessage from "@goscript/vendor/golang.org/x/net/dns/dnsmessage/index.js"
 
-import * as __goscript__interface from "./interface.gs.ts"
+import * as __goscript__interface from "./interface.gs.js"
 
-import * as __goscript_dial from "./dial.gs.ts"
+import * as __goscript_dial from "./dial.gs.js"
 
-import type * as __goscript_dnsclient from "./dnsclient.gs.ts"
+import type * as __goscript_dnsclient from "./dnsclient.gs.js"
 
-import * as __goscript_dnsclient_unix from "./dnsclient_unix.gs.ts"
+import * as __goscript_dnsclient_unix from "./dnsclient_unix.gs.js"
 
-import type * as __goscript_dnsconfig from "./dnsconfig.gs.ts"
+import type * as __goscript_dnsconfig from "./dnsconfig.gs.js"
 
-import * as __goscript_fd_fake from "./fd_fake.gs.ts"
+import * as __goscript_fd_fake from "./fd_fake.gs.js"
 
-import * as __goscript_fd_js from "./fd_js.gs.ts"
+import * as __goscript_fd_js from "./fd_js.gs.js"
 
-import * as __goscript_ip from "./ip.gs.ts"
+import * as __goscript_ip from "./ip.gs.js"
 
-import * as __goscript_iprawsock from "./iprawsock.gs.ts"
+import * as __goscript_iprawsock from "./iprawsock.gs.js"
 
-import * as __goscript_ipsock from "./ipsock.gs.ts"
+import * as __goscript_ipsock from "./ipsock.gs.js"
 
-import * as __goscript_ipsock_posix from "./ipsock_posix.gs.ts"
+import * as __goscript_ipsock_posix from "./ipsock_posix.gs.js"
 
-import * as __goscript_lookup from "./lookup.gs.ts"
+import * as __goscript_lookup from "./lookup.gs.js"
 
-import * as __goscript_lookup_unix from "./lookup_unix.gs.ts"
+import * as __goscript_lookup_unix from "./lookup_unix.gs.js"
 
-import * as __goscript_mac from "./mac.gs.ts"
+import * as __goscript_mac from "./mac.gs.js"
 
-import type * as __goscript_mptcpsock_stub from "./mptcpsock_stub.gs.ts"
+import type * as __goscript_mptcpsock_stub from "./mptcpsock_stub.gs.js"
 
-import * as __goscript_net from "./net.gs.ts"
+import * as __goscript_net from "./net.gs.js"
 
-import * as __goscript_net_fake from "./net_fake.gs.ts"
+import * as __goscript_net_fake from "./net_fake.gs.js"
 
-import * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.ts"
+import * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.js"
 
-import * as __goscript_tcpsock from "./tcpsock.gs.ts"
+import * as __goscript_tcpsock from "./tcpsock.gs.js"
 
-import type * as __goscript_tcpsock_posix from "./tcpsock_posix.gs.ts"
+import type * as __goscript_tcpsock_posix from "./tcpsock_posix.gs.js"
 
-import type * as __goscript_tcpsock_unix from "./tcpsock_unix.gs.ts"
+import type * as __goscript_tcpsock_unix from "./tcpsock_unix.gs.js"
 
-import type * as __goscript_udpsock from "./udpsock.gs.ts"
+import type * as __goscript_udpsock from "./udpsock.gs.js"
 
-import type * as __goscript_udpsock_posix from "./udpsock_posix.gs.ts"
+import type * as __goscript_udpsock_posix from "./udpsock_posix.gs.js"
 
-import type * as __goscript_unixsock from "./unixsock.gs.ts"
+import type * as __goscript_unixsock from "./unixsock.gs.js"
 
-import type * as __goscript_unixsock_posix from "./unixsock_posix.gs.ts"
+import type * as __goscript_unixsock_posix from "./unixsock_posix.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/syscall/index.js"
 import "@goscript/internal/poll/index.js"
@@ -81,22 +81,22 @@ import "@goscript/internal/singleflight/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/sync/atomic/index.js"
 import "@goscript/time/index.js"
-import "./interface.gs.ts"
-import "./dial.gs.ts"
-import "./dnsclient_unix.gs.ts"
-import "./fd_fake.gs.ts"
-import "./fd_js.gs.ts"
-import "./ip.gs.ts"
-import "./iprawsock.gs.ts"
-import "./ipsock.gs.ts"
-import "./ipsock_posix.gs.ts"
-import "./lookup.gs.ts"
-import "./lookup_unix.gs.ts"
-import "./mac.gs.ts"
-import "./net.gs.ts"
-import "./net_fake.gs.ts"
-import "./sockaddr_posix.gs.ts"
-import "./tcpsock.gs.ts"
+import "./interface.gs.js"
+import "./dial.gs.js"
+import "./dnsclient_unix.gs.js"
+import "./fd_fake.gs.js"
+import "./fd_js.gs.js"
+import "./ip.gs.js"
+import "./iprawsock.gs.js"
+import "./ipsock.gs.js"
+import "./ipsock_posix.gs.js"
+import "./lookup.gs.js"
+import "./lookup_unix.gs.js"
+import "./mac.gs.js"
+import "./net.gs.js"
+import "./net_fake.gs.js"
+import "./sockaddr_posix.gs.js"
+import "./tcpsock.gs.js"
 
 export async function sockaddrToIP(sa: syscall.Sockaddr | null): globalThis.Promise<__goscript_net.Addr | null> {
 	{

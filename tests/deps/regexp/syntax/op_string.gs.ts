@@ -5,9 +5,9 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as strconv from "@goscript/strconv/index.js"
 
-import * as __goscript_regexp from "./regexp.gs.ts"
+import * as __goscript_regexp from "./regexp.gs.js"
 import "@goscript/strconv/index.js"
-import "./regexp.gs.ts"
+import "./regexp.gs.js"
 
 export const _Op_name_0: string = "NoMatchEmptyMatchLiteralCharClassAnyCharNotNLAnyCharBeginLineEndLineBeginTextEndTextWordBoundaryNoWordBoundaryCaptureStarPlusQuestRepeatConcatAlternate"
 
@@ -51,17 +51,14 @@ export function Op_String(i: __goscript_regexp.Op): string {
 		{
 			i = i - ($.uint(1, 8))
 			return $.sliceStringOrBytes("NoMatchEmptyMatchLiteralCharClassAnyCharNotNLAnyCharBeginLineEndLineBeginTextEndTextWordBoundaryNoWordBoundaryCaptureStarPlusQuestRepeatConcatAlternate", $.arrayIndex(_Op_index_0, i), $.arrayIndex(_Op_index_0, i + 1))
-			break
 		}
 		case $.uint(i, 8) == $.uint(128, 8):
 		{
 			return "opPseudo"
-			break
 		}
 		default:
 		{
 			return ("Op(" + strconv.FormatInt($.int64(i), 10)) + ")"
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")

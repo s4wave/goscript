@@ -15,21 +15,21 @@ import type * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/pr
 
 import type * as json from "@goscript/github.com/aperturerobotics/protobuf-go-lite/json/index.js"
 
-import * as __goscript_errors from "./errors.gs.ts"
+import * as __goscript_errors from "./errors.gs.js"
 
-import * as __goscript_read_writer from "./read-writer.gs.ts"
+import * as __goscript_read_writer from "./read-writer.gs.js"
 
-import * as __goscript_rpcstream_pb from "./rpcstream.pb.gs.ts"
+import * as __goscript_rpcstream_pb from "./rpcstream.pb.gs.js"
 
-import * as __goscript_writer from "./writer.gs.ts"
+import * as __goscript_writer from "./writer.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/github.com/aperturerobotics/starpc/internal/contextutil/index.js"
 import "@goscript/github.com/aperturerobotics/starpc/srpc/index.js"
 import "@goscript/github.com/pkg/errors/index.js"
-import "./errors.gs.ts"
-import "./read-writer.gs.ts"
-import "./rpcstream.pb.gs.ts"
-import "./writer.gs.ts"
+import "./errors.gs.js"
+import "./read-writer.gs.js"
+import "./rpcstream.pb.gs.js"
+import "./writer.gs.js"
 
 export type RpcStream = {
 	Close(): $.GoError | globalThis.Promise<$.GoError>

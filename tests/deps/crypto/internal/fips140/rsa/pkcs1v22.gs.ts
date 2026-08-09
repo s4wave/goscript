@@ -27,9 +27,9 @@ import * as io from "@goscript/io/index.js"
 
 import * as bigmod from "@goscript/crypto/internal/fips140/bigmod/index.js"
 
-import * as __goscript_cast from "./cast.gs.ts"
+import * as __goscript_cast from "./cast.gs.js"
 
-import * as __goscript_rsa from "./rsa.gs.ts"
+import * as __goscript_rsa from "./rsa.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/crypto/internal/constanttime/index.js"
 import "@goscript/crypto/internal/fips140/index.js"
@@ -42,8 +42,8 @@ import "@goscript/errors/index.js"
 import "@goscript/hash/index.js"
 import "@goscript/io/index.js"
 import "@goscript/crypto/internal/fips140/bigmod/index.js"
-import "./cast.gs.ts"
-import "./rsa.gs.ts"
+import "./cast.gs.js"
+import "./rsa.gs.js"
 
 export const pssSaltLengthAutodetect: number = -1
 

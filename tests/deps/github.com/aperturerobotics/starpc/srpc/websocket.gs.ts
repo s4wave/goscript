@@ -15,14 +15,14 @@ import * as net from "@goscript/net/index.js"
 
 import type * as time from "@goscript/time/index.js"
 
-import type * as __goscript_muxed from "./muxed.gs.ts"
+import type * as __goscript_muxed from "./muxed.gs.js"
 
-import * as __goscript_muxed_conn from "./muxed-conn.gs.ts"
+import * as __goscript_muxed_conn from "./muxed-conn.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/github.com/aperturerobotics/go-websocket/index.js"
 import "@goscript/github.com/libp2p/go-yamux/v4/index.js"
 import "@goscript/net/index.js"
-import "./muxed-conn.gs.ts"
+import "./muxed-conn.gs.js"
 
 export async function NewWebSocketConn(ctx: context.Context | null, conn: websocket.Conn | $.VarRef<websocket.Conn> | null, isServer: boolean, yamuxConf: yamux.Config | $.VarRef<yamux.Config> | null): globalThis.Promise<[__goscript_muxed.MuxedConn | null, $.GoError]> {
 	let nc = await websocket.NetConn(ctx, conn, websocket.MessageBinary)

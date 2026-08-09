@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_a from "./a.gs.ts"
-import "./a.gs.ts"
+import * as __goscript_a from "./a.gs.js"
+import "./a.gs.js"
 
 export class bValue {
 	public get inner(): __goscript_a.aValue {

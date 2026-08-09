@@ -27,17 +27,17 @@ import * as url from "@goscript/net/url/index.js"
 
 import * as time from "@goscript/time/index.js"
 
-import * as __goscript_cert_pool from "./cert_pool.gs.ts"
+import * as __goscript_cert_pool from "./cert_pool.gs.js"
 
-import * as __goscript_oid from "./oid.gs.ts"
+import * as __goscript_oid from "./oid.gs.js"
 
-import * as __goscript_root_wasm from "./root_wasm.gs.ts"
+import * as __goscript_root_wasm from "./root_wasm.gs.js"
 
-import * as __goscript_verify from "./verify.gs.ts"
+import * as __goscript_verify from "./verify.gs.js"
 
-import * as __goscript_x509 from "./x509.gs.ts"
+import * as __goscript_x509 from "./x509.gs.js"
 
-import * as __goscript_x509_string from "./x509_string.gs.ts"
+import * as __goscript_x509_string from "./x509_string.gs.js"
 import "@goscript/io/fs/index.js"
 import "@goscript/os/index.js"
 import "@goscript/path/filepath/index.js"
@@ -48,12 +48,12 @@ import "@goscript/math/big/index.js"
 import "@goscript/net/index.js"
 import "@goscript/net/url/index.js"
 import "@goscript/time/index.js"
-import "./cert_pool.gs.ts"
-import "./oid.gs.ts"
-import "./root_wasm.gs.ts"
-import "./verify.gs.ts"
-import "./x509.gs.ts"
-import "./x509_string.gs.ts"
+import "./cert_pool.gs.js"
+import "./oid.gs.js"
+import "./root_wasm.gs.js"
+import "./verify.gs.js"
+import "./x509.gs.js"
+import "./x509_string.gs.js"
 
 export const certFileEnv: string = "SSL_CERT_FILE"
 

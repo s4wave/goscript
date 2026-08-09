@@ -3,11 +3,11 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_net from "./net.gs.ts"
+import * as __goscript_net from "./net.gs.js"
 
-import * as __goscript_parse from "./parse.gs.ts"
-import "./net.gs.ts"
-import "./parse.gs.ts"
+import * as __goscript_parse from "./parse.gs.js"
+import "./net.gs.js"
+import "./parse.gs.js"
 
 export type HardwareAddr = $.Slice<number>
 

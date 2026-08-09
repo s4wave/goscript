@@ -3,14 +3,14 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_ftoa from "./ftoa.gs.ts"
+import * as __goscript_ftoa from "./ftoa.gs.js"
 
-import * as __goscript_itoa from "./itoa.gs.ts"
+import * as __goscript_itoa from "./itoa.gs.js"
 
-import * as __goscript_math from "./math.gs.ts"
-import "./ftoa.gs.ts"
-import "./itoa.gs.ts"
-import "./math.gs.ts"
+import * as __goscript_math from "./math.gs.js"
+import "./ftoa.gs.js"
+import "./itoa.gs.js"
+import "./math.gs.js"
 
 export const floatMantBits64: number = 52
 

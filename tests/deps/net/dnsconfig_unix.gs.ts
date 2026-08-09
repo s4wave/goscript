@@ -15,23 +15,23 @@ import * as fs from "@goscript/io/fs/index.js"
 
 import * as os from "@goscript/os/index.js"
 
-import * as __goscript_dnsclient_unix from "./dnsclient_unix.gs.ts"
+import * as __goscript_dnsclient_unix from "./dnsclient_unix.gs.js"
 
-import * as __goscript_dnsconfig from "./dnsconfig.gs.ts"
+import * as __goscript_dnsconfig from "./dnsconfig.gs.js"
 
-import * as __goscript_ipsock from "./ipsock.gs.ts"
+import * as __goscript_ipsock from "./ipsock.gs.js"
 
-import * as __goscript_parse from "./parse.gs.ts"
+import * as __goscript_parse from "./parse.gs.js"
 import "@goscript/internal/bytealg/index.js"
 import "@goscript/internal/stringslite/index.js"
 import "@goscript/net/netip/index.js"
 import "@goscript/time/index.js"
 import "@goscript/io/fs/index.js"
 import "@goscript/os/index.js"
-import "./dnsclient_unix.gs.ts"
-import "./dnsconfig.gs.ts"
-import "./ipsock.gs.ts"
-import "./parse.gs.ts"
+import "./dnsclient_unix.gs.js"
+import "./dnsconfig.gs.js"
+import "./ipsock.gs.js"
+import "./parse.gs.js"
 
 export async function dnsReadConfig(filename: string): globalThis.Promise<__goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null> {
 	using __defer = new $.DisposableStack()

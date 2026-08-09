@@ -17,7 +17,7 @@ import * as strconv from "@goscript/strconv/index.js"
 
 import * as _unique from "@goscript/unique/index.js"
 
-import * as __goscript_uint128 from "./uint128.gs.ts"
+import * as __goscript_uint128 from "./uint128.gs.js"
 import "@goscript/cmp/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/internal/bytealg/index.js"
@@ -25,7 +25,7 @@ import "@goscript/internal/byteorder/index.js"
 import "@goscript/math/index.js"
 import "@goscript/strconv/index.js"
 import "@goscript/unique/index.js"
-import "./uint128.gs.ts"
+import "./uint128.gs.js"
 
 export class Addr {
 	// addr is the hi and lo bits of an IPv6 address. If z==z4,
@@ -113,12 +113,10 @@ export class Addr {
 			case z0:
 			{
 				return b
-				break
 			}
 			case z4:
 			{
 				return $.markAsStructValue($.cloneStructValue(ip)).appendTo4(b)
-				break
 			}
 			default:
 			{
@@ -126,7 +124,6 @@ export class Addr {
 					return $.markAsStructValue($.cloneStructValue(ip)).appendTo4In6(b)
 				}
 				return $.markAsStructValue($.cloneStructValue(ip)).appendTo6(b)
-				break
 			}
 		}
 		throw new globalThis.Error("goscript: unreachable return")
@@ -160,14 +157,12 @@ export class Addr {
 			case z0:
 			{
 				return null
-				break
 			}
 			case z4:
 			{
 				let ret: Uint8Array = new Uint8Array(4)
 				byteorder.BEPutUint32($.goSlice(ret, undefined, undefined), $.uint($.uint(ip.addr.lo, 32), 32))
 				return $.goSlice(ret, undefined, undefined)
-				break
 			}
 			default:
 			{
@@ -175,7 +170,6 @@ export class Addr {
 				byteorder.BEPutUint64($.goSlice(ret, undefined, 8), ip.addr.hi)
 				byteorder.BEPutUint64($.goSlice(ret, 8, undefined), ip.addr.lo)
 				return $.goSlice(ret, undefined, undefined)
-				break
 			}
 		}
 		throw new globalThis.Error("goscript: unreachable return")
@@ -187,12 +181,10 @@ export class Addr {
 			case z0:
 			{
 				return 0
-				break
 			}
 			case z4:
 			{
 				return 32
-				break
 			}
 		}
 		return 128
@@ -456,7 +448,6 @@ export class Addr {
 			case z0:
 			{
 				return [$.markAsStructValue(new Prefix()), null]
-				break
 			}
 			case z4:
 			{
@@ -499,12 +490,10 @@ export class Addr {
 			case z0:
 			{
 				return "invalid IP"
-				break
 			}
 			case z4:
 			{
 				return $.markAsStructValue($.cloneStructValue(ip)).string4()
-				break
 			}
 			default:
 			{
@@ -512,7 +501,6 @@ export class Addr {
 					return $.markAsStructValue($.cloneStructValue(ip)).string4In6()
 				}
 				return $.markAsStructValue($.cloneStructValue(ip)).string6()
-				break
 			}
 		}
 		throw new globalThis.Error("goscript: unreachable return")
@@ -525,7 +513,6 @@ export class Addr {
 			case z4:
 			{
 				return $.markAsStructValue($.cloneStructValue(ip)).String()
-				break
 			}
 		}
 
@@ -564,25 +551,21 @@ export class Addr {
 			{
 				$.assignStruct($.pointerValue<Addr>(ip), $.markAsStructValue(new Addr()))
 				return null
-				break
 			}
 			case n == 4:
 			{
 				$.assignStruct($.pointerValue<Addr>(ip), $.markAsStructValue($.cloneStructValue(AddrFrom4(($.sliceToArray<number>(b, 4, "byte") as Uint8Array)))))
 				return null
-				break
 			}
 			case n == 16:
 			{
 				$.assignStruct($.pointerValue<Addr>(ip), $.markAsStructValue($.cloneStructValue(AddrFrom16(($.sliceToArray<number>(b, 16, "byte") as Uint8Array)))))
 				return null
-				break
 			}
 			case n > 16:
 			{
 				$.assignStruct($.pointerValue<Addr>(ip), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(AddrFrom16(($.sliceToArray<number>($.goSlice(b, undefined, 16), 16, "byte") as Uint8Array)))).WithZone($.bytesToString($.goSlice(b, 16, undefined))))))
 				return null
-				break
 			}
 		}
 		return errors.New("unexpected slice size")
@@ -706,17 +689,14 @@ export class Addr {
 			case z0:
 			{
 				return 0
-				break
 			}
 			case z4:
 			{
 				return 4
-				break
 			}
 			default:
 			{
 				return 16 + $.len($.markAsStructValue($.cloneStructValue(ip)).Zone())
-				break
 			}
 		}
 		throw new globalThis.Error("goscript: unreachable return")
@@ -958,7 +938,6 @@ export class AddrPort {
 			case z0:
 			{
 				return b
-				break
 			}
 			case z4:
 			{
@@ -1039,7 +1018,6 @@ export class AddrPort {
 			case z0:
 			{
 				return "invalid AddrPort"
-				break
 			}
 			case z4:
 			{
@@ -1496,17 +1474,14 @@ export function ParseAddr(s: string): [Addr, $.GoError] {
 			case 46:
 			{
 				return parseIPv4(s)
-				break
 			}
 			case 58:
 			{
 				return parseIPv6(s)
-				break
 			}
 			case 37:
 			{
 				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: s, msg: "missing IPv6 address"})), "netip.parseAddrError", "netip.parseAddrError")]
-				break
 			}
 		}
 	}
@@ -1733,12 +1708,10 @@ export function AddrFromSlice(slice: $.Slice<number>): [Addr, boolean] {
 		case 4:
 		{
 			return [$.markAsStructValue($.cloneStructValue(AddrFrom4(($.sliceToArray<number>(slice, 4, "byte") as Uint8Array)))), true]
-			break
 		}
 		case 16:
 		{
 			return [$.markAsStructValue($.cloneStructValue(AddrFrom16(($.sliceToArray<number>(slice, 16, "byte") as Uint8Array)))), true]
-			break
 		}
 	}
 	return [$.markAsStructValue(new Addr()), false]

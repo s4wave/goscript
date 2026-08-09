@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_generated from "./generated.gs.ts"
-import "./generated.gs.ts"
+import * as __goscript_generated from "./generated.gs.js"
+import "./generated.gs.js"
 
 export async function main(): globalThis.Promise<void> {
 	let sym: __goscript_generated.yySymType = $.markAsStructValue(new __goscript_generated.yySymType())

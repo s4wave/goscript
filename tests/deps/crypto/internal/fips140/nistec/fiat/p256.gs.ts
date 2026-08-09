@@ -7,13 +7,13 @@ import * as subtle from "@goscript/crypto/internal/fips140/subtle/index.js"
 
 import * as errors from "@goscript/errors/index.js"
 
-import * as __goscript_p256_fiat64 from "./p256_fiat64.gs.ts"
+import * as __goscript_p256_fiat64 from "./p256_fiat64.gs.js"
 
-import * as __goscript_p256_invert from "./p256_invert.gs.ts"
+import * as __goscript_p256_invert from "./p256_invert.gs.js"
 import "@goscript/crypto/internal/fips140/subtle/index.js"
 import "@goscript/errors/index.js"
-import "./p256_fiat64.gs.ts"
-import "./p256_invert.gs.ts"
+import "./p256_fiat64.gs.js"
+import "./p256_invert.gs.js"
 
 export type p256UntypedFieldElement = bigint[]
 

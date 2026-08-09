@@ -1,3 +1,3 @@
-export type { Provider } from "./dep.gs.ts"
-export { Impl, Keyed, Wrapper } from "./dep.gs.ts"
-import "./dep.gs.ts"
+export type { Provider } from './dep.gs.js'
+export { Impl, Keyed, Wrapper } from './dep.gs.js'
+import './dep.gs.js'

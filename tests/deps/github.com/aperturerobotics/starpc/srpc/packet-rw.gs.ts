@@ -19,19 +19,19 @@ import type * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/pr
 
 import type * as json from "@goscript/github.com/aperturerobotics/protobuf-go-lite/json/index.js"
 
-import * as __goscript_packet from "./packet.gs.ts"
+import * as __goscript_packet from "./packet.gs.js"
 
-import * as __goscript_rpcproto_pb from "./rpcproto.pb.gs.ts"
+import * as __goscript_rpcproto_pb from "./rpcproto.pb.gs.js"
 
-import type * as __goscript_writer from "./writer.gs.ts"
+import type * as __goscript_writer from "./writer.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/context/index.js"
 import "@goscript/encoding/binary/index.js"
 import "@goscript/io/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/github.com/pkg/errors/index.js"
-import "./packet.gs.ts"
-import "./rpcproto.pb.gs.ts"
+import "./packet.gs.js"
+import "./rpcproto.pb.gs.js"
 
 export class writeBuffer {
 	public get data(): $.Slice<number> {

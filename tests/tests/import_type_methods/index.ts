@@ -1,1 +1,1 @@
-export { parser } from "./import_type_methods.gs.ts"
+export { parser } from './import_type_methods.gs.js'

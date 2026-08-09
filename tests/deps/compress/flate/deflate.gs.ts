@@ -11,21 +11,21 @@ import * as io from "@goscript/io/index.js"
 
 import * as math from "@goscript/math/index.js"
 
-import * as __goscript_deflatefast from "./deflatefast.gs.ts"
+import * as __goscript_deflatefast from "./deflatefast.gs.js"
 
-import * as __goscript_huffman_bit_writer from "./huffman_bit_writer.gs.ts"
+import * as __goscript_huffman_bit_writer from "./huffman_bit_writer.gs.js"
 
-import * as __goscript_huffman_code from "./huffman_code.gs.ts"
+import * as __goscript_huffman_code from "./huffman_code.gs.js"
 
-import * as __goscript_token from "./token.gs.ts"
+import * as __goscript_token from "./token.gs.js"
 import "@goscript/errors/index.js"
 import "@goscript/fmt/index.js"
 import "@goscript/io/index.js"
 import "@goscript/math/index.js"
-import "./deflatefast.gs.ts"
-import "./huffman_bit_writer.gs.ts"
-import "./huffman_code.gs.ts"
-import "./token.gs.ts"
+import "./deflatefast.gs.js"
+import "./huffman_bit_writer.gs.js"
+import "./huffman_code.gs.js"
+import "./token.gs.js"
 
 export class compressionLevel {
 	public get level(): number {
@@ -543,7 +543,6 @@ export class compressor {
 					case $.pointerValue<compressor>(d).windowEnd == 0:
 					{
 						return
-						break
 					}
 					case $.pointerValue<compressor>(d).windowEnd <= 16:
 					{
@@ -776,7 +775,6 @@ export class compressor {
 			default:
 			{
 				return fmt.Errorf("flate: invalid compression level %d: want value in range [-2, 9]", $.basicInterfaceValue(level, "int"))
-				break
 			}
 		}
 		return null

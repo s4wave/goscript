@@ -13,11 +13,11 @@ import type * as io from "@goscript/io/index.js"
 
 import * as big from "@goscript/math/big/index.js"
 
-import * as __goscript_rsa from "./rsa.gs.ts"
+import * as __goscript_rsa from "./rsa.gs.js"
 import "@goscript/crypto/internal/boring/index.js"
 import "@goscript/crypto/internal/fips140/rsa/index.js"
 import "@goscript/math/big/index.js"
-import "./rsa.gs.ts"
+import "./rsa.gs.js"
 
 export function boringPublicKey(_p0: __goscript_rsa.PublicKey | $.VarRef<__goscript_rsa.PublicKey> | null): [boring.PublicKeyRSA | $.VarRef<boring.PublicKeyRSA> | null, $.GoError] {
 	$.panic("boringcrypto: not available")

@@ -11,11 +11,11 @@ import * as strings from "@goscript/strings/index.js"
 
 import "@goscript/unsafe/index.js"
 
-import * as __goscript_fips140 from "./fips140.gs.ts"
+import * as __goscript_fips140 from "./fips140.gs.js"
 import "@goscript/crypto/internal/fips140deps/godebug/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/strings/index.js"
-import "./fips140.gs.ts"
+import "./fips140.gs.js"
 
 export function fatal(_p0: string): void {
 }

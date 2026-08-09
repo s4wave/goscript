@@ -156,19 +156,16 @@ export class fsTester {
 				{
 					fsTester.prototype.errorf.call(t, "%s: ReadDir: child has invalid name: %#q", $.arrayToSlice<any>([dir, name]))
 					continue
-					break
 				}
 				case strings.Contains(name, "/"):
 				{
 					fsTester.prototype.errorf.call(t, "%s: ReadDir: child name contains slash: %#q", $.arrayToSlice<any>([dir, name]))
 					continue
-					break
 				}
 				case strings.Contains(name, "\\"):
 				{
 					fsTester.prototype.errorf.call(t, "%s: ReadDir: child name contains backslash: %#q", $.arrayToSlice<any>([dir, name]))
 					continue
-					break
 				}
 			}
 			let __goscriptShadow1 = prefix + name

@@ -9,17 +9,17 @@ import * as fips140 from "@goscript/crypto/internal/fips140/index.js"
 
 import * as errors from "@goscript/errors/index.js"
 
-import * as __goscript_sha3 from "./sha3.gs.ts"
+import * as __goscript_sha3 from "./sha3.gs.js"
 
-import * as __goscript_sha3_noasm from "./sha3_noasm.gs.ts"
+import * as __goscript_sha3_noasm from "./sha3_noasm.gs.js"
 
-import * as __goscript_shake from "./shake.gs.ts"
+import * as __goscript_shake from "./shake.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/crypto/internal/fips140/index.js"
 import "@goscript/errors/index.js"
-import "./sha3.gs.ts"
-import "./sha3_noasm.gs.ts"
-import "./shake.gs.ts"
+import "./sha3.gs.js"
+import "./sha3_noasm.gs.js"
+import "./shake.gs.js"
 
 async function __goscriptInit0(): globalThis.Promise<void> {
 	await fips140.CAST("cSHAKE128", $.functionValue((): $.GoError => {

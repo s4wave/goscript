@@ -27,12 +27,10 @@ export function Index(s: string, substr: string): number {
 		case n == 0:
 		{
 			return 0
-			break
 		}
 		case n == 1:
 		{
 			return IndexByte(s, $.uint($.indexStringOrBytes(substr, 0), 8))
-			break
 		}
 		case n == $.len(s):
 		{
@@ -40,12 +38,10 @@ export function Index(s: string, substr: string): number {
 				return 0
 			}
 			return -1
-			break
 		}
 		case n > $.len(s):
 		{
 			return -1
-			break
 		}
 		case n <= bytealg.MaxLen:
 		{
@@ -82,7 +78,6 @@ export function Index(s: string, substr: string): number {
 				}
 			}
 			return -1
-			break
 		}
 	}
 	let c0 = $.uint($.indexStringOrBytes(substr, 0), 8)

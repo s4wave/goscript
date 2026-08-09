@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_memory from "./memory.gs.ts"
-import "./memory.gs.ts"
+import * as __goscript_memory from "./memory.gs.js"
+import "./memory.gs.js"
 
 export class storage {
 	public get files(): globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null {

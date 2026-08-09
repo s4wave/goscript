@@ -1,2 +1,2 @@
-export type { Writer } from "./subpkg.gs.ts"
-import "./subpkg.gs.ts"
+export type { Writer } from './subpkg.gs.js'
+import './subpkg.gs.js'

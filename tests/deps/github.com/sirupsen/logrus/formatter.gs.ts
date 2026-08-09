@@ -15,31 +15,31 @@ import * as runtime from "@goscript/runtime/index.js"
 
 import * as sync from "@goscript/sync/index.js"
 
-import * as __goscript_buffer_pool from "./buffer_pool.gs.ts"
+import * as __goscript_buffer_pool from "./buffer_pool.gs.js"
 
-import type * as __goscript_entry from "./entry.gs.ts"
+import type * as __goscript_entry from "./entry.gs.js"
 
-import * as __goscript_hooks from "./hooks.gs.ts"
+import * as __goscript_hooks from "./hooks.gs.js"
 
-import * as __goscript_json_formatter from "./json_formatter.gs.ts"
+import * as __goscript_json_formatter from "./json_formatter.gs.js"
 
-import * as __goscript_logger from "./logger.gs.ts"
+import * as __goscript_logger from "./logger.gs.js"
 
-import * as __goscript_logrus from "./logrus.gs.ts"
+import * as __goscript_logrus from "./logrus.gs.js"
 
-import * as __goscript_writer from "./writer.gs.ts"
+import * as __goscript_writer from "./writer.gs.js"
 import "@goscript/time/index.js"
 import "@goscript/bytes/index.js"
 import "@goscript/context/index.js"
 import "@goscript/io/index.js"
 import "@goscript/runtime/index.js"
 import "@goscript/sync/index.js"
-import "./buffer_pool.gs.ts"
-import "./hooks.gs.ts"
-import "./json_formatter.gs.ts"
-import "./logger.gs.ts"
-import "./logrus.gs.ts"
-import "./writer.gs.ts"
+import "./buffer_pool.gs.js"
+import "./hooks.gs.js"
+import "./json_formatter.gs.js"
+import "./logger.gs.js"
+import "./logrus.gs.js"
+import "./writer.gs.js"
 
 export type Formatter = {
 	Format(_p0: __goscript_entry.Entry | $.VarRef<__goscript_entry.Entry> | null): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>

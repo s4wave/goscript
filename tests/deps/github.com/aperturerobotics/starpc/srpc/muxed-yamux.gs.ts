@@ -17,9 +17,9 @@ import * as sync from "@goscript/sync/index.js"
 
 import * as time from "@goscript/time/index.js"
 
-import type * as __goscript_muxed from "./muxed.gs.ts"
+import type * as __goscript_muxed from "./muxed.gs.js"
 
-import * as __goscript_stream_yamux from "./stream-yamux.gs.ts"
+import * as __goscript_stream_yamux from "./stream-yamux.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/github.com/libp2p/go-yamux/v4/index.js"
 import "@goscript/io/index.js"
@@ -27,7 +27,7 @@ import "@goscript/log/index.js"
 import "@goscript/net/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/time/index.js"
-import "./stream-yamux.gs.ts"
+import "./stream-yamux.gs.js"
 
 export class yamuxConn {
 	public get rtt(): bigint {

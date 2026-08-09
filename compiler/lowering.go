@@ -736,7 +736,7 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 			if outputName != "" {
 				alias := "__goscript_" + safeIdentifier(strings.TrimSuffix(outputName, ".gs.ts"))
 				analysis.aliases[obj] = alias
-				analysis.aliasSources[alias] = "./" + outputName
+				analysis.aliasSources[alias] = "./" + emittedModuleName(outputName)
 				if runtime {
 					analysis.runtimeAliases[alias] = true
 				}
@@ -7034,19 +7034,41 @@ func stmtsEndInReturn(stmts []loweredStmt) bool {
 
 func stmtEndsInReturn(stmt loweredStmt) bool {
 	trimmed := strings.TrimSpace(stmt.text)
-	if strings.HasPrefix(trimmed, "return") {
+	if stmtStartsWithKeyword(trimmed, "return") {
 		return true
 	}
 	if stmt.selectStmt != nil {
 		return stmt.selectStmt.returns
 	}
-	if trimmed == "" && (stmt.hasBlock || len(stmt.children) != 0) {
+	if (trimmed == "" || strings.HasSuffix(trimmed, ":")) && (stmt.hasBlock || len(stmt.children) != 0) {
 		return stmtsEndInReturn(stmt.children)
 	}
-	if strings.HasPrefix(trimmed, "if ") && len(stmt.elseBody) != 0 {
+	if stmtStartsWithKeyword(trimmed, "if") && len(stmt.elseBody) != 0 {
 		return stmtsEndInReturn(stmt.children) && stmtsEndInReturn(stmt.elseBody)
 	}
 	return false
+}
+
+func stmtStartsWithKeyword(text string, keyword string) bool {
+	for {
+		colon := strings.IndexByte(text, ':')
+		if colon <= 0 || !token.IsIdentifier(text[:colon]) {
+			break
+		}
+		text = strings.TrimSpace(text[colon+1:])
+	}
+	if !strings.HasPrefix(text, keyword) {
+		return false
+	}
+	if len(text) == len(keyword) {
+		return true
+	}
+	switch text[len(keyword)] {
+	case ' ', '\t', '\r', '\n', ';', '(':
+		return true
+	default:
+		return false
+	}
 }
 
 func stmtsContainLoopJump(stmts []loweredStmt) bool {

@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_error_type from "./error_type.gs.ts"
-import "./error_type.gs.ts"
+import * as __goscript_error_type from "./error_type.gs.js"
+import "./error_type.gs.js"
 
 export function fail(): $.GoError {
 	return $.namedValueInterfaceValue<$.GoError>(1, "main.remoteError", {"Error": __goscript_error_type.remoteError_Error}, { kind: $.TypeKind.Basic, name: "int", typeName: "main.remoteError" })

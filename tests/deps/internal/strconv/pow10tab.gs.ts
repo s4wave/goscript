@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_math from "./math.gs.ts"
-import "./math.gs.ts"
+import * as __goscript_math from "./math.gs.js"
+import "./math.gs.js"
 
 export const pow10Min: number = -348
 

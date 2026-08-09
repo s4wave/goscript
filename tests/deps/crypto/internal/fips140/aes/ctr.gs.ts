@@ -13,19 +13,19 @@ import * as byteorder from "@goscript/crypto/internal/fips140deps/byteorder/inde
 
 import * as bits from "@goscript/math/bits/index.js"
 
-import * as __goscript_aes from "./aes.gs.ts"
+import * as __goscript_aes from "./aes.gs.js"
 
-import * as __goscript_aes_noasm from "./aes_noasm.gs.ts"
+import * as __goscript_aes_noasm from "./aes_noasm.gs.js"
 
-import * as __goscript_ctr_noasm from "./ctr_noasm.gs.ts"
+import * as __goscript_ctr_noasm from "./ctr_noasm.gs.js"
 import "@goscript/crypto/internal/fips140/index.js"
 import "@goscript/crypto/internal/fips140/alias/index.js"
 import "@goscript/crypto/internal/fips140/subtle/index.js"
 import "@goscript/crypto/internal/fips140deps/byteorder/index.js"
 import "@goscript/math/bits/index.js"
-import "./aes.gs.ts"
-import "./aes_noasm.gs.ts"
-import "./ctr_noasm.gs.ts"
+import "./aes.gs.js"
+import "./aes_noasm.gs.js"
+import "./ctr_noasm.gs.js"
 
 export class CTR {
 	public get b(): __goscript_aes.Block {

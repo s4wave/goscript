@@ -1,1 +1,1 @@
-export { namedItem } from "./anonymous_struct_slice.gs.ts"
+export { namedItem } from './anonymous_struct_slice.gs.js'

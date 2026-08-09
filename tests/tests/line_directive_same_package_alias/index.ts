@@ -1,1 +1,1 @@
-export { yyParserImpl, yySymType } from "./generated.gs.ts"
+export { yyParserImpl, yySymType } from './generated.gs.js'

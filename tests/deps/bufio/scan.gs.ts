@@ -11,12 +11,12 @@ import * as io from "@goscript/io/index.js"
 
 import * as utf8 from "@goscript/unicode/utf8/index.js"
 
-import * as __goscript_bufio from "./bufio.gs.ts"
+import * as __goscript_bufio from "./bufio.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/io/index.js"
 import "@goscript/unicode/utf8/index.js"
-import "./bufio.gs.ts"
+import "./bufio.gs.js"
 
 export type SplitFunc = ((data: $.Slice<number>, atEOF: boolean) => [number, $.Slice<number>, $.GoError] | globalThis.Promise<[number, $.Slice<number>, $.GoError]>) | null
 
@@ -449,13 +449,11 @@ export function isSpace(r: number): boolean {
 			case 13:
 			{
 				return true
-				break
 			}
 			case 133:
 			case 160:
 			{
 				return true
-				break
 			}
 		}
 		return false
@@ -473,7 +471,6 @@ export function isSpace(r: number): boolean {
 		case 12288:
 		{
 			return true
-			break
 		}
 	}
 	return false

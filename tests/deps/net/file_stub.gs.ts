@@ -9,7 +9,7 @@ import * as syscall from "@goscript/syscall/index.js"
 
 import type * as time from "@goscript/time/index.js"
 
-import type * as __goscript_net from "./net.gs.ts"
+import type * as __goscript_net from "./net.gs.js"
 import "@goscript/os/index.js"
 import "@goscript/syscall/index.js"
 

@@ -1,1 +1,1 @@
-export { LookupIPAltResolverKey, Trace, TraceKey } from "./nettrace.gs.ts"
+export { LookupIPAltResolverKey, Trace, TraceKey } from './nettrace.gs.js'

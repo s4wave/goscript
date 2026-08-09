@@ -1,1 +1,1 @@
-export { local } from "./main.gs.ts"
+export { local } from './main.gs.js'

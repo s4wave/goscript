@@ -1,3 +1,3 @@
-export type { Tx, Value } from "./types.gs.ts"
-export { sink } from "./main.gs.ts"
-import "./types.gs.ts"
+export type { Tx, Value } from './types.gs.js'
+export { sink } from './main.gs.js'
+import './types.gs.js'

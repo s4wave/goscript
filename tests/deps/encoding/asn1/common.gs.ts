@@ -9,11 +9,11 @@ import * as strconv from "@goscript/strconv/index.js"
 
 import * as strings from "@goscript/strings/index.js"
 
-import * as __goscript_asn1 from "./asn1.gs.ts"
+import * as __goscript_asn1 from "./asn1.gs.js"
 import "@goscript/reflect/index.js"
 import "@goscript/strconv/index.js"
 import "@goscript/strings/index.js"
-import "./asn1.gs.ts"
+import "./asn1.gs.js"
 
 export class tagAndLength {
 	public get _class(): number {
@@ -360,32 +360,26 @@ export async function getUniversalType(t: reflect.Type | null): globalThis.Promi
 			case $.comparableEqual(__goscriptSwitch0, __goscript_asn1.rawValueType):
 			{
 				return [true, -1, false, true]
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch0, __goscript_asn1.objectIdentifierType):
 			{
 				return [false, 6, false, true]
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch0, __goscript_asn1.bitStringType):
 			{
 				return [false, 3, false, true]
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch0, __goscript_asn1.timeType):
 			{
 				return [false, 23, false, true]
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch0, __goscript_asn1.enumeratedType):
 			{
 				return [false, 10, false, true]
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch0, __goscript_asn1.bigIntType):
 			{
 				return [false, 2, false, true]
-				break
 			}
 		}
 	}
@@ -393,7 +387,6 @@ export async function getUniversalType(t: reflect.Type | null): globalThis.Promi
 		case reflect.Bool:
 		{
 			return [false, 1, false, true]
-			break
 		}
 		case reflect.Int:
 		case reflect.Int8:
@@ -402,12 +395,10 @@ export async function getUniversalType(t: reflect.Type | null): globalThis.Promi
 		case reflect.Int64:
 		{
 			return [false, 2, false, true]
-			break
 		}
 		case reflect.Struct:
 		{
 			return [false, 16, true, true]
-			break
 		}
 		case reflect.Slice:
 		{
@@ -418,12 +409,10 @@ export async function getUniversalType(t: reflect.Type | null): globalThis.Promi
 				return [false, 17, true, true]
 			}
 			return [false, 16, true, true]
-			break
 		}
 		case reflect.String:
 		{
 			return [false, 19, false, true]
-			break
 		}
 	}
 	return [false, 0, false, false]

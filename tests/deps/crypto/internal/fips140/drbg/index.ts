@@ -1,5 +1,5 @@
-export type { DefaultReader } from "./rand.gs.ts"
-export { Counter, NewCounter, SeedSize } from "./ctrdrbg.gs.ts"
-export { Read, ReadWithReader, SetTestingReader } from "./rand.gs.ts"
-import "./cast.gs.ts"
-import "./rand.gs.ts"
+export type { DefaultReader } from './rand.gs.js'
+export { Counter, NewCounter, SeedSize } from './ctrdrbg.gs.js'
+export { Read, ReadWithReader, SetTestingReader } from './rand.gs.js'
+import './cast.gs.js'
+import './rand.gs.js'

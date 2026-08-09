@@ -1,1 +1,1 @@
-import "./c.gs.ts"
+import './c.gs.js'

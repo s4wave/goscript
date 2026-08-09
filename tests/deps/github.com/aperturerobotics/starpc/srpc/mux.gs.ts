@@ -11,21 +11,21 @@ import type * as context from "@goscript/context/index.js"
 
 import type * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
 
-import * as __goscript_errors from "./errors.gs.ts"
+import * as __goscript_errors from "./errors.gs.js"
 
-import * as __goscript_handler from "./handler.gs.ts"
+import * as __goscript_handler from "./handler.gs.js"
 
-import * as __goscript_invoker from "./invoker.gs.ts"
+import * as __goscript_invoker from "./invoker.gs.js"
 
-import type * as __goscript_message from "./message.gs.ts"
+import type * as __goscript_message from "./message.gs.js"
 
-import * as __goscript_stream from "./stream.gs.ts"
+import * as __goscript_stream from "./stream.gs.js"
 import "@goscript/slices/index.js"
 import "@goscript/sync/index.js"
-import "./errors.gs.ts"
-import "./handler.gs.ts"
-import "./invoker.gs.ts"
-import "./stream.gs.ts"
+import "./errors.gs.js"
+import "./handler.gs.js"
+import "./invoker.gs.js"
+import "./stream.gs.js"
 
 export type Mux = {
 	HasService(serviceID: string): boolean | globalThis.Promise<boolean>

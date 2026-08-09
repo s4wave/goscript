@@ -17,12 +17,10 @@ export async function main(): globalThis.Promise<void> {
 			case 0:
 			{
 				return await $.chanRecv(ch)
-				break
 			}
 			default:
 			{
 				return false
-				break
 			}
 		}
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo))

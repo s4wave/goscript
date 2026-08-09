@@ -19,23 +19,23 @@ import type * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/pr
 
 import type * as json from "@goscript/github.com/aperturerobotics/protobuf-go-lite/json/index.js"
 
-import * as __goscript_errors from "./errors.gs.ts"
+import * as __goscript_errors from "./errors.gs.js"
 
-import * as __goscript_packet from "./packet.gs.ts"
+import * as __goscript_packet from "./packet.gs.js"
 
-import * as __goscript_rpcproto_pb from "./rpcproto.pb.gs.ts"
+import * as __goscript_rpcproto_pb from "./rpcproto.pb.gs.js"
 
-import * as __goscript_writer from "./writer.gs.ts"
+import * as __goscript_writer from "./writer.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/io/index.js"
 import "@goscript/sync/atomic/index.js"
 import "@goscript/github.com/aperturerobotics/starpc/internal/contextutil/index.js"
 import "@goscript/github.com/aperturerobotics/util/broadcast/index.js"
 import "@goscript/github.com/pkg/errors/index.js"
-import "./errors.gs.ts"
-import "./packet.gs.ts"
-import "./rpcproto.pb.gs.ts"
-import "./writer.gs.ts"
+import "./errors.gs.js"
+import "./packet.gs.js"
+import "./rpcproto.pb.gs.js"
+import "./writer.gs.js"
 
 export class commonRPC {
 	// ctx is the RPC context, canceled when the RPC is canceled.

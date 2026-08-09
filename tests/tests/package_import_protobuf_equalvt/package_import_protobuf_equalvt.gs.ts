@@ -93,12 +93,10 @@ export function state_String(s: state): string {
 		case 1:
 		{
 			return "running"
-			break
 		}
 		default:
 		{
 			return "idle"
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")

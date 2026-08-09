@@ -1,13 +1,39 @@
-export type { RpcProxyGetter } from "./proxy.gs.ts"
-export type { RpcRawGetter } from "./raw-stream.gs.ts"
-export type { RpcStream, RpcStreamCaller, RpcStreamGetter } from "./rpcstream.gs.ts"
-export type { isRpcStreamPacket_Body } from "./rpcstream.pb.gs.ts"
-export { ErrNoServerForComponent, ErrUnexpectedPacket, __goscript_set_ErrNoServerForComponent, __goscript_set_ErrUnexpectedPacket } from "./errors.gs.ts"
-export { HandleProxyRpcStream } from "./proxy.gs.ts"
-export { HandleRawRpcStream } from "./raw-stream.gs.ts"
-export { HandleRpcStream, NewRpcStreamClient, NewRpcStreamOpenStream, OpenRpcStream } from "./rpcstream.gs.ts"
-export { NewRpcStreamReadWriter, ReadPump, ReadToHandler, RpcStreamReadWriter } from "./read-writer.gs.ts"
-export { NewRpcStreamWriter, RpcStreamWriter } from "./writer.gs.ts"
-export { RpcAck, RpcStreamInit, RpcStreamPacket, RpcStreamPacket_Ack, RpcStreamPacket_Data, RpcStreamPacket_Init } from "./rpcstream.pb.gs.ts"
-import "./rpcstream.gs.ts"
-import "./rpcstream.pb.gs.ts"
+export type {
+  RpcStream,
+  RpcStreamCaller,
+  RpcStreamGetter,
+} from './rpcstream.gs.js'
+export type { RpcProxyGetter } from './proxy.gs.js'
+export type { RpcRawGetter } from './raw-stream.gs.js'
+export type { isRpcStreamPacket_Body } from './rpcstream.pb.gs.js'
+export {
+  ErrNoServerForComponent,
+  ErrUnexpectedPacket,
+  __goscript_set_ErrNoServerForComponent,
+  __goscript_set_ErrUnexpectedPacket,
+} from './errors.gs.js'
+export {
+  HandleRpcStream,
+  NewRpcStreamClient,
+  NewRpcStreamOpenStream,
+  OpenRpcStream,
+} from './rpcstream.gs.js'
+export {
+  NewRpcStreamReadWriter,
+  ReadPump,
+  ReadToHandler,
+  RpcStreamReadWriter,
+} from './read-writer.gs.js'
+export {
+  RpcAck,
+  RpcStreamInit,
+  RpcStreamPacket,
+  RpcStreamPacket_Ack,
+  RpcStreamPacket_Data,
+  RpcStreamPacket_Init,
+} from './rpcstream.pb.gs.js'
+export { HandleProxyRpcStream } from './proxy.gs.js'
+export { HandleRawRpcStream } from './raw-stream.gs.js'
+export { NewRpcStreamWriter, RpcStreamWriter } from './writer.gs.js'
+import './rpcstream.gs.js'
+import './rpcstream.pb.gs.js'

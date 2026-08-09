@@ -5,18 +5,18 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as io from "@goscript/io/index.js"
 
-import * as __goscript_deflate from "./deflate.gs.ts"
+import * as __goscript_deflate from "./deflate.gs.js"
 
-import * as __goscript_huffman_code from "./huffman_code.gs.ts"
+import * as __goscript_huffman_code from "./huffman_code.gs.js"
 
-import * as __goscript_inflate from "./inflate.gs.ts"
+import * as __goscript_inflate from "./inflate.gs.js"
 
-import * as __goscript_token from "./token.gs.ts"
+import * as __goscript_token from "./token.gs.js"
 import "@goscript/io/index.js"
-import "./deflate.gs.ts"
-import "./huffman_code.gs.ts"
-import "./inflate.gs.ts"
-import "./token.gs.ts"
+import "./deflate.gs.js"
+import "./huffman_code.gs.js"
+import "./inflate.gs.js"
+import "./token.gs.js"
 
 export class huffmanBitWriter {
 	// writer is the underlying writer.

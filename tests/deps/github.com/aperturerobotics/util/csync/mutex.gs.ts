@@ -141,12 +141,10 @@ export class Mutex {
 				case 1:
 				{
 					return [release, null]
-					break
 				}
 				case 2:
 				{
 					return [(null as (() => void) | null), context.Canceled]
-					break
 				}
 			}
 		}

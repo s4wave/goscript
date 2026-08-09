@@ -15,13 +15,13 @@ import * as hash from "@goscript/hash/index.js"
 
 import type * as io from "@goscript/io/index.js"
 
-import * as __goscript_hmac from "./hmac.gs.ts"
+import * as __goscript_hmac from "./hmac.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/crypto/internal/fips140/index.js"
 import "@goscript/crypto/internal/fips140/sha256/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/hash/index.js"
-import "./hmac.gs.ts"
+import "./hmac.gs.js"
 
 async function __goscriptInit0(): globalThis.Promise<void> {
 	await fips140.CAST("HMAC-SHA2-256", $.functionValue(async (): globalThis.Promise<$.GoError> => {

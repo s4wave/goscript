@@ -13,12 +13,12 @@ import * as time from "@goscript/time/index.js"
 
 import "@goscript/unsafe/index.js"
 
-import * as __goscript_rand_js from "./rand_js.gs.ts"
+import * as __goscript_rand_js from "./rand_js.gs.js"
 import "@goscript/os/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/sync/atomic/index.js"
 import "@goscript/time/index.js"
-import "./rand_js.gs.ts"
+import "./rand_js.gs.js"
 
 export let firstUse: $.VarRef<atomic.Bool> = $.varRef($.markAsStructValue(new atomic.Bool()))
 

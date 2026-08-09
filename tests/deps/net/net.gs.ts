@@ -23,27 +23,27 @@ import "@goscript/unsafe/index.js"
 
 import * as atomic from "@goscript/sync/atomic/index.js"
 
-import * as __goscript_error_unix from "./error_unix.gs.ts"
+import * as __goscript_error_unix from "./error_unix.gs.js"
 
-import * as __goscript_fd_fake from "./fd_fake.gs.ts"
+import * as __goscript_fd_fake from "./fd_fake.gs.js"
 
-import * as __goscript_fd_js from "./fd_js.gs.ts"
+import * as __goscript_fd_js from "./fd_js.gs.js"
 
-import * as __goscript_net_fake from "./net_fake.gs.ts"
+import * as __goscript_net_fake from "./net_fake.gs.js"
 
-import * as __goscript_rlimit_js from "./rlimit_js.gs.ts"
+import * as __goscript_rlimit_js from "./rlimit_js.gs.js"
 
-import * as __goscript_sock_stub from "./sock_stub.gs.ts"
+import * as __goscript_sock_stub from "./sock_stub.gs.js"
 
-import * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.ts"
+import * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.js"
 
-import * as __goscript_sockopt_fake from "./sockopt_fake.gs.ts"
+import * as __goscript_sockopt_fake from "./sockopt_fake.gs.js"
 
-import * as __goscript_tcpsock from "./tcpsock.gs.ts"
+import * as __goscript_tcpsock from "./tcpsock.gs.js"
 
-import * as __goscript_tcpsock_posix from "./tcpsock_posix.gs.ts"
+import * as __goscript_tcpsock_posix from "./tcpsock_posix.gs.js"
 
-import * as __goscript_tcpsock_unix from "./tcpsock_unix.gs.ts"
+import * as __goscript_tcpsock_unix from "./tcpsock_unix.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/internal/poll/index.js"
@@ -53,17 +53,17 @@ import "@goscript/sync/index.js"
 import "@goscript/syscall/index.js"
 import "@goscript/time/index.js"
 import "@goscript/sync/atomic/index.js"
-import "./error_unix.gs.ts"
-import "./fd_fake.gs.ts"
-import "./fd_js.gs.ts"
-import "./net_fake.gs.ts"
-import "./rlimit_js.gs.ts"
-import "./sock_stub.gs.ts"
-import "./sockaddr_posix.gs.ts"
-import "./sockopt_fake.gs.ts"
-import "./tcpsock.gs.ts"
-import "./tcpsock_posix.gs.ts"
-import "./tcpsock_unix.gs.ts"
+import "./error_unix.gs.js"
+import "./fd_fake.gs.js"
+import "./fd_js.gs.js"
+import "./net_fake.gs.js"
+import "./rlimit_js.gs.js"
+import "./sock_stub.gs.js"
+import "./sockaddr_posix.gs.js"
+import "./sockopt_fake.gs.js"
+import "./tcpsock.gs.js"
+import "./tcpsock_posix.gs.js"
+import "./tcpsock_unix.gs.js"
 
 export type Addr = {
 	Network(): string | globalThis.Promise<string>
@@ -1372,17 +1372,14 @@ export function mapErr(err: $.GoError): $.GoError {
 			case $.comparableEqual(__goscriptSwitch0, context.Canceled):
 			{
 				return $.interfaceValue<$.GoError>($.markAsStructValue($.cloneStructValue(errCanceled)), "net.canceledError", "net.canceledError")
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch0, context.DeadlineExceeded):
 			{
 				return errTimeout
-				break
 			}
 			default:
 			{
 				return err
-				break
 			}
 		}
 	}

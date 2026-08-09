@@ -5,12 +5,12 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as math from "@goscript/math/index.js"
 
-import * as __goscript_deflate from "./deflate.gs.ts"
+import * as __goscript_deflate from "./deflate.gs.js"
 
-import * as __goscript_token from "./token.gs.ts"
+import * as __goscript_token from "./token.gs.js"
 import "@goscript/math/index.js"
-import "./deflate.gs.ts"
-import "./token.gs.ts"
+import "./deflate.gs.js"
+import "./token.gs.js"
 
 export class tableEntry {
 	public get val(): number {

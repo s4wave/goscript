@@ -15,17 +15,17 @@ import * as atomic from "@goscript/sync/atomic/index.js"
 
 import * as aes from "@goscript/crypto/internal/fips140/aes/index.js"
 
-import * as __goscript_ctrdrbg from "./ctrdrbg.gs.ts"
+import * as __goscript_ctrdrbg from "./ctrdrbg.gs.js"
 
-import * as __goscript_entropy_wasm from "./entropy_wasm.gs.ts"
+import * as __goscript_entropy_wasm from "./entropy_wasm.gs.js"
 import "@goscript/crypto/internal/fips140/index.js"
 import "@goscript/crypto/internal/sysrand/index.js"
 import "@goscript/io/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/sync/atomic/index.js"
 import "@goscript/crypto/internal/fips140/aes/index.js"
-import "./ctrdrbg.gs.ts"
-import "./entropy_wasm.gs.ts"
+import "./ctrdrbg.gs.js"
+import "./entropy_wasm.gs.js"
 
 export type DefaultReader = {
 	defaultReader(): void

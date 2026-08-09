@@ -23,9 +23,9 @@ import * as io from "@goscript/io/index.js"
 
 import * as big from "@goscript/math/big/index.js"
 
-import * as __goscript_notboring from "./notboring.gs.ts"
+import * as __goscript_notboring from "./notboring.gs.js"
 
-import * as __goscript_rsa from "./rsa.gs.ts"
+import * as __goscript_rsa from "./rsa.gs.js"
 import "@goscript/crypto/index.js"
 import "@goscript/crypto/internal/boring/index.js"
 import "@goscript/crypto/internal/fips140/rsa/index.js"
@@ -36,8 +36,8 @@ import "@goscript/errors/index.js"
 import "@goscript/hash/index.js"
 import "@goscript/io/index.js"
 import "@goscript/math/big/index.js"
-import "./notboring.gs.ts"
-import "./rsa.gs.ts"
+import "./notboring.gs.js"
+import "./rsa.gs.js"
 
 export class PSSOptions {
 	// SaltLength controls the length of the salt used in the PSS signature. It
@@ -237,17 +237,14 @@ export async function VerifyPSS(pub: __goscript_rsa.PublicKey | $.VarRef<__goscr
 		case 0:
 		{
 			return fipsError(await rsa.VerifyPSS(k, h, digest, sig))
-			break
 		}
 		case -1:
 		{
 			return fipsError(await rsa.VerifyPSSWithSaltLength(k, h, digest, sig, await $.pointerValue<Exclude<hash2.Hash, null>>(h).Size()))
-			break
 		}
 		default:
 		{
 			return fipsError(await rsa.VerifyPSSWithSaltLength(k, h, digest, sig, saltLength))
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")
@@ -483,17 +480,14 @@ export function fipsError(err: $.GoError): $.GoError {
 			case $.comparableEqual(__goscriptSwitch0, rsa.ErrDecryption):
 			{
 				return __goscript_rsa.ErrDecryption
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch0, rsa.ErrVerification):
 			{
 				return __goscript_rsa.ErrVerification
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch0, rsa.ErrMessageTooLong):
 			{
 				return __goscript_rsa.ErrMessageTooLong
-				break
 			}
 		}
 	}

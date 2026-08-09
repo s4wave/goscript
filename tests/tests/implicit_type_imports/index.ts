@@ -1,8 +1,8 @@
-export type { Handler } from "./handler.gs.ts"
-export type { Invoker } from "./invoker.gs.ts"
-export type { Stream } from "./stream.gs.ts"
-export { Server } from "./server.gs.ts"
-export { localReadWriteCloser } from "./main.gs.ts"
-import "./handler.gs.ts"
-import "./invoker.gs.ts"
-import "./stream.gs.ts"
+export type { Handler } from './handler.gs.js'
+export type { Invoker } from './invoker.gs.js'
+export type { Stream } from './stream.gs.js'
+export { Server } from './server.gs.js'
+export { localReadWriteCloser } from './main.gs.js'
+import './handler.gs.js'
+import './invoker.gs.js'
+import './stream.gs.js'

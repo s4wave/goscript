@@ -11,7 +11,7 @@ import * as sig2 from "@goscript/crypto/internal/boring/sig/index.js"
 
 import * as hash2 from "@goscript/hash/index.js"
 
-import type * as __goscript_doc from "./doc.gs.ts"
+import type * as __goscript_doc from "./doc.gs.js"
 import "@goscript/crypto/index.js"
 import "@goscript/crypto/cipher/index.js"
 import "@goscript/crypto/internal/boring/sig/index.js"

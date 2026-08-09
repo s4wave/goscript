@@ -5,21 +5,21 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as unicode from "@goscript/unicode/index.js"
 
-import * as __goscript_op_string from "./op_string.gs.ts"
+import * as __goscript_op_string from "./op_string.gs.js"
 
-import * as __goscript_parse from "./parse.gs.ts"
+import * as __goscript_parse from "./parse.gs.js"
 
-import * as __goscript_prog from "./prog.gs.ts"
+import * as __goscript_prog from "./prog.gs.js"
 
-import * as __goscript_regexp from "./regexp.gs.ts"
+import * as __goscript_regexp from "./regexp.gs.js"
 
-import * as __goscript_simplify from "./simplify.gs.ts"
+import * as __goscript_simplify from "./simplify.gs.js"
 import "@goscript/unicode/index.js"
-import "./op_string.gs.ts"
-import "./parse.gs.ts"
-import "./prog.gs.ts"
-import "./regexp.gs.ts"
-import "./simplify.gs.ts"
+import "./op_string.gs.js"
+import "./parse.gs.js"
+import "./prog.gs.js"
+import "./regexp.gs.js"
+import "./simplify.gs.js"
 
 export class patchList {
 	public get head(): number {
@@ -230,12 +230,10 @@ export class compiler {
 			case 1:
 			{
 				return $.markAsStructValue($.cloneStructValue(compiler.prototype.fail.call(c)))
-				break
 			}
 			case 2:
 			{
 				return $.markAsStructValue($.cloneStructValue(compiler.prototype.nop.call(c)))
-				break
 			}
 			case 3:
 			{
@@ -252,52 +250,42 @@ export class compiler {
 					}
 				}
 				return $.markAsStructValue($.cloneStructValue(f))
-				break
 			}
 			case 4:
 			{
 				return $.markAsStructValue($.cloneStructValue(compiler.prototype.rune.call(c, $.pointerValue<__goscript_regexp.Regexp>(re).Rune, $.uint($.pointerValue<__goscript_regexp.Regexp>(re).Flags, 16))))
-				break
 			}
 			case 5:
 			{
 				return $.markAsStructValue($.cloneStructValue(compiler.prototype.rune.call(c, anyRuneNotNL, $.uint(0, 16))))
-				break
 			}
 			case 6:
 			{
 				return $.markAsStructValue($.cloneStructValue(compiler.prototype.rune.call(c, anyRune, $.uint(0, 16))))
-				break
 			}
 			case 7:
 			{
 				return $.markAsStructValue($.cloneStructValue(compiler.prototype.empty.call(c, $.uint(1, 8))))
-				break
 			}
 			case 8:
 			{
 				return $.markAsStructValue($.cloneStructValue(compiler.prototype.empty.call(c, $.uint(2, 8))))
-				break
 			}
 			case 9:
 			{
 				return $.markAsStructValue($.cloneStructValue(compiler.prototype.empty.call(c, $.uint(4, 8))))
-				break
 			}
 			case 10:
 			{
 				return $.markAsStructValue($.cloneStructValue(compiler.prototype.empty.call(c, $.uint(8, 8))))
-				break
 			}
 			case 11:
 			{
 				return $.markAsStructValue($.cloneStructValue(compiler.prototype.empty.call(c, $.uint(16, 8))))
-				break
 			}
 			case 12:
 			{
 				return $.markAsStructValue($.cloneStructValue(compiler.prototype.empty.call(c, $.uint(32, 8))))
-				break
 			}
 			case 13:
 			{
@@ -305,22 +293,18 @@ export class compiler {
 				let sub = $.markAsStructValue($.cloneStructValue(compiler.prototype.compile.call(c, $.arrayIndex($.pointerValue<__goscript_regexp.Regexp>(re).Sub!, 0))))
 				let ket = $.markAsStructValue($.cloneStructValue(compiler.prototype.cap.call(c, $.uint($.uint(($.pointerValue<__goscript_regexp.Regexp>(re).Cap << 1) | 1, 32), 32))))
 				return $.markAsStructValue($.cloneStructValue(compiler.prototype.cat.call(c, $.markAsStructValue($.cloneStructValue(compiler.prototype.cat.call(c, $.markAsStructValue($.cloneStructValue(bra)), $.markAsStructValue($.cloneStructValue(sub))))), $.markAsStructValue($.cloneStructValue(ket)))))
-				break
 			}
 			case 14:
 			{
 				return $.markAsStructValue($.cloneStructValue(compiler.prototype.star.call(c, $.markAsStructValue($.cloneStructValue(compiler.prototype.compile.call(c, $.arrayIndex($.pointerValue<__goscript_regexp.Regexp>(re).Sub!, 0)))), $.uint(($.pointerValue<__goscript_regexp.Regexp>(re).Flags & 32), 16) != $.uint(0, 16))))
-				break
 			}
 			case 15:
 			{
 				return $.markAsStructValue($.cloneStructValue(compiler.prototype.plus.call(c, $.markAsStructValue($.cloneStructValue(compiler.prototype.compile.call(c, $.arrayIndex($.pointerValue<__goscript_regexp.Regexp>(re).Sub!, 0)))), $.uint(($.pointerValue<__goscript_regexp.Regexp>(re).Flags & 32), 16) != $.uint(0, 16))))
-				break
 			}
 			case 16:
 			{
 				return $.markAsStructValue($.cloneStructValue(compiler.prototype.quest.call(c, $.markAsStructValue($.cloneStructValue(compiler.prototype.compile.call(c, $.arrayIndex($.pointerValue<__goscript_regexp.Regexp>(re).Sub!, 0)))), $.uint(($.pointerValue<__goscript_regexp.Regexp>(re).Flags & 32), 16) != $.uint(0, 16))))
-				break
 			}
 			case 18:
 			{
@@ -337,7 +321,6 @@ export class compiler {
 					}
 				}
 				return $.markAsStructValue($.cloneStructValue(f))
-				break
 			}
 			case 19:
 			{
@@ -347,7 +330,6 @@ export class compiler {
 					f = $.markAsStructValue($.cloneStructValue(compiler.prototype.alt.call(c, $.markAsStructValue($.cloneStructValue(f)), $.markAsStructValue($.cloneStructValue(compiler.prototype.compile.call(c, sub))))))
 				}
 				return $.markAsStructValue($.cloneStructValue(f))
-				break
 			}
 		}
 		$.panic("regexp: unhandled case in compile")

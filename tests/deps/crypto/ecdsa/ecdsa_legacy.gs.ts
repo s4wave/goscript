@@ -23,7 +23,7 @@ import type * as crypto from "@goscript/crypto/index.js"
 
 import type * as ecdh from "@goscript/crypto/ecdh/index.js"
 
-import * as __goscript_ecdsa from "./ecdsa.gs.ts"
+import * as __goscript_ecdsa from "./ecdsa.gs.js"
 import "@goscript/crypto/elliptic/index.js"
 import "@goscript/crypto/internal/fips140only/index.js"
 import "@goscript/errors/index.js"
@@ -32,7 +32,7 @@ import "@goscript/math/big/index.js"
 import "@goscript/math/rand/v2/index.js"
 import "@goscript/vendor/golang.org/x/crypto/cryptobyte/index.js"
 import "@goscript/vendor/golang.org/x/crypto/cryptobyte/asn1/index.js"
-import "./ecdsa.gs.ts"
+import "./ecdsa.gs.js"
 
 export async function generateLegacy(c: elliptic.Curve | null, rand: io.Reader | null): globalThis.Promise<[__goscript_ecdsa.PrivateKey | $.VarRef<__goscript_ecdsa.PrivateKey> | null, $.GoError]> {
 	if (fips140only.Enforced()) {

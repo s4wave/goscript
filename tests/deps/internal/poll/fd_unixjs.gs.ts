@@ -9,25 +9,25 @@ import * as sync from "@goscript/sync/index.js"
 
 import type * as time from "@goscript/time/index.js"
 
-import * as __goscript_fd_fsync_posix from "./fd_fsync_posix.gs.ts"
+import * as __goscript_fd_fsync_posix from "./fd_fsync_posix.gs.js"
 
-import * as __goscript_fd_mutex from "./fd_mutex.gs.ts"
+import * as __goscript_fd_mutex from "./fd_mutex.gs.js"
 
-import * as __goscript_fd_poll_js from "./fd_poll_js.gs.ts"
+import * as __goscript_fd_poll_js from "./fd_poll_js.gs.js"
 
-import * as __goscript_fd_posix from "./fd_posix.gs.ts"
+import * as __goscript_fd_posix from "./fd_posix.gs.js"
 
-import * as __goscript_fd_unix from "./fd_unix.gs.ts"
+import * as __goscript_fd_unix from "./fd_unix.gs.js"
 
-import * as __goscript_hook_unix from "./hook_unix.gs.ts"
+import * as __goscript_hook_unix from "./hook_unix.gs.js"
 import "@goscript/syscall/index.js"
 import "@goscript/sync/index.js"
-import "./fd_fsync_posix.gs.ts"
-import "./fd_mutex.gs.ts"
-import "./fd_poll_js.gs.ts"
-import "./fd_posix.gs.ts"
-import "./fd_unix.gs.ts"
-import "./hook_unix.gs.ts"
+import "./fd_fsync_posix.gs.js"
+import "./fd_mutex.gs.js"
+import "./fd_poll_js.gs.js"
+import "./fd_posix.gs.js"
+import "./fd_unix.gs.js"
+import "./hook_unix.gs.js"
 
 export class SysFile {
 	// Writev cache.

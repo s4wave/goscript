@@ -1,1 +1,1 @@
-export { ConcurrentQueue, NewConcurrentQueue } from "./queue.gs.ts"
+export { ConcurrentQueue, NewConcurrentQueue } from './queue.gs.js'

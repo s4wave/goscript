@@ -7,11 +7,11 @@ import type * as context from "@goscript/context/index.js"
 
 import type * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
 
-import type * as __goscript_invoker from "./invoker.gs.ts"
+import type * as __goscript_invoker from "./invoker.gs.js"
 
-import type * as __goscript_message from "./message.gs.ts"
+import type * as __goscript_message from "./message.gs.js"
 
-import type * as __goscript_stream from "./stream.gs.ts"
+import type * as __goscript_stream from "./stream.gs.js"
 
 export type Handler = {
 	GetMethodIDs(): $.Slice<string> | globalThis.Promise<$.Slice<string>>

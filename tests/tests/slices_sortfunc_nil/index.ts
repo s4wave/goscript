@@ -1,1 +1,1 @@
-export { field } from "./slices_sortfunc_nil.gs.ts"
+export { field } from './slices_sortfunc_nil.gs.js'

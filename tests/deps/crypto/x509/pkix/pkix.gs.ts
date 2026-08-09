@@ -437,7 +437,6 @@ export class Name {
 						case 17:
 						{
 							continue
-							break
 						}
 					}
 				}

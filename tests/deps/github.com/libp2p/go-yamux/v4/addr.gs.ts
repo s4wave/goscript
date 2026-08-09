@@ -17,31 +17,31 @@ import * as sync from "@goscript/sync/index.js"
 
 import * as time from "@goscript/time/index.js"
 
-import type * as __goscript__const from "./const.gs.ts"
+import type * as __goscript__const from "./const.gs.js"
 
-import * as __goscript_deadline from "./deadline.gs.ts"
+import * as __goscript_deadline from "./deadline.gs.js"
 
-import * as __goscript_mux from "./mux.gs.ts"
+import * as __goscript_mux from "./mux.gs.js"
 
-import * as __goscript_ping from "./ping.gs.ts"
+import * as __goscript_ping from "./ping.gs.js"
 
-import * as __goscript_session from "./session.gs.ts"
+import * as __goscript_session from "./session.gs.js"
 
-import * as __goscript_stream from "./stream.gs.ts"
+import * as __goscript_stream from "./stream.gs.js"
 
-import * as __goscript_util from "./util.gs.ts"
+import * as __goscript_util from "./util.gs.js"
 import "@goscript/fmt/index.js"
 import "@goscript/net/index.js"
 import "@goscript/io/index.js"
 import "@goscript/log/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/time/index.js"
-import "./deadline.gs.ts"
-import "./mux.gs.ts"
-import "./ping.gs.ts"
-import "./session.gs.ts"
-import "./stream.gs.ts"
-import "./util.gs.ts"
+import "./deadline.gs.js"
+import "./mux.gs.js"
+import "./ping.gs.js"
+import "./session.gs.js"
+import "./stream.gs.js"
+import "./util.gs.js"
 
 export type hasAddr = {
 	LocalAddr(): net.Addr | null | globalThis.Promise<net.Addr | null>

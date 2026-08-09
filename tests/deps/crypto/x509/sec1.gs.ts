@@ -19,11 +19,11 @@ import * as pkix from "@goscript/crypto/x509/pkix/index.js"
 
 import * as big from "@goscript/math/big/index.js"
 
-import * as __goscript_pkcs1 from "./pkcs1.gs.ts"
+import * as __goscript_pkcs1 from "./pkcs1.gs.js"
 
-import * as __goscript_pkcs8 from "./pkcs8.gs.ts"
+import * as __goscript_pkcs8 from "./pkcs8.gs.js"
 
-import * as __goscript_x509 from "./x509.gs.ts"
+import * as __goscript_x509 from "./x509.gs.js"
 import "@goscript/crypto/ecdh/index.js"
 import "@goscript/crypto/ecdsa/index.js"
 import "@goscript/crypto/elliptic/index.js"
@@ -32,9 +32,9 @@ import "@goscript/errors/index.js"
 import "@goscript/fmt/index.js"
 import "@goscript/crypto/x509/pkix/index.js"
 import "@goscript/math/big/index.js"
-import "./pkcs1.gs.ts"
-import "./pkcs8.gs.ts"
-import "./x509.gs.ts"
+import "./pkcs1.gs.js"
+import "./pkcs8.gs.js"
+import "./x509.gs.js"
 
 export class ecPrivateKey {
 	public get Version(): number {

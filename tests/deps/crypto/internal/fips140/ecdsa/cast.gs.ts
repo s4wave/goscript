@@ -23,11 +23,11 @@ import type * as nistec from "@goscript/crypto/internal/fips140/nistec/index.js"
 
 import type * as io from "@goscript/io/index.js"
 
-import * as __goscript_ecdsa from "./ecdsa.gs.ts"
+import * as __goscript_ecdsa from "./ecdsa.gs.js"
 
-import * as __goscript_ecdsa_noasm from "./ecdsa_noasm.gs.ts"
+import * as __goscript_ecdsa_noasm from "./ecdsa_noasm.gs.js"
 
-import * as __goscript_hmacdrbg from "./hmacdrbg.gs.ts"
+import * as __goscript_hmacdrbg from "./hmacdrbg.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/crypto/internal/fips140/index.js"
 import "@goscript/crypto/internal/fips140/sha512/index.js"
@@ -35,9 +35,9 @@ import "@goscript/errors/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/crypto/internal/fips140/bigmod/index.js"
 import "@goscript/crypto/internal/fips140/hmac/index.js"
-import "./ecdsa.gs.ts"
-import "./ecdsa_noasm.gs.ts"
-import "./hmacdrbg.gs.ts"
+import "./ecdsa.gs.js"
+import "./ecdsa_noasm.gs.js"
+import "./hmacdrbg.gs.js"
 
 export function testPrivateKey(): __goscript_ecdsa.PrivateKey | $.VarRef<__goscript_ecdsa.PrivateKey> | null {
 	// https://www.rfc-editor.org/rfc/rfc9500.html#section-2.3

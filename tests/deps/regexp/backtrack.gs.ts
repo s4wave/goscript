@@ -9,17 +9,17 @@ import * as sync from "@goscript/sync/index.js"
 
 import * as io from "@goscript/io/index.js"
 
-import * as __goscript_exec from "./exec.gs.ts"
+import * as __goscript_exec from "./exec.gs.js"
 
-import * as __goscript_onepass from "./onepass.gs.ts"
+import * as __goscript_onepass from "./onepass.gs.js"
 
-import * as __goscript_regexp from "./regexp.gs.ts"
+import * as __goscript_regexp from "./regexp.gs.js"
 import "@goscript/regexp/syntax/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/io/index.js"
-import "./exec.gs.ts"
-import "./onepass.gs.ts"
-import "./regexp.gs.ts"
+import "./exec.gs.js"
+import "./onepass.gs.js"
+import "./regexp.gs.js"
 
 export class job {
 	public get pc(): number {

@@ -15,34 +15,34 @@ import * as broadcast from "@goscript/github.com/aperturerobotics/util/broadcast
 
 import * as atomic from "@goscript/sync/atomic/index.js"
 
-import * as __goscript_common_rpc from "./common-rpc.gs.ts"
+import * as __goscript_common_rpc from "./common-rpc.gs.js"
 
-import * as __goscript_errors from "./errors.gs.ts"
+import * as __goscript_errors from "./errors.gs.js"
 
-import * as __goscript_invoker from "./invoker.gs.ts"
+import * as __goscript_invoker from "./invoker.gs.js"
 
-import type * as __goscript_message from "./message.gs.ts"
+import type * as __goscript_message from "./message.gs.js"
 
-import * as __goscript_msg_stream from "./msg-stream.gs.ts"
+import * as __goscript_msg_stream from "./msg-stream.gs.js"
 
-import * as __goscript_packet from "./packet.gs.ts"
+import * as __goscript_packet from "./packet.gs.js"
 
-import * as __goscript_rpcproto_pb from "./rpcproto.pb.gs.ts"
+import * as __goscript_rpcproto_pb from "./rpcproto.pb.gs.js"
 
-import type * as __goscript_stream from "./stream.gs.ts"
+import type * as __goscript_stream from "./stream.gs.js"
 
-import * as __goscript_writer from "./writer.gs.ts"
+import * as __goscript_writer from "./writer.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/github.com/pkg/errors/index.js"
 import "@goscript/github.com/aperturerobotics/util/broadcast/index.js"
 import "@goscript/sync/atomic/index.js"
-import "./common-rpc.gs.ts"
-import "./errors.gs.ts"
-import "./invoker.gs.ts"
-import "./msg-stream.gs.ts"
-import "./packet.gs.ts"
-import "./rpcproto.pb.gs.ts"
-import "./writer.gs.ts"
+import "./common-rpc.gs.js"
+import "./errors.gs.js"
+import "./invoker.gs.js"
+import "./msg-stream.gs.js"
+import "./packet.gs.js"
+import "./rpcproto.pb.gs.js"
+import "./writer.gs.js"
 
 export class ServerRPC {
 	public get commonRPC(): __goscript_common_rpc.commonRPC {

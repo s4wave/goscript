@@ -1,2 +1,2 @@
-export type { remoteError } from "./error_type.gs.ts"
-export { remoteError_Error } from "./error_type.gs.ts"
+export type { remoteError } from './error_type.gs.js'
+export { remoteError_Error } from './error_type.gs.js'

@@ -1,10 +1,20 @@
-export type { p224Table } from "./p224.gs.ts"
-export type { p256AffineTable, p256OrdElement, p256Table } from "./p256.gs.ts"
-export type { p384Table } from "./p384.gs.ts"
-export type { p521Table } from "./p521.gs.ts"
-export { NewP224Point, P224Point, p224Table_Select } from "./p224.gs.ts"
-export { NewP256Point, P256Point, p256AffinePoint, p256AffineTable_Select, p256OrdElement_Bytes, p256OrdElement_Rsh, p256OrdElement_SetBytes, p256Table_Compute, p256Table_Select } from "./p256.gs.ts"
-export { NewP384Point, P384Point, p384Table_Select } from "./p384.gs.ts"
-export { NewP521Point, P521Point, p521Table_Select } from "./p521.gs.ts"
-export { P256OrdInverse } from "./p256_ordinv_noasm.gs.ts"
-import "./p256.gs.ts"
+export type { p224Table } from './p224.gs.js'
+export type { p256AffineTable, p256OrdElement, p256Table } from './p256.gs.js'
+export type { p384Table } from './p384.gs.js'
+export type { p521Table } from './p521.gs.js'
+export {
+  NewP256Point,
+  P256Point,
+  p256AffinePoint,
+  p256AffineTable_Select,
+  p256OrdElement_Bytes,
+  p256OrdElement_Rsh,
+  p256OrdElement_SetBytes,
+  p256Table_Compute,
+  p256Table_Select,
+} from './p256.gs.js'
+export { NewP224Point, P224Point, p224Table_Select } from './p224.gs.js'
+export { NewP384Point, P384Point, p384Table_Select } from './p384.gs.js'
+export { NewP521Point, P521Point, p521Table_Select } from './p521.gs.js'
+export { P256OrdInverse } from './p256_ordinv_noasm.gs.js'
+import './p256.gs.js'

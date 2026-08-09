@@ -1,1 +1,1 @@
-export { TestStruct } from "./comments_struct.gs.ts"
+export { TestStruct } from './comments_struct.gs.js'

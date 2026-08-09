@@ -21,7 +21,7 @@ import * as strings from "@goscript/strings/index.js"
 
 import "@goscript/unsafe/index.js"
 
-import * as __goscript_encoding_table from "./encoding_table.gs.ts"
+import * as __goscript_encoding_table from "./encoding_table.gs.js"
 import "@goscript/errors/index.js"
 import "@goscript/fmt/index.js"
 import "@goscript/internal/godebug/index.js"
@@ -30,7 +30,7 @@ import "@goscript/path/index.js"
 import "@goscript/slices/index.js"
 import "@goscript/strconv/index.js"
 import "@goscript/strings/index.js"
-import "./encoding_table.gs.ts"
+import "./encoding_table.gs.js"
 
 export type EscapeError = string
 
@@ -896,12 +896,10 @@ export function getScheme(rawURL: string): [string, string, $.GoError] {
 					return ["", "", errors.New("missing protocol scheme")]
 				}
 				return [$.sliceStringOrBytes(rawURL, undefined, i), $.sliceStringOrBytes(rawURL, i + 1, undefined), null]
-				break
 			}
 			default:
 			{
 				return ["", rawURL, null]
-				break
 			}
 		}
 	}
@@ -1527,17 +1525,14 @@ export function validUserinfo(s: string): boolean {
 			case 37:
 			{
 				continue
-				break
 			}
 			case 64:
 			{
 				continue
-				break
 			}
 			default:
 			{
 				return false
-				break
 			}
 		}
 	}

@@ -3,11 +3,11 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_consts from "./consts.gs.ts"
+import * as __goscript_consts from "./consts.gs.js"
 
-import * as __goscript_register from "./register.gs.ts"
-import "./consts.gs.ts"
-import "./register.gs.ts"
+import * as __goscript_register from "./register.gs.js"
+import "./consts.gs.js"
+import "./register.gs.js"
 
 export async function main(): globalThis.Promise<void> {
 	__goscript_consts.__goscript_get_Default()

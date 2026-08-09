@@ -1,1 +1,1 @@
-export { MyStruct } from "./varref_struct_init.gs.ts"
+export { MyStruct } from './varref_struct_init.gs.js'

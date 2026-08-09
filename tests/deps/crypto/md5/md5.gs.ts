@@ -13,16 +13,16 @@ import * as hash2 from "@goscript/hash/index.js"
 
 import * as byteorder from "@goscript/internal/byteorder/index.js"
 
-import * as __goscript_md5block from "./md5block.gs.ts"
+import * as __goscript_md5block from "./md5block.gs.js"
 
-import * as __goscript_md5block_generic from "./md5block_generic.gs.ts"
+import * as __goscript_md5block_generic from "./md5block_generic.gs.js"
 import "@goscript/crypto/index.js"
 import "@goscript/crypto/internal/fips140only/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/hash/index.js"
 import "@goscript/internal/byteorder/index.js"
-import "./md5block.gs.ts"
-import "./md5block_generic.gs.ts"
+import "./md5block.gs.js"
+import "./md5block_generic.gs.js"
 
 export class digest {
 	public get s(): number[] {

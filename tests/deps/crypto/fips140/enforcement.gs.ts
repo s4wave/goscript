@@ -7,9 +7,9 @@ import * as godebug from "@goscript/internal/godebug/index.js"
 
 import "@goscript/unsafe/index.js"
 
-import * as __goscript_fips140 from "./fips140.gs.ts"
+import * as __goscript_fips140 from "./fips140.gs.js"
 import "@goscript/internal/godebug/index.js"
-import "./fips140.gs.ts"
+import "./fips140.gs.js"
 
 export async function WithoutEnforcement(f: (() => void) | null): globalThis.Promise<void> {
 	using __defer = new $.DisposableStack()

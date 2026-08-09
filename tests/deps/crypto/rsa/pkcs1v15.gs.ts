@@ -21,9 +21,9 @@ import type * as crypto from "@goscript/crypto/index.js"
 
 import * as big from "@goscript/math/big/index.js"
 
-import * as __goscript_notboring from "./notboring.gs.ts"
+import * as __goscript_notboring from "./notboring.gs.js"
 
-import * as __goscript_rsa from "./rsa.gs.ts"
+import * as __goscript_rsa from "./rsa.gs.js"
 import "@goscript/crypto/internal/boring/index.js"
 import "@goscript/crypto/internal/fips140/rsa/index.js"
 import "@goscript/crypto/internal/fips140only/index.js"
@@ -32,8 +32,8 @@ import "@goscript/crypto/subtle/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/io/index.js"
 import "@goscript/math/big/index.js"
-import "./notboring.gs.ts"
-import "./rsa.gs.ts"
+import "./notboring.gs.js"
+import "./rsa.gs.js"
 
 export class PKCS1v15DecryptOptions {
 	// SessionKeyLen is the length of the session key that is being

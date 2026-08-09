@@ -42,17 +42,14 @@ export function RuneLen(r: number): number {
 		case ($.int(57344, 32) <= $.int(r, 32)) && ($.int(r, 32) < $.int(65536, 32)):
 		{
 			return 1
-			break
 		}
 		case ($.int(65536, 32) <= $.int(r, 32)) && ($.int(r, 32) <= $.int(1114111, 32)):
 		{
 			return 2
-			break
 		}
 		default:
 		{
 			return -1
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")
@@ -106,7 +103,6 @@ export function AppendRune(a: $.Slice<number>, r: number): $.Slice<number> {
 		case ($.int(57344, 32) <= $.int(r, 32)) && ($.int(r, 32) < $.int(65536, 32)):
 		{
 			return $.append(a, $.uint($.uint(r, 16), 16))
-			break
 		}
 		case ($.int(65536, 32) <= $.int(r, 32)) && ($.int(r, 32) <= $.int(1114111, 32)):
 		{
@@ -114,7 +110,6 @@ export function AppendRune(a: $.Slice<number>, r: number): $.Slice<number> {
 			let r1 = $.int(__goscriptTuple1[0], 32)
 			let r2 = $.int(__goscriptTuple1[1], 32)
 			return $.append(a, $.uint($.uint(r1, 16), 16), $.uint($.uint(r2, 16), 16))
-			break
 		}
 	}
 	return $.append(a, $.uint(65533, 16))

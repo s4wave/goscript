@@ -1,1 +1,1 @@
-export { Cache } from "./cache.gs.ts"
+export { Cache } from './cache.gs.js'

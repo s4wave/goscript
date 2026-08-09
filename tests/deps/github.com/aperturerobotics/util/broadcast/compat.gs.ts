@@ -9,11 +9,11 @@ import * as errors from "@goscript/errors/index.js"
 
 import * as sync from "@goscript/sync/index.js"
 
-import * as __goscript_broadcast from "./broadcast.gs.ts"
+import * as __goscript_broadcast from "./broadcast.gs.js"
 
-import * as __goscript_locked from "./locked.gs.ts"
+import * as __goscript_locked from "./locked.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/sync/index.js"
-import "./broadcast.gs.ts"
-import "./locked.gs.ts"
+import "./broadcast.gs.js"
+import "./locked.gs.js"

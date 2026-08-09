@@ -3,14 +3,14 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_aes from "./aes.gs.ts"
+import * as __goscript_aes from "./aes.gs.js"
 
-import * as __goscript_aes_noasm from "./aes_noasm.gs.ts"
+import * as __goscript_aes_noasm from "./aes_noasm.gs.js"
 
-import * as __goscript_cbc from "./cbc.gs.ts"
-import "./aes.gs.ts"
-import "./aes_noasm.gs.ts"
-import "./cbc.gs.ts"
+import * as __goscript_cbc from "./cbc.gs.js"
+import "./aes.gs.js"
+import "./aes_noasm.gs.js"
+import "./cbc.gs.js"
 
 export function cryptBlocksEnc(b: __goscript_aes.Block | $.VarRef<__goscript_aes.Block> | null, civ: $.VarRef<Uint8Array> | null, dst: $.Slice<number>, src: $.Slice<number>): void {
 	__goscript_cbc.cryptBlocksEncGeneric(b, civ, dst, src)

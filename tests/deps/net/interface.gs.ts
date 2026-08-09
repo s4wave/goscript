@@ -13,21 +13,21 @@ import * as time from "@goscript/time/index.js"
 
 import "@goscript/unsafe/index.js"
 
-import * as __goscript_interface_stub from "./interface_stub.gs.ts"
+import * as __goscript_interface_stub from "./interface_stub.gs.js"
 
-import * as __goscript_mac from "./mac.gs.ts"
+import * as __goscript_mac from "./mac.gs.js"
 
-import * as __goscript_net from "./net.gs.ts"
+import * as __goscript_net from "./net.gs.js"
 
-import * as __goscript_parse from "./parse.gs.ts"
+import * as __goscript_parse from "./parse.gs.js"
 import "@goscript/errors/index.js"
 import "@goscript/internal/strconv/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/time/index.js"
-import "./interface_stub.gs.ts"
-import "./mac.gs.ts"
-import "./net.gs.ts"
-import "./parse.gs.ts"
+import "./interface_stub.gs.js"
+import "./mac.gs.js"
+import "./net.gs.js"
+import "./parse.gs.js"
 
 export type Flags = number
 

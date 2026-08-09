@@ -9,17 +9,17 @@ import * as syntax from "@goscript/regexp/syntax/index.js"
 
 import * as sync from "@goscript/sync/index.js"
 
-import * as __goscript_backtrack from "./backtrack.gs.ts"
+import * as __goscript_backtrack from "./backtrack.gs.js"
 
-import * as __goscript_onepass from "./onepass.gs.ts"
+import * as __goscript_onepass from "./onepass.gs.js"
 
-import * as __goscript_regexp from "./regexp.gs.ts"
+import * as __goscript_regexp from "./regexp.gs.js"
 import "@goscript/io/index.js"
 import "@goscript/regexp/syntax/index.js"
 import "@goscript/sync/index.js"
-import "./backtrack.gs.ts"
-import "./onepass.gs.ts"
-import "./regexp.gs.ts"
+import "./backtrack.gs.js"
+import "./onepass.gs.js"
+import "./regexp.gs.js"
 
 export type lazyFlag = bigint
 
@@ -394,7 +394,6 @@ export class machine {
 					t = machine.prototype.add.call(m, q, $.uint($.pointerValue<syntax.Inst>(i).Out, 32), pos, cap, cond, t)
 					pc = $.uint($.pointerValue<syntax.Inst>(i).Arg, 32)
 					continue Again
-					break
 				}
 				case syntax.InstEmptyWidth:
 				{
@@ -408,7 +407,6 @@ export class machine {
 				{
 					pc = $.uint($.pointerValue<syntax.Inst>(i).Out, 32)
 					continue Again
-					break
 				}
 				case syntax.InstCapture:
 				{

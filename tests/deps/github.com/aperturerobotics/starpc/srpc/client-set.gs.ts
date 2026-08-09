@@ -7,19 +7,19 @@ import * as context from "@goscript/context/index.js"
 
 import * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
 
-import * as __goscript_client from "./client.gs.ts"
+import * as __goscript_client from "./client.gs.js"
 
-import * as __goscript_errors from "./errors.gs.ts"
+import * as __goscript_errors from "./errors.gs.js"
 
-import * as __goscript_message from "./message.gs.ts"
+import * as __goscript_message from "./message.gs.js"
 
-import * as __goscript_stream from "./stream.gs.ts"
+import * as __goscript_stream from "./stream.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
-import "./client.gs.ts"
-import "./errors.gs.ts"
-import "./message.gs.ts"
-import "./stream.gs.ts"
+import "./client.gs.js"
+import "./errors.gs.js"
+import "./message.gs.js"
+import "./stream.gs.js"
 
 export class ClientSet {
 	public get clients(): $.Slice<__goscript_client.Client | null> {

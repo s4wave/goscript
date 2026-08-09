@@ -7,12 +7,12 @@ import * as os from "@goscript/os/index.js"
 
 import type * as time from "@goscript/time/index.js"
 
-import * as __goscript_file_stub from "./file_stub.gs.ts"
+import * as __goscript_file_stub from "./file_stub.gs.js"
 
-import * as __goscript_net from "./net.gs.ts"
+import * as __goscript_net from "./net.gs.js"
 import "@goscript/os/index.js"
-import "./file_stub.gs.ts"
-import "./net.gs.ts"
+import "./file_stub.gs.js"
+import "./net.gs.js"
 
 export type fileAddr = string
 

@@ -9,14 +9,14 @@ import * as subtle from "@goscript/crypto/internal/fips140/subtle/index.js"
 
 import * as errors from "@goscript/errors/index.js"
 
-import * as __goscript_hashes from "./hashes.gs.ts"
+import * as __goscript_hashes from "./hashes.gs.js"
 
-import * as __goscript_sha3_noasm from "./sha3_noasm.gs.ts"
+import * as __goscript_sha3_noasm from "./sha3_noasm.gs.js"
 import "@goscript/crypto/internal/fips140/index.js"
 import "@goscript/crypto/internal/fips140/subtle/index.js"
 import "@goscript/errors/index.js"
-import "./hashes.gs.ts"
-import "./sha3_noasm.gs.ts"
+import "./hashes.gs.js"
+import "./sha3_noasm.gs.js"
 
 export type spongeDirection = number
 
@@ -213,7 +213,6 @@ export class Digest {
 			default:
 			{
 				return errors.New("sha3: invalid hash state identifier")
-				break
 			}
 		}
 

@@ -73,23 +73,23 @@ import * as cryptobyte_asn1 from "@goscript/vendor/golang.org/x/crypto/cryptobyt
 
 import * as hash2 from "@goscript/hash/index.js"
 
-import * as __goscript_cert_pool from "./cert_pool.gs.ts"
+import * as __goscript_cert_pool from "./cert_pool.gs.js"
 
-import * as __goscript_constraints from "./constraints.gs.ts"
+import * as __goscript_constraints from "./constraints.gs.js"
 
-import * as __goscript_oid from "./oid.gs.ts"
+import * as __goscript_oid from "./oid.gs.js"
 
-import * as __goscript_parser from "./parser.gs.ts"
+import * as __goscript_parser from "./parser.gs.js"
 
-import * as __goscript_pkcs1 from "./pkcs1.gs.ts"
+import * as __goscript_pkcs1 from "./pkcs1.gs.js"
 
-import * as __goscript_root from "./root.gs.ts"
+import * as __goscript_root from "./root.gs.js"
 
-import * as __goscript_root_unix from "./root_unix.gs.ts"
+import * as __goscript_root_unix from "./root_unix.gs.js"
 
-import * as __goscript_verify from "./verify.gs.ts"
+import * as __goscript_verify from "./verify.gs.js"
 
-import * as __goscript_x509_string from "./x509_string.gs.ts"
+import * as __goscript_x509_string from "./x509_string.gs.js"
 import "@goscript/io/fs/index.js"
 import "@goscript/os/index.js"
 import "@goscript/path/filepath/index.js"
@@ -124,15 +124,15 @@ import "@goscript/unicode/index.js"
 import "@goscript/vendor/golang.org/x/crypto/cryptobyte/index.js"
 import "@goscript/vendor/golang.org/x/crypto/cryptobyte/asn1/index.js"
 import "@goscript/hash/index.js"
-import "./cert_pool.gs.ts"
-import "./constraints.gs.ts"
-import "./oid.gs.ts"
-import "./parser.gs.ts"
-import "./pkcs1.gs.ts"
-import "./root.gs.ts"
-import "./root_unix.gs.ts"
-import "./verify.gs.ts"
-import "./x509_string.gs.ts"
+import "./cert_pool.gs.js"
+import "./constraints.gs.js"
+import "./oid.gs.js"
+import "./parser.gs.js"
+import "./pkcs1.gs.js"
+import "./root.gs.js"
+import "./root_unix.gs.js"
+import "./verify.gs.js"
+import "./x509_string.gs.js"
 
 export type SignatureAlgorithm = number
 
@@ -3387,17 +3387,14 @@ export async function getSignatureAlgorithmFromAI(ai: pkix2.AlgorithmIdentifier)
 		case asn1.ObjectIdentifier_Equal(params.value.Hash.Algorithm, (oidSHA256 as asn1.ObjectIdentifier)) && (params.value.SaltLength == 32):
 		{
 			return 13
-			break
 		}
 		case asn1.ObjectIdentifier_Equal(params.value.Hash.Algorithm, (oidSHA384 as asn1.ObjectIdentifier)) && (params.value.SaltLength == 48):
 		{
 			return 14
-			break
 		}
 		case asn1.ObjectIdentifier_Equal(params.value.Hash.Algorithm, (oidSHA512 as asn1.ObjectIdentifier)) && (params.value.SaltLength == 64):
 		{
 			return 15
-			break
 		}
 	}
 
@@ -3439,22 +3436,18 @@ export function getPublicKeyAlgorithmFromOID(oid: asn1.ObjectIdentifier): Public
 		case asn1.ObjectIdentifier_Equal(oid, (oidPublicKeyRSA as asn1.ObjectIdentifier)):
 		{
 			return 1
-			break
 		}
 		case asn1.ObjectIdentifier_Equal(oid, (oidPublicKeyDSA as asn1.ObjectIdentifier)):
 		{
 			return 2
-			break
 		}
 		case asn1.ObjectIdentifier_Equal(oid, (oidPublicKeyECDSA as asn1.ObjectIdentifier)):
 		{
 			return 3
-			break
 		}
 		case asn1.ObjectIdentifier_Equal(oid, (oidPublicKeyEd25519 as asn1.ObjectIdentifier)):
 		{
 			return 4
-			break
 		}
 	}
 	return 0
@@ -3489,22 +3482,18 @@ export async function namedCurveFromOID(oid: asn1.ObjectIdentifier): globalThis.
 		case asn1.ObjectIdentifier_Equal(oid, (oidNamedCurveP224 as asn1.ObjectIdentifier)):
 		{
 			return elliptic.P224()
-			break
 		}
 		case asn1.ObjectIdentifier_Equal(oid, (oidNamedCurveP256 as asn1.ObjectIdentifier)):
 		{
 			return elliptic.P256()
-			break
 		}
 		case asn1.ObjectIdentifier_Equal(oid, (oidNamedCurveP384 as asn1.ObjectIdentifier)):
 		{
 			return elliptic.P384()
-			break
 		}
 		case asn1.ObjectIdentifier_Equal(oid, (oidNamedCurveP521 as asn1.ObjectIdentifier)):
 		{
 			return elliptic.P521()
-			break
 		}
 	}
 	return null
@@ -3517,22 +3506,18 @@ export async function oidFromNamedCurve(curve: elliptic.Curve | null): globalThi
 			case $.comparableEqual(__goscriptSwitch0, await elliptic.P224()):
 			{
 				return [(oidNamedCurveP224 as asn1.ObjectIdentifier), true]
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch0, await elliptic.P256()):
 			{
 				return [(oidNamedCurveP256 as asn1.ObjectIdentifier), true]
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch0, await elliptic.P384()):
 			{
 				return [(oidNamedCurveP384 as asn1.ObjectIdentifier), true]
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch0, await elliptic.P521()):
 			{
 				return [(oidNamedCurveP521 as asn1.ObjectIdentifier), true]
-				break
 			}
 		}
 	}
@@ -3547,22 +3532,18 @@ export function oidFromECDHCurve(curve: ecdh.Curve | null): [asn1.ObjectIdentifi
 			case $.comparableEqual(__goscriptSwitch1, ecdh.X25519()):
 			{
 				return [(oidPublicKeyX25519 as asn1.ObjectIdentifier), true]
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch1, ecdh.P256()):
 			{
 				return [(oidNamedCurveP256 as asn1.ObjectIdentifier), true]
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch1, ecdh.P384()):
 			{
 				return [(oidNamedCurveP384 as asn1.ObjectIdentifier), true]
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch1, ecdh.P521()):
 			{
 				return [(oidNamedCurveP521 as asn1.ObjectIdentifier), true]
-				break
 			}
 		}
 	}
@@ -3737,7 +3718,6 @@ export async function checkSignature(algo: SignatureAlgorithm, signed: $.Slice<n
 		case crypto.MD5:
 		{
 			return $.namedValueInterfaceValue<$.GoError>($.int(algo), "x509.InsecureAlgorithmError", {"Error": InsecureAlgorithmError_Error}, { kind: $.TypeKind.Basic, name: "int", typeName: "x509.InsecureAlgorithmError" })
-			break
 		}
 		case crypto.SHA1:
 		{
@@ -4393,7 +4373,6 @@ export async function signingParamsForKey(key: crypto.Signer | null, sigAlgo: Si
 							default:
 							{
 								return [0, $.markAsStructValue($.cloneStructValue(ai)), errors.New("x509: unsupported elliptic curve")]
-								break
 							}
 						}
 					}

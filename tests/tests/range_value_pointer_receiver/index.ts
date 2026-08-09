@@ -1,1 +1,1 @@
-export { item } from "./range_value_pointer_receiver.gs.ts"
+export { item } from './range_value_pointer_receiver.gs.js'

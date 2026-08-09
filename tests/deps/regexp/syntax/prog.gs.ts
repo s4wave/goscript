@@ -11,12 +11,12 @@ import * as unicode from "@goscript/unicode/index.js"
 
 import * as utf8 from "@goscript/unicode/utf8/index.js"
 
-import * as __goscript_parse from "./parse.gs.ts"
+import * as __goscript_parse from "./parse.gs.js"
 import "@goscript/strconv/index.js"
 import "@goscript/strings/index.js"
 import "@goscript/unicode/index.js"
 import "@goscript/unicode/utf8/index.js"
-import "./parse.gs.ts"
+import "./parse.gs.js"
 
 export type InstOp = number
 
@@ -103,7 +103,6 @@ export class Prog {
 				case 5:
 				{
 					return $.uint($.uint(~0, 8), 8)
-					break
 				}
 				case 2:
 				case 6:
@@ -113,7 +112,6 @@ export class Prog {
 				default:
 				{
 					break Loop
-					break
 				}
 			}
 			pc = $.uint($.pointerValue<Inst>(i).Out, 32)
@@ -209,32 +207,26 @@ export class Inst {
 			case 1:
 			{
 				return ($.int(before, 32) == $.int(10, 32)) || ($.int(before, 32) == $.int(-1, 32))
-				break
 			}
 			case 2:
 			{
 				return ($.int(after, 32) == $.int(10, 32)) || ($.int(after, 32) == $.int(-1, 32))
-				break
 			}
 			case 4:
 			{
 				return $.int(before, 32) == $.int(-1, 32)
-				break
 			}
 			case 8:
 			{
 				return $.int(after, 32) == $.int(-1, 32)
-				break
 			}
 			case 16:
 			{
 				return IsWordChar($.int(before, 32)) != IsWordChar($.int(after, 32))
-				break
 			}
 			case 32:
 			{
 				return IsWordChar($.int(before, 32)) == IsWordChar($.int(after, 32))
-				break
 			}
 		}
 		$.panic("unknown empty width arg")
@@ -254,7 +246,6 @@ export class Inst {
 			case 0:
 			{
 				return -1
-				break
 			}
 			case 1:
 			{
@@ -270,7 +261,6 @@ export class Inst {
 					}
 				}
 				return -1
-				break
 			}
 			case 2:
 			{
@@ -278,7 +268,6 @@ export class Inst {
 					return 0
 				}
 				return -1
-				break
 			}
 			case 4:
 			case 6:
@@ -293,7 +282,6 @@ export class Inst {
 					}
 				}
 				return -1
-				break
 			}
 		}
 

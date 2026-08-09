@@ -23,25 +23,25 @@ import * as atomic from "@goscript/sync/atomic/index.js"
 
 import type * as time from "@goscript/time/index.js"
 
-import * as __goscript_common_rpc from "./common-rpc.gs.ts"
+import * as __goscript_common_rpc from "./common-rpc.gs.js"
 
-import * as __goscript_invoker from "./invoker.gs.ts"
+import * as __goscript_invoker from "./invoker.gs.js"
 
-import type * as __goscript_message from "./message.gs.ts"
+import type * as __goscript_message from "./message.gs.js"
 
-import * as __goscript_muxed from "./muxed.gs.ts"
+import * as __goscript_muxed from "./muxed.gs.js"
 
-import type * as __goscript_packet from "./packet.gs.ts"
+import type * as __goscript_packet from "./packet.gs.js"
 
-import * as __goscript_packet_rw from "./packet-rw.gs.ts"
+import * as __goscript_packet_rw from "./packet-rw.gs.js"
 
-import * as __goscript_rpcproto_pb from "./rpcproto.pb.gs.ts"
+import * as __goscript_rpcproto_pb from "./rpcproto.pb.gs.js"
 
-import * as __goscript_server_rpc from "./server-rpc.gs.ts"
+import * as __goscript_server_rpc from "./server-rpc.gs.js"
 
-import type * as __goscript_stream from "./stream.gs.ts"
+import type * as __goscript_stream from "./stream.gs.js"
 
-import * as __goscript_writer from "./writer.gs.ts"
+import * as __goscript_writer from "./writer.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/io/index.js"
 import "@goscript/github.com/aperturerobotics/starpc/internal/contextutil/index.js"
@@ -49,13 +49,13 @@ import "@goscript/bytes/index.js"
 import "@goscript/github.com/aperturerobotics/util/broadcast/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/sync/atomic/index.js"
-import "./common-rpc.gs.ts"
-import "./invoker.gs.ts"
-import "./muxed.gs.ts"
-import "./packet-rw.gs.ts"
-import "./rpcproto.pb.gs.ts"
-import "./server-rpc.gs.ts"
-import "./writer.gs.ts"
+import "./common-rpc.gs.js"
+import "./invoker.gs.js"
+import "./muxed.gs.js"
+import "./packet-rw.gs.js"
+import "./rpcproto.pb.gs.js"
+import "./server-rpc.gs.js"
+import "./writer.gs.js"
 
 export class Server {
 	// invoker is the method invoker

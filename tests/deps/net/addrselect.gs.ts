@@ -17,40 +17,40 @@ import type * as syscall from "@goscript/syscall/index.js"
 
 import * as time from "@goscript/time/index.js"
 
-import * as __goscript_fd_fake from "./fd_fake.gs.ts"
+import * as __goscript_fd_fake from "./fd_fake.gs.js"
 
-import * as __goscript_fd_js from "./fd_js.gs.ts"
+import * as __goscript_fd_js from "./fd_js.gs.js"
 
-import * as __goscript_ip from "./ip.gs.ts"
+import * as __goscript_ip from "./ip.gs.js"
 
-import * as __goscript_iprawsock from "./iprawsock.gs.ts"
+import * as __goscript_iprawsock from "./iprawsock.gs.js"
 
-import * as __goscript_iprawsock_posix from "./iprawsock_posix.gs.ts"
+import * as __goscript_iprawsock_posix from "./iprawsock_posix.gs.js"
 
-import * as __goscript_net from "./net.gs.ts"
+import * as __goscript_net from "./net.gs.js"
 
-import * as __goscript_net_fake from "./net_fake.gs.ts"
+import * as __goscript_net_fake from "./net_fake.gs.js"
 
-import * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.ts"
+import * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.js"
 
-import * as __goscript_udpsock from "./udpsock.gs.ts"
+import * as __goscript_udpsock from "./udpsock.gs.js"
 
-import * as __goscript_udpsock_posix from "./udpsock_posix.gs.ts"
+import * as __goscript_udpsock_posix from "./udpsock_posix.gs.js"
 import "@goscript/net/netip/index.js"
 import "@goscript/slices/index.js"
 import "@goscript/internal/poll/index.js"
 import "@goscript/sync/atomic/index.js"
 import "@goscript/time/index.js"
-import "./fd_fake.gs.ts"
-import "./fd_js.gs.ts"
-import "./ip.gs.ts"
-import "./iprawsock.gs.ts"
-import "./iprawsock_posix.gs.ts"
-import "./net.gs.ts"
-import "./net_fake.gs.ts"
-import "./sockaddr_posix.gs.ts"
-import "./udpsock.gs.ts"
-import "./udpsock_posix.gs.ts"
+import "./fd_fake.gs.js"
+import "./fd_js.gs.js"
+import "./ip.gs.js"
+import "./iprawsock.gs.js"
+import "./iprawsock_posix.gs.js"
+import "./net.gs.js"
+import "./net_fake.gs.js"
+import "./sockaddr_posix.gs.js"
+import "./udpsock.gs.js"
+import "./udpsock_posix.gs.js"
 
 export type policyTable = $.Slice<policyTableEntry>
 

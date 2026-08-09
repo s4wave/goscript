@@ -5,9 +5,9 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as strconv from "@goscript/strconv/index.js"
 
-import * as __goscript_ws_js from "./ws_js.gs.ts"
+import * as __goscript_ws_js from "./ws_js.gs.js"
 import "@goscript/strconv/index.js"
-import "./ws_js.gs.ts"
+import "./ws_js.gs.js"
 
 export const _opcode_name_0: string = "opContinuationopTextopBinary"
 
@@ -46,18 +46,15 @@ export function opcode_String(i: __goscript_ws_js.opcode): string {
 		case (0 <= i) && (i <= 2):
 		{
 			return $.sliceStringOrBytes("opContinuationopTextopBinary", $.arrayIndex(_opcode_index_0, i), $.arrayIndex(_opcode_index_0, i + 1))
-			break
 		}
 		case (8 <= i) && (i <= 10):
 		{
 			i = i - (8)
 			return $.sliceStringOrBytes("opCloseopPingopPong", $.arrayIndex(_opcode_index_1, i), $.arrayIndex(_opcode_index_1, i + 1))
-			break
 		}
 		default:
 		{
 			return ("opcode(" + strconv.FormatInt($.int64(i), 10)) + ")"
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")

@@ -11,20 +11,20 @@ import type * as context from "@goscript/context/index.js"
 
 import type * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
 
-import * as __goscript_handler from "./handler.gs.ts"
+import * as __goscript_handler from "./handler.gs.js"
 
-import type * as __goscript_invoker from "./invoker.gs.ts"
+import type * as __goscript_invoker from "./invoker.gs.js"
 
-import type * as __goscript_message from "./message.gs.ts"
+import type * as __goscript_message from "./message.gs.js"
 
-import * as __goscript_mux from "./mux.gs.ts"
+import * as __goscript_mux from "./mux.gs.js"
 
-import * as __goscript_stream from "./stream.gs.ts"
+import * as __goscript_stream from "./stream.gs.js"
 import "@goscript/time/index.js"
 import "@goscript/github.com/sirupsen/logrus/index.js"
-import "./handler.gs.ts"
-import "./mux.gs.ts"
-import "./stream.gs.ts"
+import "./handler.gs.js"
+import "./mux.gs.js"
+import "./stream.gs.js"
 
 export class VMux {
 	public get mx(): __goscript_mux.Mux | null {

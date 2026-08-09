@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_utils from "./utils.gs.ts"
-import "./utils.gs.ts"
+import * as __goscript_utils from "./utils.gs.js"
+import "./utils.gs.js"
 
 export async function main(): globalThis.Promise<void> {
 	$.println("=== Selective Exports Test ===")

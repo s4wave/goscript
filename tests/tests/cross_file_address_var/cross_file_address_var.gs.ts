@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_table from "./table.gs.ts"
-import "./table.gs.ts"
+import * as __goscript_table from "./table.gs.js"
+import "./table.gs.js"
 
 export async function main(): globalThis.Promise<void> {
 	let p: $.VarRef<number[]> | null = __goscript_table.table

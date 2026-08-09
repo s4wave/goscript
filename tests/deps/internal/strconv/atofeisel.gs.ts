@@ -5,15 +5,15 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as bits from "@goscript/math/bits/index.js"
 
-import * as __goscript_deps from "./deps.gs.ts"
+import * as __goscript_deps from "./deps.gs.js"
 
-import * as __goscript_ftoa from "./ftoa.gs.ts"
+import * as __goscript_ftoa from "./ftoa.gs.js"
 
-import * as __goscript_math from "./math.gs.ts"
+import * as __goscript_math from "./math.gs.js"
 import "@goscript/math/bits/index.js"
-import "./deps.gs.ts"
-import "./ftoa.gs.ts"
-import "./math.gs.ts"
+import "./deps.gs.js"
+import "./ftoa.gs.js"
+import "./math.gs.js"
 
 export function eiselLemire64(man: bigint, exp10: number, neg: boolean): [number, boolean] {
 	let f: number = 0

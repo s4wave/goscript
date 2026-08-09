@@ -5,9 +5,9 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as sync from "@goscript/sync/index.js"
 
-import * as __goscript_a from "./a.gs.ts"
+import * as __goscript_a from "./a.gs.js"
 import "@goscript/sync/index.js"
-import "./a.gs.ts"
+import "./a.gs.js"
 
 export let lock: $.VarRef<sync.Mutex> = $.varRef($.markAsStructValue(new sync.Mutex()))
 

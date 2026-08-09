@@ -1,1 +1,1 @@
-export { multiplyCase } from "./imul_32bit.gs.ts"
+export { multiplyCase } from './imul_32bit.gs.js'

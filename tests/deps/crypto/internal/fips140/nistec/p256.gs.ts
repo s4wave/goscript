@@ -19,7 +19,7 @@ import * as sync from "@goscript/sync/index.js"
 
 import * as unsafe from "@goscript/unsafe/index.js"
 
-import * as __goscript_p256_table from "./p256_table.gs.ts"
+import * as __goscript_p256_table from "./p256_table.gs.js"
 import "@goscript/crypto/internal/constanttime/index.js"
 import "@goscript/crypto/internal/fips140/nistec/fiat/index.js"
 import "@goscript/crypto/internal/fips140deps/byteorder/index.js"
@@ -28,7 +28,7 @@ import "@goscript/errors/index.js"
 import "@goscript/math/bits/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/unsafe/index.js"
-import "./p256_table.gs.ts"
+import "./p256_table.gs.js"
 
 export type p256OrdElement = bigint[]
 
@@ -421,7 +421,6 @@ export class P256Point {
 			case ($.len(b) == 1) && ($.uint($.arrayIndex(b!, 0), 8) == $.uint(0, 8)):
 			{
 				return [P256Point.prototype.Set.call(p, NewP256Point()), null]
-				break
 			}
 			case ($.len(b) == 65) && ($.uint($.arrayIndex(b!, 0), 8) == $.uint(4, 8)):
 			{
@@ -447,7 +446,6 @@ export class P256Point {
 				$.pointerValue<P256Point>(p).y.Set(y)
 				$.pointerValue<P256Point>(p).z.One()
 				return [p, null]
-				break
 			}
 			case ($.len(b) == 33) && (($.uint($.arrayIndex(b!, 0), 8) == $.uint(2, 8)) || ($.uint($.arrayIndex(b!, 0), 8) == $.uint(3, 8))):
 			{
@@ -475,12 +473,10 @@ export class P256Point {
 				$.pointerValue<P256Point>(p).y.Set(y)
 				$.pointerValue<P256Point>(p).z.One()
 				return [p, null]
-				break
 			}
 			default:
 			{
 				return [null, errors.New("invalid P256 point encoding")]
-				break
 			}
 		}
 		throw new globalThis.Error("goscript: unreachable return")

@@ -11,18 +11,18 @@ import * as strings from "@goscript/strings/index.js"
 
 import * as unicode from "@goscript/unicode/index.js"
 
-import * as __goscript_op_string from "./op_string.gs.ts"
+import * as __goscript_op_string from "./op_string.gs.js"
 
-import * as __goscript_parse from "./parse.gs.ts"
+import * as __goscript_parse from "./parse.gs.js"
 
-import * as __goscript_simplify from "./simplify.gs.ts"
+import * as __goscript_simplify from "./simplify.gs.js"
 import "@goscript/strconv/index.js"
 import "@goscript/slices/index.js"
 import "@goscript/strings/index.js"
 import "@goscript/unicode/index.js"
-import "./op_string.gs.ts"
-import "./parse.gs.ts"
-import "./simplify.gs.ts"
+import "./op_string.gs.js"
+import "./parse.gs.js"
+import "./simplify.gs.js"
 
 export type Op = number
 
@@ -171,13 +171,11 @@ export class Regexp {
 			case 4:
 			{
 				return ($.uint(($.pointerValue<Regexp>(x).Flags & 1), 16) == $.uint(($.pointerValue<Regexp>(y).Flags & 1), 16)) && slices.Equal($.pointerValue<Regexp>(x).Rune, $.pointerValue<Regexp>(y).Rune)
-				break
 			}
 			case 19:
 			case 18:
 			{
 				return slices.EqualFunc($.pointerValue<Regexp>(x).Sub, $.pointerValue<Regexp>(y).Sub, $.functionValue((x: Regexp | $.VarRef<Regexp> | null, y: Regexp | $.VarRef<Regexp> | null): boolean => $.pointerValue<Regexp>(x).Equal(y), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "syntax.Regexp" }, { kind: $.TypeKind.Pointer, elemType: "syntax.Regexp" }], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo)))
-				break
 			}
 			case 14:
 			case 15:
@@ -250,7 +248,6 @@ export class Regexp {
 					}
 				}
 				return nre
-				break
 			}
 			case 14:
 			case 15:
@@ -258,7 +255,6 @@ export class Regexp {
 			{
 				let sub: Regexp | $.VarRef<Regexp> | null = Regexp.prototype.Simplify.call($.arrayIndex($.pointerValue<Regexp>(re).Sub!, 0))
 				return __goscript_simplify.simplify1($.uint($.pointerValue<Regexp>(re).Op, 8), $.uint($.pointerValue<Regexp>(re).Flags, 16), sub, re)
-				break
 			}
 			case 17:
 			{
@@ -325,7 +321,6 @@ export class Regexp {
 				// flagI<<negShift is (?-i:
 
 				return new Regexp({Op: $.uint(1, 8)})
-				break
 			}
 		}
 
@@ -438,7 +433,6 @@ export function calcFlags(re: Regexp | $.VarRef<Regexp> | null, flags: $.VarRef<
 		default:
 		{
 			return [$.uint(0, 8), $.uint(0, 8)]
-			break
 		}
 		case 3:
 		{
@@ -453,7 +447,6 @@ export function calcFlags(re: Regexp | $.VarRef<Regexp> | null, flags: $.VarRef<
 				}
 			}
 			return [$.uint(0, 8), $.uint(0, 8)]
-			break
 		}
 		case 4:
 		{
@@ -469,23 +462,19 @@ export function calcFlags(re: Regexp | $.VarRef<Regexp> | null, flags: $.VarRef<
 				}
 			}
 			return [$.uint(0, 8), $.uint(0, 8)]
-			break
 		}
 		case 5:
 		{
 			return [$.uint(0, 8), $.uint(4, 8)]
-			break
 		}
 		case 6:
 		{
 			return [$.uint(4, 8), $.uint(0, 8)]
-			break
 		}
 		case 7:
 		case 8:
 		{
 			return [$.uint(2, 8), $.uint(0, 8)]
-			break
 		}
 		case 10:
 		{
@@ -493,7 +482,6 @@ export function calcFlags(re: Regexp | $.VarRef<Regexp> | null, flags: $.VarRef<
 				return [$.uint(0, 8), $.uint(2, 8)]
 			}
 			return [$.uint(0, 8), $.uint(0, 8)]
-			break
 		}
 		case 13:
 		case 14:
@@ -547,7 +535,6 @@ export function calcFlags(re: Regexp | $.VarRef<Regexp> | null, flags: $.VarRef<
 				addSpan($.arrayIndex($.pointerValue<Regexp>(re).Sub!, start), $.arrayIndex($.pointerValue<Regexp>(re).Sub!, last), $.uint(__goscriptShadow0, 8), flags)
 			}
 			return [$.uint(0, 8), $.uint(allCant, 8)]
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")

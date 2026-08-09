@@ -1,1 +1,1 @@
-export { Parser } from "./reserved_identifier_arguments.gs.ts"
+export { Parser } from './reserved_identifier_arguments.gs.js'

@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_types from "./types.gs.ts"
-import "./types.gs.ts"
+import * as __goscript_types from "./types.gs.js"
+import "./types.gs.js"
 
 export function MakeJobs(): __goscript_types.Jobs {
 	return $.makeChannel<__goscript_types.Job>(0, $.markAsStructValue(new __goscript_types.Job()), "both")

@@ -9,27 +9,27 @@ import type * as io from "@goscript/io/index.js"
 
 import type * as rand from "@goscript/math/rand/index.js"
 
-import * as __goscript_arith from "./arith.gs.ts"
+import * as __goscript_arith from "./arith.gs.js"
 
-import * as __goscript_arith_decl from "./arith_decl.gs.ts"
+import * as __goscript_arith_decl from "./arith_decl.gs.js"
 
-import * as __goscript_int from "./int.gs.ts"
+import * as __goscript_int from "./int.gs.js"
 
-import * as __goscript_nat from "./nat.gs.ts"
+import * as __goscript_nat from "./nat.gs.js"
 
-import * as __goscript_natconv from "./natconv.gs.ts"
+import * as __goscript_natconv from "./natconv.gs.js"
 
-import * as __goscript_natmul from "./natmul.gs.ts"
+import * as __goscript_natmul from "./natmul.gs.js"
 
-import * as __goscript_prime from "./prime.gs.ts"
+import * as __goscript_prime from "./prime.gs.js"
 import "@goscript/math/bits/index.js"
-import "./arith.gs.ts"
-import "./arith_decl.gs.ts"
-import "./int.gs.ts"
-import "./nat.gs.ts"
-import "./natconv.gs.ts"
-import "./natmul.gs.ts"
-import "./prime.gs.ts"
+import "./arith.gs.js"
+import "./arith_decl.gs.js"
+import "./int.gs.js"
+import "./nat.gs.js"
+import "./natconv.gs.js"
+import "./natmul.gs.js"
+import "./prime.gs.js"
 
 export async function nat_rem(z: __goscript_nat.nat, stk: __goscript_nat.stack | $.VarRef<__goscript_nat.stack> | null, u: __goscript_nat.nat, v: __goscript_nat.nat): globalThis.Promise<__goscript_nat.nat> {
 	let r: __goscript_nat.nat = null! as __goscript_nat.nat
@@ -100,13 +100,11 @@ export function nat_divW(z: __goscript_nat.nat, x: __goscript_nat.nat, y: __gosc
 		{
 			q = (__goscript_nat.nat__set(z, (x as __goscript_nat.nat)) as __goscript_nat.nat)
 			return [q, r]
-			break
 		}
 		case m == 0:
 		{
 			q = ($.goSlice(z, undefined, 0) as __goscript_nat.nat)
 			return [q, r]
-			break
 		}
 	}
 	// m > 0

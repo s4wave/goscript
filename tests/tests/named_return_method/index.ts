@@ -1,1 +1,1 @@
-export { content } from "./named_return_method.gs.ts"
+export { content } from './named_return_method.gs.js'

@@ -11,11 +11,11 @@ import * as errors from "@goscript/errors/index.js"
 
 import * as bits from "@goscript/math/bits/index.js"
 
-import * as __goscript_nat_wasm from "./nat_wasm.gs.ts"
+import * as __goscript_nat_wasm from "./nat_wasm.gs.js"
 import "@goscript/crypto/internal/fips140deps/byteorder/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/math/bits/index.js"
-import "./nat_wasm.gs.ts"
+import "./nat_wasm.gs.js"
 
 export type choice = number
 
@@ -323,7 +323,6 @@ export class Nat {
 
 				// x = T mod m
 				return Nat.prototype.Mod.call(x, new Nat({limbs: T}), m)
-				break
 			}
 			case Math.trunc(1024 / 64):
 			{
@@ -333,7 +332,6 @@ export class Nat {
 					T![16 + i] = __goscript_nat_wasm.addMulVVW1024($.indexRef(T!, i), $.indexRef(xLimbs!, 0), $.arrayIndex(yLimbs!, i))
 				}
 				return Nat.prototype.Mod.call(x, new Nat({limbs: T}), m)
-				break
 			}
 			case Math.trunc(1536 / 64):
 			{
@@ -343,7 +341,6 @@ export class Nat {
 					T![24 + i] = __goscript_nat_wasm.addMulVVW1536($.indexRef(T!, i), $.indexRef(xLimbs!, 0), $.arrayIndex(yLimbs!, i))
 				}
 				return Nat.prototype.Mod.call(x, new Nat({limbs: T}), m)
-				break
 			}
 			case Math.trunc(2048 / 64):
 			{
@@ -353,7 +350,6 @@ export class Nat {
 					T![32 + i] = __goscript_nat_wasm.addMulVVW2048($.indexRef(T!, i), $.indexRef(xLimbs!, 0), $.arrayIndex(yLimbs!, i))
 				}
 				return Nat.prototype.Mod.call(x, new Nat({limbs: T}), m)
-				break
 			}
 		}
 		throw new globalThis.Error("goscript: unreachable return")

@@ -7,13 +7,13 @@ import * as big from "@goscript/math/big/index.js"
 
 import * as nistec from "@goscript/crypto/internal/fips140/nistec/index.js"
 
-import * as __goscript_elliptic from "./elliptic.gs.ts"
+import * as __goscript_elliptic from "./elliptic.gs.js"
 
-import * as __goscript_nistec from "./nistec.gs.ts"
+import * as __goscript_nistec from "./nistec.gs.js"
 import "@goscript/math/big/index.js"
 import "@goscript/crypto/internal/fips140/nistec/index.js"
-import "./elliptic.gs.ts"
-import "./nistec.gs.ts"
+import "./elliptic.gs.js"
+import "./nistec.gs.js"
 
 export class CurveParams {
 	public get P(): big.Int | $.VarRef<big.Int> | null {

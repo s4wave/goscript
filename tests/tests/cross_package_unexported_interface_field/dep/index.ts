@@ -1,3 +1,3 @@
-export type { hidden } from "./dep.gs.ts"
-export { Holder, NewHolder, impl } from "./dep.gs.ts"
-import "./dep.gs.ts"
+export type { hidden } from './dep.gs.js'
+export { Holder, NewHolder, impl } from './dep.gs.js'
+import './dep.gs.js'

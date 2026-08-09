@@ -1,1 +1,1 @@
-export { Thing } from "./dep.gs.ts"
+export { Thing } from './dep.gs.js'

@@ -27,7 +27,7 @@ import * as utf16 from "@goscript/unicode/utf16/index.js"
 
 import * as utf8 from "@goscript/unicode/utf8/index.js"
 
-import * as __goscript_common from "./common.gs.ts"
+import * as __goscript_common from "./common.gs.js"
 import "@goscript/errors/index.js"
 import "@goscript/fmt/index.js"
 import "@goscript/internal/saferio/index.js"
@@ -40,7 +40,7 @@ import "@goscript/strings/index.js"
 import "@goscript/time/index.js"
 import "@goscript/unicode/utf16/index.js"
 import "@goscript/unicode/utf8/index.js"
-import "./common.gs.ts"
+import "./common.gs.js"
 
 export type ObjectIdentifier = $.Slice<number>
 
@@ -1357,7 +1357,6 @@ export async function parseField(v: reflect.Value, bytes: $.Slice<number>, initO
 				}
 				err = err1
 				return [offset, err]
-				break
 			}
 			case reflect.Int:
 			case reflect.Int32:
@@ -1379,7 +1378,6 @@ export async function parseField(v: reflect.Value, bytes: $.Slice<number>, initO
 					err = err1
 				}
 				return [offset, err]
-				break
 			}
 			case reflect.Struct:
 			{
@@ -1415,7 +1413,6 @@ export async function parseField(v: reflect.Value, bytes: $.Slice<number>, initO
 				// adding elements to the end has been used in X.509 as the
 				// version numbers have increased.
 				return [offset, err]
-				break
 			}
 			case reflect.Slice:
 			{
@@ -1431,7 +1428,6 @@ export async function parseField(v: reflect.Value, bytes: $.Slice<number>, initO
 				}
 				err = err1
 				return [offset, err]
-				break
 			}
 			case reflect.String:
 			{
@@ -1496,7 +1492,6 @@ export async function parseField(v: reflect.Value, bytes: $.Slice<number>, initO
 					$.markAsStructValue($.cloneStructValue(val)).SetString(__goscriptShadow2)
 				}
 				return [offset, err]
-				break
 			}
 		}
 	}
@@ -1513,7 +1508,6 @@ export function canHaveDefaultValue(k: reflect.Kind): boolean {
 		case reflect.Int64:
 		{
 			return true
-			break
 		}
 	}
 

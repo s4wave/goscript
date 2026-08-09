@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_parse from "./parse.gs.ts"
-import "./parse.gs.ts"
+import * as __goscript_parse from "./parse.gs.js"
+import "./parse.gs.js"
 
 export let code1: $.Slice<number> = $.arrayToSlice<number>([$.int(0x30, 32), $.int(0x39, 32)])
 

@@ -1,1 +1,1 @@
-export { WithCancel } from "./with-cancel.gs.ts"
+export { WithCancel } from './with-cancel.gs.js'

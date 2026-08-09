@@ -1,1 +1,1 @@
-export { Newline, Separator, Space } from "./subpkg.gs.ts"
+export { Newline, Separator, Space } from './subpkg.gs.js'

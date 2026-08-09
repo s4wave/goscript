@@ -11,14 +11,14 @@ import * as os from "@goscript/os/index.js"
 
 import type * as time from "@goscript/time/index.js"
 
-import * as __goscript_lookup from "./lookup.gs.ts"
+import * as __goscript_lookup from "./lookup.gs.js"
 
-import * as __goscript_parse from "./parse.gs.ts"
+import * as __goscript_parse from "./parse.gs.js"
 import "@goscript/internal/bytealg/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/os/index.js"
-import "./lookup.gs.ts"
-import "./parse.gs.ts"
+import "./lookup.gs.js"
+import "./parse.gs.js"
 
 export let onceReadServices: $.VarRef<sync.Once> = $.varRef($.markAsStructValue(new sync.Once()))
 

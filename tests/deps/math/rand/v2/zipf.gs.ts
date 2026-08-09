@@ -5,15 +5,15 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as math from "@goscript/math/index.js"
 
-import * as __goscript_exp from "./exp.gs.ts"
+import * as __goscript_exp from "./exp.gs.js"
 
-import * as __goscript_normal from "./normal.gs.ts"
+import * as __goscript_normal from "./normal.gs.js"
 
-import * as __goscript_rand from "./rand.gs.ts"
+import * as __goscript_rand from "./rand.gs.js"
 import "@goscript/math/index.js"
-import "./exp.gs.ts"
-import "./normal.gs.ts"
-import "./rand.gs.ts"
+import "./exp.gs.js"
+import "./normal.gs.js"
+import "./rand.gs.js"
 
 export class Zipf {
 	public get r(): __goscript_rand.Rand | $.VarRef<__goscript_rand.Rand> | null {

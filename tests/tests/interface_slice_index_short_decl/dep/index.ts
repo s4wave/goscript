@@ -1,3 +1,3 @@
-export type { Ref } from "./dep.gs.ts"
-export { ToKey } from "./dep.gs.ts"
-import "./dep.gs.ts"
+export type { Ref } from './dep.gs.js'
+export { ToKey } from './dep.gs.js'
+import './dep.gs.js'

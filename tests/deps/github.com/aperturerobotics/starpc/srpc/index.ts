@@ -1,54 +1,123 @@
-export type { Client, OpenStreamFunc } from "./client.gs.ts"
-export type { CloseHandler, PacketDataHandler, PacketHandler } from "./packet.gs.ts"
-export type { Handler } from "./handler.gs.ts"
-export type { Invoker, InvokerFunc, InvokerSlice, QueryableInvoker } from "./invoker.gs.ts"
-export type { Message } from "./message.gs.ts"
-export type { MsgStreamRw } from "./msg-stream.gs.ts"
-export type { Mux, muxMethods } from "./mux.gs.ts"
-export type { MuxedConn, MuxedStream } from "./muxed.gs.ts"
-export type { PacketWriter } from "./writer.gs.ts"
-export type { Stream, StreamRecv, StreamSend, StreamSendAndClose } from "./stream.gs.ts"
-export type { isPacket_Body } from "./rpcproto.pb.gs.ts"
-export { AcceptMuxedListener } from "./accept.gs.ts"
-export { CallData, CallStart, Packet, Packet_CallCancel, Packet_CallData, Packet_CallStart } from "./rpcproto.pb.gs.ts"
-export { CheckStripPrefix } from "./strip-prefix.gs.ts"
-export { ClientInvoker, NewClientInvoker } from "./client-invoker.gs.ts"
-export { ClientRPC, NewClientRPC } from "./client-rpc.gs.ts"
-export { ClientSet, NewClientSet } from "./client-set.gs.ts"
-export { Dial, Listen } from "./net.gs.ts"
-export { ErrCompleted, ErrEmptyMethodID, ErrEmptyPacket, ErrEmptyServiceID, ErrInvalidMessage, ErrNilWriter, ErrNoAvailableClients, ErrReset, ErrUnimplemented, ErrUnrecognizedPacket, __goscript_set_ErrCompleted, __goscript_set_ErrEmptyMethodID, __goscript_set_ErrEmptyPacket, __goscript_set_ErrEmptyServiceID, __goscript_set_ErrInvalidMessage, __goscript_set_ErrNilWriter, __goscript_set_ErrNoAvailableClients, __goscript_set_ErrReset, __goscript_set_ErrUnimplemented, __goscript_set_ErrUnrecognizedPacket } from "./errors.gs.ts"
-export { HTTPServer, NewHTTPServer } from "./server-http_js.gs.ts"
-export { InvokerFunc_InvokeMethod, InvokerSlice_InvokeMethod } from "./invoker.gs.ts"
-export { MsgStream, NewMsgStream } from "./msg-stream.gs.ts"
-export { NewCallCancelPacket, NewCallDataPacket, NewCallStartPacket, NewPacketDataHandler } from "./packet.gs.ts"
-export { NewClient, client } from "./client.gs.ts"
-export { NewClientWithConn, NewClientWithMuxedConn, NewMuxedConn, NewMuxedConnWithRwc, NewOpenStreamWithMuxedConn, NewYamuxConfig } from "./muxed-conn.gs.ts"
-export { NewMux, mux } from "./mux.gs.ts"
-export { NewPacketReadWriter, PacketReadWriter, writeBuffer } from "./packet-rw.gs.ts"
-export { NewPacketWriterWithClose, packetWriterWithClose } from "./writer.gs.ts"
-export { NewPipeStream, pipeStream } from "./stream-pipe.gs.ts"
-export { NewPrefixClient, PrefixClient } from "./client-prefix.gs.ts"
-export { NewPrefixInvoker, PrefixInvoker } from "./invoker-prefix.gs.ts"
-export { NewPushablePacketWriter, PushablePacketWriter } from "./pushable_js.gs.ts"
-export { NewRawMessage, RawMessage } from "./message.gs.ts"
-export { NewRwcConn, RwcConn, bufPool } from "./rwc-conn.gs.ts"
-export { NewServer, Server } from "./server.gs.ts"
-export { NewServerPipe } from "./server-pipe.gs.ts"
-export { NewServerRPC, ServerRPC } from "./server-rpc.gs.ts"
-export { NewStreamRwc, StreamRwc } from "./stream-rwc.gs.ts"
-export { NewStreamWithClose, NewStreamWithContext, streamWithClose, streamWithContext } from "./stream.gs.ts"
-export { NewVClient, VClient } from "./client-verbose.gs.ts"
-export { NewVMux, VMux } from "./mux-verbose.gs.ts"
-export { NewWebSocketConn } from "./websocket.gs.ts"
-export { commonRPC } from "./common-rpc.gs.ts"
-export { yamuxConn } from "./muxed-yamux.gs.ts"
-export { yamuxStream } from "./stream-yamux.gs.ts"
-import "./client.gs.ts"
-import "./handler.gs.ts"
-import "./invoker.gs.ts"
-import "./msg-stream.gs.ts"
-import "./mux.gs.ts"
-import "./muxed.gs.ts"
-import "./rpcproto.pb.gs.ts"
-import "./stream.gs.ts"
-import "./writer.gs.ts"
+export type {
+  CloseHandler,
+  PacketDataHandler,
+  PacketHandler,
+} from './packet.gs.js'
+export type {
+  Invoker,
+  InvokerFunc,
+  InvokerSlice,
+  QueryableInvoker,
+} from './invoker.gs.js'
+export type {
+  Stream,
+  StreamRecv,
+  StreamSend,
+  StreamSendAndClose,
+} from './stream.gs.js'
+export type { Client, OpenStreamFunc } from './client.gs.js'
+export type { Handler } from './handler.gs.js'
+export type { Message } from './message.gs.js'
+export type { MsgStreamRw } from './msg-stream.gs.js'
+export type { Mux, muxMethods } from './mux.gs.js'
+export type { MuxedConn, MuxedStream } from './muxed.gs.js'
+export type { PacketWriter } from './writer.gs.js'
+export type { isPacket_Body } from './rpcproto.pb.gs.js'
+export {
+  CallData,
+  CallStart,
+  Packet,
+  Packet_CallCancel,
+  Packet_CallData,
+  Packet_CallStart,
+} from './rpcproto.pb.gs.js'
+export {
+  ErrCompleted,
+  ErrEmptyMethodID,
+  ErrEmptyPacket,
+  ErrEmptyServiceID,
+  ErrInvalidMessage,
+  ErrNilWriter,
+  ErrNoAvailableClients,
+  ErrReset,
+  ErrUnimplemented,
+  ErrUnrecognizedPacket,
+  __goscript_set_ErrCompleted,
+  __goscript_set_ErrEmptyMethodID,
+  __goscript_set_ErrEmptyPacket,
+  __goscript_set_ErrEmptyServiceID,
+  __goscript_set_ErrInvalidMessage,
+  __goscript_set_ErrNilWriter,
+  __goscript_set_ErrNoAvailableClients,
+  __goscript_set_ErrReset,
+  __goscript_set_ErrUnimplemented,
+  __goscript_set_ErrUnrecognizedPacket,
+} from './errors.gs.js'
+export {
+  InvokerFunc_InvokeMethod,
+  InvokerSlice_InvokeMethod,
+} from './invoker.gs.js'
+export {
+  NewCallCancelPacket,
+  NewCallDataPacket,
+  NewCallStartPacket,
+  NewPacketDataHandler,
+} from './packet.gs.js'
+export {
+  NewClientWithConn,
+  NewClientWithMuxedConn,
+  NewMuxedConn,
+  NewMuxedConnWithRwc,
+  NewOpenStreamWithMuxedConn,
+  NewYamuxConfig,
+} from './muxed-conn.gs.js'
+export {
+  NewPacketReadWriter,
+  PacketReadWriter,
+  writeBuffer,
+} from './packet-rw.gs.js'
+export {
+  NewPushablePacketWriter,
+  PushablePacketWriter,
+} from './pushable_js.gs.js'
+export {
+  NewStreamWithClose,
+  NewStreamWithContext,
+  streamWithClose,
+  streamWithContext,
+} from './stream.gs.js'
+export { AcceptMuxedListener } from './accept.gs.js'
+export { CheckStripPrefix } from './strip-prefix.gs.js'
+export { ClientInvoker, NewClientInvoker } from './client-invoker.gs.js'
+export { ClientRPC, NewClientRPC } from './client-rpc.gs.js'
+export { ClientSet, NewClientSet } from './client-set.gs.js'
+export { Dial, Listen } from './net.gs.js'
+export { HTTPServer, NewHTTPServer } from './server-http_js.gs.js'
+export { MsgStream, NewMsgStream } from './msg-stream.gs.js'
+export { NewClient, client } from './client.gs.js'
+export { NewMux, mux } from './mux.gs.js'
+export { NewPacketWriterWithClose, packetWriterWithClose } from './writer.gs.js'
+export { NewPipeStream, pipeStream } from './stream-pipe.gs.js'
+export { NewPrefixClient, PrefixClient } from './client-prefix.gs.js'
+export { NewPrefixInvoker, PrefixInvoker } from './invoker-prefix.gs.js'
+export { NewRawMessage, RawMessage } from './message.gs.js'
+export { NewRwcConn, RwcConn, bufPool } from './rwc-conn.gs.js'
+export { NewServer, Server } from './server.gs.js'
+export { NewServerPipe } from './server-pipe.gs.js'
+export { NewServerRPC, ServerRPC } from './server-rpc.gs.js'
+export { NewStreamRwc, StreamRwc } from './stream-rwc.gs.js'
+export { NewVClient, VClient } from './client-verbose.gs.js'
+export { NewVMux, VMux } from './mux-verbose.gs.js'
+export { NewWebSocketConn } from './websocket.gs.js'
+export { commonRPC } from './common-rpc.gs.js'
+export { yamuxConn } from './muxed-yamux.gs.js'
+export { yamuxStream } from './stream-yamux.gs.js'
+import './client.gs.js'
+import './handler.gs.js'
+import './invoker.gs.js'
+import './msg-stream.gs.js'
+import './mux.gs.js'
+import './muxed.gs.js'
+import './rpcproto.pb.gs.js'
+import './stream.gs.js'
+import './writer.gs.js'

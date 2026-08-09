@@ -15,16 +15,16 @@ import * as errors from "@goscript/errors/index.js"
 
 import * as sync from "@goscript/sync/index.js"
 
-import * as __goscript_pkcs1v15 from "./pkcs1v15.gs.ts"
+import * as __goscript_pkcs1v15 from "./pkcs1v15.gs.js"
 
-import * as __goscript_rsa from "./rsa.gs.ts"
+import * as __goscript_rsa from "./rsa.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/crypto/internal/fips140/index.js"
 import "@goscript/crypto/internal/fips140/bigmod/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/sync/index.js"
-import "./pkcs1v15.gs.ts"
-import "./rsa.gs.ts"
+import "./pkcs1v15.gs.js"
+import "./rsa.gs.js"
 
 export function testPrivateKey(): __goscript_rsa.PrivateKey | $.VarRef<__goscript_rsa.PrivateKey> | null {
 	// https://www.rfc-editor.org/rfc/rfc9500.html#section-2.1

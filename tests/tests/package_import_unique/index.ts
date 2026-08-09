@@ -1,1 +1,1 @@
-export { zone } from "./package_import_unique.gs.ts"
+export { zone } from './package_import_unique.gs.js'

@@ -1,1 +1,1 @@
-export type { Callback, Opener } from "./async_function_alias.gs.ts"
+export type { Callback, Opener } from './async_function_alias.gs.js'

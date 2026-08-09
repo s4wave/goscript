@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_math from "./math.gs.ts"
-import "./math.gs.ts"
+import * as __goscript_math from "./math.gs.js"
+import "./math.gs.js"
 
 export type Error = number
 
@@ -29,22 +29,18 @@ export function Error_Error(e: Error): string {
 		case 1:
 		{
 			return "value out of range"
-			break
 		}
 		case 2:
 		{
 			return "invalid syntax"
-			break
 		}
 		case 3:
 		{
 			return "invalid base"
-			break
 		}
 		case 4:
 		{
 			return "invalid bit size"
-			break
 		}
 	}
 	return "unknown error"
@@ -101,7 +97,6 @@ export function ParseUint(s: string, base: number, bitSize: number): [bigint, $.
 		default:
 		{
 			return [0n, $.namedValueInterfaceValue<$.GoError>(3, "strconv.Error", {"Error": Error_Error}, { kind: $.TypeKind.Basic, name: "int", typeName: "strconv.Error" })]
-			break
 		}
 	}
 
@@ -146,7 +141,6 @@ export function ParseUint(s: string, base: number, bitSize: number): [bigint, $.
 			{
 				underscores = true
 				continue
-				break
 			}
 			case ($.uint(48, 8) <= $.uint(c, 8)) && ($.uint(c, 8) <= $.uint(57, 8)):
 			{
@@ -161,7 +155,6 @@ export function ParseUint(s: string, base: number, bitSize: number): [bigint, $.
 			default:
 			{
 				return [0n, $.namedValueInterfaceValue<$.GoError>(2, "strconv.Error", {"Error": Error_Error}, { kind: $.TypeKind.Basic, name: "int", typeName: "strconv.Error" })]
-				break
 			}
 		}
 

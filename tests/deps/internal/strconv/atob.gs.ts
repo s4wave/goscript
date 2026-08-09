@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_atoi from "./atoi.gs.ts"
-import "./atoi.gs.ts"
+import * as __goscript_atoi from "./atoi.gs.js"
+import "./atoi.gs.js"
 
 export function ParseBool(str: string): [boolean, $.GoError] {
 	switch (str) {
@@ -16,7 +16,6 @@ export function ParseBool(str: string): [boolean, $.GoError] {
 		case "True":
 		{
 			return [true, null]
-			break
 		}
 		case "0":
 		case "f":
@@ -26,7 +25,6 @@ export function ParseBool(str: string): [boolean, $.GoError] {
 		case "False":
 		{
 			return [false, null]
-			break
 		}
 	}
 	return [false, $.namedValueInterfaceValue<$.GoError>(2, "strconv.Error", {"Error": __goscript_atoi.Error_Error}, { kind: $.TypeKind.Basic, name: "int", typeName: "strconv.Error" })]

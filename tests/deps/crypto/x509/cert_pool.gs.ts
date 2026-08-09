@@ -27,19 +27,19 @@ import * as url from "@goscript/net/url/index.js"
 
 import * as time from "@goscript/time/index.js"
 
-import * as __goscript_oid from "./oid.gs.ts"
+import * as __goscript_oid from "./oid.gs.js"
 
-import * as __goscript_parser from "./parser.gs.ts"
+import * as __goscript_parser from "./parser.gs.js"
 
-import * as __goscript_root from "./root.gs.ts"
+import * as __goscript_root from "./root.gs.js"
 
-import * as __goscript_root_unix from "./root_unix.gs.ts"
+import * as __goscript_root_unix from "./root_unix.gs.js"
 
-import * as __goscript_verify from "./verify.gs.ts"
+import * as __goscript_verify from "./verify.gs.js"
 
-import * as __goscript_x509 from "./x509.gs.ts"
+import * as __goscript_x509 from "./x509.gs.js"
 
-import * as __goscript_x509_string from "./x509_string.gs.ts"
+import * as __goscript_x509_string from "./x509_string.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/crypto/sha256/index.js"
 import "@goscript/encoding/pem/index.js"
@@ -50,13 +50,13 @@ import "@goscript/math/big/index.js"
 import "@goscript/net/index.js"
 import "@goscript/net/url/index.js"
 import "@goscript/time/index.js"
-import "./oid.gs.ts"
-import "./parser.gs.ts"
-import "./root.gs.ts"
-import "./root_unix.gs.ts"
-import "./verify.gs.ts"
-import "./x509.gs.ts"
-import "./x509_string.gs.ts"
+import "./oid.gs.js"
+import "./parser.gs.js"
+import "./root.gs.js"
+import "./root_unix.gs.js"
+import "./verify.gs.js"
+import "./x509.gs.js"
+import "./x509_string.gs.js"
 
 export type sum224 = Uint8Array
 

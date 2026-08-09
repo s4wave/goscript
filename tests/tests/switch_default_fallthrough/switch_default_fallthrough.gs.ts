@@ -11,12 +11,10 @@ export function classify(value: number): string {
 		case 1:
 		{
 			return "one"
-			break
 		}
 		case 2:
 		{
 			return "two"
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")

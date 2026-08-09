@@ -13,15 +13,15 @@ import type * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/pr
 
 import type * as json from "@goscript/github.com/aperturerobotics/protobuf-go-lite/json/index.js"
 
-import type * as __goscript_packet from "./packet.gs.ts"
+import type * as __goscript_packet from "./packet.gs.js"
 
-import * as __goscript_rpcproto_pb from "./rpcproto.pb.gs.ts"
+import * as __goscript_rpcproto_pb from "./rpcproto.pb.gs.js"
 
-import type * as __goscript_writer from "./writer.gs.ts"
+import type * as __goscript_writer from "./writer.gs.js"
 import "@goscript/io/index.js"
 import "@goscript/sync/atomic/index.js"
 import "@goscript/syscall/js/index.js"
-import "./rpcproto.pb.gs.ts"
+import "./rpcproto.pb.gs.js"
 
 export class PushablePacketWriter {
 	public get closed(): atomic.Bool {

@@ -7,11 +7,11 @@ import * as strconv from "@goscript/strconv/index.js"
 
 import type * as asn1 from "@goscript/encoding/asn1/index.js"
 
-import type * as __goscript_oid from "./oid.gs.ts"
+import type * as __goscript_oid from "./oid.gs.js"
 
-import * as __goscript_x509 from "./x509.gs.ts"
+import * as __goscript_x509 from "./x509.gs.js"
 import "@goscript/strconv/index.js"
-import "./x509.gs.ts"
+import "./x509.gs.js"
 
 export const _KeyUsage_name_0: string = "digitalSignaturecontentCommitment"
 
@@ -58,47 +58,38 @@ export function KeyUsage_String(i: __goscript_x509.KeyUsage): string {
 		{
 			i = i - (1)
 			return $.sliceStringOrBytes("digitalSignaturecontentCommitment", $.arrayIndex(_KeyUsage_index_0, i), $.arrayIndex(_KeyUsage_index_0, i + 1))
-			break
 		}
 		case i == 4:
 		{
 			return "keyEncipherment"
-			break
 		}
 		case i == 8:
 		{
 			return "dataEncipherment"
-			break
 		}
 		case i == 16:
 		{
 			return "keyAgreement"
-			break
 		}
 		case i == 32:
 		{
 			return "keyCertSign"
-			break
 		}
 		case i == 64:
 		{
 			return "cRLSign"
-			break
 		}
 		case i == 128:
 		{
 			return "encipherOnly"
-			break
 		}
 		case i == 256:
 		{
 			return "decipherOnly"
-			break
 		}
 		default:
 		{
 			return ("KeyUsage(" + strconv.FormatInt($.int64(i), 10)) + ")"
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")

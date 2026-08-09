@@ -7,10 +7,10 @@ import * as io from "@goscript/io/index.js"
 
 import * as sync from "@goscript/sync/index.js"
 
-import * as __goscript_pool from "./pool.gs.ts"
+import * as __goscript_pool from "./pool.gs.js"
 import "@goscript/io/index.js"
 import "@goscript/sync/index.js"
-import "./pool.gs.ts"
+import "./pool.gs.js"
 
 export class Buffer {
 	// Pool is the buffer pool to use. If nil, this Buffer will use the
@@ -154,7 +154,6 @@ export class Buffer {
 					{
 						await Buffer.prototype.shrink.call(b)
 						return [n, err]
-						break
 					}
 				}
 			}

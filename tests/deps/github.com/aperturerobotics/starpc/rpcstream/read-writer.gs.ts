@@ -17,15 +17,15 @@ import type * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/pr
 
 import type * as json from "@goscript/github.com/aperturerobotics/protobuf-go-lite/json/index.js"
 
-import * as __goscript_rpcstream from "./rpcstream.gs.ts"
+import * as __goscript_rpcstream from "./rpcstream.gs.js"
 
-import * as __goscript_rpcstream_pb from "./rpcstream.pb.gs.ts"
+import * as __goscript_rpcstream_pb from "./rpcstream.pb.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/io/index.js"
 import "@goscript/github.com/aperturerobotics/starpc/srpc/index.js"
-import "./rpcstream.gs.ts"
-import "./rpcstream.pb.gs.ts"
+import "./rpcstream.gs.js"
+import "./rpcstream.pb.gs.js"
 
 export class RpcStreamReadWriter {
 	// stream is the RpcStream

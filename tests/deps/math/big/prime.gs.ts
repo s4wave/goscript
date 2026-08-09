@@ -9,37 +9,37 @@ import type * as fmt from "@goscript/fmt/index.js"
 
 import type * as io from "@goscript/io/index.js"
 
-import type * as __goscript_accuracy_string from "./accuracy_string.gs.ts"
+import type * as __goscript_accuracy_string from "./accuracy_string.gs.js"
 
-import * as __goscript_arith from "./arith.gs.ts"
+import * as __goscript_arith from "./arith.gs.js"
 
-import type * as __goscript_float from "./float.gs.ts"
+import type * as __goscript_float from "./float.gs.js"
 
-import * as __goscript_int from "./int.gs.ts"
+import * as __goscript_int from "./int.gs.js"
 
-import * as __goscript_intconv from "./intconv.gs.ts"
+import * as __goscript_intconv from "./intconv.gs.js"
 
-import * as __goscript_intmarsh from "./intmarsh.gs.ts"
+import * as __goscript_intmarsh from "./intmarsh.gs.js"
 
-import * as __goscript_nat from "./nat.gs.ts"
+import * as __goscript_nat from "./nat.gs.js"
 
-import * as __goscript_natconv from "./natconv.gs.ts"
+import * as __goscript_natconv from "./natconv.gs.js"
 
-import * as __goscript_natdiv from "./natdiv.gs.ts"
+import * as __goscript_natdiv from "./natdiv.gs.js"
 
-import * as __goscript_natmul from "./natmul.gs.ts"
+import * as __goscript_natmul from "./natmul.gs.js"
 
-import * as __goscript_rat from "./rat.gs.ts"
+import * as __goscript_rat from "./rat.gs.js"
 import "@goscript/math/rand/index.js"
-import "./arith.gs.ts"
-import "./int.gs.ts"
-import "./intconv.gs.ts"
-import "./intmarsh.gs.ts"
-import "./nat.gs.ts"
-import "./natconv.gs.ts"
-import "./natdiv.gs.ts"
-import "./natmul.gs.ts"
-import "./rat.gs.ts"
+import "./arith.gs.js"
+import "./int.gs.js"
+import "./intconv.gs.js"
+import "./intmarsh.gs.js"
+import "./nat.gs.js"
+import "./natconv.gs.js"
+import "./natdiv.gs.js"
+import "./natmul.gs.js"
+import "./rat.gs.js"
 
 export async function nat_probablyPrimeMillerRabin(n: __goscript_nat.nat, stk: __goscript_nat.stack | $.VarRef<__goscript_nat.stack> | null, reps: number, force2: boolean): globalThis.Promise<boolean> {
 	let nm1: __goscript_nat.nat = (__goscript_nat.nat_sub((null as __goscript_nat.nat), (n as __goscript_nat.nat), (__goscript_nat.__goscript_get_natOne() as __goscript_nat.nat)) as __goscript_nat.nat)

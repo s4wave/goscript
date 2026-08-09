@@ -1,1 +1,1 @@
-export { Read } from "./rand.gs.ts"
+export { Read } from './rand.gs.js'

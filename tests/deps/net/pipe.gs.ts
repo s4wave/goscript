@@ -11,12 +11,12 @@ import * as sync from "@goscript/sync/index.js"
 
 import * as time from "@goscript/time/index.js"
 
-import * as __goscript_net from "./net.gs.ts"
+import * as __goscript_net from "./net.gs.js"
 import "@goscript/io/index.js"
 import "@goscript/os/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/time/index.js"
-import "./net.gs.ts"
+import "./net.gs.js"
 
 export class pipeDeadline {
 	public get mu(): sync.Mutex {
@@ -344,17 +344,14 @@ export class pipe {
 			case await isClosedChan($.pointerValue<pipe>(p).localDone):
 			{
 				return [0, io.ErrClosedPipe]
-				break
 			}
 			case await isClosedChan($.pointerValue<pipe>(p).remoteDone):
 			{
 				return [0, io.EOF]
-				break
 			}
 			case await isClosedChan(await $.pointerValue<pipe>(p).readDeadline.wait()):
 			{
 				return [0, os.ErrDeadlineExceeded]
-				break
 			}
 		}
 
@@ -411,17 +408,14 @@ export class pipe {
 			case await isClosedChan($.pointerValue<pipe>(p).localDone):
 			{
 				return [0, io.ErrClosedPipe]
-				break
 			}
 			case await isClosedChan($.pointerValue<pipe>(p).remoteDone):
 			{
 				return [0, io.ErrClosedPipe]
-				break
 			}
 			case await isClosedChan(await $.pointerValue<pipe>(p).writeDeadline.wait()):
 			{
 				return [0, os.ErrDeadlineExceeded]
-				break
 			}
 		}
 

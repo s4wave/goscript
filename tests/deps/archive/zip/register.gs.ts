@@ -11,15 +11,15 @@ import * as io from "@goscript/io/index.js"
 
 import * as sync from "@goscript/sync/index.js"
 
-import * as __goscript_struct from "./struct.gs.ts"
+import * as __goscript_struct from "./struct.gs.js"
 
-import * as __goscript_writer from "./writer.gs.ts"
+import * as __goscript_writer from "./writer.gs.js"
 import "@goscript/compress/flate/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/io/index.js"
 import "@goscript/sync/index.js"
-import "./struct.gs.ts"
-import "./writer.gs.ts"
+import "./struct.gs.js"
+import "./writer.gs.js"
 
 export type Compressor = ((w: io.Writer | null) => [io.WriteCloser | null, $.GoError] | globalThis.Promise<[io.WriteCloser | null, $.GoError]>) | null
 

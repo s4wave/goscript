@@ -1,1 +1,1 @@
-export { sourceStruct, viewStruct } from "./unsafe_noescape_uintptr_xor.gs.ts"
+export { sourceStruct, viewStruct } from './unsafe_noescape_uintptr_xor.gs.js'

@@ -35,9 +35,9 @@ import * as big from "@goscript/math/big/index.js"
 
 import * as hash from "@goscript/hash/index.js"
 
-import * as __goscript_fips from "./fips.gs.ts"
+import * as __goscript_fips from "./fips.gs.js"
 
-import * as __goscript_pkcs1v15 from "./pkcs1v15.gs.ts"
+import * as __goscript_pkcs1v15 from "./pkcs1v15.gs.js"
 import "@goscript/crypto/index.js"
 import "@goscript/crypto/internal/boring/index.js"
 import "@goscript/crypto/internal/boring/bbig/index.js"
@@ -54,8 +54,8 @@ import "@goscript/io/index.js"
 import "@goscript/math/index.js"
 import "@goscript/math/big/index.js"
 import "@goscript/hash/index.js"
-import "./fips.gs.ts"
-import "./pkcs1v15.gs.ts"
+import "./fips.gs.js"
+import "./pkcs1v15.gs.js"
 
 export class PublicKey {
 	public get N(): big.Int | $.VarRef<big.Int> | null {

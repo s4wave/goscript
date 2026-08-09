@@ -1,1 +1,1 @@
-export { holder } from "./range_shadow_rhs.gs.ts"
+export { holder } from './range_shadow_rhs.gs.js'

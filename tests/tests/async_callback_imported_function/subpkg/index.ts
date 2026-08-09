@@ -1,1 +1,1 @@
-export { Run } from "./subpkg.gs.ts"
+export { Run } from './subpkg.gs.js'

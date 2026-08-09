@@ -5,7 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 
 import "@goscript/unsafe/index.js"
 
-import type * as __goscript_arith from "./arith.gs.ts"
+import type * as __goscript_arith from "./arith.gs.js"
 
 export function addVV(z: $.Slice<__goscript_arith.Word>, x: $.Slice<__goscript_arith.Word>, y: $.Slice<__goscript_arith.Word>): __goscript_arith.Word {
 	let c: __goscript_arith.Word = 0

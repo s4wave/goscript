@@ -1,2 +1,2 @@
-export type { Base } from "./dep1.gs.ts"
-import "./dep1.gs.ts"
+export type { Base } from './dep1.gs.js'
+import './dep1.gs.js'

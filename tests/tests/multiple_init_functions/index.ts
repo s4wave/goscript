@@ -1,1 +1,1 @@
-import "./multiple_init_functions.gs.ts"
+import './multiple_init_functions.gs.js'

@@ -33,9 +33,9 @@ import * as bpool from "@goscript/github.com/aperturerobotics/go-websocket/inter
 
 import * as wsjs from "@goscript/github.com/aperturerobotics/go-websocket/internal/wsjs/index.js"
 
-import * as __goscript_errors from "./errors.gs.ts"
+import * as __goscript_errors from "./errors.gs.js"
 
-import * as __goscript_stringer from "./stringer.gs.ts"
+import * as __goscript_stringer from "./stringer.gs.js"
 import "@goscript/strconv/index.js"
 import "@goscript/bytes/index.js"
 import "@goscript/context/index.js"
@@ -51,8 +51,8 @@ import "@goscript/sync/atomic/index.js"
 import "@goscript/syscall/js/index.js"
 import "@goscript/github.com/aperturerobotics/go-websocket/internal/bpool/index.js"
 import "@goscript/github.com/aperturerobotics/go-websocket/internal/wsjs/index.js"
-import "./errors.gs.ts"
-import "./stringer.gs.ts"
+import "./errors.gs.js"
+import "./stringer.gs.js"
 
 export type opcode = number
 
@@ -630,17 +630,14 @@ export class Conn {
 			case 2:
 			{
 				return $.markAsStructValue($.cloneStructValue($.pointerValue<Conn>(c).ws)).SendBytes(p)
-				break
 			}
 			case 1:
 			{
 				return $.markAsStructValue($.cloneStructValue($.pointerValue<Conn>(c).ws)).SendText($.bytesToString(p))
-				break
 			}
 			default:
 			{
 				return fmt.Errorf("unexpected message type: %v", $.namedValueInterfaceValue<any>(typ, "websocket.MessageType", {String: (receiver: any, ...args: any[]) => (__goscript_stringer.MessageType_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Basic, name: "int", typeName: "websocket.MessageType" }, [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]))
-				break
 			}
 		}
 		throw new globalThis.Error("goscript: unreachable return")

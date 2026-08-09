@@ -7,7 +7,7 @@ import * as context from "@goscript/context/index.js"
 
 import type * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
 
-import type * as __goscript_message from "./message.gs.ts"
+import type * as __goscript_message from "./message.gs.js"
 import "@goscript/context/index.js"
 
 export type Stream = {

@@ -13,12 +13,12 @@ import * as errors from "@goscript/errors/index.js"
 
 import * as aes from "@goscript/crypto/internal/fips140/aes/index.js"
 
-import * as __goscript_ctrdrbg from "./ctrdrbg.gs.ts"
+import * as __goscript_ctrdrbg from "./ctrdrbg.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/crypto/internal/fips140/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/crypto/internal/fips140/aes/index.js"
-import "./ctrdrbg.gs.ts"
+import "./ctrdrbg.gs.js"
 
 async function __goscriptInit0(): globalThis.Promise<void> {
 	// Per IG 10.3.A, Resolution 7: "A KAT of a DRBG may be performed by:

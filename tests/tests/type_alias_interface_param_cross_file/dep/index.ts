@@ -1,1 +1,1 @@
-export type { Value } from "./dep.gs.ts"
+export type { Value } from './dep.gs.js'

@@ -1,1 +1,1 @@
-export { Make, Pointer } from "./pointer.gs.ts"
+export { Make, Pointer } from './pointer.gs.js'

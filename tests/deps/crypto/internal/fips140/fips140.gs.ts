@@ -9,17 +9,17 @@ import * as errors from "@goscript/errors/index.js"
 
 import * as runtime from "@goscript/runtime/index.js"
 
-import * as __goscript_notasan from "./notasan.gs.ts"
+import * as __goscript_notasan from "./notasan.gs.js"
 
-import * as __goscript_notboring from "./notboring.gs.ts"
+import * as __goscript_notboring from "./notboring.gs.js"
 
-import * as __goscript_notpurego from "./notpurego.gs.ts"
+import * as __goscript_notpurego from "./notpurego.gs.js"
 import "@goscript/crypto/internal/fips140deps/godebug/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/runtime/index.js"
-import "./notasan.gs.ts"
-import "./notboring.gs.ts"
-import "./notpurego.gs.ts"
+import "./notasan.gs.js"
+import "./notboring.gs.js"
+import "./notpurego.gs.js"
 
 export let Enabled: boolean = false
 
@@ -89,7 +89,6 @@ export function Supported(): $.GoError {
 		case $.stringEqual(runtime.GOOS, "aix"):
 		{
 			return errors.New((("FIPS 140-3 mode is not supported on " + runtime.GOOS) + "-") + runtime.GOARCH)
-			break
 		}
 	}
 

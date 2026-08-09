@@ -9,10 +9,10 @@ import * as bits from "@goscript/math/bits/index.js"
 
 import type * as hash from "@goscript/hash/index.js"
 
-import * as __goscript_md5 from "./md5.gs.ts"
+import * as __goscript_md5 from "./md5.gs.js"
 import "@goscript/internal/byteorder/index.js"
 import "@goscript/math/bits/index.js"
-import "./md5.gs.ts"
+import "./md5.gs.js"
 
 export function blockGeneric(dig: __goscript_md5.digest | $.VarRef<__goscript_md5.digest> | null, p: $.Slice<number>): void {
 	// load state

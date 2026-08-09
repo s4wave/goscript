@@ -1,1 +1,1 @@
-export { RunSubtest } from "./testing_async_subtest.gs.ts"
+export { RunSubtest } from './testing_async_subtest.gs.js'

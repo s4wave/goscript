@@ -5,9 +5,9 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as strconv from "@goscript/strconv/index.js"
 
-import * as __goscript_float from "./float.gs.ts"
+import * as __goscript_float from "./float.gs.js"
 import "@goscript/strconv/index.js"
-import "./float.gs.ts"
+import "./float.gs.js"
 
 export const _RoundingMode_name: string = "ToNearestEvenToNearestAwayToZeroAwayFromZeroToNegativeInfToPositiveInf"
 

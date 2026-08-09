@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_notboring from "./notboring.gs.ts"
-import "./notboring.gs.ts"
+import * as __goscript_notboring from "./notboring.gs.js"
+import "./notboring.gs.js"
 
 export type BigInt = $.Slice<number>
 

@@ -1,1 +1,1 @@
-export { code } from "./make_slice_struct_zero.gs.ts"
+export { code } from './make_slice_struct_zero.gs.js'

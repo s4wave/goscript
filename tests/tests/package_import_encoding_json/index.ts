@@ -1,1 +1,1 @@
-export { Person } from "./package_import_encoding_json.gs.ts"
+export { Person } from './package_import_encoding_json.gs.js'

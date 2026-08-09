@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_method from "./method.gs.ts"
-import "./method.gs.ts"
+import * as __goscript_method from "./method.gs.js"
+import "./method.gs.js"
 
 export type runner = {
 	Run(): string | globalThis.Promise<string>

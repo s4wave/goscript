@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_b from "./b.gs.ts"
-import "./b.gs.ts"
+import * as __goscript_b from "./b.gs.js"
+import "./b.gs.js"
 
 export class aValue {
 	public get next(): __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null {

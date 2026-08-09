@@ -1,1 +1,1 @@
-export { Block, Decode, Encode, EncodeToMemory, lineBreaker } from "./pem.gs.ts"
+export { Block, Decode, Encode, EncodeToMemory, lineBreaker } from './pem.gs.js'

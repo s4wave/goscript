@@ -1,1 +1,1 @@
-export { counter, inner, outer } from "./promoted_pointer_fields.gs.ts"
+export { counter, inner, outer } from './promoted_pointer_fields.gs.js'

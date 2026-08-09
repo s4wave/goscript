@@ -1,1 +1,1 @@
-export { item } from "./map_index_type_shadow.gs.ts"
+export { item } from './map_index_type_shadow.gs.js'

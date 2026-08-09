@@ -5,9 +5,9 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as unsafe from "@goscript/unsafe/index.js"
 
-import * as __goscript_nat from "./nat.gs.ts"
+import * as __goscript_nat from "./nat.gs.js"
 import "@goscript/unsafe/index.js"
-import "./nat.gs.ts"
+import "./nat.gs.js"
 
 export function idx(x: $.VarRef<number> | null, i: number): $.VarRef<number> | null {
 	return ($.uint($.uint64Add(((x as any) as any), ($.uint($.uint64Mul(i, 8n), 64))), 64) as any)

@@ -291,7 +291,6 @@ export class P384Point {
 			case ($.len(b) == 1) && ($.uint($.arrayIndex(b!, 0), 8) == $.uint(0, 8)):
 			{
 				return [P384Point.prototype.Set.call(p, NewP384Point()), null]
-				break
 			}
 			case ($.len(b) == (1 + (2 * 48))) && ($.uint($.arrayIndex(b!, 0), 8) == $.uint(4, 8)):
 			{
@@ -317,7 +316,6 @@ export class P384Point {
 				fiat.P384Element.prototype.Set.call($.pointerValue<P384Point>(p).y, y)
 				fiat.P384Element.prototype.One.call($.pointerValue<P384Point>(p).z)
 				return [p, null]
-				break
 			}
 			case ($.len(b) == (1 + 48)) && (($.uint($.arrayIndex(b!, 0), 8) == $.uint(2, 8)) || ($.uint($.arrayIndex(b!, 0), 8) == $.uint(3, 8))):
 			{
@@ -345,12 +343,10 @@ export class P384Point {
 				fiat.P384Element.prototype.Set.call($.pointerValue<P384Point>(p).y, y)
 				fiat.P384Element.prototype.One.call($.pointerValue<P384Point>(p).z)
 				return [p, null]
-				break
 			}
 			default:
 			{
 				return [null, errors.New("invalid P384 point encoding")]
-				break
 			}
 		}
 		throw new globalThis.Error("goscript: unreachable return")

@@ -23,29 +23,29 @@ import * as errors from "@goscript/errors/index.js"
 
 import * as math from "@goscript/math/index.js"
 
-import type * as __goscript_accuracy_string from "./accuracy_string.gs.ts"
+import type * as __goscript_accuracy_string from "./accuracy_string.gs.js"
 
-import * as __goscript_arith from "./arith.gs.ts"
+import * as __goscript_arith from "./arith.gs.js"
 
-import * as __goscript_arith_decl from "./arith_decl.gs.ts"
+import * as __goscript_arith_decl from "./arith_decl.gs.js"
 
-import type * as __goscript_float from "./float.gs.ts"
+import type * as __goscript_float from "./float.gs.js"
 
-import * as __goscript_int from "./int.gs.ts"
+import * as __goscript_int from "./int.gs.js"
 
-import * as __goscript_intconv from "./intconv.gs.ts"
+import * as __goscript_intconv from "./intconv.gs.js"
 
-import * as __goscript_intmarsh from "./intmarsh.gs.ts"
+import * as __goscript_intmarsh from "./intmarsh.gs.js"
 
-import * as __goscript_natconv from "./natconv.gs.ts"
+import * as __goscript_natconv from "./natconv.gs.js"
 
-import * as __goscript_natdiv from "./natdiv.gs.ts"
+import * as __goscript_natdiv from "./natdiv.gs.js"
 
-import * as __goscript_natmul from "./natmul.gs.ts"
+import * as __goscript_natmul from "./natmul.gs.js"
 
-import * as __goscript_prime from "./prime.gs.ts"
+import * as __goscript_prime from "./prime.gs.js"
 
-import * as __goscript_rat from "./rat.gs.ts"
+import * as __goscript_rat from "./rat.gs.js"
 import "@goscript/fmt/index.js"
 import "@goscript/io/index.js"
 import "@goscript/math/rand/index.js"
@@ -56,16 +56,16 @@ import "@goscript/slices/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/math/index.js"
-import "./arith.gs.ts"
-import "./arith_decl.gs.ts"
-import "./int.gs.ts"
-import "./intconv.gs.ts"
-import "./intmarsh.gs.ts"
-import "./natconv.gs.ts"
-import "./natdiv.gs.ts"
-import "./natmul.gs.ts"
-import "./prime.gs.ts"
-import "./rat.gs.ts"
+import "./arith.gs.js"
+import "./arith_decl.gs.js"
+import "./int.gs.js"
+import "./intconv.gs.js"
+import "./intmarsh.gs.js"
+import "./natconv.gs.js"
+import "./natdiv.gs.js"
+import "./natmul.gs.js"
+import "./prime.gs.js"
+import "./rat.gs.js"
 
 export type nat = $.Slice<__goscript_arith.Word>
 
@@ -234,17 +234,14 @@ export function nat_add(z: nat, x: nat, y: nat): nat {
 		case m < n:
 		{
 			return (nat_add(z, (y as nat), (x as nat)) as nat)
-			break
 		}
 		case m == 0:
 		{
 			return ($.goSlice(z, undefined, 0) as nat)
-			break
 		}
 		case n == 0:
 		{
 			return (nat__set(z, (x as nat)) as nat)
-			break
 		}
 	}
 	// m > 0
@@ -272,12 +269,10 @@ export function nat_sub(z: nat, x: nat, y: nat): nat {
 		case m == 0:
 		{
 			return ($.goSlice(z, undefined, 0) as nat)
-			break
 		}
 		case n == 0:
 		{
 			return (nat__set(z, (x as nat)) as nat)
-			break
 		}
 	}
 	// m > 0
@@ -393,22 +388,18 @@ export async function nat_mulRange(z: nat, stk: stack | $.VarRef<stack> | null, 
 		case a == 0n:
 		{
 			return (nat_setUint64(z, 0n) as nat)
-			break
 		}
 		case a > b:
 		{
 			return (nat_setUint64(z, 1n) as nat)
-			break
 		}
 		case a == b:
 		{
 			return (nat_setUint64(z, a) as nat)
-			break
 		}
 		case ($.uint64Add(a, 1n)) == b:
 		{
 			return (await __goscript_natmul.nat_mul(z, stk, (nat_setUint64((null as nat), a) as nat), (nat_setUint64((null as nat), b) as nat)) as nat)
-			break
 		}
 	}
 
@@ -576,7 +567,6 @@ export function nat_setBit(z: nat, x: nat, i: number, b: number): nat {
 			}
 			z![j] = $.uint($.uint64AndNot(z![j], m), 64)
 			return (nat_norm(z) as nat)
-			break
 		}
 		case 1:
 		{
@@ -590,7 +580,6 @@ export function nat_setBit(z: nat, x: nat, i: number, b: number): nat {
 			z![j] = $.uint($.uint64Or(z![j], m), 64)
 			// no need to normalize
 			return (z as nat)
-			break
 		}
 	}
 	$.panic("set bit is not 0 or 1")

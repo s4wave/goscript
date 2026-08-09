@@ -11,12 +11,12 @@ import * as errors from "@goscript/errors/index.js"
 
 import * as sync from "@goscript/sync/index.js"
 
-import * as __goscript_p224_sqrt from "./p224_sqrt.gs.ts"
+import * as __goscript_p224_sqrt from "./p224_sqrt.gs.js"
 import "@goscript/crypto/internal/constanttime/index.js"
 import "@goscript/crypto/internal/fips140/nistec/fiat/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/sync/index.js"
-import "./p224_sqrt.gs.ts"
+import "./p224_sqrt.gs.js"
 
 export type p224Table = (P224Point | $.VarRef<P224Point> | null)[]
 
@@ -294,7 +294,6 @@ export class P224Point {
 			case ($.len(b) == 1) && ($.uint($.arrayIndex(b!, 0), 8) == $.uint(0, 8)):
 			{
 				return [P224Point.prototype.Set.call(p, NewP224Point()), null]
-				break
 			}
 			case ($.len(b) == (1 + (2 * 28))) && ($.uint($.arrayIndex(b!, 0), 8) == $.uint(4, 8)):
 			{
@@ -320,7 +319,6 @@ export class P224Point {
 				fiat.P224Element.prototype.Set.call($.pointerValue<P224Point>(p).y, y)
 				fiat.P224Element.prototype.One.call($.pointerValue<P224Point>(p).z)
 				return [p, null]
-				break
 			}
 			case ($.len(b) == (1 + 28)) && (($.uint($.arrayIndex(b!, 0), 8) == $.uint(2, 8)) || ($.uint($.arrayIndex(b!, 0), 8) == $.uint(3, 8))):
 			{
@@ -348,12 +346,10 @@ export class P224Point {
 				fiat.P224Element.prototype.Set.call($.pointerValue<P224Point>(p).y, y)
 				fiat.P224Element.prototype.One.call($.pointerValue<P224Point>(p).z)
 				return [p, null]
-				break
 			}
 			default:
 			{
 				return [null, errors.New("invalid P224 point encoding")]
-				break
 			}
 		}
 		throw new globalThis.Error("goscript: unreachable return")

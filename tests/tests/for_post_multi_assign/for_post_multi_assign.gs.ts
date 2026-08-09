@@ -71,17 +71,14 @@ export class iterator {
 			case 1:
 			{
 				return [$.markAsStructValue(new frame({name: "first"})), true]
-				break
 			}
 			case 2:
 			{
 				return [$.markAsStructValue(new frame({name: "second"})), true]
-				break
 			}
 			default:
 			{
 				return [$.markAsStructValue(new frame()), false]
-				break
 			}
 		}
 		throw new globalThis.Error("goscript: unreachable return")

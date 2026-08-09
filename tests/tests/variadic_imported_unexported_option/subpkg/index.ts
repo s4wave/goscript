@@ -1,2 +1,2 @@
-export type { option } from "./subpkg.gs.ts"
-export { New, Thing, WithLabel, WithValue } from "./subpkg.gs.ts"
+export type { option } from './subpkg.gs.js'
+export { New, Thing, WithLabel, WithValue } from './subpkg.gs.js'

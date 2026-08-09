@@ -1,1 +1,1 @@
-export { MyStruct } from "./atomic_struct_field_init.gs.ts"
+export { MyStruct } from './atomic_struct_field_init.gs.js'

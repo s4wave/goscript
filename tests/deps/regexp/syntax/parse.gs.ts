@@ -13,22 +13,22 @@ import * as unicode from "@goscript/unicode/index.js"
 
 import * as utf8 from "@goscript/unicode/utf8/index.js"
 
-import * as __goscript_op_string from "./op_string.gs.ts"
+import * as __goscript_op_string from "./op_string.gs.js"
 
-import * as __goscript_perl_groups from "./perl_groups.gs.ts"
+import * as __goscript_perl_groups from "./perl_groups.gs.js"
 
-import * as __goscript_regexp from "./regexp.gs.ts"
+import * as __goscript_regexp from "./regexp.gs.js"
 
-import * as __goscript_simplify from "./simplify.gs.ts"
+import * as __goscript_simplify from "./simplify.gs.js"
 import "@goscript/sort/index.js"
 import "@goscript/strings/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/unicode/index.js"
 import "@goscript/unicode/utf8/index.js"
-import "./op_string.gs.ts"
-import "./perl_groups.gs.ts"
-import "./regexp.gs.ts"
-import "./simplify.gs.ts"
+import "./op_string.gs.js"
+import "./perl_groups.gs.js"
+import "./regexp.gs.js"
+import "./simplify.gs.js"
 
 export type ErrorCode = string
 
@@ -956,7 +956,6 @@ export class parser {
 						t = $.sliceStringOrBytes(t, 1, undefined)
 					}
 					return [$.int(r, 32), t, null]
-					break
 				}
 				case 120:
 				{
@@ -1027,37 +1026,30 @@ export class parser {
 						break
 					}
 					return [$.int((Math.imul(x, 16)) + y, 32), t, null]
-					break
 				}
 				case 97:
 				{
 					return [$.int(7, 32), t, err]
-					break
 				}
 				case 102:
 				{
 					return [$.int(12, 32), t, err]
-					break
 				}
 				case 110:
 				{
 					return [$.int(10, 32), t, err]
-					break
 				}
 				case 114:
 				{
 					return [$.int(13, 32), t, err]
-					break
 				}
 				case 116:
 				{
 					return [$.int(9, 32), t, err]
-					break
 				}
 				case 118:
 				{
 					return [$.int(11, 32), t, err]
-					break
 				}
 			}
 		}
@@ -1215,7 +1207,6 @@ export class parser {
 				default:
 				{
 					break Loop
-					break
 				}
 				case 105:
 				{
@@ -1268,7 +1259,6 @@ export class parser {
 					}
 					$.pointerValue<parser>(p).flags = $.uint(flags, 16)
 					return [t, null]
-					break
 				}
 			}
 		}
@@ -2192,21 +2182,18 @@ export async function parse(s: string, flags: Flags): globalThis.Promise<[__gosc
 									p.value.op($.uint(9, 8))
 									t = $.sliceStringOrBytes(t, 2, undefined)
 									break BigSwitch
-									break
 								}
 								case 98:
 								{
 									p.value.op($.uint(11, 8))
 									t = $.sliceStringOrBytes(t, 2, undefined)
 									break BigSwitch
-									break
 								}
 								case 66:
 								{
 									p.value.op($.uint(12, 8))
 									t = $.sliceStringOrBytes(t, 2, undefined)
 									break BigSwitch
-									break
 								}
 								case 67:
 								{
@@ -2237,14 +2224,12 @@ export async function parse(s: string, flags: Flags): globalThis.Promise<[__gosc
 										lit = rest
 									}
 									break BigSwitch
-									break
 								}
 								case 122:
 								{
 									p.value.op($.uint(10, 8))
 									t = $.sliceStringOrBytes(t, 2, undefined)
 									break BigSwitch
-									break
 								}
 							}
 						}
@@ -2356,7 +2341,6 @@ export function matchRune(re: __goscript_regexp.Regexp | $.VarRef<__goscript_reg
 		case 3:
 		{
 			return ($.len($.pointerValue<__goscript_regexp.Regexp>(re).Rune) == 1) && ($.int($.arrayIndex($.pointerValue<__goscript_regexp.Regexp>(re).Rune!, 0), 32) == $.int(r, 32))
-			break
 		}
 		case 4:
 		{
@@ -2366,17 +2350,14 @@ export function matchRune(re: __goscript_regexp.Regexp | $.VarRef<__goscript_reg
 				}
 			}
 			return false
-			break
 		}
 		case 5:
 		{
 			return $.int(r, 32) != $.int(10, 32)
-			break
 		}
 		case 6:
 		{
 			return true
-			break
 		}
 	}
 	return false
@@ -2506,22 +2487,18 @@ export async function unicodeTable(name: string): globalThis.Promise<[unicode.Ra
 		case "Any":
 		{
 			return [anyTable, anyTable, +1]
-			break
 		}
 		case "Assigned":
 		{
 			return [unicode.Cn, unicode.Cn, -1]
-			break
 		}
 		case "Ascii":
 		{
 			return [asciiTable, asciiFoldTable, +1]
-			break
 		}
 		case "Lc":
 		{
 			return [$.mapGet<string, unicode.RangeTable | $.VarRef<unicode.RangeTable> | null, unicode.RangeTable | $.VarRef<unicode.RangeTable> | null>(unicode.Categories, "LC", null)[0], $.mapGet<string, unicode.RangeTable | $.VarRef<unicode.RangeTable> | null, unicode.RangeTable | $.VarRef<unicode.RangeTable> | null>(unicode.FoldCategory, "LC", null)[0], +1]
-			break
 		}
 	}
 	{

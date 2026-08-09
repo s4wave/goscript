@@ -1,1 +1,5 @@
-export { ApprovedHash, ApprovedRandomReader, Enforced } from "./fips140only.gs.ts"
+export {
+  ApprovedHash,
+  ApprovedRandomReader,
+  Enforced,
+} from './fips140only.gs.js'

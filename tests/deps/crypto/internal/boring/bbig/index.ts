@@ -1,1 +1,1 @@
-export { Dec, Enc } from "./big.gs.ts"
+export { Dec, Enc } from './big.gs.js'

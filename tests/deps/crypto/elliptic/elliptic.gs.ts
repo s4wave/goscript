@@ -11,15 +11,15 @@ import * as sync from "@goscript/sync/index.js"
 
 import * as nistec from "@goscript/crypto/internal/fips140/nistec/index.js"
 
-import * as __goscript_nistec from "./nistec.gs.ts"
+import * as __goscript_nistec from "./nistec.gs.js"
 
-import * as __goscript_params from "./params.gs.ts"
+import * as __goscript_params from "./params.gs.js"
 import "@goscript/io/index.js"
 import "@goscript/math/big/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/crypto/internal/fips140/nistec/index.js"
-import "./nistec.gs.ts"
-import "./params.gs.ts"
+import "./nistec.gs.js"
+import "./params.gs.js"
 
 export type Curve = {
 	Add(x1: big.Int | $.VarRef<big.Int> | null, y1: big.Int | $.VarRef<big.Int> | null, x2: big.Int | $.VarRef<big.Int> | null, y2: big.Int | $.VarRef<big.Int> | null): [big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null] | globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]>

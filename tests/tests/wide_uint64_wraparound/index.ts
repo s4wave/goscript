@@ -1,1 +1,1 @@
-export { BigInt } from "./wide_uint64_wraparound.gs.ts"
+export { BigInt } from './wide_uint64_wraparound.gs.js'

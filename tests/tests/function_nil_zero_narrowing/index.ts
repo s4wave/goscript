@@ -1,1 +1,1 @@
-export type { Cancel } from "./function_nil_zero_narrowing.gs.ts"
+export type { Cancel } from './function_nil_zero_narrowing.gs.js'

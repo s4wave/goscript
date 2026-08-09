@@ -7,9 +7,9 @@ import * as bits from "@goscript/math/bits/index.js"
 
 import type * as hash from "@goscript/hash/index.js"
 
-import * as __goscript_sha512 from "./sha512.gs.ts"
+import * as __goscript_sha512 from "./sha512.gs.js"
 import "@goscript/math/bits/index.js"
-import "./sha512.gs.ts"
+import "./sha512.gs.js"
 
 export var _K: bigint[]
 

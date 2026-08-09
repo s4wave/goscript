@@ -3,14 +3,14 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_aes from "./aes.gs.ts"
+import * as __goscript_aes from "./aes.gs.js"
 
-import * as __goscript_aes_noasm from "./aes_noasm.gs.ts"
+import * as __goscript_aes_noasm from "./aes_noasm.gs.js"
 
-import * as __goscript_ctr from "./ctr.gs.ts"
-import "./aes.gs.ts"
-import "./aes_noasm.gs.ts"
-import "./ctr.gs.ts"
+import * as __goscript_ctr from "./ctr.gs.js"
+import "./aes.gs.js"
+import "./aes_noasm.gs.js"
+import "./ctr.gs.js"
 
 export function ctrBlocks1(b: __goscript_aes.Block | $.VarRef<__goscript_aes.Block> | null, dst: $.VarRef<Uint8Array> | null, src: $.VarRef<Uint8Array> | null, ivlo: bigint, ivhi: bigint): void {
 	__goscript_ctr.ctrBlocks(b, $.goSlice($.pointerValue<Uint8Array>(dst), undefined, undefined), $.goSlice($.pointerValue<Uint8Array>(src), undefined, undefined), ivlo, ivhi)

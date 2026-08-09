@@ -13,17 +13,17 @@ import type * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/pr
 
 import type * as json from "@goscript/github.com/aperturerobotics/protobuf-go-lite/json/index.js"
 
-import * as __goscript_errors from "./errors.gs.ts"
+import * as __goscript_errors from "./errors.gs.js"
 
-import * as __goscript_rpcstream from "./rpcstream.gs.ts"
+import * as __goscript_rpcstream from "./rpcstream.gs.js"
 
-import * as __goscript_rpcstream_pb from "./rpcstream.pb.gs.ts"
+import * as __goscript_rpcstream_pb from "./rpcstream.pb.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/io/index.js"
 import "@goscript/github.com/aperturerobotics/starpc/srpc/index.js"
-import "./errors.gs.ts"
-import "./rpcstream.gs.ts"
-import "./rpcstream.pb.gs.ts"
+import "./errors.gs.js"
+import "./rpcstream.gs.js"
+import "./rpcstream.pb.gs.js"
 
 export type RpcProxyGetter = ((ctx: context.Context | null, componentID: string) => [__goscript_rpcstream.RpcStreamCaller | null, string, (() => void) | null, $.GoError] | globalThis.Promise<[__goscript_rpcstream.RpcStreamCaller | null, string, (() => void) | null, $.GoError]>) | null
 

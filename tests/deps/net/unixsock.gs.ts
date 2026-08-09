@@ -27,57 +27,57 @@ import * as atomic from "@goscript/sync/atomic/index.js"
 
 import type * as dnsmessage from "@goscript/vendor/golang.org/x/net/dns/dnsmessage/index.js"
 
-import * as __goscript__interface from "./interface.gs.ts"
+import * as __goscript__interface from "./interface.gs.js"
 
-import * as __goscript_dial from "./dial.gs.ts"
+import * as __goscript_dial from "./dial.gs.js"
 
-import type * as __goscript_dnsclient from "./dnsclient.gs.ts"
+import type * as __goscript_dnsclient from "./dnsclient.gs.js"
 
-import * as __goscript_dnsclient_unix from "./dnsclient_unix.gs.ts"
+import * as __goscript_dnsclient_unix from "./dnsclient_unix.gs.js"
 
-import type * as __goscript_dnsconfig from "./dnsconfig.gs.ts"
+import type * as __goscript_dnsconfig from "./dnsconfig.gs.js"
 
-import * as __goscript_fd_fake from "./fd_fake.gs.ts"
+import * as __goscript_fd_fake from "./fd_fake.gs.js"
 
-import * as __goscript_fd_js from "./fd_js.gs.ts"
+import * as __goscript_fd_js from "./fd_js.gs.js"
 
-import * as __goscript_ip from "./ip.gs.ts"
+import * as __goscript_ip from "./ip.gs.js"
 
-import type * as __goscript_iprawsock from "./iprawsock.gs.ts"
+import type * as __goscript_iprawsock from "./iprawsock.gs.js"
 
-import * as __goscript_iprawsock_posix from "./iprawsock_posix.gs.ts"
+import * as __goscript_iprawsock_posix from "./iprawsock_posix.gs.js"
 
-import * as __goscript_ipsock from "./ipsock.gs.ts"
+import * as __goscript_ipsock from "./ipsock.gs.js"
 
-import * as __goscript_lookup from "./lookup.gs.ts"
+import * as __goscript_lookup from "./lookup.gs.js"
 
-import * as __goscript_lookup_unix from "./lookup_unix.gs.ts"
+import * as __goscript_lookup_unix from "./lookup_unix.gs.js"
 
-import * as __goscript_mac from "./mac.gs.ts"
+import * as __goscript_mac from "./mac.gs.js"
 
-import * as __goscript_mptcpsock_stub from "./mptcpsock_stub.gs.ts"
+import * as __goscript_mptcpsock_stub from "./mptcpsock_stub.gs.js"
 
-import * as __goscript_net from "./net.gs.ts"
+import * as __goscript_net from "./net.gs.js"
 
-import * as __goscript_net_fake from "./net_fake.gs.ts"
+import * as __goscript_net_fake from "./net_fake.gs.js"
 
-import * as __goscript_rawconn from "./rawconn.gs.ts"
+import * as __goscript_rawconn from "./rawconn.gs.js"
 
-import * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.ts"
+import * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.js"
 
-import * as __goscript_tcpsock from "./tcpsock.gs.ts"
+import * as __goscript_tcpsock from "./tcpsock.gs.js"
 
-import * as __goscript_tcpsock_posix from "./tcpsock_posix.gs.ts"
+import * as __goscript_tcpsock_posix from "./tcpsock_posix.gs.js"
 
-import type * as __goscript_tcpsock_unix from "./tcpsock_unix.gs.ts"
+import type * as __goscript_tcpsock_unix from "./tcpsock_unix.gs.js"
 
-import type * as __goscript_udpsock from "./udpsock.gs.ts"
+import type * as __goscript_udpsock from "./udpsock.gs.js"
 
-import * as __goscript_udpsock_posix from "./udpsock_posix.gs.ts"
+import * as __goscript_udpsock_posix from "./udpsock_posix.gs.js"
 
-import * as __goscript_unixsock_posix from "./unixsock_posix.gs.ts"
+import * as __goscript_unixsock_posix from "./unixsock_posix.gs.js"
 
-import * as __goscript_unixsock_readmsg_other from "./unixsock_readmsg_other.gs.ts"
+import * as __goscript_unixsock_readmsg_other from "./unixsock_readmsg_other.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/os/index.js"
 import "@goscript/sync/index.js"
@@ -87,27 +87,27 @@ import "@goscript/errors/index.js"
 import "@goscript/internal/poll/index.js"
 import "@goscript/internal/singleflight/index.js"
 import "@goscript/sync/atomic/index.js"
-import "./interface.gs.ts"
-import "./dial.gs.ts"
-import "./dnsclient_unix.gs.ts"
-import "./fd_fake.gs.ts"
-import "./fd_js.gs.ts"
-import "./ip.gs.ts"
-import "./iprawsock_posix.gs.ts"
-import "./ipsock.gs.ts"
-import "./lookup.gs.ts"
-import "./lookup_unix.gs.ts"
-import "./mac.gs.ts"
-import "./mptcpsock_stub.gs.ts"
-import "./net.gs.ts"
-import "./net_fake.gs.ts"
-import "./rawconn.gs.ts"
-import "./sockaddr_posix.gs.ts"
-import "./tcpsock.gs.ts"
-import "./tcpsock_posix.gs.ts"
-import "./udpsock_posix.gs.ts"
-import "./unixsock_posix.gs.ts"
-import "./unixsock_readmsg_other.gs.ts"
+import "./interface.gs.js"
+import "./dial.gs.js"
+import "./dnsclient_unix.gs.js"
+import "./fd_fake.gs.js"
+import "./fd_js.gs.js"
+import "./ip.gs.js"
+import "./iprawsock_posix.gs.js"
+import "./ipsock.gs.js"
+import "./lookup.gs.js"
+import "./lookup_unix.gs.js"
+import "./mac.gs.js"
+import "./mptcpsock_stub.gs.js"
+import "./net.gs.js"
+import "./net_fake.gs.js"
+import "./rawconn.gs.js"
+import "./sockaddr_posix.gs.js"
+import "./tcpsock.gs.js"
+import "./tcpsock_posix.gs.js"
+import "./udpsock_posix.gs.js"
+import "./unixsock_posix.gs.js"
+import "./unixsock_readmsg_other.gs.js"
 
 export class UnixAddr {
 	public get Name(): string {
@@ -701,12 +701,10 @@ export function ResolveUnixAddr(network: string, address: string): [UnixAddr | $
 		case "unixpacket":
 		{
 			return [new UnixAddr({Name: address, Net: network}), null]
-			break
 		}
 		default:
 		{
 			return [null, $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })]
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")
@@ -731,7 +729,6 @@ export async function dialUnix(ctx: context.Context | null, dialer: __goscript_d
 		default:
 		{
 			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField5 = UnixAddr.prototype.opAddr.call(laddr); const __goscriptLiteralField6 = UnixAddr.prototype.opAddr.call(raddr); return new __goscript_net.OpError({Op: "dial", Net: network, Source: __goscriptLiteralField5, Addr: __goscriptLiteralField6, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
-			break
 		}
 	}
 	let sd: __goscript_dial.sysDialer | $.VarRef<__goscript_dial.sysDialer> | null = (() => { const __goscriptLiteralField7 = UnixAddr.prototype.String.call(raddr); return new __goscript_dial.sysDialer({network: network, address: __goscriptLiteralField7}) })()
@@ -757,7 +754,6 @@ export async function ListenUnix(network: string, laddr: UnixAddr | $.VarRef<Uni
 		default:
 		{
 			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField10 = UnixAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField10, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
-			break
 		}
 	}
 	if (laddr == null) {
@@ -782,7 +778,6 @@ export async function ListenUnixgram(network: string, laddr: UnixAddr | $.VarRef
 		default:
 		{
 			return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField14 = UnixAddr.prototype.opAddr.call(laddr); return new __goscript_net.OpError({Op: "listen", Net: network, Source: null, Addr: __goscriptLiteralField14, Err: $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })}) })(), "*net.OpError", { kind: $.TypeKind.Pointer, elemType: "net.OpError" })]
-			break
 		}
 	}
 	if (laddr == null) {

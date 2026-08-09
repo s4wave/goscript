@@ -1,2 +1,2 @@
-export { Setting } from "./bodyless_async_callback.gs.ts"
-import "./bodyless_async_callback.gs.ts"
+export { Setting } from './bodyless_async_callback.gs.js'
+import './bodyless_async_callback.gs.js'

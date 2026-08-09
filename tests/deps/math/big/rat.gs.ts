@@ -19,31 +19,31 @@ import * as byteorder from "@goscript/internal/byteorder/index.js"
 
 import type * as rand from "@goscript/math/rand/index.js"
 
-import type * as __goscript_accuracy_string from "./accuracy_string.gs.ts"
+import type * as __goscript_accuracy_string from "./accuracy_string.gs.js"
 
-import * as __goscript_arith from "./arith.gs.ts"
+import * as __goscript_arith from "./arith.gs.js"
 
-import type * as __goscript_float from "./float.gs.ts"
+import type * as __goscript_float from "./float.gs.js"
 
-import * as __goscript_int from "./int.gs.ts"
+import * as __goscript_int from "./int.gs.js"
 
-import * as __goscript_intconv from "./intconv.gs.ts"
+import * as __goscript_intconv from "./intconv.gs.js"
 
-import * as __goscript_intmarsh from "./intmarsh.gs.ts"
+import * as __goscript_intmarsh from "./intmarsh.gs.js"
 
-import * as __goscript_nat from "./nat.gs.ts"
+import * as __goscript_nat from "./nat.gs.js"
 
-import * as __goscript_natconv from "./natconv.gs.ts"
+import * as __goscript_natconv from "./natconv.gs.js"
 
-import * as __goscript_natdiv from "./natdiv.gs.ts"
+import * as __goscript_natdiv from "./natdiv.gs.js"
 
-import * as __goscript_natmul from "./natmul.gs.ts"
+import * as __goscript_natmul from "./natmul.gs.js"
 
-import * as __goscript_prime from "./prime.gs.ts"
+import * as __goscript_prime from "./prime.gs.js"
 
-import * as __goscript_ratconv from "./ratconv.gs.ts"
+import * as __goscript_ratconv from "./ratconv.gs.js"
 
-import * as __goscript_ratmarsh from "./ratmarsh.gs.ts"
+import * as __goscript_ratmarsh from "./ratmarsh.gs.js"
 import "@goscript/fmt/index.js"
 import "@goscript/math/index.js"
 import "@goscript/errors/index.js"
@@ -51,17 +51,17 @@ import "@goscript/io/index.js"
 import "@goscript/strconv/index.js"
 import "@goscript/strings/index.js"
 import "@goscript/internal/byteorder/index.js"
-import "./arith.gs.ts"
-import "./int.gs.ts"
-import "./intconv.gs.ts"
-import "./intmarsh.gs.ts"
-import "./nat.gs.ts"
-import "./natconv.gs.ts"
-import "./natdiv.gs.ts"
-import "./natmul.gs.ts"
-import "./prime.gs.ts"
-import "./ratconv.gs.ts"
-import "./ratmarsh.gs.ts"
+import "./arith.gs.js"
+import "./int.gs.js"
+import "./intconv.gs.js"
+import "./intmarsh.gs.js"
+import "./nat.gs.js"
+import "./natconv.gs.js"
+import "./natdiv.gs.js"
+import "./natmul.gs.js"
+import "./prime.gs.js"
+import "./ratconv.gs.js"
+import "./ratmarsh.gs.js"
 
 export class Rat {
 	// To make zero values for Rat work w/o initialization,
@@ -516,7 +516,6 @@ export class Rat {
 			case 2047:
 			{
 				return null
-				break
 			}
 			case 0:
 			{
@@ -1090,17 +1089,14 @@ export async function mulDenom(stk: __goscript_nat.stack | $.VarRef<__goscript_n
 		case ($.len((x as __goscript_nat.nat)) == 0) && ($.len((y as __goscript_nat.nat)) == 0):
 		{
 			return (__goscript_nat.nat_setWord(z, 1) as __goscript_nat.nat)
-			break
 		}
 		case $.len((x as __goscript_nat.nat)) == 0:
 		{
 			return (__goscript_nat.nat__set(z, (y as __goscript_nat.nat)) as __goscript_nat.nat)
-			break
 		}
 		case $.len((y as __goscript_nat.nat)) == 0:
 		{
 			return (__goscript_nat.nat__set(z, (x as __goscript_nat.nat)) as __goscript_nat.nat)
-			break
 		}
 	}
 	return (await __goscript_natmul.nat_mul(z, stk, (x as __goscript_nat.nat), (y as __goscript_nat.nat)) as __goscript_nat.nat)

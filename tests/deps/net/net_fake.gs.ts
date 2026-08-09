@@ -25,27 +25,27 @@ import type * as fs from "@goscript/io/fs/index.js"
 
 import type * as netip from "@goscript/net/netip/index.js"
 
-import * as __goscript_fd_fake from "./fd_fake.gs.ts"
+import * as __goscript_fd_fake from "./fd_fake.gs.js"
 
-import * as __goscript_fd_js from "./fd_js.gs.ts"
+import * as __goscript_fd_js from "./fd_js.gs.js"
 
-import * as __goscript_ip from "./ip.gs.ts"
+import * as __goscript_ip from "./ip.gs.js"
 
-import * as __goscript_net from "./net.gs.ts"
+import * as __goscript_net from "./net.gs.js"
 
-import * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.ts"
+import * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.js"
 
-import * as __goscript_tcpsock from "./tcpsock.gs.ts"
+import * as __goscript_tcpsock from "./tcpsock.gs.js"
 
-import * as __goscript_tcpsock_posix from "./tcpsock_posix.gs.ts"
+import * as __goscript_tcpsock_posix from "./tcpsock_posix.gs.js"
 
-import * as __goscript_udpsock from "./udpsock.gs.ts"
+import * as __goscript_udpsock from "./udpsock.gs.js"
 
-import * as __goscript_udpsock_posix from "./udpsock_posix.gs.ts"
+import * as __goscript_udpsock_posix from "./udpsock_posix.gs.js"
 
-import * as __goscript_unixsock from "./unixsock.gs.ts"
+import * as __goscript_unixsock from "./unixsock.gs.js"
 
-import * as __goscript_unixsock_posix from "./unixsock_posix.gs.ts"
+import * as __goscript_unixsock_posix from "./unixsock_posix.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/io/index.js"
@@ -55,17 +55,17 @@ import "@goscript/sync/atomic/index.js"
 import "@goscript/syscall/index.js"
 import "@goscript/time/index.js"
 import "@goscript/internal/poll/index.js"
-import "./fd_fake.gs.ts"
-import "./fd_js.gs.ts"
-import "./ip.gs.ts"
-import "./net.gs.ts"
-import "./sockaddr_posix.gs.ts"
-import "./tcpsock.gs.ts"
-import "./tcpsock_posix.gs.ts"
-import "./udpsock.gs.ts"
-import "./udpsock_posix.gs.ts"
-import "./unixsock.gs.ts"
-import "./unixsock_posix.gs.ts"
+import "./fd_fake.gs.js"
+import "./fd_js.gs.js"
+import "./ip.gs.js"
+import "./net.gs.js"
+import "./sockaddr_posix.gs.js"
+import "./tcpsock.gs.js"
+import "./tcpsock_posix.gs.js"
+import "./udpsock.gs.js"
+import "./udpsock_posix.gs.js"
+import "./unixsock.gs.js"
+import "./unixsock_posix.gs.js"
 
 export class fakeSockAddr {
 	public get family(): number {
@@ -644,7 +644,6 @@ export class fakeNetFD {
 					return assignIP!($.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(new __goscript_tcpsock.TCPAddr(), "*net.TCPAddr", { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" }))
 				}
 				return assignIP!(addr)
-				break
 			}
 			case "udp":
 			case "udp4":
@@ -654,7 +653,6 @@ export class fakeNetFD {
 					return assignIP!($.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(new __goscript_udpsock.UDPAddr(), "*net.UDPAddr", { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" }))
 				}
 				return assignIP!(addr)
-				break
 			}
 			case "unix":
 			case "unixgram":
@@ -670,12 +668,10 @@ export class fakeNetFD {
 					return validate!($.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(new __goscript_unixsock.UnixAddr({Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<fakeNetFD>(ffd).fd).net}), "*net.UnixAddr", { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" }))
 				}
 				return validate!($.interfaceValue<__goscript_sockaddr_posix.sockaddr | null>(new __goscript_unixsock.UnixAddr({Net: $.pointerValue<__goscript_fd_fake.netFD>($.pointerValue<fakeNetFD>(ffd).fd).net, Name: $.pointerValue<__goscript_unixsock.UnixAddr>(uaddr).Name}), "*net.UnixAddr", { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" }))
-				break
 			}
 			default:
 			{
 				return $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField13 = syscall.Errno_Error(syscall.EAFNOSUPPORT); const __goscriptLiteralField14 = await $.pointerValue<Exclude<__goscript_sockaddr_posix.sockaddr, null>>(addr).String(); return new __goscript_net.AddrError({Err: __goscriptLiteralField13, Addr: __goscriptLiteralField14}) })()), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })
-				break
 			}
 		}
 		throw new globalThis.Error("goscript: unreachable return")
@@ -1701,7 +1697,6 @@ export async function socket(ctx: context.Context | null, net: string, family: n
 		default:
 		{
 			return [null, os.NewSyscallError("socket", $.namedValueInterfaceValue<$.GoError>(syscall.ENOTSUP, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" }))]
-			break
 		}
 	}
 
@@ -1777,7 +1772,6 @@ export async function validateResolvedAddr(net: string, family: number, sa: __go
 				return $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField5 = __goscript_tcpsock.TCPAddr.prototype.String.call(__goscriptShadow1); return new __goscript_net.AddrError({Err: "port out of range", Addr: __goscriptLiteralField5}) })(), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })
 			}
 			return null
-			break
 		}
 		case "udp":
 		case "udp4":
@@ -1800,7 +1794,6 @@ export async function validateResolvedAddr(net: string, family: number, sa: __go
 				return $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField7 = __goscript_udpsock.UDPAddr.prototype.String.call(__goscriptShadow3); return new __goscript_net.AddrError({Err: "port out of range", Addr: __goscriptLiteralField7}) })(), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })
 			}
 			return null
-			break
 		}
 		case "unix":
 		case "unixgram":
@@ -1832,12 +1825,10 @@ export async function validateResolvedAddr(net: string, family: number, sa: __go
 				}
 			}
 			return null
-			break
 		}
 		default:
 		{
 			return $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField10 = syscall.Errno_Error(syscall.EAFNOSUPPORT); const __goscriptLiteralField11 = await $.pointerValue<Exclude<__goscript_sockaddr_posix.sockaddr, null>>(sa).String(); return new __goscript_net.AddrError({Err: __goscriptLiteralField10, Addr: __goscriptLiteralField11}) })()), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")
@@ -1849,17 +1840,14 @@ export async function matchIPFamily(family: number, addr: __goscript_sockaddr_po
 			case syscall.AF_INET:
 			{
 				return (__goscript_ip.IP_To4(ip) as __goscript_ip.IP)
-				break
 			}
 			case syscall.AF_INET6:
 			{
 				return (__goscript_ip.IP_To16(ip) as __goscript_ip.IP)
-				break
 			}
 			default:
 			{
 				return (ip as __goscript_ip.IP)
-				break
 			}
 		}
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, typeName: "net.IP", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }], results: [{ kind: $.TypeKind.Slice, typeName: "net.IP", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }] } as $.FunctionTypeInfo))
@@ -2090,7 +2078,6 @@ export async function fakeConnect(ctx: context.Context | null, fd: __goscript_fd
 			}
 			$.pointerValue<__goscript_fd_fake.netFD>(fd).isConnected = true
 			return null
-			break
 		}
 		case syscall.SOCK_STREAM:
 		case syscall.SOCK_SEQPACKET:
@@ -2100,7 +2087,6 @@ export async function fakeConnect(ctx: context.Context | null, fd: __goscript_fd
 		default:
 		{
 			return wrapErr!($.namedValueInterfaceValue<$.GoError>(syscall.EINVAL, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" }))
-			break
 		}
 	}
 

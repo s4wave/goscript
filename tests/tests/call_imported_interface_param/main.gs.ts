@@ -5,8 +5,8 @@ import * as $ from "@goscript/builtin/index.js"
 
 import type * as subpkg from "@goscript/github.com/s4wave/goscript/tests/tests/call_imported_interface_param/subpkg/index.js"
 
-import * as __goscript_sink from "./sink.gs.ts"
-import "./sink.gs.ts"
+import * as __goscript_sink from "./sink.gs.js"
+import "./sink.gs.js"
 
 export class Buffer {
 	public get data(): $.Slice<number> {

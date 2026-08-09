@@ -153,102 +153,82 @@ export function Hash_String(h: Hash): string {
 		case 1:
 		{
 			return "MD4"
-			break
 		}
 		case 2:
 		{
 			return "MD5"
-			break
 		}
 		case 3:
 		{
 			return "SHA-1"
-			break
 		}
 		case 4:
 		{
 			return "SHA-224"
-			break
 		}
 		case 5:
 		{
 			return "SHA-256"
-			break
 		}
 		case 6:
 		{
 			return "SHA-384"
-			break
 		}
 		case 7:
 		{
 			return "SHA-512"
-			break
 		}
 		case 8:
 		{
 			return "MD5+SHA1"
-			break
 		}
 		case 9:
 		{
 			return "RIPEMD-160"
-			break
 		}
 		case 10:
 		{
 			return "SHA3-224"
-			break
 		}
 		case 11:
 		{
 			return "SHA3-256"
-			break
 		}
 		case 12:
 		{
 			return "SHA3-384"
-			break
 		}
 		case 13:
 		{
 			return "SHA3-512"
-			break
 		}
 		case 14:
 		{
 			return "SHA-512/224"
-			break
 		}
 		case 15:
 		{
 			return "SHA-512/256"
-			break
 		}
 		case 16:
 		{
 			return "BLAKE2s-256"
-			break
 		}
 		case 17:
 		{
 			return "BLAKE2b-256"
-			break
 		}
 		case 18:
 		{
 			return "BLAKE2b-384"
-			break
 		}
 		case 19:
 		{
 			return "BLAKE2b-512"
-			break
 		}
 		default:
 		{
 			return "unknown hash value " + strconv.Itoa($.int(h))
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")

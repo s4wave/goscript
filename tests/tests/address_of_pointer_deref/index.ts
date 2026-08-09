@@ -1,1 +1,1 @@
-export { Col } from "./address_of_pointer_deref.gs.ts"
+export { Col } from './address_of_pointer_deref.gs.js'

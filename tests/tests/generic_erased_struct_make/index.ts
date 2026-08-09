@@ -1,1 +1,1 @@
-export { queue } from "./generic_erased_struct_make.gs.ts"
+export { queue } from './generic_erased_struct_make.gs.js'

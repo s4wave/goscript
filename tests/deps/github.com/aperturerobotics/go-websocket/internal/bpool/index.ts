@@ -1,1 +1,1 @@
-export { Get, Put } from "./bpool.gs.ts"
+export { Get, Put } from './bpool.gs.js'

@@ -3,13 +3,13 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_atof from "./atof.gs.ts"
+import * as __goscript_atof from "./atof.gs.js"
 
-import * as __goscript_atoi from "./atoi.gs.ts"
+import * as __goscript_atoi from "./atoi.gs.js"
 
-import type * as __goscript_ftoa from "./ftoa.gs.ts"
-import "./atof.gs.ts"
-import "./atoi.gs.ts"
+import type * as __goscript_ftoa from "./ftoa.gs.js"
+import "./atof.gs.js"
+import "./atoi.gs.js"
 
 export class decimal {
 	public get d(): Uint8Array {
@@ -208,7 +208,6 @@ export class decimal {
 			case $.pointerValue<decimal>(a).nd == 0:
 			{
 				return "0"
-				break
 			}
 			case $.pointerValue<decimal>(a).dp <= 0:
 			{
@@ -362,7 +361,6 @@ export class decimal {
 				case $.uint($.indexStringOrBytes(s, i), 8) == $.uint(95, 8):
 				{
 					continue
-					break
 				}
 				case $.uint($.indexStringOrBytes(s, i), 8) == $.uint(46, 8):
 				{
@@ -372,7 +370,6 @@ export class decimal {
 					sawdot = true
 					$.pointerValue<decimal>(b).dp = $.pointerValue<decimal>(b).nd
 					continue
-					break
 				}
 				case ($.uint(48, 8) <= $.uint($.indexStringOrBytes(s, i), 8)) && ($.uint($.indexStringOrBytes(s, i), 8) <= $.uint(57, 8)):
 				{
@@ -390,7 +387,6 @@ export class decimal {
 						}
 					}
 					continue
-					break
 				}
 			}
 			break

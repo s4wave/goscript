@@ -3,20 +3,20 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_atofeisel from "./atofeisel.gs.ts"
+import * as __goscript_atofeisel from "./atofeisel.gs.js"
 
-import * as __goscript_atoi from "./atoi.gs.ts"
+import * as __goscript_atoi from "./atoi.gs.js"
 
-import * as __goscript_decimal from "./decimal.gs.ts"
+import * as __goscript_decimal from "./decimal.gs.js"
 
-import * as __goscript_deps from "./deps.gs.ts"
+import * as __goscript_deps from "./deps.gs.js"
 
-import * as __goscript_ftoa from "./ftoa.gs.ts"
-import "./atofeisel.gs.ts"
-import "./atoi.gs.ts"
-import "./decimal.gs.ts"
-import "./deps.gs.ts"
-import "./ftoa.gs.ts"
+import * as __goscript_ftoa from "./ftoa.gs.js"
+import "./atofeisel.gs.js"
+import "./atoi.gs.js"
+import "./decimal.gs.js"
+import "./deps.gs.js"
+import "./ftoa.gs.js"
 
 export const fnParseFloat: string = "ParseFloat"
 
@@ -137,7 +137,6 @@ export function readFloat(s: string): [bigint, number, boolean, boolean, boolean
 				{
 					underscores = true
 					continue
-					break
 				}
 				case $.uint(c, 8) == $.uint(46, 8):
 				{
@@ -147,7 +146,6 @@ export function readFloat(s: string): [bigint, number, boolean, boolean, boolean
 					sawdot = true
 					dp = nd
 					continue
-					break
 				}
 				case ($.uint(48, 8) <= $.uint(c, 8)) && ($.uint(c, 8) <= $.uint(57, 8)):
 				{
@@ -167,7 +165,6 @@ export function readFloat(s: string): [bigint, number, boolean, boolean, boolean
 						}
 					}
 					continue
-					break
 				}
 				case ((base == 16n) && ($.uint(97, 8) <= $.uint(__goscript_atoi.lower($.uint(c, 8)), 8))) && ($.uint(__goscript_atoi.lower($.uint(c, 8)), 8) <= $.uint(102, 8)):
 				{
@@ -181,7 +178,6 @@ export function readFloat(s: string): [bigint, number, boolean, boolean, boolean
 						trunc = true
 					}
 					continue
-					break
 				}
 			}
 		}
@@ -288,7 +284,6 @@ export function atof64exact(mantissa: bigint, exp: number, neg: boolean): [numbe
 		case exp == 0:
 		{
 			return [f, true]
-			break
 		}
 		case (exp > 0) && (exp <= (15 + 22)):
 		{
@@ -301,12 +296,10 @@ export function atof64exact(mantissa: bigint, exp: number, neg: boolean): [numbe
 				return [f, ok]
 			}
 			return [f * $.arrayIndex(float64pow10!, exp), true]
-			break
 		}
 		case (exp < 0) && (exp >= -22):
 		{
 			return [f / $.arrayIndex(float64pow10!, -exp), true]
-			break
 		}
 	}
 	return [f, ok]
@@ -326,7 +319,6 @@ export function atof32exact(mantissa: bigint, exp: number, neg: boolean): [numbe
 		case exp == 0:
 		{
 			return [f, true]
-			break
 		}
 		case (exp > 0) && (exp <= (7 + 10)):
 		{
@@ -339,12 +331,10 @@ export function atof32exact(mantissa: bigint, exp: number, neg: boolean): [numbe
 				return [f, ok]
 			}
 			return [$.float32(f * $.arrayIndex(float32pow10!, exp)), true]
-			break
 		}
 		case (exp < 0) && (exp >= -10):
 		{
 			return [$.float32(f / $.arrayIndex(float32pow10!, -exp)), true]
-			break
 		}
 	}
 	return [f, ok]

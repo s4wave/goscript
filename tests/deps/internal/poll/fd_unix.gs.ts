@@ -15,32 +15,32 @@ import * as strconv from "@goscript/internal/strconv/index.js"
 
 import * as unix from "@goscript/internal/syscall/unix/index.js"
 
-import * as __goscript_fd from "./fd.gs.ts"
+import * as __goscript_fd from "./fd.gs.js"
 
-import * as __goscript_fd_fsync_posix from "./fd_fsync_posix.gs.ts"
+import * as __goscript_fd_fsync_posix from "./fd_fsync_posix.gs.js"
 
-import * as __goscript_fd_mutex from "./fd_mutex.gs.ts"
+import * as __goscript_fd_mutex from "./fd_mutex.gs.js"
 
-import * as __goscript_fd_poll_js from "./fd_poll_js.gs.ts"
+import * as __goscript_fd_poll_js from "./fd_poll_js.gs.js"
 
-import * as __goscript_fd_posix from "./fd_posix.gs.ts"
+import * as __goscript_fd_posix from "./fd_posix.gs.js"
 
-import * as __goscript_fd_unixjs from "./fd_unixjs.gs.ts"
+import * as __goscript_fd_unixjs from "./fd_unixjs.gs.js"
 
-import * as __goscript_sys_cloexec from "./sys_cloexec.gs.ts"
+import * as __goscript_sys_cloexec from "./sys_cloexec.gs.js"
 import "@goscript/syscall/index.js"
 import "@goscript/sync/atomic/index.js"
 import "@goscript/time/index.js"
 import "@goscript/io/index.js"
 import "@goscript/internal/strconv/index.js"
 import "@goscript/internal/syscall/unix/index.js"
-import "./fd.gs.ts"
-import "./fd_fsync_posix.gs.ts"
-import "./fd_mutex.gs.ts"
-import "./fd_poll_js.gs.ts"
-import "./fd_posix.gs.ts"
-import "./fd_unixjs.gs.ts"
-import "./sys_cloexec.gs.ts"
+import "./fd.gs.js"
+import "./fd_fsync_posix.gs.js"
+import "./fd_mutex.gs.js"
+import "./fd_poll_js.gs.js"
+import "./fd_posix.gs.js"
+import "./fd_unixjs.gs.js"
+import "./sys_cloexec.gs.js"
 
 export class FD {
 	// Lock sysfd and serialize access to Read and Write methods.
@@ -186,7 +186,6 @@ export class FD {
 					case $.comparableEqual(__goscriptSwitch0, $.namedValueInterfaceValue<$.GoError>(syscall.EINTR, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })):
 					{
 						continue
-						break
 					}
 					case $.comparableEqual(__goscriptSwitch0, $.namedValueInterfaceValue<$.GoError>(syscall.EAGAIN, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })):
 					{
@@ -203,7 +202,6 @@ export class FD {
 					case $.comparableEqual(__goscriptSwitch0, $.namedValueInterfaceValue<$.GoError>(syscall.ECONNABORTED, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })):
 					{
 						continue
-						break
 					}
 				}
 			}
@@ -1287,7 +1285,6 @@ export async function DupCloseOnExec(fd: number): globalThis.Promise<[number, st
 				default:
 				{
 					return [-1, "fcntl", err]
-					break
 				}
 			}
 		}

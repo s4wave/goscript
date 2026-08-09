@@ -1,1 +1,1 @@
-export { Register, Registered } from "./registry.gs.ts"
+export { Register, Registered } from './registry.gs.js'

@@ -7,10 +7,10 @@ import type * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/pr
 
 import type * as json from "@goscript/github.com/aperturerobotics/protobuf-go-lite/json/index.js"
 
-import type * as __goscript_packet from "./packet.gs.ts"
+import type * as __goscript_packet from "./packet.gs.js"
 
-import * as __goscript_rpcproto_pb from "./rpcproto.pb.gs.ts"
-import "./rpcproto.pb.gs.ts"
+import * as __goscript_rpcproto_pb from "./rpcproto.pb.gs.js"
+import "./rpcproto.pb.gs.js"
 
 export type PacketWriter = {
 	Close(): $.GoError | globalThis.Promise<$.GoError>

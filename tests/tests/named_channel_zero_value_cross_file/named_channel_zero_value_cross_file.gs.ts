@@ -3,10 +3,10 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_create from "./create.gs.ts"
+import * as __goscript_create from "./create.gs.js"
 
-import type * as __goscript_types from "./types.gs.ts"
-import "./create.gs.ts"
+import type * as __goscript_types from "./types.gs.js"
+import "./create.gs.js"
 
 export async function main(): globalThis.Promise<void> {
 	let jobs: __goscript_types.Jobs = __goscript_create.MakeJobs()

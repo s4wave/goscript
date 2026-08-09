@@ -71,11 +71,11 @@ func NewFoo() Foo {
 		t.Fatalf("binding metadata assignments should be semicolon-terminated to avoid ASI calls, got:\n%s", binding)
 	}
 	index := readTestFile(t, filepath.Join(pkgDir, "index.ts"))
-	if !strings.Contains(index, `export { Foo, Object } from "./foo.pb.ts"`) {
+	if !strings.Contains(index, `export { Foo, Object } from './foo.pb.js'`) {
 		t.Fatalf("package index should re-export binding file, got:\n%s", index)
 	}
 	use := readTestFile(t, filepath.Join(pkgDir, "use.gs.ts"))
-	if !strings.Contains(use, `from "./foo.pb.ts"`) {
+	if !strings.Contains(use, `from "./foo.pb.js"`) {
 		t.Fatalf("non-protobuf file should import bound protobuf declarations, got:\n%s", use)
 	}
 }

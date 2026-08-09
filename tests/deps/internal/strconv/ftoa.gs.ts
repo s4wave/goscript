@@ -3,29 +3,29 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_atof from "./atof.gs.ts"
+import * as __goscript_atof from "./atof.gs.js"
 
-import * as __goscript_atoi from "./atoi.gs.ts"
+import * as __goscript_atoi from "./atoi.gs.js"
 
-import * as __goscript_decimal from "./decimal.gs.ts"
+import * as __goscript_decimal from "./decimal.gs.js"
 
-import * as __goscript_deps from "./deps.gs.ts"
+import * as __goscript_deps from "./deps.gs.js"
 
-import * as __goscript_ftoadbox from "./ftoadbox.gs.ts"
+import * as __goscript_ftoadbox from "./ftoadbox.gs.js"
 
-import * as __goscript_ftoafixed from "./ftoafixed.gs.ts"
+import * as __goscript_ftoafixed from "./ftoafixed.gs.js"
 
-import * as __goscript_itoa from "./itoa.gs.ts"
+import * as __goscript_itoa from "./itoa.gs.js"
 
-import * as __goscript_math from "./math.gs.ts"
-import "./atof.gs.ts"
-import "./atoi.gs.ts"
-import "./decimal.gs.ts"
-import "./deps.gs.ts"
-import "./ftoadbox.gs.ts"
-import "./ftoafixed.gs.ts"
-import "./itoa.gs.ts"
-import "./math.gs.ts"
+import * as __goscript_math from "./math.gs.js"
+import "./atof.gs.js"
+import "./atoi.gs.js"
+import "./decimal.gs.js"
+import "./deps.gs.js"
+import "./ftoadbox.gs.js"
+import "./ftoafixed.gs.js"
+import "./itoa.gs.js"
+import "./math.gs.js"
 
 export class floatInfo {
 	public get mantbits(): number {
@@ -223,7 +223,6 @@ export function genericFtoa(dst: $.Slice<number>, val: number, fmt: number, prec
 				}
 			}
 			return $.appendSlice(dst, $.stringToBytes(s), $.byteSliceHint)
-			break
 		}
 		case 0:
 		{
@@ -396,12 +395,10 @@ export function formatDigits(dst: $.Slice<number>, shortest: boolean, neg: boole
 		case 69:
 		{
 			return fmtE(dst, neg, $.markAsStructValue($.cloneStructValue(digs)), prec, $.uint(fmt, 8))
-			break
 		}
 		case 102:
 		{
 			return fmtF(dst, neg, $.markAsStructValue($.cloneStructValue(digs)), prec)
-			break
 		}
 		case 103:
 		case 71:
@@ -427,7 +424,6 @@ export function formatDigits(dst: $.Slice<number>, shortest: boolean, neg: boole
 				prec = digs.nd
 			}
 			return fmtF(dst, neg, $.markAsStructValue($.cloneStructValue(digs)), $.max(prec - digs.dp, 0))
-			break
 		}
 	}
 
@@ -563,19 +559,16 @@ export function roundShortest(d: __goscript_decimal.decimal | $.VarRef<__goscrip
 			{
 				__goscript_decimal.decimal.prototype.Round.call(d, mi + 1)
 				return
-				break
 			}
 			case okdown:
 			{
 				__goscript_decimal.decimal.prototype.RoundDown.call(d, mi + 1)
 				return
-				break
 			}
 			case okup:
 			{
 				__goscript_decimal.decimal.prototype.RoundUp.call(d, mi + 1)
 				return
-				break
 			}
 		}
 	}

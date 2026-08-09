@@ -37,35 +37,35 @@ import type * as netip from "@goscript/net/netip/index.js"
 
 import type * as syscall from "@goscript/syscall/index.js"
 
-import * as __goscript_addrselect from "./addrselect.gs.ts"
+import * as __goscript_addrselect from "./addrselect.gs.js"
 
-import type * as __goscript_dial from "./dial.gs.ts"
+import type * as __goscript_dial from "./dial.gs.js"
 
-import * as __goscript_dnsclient from "./dnsclient.gs.ts"
+import * as __goscript_dnsclient from "./dnsclient.gs.js"
 
-import * as __goscript_dnsconfig from "./dnsconfig.gs.ts"
+import * as __goscript_dnsconfig from "./dnsconfig.gs.js"
 
-import * as __goscript_dnsconfig_unix from "./dnsconfig_unix.gs.ts"
+import * as __goscript_dnsconfig_unix from "./dnsconfig_unix.gs.js"
 
-import * as __goscript_hosts from "./hosts.gs.ts"
+import * as __goscript_hosts from "./hosts.gs.js"
 
-import * as __goscript_ip from "./ip.gs.ts"
+import * as __goscript_ip from "./ip.gs.js"
 
-import * as __goscript_iprawsock from "./iprawsock.gs.ts"
+import * as __goscript_iprawsock from "./iprawsock.gs.js"
 
-import * as __goscript_iprawsock_posix from "./iprawsock_posix.gs.ts"
+import * as __goscript_iprawsock_posix from "./iprawsock_posix.gs.js"
 
-import * as __goscript_ipsock from "./ipsock.gs.ts"
+import * as __goscript_ipsock from "./ipsock.gs.js"
 
-import * as __goscript_lookup from "./lookup.gs.ts"
+import * as __goscript_lookup from "./lookup.gs.js"
 
-import type * as __goscript_lookup_unix from "./lookup_unix.gs.ts"
+import type * as __goscript_lookup_unix from "./lookup_unix.gs.js"
 
-import * as __goscript_net from "./net.gs.ts"
+import * as __goscript_net from "./net.gs.js"
 
-import * as __goscript_parse from "./parse.gs.ts"
+import * as __goscript_parse from "./parse.gs.js"
 
-import type * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.ts"
+import type * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/internal/bytealg/index.js"
@@ -81,18 +81,18 @@ import "@goscript/time/index.js"
 import "@goscript/vendor/golang.org/x/net/dns/dnsmessage/index.js"
 import "@goscript/internal/singleflight/index.js"
 import "@goscript/io/fs/index.js"
-import "./addrselect.gs.ts"
-import "./dnsclient.gs.ts"
-import "./dnsconfig.gs.ts"
-import "./dnsconfig_unix.gs.ts"
-import "./hosts.gs.ts"
-import "./ip.gs.ts"
-import "./iprawsock.gs.ts"
-import "./iprawsock_posix.gs.ts"
-import "./ipsock.gs.ts"
-import "./lookup.gs.ts"
-import "./net.gs.ts"
-import "./parse.gs.ts"
+import "./addrselect.gs.js"
+import "./dnsclient.gs.js"
+import "./dnsconfig.gs.js"
+import "./dnsconfig_unix.gs.js"
+import "./hosts.gs.js"
+import "./ip.gs.js"
+import "./iprawsock.gs.js"
+import "./iprawsock_posix.gs.js"
+import "./ipsock.gs.js"
+import "./lookup.gs.js"
+import "./net.gs.js"
+import "./parse.gs.js"
 
 export type hostLookupOrder = number
 

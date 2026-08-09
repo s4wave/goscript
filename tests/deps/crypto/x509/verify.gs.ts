@@ -37,19 +37,19 @@ import * as big from "@goscript/math/big/index.js"
 
 import * as url from "@goscript/net/url/index.js"
 
-import * as __goscript_cert_pool from "./cert_pool.gs.ts"
+import * as __goscript_cert_pool from "./cert_pool.gs.js"
 
-import * as __goscript_constraints from "./constraints.gs.ts"
+import * as __goscript_constraints from "./constraints.gs.js"
 
-import * as __goscript_oid from "./oid.gs.ts"
+import * as __goscript_oid from "./oid.gs.js"
 
-import * as __goscript_root from "./root.gs.ts"
+import * as __goscript_root from "./root.gs.js"
 
-import * as __goscript_root_unix from "./root_unix.gs.ts"
+import * as __goscript_root_unix from "./root_unix.gs.js"
 
-import * as __goscript_x509 from "./x509.gs.ts"
+import * as __goscript_x509 from "./x509.gs.js"
 
-import * as __goscript_x509_string from "./x509_string.gs.ts"
+import * as __goscript_x509_string from "./x509_string.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/crypto/index.js"
 import "@goscript/crypto/x509/pkix/index.js"
@@ -66,13 +66,13 @@ import "@goscript/unicode/utf8/index.js"
 import "@goscript/encoding/asn1/index.js"
 import "@goscript/math/big/index.js"
 import "@goscript/net/url/index.js"
-import "./cert_pool.gs.ts"
-import "./constraints.gs.ts"
-import "./oid.gs.ts"
-import "./root.gs.ts"
-import "./root_unix.gs.ts"
-import "./x509.gs.ts"
-import "./x509_string.gs.ts"
+import "./cert_pool.gs.js"
+import "./constraints.gs.js"
+import "./oid.gs.js"
+import "./root.gs.js"
+import "./root_unix.gs.js"
+import "./x509.gs.js"
+import "./x509_string.gs.js"
 
 export type InvalidReason = number
 
@@ -128,47 +128,38 @@ export class CertificateInvalidError {
 			case 0:
 			{
 				return "x509: certificate is not authorized to sign other certificates"
-				break
 			}
 			case 1:
 			{
 				return "x509: certificate has expired or is not yet valid: " + e.Detail
-				break
 			}
 			case 2:
 			{
 				return "x509: a root or intermediate certificate is not authorized to sign for this name: " + e.Detail
-				break
 			}
 			case 9:
 			{
 				return "x509: a root or intermediate certificate is not authorized for an extended key usage: " + e.Detail
-				break
 			}
 			case 3:
 			{
 				return "x509: too many intermediates for path length constraint"
-				break
 			}
 			case 4:
 			{
 				return "x509: certificate specifies an incompatible key usage"
-				break
 			}
 			case 5:
 			{
 				return "x509: issuer name does not match subject from issuing certificate"
-				break
 			}
 			case 6:
 			{
 				return "x509: issuer has name constraints but leaf doesn't have a SAN extension"
-				break
 			}
 			case 7:
 			{
 				return "x509: issuer has name constraints but leaf contains unknown or unconstrained name: " + e.Detail
-				break
 			}
 			case 10:
 			{
@@ -177,7 +168,6 @@ export class CertificateInvalidError {
 					s = await fmt.Sprintf("%s: %s", s, e.Detail)
 				}
 				return s
-				break
 			}
 		}
 		return "x509: unknown error"
@@ -896,7 +886,6 @@ export function parseRFC2821Mailbox(_in: string): [rfc2821Mailbox, boolean] {
 				case $.uint(c, 8) == $.uint(34, 8):
 				{
 					break QuotedString
-					break
 				}
 				case $.uint(c, 8) == $.uint(92, 8):
 				{
@@ -919,7 +908,6 @@ export function parseRFC2821Mailbox(_in: string): [rfc2821Mailbox, boolean] {
 				default:
 				{
 					return [$.markAsStructValue($.cloneStructValue(mailbox)), false]
-					break
 				}
 			}
 		}
@@ -946,7 +934,6 @@ export function parseRFC2821Mailbox(_in: string): [rfc2821Mailbox, boolean] {
 				default:
 				{
 					break NextChar
-					break
 				}
 			}
 		}

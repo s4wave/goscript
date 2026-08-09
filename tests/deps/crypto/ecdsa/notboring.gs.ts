@@ -15,11 +15,11 @@ import type * as io from "@goscript/io/index.js"
 
 import * as big from "@goscript/math/big/index.js"
 
-import * as __goscript_ecdsa from "./ecdsa.gs.ts"
+import * as __goscript_ecdsa from "./ecdsa.gs.js"
 import "@goscript/crypto/internal/boring/index.js"
 import "@goscript/crypto/elliptic/index.js"
 import "@goscript/math/big/index.js"
-import "./ecdsa.gs.ts"
+import "./ecdsa.gs.js"
 
 export function boringPublicKey(_p0: __goscript_ecdsa.PublicKey | $.VarRef<__goscript_ecdsa.PublicKey> | null): [boring.PublicKeyECDSA | $.VarRef<boring.PublicKeyECDSA> | null, $.GoError] {
 	$.panic("boringcrypto: not available")

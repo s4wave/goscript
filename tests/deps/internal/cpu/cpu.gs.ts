@@ -5,8 +5,8 @@ import * as $ from "@goscript/builtin/index.js"
 
 import "@goscript/unsafe/index.js"
 
-import * as __goscript_cpu_wasm from "./cpu_wasm.gs.ts"
-import "./cpu_wasm.gs.ts"
+import * as __goscript_cpu_wasm from "./cpu_wasm.gs.js"
+import "./cpu_wasm.gs.js"
 
 export class CacheLinePad {
 	public get _blank0(): Uint8Array {
@@ -237,7 +237,6 @@ export function processOptions(env: string): void {
 			{
 				$.print("GODEBUG: value \"", value, "\" not supported for cpu option \"", key, "\"\n")
 				continue field
-				break
 			}
 		}
 

@@ -35,7 +35,7 @@ import type * as singleflight from "@goscript/internal/singleflight/index.js"
 
 import type * as fs from "@goscript/io/fs/index.js"
 
-import * as __goscript_dnsclient_unix from "./dnsclient_unix.gs.ts"
+import * as __goscript_dnsclient_unix from "./dnsclient_unix.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/internal/bytealg/index.js"
@@ -49,7 +49,7 @@ import "@goscript/sync/index.js"
 import "@goscript/sync/atomic/index.js"
 import "@goscript/time/index.js"
 import "@goscript/vendor/golang.org/x/net/dns/dnsmessage/index.js"
-import "./dnsclient_unix.gs.ts"
+import "./dnsclient_unix.gs.js"
 
 export class dnsConfig {
 	public get servers(): $.Slice<string> {

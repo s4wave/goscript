@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_ftoa from "./ftoa.gs.ts"
-import "./ftoa.gs.ts"
+import * as __goscript_ftoa from "./ftoa.gs.js"
+import "./ftoa.gs.js"
 
 export function FormatComplex(c: $.Complex, fmt: number, prec: number, bitSize: number): string {
 	let buf: Uint8Array = new Uint8Array(64)

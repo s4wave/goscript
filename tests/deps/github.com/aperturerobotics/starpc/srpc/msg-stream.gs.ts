@@ -7,12 +7,12 @@ import * as context from "@goscript/context/index.js"
 
 import * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
 
-import * as __goscript_message from "./message.gs.ts"
+import * as __goscript_message from "./message.gs.js"
 
-import type * as __goscript_stream from "./stream.gs.ts"
+import type * as __goscript_stream from "./stream.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
-import "./message.gs.ts"
+import "./message.gs.js"
 
 export type MsgStreamRw = {
 	ReadOne(): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>

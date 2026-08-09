@@ -11,17 +11,17 @@ import "@goscript/crypto/internal/fips140/check/index.js"
 
 import * as errors from "@goscript/errors/index.js"
 
-import * as __goscript_aes from "./aes.gs.ts"
+import * as __goscript_aes from "./aes.gs.js"
 
-import * as __goscript_aes_noasm from "./aes_noasm.gs.ts"
+import * as __goscript_aes_noasm from "./aes_noasm.gs.js"
 
-import * as __goscript_cbc from "./cbc.gs.ts"
+import * as __goscript_cbc from "./cbc.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/crypto/internal/fips140/index.js"
 import "@goscript/errors/index.js"
-import "./aes.gs.ts"
-import "./aes_noasm.gs.ts"
-import "./cbc.gs.ts"
+import "./aes.gs.js"
+import "./aes_noasm.gs.js"
+import "./cbc.gs.js"
 
 async function __goscriptInit0(): globalThis.Promise<void> {
 	await fips140.CAST("AES-CBC", $.functionValue((): $.GoError => {

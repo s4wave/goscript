@@ -15,24 +15,24 @@ import type * as io from "@goscript/io/index.js"
 
 import type * as time from "@goscript/time/index.js"
 
-import * as __goscript_invoker from "./invoker.gs.ts"
+import * as __goscript_invoker from "./invoker.gs.js"
 
-import type * as __goscript_message from "./message.gs.ts"
+import type * as __goscript_message from "./message.gs.js"
 
-import * as __goscript_muxed from "./muxed.gs.ts"
+import * as __goscript_muxed from "./muxed.gs.js"
 
-import * as __goscript_muxed_conn from "./muxed-conn.gs.ts"
+import * as __goscript_muxed_conn from "./muxed-conn.gs.js"
 
-import * as __goscript_server from "./server.gs.ts"
+import * as __goscript_server from "./server.gs.js"
 
-import type * as __goscript_stream from "./stream.gs.ts"
+import type * as __goscript_stream from "./stream.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/net/index.js"
 import "@goscript/github.com/libp2p/go-yamux/v4/index.js"
-import "./invoker.gs.ts"
-import "./muxed.gs.ts"
-import "./muxed-conn.gs.ts"
-import "./server.gs.ts"
+import "./invoker.gs.js"
+import "./muxed.gs.js"
+import "./muxed-conn.gs.js"
+import "./server.gs.js"
 
 export async function AcceptMuxedListener(ctx: context.Context | null, lis: net.Listener | null, srv: __goscript_server.Server | $.VarRef<__goscript_server.Server> | null, yamuxConf: yamux.Config | $.VarRef<yamux.Config> | null): globalThis.Promise<$.GoError> {
 	while (true) {

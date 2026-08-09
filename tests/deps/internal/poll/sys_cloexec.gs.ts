@@ -5,9 +5,9 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as syscall from "@goscript/syscall/index.js"
 
-import * as __goscript_hook_unix from "./hook_unix.gs.ts"
+import * as __goscript_hook_unix from "./hook_unix.gs.js"
 import "@goscript/syscall/index.js"
-import "./hook_unix.gs.ts"
+import "./hook_unix.gs.js"
 
 export async function accept(s: number): globalThis.Promise<[number, syscall.Sockaddr | null, string, $.GoError]> {
 	// See ../syscall/exec_unix.go for description of ForkLock.

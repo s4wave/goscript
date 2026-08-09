@@ -19,19 +19,19 @@ import * as sync from "@goscript/sync/index.js"
 
 import type * as rand from "@goscript/math/rand/index.js"
 
-import * as __goscript_arith from "./arith.gs.ts"
+import * as __goscript_arith from "./arith.gs.js"
 
-import * as __goscript_arith_decl from "./arith_decl.gs.ts"
+import * as __goscript_arith_decl from "./arith_decl.gs.js"
 
-import * as __goscript_int from "./int.gs.ts"
+import * as __goscript_int from "./int.gs.js"
 
-import * as __goscript_nat from "./nat.gs.ts"
+import * as __goscript_nat from "./nat.gs.js"
 
-import * as __goscript_natdiv from "./natdiv.gs.ts"
+import * as __goscript_natdiv from "./natdiv.gs.js"
 
-import * as __goscript_natmul from "./natmul.gs.ts"
+import * as __goscript_natmul from "./natmul.gs.js"
 
-import * as __goscript_prime from "./prime.gs.ts"
+import * as __goscript_prime from "./prime.gs.js"
 import "@goscript/errors/index.js"
 import "@goscript/fmt/index.js"
 import "@goscript/io/index.js"
@@ -39,13 +39,13 @@ import "@goscript/math/index.js"
 import "@goscript/math/bits/index.js"
 import "@goscript/slices/index.js"
 import "@goscript/sync/index.js"
-import "./arith.gs.ts"
-import "./arith_decl.gs.ts"
-import "./int.gs.ts"
-import "./nat.gs.ts"
-import "./natdiv.gs.ts"
-import "./natmul.gs.ts"
-import "./prime.gs.ts"
+import "./arith.gs.js"
+import "./arith_decl.gs.js"
+import "./int.gs.js"
+import "./nat.gs.js"
+import "./natdiv.gs.js"
+import "./natmul.gs.js"
+import "./prime.gs.js"
 
 export class divisor {
 	public get bbb(): __goscript_nat.nat {

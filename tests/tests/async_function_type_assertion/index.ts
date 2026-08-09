@@ -1,1 +1,1 @@
-export { Worker } from "./async_function_type_assertion.gs.ts"
+export { Worker } from './async_function_type_assertion.gs.js'

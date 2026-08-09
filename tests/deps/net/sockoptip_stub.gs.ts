@@ -13,32 +13,32 @@ import * as atomic from "@goscript/sync/atomic/index.js"
 
 import * as time from "@goscript/time/index.js"
 
-import * as __goscript__interface from "./interface.gs.ts"
+import * as __goscript__interface from "./interface.gs.js"
 
-import * as __goscript_fd_fake from "./fd_fake.gs.ts"
+import * as __goscript_fd_fake from "./fd_fake.gs.js"
 
-import * as __goscript_fd_js from "./fd_js.gs.ts"
+import * as __goscript_fd_js from "./fd_js.gs.js"
 
-import type * as __goscript_ip from "./ip.gs.ts"
+import type * as __goscript_ip from "./ip.gs.js"
 
-import * as __goscript_mac from "./mac.gs.ts"
+import * as __goscript_mac from "./mac.gs.js"
 
-import * as __goscript_net from "./net.gs.ts"
+import * as __goscript_net from "./net.gs.js"
 
-import * as __goscript_net_fake from "./net_fake.gs.ts"
+import * as __goscript_net_fake from "./net_fake.gs.js"
 
-import * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.ts"
+import * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.js"
 import "@goscript/syscall/index.js"
 import "@goscript/internal/poll/index.js"
 import "@goscript/sync/atomic/index.js"
 import "@goscript/time/index.js"
-import "./interface.gs.ts"
-import "./fd_fake.gs.ts"
-import "./fd_js.gs.ts"
-import "./mac.gs.ts"
-import "./net.gs.ts"
-import "./net_fake.gs.ts"
-import "./sockaddr_posix.gs.ts"
+import "./interface.gs.js"
+import "./fd_fake.gs.js"
+import "./fd_js.gs.js"
+import "./mac.gs.js"
+import "./net.gs.js"
+import "./net_fake.gs.js"
+import "./sockaddr_posix.gs.js"
 
 export function setIPv4MulticastInterface(fd: __goscript_fd_fake.netFD | $.VarRef<__goscript_fd_fake.netFD> | null, ifi: __goscript__interface.Interface | $.VarRef<__goscript__interface.Interface> | null): $.GoError {
 	return $.namedValueInterfaceValue<$.GoError>(syscall.ENOPROTOOPT, "syscall.Errno", {"Error": syscall.Errno_Error}, { kind: $.TypeKind.Basic, name: "uintptr", typeName: "syscall.Errno" })

@@ -17,11 +17,11 @@ import * as time from "@goscript/time/index.js"
 
 import * as os from "@goscript/os/index.js"
 
-import * as __goscript_dnsclient from "./dnsclient.gs.ts"
+import * as __goscript_dnsclient from "./dnsclient.gs.js"
 
-import * as __goscript_hook_unix from "./hook_unix.gs.ts"
+import * as __goscript_hook_unix from "./hook_unix.gs.js"
 
-import * as __goscript_parse from "./parse.gs.ts"
+import * as __goscript_parse from "./parse.gs.js"
 import "@goscript/errors/index.js"
 import "@goscript/internal/bytealg/index.js"
 import "@goscript/io/fs/index.js"
@@ -29,9 +29,9 @@ import "@goscript/net/netip/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/time/index.js"
 import "@goscript/os/index.js"
-import "./dnsclient.gs.ts"
-import "./hook_unix.gs.ts"
-import "./parse.gs.ts"
+import "./dnsclient.gs.js"
+import "./hook_unix.gs.js"
+import "./parse.gs.js"
 
 export class byName {
 	public get addrs(): $.Slice<string> {

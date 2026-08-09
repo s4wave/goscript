@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_register from "./register.gs.ts"
-import "./register.gs.ts"
+import * as __goscript_register from "./register.gs.js"
+import "./register.gs.js"
 
 export const Store: number = 0
 

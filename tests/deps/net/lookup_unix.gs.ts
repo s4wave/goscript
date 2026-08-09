@@ -21,48 +21,48 @@ import * as time from "@goscript/time/index.js"
 
 import type * as dnsmessage from "@goscript/vendor/golang.org/x/net/dns/dnsmessage/index.js"
 
-import * as __goscript_cgo_stub from "./cgo_stub.gs.ts"
+import * as __goscript_cgo_stub from "./cgo_stub.gs.js"
 
-import * as __goscript_conf from "./conf.gs.ts"
+import * as __goscript_conf from "./conf.gs.js"
 
-import type * as __goscript_dial from "./dial.gs.ts"
+import type * as __goscript_dial from "./dial.gs.js"
 
-import type * as __goscript_dnsclient from "./dnsclient.gs.ts"
+import type * as __goscript_dnsclient from "./dnsclient.gs.js"
 
-import * as __goscript_dnsclient_unix from "./dnsclient_unix.gs.ts"
+import * as __goscript_dnsclient_unix from "./dnsclient_unix.gs.js"
 
-import type * as __goscript_dnsconfig from "./dnsconfig.gs.ts"
+import type * as __goscript_dnsconfig from "./dnsconfig.gs.js"
 
-import * as __goscript_ip from "./ip.gs.ts"
+import * as __goscript_ip from "./ip.gs.js"
 
-import type * as __goscript_iprawsock from "./iprawsock.gs.ts"
+import type * as __goscript_iprawsock from "./iprawsock.gs.js"
 
-import type * as __goscript_iprawsock_posix from "./iprawsock_posix.gs.ts"
+import type * as __goscript_iprawsock_posix from "./iprawsock_posix.gs.js"
 
-import type * as __goscript_ipsock from "./ipsock.gs.ts"
+import type * as __goscript_ipsock from "./ipsock.gs.js"
 
-import * as __goscript_lookup from "./lookup.gs.ts"
+import * as __goscript_lookup from "./lookup.gs.js"
 
-import type * as __goscript_net from "./net.gs.ts"
+import type * as __goscript_net from "./net.gs.js"
 
-import * as __goscript_parse from "./parse.gs.ts"
+import * as __goscript_parse from "./parse.gs.js"
 
-import * as __goscript_port_unix from "./port_unix.gs.ts"
+import * as __goscript_port_unix from "./port_unix.gs.js"
 
-import type * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.ts"
+import type * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/internal/bytealg/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/internal/singleflight/index.js"
 import "@goscript/os/index.js"
 import "@goscript/time/index.js"
-import "./cgo_stub.gs.ts"
-import "./conf.gs.ts"
-import "./dnsclient_unix.gs.ts"
-import "./ip.gs.ts"
-import "./lookup.gs.ts"
-import "./parse.gs.ts"
-import "./port_unix.gs.ts"
+import "./cgo_stub.gs.js"
+import "./conf.gs.js"
+import "./dnsclient_unix.gs.js"
+import "./ip.gs.js"
+import "./lookup.gs.js"
+import "./parse.gs.js"
+import "./port_unix.gs.js"
 
 export var readProtocolsOnce: (() => void) | null
 

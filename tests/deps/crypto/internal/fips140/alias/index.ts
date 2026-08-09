@@ -1,1 +1,1 @@
-export { AnyOverlap, InexactOverlap } from "./alias.gs.ts"
+export { AnyOverlap, InexactOverlap } from './alias.gs.js'

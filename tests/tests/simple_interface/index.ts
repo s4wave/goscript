@@ -1,1 +1,1 @@
-export { MyStruct } from "./simple_interface.gs.ts"
+export { MyStruct } from './simple_interface.gs.js'

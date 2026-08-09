@@ -23,25 +23,25 @@ import * as sync from "@goscript/sync/index.js"
 
 import * as time from "@goscript/time/index.js"
 
-import * as __goscript_client from "./client.gs.ts"
+import * as __goscript_client from "./client.gs.js"
 
-import type * as __goscript_message from "./message.gs.ts"
+import type * as __goscript_message from "./message.gs.js"
 
-import * as __goscript_muxed from "./muxed.gs.ts"
+import * as __goscript_muxed from "./muxed.gs.js"
 
-import * as __goscript_muxed_yamux from "./muxed-yamux.gs.ts"
+import * as __goscript_muxed_yamux from "./muxed-yamux.gs.js"
 
-import type * as __goscript_packet from "./packet.gs.ts"
+import type * as __goscript_packet from "./packet.gs.js"
 
-import * as __goscript_packet_rw from "./packet-rw.gs.ts"
+import * as __goscript_packet_rw from "./packet-rw.gs.js"
 
-import * as __goscript_rpcproto_pb from "./rpcproto.pb.gs.ts"
+import * as __goscript_rpcproto_pb from "./rpcproto.pb.gs.js"
 
-import * as __goscript_rwc_conn from "./rwc-conn.gs.ts"
+import * as __goscript_rwc_conn from "./rwc-conn.gs.js"
 
-import type * as __goscript_stream from "./stream.gs.ts"
+import type * as __goscript_stream from "./stream.gs.js"
 
-import type * as __goscript_writer from "./writer.gs.ts"
+import type * as __goscript_writer from "./writer.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/io/index.js"
 import "@goscript/math/index.js"
@@ -50,12 +50,12 @@ import "@goscript/github.com/libp2p/go-yamux/v4/index.js"
 import "@goscript/bytes/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/time/index.js"
-import "./client.gs.ts"
-import "./muxed.gs.ts"
-import "./muxed-yamux.gs.ts"
-import "./packet-rw.gs.ts"
-import "./rpcproto.pb.gs.ts"
-import "./rwc-conn.gs.ts"
+import "./client.gs.js"
+import "./muxed.gs.js"
+import "./muxed-yamux.gs.js"
+import "./packet-rw.gs.js"
+import "./rpcproto.pb.gs.js"
+import "./rwc-conn.gs.js"
 
 export function NewYamuxConfig(): yamux.Config | $.VarRef<yamux.Config> | null {
 	let config: yamux.Config | $.VarRef<yamux.Config> | null = yamux.DefaultConfig()

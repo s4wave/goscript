@@ -53,7 +53,7 @@ func TestCompileCommandForwardsBuildFlags(t *testing.T) {
 	if err != nil {
 		t.Fatalf("read generated file: %v", err)
 	}
-	if !strings.Contains(string(generated), `./tagged.gs.ts`) {
+	if !strings.Contains(string(generated), `./tagged.gs.js`) {
 		t.Fatalf("expected main output to import tagged source, got:\n%s", generated)
 	}
 	taggedPath := filepath.Join(outputDir, "@goscript", "example.test", "cli", "tagged.gs.ts")

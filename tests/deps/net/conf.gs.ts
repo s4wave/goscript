@@ -31,39 +31,39 @@ import * as time from "@goscript/time/index.js"
 
 import type * as dnsmessage from "@goscript/vendor/golang.org/x/net/dns/dnsmessage/index.js"
 
-import * as __goscript_cgo_stub from "./cgo_stub.gs.ts"
+import * as __goscript_cgo_stub from "./cgo_stub.gs.js"
 
-import type * as __goscript_dial from "./dial.gs.ts"
+import type * as __goscript_dial from "./dial.gs.js"
 
-import type * as __goscript_dnsclient from "./dnsclient.gs.ts"
+import type * as __goscript_dnsclient from "./dnsclient.gs.js"
 
-import * as __goscript_dnsclient_unix from "./dnsclient_unix.gs.ts"
+import * as __goscript_dnsclient_unix from "./dnsclient_unix.gs.js"
 
-import * as __goscript_dnsconfig from "./dnsconfig.gs.ts"
+import * as __goscript_dnsconfig from "./dnsconfig.gs.js"
 
-import * as __goscript_ip from "./ip.gs.ts"
+import * as __goscript_ip from "./ip.gs.js"
 
-import type * as __goscript_iprawsock from "./iprawsock.gs.ts"
+import type * as __goscript_iprawsock from "./iprawsock.gs.js"
 
-import type * as __goscript_iprawsock_posix from "./iprawsock_posix.gs.ts"
+import type * as __goscript_iprawsock_posix from "./iprawsock_posix.gs.js"
 
-import type * as __goscript_ipsock from "./ipsock.gs.ts"
+import type * as __goscript_ipsock from "./ipsock.gs.js"
 
-import * as __goscript_lookup from "./lookup.gs.ts"
+import * as __goscript_lookup from "./lookup.gs.js"
 
-import type * as __goscript_lookup_unix from "./lookup_unix.gs.ts"
+import type * as __goscript_lookup_unix from "./lookup_unix.gs.js"
 
-import type * as __goscript_net from "./net.gs.ts"
+import type * as __goscript_net from "./net.gs.js"
 
-import * as __goscript_netcgo_off from "./netcgo_off.gs.ts"
+import * as __goscript_netcgo_off from "./netcgo_off.gs.js"
 
-import * as __goscript_netgo_off from "./netgo_off.gs.ts"
+import * as __goscript_netgo_off from "./netgo_off.gs.js"
 
-import * as __goscript_nss from "./nss.gs.ts"
+import * as __goscript_nss from "./nss.gs.js"
 
-import * as __goscript_parse from "./parse.gs.ts"
+import * as __goscript_parse from "./parse.gs.js"
 
-import type * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.ts"
+import type * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.js"
 import "@goscript/errors/index.js"
 import "@goscript/internal/bytealg/index.js"
 import "@goscript/internal/godebug/index.js"
@@ -74,15 +74,15 @@ import "@goscript/runtime/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/internal/singleflight/index.js"
 import "@goscript/time/index.js"
-import "./cgo_stub.gs.ts"
-import "./dnsclient_unix.gs.ts"
-import "./dnsconfig.gs.ts"
-import "./ip.gs.ts"
-import "./lookup.gs.ts"
-import "./netcgo_off.gs.ts"
-import "./netgo_off.gs.ts"
-import "./nss.gs.ts"
-import "./parse.gs.ts"
+import "./cgo_stub.gs.js"
+import "./dnsclient_unix.gs.js"
+import "./dnsconfig.gs.js"
+import "./ip.gs.js"
+import "./lookup.gs.js"
+import "./netcgo_off.gs.js"
+import "./netgo_off.gs.js"
+import "./nss.gs.js"
+import "./parse.gs.js"
 
 export type mdnsTest = number
 
@@ -245,7 +245,6 @@ export class conf {
 			case "ios":
 			{
 				return [fallbackOrder, null]
-				break
 			}
 		}
 
@@ -301,7 +300,6 @@ export class conf {
 						return [fallbackOrder, dnsConf]
 					}
 					return [4, dnsConf]
-					break
 				}
 				case "file":
 				{
@@ -313,12 +311,10 @@ export class conf {
 						return [fallbackOrder, dnsConf]
 					}
 					return [3, dnsConf]
-					break
 				}
 				default:
 				{
 					return [fallbackOrder, dnsConf]
-					break
 				}
 			}
 		}
@@ -384,7 +380,6 @@ export class conf {
 							return [0, dnsConf]
 						}
 						continue
-						break
 					}
 					case (!$.stringEqual(hostname, "")) && stringslite.HasPrefix(src.source, "mdns"):
 					{
@@ -426,12 +421,10 @@ export class conf {
 							return [0, dnsConf]
 						}
 						continue
-						break
 					}
 					default:
 					{
 						return [0, dnsConf]
-						break
 					}
 				}
 			}
@@ -468,17 +461,14 @@ export class conf {
 				} else {
 					return [2, dnsConf]
 				}
-				break
 			}
 			case filesSource:
 			{
 				return [3, dnsConf]
-				break
 			}
 			case dnsSource:
 			{
 				return [4, dnsConf]
-				break
 			}
 		}
 
@@ -616,7 +606,6 @@ export async function initConfVal(): globalThis.Promise<void> {
 		case "wasip1":
 		{
 			return
-			break
 		}
 	}
 
@@ -644,23 +633,19 @@ export function goosPrefersCgo(): boolean {
 		case "plan9":
 		{
 			return true
-			break
 		}
 		case "darwin":
 		case "ios":
 		{
 			return true
-			break
 		}
 		case "android":
 		{
 			return true
-			break
 		}
 		default:
 		{
 			return false
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")

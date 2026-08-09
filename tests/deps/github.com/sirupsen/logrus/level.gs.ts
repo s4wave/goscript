@@ -7,10 +7,10 @@ import * as strings from "@goscript/strings/index.js"
 
 import * as sync from "@goscript/sync/index.js"
 
-import * as __goscript_logrus from "./logrus.gs.ts"
+import * as __goscript_logrus from "./logrus.gs.js"
 import "@goscript/strings/index.js"
 import "@goscript/sync/index.js"
-import "./logrus.gs.ts"
+import "./logrus.gs.js"
 
 export class lvlPrefix {
 	public get full(): string {
@@ -180,17 +180,14 @@ export async function levelPrefix(level: __goscript_logrus.Level, disableTrunc: 
 		case pad:
 		{
 			return p.padded
-			break
 		}
 		case !disableTrunc:
 		{
 			return p.truncated
-			break
 		}
 		default:
 		{
 			return p.full
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")

@@ -1,1 +1,1 @@
-export { byteFormatter } from "./package_import_fmt.gs.ts"
+export { byteFormatter } from './package_import_fmt.gs.js'

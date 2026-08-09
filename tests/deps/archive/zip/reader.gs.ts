@@ -35,11 +35,11 @@ import * as sync from "@goscript/sync/index.js"
 
 import * as time from "@goscript/time/index.js"
 
-import * as __goscript_register from "./register.gs.ts"
+import * as __goscript_register from "./register.gs.js"
 
-import * as __goscript_struct from "./struct.gs.ts"
+import * as __goscript_struct from "./struct.gs.js"
 
-import * as __goscript_writer from "./writer.gs.ts"
+import * as __goscript_writer from "./writer.gs.js"
 import "@goscript/bufio/index.js"
 import "@goscript/encoding/binary/index.js"
 import "@goscript/errors/index.js"
@@ -56,9 +56,9 @@ import "@goscript/slices/index.js"
 import "@goscript/strings/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/time/index.js"
-import "./register.gs.ts"
-import "./struct.gs.ts"
-import "./writer.gs.ts"
+import "./register.gs.js"
+import "./struct.gs.js"
+import "./writer.gs.js"
 
 export type readBuf = $.Slice<number>
 

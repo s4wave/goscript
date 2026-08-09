@@ -7,12 +7,12 @@ import type * as context from "@goscript/context/index.js"
 
 import * as sync from "@goscript/sync/index.js"
 
-import * as __goscript_broadcast from "./broadcast.gs.ts"
+import * as __goscript_broadcast from "./broadcast.gs.js"
 
-import * as __goscript_compat from "./compat.gs.ts"
+import * as __goscript_compat from "./compat.gs.js"
 import "@goscript/sync/index.js"
-import "./broadcast.gs.ts"
-import "./compat.gs.ts"
+import "./broadcast.gs.js"
+import "./compat.gs.js"
 
 export class Locked {
 	public get b(): __goscript_broadcast.Broadcast | $.VarRef<__goscript_broadcast.Broadcast> | null {

@@ -31,19 +31,19 @@ import * as time from "@goscript/time/index.js"
 
 import * as pool from "@goscript/github.com/libp2p/go-buffer-pool/index.js"
 
-import * as __goscript__const from "./const.gs.ts"
+import * as __goscript__const from "./const.gs.js"
 
-import * as __goscript_addr from "./addr.gs.ts"
+import * as __goscript_addr from "./addr.gs.js"
 
-import * as __goscript_deadline from "./deadline.gs.ts"
+import * as __goscript_deadline from "./deadline.gs.js"
 
-import * as __goscript_mux from "./mux.gs.ts"
+import * as __goscript_mux from "./mux.gs.js"
 
-import * as __goscript_ping from "./ping.gs.ts"
+import * as __goscript_ping from "./ping.gs.js"
 
-import * as __goscript_stream from "./stream.gs.ts"
+import * as __goscript_stream from "./stream.gs.js"
 
-import * as __goscript_util from "./util.gs.ts"
+import * as __goscript_util from "./util.gs.js"
 import "@goscript/fmt/index.js"
 import "@goscript/net/index.js"
 import "@goscript/bufio/index.js"
@@ -58,13 +58,13 @@ import "@goscript/sync/index.js"
 import "@goscript/sync/atomic/index.js"
 import "@goscript/time/index.js"
 import "@goscript/github.com/libp2p/go-buffer-pool/index.js"
-import "./const.gs.ts"
-import "./addr.gs.ts"
-import "./deadline.gs.ts"
-import "./mux.gs.ts"
-import "./ping.gs.ts"
-import "./stream.gs.ts"
-import "./util.gs.ts"
+import "./const.gs.js"
+import "./addr.gs.js"
+import "./deadline.gs.js"
+import "./mux.gs.js"
+import "./ping.gs.js"
+import "./stream.gs.js"
+import "./util.gs.js"
 
 export type MemoryManager = {
 	Done(): void
@@ -1014,19 +1014,16 @@ export class Session {
 			{
 				await log.Logger.prototype.Printf.call($.pointerValue<Session>(s).logger, "[ERR] yamux: received protocol error go away", null)
 				return fmt.Errorf("yamux protocol error")
-				break
 			}
 			case 2:
 			{
 				await log.Logger.prototype.Printf.call($.pointerValue<Session>(s).logger, "[ERR] yamux: received internal error go away", null)
 				return fmt.Errorf("remote yamux internal error")
-				break
 			}
 			default:
 			{
 				await log.Logger.prototype.Printf.call($.pointerValue<Session>(s).logger, "[ERR] yamux: received unexpected go away", null)
 				return fmt.Errorf("unexpected go away received")
-				break
 			}
 		}
 		return null

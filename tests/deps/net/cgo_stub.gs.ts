@@ -7,17 +7,17 @@ import * as context from "@goscript/context/index.js"
 
 import type * as syscall from "@goscript/syscall/index.js"
 
-import * as __goscript_ip from "./ip.gs.ts"
+import * as __goscript_ip from "./ip.gs.js"
 
-import type * as __goscript_iprawsock from "./iprawsock.gs.ts"
+import type * as __goscript_iprawsock from "./iprawsock.gs.js"
 
-import type * as __goscript_iprawsock_posix from "./iprawsock_posix.gs.ts"
+import type * as __goscript_iprawsock_posix from "./iprawsock_posix.gs.js"
 
-import type * as __goscript_net from "./net.gs.ts"
+import type * as __goscript_net from "./net.gs.js"
 
-import type * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.ts"
+import type * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.js"
 import "@goscript/context/index.js"
-import "./ip.gs.ts"
+import "./ip.gs.js"
 
 export const cgoAvailable: boolean = false
 

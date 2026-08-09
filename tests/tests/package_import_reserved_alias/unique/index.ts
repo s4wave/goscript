@@ -1,1 +1,1 @@
-export { Box, NewBox } from "./unique.gs.ts"
+export { Box, NewBox } from './unique.gs.js'

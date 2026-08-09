@@ -1,1 +1,1 @@
-export type { box } from "./box.gs.ts"
+export type { box } from './box.gs.js'

@@ -3,11 +3,11 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_atof from "./atof.gs.ts"
+import * as __goscript_atof from "./atof.gs.js"
 
-import * as __goscript_atoi from "./atoi.gs.ts"
-import "./atof.gs.ts"
-import "./atoi.gs.ts"
+import * as __goscript_atoi from "./atoi.gs.js"
+import "./atof.gs.js"
+import "./atoi.gs.js"
 
 export function ParseComplex(s: string, bitSize: number): [$.Complex, $.GoError] {
 	let size = 64
@@ -59,7 +59,6 @@ export function ParseComplex(s: string, bitSize: number): [$.Complex, $.GoError]
 		default:
 		{
 			return [$.complex(0, 0), $.namedValueInterfaceValue<$.GoError>(2, "strconv.Error", {"Error": __goscript_atoi.Error_Error}, { kind: $.TypeKind.Basic, name: "int", typeName: "strconv.Error" })]
-			break
 		}
 	}
 

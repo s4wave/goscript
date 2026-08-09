@@ -1,1 +1,1 @@
-export { node } from "./typed_nil_pointer_conversion.gs.ts"
+export { node } from './typed_nil_pointer_conversion.gs.js'

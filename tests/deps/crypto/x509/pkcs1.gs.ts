@@ -15,20 +15,20 @@ import * as big from "@goscript/math/big/index.js"
 
 import * as pkix from "@goscript/crypto/x509/pkix/index.js"
 
-import * as __goscript_pkcs8 from "./pkcs8.gs.ts"
+import * as __goscript_pkcs8 from "./pkcs8.gs.js"
 
-import * as __goscript_sec1 from "./sec1.gs.ts"
+import * as __goscript_sec1 from "./sec1.gs.js"
 
-import * as __goscript_x509 from "./x509.gs.ts"
+import * as __goscript_x509 from "./x509.gs.js"
 import "@goscript/crypto/rsa/index.js"
 import "@goscript/encoding/asn1/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/internal/godebug/index.js"
 import "@goscript/math/big/index.js"
 import "@goscript/crypto/x509/pkix/index.js"
-import "./pkcs8.gs.ts"
-import "./sec1.gs.ts"
-import "./x509.gs.ts"
+import "./pkcs8.gs.js"
+import "./sec1.gs.js"
+import "./x509.gs.js"
 
 export class pkcs1PrivateKey {
 	public get Version(): number {

@@ -9,39 +9,39 @@ import type * as io from "@goscript/io/index.js"
 
 import type * as rand from "@goscript/math/rand/index.js"
 
-import type * as __goscript_accuracy_string from "./accuracy_string.gs.ts"
+import type * as __goscript_accuracy_string from "./accuracy_string.gs.js"
 
-import * as __goscript_arith from "./arith.gs.ts"
+import * as __goscript_arith from "./arith.gs.js"
 
-import * as __goscript_arith_decl from "./arith_decl.gs.ts"
+import * as __goscript_arith_decl from "./arith_decl.gs.js"
 
-import type * as __goscript_float from "./float.gs.ts"
+import type * as __goscript_float from "./float.gs.js"
 
-import * as __goscript_int from "./int.gs.ts"
+import * as __goscript_int from "./int.gs.js"
 
-import * as __goscript_intconv from "./intconv.gs.ts"
+import * as __goscript_intconv from "./intconv.gs.js"
 
-import * as __goscript_intmarsh from "./intmarsh.gs.ts"
+import * as __goscript_intmarsh from "./intmarsh.gs.js"
 
-import * as __goscript_nat from "./nat.gs.ts"
+import * as __goscript_nat from "./nat.gs.js"
 
-import * as __goscript_natconv from "./natconv.gs.ts"
+import * as __goscript_natconv from "./natconv.gs.js"
 
-import * as __goscript_natdiv from "./natdiv.gs.ts"
+import * as __goscript_natdiv from "./natdiv.gs.js"
 
-import * as __goscript_prime from "./prime.gs.ts"
+import * as __goscript_prime from "./prime.gs.js"
 
-import * as __goscript_rat from "./rat.gs.ts"
-import "./arith.gs.ts"
-import "./arith_decl.gs.ts"
-import "./int.gs.ts"
-import "./intconv.gs.ts"
-import "./intmarsh.gs.ts"
-import "./nat.gs.ts"
-import "./natconv.gs.ts"
-import "./natdiv.gs.ts"
-import "./prime.gs.ts"
-import "./rat.gs.ts"
+import * as __goscript_rat from "./rat.gs.js"
+import "./arith.gs.js"
+import "./arith_decl.gs.js"
+import "./int.gs.js"
+import "./intconv.gs.js"
+import "./intmarsh.gs.js"
+import "./nat.gs.js"
+import "./natconv.gs.js"
+import "./natdiv.gs.js"
+import "./prime.gs.js"
+import "./rat.gs.js"
 
 export var karatsubaThreshold: number
 
@@ -71,17 +71,14 @@ export async function nat_mul(z: __goscript_nat.nat, stk: __goscript_nat.stack |
 		case m < n:
 		{
 			return (await nat_mul(z, stk, (y as __goscript_nat.nat), (x as __goscript_nat.nat)) as __goscript_nat.nat)
-			break
 		}
 		case (m == 0) || (n == 0):
 		{
 			return ($.goSlice(z, undefined, 0) as __goscript_nat.nat)
-			break
 		}
 		case n == 1:
 		{
 			return (nat_mulAddWW(z, (x as __goscript_nat.nat), $.arrayIndex(y!, 0), 0) as __goscript_nat.nat)
-			break
 		}
 	}
 	// m >= n > 1
@@ -166,7 +163,6 @@ export async function nat_sqr(z: __goscript_nat.nat, stk: __goscript_nat.stack |
 		case n == 0:
 		{
 			return ($.goSlice(z, undefined, 0) as __goscript_nat.nat)
-			break
 		}
 		case n == 1:
 		{
@@ -176,7 +172,6 @@ export async function nat_sqr(z: __goscript_nat.nat, stk: __goscript_nat.stack |
 			z![1] = __goscriptTuple0[0]
 			z![0] = __goscriptTuple0[1]
 			return (__goscript_nat.nat_norm(z) as __goscript_nat.nat)
-			break
 		}
 	}
 

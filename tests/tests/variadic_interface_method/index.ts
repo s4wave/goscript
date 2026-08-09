@@ -1,3 +1,3 @@
-export type { Basic } from "./variadic_interface_method.gs.ts"
-export { PathJoiner } from "./variadic_interface_method.gs.ts"
-import "./variadic_interface_method.gs.ts"
+export type { Basic } from './variadic_interface_method.gs.js'
+export { PathJoiner } from './variadic_interface_method.gs.js'
+import './variadic_interface_method.gs.js'

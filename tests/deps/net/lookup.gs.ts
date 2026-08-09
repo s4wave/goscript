@@ -43,63 +43,63 @@ import * as poll from "@goscript/internal/poll/index.js"
 
 import type * as fs from "@goscript/io/fs/index.js"
 
-import * as __goscript_addrselect from "./addrselect.gs.ts"
+import * as __goscript_addrselect from "./addrselect.gs.js"
 
-import * as __goscript_cgo_stub from "./cgo_stub.gs.ts"
+import * as __goscript_cgo_stub from "./cgo_stub.gs.js"
 
-import * as __goscript_conf from "./conf.gs.ts"
+import * as __goscript_conf from "./conf.gs.js"
 
-import * as __goscript_dial from "./dial.gs.ts"
+import * as __goscript_dial from "./dial.gs.js"
 
-import * as __goscript_dnsclient from "./dnsclient.gs.ts"
+import * as __goscript_dnsclient from "./dnsclient.gs.js"
 
-import * as __goscript_dnsclient_unix from "./dnsclient_unix.gs.ts"
+import * as __goscript_dnsclient_unix from "./dnsclient_unix.gs.js"
 
-import * as __goscript_dnsconfig from "./dnsconfig.gs.ts"
+import * as __goscript_dnsconfig from "./dnsconfig.gs.js"
 
-import * as __goscript_fd_fake from "./fd_fake.gs.ts"
+import * as __goscript_fd_fake from "./fd_fake.gs.js"
 
-import * as __goscript_fd_js from "./fd_js.gs.ts"
+import * as __goscript_fd_js from "./fd_js.gs.js"
 
-import * as __goscript_hook from "./hook.gs.ts"
+import * as __goscript_hook from "./hook.gs.js"
 
-import * as __goscript_hosts from "./hosts.gs.ts"
+import * as __goscript_hosts from "./hosts.gs.js"
 
-import * as __goscript_ip from "./ip.gs.ts"
+import * as __goscript_ip from "./ip.gs.js"
 
-import * as __goscript_iprawsock from "./iprawsock.gs.ts"
+import * as __goscript_iprawsock from "./iprawsock.gs.js"
 
-import * as __goscript_iprawsock_posix from "./iprawsock_posix.gs.ts"
+import * as __goscript_iprawsock_posix from "./iprawsock_posix.gs.js"
 
-import * as __goscript_ipsock from "./ipsock.gs.ts"
+import * as __goscript_ipsock from "./ipsock.gs.js"
 
-import * as __goscript_lookup_unix from "./lookup_unix.gs.ts"
+import * as __goscript_lookup_unix from "./lookup_unix.gs.js"
 
-import * as __goscript_net from "./net.gs.ts"
+import * as __goscript_net from "./net.gs.js"
 
-import * as __goscript_net_fake from "./net_fake.gs.ts"
+import * as __goscript_net_fake from "./net_fake.gs.js"
 
-import * as __goscript_parse from "./parse.gs.ts"
+import * as __goscript_parse from "./parse.gs.js"
 
-import * as __goscript_port from "./port.gs.ts"
+import * as __goscript_port from "./port.gs.js"
 
-import * as __goscript_port_unix from "./port_unix.gs.ts"
+import * as __goscript_port_unix from "./port_unix.gs.js"
 
-import * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.ts"
+import * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.js"
 
-import * as __goscript_tcpsock from "./tcpsock.gs.ts"
+import * as __goscript_tcpsock from "./tcpsock.gs.js"
 
-import * as __goscript_tcpsock_posix from "./tcpsock_posix.gs.ts"
+import * as __goscript_tcpsock_posix from "./tcpsock_posix.gs.js"
 
-import type * as __goscript_tcpsock_unix from "./tcpsock_unix.gs.ts"
+import type * as __goscript_tcpsock_unix from "./tcpsock_unix.gs.js"
 
-import * as __goscript_udpsock from "./udpsock.gs.ts"
+import * as __goscript_udpsock from "./udpsock.gs.js"
 
-import * as __goscript_udpsock_posix from "./udpsock_posix.gs.ts"
+import * as __goscript_udpsock_posix from "./udpsock_posix.gs.js"
 
-import * as __goscript_unixsock from "./unixsock.gs.ts"
+import * as __goscript_unixsock from "./unixsock.gs.js"
 
-import * as __goscript_unixsock_posix from "./unixsock_posix.gs.ts"
+import * as __goscript_unixsock_posix from "./unixsock_posix.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/internal/bytealg/index.js"
 import "@goscript/internal/godebug/index.js"
@@ -118,34 +118,34 @@ import "@goscript/sync/atomic/index.js"
 import "@goscript/vendor/golang.org/x/net/dns/dnsmessage/index.js"
 import "@goscript/internal/singleflight/index.js"
 import "@goscript/internal/poll/index.js"
-import "./addrselect.gs.ts"
-import "./cgo_stub.gs.ts"
-import "./conf.gs.ts"
-import "./dial.gs.ts"
-import "./dnsclient.gs.ts"
-import "./dnsclient_unix.gs.ts"
-import "./dnsconfig.gs.ts"
-import "./fd_fake.gs.ts"
-import "./fd_js.gs.ts"
-import "./hook.gs.ts"
-import "./hosts.gs.ts"
-import "./ip.gs.ts"
-import "./iprawsock.gs.ts"
-import "./iprawsock_posix.gs.ts"
-import "./ipsock.gs.ts"
-import "./lookup_unix.gs.ts"
-import "./net.gs.ts"
-import "./net_fake.gs.ts"
-import "./parse.gs.ts"
-import "./port.gs.ts"
-import "./port_unix.gs.ts"
-import "./sockaddr_posix.gs.ts"
-import "./tcpsock.gs.ts"
-import "./tcpsock_posix.gs.ts"
-import "./udpsock.gs.ts"
-import "./udpsock_posix.gs.ts"
-import "./unixsock.gs.ts"
-import "./unixsock_posix.gs.ts"
+import "./addrselect.gs.js"
+import "./cgo_stub.gs.js"
+import "./conf.gs.js"
+import "./dial.gs.js"
+import "./dnsclient.gs.js"
+import "./dnsclient_unix.gs.js"
+import "./dnsconfig.gs.js"
+import "./fd_fake.gs.js"
+import "./fd_js.gs.js"
+import "./hook.gs.js"
+import "./hosts.gs.js"
+import "./ip.gs.js"
+import "./iprawsock.gs.js"
+import "./iprawsock_posix.gs.js"
+import "./ipsock.gs.js"
+import "./lookup_unix.gs.js"
+import "./net.gs.js"
+import "./net_fake.gs.js"
+import "./parse.gs.js"
+import "./port.gs.js"
+import "./port_unix.gs.js"
+import "./sockaddr_posix.gs.js"
+import "./tcpsock.gs.js"
+import "./tcpsock_posix.gs.js"
+import "./udpsock.gs.js"
+import "./udpsock_posix.gs.js"
+import "./unixsock.gs.js"
+import "./unixsock_posix.gs.js"
 
 export class Resolver {
 	// PreferGo controls whether Go's built-in DNS resolver is preferred
@@ -294,7 +294,6 @@ export class Resolver {
 			default:
 			{
 				return [null, $.namedValueInterfaceValue<$.GoError>(network, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })]
-				break
 			}
 		}
 
@@ -428,7 +427,6 @@ export class Resolver {
 				default:
 				{
 					return [0, $.interfaceValue<$.GoError>(new __goscript_net.AddrError({Err: "unknown network", Addr: network}), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
-					break
 				}
 			}
 			let __goscriptTuple7: any = await Resolver.prototype.lookupPort.call(r, ctx, network, service)
@@ -849,7 +847,6 @@ export class Resolver {
 								}
 							}
 							continue
-							break
 						}
 					}
 				}
@@ -1191,7 +1188,6 @@ export class Resolver {
 			default:
 			{
 				return [(null as __goscript_ipsock.addrList), $.namedValueInterfaceValue<$.GoError>(net, "net.UnknownNetworkError", {"Error": __goscript_net.UnknownNetworkError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "net.UnknownNetworkError" })]
-				break
 			}
 		}
 		let inetaddr: ((ip: __goscript_iprawsock.IPAddr) => __goscript_net.Addr | null | globalThis.Promise<__goscript_net.Addr | null>) | null = $.functionValue((ip: __goscript_iprawsock.IPAddr): __goscript_net.Addr | null => {
@@ -1201,21 +1197,18 @@ export class Resolver {
 				case "tcp6":
 				{
 					return $.interfaceValue<__goscript_net.Addr | null>(new __goscript_tcpsock.TCPAddr({IP: (ip.IP as __goscript_ip.IP), Port: portnum, Zone: ip.Zone}), "*net.TCPAddr", { kind: $.TypeKind.Pointer, elemType: "net.TCPAddr" })
-					break
 				}
 				case "udp":
 				case "udp4":
 				case "udp6":
 				{
 					return $.interfaceValue<__goscript_net.Addr | null>(new __goscript_udpsock.UDPAddr({IP: (ip.IP as __goscript_ip.IP), Port: portnum, Zone: ip.Zone}), "*net.UDPAddr", { kind: $.TypeKind.Pointer, elemType: "net.UDPAddr" })
-					break
 				}
 				case "ip":
 				case "ip4":
 				case "ip6":
 				{
 					return $.interfaceValue<__goscript_net.Addr | null>(new __goscript_iprawsock.IPAddr({IP: (ip.IP as __goscript_ip.IP), Zone: ip.Zone}), "*net.IPAddr", { kind: $.TypeKind.Pointer, elemType: "net.IPAddr" })
-					break
 				}
 				default:
 				{
@@ -1523,7 +1516,6 @@ export class Resolver {
 					return [(null as __goscript_ipsock.addrList), $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField13 = await $.pointerValue<Exclude<__goscript_net.Addr, null>>(hint).String(); return new __goscript_net.AddrError({Err: "mismatched local address type", Addr: __goscriptLiteralField13}) })()), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 				}
 				return [($.arrayToSlice<__goscript_net.Addr | null>([$.interfaceValue<__goscript_net.Addr | null>(__goscriptShadow39, "*net.UnixAddr", { kind: $.TypeKind.Pointer, elemType: "net.UnixAddr" })]) as __goscript_ipsock.addrList), null]
-				break
 			}
 		}
 		let __goscriptTuple47: any = await Resolver.prototype.internetAddrList.call(r, ctx, afnet, addr)
@@ -1827,21 +1819,18 @@ export async function lookupPortMap(network: string, service: string): globalThi
 				}
 			}
 			return lookupPortMapWithNetwork("udp", "ip", service)
-			break
 		}
 		case "tcp":
 		case "tcp4":
 		case "tcp6":
 		{
 			return lookupPortMapWithNetwork("tcp", "tcp", service)
-			break
 		}
 		case "udp":
 		case "udp4":
 		case "udp6":
 		{
 			return lookupPortMapWithNetwork("udp", "udp", service)
-			break
 		}
 	}
 	return [0, $.interfaceValue<$.GoError>(new __goscript_net.DNSError({Err: "unknown network", Name: (network + "/") + service}), "*net.DNSError", { kind: $.TypeKind.Pointer, elemType: "net.DNSError" })]

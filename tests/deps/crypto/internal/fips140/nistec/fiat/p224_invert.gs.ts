@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_p224 from "./p224.gs.ts"
+import * as __goscript_p224 from "./p224.gs.js"
 
-import * as __goscript_p224_fiat64 from "./p224_fiat64.gs.ts"
-import "./p224.gs.ts"
-import "./p224_fiat64.gs.ts"
+import * as __goscript_p224_fiat64 from "./p224_fiat64.gs.js"
+import "./p224.gs.js"
+import "./p224_fiat64.gs.js"

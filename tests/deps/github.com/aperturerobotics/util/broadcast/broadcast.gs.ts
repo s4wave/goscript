@@ -9,14 +9,14 @@ import * as context from "@goscript/context/index.js"
 
 import * as errors from "@goscript/errors/index.js"
 
-import * as __goscript_compat from "./compat.gs.ts"
+import * as __goscript_compat from "./compat.gs.js"
 
-import * as __goscript_locked from "./locked.gs.ts"
+import * as __goscript_locked from "./locked.gs.js"
 import "@goscript/sync/index.js"
 import "@goscript/context/index.js"
 import "@goscript/errors/index.js"
-import "./compat.gs.ts"
-import "./locked.gs.ts"
+import "./compat.gs.js"
+import "./locked.gs.js"
 
 export class Broadcast {
 	public get mtx(): sync.Mutex {

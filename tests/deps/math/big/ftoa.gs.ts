@@ -13,63 +13,63 @@ import type * as io from "@goscript/io/index.js"
 
 import type * as rand from "@goscript/math/rand/index.js"
 
-import * as __goscript_accuracy_string from "./accuracy_string.gs.ts"
+import * as __goscript_accuracy_string from "./accuracy_string.gs.js"
 
-import * as __goscript_arith from "./arith.gs.ts"
+import * as __goscript_arith from "./arith.gs.js"
 
-import * as __goscript_decimal from "./decimal.gs.ts"
+import * as __goscript_decimal from "./decimal.gs.js"
 
-import * as __goscript_float from "./float.gs.ts"
+import * as __goscript_float from "./float.gs.js"
 
-import * as __goscript_floatconv from "./floatconv.gs.ts"
+import * as __goscript_floatconv from "./floatconv.gs.js"
 
-import * as __goscript_floatmarsh from "./floatmarsh.gs.ts"
+import * as __goscript_floatmarsh from "./floatmarsh.gs.js"
 
-import * as __goscript_int from "./int.gs.ts"
+import * as __goscript_int from "./int.gs.js"
 
-import * as __goscript_intconv from "./intconv.gs.ts"
+import * as __goscript_intconv from "./intconv.gs.js"
 
-import * as __goscript_intmarsh from "./intmarsh.gs.ts"
+import * as __goscript_intmarsh from "./intmarsh.gs.js"
 
-import * as __goscript_nat from "./nat.gs.ts"
+import * as __goscript_nat from "./nat.gs.js"
 
-import * as __goscript_natconv from "./natconv.gs.ts"
+import * as __goscript_natconv from "./natconv.gs.js"
 
-import * as __goscript_natdiv from "./natdiv.gs.ts"
+import * as __goscript_natdiv from "./natdiv.gs.js"
 
-import * as __goscript_natmul from "./natmul.gs.ts"
+import * as __goscript_natmul from "./natmul.gs.js"
 
-import * as __goscript_prime from "./prime.gs.ts"
+import * as __goscript_prime from "./prime.gs.js"
 
-import * as __goscript_rat from "./rat.gs.ts"
+import * as __goscript_rat from "./rat.gs.js"
 
-import type * as __goscript_ratconv from "./ratconv.gs.ts"
+import type * as __goscript_ratconv from "./ratconv.gs.js"
 
-import type * as __goscript_ratmarsh from "./ratmarsh.gs.ts"
+import type * as __goscript_ratmarsh from "./ratmarsh.gs.js"
 
-import * as __goscript_roundingmode_string from "./roundingmode_string.gs.ts"
+import * as __goscript_roundingmode_string from "./roundingmode_string.gs.js"
 
-import * as __goscript_sqrt from "./sqrt.gs.ts"
+import * as __goscript_sqrt from "./sqrt.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/fmt/index.js"
 import "@goscript/strconv/index.js"
-import "./accuracy_string.gs.ts"
-import "./arith.gs.ts"
-import "./decimal.gs.ts"
-import "./float.gs.ts"
-import "./floatconv.gs.ts"
-import "./floatmarsh.gs.ts"
-import "./int.gs.ts"
-import "./intconv.gs.ts"
-import "./intmarsh.gs.ts"
-import "./nat.gs.ts"
-import "./natconv.gs.ts"
-import "./natdiv.gs.ts"
-import "./natmul.gs.ts"
-import "./prime.gs.ts"
-import "./rat.gs.ts"
-import "./roundingmode_string.gs.ts"
-import "./sqrt.gs.ts"
+import "./accuracy_string.gs.js"
+import "./arith.gs.js"
+import "./decimal.gs.js"
+import "./float.gs.js"
+import "./floatconv.gs.js"
+import "./floatmarsh.gs.js"
+import "./int.gs.js"
+import "./intconv.gs.js"
+import "./intmarsh.gs.js"
+import "./nat.gs.js"
+import "./natconv.gs.js"
+import "./natdiv.gs.js"
+import "./natmul.gs.js"
+import "./prime.gs.js"
+import "./rat.gs.js"
+import "./roundingmode_string.gs.js"
+import "./sqrt.gs.js"
 
 export async function roundShortest(d: __goscript_decimal.decimal | $.VarRef<__goscript_decimal.decimal> | null, x: __goscript_float.Float | $.VarRef<__goscript_float.Float> | null): globalThis.Promise<void> {
 	// if the mantissa is zero, the number is zero - stop now
@@ -143,19 +143,16 @@ export async function roundShortest(d: __goscript_decimal.decimal | $.VarRef<__g
 			{
 				__goscript_decimal.decimal.prototype.round.call(d, i + 1)
 				return
-				break
 			}
 			case okdown:
 			{
 				__goscript_decimal.decimal.prototype.roundDown.call(d, i + 1)
 				return
-				break
 			}
 			case okup:
 			{
 				__goscript_decimal.decimal.prototype.roundUp.call(d, i + 1)
 				return
-				break
 			}
 		}
 	}

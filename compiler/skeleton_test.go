@@ -1445,7 +1445,7 @@ func TestCompilePackagesEmitsPackageLocalImport(t *testing.T) {
 	if !strings.Contains(string(mainContent), "let b: $.VarRef<subpkg.Builder> = $.varRef($.markAsStructValue(new subpkg.Builder()))") {
 		t.Fatalf("missing imported struct zero value qualification:\n%s", string(mainContent))
 	}
-	if !strings.Contains(string(mainContent), "import * as __goscript_helper from \"./helper.gs.ts\"") ||
+	if !strings.Contains(string(mainContent), "import * as __goscript_helper from \"./helper.gs.js\"") ||
 		!strings.Contains(string(mainContent), "$.println(__goscript_helper.localMessage())") {
 		t.Fatalf("missing same-package helper import:\n%s", string(mainContent))
 	}
@@ -1454,7 +1454,7 @@ func TestCompilePackagesEmitsPackageLocalImport(t *testing.T) {
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	if string(indexContent) != "export { Builder, Greet } from \"./subpkg.gs.ts\"\n" {
+	if string(indexContent) != "export { Builder, Greet } from './subpkg.gs.js'\n" {
 		t.Fatalf("unexpected subpkg index:\n%s", string(indexContent))
 	}
 	mainIndexFile := filepath.Join(outputDir, "@goscript", "example.test", "imports", "index.ts")
@@ -1547,10 +1547,10 @@ func TestCompilePackagesEmitsTypeOnlyLocalImports(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	text := string(content)
-	if !strings.Contains(text, "import type * as __goscript_payload from \"./payload.gs.ts\"") {
+	if !strings.Contains(text, "import type * as __goscript_payload from \"./payload.gs.js\"") {
 		t.Fatalf("missing type-only same-package import:\n%s", text)
 	}
-	if strings.Contains(text, "import \"./payload.gs.ts\"") {
+	if strings.Contains(text, "import \"./payload.gs.js\"") {
 		t.Fatalf("type-only same-package import should not force sibling module execution:\n%s", text)
 	}
 }
@@ -1670,7 +1670,7 @@ func TestCompilePackagesEmitsSideEffectImportsForInterfaceRegistry(t *testing.T)
 	for _, want := range []string{
 		"import * as dep from \"@goscript/example.test/interface-registry/dep/index.js\"",
 		"import \"@goscript/example.test/interface-registry/dep/index.js\"",
-		"import type * as __goscript_local from \"./local.gs.ts\"",
+		"import type * as __goscript_local from \"./local.gs.js\"",
 		"case $.typeAssert<__goscript_local.Local | null>(__goscriptTypeSwitchValue, \"main.Local\").ok",
 		"$.typeAssertTuple<dep.Remote | null>(v, \"dep.Remote\")",
 	} {
@@ -1683,7 +1683,7 @@ func TestCompilePackagesEmitsSideEffectImportsForInterfaceRegistry(t *testing.T)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	if !strings.Contains(string(depIndexContent), "import \"./dep.gs.ts\"") {
+	if !strings.Contains(string(depIndexContent), "import './dep.gs.js'") {
 		t.Fatalf("missing interface side-effect import in dep index:\n%s", string(depIndexContent))
 	}
 }

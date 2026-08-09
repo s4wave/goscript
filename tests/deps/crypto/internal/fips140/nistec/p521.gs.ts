@@ -291,7 +291,6 @@ export class P521Point {
 			case ($.len(b) == 1) && ($.uint($.arrayIndex(b!, 0), 8) == $.uint(0, 8)):
 			{
 				return [P521Point.prototype.Set.call(p, NewP521Point()), null]
-				break
 			}
 			case ($.len(b) == (1 + (2 * 66))) && ($.uint($.arrayIndex(b!, 0), 8) == $.uint(4, 8)):
 			{
@@ -317,7 +316,6 @@ export class P521Point {
 				fiat.P521Element.prototype.Set.call($.pointerValue<P521Point>(p).y, y)
 				fiat.P521Element.prototype.One.call($.pointerValue<P521Point>(p).z)
 				return [p, null]
-				break
 			}
 			case ($.len(b) == (1 + 66)) && (($.uint($.arrayIndex(b!, 0), 8) == $.uint(2, 8)) || ($.uint($.arrayIndex(b!, 0), 8) == $.uint(3, 8))):
 			{
@@ -345,12 +343,10 @@ export class P521Point {
 				fiat.P521Element.prototype.Set.call($.pointerValue<P521Point>(p).y, y)
 				fiat.P521Element.prototype.One.call($.pointerValue<P521Point>(p).z)
 				return [p, null]
-				break
 			}
 			default:
 			{
 				return [null, errors.New("invalid P521 point encoding")]
-				break
 			}
 		}
 		throw new globalThis.Error("goscript: unreachable return")

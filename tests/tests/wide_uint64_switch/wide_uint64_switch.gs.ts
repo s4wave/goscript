@@ -8,22 +8,18 @@ export function classifyU(v: bigint): string {
 		case 0n:
 		{
 			return "zero"
-			break
 		}
 		case 5n:
 		{
 			return "five"
-			break
 		}
 		case 1152921504606846976n:
 		{
 			return "wide"
-			break
 		}
 		default:
 		{
 			return "other"
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")
@@ -34,17 +30,14 @@ export function classifyI(v: bigint): string {
 		case -5n:
 		{
 			return "neg"
-			break
 		}
 		case 7n:
 		{
 			return "seven"
-			break
 		}
 		default:
 		{
 			return "other"
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")

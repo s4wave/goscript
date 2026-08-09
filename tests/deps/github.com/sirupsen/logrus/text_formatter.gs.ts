@@ -27,25 +27,25 @@ import * as context from "@goscript/context/index.js"
 
 import * as io from "@goscript/io/index.js"
 
-import * as __goscript_buffer_pool from "./buffer_pool.gs.ts"
+import * as __goscript_buffer_pool from "./buffer_pool.gs.js"
 
-import type * as __goscript_entry from "./entry.gs.ts"
+import type * as __goscript_entry from "./entry.gs.js"
 
-import * as __goscript_formatter from "./formatter.gs.ts"
+import * as __goscript_formatter from "./formatter.gs.js"
 
-import * as __goscript_hooks from "./hooks.gs.ts"
+import * as __goscript_hooks from "./hooks.gs.js"
 
-import * as __goscript_json_formatter from "./json_formatter.gs.ts"
+import * as __goscript_json_formatter from "./json_formatter.gs.js"
 
-import * as __goscript_level from "./level.gs.ts"
+import * as __goscript_level from "./level.gs.js"
 
-import * as __goscript_logger from "./logger.gs.ts"
+import * as __goscript_logger from "./logger.gs.js"
 
-import * as __goscript_logrus from "./logrus.gs.ts"
+import * as __goscript_logrus from "./logrus.gs.js"
 
-import * as __goscript_terminal_check_no_terminal from "./terminal_check_no_terminal.gs.ts"
+import * as __goscript_terminal_check_no_terminal from "./terminal_check_no_terminal.gs.js"
 
-import * as __goscript_writer from "./writer.gs.ts"
+import * as __goscript_writer from "./writer.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/fmt/index.js"
 import "@goscript/maps/index.js"
@@ -58,15 +58,15 @@ import "@goscript/sync/index.js"
 import "@goscript/time/index.js"
 import "@goscript/context/index.js"
 import "@goscript/io/index.js"
-import "./buffer_pool.gs.ts"
-import "./formatter.gs.ts"
-import "./hooks.gs.ts"
-import "./json_formatter.gs.ts"
-import "./level.gs.ts"
-import "./logger.gs.ts"
-import "./logrus.gs.ts"
-import "./terminal_check_no_terminal.gs.ts"
-import "./writer.gs.ts"
+import "./buffer_pool.gs.js"
+import "./formatter.gs.js"
+import "./hooks.gs.js"
+import "./json_formatter.gs.js"
+import "./level.gs.js"
+import "./logger.gs.js"
+import "./logrus.gs.js"
+import "./terminal_check_no_terminal.gs.js"
+import "./writer.gs.js"
 
 export class TextFormatter {
 	// Set to true to bypass checking for a TTY before outputting colors.
@@ -790,12 +790,10 @@ export function isSafeByte(ch: number): boolean {
 		case 43:
 		{
 			return true
-			break
 		}
 		default:
 		{
 			return false
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")

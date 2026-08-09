@@ -3,7 +3,7 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import type * as __goscript_stream from "./stream.gs.ts"
+import type * as __goscript_stream from "./stream.gs.js"
 
 export type Invoker = {
 	Invoke(_p0: __goscript_stream.Stream | null): $.GoError

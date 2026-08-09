@@ -221,7 +221,6 @@ export async function GenerateParameters(params: Parameters | $.VarRef<Parameter
 		default:
 		{
 			return errors.New("crypto/dsa: invalid ParameterSizes")
-			break
 		}
 	}
 

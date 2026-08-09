@@ -5,10 +5,10 @@ import * as $ from "@goscript/builtin/index.js"
 
 import type * as hash from "@goscript/hash/index.js"
 
-import type * as __goscript_md5 from "./md5.gs.ts"
+import type * as __goscript_md5 from "./md5.gs.js"
 
-import * as __goscript_md5block from "./md5block.gs.ts"
-import "./md5block.gs.ts"
+import * as __goscript_md5block from "./md5block.gs.js"
+import "./md5block.gs.js"
 
 export const haveAsm: boolean = false
 

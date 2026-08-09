@@ -1,2 +1,2 @@
-export type { StrOrBytes } from "./main.gs.ts"
-import "./main.gs.ts"
+export type { StrOrBytes } from './main.gs.js'
+import './main.gs.js'

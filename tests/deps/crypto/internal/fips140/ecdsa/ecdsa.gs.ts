@@ -23,11 +23,11 @@ import * as sync from "@goscript/sync/index.js"
 
 import * as hmac from "@goscript/crypto/internal/fips140/hmac/index.js"
 
-import * as __goscript_cast from "./cast.gs.ts"
+import * as __goscript_cast from "./cast.gs.js"
 
-import * as __goscript_ecdsa_noasm from "./ecdsa_noasm.gs.ts"
+import * as __goscript_ecdsa_noasm from "./ecdsa_noasm.gs.js"
 
-import * as __goscript_hmacdrbg from "./hmacdrbg.gs.ts"
+import * as __goscript_hmacdrbg from "./hmacdrbg.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/crypto/internal/fips140/index.js"
 import "@goscript/crypto/internal/fips140/bigmod/index.js"
@@ -38,9 +38,9 @@ import "@goscript/hash/index.js"
 import "@goscript/io/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/crypto/internal/fips140/hmac/index.js"
-import "./cast.gs.ts"
-import "./ecdsa_noasm.gs.ts"
-import "./hmacdrbg.gs.ts"
+import "./cast.gs.js"
+import "./ecdsa_noasm.gs.js"
+import "./hmacdrbg.gs.js"
 
 export type curveID = string
 

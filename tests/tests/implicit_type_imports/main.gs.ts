@@ -5,8 +5,8 @@ import * as $ from "@goscript/builtin/index.js"
 
 import type * as io from "@goscript/io/index.js"
 
-import * as __goscript_server from "./server.gs.ts"
-import "./server.gs.ts"
+import * as __goscript_server from "./server.gs.js"
+import "./server.gs.js"
 
 export class localReadWriteCloser {
 	public _fields: {

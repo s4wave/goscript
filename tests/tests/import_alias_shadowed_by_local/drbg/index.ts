@@ -1,1 +1,1 @@
-export { Read } from "./drbg.gs.ts"
+export { Read } from './drbg.gs.js'

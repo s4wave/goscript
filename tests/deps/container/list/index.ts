@@ -1,1 +1,1 @@
-export { Element, List, New } from "./list.gs.ts"
+export { Element, List, New } from './list.gs.js'

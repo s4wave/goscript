@@ -21,19 +21,19 @@ import * as sync from "@goscript/sync/index.js"
 
 import * as time from "@goscript/time/index.js"
 
-import * as __goscript_buffer_pool from "./buffer_pool.gs.ts"
+import * as __goscript_buffer_pool from "./buffer_pool.gs.js"
 
-import type * as __goscript_entry from "./entry.gs.ts"
+import type * as __goscript_entry from "./entry.gs.js"
 
-import * as __goscript_formatter from "./formatter.gs.ts"
+import * as __goscript_formatter from "./formatter.gs.js"
 
-import * as __goscript_hooks from "./hooks.gs.ts"
+import * as __goscript_hooks from "./hooks.gs.js"
 
-import * as __goscript_logger from "./logger.gs.ts"
+import * as __goscript_logger from "./logger.gs.js"
 
-import * as __goscript_logrus from "./logrus.gs.ts"
+import * as __goscript_logrus from "./logrus.gs.js"
 
-import * as __goscript_writer from "./writer.gs.ts"
+import * as __goscript_writer from "./writer.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/encoding/json/index.js"
 import "@goscript/fmt/index.js"
@@ -43,12 +43,12 @@ import "@goscript/context/index.js"
 import "@goscript/io/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/time/index.js"
-import "./buffer_pool.gs.ts"
-import "./formatter.gs.ts"
-import "./hooks.gs.ts"
-import "./logger.gs.ts"
-import "./logrus.gs.ts"
-import "./writer.gs.ts"
+import "./buffer_pool.gs.js"
+import "./formatter.gs.js"
+import "./hooks.gs.js"
+import "./logger.gs.js"
+import "./logrus.gs.js"
+import "./writer.gs.js"
 
 export type fieldKey = string
 

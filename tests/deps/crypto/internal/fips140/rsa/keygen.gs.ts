@@ -13,16 +13,16 @@ import * as errors from "@goscript/errors/index.js"
 
 import * as io from "@goscript/io/index.js"
 
-import * as __goscript_pkcs1v15 from "./pkcs1v15.gs.ts"
+import * as __goscript_pkcs1v15 from "./pkcs1v15.gs.js"
 
-import * as __goscript_rsa from "./rsa.gs.ts"
+import * as __goscript_rsa from "./rsa.gs.js"
 import "@goscript/crypto/internal/fips140/index.js"
 import "@goscript/crypto/internal/fips140/bigmod/index.js"
 import "@goscript/crypto/internal/fips140/drbg/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/io/index.js"
-import "./pkcs1v15.gs.ts"
-import "./rsa.gs.ts"
+import "./pkcs1v15.gs.js"
+import "./rsa.gs.js"
 
 export class millerRabin {
 	public get w(): bigmod.Modulus | $.VarRef<bigmod.Modulus> | null {

@@ -41,7 +41,6 @@ export function mixedForwardBackward(limit: number): number {
 					continue __goscriptGotoLoop0
 					__goscriptGotoState0 = "checkAndLoop"
 					continue __goscriptGotoLoop0
-					break
 				}
 				case "checkAndLoop":
 				{
@@ -50,7 +49,6 @@ export function mixedForwardBackward(limit: number): number {
 					}
 					__goscriptGotoState0 = "skipVisit"
 					continue __goscriptGotoLoop0
-					break
 				}
 				case "skipVisit":
 				{
@@ -60,18 +58,15 @@ export function mixedForwardBackward(limit: number): number {
 							total = total + (2)
 							__goscriptGotoState0 = "checkAndLoop"
 							continue __goscriptGotoLoop0
-							break
 						}
 						case 1:
 						{
 							total = total + (3)
 							__goscriptGotoState0 = "checkAndLoop"
 							continue __goscriptGotoLoop0
-							break
 						}
 					}
 					break __goscriptGotoLoop0
-					break
 				}
 			}
 			break
@@ -126,7 +121,6 @@ export function mixedForwardBackwardDecl(limit: number): number {
 					continue __goscriptGotoLoop1
 					__goscriptGotoState1 = "check"
 					continue __goscriptGotoLoop1
-					break
 				}
 				case "check":
 				{
@@ -135,7 +129,6 @@ export function mixedForwardBackwardDecl(limit: number): number {
 					}
 					__goscriptGotoState1 = "skip"
 					continue __goscriptGotoLoop1
-					break
 				}
 				case "skip":
 				{
@@ -144,7 +137,6 @@ export function mixedForwardBackwardDecl(limit: number): number {
 					__goscriptGotoState1 = "check"
 					continue __goscriptGotoLoop1
 					break __goscriptGotoLoop1
-					break
 				}
 			}
 			break
@@ -168,7 +160,6 @@ export function stateMachineGoto(start: number): number {
 				continue __goscriptGotoLoop2
 				__goscriptGotoState2 = "readLiteral"
 				continue __goscriptGotoLoop2
-				break
 			}
 			case "readLiteral":
 			{
@@ -183,7 +174,6 @@ export function stateMachineGoto(start: number): number {
 				}
 				__goscriptGotoState2 = "copyHistory"
 				continue __goscriptGotoLoop2
-				break
 			}
 			case "copyHistory":
 			{
@@ -195,7 +185,6 @@ export function stateMachineGoto(start: number): number {
 					}
 				}
 				break __goscriptGotoLoop2
-				break
 			}
 		}
 		break
@@ -330,13 +319,11 @@ export async function main(): globalThis.Promise<void> {
 				}
 				__goscriptGotoState3 = "rangeDone"
 				continue __goscriptGotoLoop3
-				break
 			}
 			case "rangeDone":
 			{
 				$.println("range func break:", rangeTotal)
 				break __goscriptGotoLoop3
-				break
 			}
 		}
 		break

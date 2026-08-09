@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_kernel_version_other from "./kernel_version_other.gs.ts"
-import "./kernel_version_other.gs.ts"
+import * as __goscript_kernel_version_other from "./kernel_version_other.gs.js"
+import "./kernel_version_other.gs.js"
 
 export function KernelVersionGE(x: number, y: number): boolean {
 	let [xx, yy] = __goscript_kernel_version_other.KernelVersion()

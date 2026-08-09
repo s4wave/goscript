@@ -7,10 +7,10 @@ import * as goarch from "@goscript/internal/goarch/index.js"
 
 import * as unsafe from "@goscript/unsafe/index.js"
 
-import * as __goscript_chacha8 from "./chacha8.gs.ts"
+import * as __goscript_chacha8 from "./chacha8.gs.js"
 import "@goscript/internal/goarch/index.js"
 import "@goscript/unsafe/index.js"
-import "./chacha8.gs.ts"
+import "./chacha8.gs.js"
 
 export function setup(seed: $.VarRef<bigint[]> | null, b32: $.VarRef<number[][]> | null, counter: number): void {
 	// Convert to uint64 to do half as many stores to memory.

@@ -23,27 +23,27 @@ import * as atomic from "@goscript/sync/atomic/index.js"
 
 import * as time from "@goscript/time/index.js"
 
-import * as __goscript__interface from "./interface.gs.ts"
+import * as __goscript__interface from "./interface.gs.js"
 
-import * as __goscript_fd_fake from "./fd_fake.gs.ts"
+import * as __goscript_fd_fake from "./fd_fake.gs.js"
 
-import * as __goscript_fd_js from "./fd_js.gs.ts"
+import * as __goscript_fd_js from "./fd_js.gs.js"
 
-import * as __goscript_ip from "./ip.gs.ts"
+import * as __goscript_ip from "./ip.gs.js"
 
-import * as __goscript_ipsock from "./ipsock.gs.ts"
+import * as __goscript_ipsock from "./ipsock.gs.js"
 
-import * as __goscript_mac from "./mac.gs.ts"
+import * as __goscript_mac from "./mac.gs.js"
 
-import * as __goscript_net from "./net.gs.ts"
+import * as __goscript_net from "./net.gs.js"
 
-import * as __goscript_net_fake from "./net_fake.gs.ts"
+import * as __goscript_net_fake from "./net_fake.gs.js"
 
-import * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.ts"
+import * as __goscript_sockaddr_posix from "./sockaddr_posix.gs.js"
 
-import * as __goscript_tcpsock from "./tcpsock.gs.ts"
+import * as __goscript_tcpsock from "./tcpsock.gs.js"
 
-import * as __goscript_tcpsock_posix from "./tcpsock_posix.gs.ts"
+import * as __goscript_tcpsock_posix from "./tcpsock_posix.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/internal/poll/index.js"
 import "@goscript/net/netip/index.js"
@@ -52,17 +52,17 @@ import "@goscript/syscall/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/sync/atomic/index.js"
 import "@goscript/time/index.js"
-import "./interface.gs.ts"
-import "./fd_fake.gs.ts"
-import "./fd_js.gs.ts"
-import "./ip.gs.ts"
-import "./ipsock.gs.ts"
-import "./mac.gs.ts"
-import "./net.gs.ts"
-import "./net_fake.gs.ts"
-import "./sockaddr_posix.gs.ts"
-import "./tcpsock.gs.ts"
-import "./tcpsock_posix.gs.ts"
+import "./interface.gs.js"
+import "./fd_fake.gs.js"
+import "./fd_js.gs.js"
+import "./ip.gs.js"
+import "./ipsock.gs.js"
+import "./mac.gs.js"
+import "./net.gs.js"
+import "./net_fake.gs.js"
+import "./sockaddr_posix.gs.js"
+import "./tcpsock.gs.js"
+import "./tcpsock_posix.gs.js"
 
 export async function favoriteAddrFamily(network: string, laddr: __goscript_sockaddr_posix.sockaddr | null, raddr: __goscript_sockaddr_posix.sockaddr | null, mode: string): globalThis.Promise<[number, boolean]> {
 	let family: number = 0
@@ -71,12 +71,10 @@ export async function favoriteAddrFamily(network: string, laddr: __goscript_sock
 		case 52:
 		{
 			return [syscall.AF_INET, false]
-			break
 		}
 		case 54:
 		{
 			return [syscall.AF_INET6, true]
-			break
 		}
 	}
 
@@ -165,7 +163,6 @@ export async function ipToSockaddr(family: number, ip: __goscript_ip.IP, port: n
 				return [null, err]
 			}
 			return [$.interfaceValue<syscall.Sockaddr | null>(sa, "*syscall.SockaddrInet4", { kind: $.TypeKind.Pointer, elemType: "syscall.SockaddrInet4" }), null]
-			break
 		}
 		case syscall.AF_INET6:
 		{
@@ -176,7 +173,6 @@ export async function ipToSockaddr(family: number, ip: __goscript_ip.IP, port: n
 				return [null, err]
 			}
 			return [$.interfaceValue<syscall.Sockaddr | null>(sa, "*syscall.SockaddrInet6", { kind: $.TypeKind.Pointer, elemType: "syscall.SockaddrInet6" }), null]
-			break
 		}
 	}
 	return [null, $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField3 = __goscript_ip.IP_String(ip); return new __goscript_net.AddrError({Err: "invalid address family", Addr: __goscriptLiteralField3}) })(), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]

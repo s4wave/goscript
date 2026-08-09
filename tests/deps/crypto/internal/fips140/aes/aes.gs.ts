@@ -9,14 +9,14 @@ import * as alias from "@goscript/crypto/internal/fips140/alias/index.js"
 
 import * as strconv from "@goscript/strconv/index.js"
 
-import * as __goscript_aes_generic from "./aes_generic.gs.ts"
+import * as __goscript_aes_generic from "./aes_generic.gs.js"
 
-import * as __goscript_aes_noasm from "./aes_noasm.gs.ts"
+import * as __goscript_aes_noasm from "./aes_noasm.gs.js"
 import "@goscript/crypto/internal/fips140/index.js"
 import "@goscript/crypto/internal/fips140/alias/index.js"
 import "@goscript/strconv/index.js"
-import "./aes_generic.gs.ts"
-import "./aes_noasm.gs.ts"
+import "./aes_generic.gs.js"
+import "./aes_noasm.gs.js"
 
 export type KeySizeError = number
 
@@ -191,7 +191,6 @@ export function newOutlined(b: Block | $.VarRef<Block> | null, key: $.Slice<numb
 		default:
 		{
 			return [null, $.namedValueInterfaceValue<$.GoError>($.int($.len(key)), "aes.KeySizeError", {"Error": KeySizeError_Error}, { kind: $.TypeKind.Basic, name: "int", typeName: "aes.KeySizeError" })]
-			break
 		}
 	}
 	return [__goscript_aes_noasm.newBlock(b, key), null]

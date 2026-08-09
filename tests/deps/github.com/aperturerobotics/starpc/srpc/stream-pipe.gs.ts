@@ -13,15 +13,15 @@ import * as contextutil from "@goscript/github.com/aperturerobotics/starpc/inter
 
 import * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
 
-import * as __goscript_message from "./message.gs.ts"
+import * as __goscript_message from "./message.gs.js"
 
-import type * as __goscript_stream from "./stream.gs.ts"
+import type * as __goscript_stream from "./stream.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/io/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/github.com/aperturerobotics/starpc/internal/contextutil/index.js"
 import "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
-import "./message.gs.ts"
+import "./message.gs.js"
 
 export class pipeStream {
 	public get ctx(): context.Context | null {

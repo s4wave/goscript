@@ -19,9 +19,9 @@ import * as time from "@goscript/time/index.js"
 
 import * as utf8 from "@goscript/unicode/utf8/index.js"
 
-import * as __goscript_asn1 from "./asn1.gs.ts"
+import * as __goscript_asn1 from "./asn1.gs.js"
 
-import * as __goscript_common from "./common.gs.ts"
+import * as __goscript_common from "./common.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/fmt/index.js"
@@ -30,8 +30,8 @@ import "@goscript/reflect/index.js"
 import "@goscript/slices/index.js"
 import "@goscript/time/index.js"
 import "@goscript/unicode/utf8/index.js"
-import "./asn1.gs.ts"
-import "./common.gs.ts"
+import "./asn1.gs.js"
+import "./common.gs.js"
 
 export type encoder = {
 	Encode(dst: $.Slice<number>): void
@@ -551,7 +551,6 @@ export function appendUTCTime(dst: $.Slice<number>, t: time.Time): [$.Slice<numb
 		default:
 		{
 			return [null, $.interfaceValue<$.GoError>($.markAsStructValue(new __goscript_asn1.StructuralError({Msg: "cannot represent time as UTCTime"})), "asn1.StructuralError", "asn1.StructuralError")]
-			break
 		}
 	}
 
@@ -589,7 +588,6 @@ export function appendTimeCommon(dst: $.Slice<number>, t: time.Time): $.Slice<nu
 		case (Math.trunc(offset / 60)) == 0:
 		{
 			return $.append(dst, $.uint(90, 8), $.byteSliceHint)
-			break
 		}
 		case offset > 0:
 		{
@@ -631,7 +629,6 @@ export async function makeBody(value: reflect.Value, params: __goscript_common.f
 			case $.comparableEqual(__goscriptSwitch0, __goscript_asn1.flagType):
 			{
 				return [$.namedValueInterfaceValue<encoder | null>((null as bytesEncoder), "asn1.bytesEncoder", {Encode: (receiver: any, ...args: any[]) => (bytesEncoder_Encode as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Len: (receiver: any, ...args: any[]) => (bytesEncoder_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "asn1.bytesEncoder", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Encode", args: [{ name: "dst", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [] }, { name: "Len", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]), null]
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch0, __goscript_asn1.timeType):
 			{
@@ -641,28 +638,24 @@ export async function makeBody(value: reflect.Value, params: __goscript_common.f
 					return makeGeneralizedTime($.markAsStructValue($.cloneStructValue(t)))
 				}
 				return makeUTCTime($.markAsStructValue($.cloneStructValue(t)))
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch0, __goscript_asn1.bitStringType):
 			{
 				let __goscriptTuple3: any = reflect.TypeAssert({[$.genericTypeArgsMarker]: true, T: { type: "asn1.BitString", zero: () => $.markAsStructValue(new __goscript_asn1.BitString()), methods: {At: (receiver: any, ...args: any[]) => receiver.At(...$.stripGenericTypeArgs(args)), RightAlign: (receiver: any, ...args: any[]) => receiver.RightAlign(...$.stripGenericTypeArgs(args))} }}, $.markAsStructValue($.cloneStructValue(value)))
 				let v = (__goscriptTuple3[0] as __goscript_asn1.BitString)
 				return [$.interfaceValue<encoder | null>($.markAsStructValue($.cloneStructValue((() => { const __goscriptConvert0 = v; return $.markAsStructValue(new bitStringEncoder({Bytes: __goscriptConvert0.Bytes, BitLength: __goscriptConvert0.BitLength})) })())), "asn1.bitStringEncoder", "asn1.bitStringEncoder"), null]
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch0, __goscript_asn1.objectIdentifierType):
 			{
 				let __goscriptTuple4: any = reflect.TypeAssert({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Slice, typeName: "asn1.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } }, zero: () => null, methods: {Equal: (receiver: any, ...args: any[]) => (__goscript_asn1.ObjectIdentifier_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (__goscript_asn1.ObjectIdentifier_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: "Equal", args: [{ name: "other", type: { kind: $.TypeKind.Slice, typeName: "asn1.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] }}, $.markAsStructValue($.cloneStructValue(value)))
 				let v: __goscript_asn1.ObjectIdentifier = ((__goscriptTuple4[0] as __goscript_asn1.ObjectIdentifier) as __goscript_asn1.ObjectIdentifier)
 				return makeObjectIdentifier(v)
-				break
 			}
 			case $.comparableEqual(__goscriptSwitch0, __goscript_asn1.bigIntType):
 			{
 				let __goscriptTuple5: any = reflect.TypeAssert({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Pointer, elemType: "big.Int" }, zero: () => null, methods: {Abs: (receiver: any, ...args: any[]) => receiver.Abs(...$.stripGenericTypeArgs(args)), Add: (receiver: any, ...args: any[]) => receiver.Add(...$.stripGenericTypeArgs(args)), And: (receiver: any, ...args: any[]) => receiver.And(...$.stripGenericTypeArgs(args)), AndNot: (receiver: any, ...args: any[]) => receiver.AndNot(...$.stripGenericTypeArgs(args)), Append: (receiver: any, ...args: any[]) => receiver.Append(...$.stripGenericTypeArgs(args)), AppendText: (receiver: any, ...args: any[]) => receiver.AppendText(...$.stripGenericTypeArgs(args)), Binomial: (receiver: any, ...args: any[]) => receiver.Binomial(...$.stripGenericTypeArgs(args)), Bit: (receiver: any, ...args: any[]) => receiver.Bit(...$.stripGenericTypeArgs(args)), BitLen: (receiver: any, ...args: any[]) => receiver.BitLen(...$.stripGenericTypeArgs(args)), Bits: (receiver: any, ...args: any[]) => receiver.Bits(...$.stripGenericTypeArgs(args)), Bytes: (receiver: any, ...args: any[]) => receiver.Bytes(...$.stripGenericTypeArgs(args)), Cmp: (receiver: any, ...args: any[]) => receiver.Cmp(...$.stripGenericTypeArgs(args)), CmpAbs: (receiver: any, ...args: any[]) => receiver.CmpAbs(...$.stripGenericTypeArgs(args)), Div: (receiver: any, ...args: any[]) => receiver.Div(...$.stripGenericTypeArgs(args)), DivMod: (receiver: any, ...args: any[]) => receiver.DivMod(...$.stripGenericTypeArgs(args)), Exp: (receiver: any, ...args: any[]) => receiver.Exp(...$.stripGenericTypeArgs(args)), FillBytes: (receiver: any, ...args: any[]) => receiver.FillBytes(...$.stripGenericTypeArgs(args)), Float64: (receiver: any, ...args: any[]) => receiver.Float64(...$.stripGenericTypeArgs(args)), Format: (receiver: any, ...args: any[]) => receiver.Format(...$.stripGenericTypeArgs(args)), GCD: (receiver: any, ...args: any[]) => receiver.GCD(...$.stripGenericTypeArgs(args)), GobDecode: (receiver: any, ...args: any[]) => receiver.GobDecode(...$.stripGenericTypeArgs(args)), GobEncode: (receiver: any, ...args: any[]) => receiver.GobEncode(...$.stripGenericTypeArgs(args)), Int64: (receiver: any, ...args: any[]) => receiver.Int64(...$.stripGenericTypeArgs(args)), IsInt64: (receiver: any, ...args: any[]) => receiver.IsInt64(...$.stripGenericTypeArgs(args)), IsUint64: (receiver: any, ...args: any[]) => receiver.IsUint64(...$.stripGenericTypeArgs(args)), Lsh: (receiver: any, ...args: any[]) => receiver.Lsh(...$.stripGenericTypeArgs(args)), MarshalJSON: (receiver: any, ...args: any[]) => receiver.MarshalJSON(...$.stripGenericTypeArgs(args)), MarshalText: (receiver: any, ...args: any[]) => receiver.MarshalText(...$.stripGenericTypeArgs(args)), Mod: (receiver: any, ...args: any[]) => receiver.Mod(...$.stripGenericTypeArgs(args)), ModInverse: (receiver: any, ...args: any[]) => receiver.ModInverse(...$.stripGenericTypeArgs(args)), ModSqrt: (receiver: any, ...args: any[]) => receiver.ModSqrt(...$.stripGenericTypeArgs(args)), Mul: (receiver: any, ...args: any[]) => receiver.Mul(...$.stripGenericTypeArgs(args)), MulRange: (receiver: any, ...args: any[]) => receiver.MulRange(...$.stripGenericTypeArgs(args)), Neg: (receiver: any, ...args: any[]) => receiver.Neg(...$.stripGenericTypeArgs(args)), Not: (receiver: any, ...args: any[]) => receiver.Not(...$.stripGenericTypeArgs(args)), Or: (receiver: any, ...args: any[]) => receiver.Or(...$.stripGenericTypeArgs(args)), ProbablyPrime: (receiver: any, ...args: any[]) => receiver.ProbablyPrime(...$.stripGenericTypeArgs(args)), Quo: (receiver: any, ...args: any[]) => receiver.Quo(...$.stripGenericTypeArgs(args)), QuoRem: (receiver: any, ...args: any[]) => receiver.QuoRem(...$.stripGenericTypeArgs(args)), Rand: (receiver: any, ...args: any[]) => receiver.Rand(...$.stripGenericTypeArgs(args)), Rem: (receiver: any, ...args: any[]) => receiver.Rem(...$.stripGenericTypeArgs(args)), Rsh: (receiver: any, ...args: any[]) => receiver.Rsh(...$.stripGenericTypeArgs(args)), Scan: (receiver: any, ...args: any[]) => receiver.Scan(...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => receiver.Set(...$.stripGenericTypeArgs(args)), SetBit: (receiver: any, ...args: any[]) => receiver.SetBit(...$.stripGenericTypeArgs(args)), SetBits: (receiver: any, ...args: any[]) => receiver.SetBits(...$.stripGenericTypeArgs(args)), SetBytes: (receiver: any, ...args: any[]) => receiver.SetBytes(...$.stripGenericTypeArgs(args)), SetInt64: (receiver: any, ...args: any[]) => receiver.SetInt64(...$.stripGenericTypeArgs(args)), SetString: (receiver: any, ...args: any[]) => receiver.SetString(...$.stripGenericTypeArgs(args)), SetUint64: (receiver: any, ...args: any[]) => receiver.SetUint64(...$.stripGenericTypeArgs(args)), Sign: (receiver: any, ...args: any[]) => receiver.Sign(...$.stripGenericTypeArgs(args)), Sqrt: (receiver: any, ...args: any[]) => receiver.Sqrt(...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => receiver.String(...$.stripGenericTypeArgs(args)), Sub: (receiver: any, ...args: any[]) => receiver.Sub(...$.stripGenericTypeArgs(args)), Text: (receiver: any, ...args: any[]) => receiver.Text(...$.stripGenericTypeArgs(args)), TrailingZeroBits: (receiver: any, ...args: any[]) => receiver.TrailingZeroBits(...$.stripGenericTypeArgs(args)), Uint64: (receiver: any, ...args: any[]) => receiver.Uint64(...$.stripGenericTypeArgs(args)), UnmarshalJSON: (receiver: any, ...args: any[]) => receiver.UnmarshalJSON(...$.stripGenericTypeArgs(args)), UnmarshalText: (receiver: any, ...args: any[]) => receiver.UnmarshalText(...$.stripGenericTypeArgs(args)), Xor: (receiver: any, ...args: any[]) => receiver.Xor(...$.stripGenericTypeArgs(args)), exp: (receiver: any, ...args: any[]) => receiver.exp(...$.stripGenericTypeArgs(args)), expSlow: (receiver: any, ...args: any[]) => receiver.expSlow(...$.stripGenericTypeArgs(args)), lehmerGCD: (receiver: any, ...args: any[]) => receiver.lehmerGCD(...$.stripGenericTypeArgs(args)), modSqrt3Mod4Prime: (receiver: any, ...args: any[]) => receiver.modSqrt3Mod4Prime(...$.stripGenericTypeArgs(args)), modSqrt5Mod8Prime: (receiver: any, ...args: any[]) => receiver.modSqrt5Mod8Prime(...$.stripGenericTypeArgs(args)), modSqrtTonelliShanks: (receiver: any, ...args: any[]) => receiver.modSqrtTonelliShanks(...$.stripGenericTypeArgs(args)), mul: (receiver: any, ...args: any[]) => receiver.mul(...$.stripGenericTypeArgs(args)), scaleDenom: (receiver: any, ...args: any[]) => receiver.scaleDenom(...$.stripGenericTypeArgs(args)), scan: (receiver: any, ...args: any[]) => receiver.scan(...$.stripGenericTypeArgs(args)), setFromScanner: (receiver: any, ...args: any[]) => receiver.setFromScanner(...$.stripGenericTypeArgs(args))} }}, $.markAsStructValue($.cloneStructValue(value)))
 				let v: big.Int | $.VarRef<big.Int> | null = (__goscriptTuple5[0] as big.Int | $.VarRef<big.Int> | null)
 				return makeBigInt(v)
-				break
 			}
 		}
 	}
@@ -676,7 +669,6 @@ export async function makeBody(value: reflect.Value, params: __goscript_common.f
 					return [byteFFEncoder, null]
 				}
 				return [byte00Encoder, null]
-				break
 			}
 			case reflect.Int:
 			case reflect.Int8:
@@ -685,7 +677,6 @@ export async function makeBody(value: reflect.Value, params: __goscript_common.f
 			case reflect.Int64:
 			{
 				return [$.namedValueInterfaceValue<encoder | null>($.int64($.markAsStructValue($.cloneStructValue(v)).Int()), "asn1.int64Encoder", {Encode: (receiver: any, ...args: any[]) => (int64Encoder_Encode as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Len: (receiver: any, ...args: any[]) => (int64Encoder_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Basic, name: "int64", typeName: "asn1.int64Encoder" }, [{ name: "Encode", args: [{ name: "dst", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [] }, { name: "Len", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]), null]
-				break
 			}
 			case reflect.Struct:
 			{
@@ -726,12 +717,10 @@ export async function makeBody(value: reflect.Value, params: __goscript_common.f
 						case 0:
 						{
 							return [$.namedValueInterfaceValue<encoder | null>((null as bytesEncoder), "asn1.bytesEncoder", {Encode: (receiver: any, ...args: any[]) => (bytesEncoder_Encode as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Len: (receiver: any, ...args: any[]) => (bytesEncoder_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "asn1.bytesEncoder", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Encode", args: [{ name: "dst", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [] }, { name: "Len", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]), null]
-							break
 						}
 						case 1:
 						{
 							return makeField($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Field(startingField))), $.markAsStructValue($.cloneStructValue(__goscript_common.parseFieldParameters(reflect.StructTag_Get((await $.pointerValue<Exclude<reflect.Type, null>>(t).Field(startingField)).Tag, "asn1")))))
-							break
 						}
 						default:
 						{
@@ -746,7 +735,6 @@ export async function makeBody(value: reflect.Value, params: __goscript_common.f
 							}
 
 							return [$.namedValueInterfaceValue<encoder | null>((m as multiEncoder), "asn1.multiEncoder", {Encode: (receiver: any, ...args: any[]) => (multiEncoder_Encode as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Len: (receiver: any, ...args: any[]) => (multiEncoder_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "asn1.multiEncoder", elemType: "asn1.encoder" }, [{ name: "Encode", args: [{ name: "dst", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [] }, { name: "Len", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]), null]
-							break
 						}
 					}
 				}
@@ -767,12 +755,10 @@ export async function makeBody(value: reflect.Value, params: __goscript_common.f
 						case 0:
 						{
 							return [$.namedValueInterfaceValue<encoder | null>((null as bytesEncoder), "asn1.bytesEncoder", {Encode: (receiver: any, ...args: any[]) => (bytesEncoder_Encode as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Len: (receiver: any, ...args: any[]) => (bytesEncoder_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "asn1.bytesEncoder", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Encode", args: [{ name: "dst", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [] }, { name: "Len", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]), null]
-							break
 						}
 						case 1:
 						{
 							return makeField($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Index(0))), $.markAsStructValue($.cloneStructValue(fp)))
-							break
 						}
 						default:
 						{
@@ -791,7 +777,6 @@ export async function makeBody(value: reflect.Value, params: __goscript_common.f
 								return [$.namedValueInterfaceValue<encoder | null>((m as setEncoder), "asn1.setEncoder", {Encode: (receiver: any, ...args: any[]) => (setEncoder_Encode as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Len: (receiver: any, ...args: any[]) => (setEncoder_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "asn1.setEncoder", elemType: "asn1.encoder" }, [{ name: "Encode", args: [{ name: "dst", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [] }, { name: "Len", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]), null]
 							}
 							return [$.namedValueInterfaceValue<encoder | null>((m as multiEncoder), "asn1.multiEncoder", {Encode: (receiver: any, ...args: any[]) => (multiEncoder_Encode as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Len: (receiver: any, ...args: any[]) => (multiEncoder_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "asn1.multiEncoder", elemType: "asn1.encoder" }, [{ name: "Encode", args: [{ name: "dst", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }], returns: [] }, { name: "Len", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]), null]
-							break
 						}
 					}
 				}
@@ -803,22 +788,18 @@ export async function makeBody(value: reflect.Value, params: __goscript_common.f
 					case 22:
 					{
 						return makeIA5String($.markAsStructValue($.cloneStructValue(v)).String())
-						break
 					}
 					case 19:
 					{
 						return makePrintableString($.markAsStructValue($.cloneStructValue(v)).String())
-						break
 					}
 					case 18:
 					{
 						return makeNumericString($.markAsStructValue($.cloneStructValue(v)).String())
-						break
 					}
 					default:
 					{
 						return [makeUTF8String($.markAsStructValue($.cloneStructValue(v)).String()), null]
-						break
 					}
 				}
 				break

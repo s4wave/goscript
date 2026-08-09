@@ -1,1 +1,1 @@
-export { Holder } from "./main.gs.ts"
+export { Holder } from './main.gs.js'

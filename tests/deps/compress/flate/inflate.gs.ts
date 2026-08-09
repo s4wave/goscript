@@ -13,19 +13,19 @@ import * as strconv from "@goscript/strconv/index.js"
 
 import * as sync from "@goscript/sync/index.js"
 
-import * as __goscript_deflate from "./deflate.gs.ts"
+import * as __goscript_deflate from "./deflate.gs.js"
 
-import * as __goscript_dict_decoder from "./dict_decoder.gs.ts"
+import * as __goscript_dict_decoder from "./dict_decoder.gs.js"
 
-import * as __goscript_huffman_bit_writer from "./huffman_bit_writer.gs.ts"
+import * as __goscript_huffman_bit_writer from "./huffman_bit_writer.gs.js"
 import "@goscript/bufio/index.js"
 import "@goscript/io/index.js"
 import "@goscript/math/bits/index.js"
 import "@goscript/strconv/index.js"
 import "@goscript/sync/index.js"
-import "./deflate.gs.ts"
-import "./dict_decoder.gs.ts"
-import "./huffman_bit_writer.gs.ts"
+import "./deflate.gs.js"
+import "./dict_decoder.gs.js"
+import "./huffman_bit_writer.gs.js"
 
 export type CorruptInputError = bigint
 
@@ -757,18 +757,15 @@ export class decompressor {
 						{
 							__goscriptGotoState0 = "readLiteral"
 							continue __goscriptGotoLoop0
-							break
 						}
 						case 1:
 						{
 							__goscriptGotoState0 = "copyHistory"
 							continue __goscriptGotoLoop0
-							break
 						}
 					}
 					__goscriptGotoState0 = "readLiteral"
 					continue __goscriptGotoLoop0
-					break
 				}
 				case "readLiteral":
 				{
@@ -793,13 +790,11 @@ export class decompressor {
 								}
 								__goscriptGotoState0 = "readLiteral"
 								continue __goscriptGotoLoop0
-								break
 							}
 							case v == 256:
 							{
 								decompressor.prototype.finishBlock.call(f)
 								return
-								break
 							}
 							case v < 265:
 							{
@@ -847,7 +842,6 @@ export class decompressor {
 							{
 								$.pointerValue<decompressor>(f).err = $.namedValueInterfaceValue<$.GoError>($.int64($.pointerValue<decompressor>(f).roffset), "flate.CorruptInputError", {"Error": CorruptInputError_Error}, { kind: $.TypeKind.Basic, name: "int64", typeName: "flate.CorruptInputError" })
 								return
-								break
 							}
 						}
 						if (n > 0) {
@@ -921,7 +915,6 @@ export class decompressor {
 							{
 								$.pointerValue<decompressor>(f).err = $.namedValueInterfaceValue<$.GoError>($.int64($.pointerValue<decompressor>(f).roffset), "flate.CorruptInputError", {"Error": CorruptInputError_Error}, { kind: $.TypeKind.Basic, name: "int64", typeName: "flate.CorruptInputError" })
 								return
-								break
 							}
 						}
 
@@ -940,7 +933,6 @@ export class decompressor {
 					}
 					__goscriptGotoState0 = "copyHistory"
 					continue __goscriptGotoLoop0
-					break
 				}
 				case "copyHistory":
 				{
@@ -962,7 +954,6 @@ export class decompressor {
 						continue __goscriptGotoLoop0
 					}
 					break __goscriptGotoLoop0
-					break
 				}
 			}
 			break
@@ -1120,7 +1111,6 @@ export class decompressor {
 				default:
 				{
 					return $.namedValueInterfaceValue<$.GoError>("unexpected length code", "flate.InternalError", {"Error": InternalError_Error}, { kind: $.TypeKind.Basic, name: "string", typeName: "flate.InternalError" })
-					break
 				}
 				case 16:
 				{

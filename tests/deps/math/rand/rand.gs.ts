@@ -13,18 +13,18 @@ import * as atomic from "@goscript/sync/atomic/index.js"
 
 import "@goscript/unsafe/index.js"
 
-import * as __goscript_exp from "./exp.gs.ts"
+import * as __goscript_exp from "./exp.gs.js"
 
-import * as __goscript_normal from "./normal.gs.ts"
+import * as __goscript_normal from "./normal.gs.js"
 
-import * as __goscript_rng from "./rng.gs.ts"
+import * as __goscript_rng from "./rng.gs.js"
 import "@goscript/math/index.js"
 import "@goscript/internal/godebug/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/sync/atomic/index.js"
-import "./exp.gs.ts"
-import "./normal.gs.ts"
-import "./rng.gs.ts"
+import "./exp.gs.js"
+import "./normal.gs.js"
+import "./rng.gs.js"
 
 export type Source = {
 	Int63(): bigint | globalThis.Promise<bigint>

@@ -80,12 +80,10 @@ export async function run(frames: $.Channel<number> | null, done: $.Channel<stri
 						{
 							out = out + ("resize ")
 							continue
-							break
 						}
 						case 3:
 						{
 							return out + "close"
-							break
 						}
 					}
 					break

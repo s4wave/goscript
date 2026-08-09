@@ -3,11 +3,11 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_build_tags_generic from "./build_tags_generic.gs.ts"
+import * as __goscript_build_tags_generic from "./build_tags_generic.gs.js"
 
-import * as __goscript_build_tags_js from "./build_tags_js.gs.ts"
-import "./build_tags_generic.gs.ts"
-import "./build_tags_js.gs.ts"
+import * as __goscript_build_tags_js from "./build_tags_js.gs.js"
+import "./build_tags_generic.gs.js"
+import "./build_tags_js.gs.js"
 
 export async function main(): globalThis.Promise<void> {
 	$.println("=== Build Tags Test ===")

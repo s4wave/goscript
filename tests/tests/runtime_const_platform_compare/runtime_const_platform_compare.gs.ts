@@ -11,27 +11,22 @@ export function platform(): string {
 		case $.stringEqual(runtime.GOARCH, "wasm"):
 		{
 			return "wasm"
-			break
 		}
 		case ($.stringEqual(runtime.GOOS, "windows")) && ($.stringEqual(runtime.GOARCH, "386")):
 		{
 			return "windows386"
-			break
 		}
 		case $.stringEqual(runtime.GOOS, "openbsd"):
 		{
 			return "openbsd"
-			break
 		}
 		case $.stringEqual(runtime.GOOS, "aix"):
 		{
 			return "aix"
-			break
 		}
 		default:
 		{
 			return "other"
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")

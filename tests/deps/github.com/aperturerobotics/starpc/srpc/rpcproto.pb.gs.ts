@@ -19,9 +19,9 @@ import * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/protobu
 
 import * as json from "@goscript/github.com/aperturerobotics/protobuf-go-lite/json/index.js"
 
-import * as __goscript_errors from "./errors.gs.ts"
+import * as __goscript_errors from "./errors.gs.js"
 
-import * as __goscript_packet from "./packet.gs.ts"
+import * as __goscript_packet from "./packet.gs.js"
 import "@goscript/encoding/base64/index.js"
 import "@goscript/fmt/index.js"
 import "@goscript/io/index.js"
@@ -30,8 +30,8 @@ import "@goscript/strconv/index.js"
 import "@goscript/strings/index.js"
 import "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
 import "@goscript/github.com/aperturerobotics/protobuf-go-lite/json/index.js"
-import "./errors.gs.ts"
-import "./packet.gs.ts"
+import "./errors.gs.js"
+import "./packet.gs.js"
 
 export type isPacket_Body = {
 	isPacket_Body(): void

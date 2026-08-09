@@ -1,1 +1,1 @@
-export { emptyFS, linkFS } from "./package_import_io_fs_readlink.gs.ts"
+export { emptyFS, linkFS } from './package_import_io_fs_readlink.gs.js'

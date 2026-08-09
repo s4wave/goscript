@@ -5,9 +5,9 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as bits from "@goscript/math/bits/index.js"
 
-import * as __goscript_pow10tab from "./pow10tab.gs.ts"
+import * as __goscript_pow10tab from "./pow10tab.gs.js"
 import "@goscript/math/bits/index.js"
-import "./pow10tab.gs.ts"
+import "./pow10tab.gs.js"
 
 export class uint128 {
 	public get Hi(): bigint {

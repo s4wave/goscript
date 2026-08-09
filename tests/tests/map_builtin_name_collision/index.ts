@@ -1,1 +1,1 @@
-export { Map } from "./map_builtin_name_collision.gs.ts"
+export { Map } from './map_builtin_name_collision.gs.js'

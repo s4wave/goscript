@@ -9,17 +9,17 @@ import * as proto from "@goscript/github.com/aperturerobotics/protobuf-go-lite/i
 
 import * as sync from "@goscript/sync/index.js"
 
-import * as __goscript_broadcast from "./broadcast.gs.ts"
+import * as __goscript_broadcast from "./broadcast.gs.js"
 
-import * as __goscript_compat from "./compat.gs.ts"
+import * as __goscript_compat from "./compat.gs.js"
 
-import * as __goscript_locked from "./locked.gs.ts"
+import * as __goscript_locked from "./locked.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
 import "@goscript/sync/index.js"
-import "./broadcast.gs.ts"
-import "./compat.gs.ts"
-import "./locked.gs.ts"
+import "./broadcast.gs.js"
+import "./compat.gs.js"
+import "./locked.gs.js"
 
 export async function WatchBroadcast(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, bcast: __goscript_broadcast.Broadcast | $.VarRef<__goscript_broadcast.Broadcast> | null, snapshot: (() => any | globalThis.Promise<any>) | null, send: ((_p0: any) => $.GoError | globalThis.Promise<$.GoError>) | null): globalThis.Promise<$.GoError> {
 	return WatchBroadcastWithEqual(undefined, ctx, bcast, snapshot, send, (null as ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null))

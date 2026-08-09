@@ -1,3 +1,6 @@
-export type { Store } from "./package_import_embedded_forwarder.gs.ts"
-export { NewVerboseStore, VerboseStore } from "./package_import_embedded_forwarder.gs.ts"
-import "./package_import_embedded_forwarder.gs.ts"
+export type { Store } from './package_import_embedded_forwarder.gs.js'
+export {
+  NewVerboseStore,
+  VerboseStore,
+} from './package_import_embedded_forwarder.gs.js'
+import './package_import_embedded_forwarder.gs.js'

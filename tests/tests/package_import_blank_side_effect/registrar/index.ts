@@ -1,1 +1,1 @@
-import "./registrar.gs.ts"
+import './registrar.gs.js'

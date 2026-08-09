@@ -15,19 +15,19 @@ import "@goscript/unsafe/index.js"
 
 import * as dnsmessage from "@goscript/vendor/golang.org/x/net/dns/dnsmessage/index.js"
 
-import * as __goscript_ip from "./ip.gs.ts"
+import * as __goscript_ip from "./ip.gs.js"
 
-import * as __goscript_mac from "./mac.gs.ts"
+import * as __goscript_mac from "./mac.gs.js"
 
-import * as __goscript_net from "./net.gs.ts"
+import * as __goscript_net from "./net.gs.js"
 import "@goscript/cmp/index.js"
 import "@goscript/internal/bytealg/index.js"
 import "@goscript/internal/strconv/index.js"
 import "@goscript/slices/index.js"
 import "@goscript/vendor/golang.org/x/net/dns/dnsmessage/index.js"
-import "./ip.gs.ts"
-import "./mac.gs.ts"
-import "./net.gs.ts"
+import "./ip.gs.js"
+import "./mac.gs.js"
+import "./net.gs.js"
 
 export type byPriorityWeight = $.Slice<SRV | $.VarRef<SRV> | null>
 
@@ -260,7 +260,6 @@ export function isDomainName(s: string): boolean {
 			default:
 			{
 				return false
-				break
 			}
 			case ((($.uint(97, 8) <= $.uint(c, 8)) && ($.uint(c, 8) <= $.uint(122, 8))) || (($.uint(65, 8) <= $.uint(c, 8)) && ($.uint(c, 8) <= $.uint(90, 8)))) || ($.uint(c, 8) == $.uint(95, 8)):
 			{

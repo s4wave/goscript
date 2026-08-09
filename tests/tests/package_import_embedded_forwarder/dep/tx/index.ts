@@ -1,1 +1,1 @@
-export { Tx } from "./tx.gs.ts"
+export { Tx } from './tx.gs.js'

@@ -7,10 +7,10 @@ import * as goarch from "@goscript/internal/goarch/index.js"
 
 import * as goos from "@goscript/internal/goos/index.js"
 
-import * as __goscript_consts_norace from "./consts_norace.gs.ts"
+import * as __goscript_consts_norace from "./consts_norace.gs.js"
 import "@goscript/internal/goarch/index.js"
 import "@goscript/internal/goos/index.js"
-import "./consts_norace.gs.ts"
+import "./consts_norace.gs.js"
 
 export const StackGuardMultiplier: number = 1
 

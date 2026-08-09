@@ -11,13 +11,13 @@ import type * as context from "@goscript/context/index.js"
 
 import type * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
 
-import * as __goscript_message from "./message.gs.ts"
+import * as __goscript_message from "./message.gs.js"
 
-import * as __goscript_stream from "./stream.gs.ts"
+import * as __goscript_stream from "./stream.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/io/index.js"
-import "./message.gs.ts"
-import "./stream.gs.ts"
+import "./message.gs.js"
+import "./stream.gs.js"
 
 export class StreamRwc {
 	public get Stream(): __goscript_stream.Stream | null {

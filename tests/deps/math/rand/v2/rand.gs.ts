@@ -9,13 +9,13 @@ import * as bits from "@goscript/math/bits/index.js"
 
 import "@goscript/unsafe/index.js"
 
-import * as __goscript_exp from "./exp.gs.ts"
+import * as __goscript_exp from "./exp.gs.js"
 
-import * as __goscript_normal from "./normal.gs.ts"
+import * as __goscript_normal from "./normal.gs.js"
 import "@goscript/math/index.js"
 import "@goscript/math/bits/index.js"
-import "./exp.gs.ts"
-import "./normal.gs.ts"
+import "./exp.gs.js"
+import "./normal.gs.js"
 
 export type Source = {
 	Uint64(): bigint | globalThis.Promise<bigint>

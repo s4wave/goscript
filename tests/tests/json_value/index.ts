@@ -1,1 +1,1 @@
-export { Person } from "./json_value.gs.ts"
+export { Person } from './json_value.gs.js'

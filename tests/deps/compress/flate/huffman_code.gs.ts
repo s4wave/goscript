@@ -9,11 +9,11 @@ import * as bits2 from "@goscript/math/bits/index.js"
 
 import * as sort2 from "@goscript/sort/index.js"
 
-import * as __goscript_inflate from "./inflate.gs.ts"
+import * as __goscript_inflate from "./inflate.gs.js"
 import "@goscript/math/index.js"
 import "@goscript/math/bits/index.js"
 import "@goscript/sort/index.js"
-import "./inflate.gs.ts"
+import "./inflate.gs.js"
 
 export type byLiteral = $.Slice<literalNode>
 

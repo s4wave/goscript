@@ -15,21 +15,21 @@ import type * as json from "@goscript/github.com/aperturerobotics/protobuf-go-li
 
 import * as srpc from "@goscript/github.com/aperturerobotics/starpc/srpc/index.js"
 
-import * as __goscript_errors from "./errors.gs.ts"
+import * as __goscript_errors from "./errors.gs.js"
 
-import * as __goscript_read_writer from "./read-writer.gs.ts"
+import * as __goscript_read_writer from "./read-writer.gs.js"
 
-import * as __goscript_rpcstream from "./rpcstream.gs.ts"
+import * as __goscript_rpcstream from "./rpcstream.gs.js"
 
-import * as __goscript_rpcstream_pb from "./rpcstream.pb.gs.ts"
+import * as __goscript_rpcstream_pb from "./rpcstream.pb.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/io/index.js"
 import "@goscript/bytes/index.js"
 import "@goscript/github.com/aperturerobotics/starpc/srpc/index.js"
-import "./errors.gs.ts"
-import "./read-writer.gs.ts"
-import "./rpcstream.gs.ts"
-import "./rpcstream.pb.gs.ts"
+import "./errors.gs.js"
+import "./read-writer.gs.js"
+import "./rpcstream.gs.js"
+import "./rpcstream.pb.gs.js"
 
 export type RpcRawGetter = ((ctx: context.Context | null, componentID: string) => [io.ReadWriteCloser | null, (() => void) | null, $.GoError] | globalThis.Promise<[io.ReadWriteCloser | null, (() => void) | null, $.GoError]>) | null
 

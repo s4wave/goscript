@@ -1,3 +1,3 @@
-export type { Value } from "./helper.gs.ts"
-export { Box, Collect, IntValue, Wrap } from "./helper.gs.ts"
-import "./helper.gs.ts"
+export type { Value } from './helper.gs.js'
+export { Box, Collect, IntValue, Wrap } from './helper.gs.js'
+import './helper.gs.js'

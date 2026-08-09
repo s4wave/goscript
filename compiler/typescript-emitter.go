@@ -758,9 +758,8 @@ func loweredStmtsEndWithTerminal(stmts []loweredStmt) bool {
 	if len(stmts) == 0 {
 		return false
 	}
-	last := stmts[len(stmts)-1]
-	text := strings.TrimSpace(last.text)
-	return strings.HasPrefix(text, "return") || strings.HasPrefix(text, "throw ")
+	text := strings.TrimSpace(stmts[len(stmts)-1].text)
+	return stmtStartsWithKeyword(text, "return") || stmtStartsWithKeyword(text, "throw")
 }
 
 func renderFunctionTypeParams(b *strings.Builder, fn *loweredFunction) {
@@ -980,12 +979,35 @@ func renderSwitchBody(b *strings.Builder, body []loweredStmt, fallsThrough bool,
 	writeIndent(b, indent)
 	b.WriteString("{\n")
 	renderStmts(b, body, indent+1)
-	if !fallsThrough {
+	if !fallsThrough && !loweredStmtsEndWithSwitchExit(body) {
 		writeIndent(b, indent+1)
 		b.WriteString("break\n")
 	}
 	writeIndent(b, indent)
 	b.WriteString("}\n")
+}
+
+func loweredStmtsEndWithSwitchExit(stmts []loweredStmt) bool {
+	if len(stmts) == 0 {
+		return false
+	}
+	last := stmts[len(stmts)-1]
+	if stmtEndsInReturn(last) {
+		return true
+	}
+	trimmed := strings.TrimSpace(last.text)
+	if stmtStartsWithKeyword(trimmed, "throw") ||
+		stmtStartsWithKeyword(trimmed, "continue") ||
+		stmtStartsWithKeyword(trimmed, "break") {
+		return true
+	}
+	if (trimmed == "" || strings.HasSuffix(trimmed, ":")) && (last.hasBlock || len(last.children) != 0) {
+		return loweredStmtsEndWithSwitchExit(last.children)
+	}
+	if stmtStartsWithKeyword(trimmed, "if") && len(last.elseBody) != 0 {
+		return loweredStmtsEndWithSwitchExit(last.children) && loweredStmtsEndWithSwitchExit(last.elseBody)
+	}
+	return false
 }
 
 func renderRangeFunc(b *strings.Builder, stmt *loweredRangeFunc, indent int) {
@@ -1396,21 +1418,22 @@ func renderTypeSwitchInlineBody(
 func renderIndex(pkg *loweredPackage) string {
 	var lines []string
 	for _, file := range pkg.files {
+		source := "./" + emittedModuleName(file.outputName)
 		if file.sideEffect {
-			lines = append(lines, "import \"./"+file.outputName+"\"")
+			lines = append(lines, "import '"+source+"'")
 		}
 		if file.exportAll {
-			lines = append(lines, "export * from \"./"+file.outputName+"\"")
+			lines = append(lines, "export * from '"+source+"'")
 		}
 		exports := slices.Clone(file.exports)
 		slices.Sort(exports)
 		if len(exports) != 0 {
-			lines = append(lines, "export { "+strings.Join(exports, ", ")+" } from \"./"+file.outputName+"\"")
+			lines = append(lines, renderIndexExports("export", exports, source))
 		}
 		typeExports := slices.Clone(file.typeExports)
 		slices.Sort(typeExports)
 		if len(typeExports) != 0 {
-			lines = append(lines, "export type { "+strings.Join(typeExports, ", ")+" } from \"./"+file.outputName+"\"")
+			lines = append(lines, renderIndexExports("export type", typeExports, source))
 		}
 	}
 	slices.Sort(lines)
@@ -1418,6 +1441,18 @@ func renderIndex(pkg *loweredPackage) string {
 		return ""
 	}
 	return strings.Join(lines, "\n") + "\n"
+}
+
+func emittedModuleName(outputName string) string {
+	return strings.TrimSuffix(outputName, ".ts") + ".js"
+}
+
+func renderIndexExports(prefix string, exports []string, source string) string {
+	oneLine := prefix + " { " + strings.Join(exports, ", ") + " } from '" + source + "'"
+	if len(exports) == 1 || len(oneLine) <= 80 {
+		return oneLine
+	}
+	return prefix + " {\n  " + strings.Join(exports, ",\n  ") + ",\n} from '" + source + "'"
 }
 
 func writeIndent(b *strings.Builder, indent int) {

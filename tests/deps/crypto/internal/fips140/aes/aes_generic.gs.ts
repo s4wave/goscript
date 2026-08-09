@@ -5,15 +5,15 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as byteorder from "@goscript/crypto/internal/fips140deps/byteorder/index.js"
 
-import * as __goscript__const from "./const.gs.ts"
+import * as __goscript__const from "./const.gs.js"
 
-import * as __goscript_aes from "./aes.gs.ts"
+import * as __goscript_aes from "./aes.gs.js"
 
-import * as __goscript_aes_noasm from "./aes_noasm.gs.ts"
+import * as __goscript_aes_noasm from "./aes_noasm.gs.js"
 import "@goscript/crypto/internal/fips140deps/byteorder/index.js"
-import "./const.gs.ts"
-import "./aes.gs.ts"
-import "./aes_noasm.gs.ts"
+import "./const.gs.js"
+import "./aes.gs.js"
+import "./aes_noasm.gs.js"
 
 export function encryptBlockGeneric(c: __goscript_aes.blockExpanded | $.VarRef<__goscript_aes.blockExpanded> | null, dst: $.Slice<number>, src: $.Slice<number>): void {
 	__goscript_aes_noasm.checkGenericIsExpected()

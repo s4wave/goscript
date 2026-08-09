@@ -5,12 +5,12 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as strings from "@goscript/strings/index.js"
 
-import * as __goscript_helper from "./helper.gs.ts"
+import * as __goscript_helper from "./helper.gs.js"
 
-import * as __goscript_method from "./method.gs.ts"
+import * as __goscript_method from "./method.gs.js"
 import "@goscript/strings/index.js"
-import "./helper.gs.ts"
-import "./method.gs.ts"
+import "./helper.gs.js"
+import "./method.gs.js"
 
 export class label {
 	public get value(): string {

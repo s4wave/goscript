@@ -299,13 +299,11 @@ export class Encoding {
 					case j == 0:
 					{
 						return [si, 0, null]
-						break
 					}
 					case j == 1:
 					case $.int($.pointerValue<Encoding>(enc).padChar, 32) != $.int(-1, 32):
 					{
 						return [si, 0, $.namedValueInterfaceValue<$.GoError>($.int64(si - j), "base64.CorruptInputError", {"Error": CorruptInputError_Error}, { kind: $.TypeKind.Basic, name: "int64", typeName: "base64.CorruptInputError" })]
-						break
 					}
 				}
 				dlen = j
@@ -335,7 +333,6 @@ export class Encoding {
 				case 1:
 				{
 					return [si, 0, $.namedValueInterfaceValue<$.GoError>($.int64(si - 1), "base64.CorruptInputError", {"Error": CorruptInputError_Error}, { kind: $.TypeKind.Basic, name: "int64", typeName: "base64.CorruptInputError" })]
-					break
 				}
 				case 2:
 				{

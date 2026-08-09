@@ -1,1 +1,1 @@
-export { token } from "./helper.gs.ts"
+export { token } from './helper.gs.js'

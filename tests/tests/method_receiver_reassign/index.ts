@@ -1,1 +1,1 @@
-export { item } from "./method_receiver_reassign.gs.ts"
+export { item } from './method_receiver_reassign.gs.js'

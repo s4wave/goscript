@@ -5,14 +5,14 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as bits from "@goscript/math/bits/index.js"
 
-import type * as __goscript_ftoa from "./ftoa.gs.ts"
+import type * as __goscript_ftoa from "./ftoa.gs.js"
 
-import * as __goscript_itoa from "./itoa.gs.ts"
+import * as __goscript_itoa from "./itoa.gs.js"
 
-import * as __goscript_math from "./math.gs.ts"
+import * as __goscript_math from "./math.gs.js"
 import "@goscript/math/bits/index.js"
-import "./itoa.gs.ts"
-import "./math.gs.ts"
+import "./itoa.gs.js"
+import "./math.gs.js"
 
 export let uint64pow10: bigint[] = [1n, 10n, 100n, 1000n, 10000n, 100000n, 1000000n, 10000000n, 100000000n, 1000000000n, 10000000000n, 100000000000n, 1000000000000n, 10000000000000n, 100000000000000n, 1000000000000000n, 10000000000000000n, 100000000000000000n, 1000000000000000000n, 10000000000000000000n]
 

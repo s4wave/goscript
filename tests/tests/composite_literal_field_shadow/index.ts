@@ -1,1 +1,1 @@
-export { buffer } from "./composite_literal_field_shadow.gs.ts"
+export { buffer } from './composite_literal_field_shadow.gs.js'

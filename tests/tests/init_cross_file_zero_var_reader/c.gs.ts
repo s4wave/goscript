@@ -3,8 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_b from "./b.gs.ts"
-import "./b.gs.ts"
+import * as __goscript_b from "./b.gs.js"
+import "./b.gs.js"
 
 export var marker: number
 

@@ -21,19 +21,19 @@ import * as log from "@goscript/log/index.js"
 
 import * as sync from "@goscript/sync/index.js"
 
-import * as __goscript__const from "./const.gs.ts"
+import * as __goscript__const from "./const.gs.js"
 
-import * as __goscript_addr from "./addr.gs.ts"
+import * as __goscript_addr from "./addr.gs.js"
 
-import * as __goscript_deadline from "./deadline.gs.ts"
+import * as __goscript_deadline from "./deadline.gs.js"
 
-import * as __goscript_ping from "./ping.gs.ts"
+import * as __goscript_ping from "./ping.gs.js"
 
-import * as __goscript_session from "./session.gs.ts"
+import * as __goscript_session from "./session.gs.js"
 
-import * as __goscript_stream from "./stream.gs.ts"
+import * as __goscript_stream from "./stream.gs.js"
 
-import * as __goscript_util from "./util.gs.ts"
+import * as __goscript_util from "./util.gs.js"
 import "@goscript/errors/index.js"
 import "@goscript/fmt/index.js"
 import "@goscript/io/index.js"
@@ -42,13 +42,13 @@ import "@goscript/os/index.js"
 import "@goscript/time/index.js"
 import "@goscript/log/index.js"
 import "@goscript/sync/index.js"
-import "./const.gs.ts"
-import "./addr.gs.ts"
-import "./deadline.gs.ts"
-import "./ping.gs.ts"
-import "./session.gs.ts"
-import "./stream.gs.ts"
-import "./util.gs.ts"
+import "./const.gs.js"
+import "./addr.gs.js"
+import "./deadline.gs.js"
+import "./ping.gs.js"
+import "./session.gs.js"
+import "./stream.gs.js"
+import "./util.gs.js"
 
 export class Config {
 	// AcceptBacklog is used to limit how many streams may be

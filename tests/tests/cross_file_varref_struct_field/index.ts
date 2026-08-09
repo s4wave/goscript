@@ -1,1 +1,1 @@
-export { floatInfo } from "./info.gs.ts"
+export { floatInfo } from './info.gs.js'

@@ -23,23 +23,23 @@ import * as strings from "@goscript/strings/index.js"
 
 import * as bytes from "@goscript/bytes/index.js"
 
-import * as __goscript_alt_exit from "./alt_exit.gs.ts"
+import * as __goscript_alt_exit from "./alt_exit.gs.js"
 
-import * as __goscript_buffer_pool from "./buffer_pool.gs.ts"
+import * as __goscript_buffer_pool from "./buffer_pool.gs.js"
 
-import * as __goscript_entry from "./entry.gs.ts"
+import * as __goscript_entry from "./entry.gs.js"
 
-import * as __goscript_formatter from "./formatter.gs.ts"
+import * as __goscript_formatter from "./formatter.gs.js"
 
-import * as __goscript_hooks from "./hooks.gs.ts"
+import * as __goscript_hooks from "./hooks.gs.js"
 
-import * as __goscript_json_formatter from "./json_formatter.gs.ts"
+import * as __goscript_json_formatter from "./json_formatter.gs.js"
 
-import * as __goscript_logrus from "./logrus.gs.ts"
+import * as __goscript_logrus from "./logrus.gs.js"
 
-import * as __goscript_text_formatter from "./text_formatter.gs.ts"
+import * as __goscript_text_formatter from "./text_formatter.gs.js"
 
-import * as __goscript_writer from "./writer.gs.ts"
+import * as __goscript_writer from "./writer.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/io/index.js"
 import "@goscript/os/index.js"
@@ -50,15 +50,15 @@ import "@goscript/bufio/index.js"
 import "@goscript/runtime/index.js"
 import "@goscript/strings/index.js"
 import "@goscript/bytes/index.js"
-import "./alt_exit.gs.ts"
-import "./buffer_pool.gs.ts"
-import "./entry.gs.ts"
-import "./formatter.gs.ts"
-import "./hooks.gs.ts"
-import "./json_formatter.gs.ts"
-import "./logrus.gs.ts"
-import "./text_formatter.gs.ts"
-import "./writer.gs.ts"
+import "./alt_exit.gs.js"
+import "./buffer_pool.gs.js"
+import "./entry.gs.js"
+import "./formatter.gs.js"
+import "./hooks.gs.js"
+import "./json_formatter.gs.js"
+import "./logrus.gs.js"
+import "./text_formatter.gs.js"
+import "./writer.gs.js"
 
 export type LogFunction = (() => $.Slice<any> | globalThis.Promise<$.Slice<any>>) | null
 

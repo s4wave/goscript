@@ -1,1 +1,1 @@
-export { Next } from "./subpkg.gs.ts"
+export { Next } from './subpkg.gs.js'

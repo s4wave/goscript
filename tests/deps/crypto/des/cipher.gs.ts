@@ -17,9 +17,9 @@ import * as errors from "@goscript/errors/index.js"
 
 import * as strconv from "@goscript/strconv/index.js"
 
-import * as __goscript__const from "./const.gs.ts"
+import * as __goscript__const from "./const.gs.js"
 
-import * as __goscript_block from "./block.gs.ts"
+import * as __goscript_block from "./block.gs.js"
 import "@goscript/internal/byteorder/index.js"
 import "@goscript/sync/index.js"
 import "@goscript/crypto/cipher/index.js"
@@ -27,8 +27,8 @@ import "@goscript/crypto/internal/fips140/alias/index.js"
 import "@goscript/crypto/internal/fips140only/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/strconv/index.js"
-import "./const.gs.ts"
-import "./block.gs.ts"
+import "./const.gs.js"
+import "./block.gs.js"
 
 export type KeySizeError = number
 

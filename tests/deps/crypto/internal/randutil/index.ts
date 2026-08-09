@@ -1,1 +1,1 @@
-export { MaybeReadByte } from "./randutil.gs.ts"
+export { MaybeReadByte } from './randutil.gs.js'

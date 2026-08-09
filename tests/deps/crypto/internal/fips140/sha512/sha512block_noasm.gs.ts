@@ -5,10 +5,10 @@ import * as $ from "@goscript/builtin/index.js"
 
 import type * as hash from "@goscript/hash/index.js"
 
-import type * as __goscript_sha512 from "./sha512.gs.ts"
+import type * as __goscript_sha512 from "./sha512.gs.js"
 
-import * as __goscript_sha512block from "./sha512block.gs.ts"
-import "./sha512block.gs.ts"
+import * as __goscript_sha512block from "./sha512block.gs.js"
+import "./sha512block.gs.js"
 
 export function block(dig: __goscript_sha512.Digest | $.VarRef<__goscript_sha512.Digest> | null, p: $.Slice<number>): void {
 	__goscript_sha512block.blockGeneric(dig, p)

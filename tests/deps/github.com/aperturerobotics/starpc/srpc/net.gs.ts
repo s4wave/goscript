@@ -15,27 +15,27 @@ import type * as io from "@goscript/io/index.js"
 
 import type * as time from "@goscript/time/index.js"
 
-import * as __goscript_accept from "./accept.gs.ts"
+import * as __goscript_accept from "./accept.gs.js"
 
-import type * as __goscript_client from "./client.gs.ts"
+import type * as __goscript_client from "./client.gs.js"
 
-import * as __goscript_invoker from "./invoker.gs.ts"
+import * as __goscript_invoker from "./invoker.gs.js"
 
-import type * as __goscript_message from "./message.gs.ts"
+import type * as __goscript_message from "./message.gs.js"
 
-import * as __goscript_muxed from "./muxed.gs.ts"
+import * as __goscript_muxed from "./muxed.gs.js"
 
-import * as __goscript_muxed_conn from "./muxed-conn.gs.ts"
+import * as __goscript_muxed_conn from "./muxed-conn.gs.js"
 
-import type * as __goscript_server from "./server.gs.ts"
+import type * as __goscript_server from "./server.gs.js"
 
-import type * as __goscript_stream from "./stream.gs.ts"
+import type * as __goscript_stream from "./stream.gs.js"
 import "@goscript/context/index.js"
 import "@goscript/net/index.js"
-import "./accept.gs.ts"
-import "./invoker.gs.ts"
-import "./muxed.gs.ts"
-import "./muxed-conn.gs.ts"
+import "./accept.gs.js"
+import "./invoker.gs.js"
+import "./muxed.gs.js"
+import "./muxed-conn.gs.js"
 
 export async function Dial(addr: string): globalThis.Promise<[__goscript_client.Client | null, $.GoError]> {
 	let [nconn, err] = await net.Dial("tcp", addr)

@@ -23,11 +23,11 @@ import * as elliptic from "@goscript/crypto/elliptic/index.js"
 
 import * as big from "@goscript/math/big/index.js"
 
-import * as __goscript_pkcs1 from "./pkcs1.gs.ts"
+import * as __goscript_pkcs1 from "./pkcs1.gs.js"
 
-import * as __goscript_sec1 from "./sec1.gs.ts"
+import * as __goscript_sec1 from "./sec1.gs.js"
 
-import * as __goscript_x509 from "./x509.gs.ts"
+import * as __goscript_x509 from "./x509.gs.js"
 import "@goscript/crypto/ecdh/index.js"
 import "@goscript/crypto/ecdsa/index.js"
 import "@goscript/crypto/ed25519/index.js"
@@ -38,9 +38,9 @@ import "@goscript/errors/index.js"
 import "@goscript/fmt/index.js"
 import "@goscript/crypto/elliptic/index.js"
 import "@goscript/math/big/index.js"
-import "./pkcs1.gs.ts"
-import "./sec1.gs.ts"
-import "./x509.gs.ts"
+import "./pkcs1.gs.js"
+import "./sec1.gs.js"
+import "./x509.gs.js"
 
 export class pkcs8 {
 	public get Version(): number {
@@ -129,7 +129,6 @@ export async function ParsePKCS8PrivateKey(der: $.Slice<number>): globalThis.Pro
 				return [null, errors.New("x509: failed to parse RSA private key embedded in PKCS#8: " + $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
 			}
 			return [key, null]
-			break
 		}
 		case asn1.ObjectIdentifier_Equal(privKey.value.Algo.Algorithm, (__goscript_x509.oidPublicKeyECDSA as asn1.ObjectIdentifier)):
 		{
@@ -148,7 +147,6 @@ export async function ParsePKCS8PrivateKey(der: $.Slice<number>): globalThis.Pro
 				return [null, errors.New("x509: failed to parse EC private key embedded in PKCS#8: " + $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
 			}
 			return [key, null]
-			break
 		}
 		case asn1.ObjectIdentifier_Equal(privKey.value.Algo.Algorithm, (__goscript_x509.oidPublicKeyEd25519 as asn1.ObjectIdentifier)):
 		{
@@ -172,7 +170,6 @@ export async function ParsePKCS8PrivateKey(der: $.Slice<number>): globalThis.Pro
 				}
 			}
 			return [$.namedValueInterfaceValue<any>(await ed25519.NewKeyFromSeed(curvePrivateKey.value), "ed25519.PrivateKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Public: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Public as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Seed: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Seed as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Sign: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Sign as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "ed25519.PrivateKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PrivateKey" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Public", args: [], returns: [{ name: "_r0", type: "crypto.PublicKey" }] }, { name: "Seed", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Sign", args: [{ name: "rand", type: "io.Reader" }, { name: "message", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "opts", type: "crypto.SignerOpts" }], returns: [{ name: "signature", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "err", type: "error" }] }]), null]
-			break
 		}
 		case asn1.ObjectIdentifier_Equal(privKey.value.Algo.Algorithm, (__goscript_x509.oidPublicKeyX25519 as asn1.ObjectIdentifier)):
 		{
@@ -196,7 +193,6 @@ export async function ParsePKCS8PrivateKey(der: $.Slice<number>): globalThis.Pro
 		default:
 		{
 			return [null, fmt.Errorf("x509: PKCS#8 wrapping contained private key with unknown algorithm: %v", $.namedValueInterfaceValue<any>(privKey.value.Algo.Algorithm, "asn1.ObjectIdentifier", {Equal: (receiver: any, ...args: any[]) => (asn1.ObjectIdentifier_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (asn1.ObjectIdentifier_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "asn1.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } }, [{ name: "Equal", args: [{ name: "other", type: { kind: $.TypeKind.Slice, typeName: "asn1.ObjectIdentifier", elemType: { kind: $.TypeKind.Basic, name: "int" } } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }]))]
-			break
 		}
 	}
 	throw new globalThis.Error("goscript: unreachable return")

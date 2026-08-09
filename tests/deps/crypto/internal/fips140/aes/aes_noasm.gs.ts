@@ -3,11 +3,11 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-import * as __goscript_aes from "./aes.gs.ts"
+import * as __goscript_aes from "./aes.gs.js"
 
-import * as __goscript_aes_generic from "./aes_generic.gs.ts"
-import "./aes.gs.ts"
-import "./aes_generic.gs.ts"
+import * as __goscript_aes_generic from "./aes_generic.gs.js"
+import "./aes.gs.js"
+import "./aes_generic.gs.js"
 
 export class block {
 	public get blockExpanded(): __goscript_aes.blockExpanded {

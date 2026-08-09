@@ -1,1 +1,1 @@
-export { storage } from "./storage.gs.ts"
+export { storage } from './storage.gs.js'

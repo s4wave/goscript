@@ -1,2 +1,2 @@
-export { aValue } from "./a.gs.ts"
-export { bValue } from "./b.gs.ts"
+export { aValue } from './a.gs.js'
+export { bValue } from './b.gs.js'

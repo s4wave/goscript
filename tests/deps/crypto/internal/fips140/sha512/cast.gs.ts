@@ -11,11 +11,11 @@ import * as errors from "@goscript/errors/index.js"
 
 import type * as hash from "@goscript/hash/index.js"
 
-import * as __goscript_sha512 from "./sha512.gs.ts"
+import * as __goscript_sha512 from "./sha512.gs.js"
 import "@goscript/bytes/index.js"
 import "@goscript/crypto/internal/fips140/index.js"
 import "@goscript/errors/index.js"
-import "./sha512.gs.ts"
+import "./sha512.gs.js"
 
 async function __goscriptInit0(): globalThis.Promise<void> {
 	await fips140.CAST("SHA2-512", $.functionValue((): $.GoError => {

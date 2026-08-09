@@ -13,7 +13,6 @@ export function valid(network: string): boolean {
 		default:
 		{
 			return false
-			break
 		}
 	}
 	return !$.stringEqual(network, "")

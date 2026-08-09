@@ -9,11 +9,11 @@ import * as errors from "@goscript/errors/index.js"
 
 import * as big from "@goscript/math/big/index.js"
 
-import * as __goscript_params from "./params.gs.ts"
+import * as __goscript_params from "./params.gs.js"
 import "@goscript/crypto/internal/fips140/nistec/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/math/big/index.js"
-import "./params.gs.ts"
+import "./params.gs.js"
 
 export type nistPoint = {
 	Add(__typeArgs: $.GenericTypeArgs | undefined, _p0: any, _p1: any): any | globalThis.Promise<any>

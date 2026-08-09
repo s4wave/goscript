@@ -5,9 +5,9 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as reflect from "@goscript/reflect/index.js"
 
-import * as __goscript_c from "./c.gs.ts"
+import * as __goscript_c from "./c.gs.js"
 import "@goscript/reflect/index.js"
-import "./c.gs.ts"
+import "./c.gs.js"
 
 export var table: $.Slice<number>
 

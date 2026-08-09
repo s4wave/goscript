@@ -1,1 +1,1 @@
-export { requestKey } from "./map_struct_key.gs.ts"
+export { requestKey } from './map_struct_key.gs.js'

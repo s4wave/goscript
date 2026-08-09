@@ -7,6 +7,6 @@ import * as dep1 from "@goscript/github.com/s4wave/goscript/tests/tests/method_r
 
 import * as dep2 from "@goscript/github.com/s4wave/goscript/tests/tests/method_result_imports_cross_file/dep2/index.js"
 
-import type * as __goscript_main from "./main.gs.ts"
+import type * as __goscript_main from "./main.gs.js"
 import "@goscript/github.com/s4wave/goscript/tests/tests/method_result_imports_cross_file/dep1/index.js"
 import "@goscript/github.com/s4wave/goscript/tests/tests/method_result_imports_cross_file/dep2/index.js"

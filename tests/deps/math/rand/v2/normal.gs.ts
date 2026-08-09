@@ -5,11 +5,11 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as math from "@goscript/math/index.js"
 
-import type * as __goscript_exp from "./exp.gs.ts"
+import type * as __goscript_exp from "./exp.gs.js"
 
-import * as __goscript_rand from "./rand.gs.ts"
+import * as __goscript_rand from "./rand.gs.js"
 import "@goscript/math/index.js"
-import "./rand.gs.ts"
+import "./rand.gs.js"
 
 export const rn: number = 3442619855899/1000000000000
 

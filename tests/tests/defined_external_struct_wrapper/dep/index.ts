@@ -1,1 +1,1 @@
-export { Public, hidden } from "./dep.gs.ts"
+export { Public, hidden } from './dep.gs.js'

@@ -17,41 +17,41 @@ import * as bytes from "@goscript/bytes/index.js"
 
 import * as math from "@goscript/math/index.js"
 
-import * as __goscript_accuracy_string from "./accuracy_string.gs.ts"
+import * as __goscript_accuracy_string from "./accuracy_string.gs.js"
 
-import * as __goscript_arith from "./arith.gs.ts"
+import * as __goscript_arith from "./arith.gs.js"
 
-import * as __goscript_float from "./float.gs.ts"
+import * as __goscript_float from "./float.gs.js"
 
-import * as __goscript_floatconv from "./floatconv.gs.ts"
+import * as __goscript_floatconv from "./floatconv.gs.js"
 
-import * as __goscript_floatmarsh from "./floatmarsh.gs.ts"
+import * as __goscript_floatmarsh from "./floatmarsh.gs.js"
 
-import * as __goscript_ftoa from "./ftoa.gs.ts"
+import * as __goscript_ftoa from "./ftoa.gs.js"
 
-import * as __goscript_intconv from "./intconv.gs.ts"
+import * as __goscript_intconv from "./intconv.gs.js"
 
-import * as __goscript_intmarsh from "./intmarsh.gs.ts"
+import * as __goscript_intmarsh from "./intmarsh.gs.js"
 
-import * as __goscript_nat from "./nat.gs.ts"
+import * as __goscript_nat from "./nat.gs.js"
 
-import * as __goscript_natconv from "./natconv.gs.ts"
+import * as __goscript_natconv from "./natconv.gs.js"
 
-import * as __goscript_natdiv from "./natdiv.gs.ts"
+import * as __goscript_natdiv from "./natdiv.gs.js"
 
-import * as __goscript_natmul from "./natmul.gs.ts"
+import * as __goscript_natmul from "./natmul.gs.js"
 
-import * as __goscript_prime from "./prime.gs.ts"
+import * as __goscript_prime from "./prime.gs.js"
 
-import * as __goscript_rat from "./rat.gs.ts"
+import * as __goscript_rat from "./rat.gs.js"
 
-import type * as __goscript_ratconv from "./ratconv.gs.ts"
+import type * as __goscript_ratconv from "./ratconv.gs.js"
 
-import type * as __goscript_ratmarsh from "./ratmarsh.gs.ts"
+import type * as __goscript_ratmarsh from "./ratmarsh.gs.js"
 
-import * as __goscript_roundingmode_string from "./roundingmode_string.gs.ts"
+import * as __goscript_roundingmode_string from "./roundingmode_string.gs.js"
 
-import * as __goscript_sqrt from "./sqrt.gs.ts"
+import * as __goscript_sqrt from "./sqrt.gs.js"
 import "@goscript/fmt/index.js"
 import "@goscript/io/index.js"
 import "@goscript/math/rand/index.js"
@@ -59,22 +59,22 @@ import "@goscript/strings/index.js"
 import "@goscript/errors/index.js"
 import "@goscript/bytes/index.js"
 import "@goscript/math/index.js"
-import "./accuracy_string.gs.ts"
-import "./arith.gs.ts"
-import "./float.gs.ts"
-import "./floatconv.gs.ts"
-import "./floatmarsh.gs.ts"
-import "./ftoa.gs.ts"
-import "./intconv.gs.ts"
-import "./intmarsh.gs.ts"
-import "./nat.gs.ts"
-import "./natconv.gs.ts"
-import "./natdiv.gs.ts"
-import "./natmul.gs.ts"
-import "./prime.gs.ts"
-import "./rat.gs.ts"
-import "./roundingmode_string.gs.ts"
-import "./sqrt.gs.ts"
+import "./accuracy_string.gs.js"
+import "./arith.gs.js"
+import "./float.gs.js"
+import "./floatconv.gs.js"
+import "./floatmarsh.gs.js"
+import "./ftoa.gs.js"
+import "./intconv.gs.js"
+import "./intmarsh.gs.js"
+import "./nat.gs.js"
+import "./natconv.gs.js"
+import "./natdiv.gs.js"
+import "./natmul.gs.js"
+import "./prime.gs.js"
+import "./rat.gs.js"
+import "./roundingmode_string.gs.js"
+import "./sqrt.gs.js"
 
 export class Int {
 	public get neg(): boolean {
@@ -451,7 +451,6 @@ export class Int {
 			{
 				await fmt.Fprintf($.pointerValueOrNil((s as io.Writer | null))!, "%%!%c(big.Int=%s)", $.basicInterfaceValue(ch, "rune", "int32"), await Int.prototype.String.call(x))
 				return
-				break
 			}
 		}
 
@@ -535,7 +534,6 @@ export class Int {
 				case (($.len(digits) == 1) && ($.uint($.arrayIndex(digits!, 0), 8) == $.uint(48, 8))) && (precision == 0):
 				{
 					return
-					break
 				}
 			}
 		}
@@ -740,16 +738,13 @@ export class Int {
 			case -1:
 			{
 				return null
-				break
 			}
 			case 0:
 			{
 				return Int.prototype.SetInt64.call(z, 0n)
-				break
 			}
 			case 1:
 			{
-				break
 				break
 			}
 		}
@@ -761,17 +756,14 @@ export class Int {
 			case ($.uint($.uint64Mod($.arrayIndex($.pointerValue<Int>(p).abs!, 0), 4n), 64)) == 3:
 			{
 				return Int.prototype.modSqrt3Mod4Prime.call(z, x, p)
-				break
 			}
 			case ($.uint($.uint64Mod($.arrayIndex($.pointerValue<Int>(p).abs!, 0), 8n), 64)) == 5:
 			{
 				return Int.prototype.modSqrt5Mod8Prime.call(z, x, p)
-				break
 			}
 			default:
 			{
 				return Int.prototype.modSqrtTonelliShanks.call(z, x, p)
-				break
 			}
 		}
 		throw new globalThis.Error("goscript: unreachable return")
@@ -789,12 +781,10 @@ export class Int {
 			case a > b:
 			{
 				return Int.prototype.SetInt64.call(z, 1n)
-				break
 			}
 			case (a <= 0n) && (b >= 0n):
 			{
 				return Int.prototype.SetInt64.call(z, 0n)
-				break
 			}
 		}
 		// a <= b && (b < 0 || a > 0)
@@ -1018,7 +1008,6 @@ export class Int {
 			default:
 			{
 				return errors.New("Int.Scan: invalid verb")
-				break
 			}
 		}
 		let [, , err] = await Int.prototype.scan.call(z, $.interfaceValue<io.ByteScanner | null>($.markAsStructValue(new __goscript_intconv.byteReader({ScanState: s})), "big.byteReader", "big.byteReader"), base)
