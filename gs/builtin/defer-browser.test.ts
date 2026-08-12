@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -28,29 +28,32 @@ describe.each([
   ['Chromium', chromium],
   ['WebKit', webkit],
 ])('DisposableStack in %s', (_name, browserType) => {
-  it('supports generated using declarations', async () => {
-    const browser = await browserType.launch({ headless: true })
-    const page = await browser.newPage()
-    const errors: string[] = []
-    page.on('pageerror', (error) => errors.push(error.message))
+  it.skipIf(!existsSync(browserType.executablePath()))(
+    'supports generated using declarations',
+    async () => {
+      const browser = await browserType.launch({ headless: true })
+      const page = await browser.newPage()
+      const errors: string[] = []
+      page.on('pageerror', (error) => errors.push(error.message))
 
-    try {
-      await page.addScriptTag({ content: bundle })
-      expect(errors).toEqual([])
-      expect(
-        await page.evaluate(
-          async () => await globalThis.__goscriptDisposableStackResult,
-        ),
-      ).toEqual({
-        disposeSymbolPresent: _name === 'Chromium',
-        asyncDisposeSymbolPresent: _name === 'Chromium',
-        usesDisposeSymbol: true,
-        usesAsyncDisposeSymbol: true,
-        order: ['second', 'first', 'async'],
-        disposeError: 'deferred failure',
-      })
-    } finally {
-      await browser.close()
-    }
-  })
+      try {
+        await page.addScriptTag({ content: bundle })
+        expect(errors).toEqual([])
+        expect(
+          await page.evaluate(
+            async () => await globalThis.__goscriptDisposableStackResult,
+          ),
+        ).toEqual({
+          disposeSymbolPresent: _name === 'Chromium',
+          asyncDisposeSymbolPresent: _name === 'Chromium',
+          usesDisposeSymbol: true,
+          usesAsyncDisposeSymbol: true,
+          order: ['second', 'first', 'async'],
+          disposeError: 'deferred failure',
+        })
+      } finally {
+        await browser.close()
+      }
+    },
+  )
 })
