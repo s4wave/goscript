@@ -114,8 +114,9 @@ a runtime test under [gs/](./gs), or a consuming project.
   go-git/go-billy, klauspost/compress, zeebo/blake3, mr-tron/base58,
   pkg/errors, hack-pad/safejs, and protobuf-go-lite
 - `goscript test`, which compiles Go package tests to TypeScript, typechecks
-  the generated workspace, and runs it with Bun or in a Chromium browser
-  (`--browser`), reporting failures with compiler-stage classifications
+  the generated workspace, and runs it with Bun or in the selected Chromium or
+  WebKit browser (`--browser <chromium|webkit>`), reporting failures with
+  compiler-stage classifications
 - Real application graphs: Spacewave's browser core plugin compiles and boots
   through GoScript in its end-to-end WASM harness, a package graph that
   includes go-git and the go-mysql-server SQL engine; Spacewave also runs its
@@ -256,7 +257,8 @@ goscript test --tags goscript ./...
 
 `goscript test` loads package test variants, compiles each selected package
 through the normal GoScript pipeline, writes a TypeScript test runner, typechecks
-the generated workspace, and runs it with Bun. Useful options:
+the generated workspace, and runs it with Bun unless a browser is selected.
+Useful options:
 
 - `--tags <tags>`: comma-separated Go build tags.
 - `--run <regexp>`: run only matching Go test names.
@@ -266,7 +268,8 @@ the generated workspace, and runs it with Bun. Useful options:
 - `--workdir <dir>`: generated test workspace directory.
 - `--output <dir>`: generated TypeScript output root.
 - `-p <n>`: maximum package typecheck/runtime commands to run concurrently.
-- `--browser`: run package runtimes in a Chromium browser instead of Bun.
+- `--browser <chromium|webkit>`: run package runtimes in the selected browser
+  instead of Bun. Omitting `--browser` runs package runtimes with Bun.
 - `--runtime-groups`: run package runtimes in grouped Bun worker processes.
 - `--incremental-typecheck`: reuse TypeScript build-info files in the test workdir.
 

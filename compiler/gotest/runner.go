@@ -1418,7 +1418,7 @@ func renderBrowserVitestConfig(req *normalizedRequest, outputRoot string, runner
 	b.WriteString("      enabled: true,\n")
 	b.WriteString("      headless: true,\n")
 	b.WriteString("      provider: playwright(),\n")
-	b.WriteString("      instances: [{ browser: \"chromium\" }],\n")
+	b.WriteString("      instances: [{ browser: \"" + string(req.Browser) + "\" }],\n")
 	b.WriteString("    },\n")
 	b.WriteString("    testTimeout: ")
 	b.WriteString(strconv.FormatInt(timeoutMS, 10))

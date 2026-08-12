@@ -32,7 +32,7 @@ func newTestCommand() *cli.Command {
 	var dir string
 	var parallelism int
 	var runtimeGroups bool
-	var browser bool
+	var browser string
 	var cpuProfile string
 	var memProfile string
 	var incrementalTypeCheck bool
@@ -56,10 +56,14 @@ func newTestCommand() *cli.Command {
 				WorkDir:                   workDir,
 				OutputRoot:                outputRoot,
 				Parallelism:               parallelism,
-				RuntimeBackend:            testRuntimeBackend(browser),
+				RuntimeBackend:            gotest.RuntimeBackendBun,
+				Browser:                   gotest.BrowserName(browser),
 				RuntimeGroups:             runtimeGroups,
 				IncrementalTypeCheck:      incrementalTypeCheck,
 				ProtobufTypeScriptBinding: protobufTypeScriptBinding,
+			}
+			if c.IsSet("browser") {
+				req.RuntimeBackend = gotest.RuntimeBackendBrowser
 			}
 			stopProfile, err := startCPUProfile(cpuProfile)
 			if err != nil {
@@ -151,9 +155,9 @@ func newTestCommand() *cli.Command {
 				Usage:       "run package runtimes in grouped Bun worker processes",
 				Destination: &runtimeGroups,
 			},
-			&cli.BoolFlag{
+			&cli.StringFlag{
 				Name:        "browser",
-				Usage:       "run package runtimes in a Chromium browser",
+				Usage:       "run package runtimes in the selected Chromium or WebKit browser",
 				Destination: &browser,
 			},
 			&cli.BoolFlag{
@@ -178,13 +182,6 @@ func newTestCommand() *cli.Command {
 			},
 		},
 	}
-}
-
-func testRuntimeBackend(browser bool) gotest.RuntimeBackend {
-	if browser {
-		return gotest.RuntimeBackendBrowser
-	}
-	return gotest.RuntimeBackendBun
 }
 
 func startCPUProfile(path string) (func(), error) {

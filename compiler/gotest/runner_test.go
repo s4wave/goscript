@@ -1090,47 +1090,57 @@ func TestRunnerRunsCombinedRuntimeChunks(t *testing.T) {
 }
 
 func TestRunnerRunsBrowserRuntimeBackend(t *testing.T) {
-	moduleDir := writeFixture(t, map[string]string{
-		"go.mod": "module example.test/browser\n\ngo 1.25.3\n",
-		"value_test.go": strings.Join([]string{
-			"package browser",
-			"",
-			"import \"testing\"",
-			"",
-			"func TestBrowser(t *testing.T) {}",
-			"",
-		}, "\n"),
-	})
-	workDir := filepath.Join(moduleDir, ".tmp", "browser-runtime")
-	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "vitest"), strings.Join([]string{
-		"#!/bin/sh",
-		"printf '" + combinedRuntimeResultPrefix + "example.test%%2Fbrowser\\t1\\t7\\tbrowser%%20ok\\n'",
-		"exit 0",
-		"",
-	}, "\n"))
+	for _, browser := range []BrowserName{BrowserNameChromium, BrowserNameWebKit} {
+		t.Run(string(browser), func(t *testing.T) {
+			moduleDir := writeFixture(t, map[string]string{
+				"go.mod": "module example.test/browser\n\ngo 1.25.3\n",
+				"value_test.go": strings.Join([]string{
+					"package browser",
+					"",
+					"import \"testing\"",
+					"",
+					"func TestBrowser(t *testing.T) {}",
+					"",
+				}, "\n"),
+			})
+			workDir := filepath.Join(moduleDir, ".tmp", "browser-runtime")
+			writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "vitest"), strings.Join([]string{
+				"#!/bin/sh",
+				"printf '" + combinedRuntimeResultPrefix + "example.test%%2Fbrowser\t1\t7\tbrowser%%20ok\n'",
+				"exit 0",
+				"",
+			}, "\n"))
 
-	result, err := NewRunner().Run(context.Background(), &Request{
-		Dir:            moduleDir,
-		Patterns:       []string{"."},
-		Timeout:        30 * time.Second,
-		WorkDir:        workDir,
-		RuntimeBackend: RuntimeBackendBrowser,
-	})
-	if err != nil {
-		t.Fatalf("run browser runtime fixture: %v", err)
-	}
-	if !result.Passed() {
-		t.Fatalf("expected browser runtime fixture to pass: %#v", result.Packages)
-	}
-	if got := result.Packages[0].Output; got != "browser ok" {
-		t.Fatalf("expected browser runtime output, got %q", got)
-	}
-	config, err := os.ReadFile(filepath.Join(workDir, "vitest-browser-0.config.mts"))
-	if err != nil {
-		t.Fatalf("read browser vitest config: %v", err)
-	}
-	if !strings.Contains(string(config), "browser: \"chromium\"") {
-		t.Fatalf("expected Chromium browser config, got:\n%s", config)
+			result, err := NewRunner().Run(context.Background(), &Request{
+				Dir:            moduleDir,
+				Patterns:       []string{"."},
+				Timeout:        30 * time.Second,
+				WorkDir:        workDir,
+				RuntimeBackend: RuntimeBackendBrowser,
+				Browser:        browser,
+			})
+			if err != nil {
+				t.Fatalf("run browser runtime fixture: %v", err)
+			}
+			if !result.Passed() {
+				t.Fatalf("expected browser runtime fixture to pass: %#v", result.Packages)
+			}
+			if got := result.Packages[0].Output; got != "browser ok" {
+				t.Fatalf("expected browser runtime output, got %q", got)
+			}
+			config, err := os.ReadFile(filepath.Join(workDir, "vitest-browser-0.config.mts"))
+			if err != nil {
+				t.Fatalf("read browser vitest config: %v", err)
+			}
+			configText := string(config)
+			if got := strings.Count(configText, "      instances:"); got != 1 {
+				t.Fatalf("expected exactly one browser instance row, got %d:\n%s", got, config)
+			}
+			want := `      instances: [{ browser: "` + string(browser) + `" }],`
+			if got := strings.Count(configText, want); got != 1 {
+				t.Fatalf("expected exactly one %s browser instance row, got %d:\n%s", browser, got, config)
+			}
+		})
 	}
 }
 
@@ -1159,6 +1169,7 @@ func TestRunnerReportsBrowserRuntimeFailureRecord(t *testing.T) {
 		Patterns:       []string{"."},
 		Timeout:        30 * time.Second,
 		RuntimeBackend: RuntimeBackendBrowser,
+		Browser:        BrowserNameChromium,
 	})
 	if err != nil {
 		t.Fatalf("run browser failure fixture: %v", err)
@@ -1224,6 +1235,7 @@ func TestRunnerReportsBrowserRuntimeMissingResult(t *testing.T) {
 		Patterns:       []string{"."},
 		Timeout:        30 * time.Second,
 		RuntimeBackend: RuntimeBackendBrowser,
+		Browser:        BrowserNameChromium,
 	})
 	if err != nil {
 		t.Fatalf("run browser missing-result fixture: %v", err)
@@ -1375,6 +1387,7 @@ func TestNormalizeRuntimeBackend(t *testing.T) {
 	norm, err = (&Request{
 		Patterns:       []string{"."},
 		RuntimeBackend: RuntimeBackendBrowser,
+		Browser:        BrowserNameChromium,
 	}).normalize()
 	if err != nil {
 		t.Fatalf("normalize browser runtime backend: %v", err)
@@ -1450,6 +1463,7 @@ func TestRenderRunnerChangesToPackageSourceDir(t *testing.T) {
 func TestRenderBrowserRunnerAvoidsProcessAPIs(t *testing.T) {
 	req := &normalizedRequest{
 		RuntimeBackend: RuntimeBackendBrowser,
+		Browser:        BrowserNameChromium,
 	}
 	runner := renderPackageRunner(PackageResult{
 		PackagePath: "example.test/pkg",
@@ -1474,6 +1488,7 @@ func TestRenderBrowserRunnerAvoidsProcessAPIs(t *testing.T) {
 func TestRenderBrowserRunnerReportsProcessExit(t *testing.T) {
 	req := &normalizedRequest{
 		RuntimeBackend: RuntimeBackendBrowser,
+		Browser:        BrowserNameChromium,
 	}
 	runner := renderPackageRunner(PackageResult{
 		PackagePath: "example.test/pkg",
@@ -1498,6 +1513,7 @@ func TestRenderBrowserRunnerReportsProcessExit(t *testing.T) {
 func TestRenderBrowserRunnerHonorsPanicOnExitZero(t *testing.T) {
 	req := &normalizedRequest{
 		RuntimeBackend: RuntimeBackendBrowser,
+		Browser:        BrowserNameChromium,
 		PanicOnExit0:   true,
 	}
 	runner := renderPackageRunner(PackageResult{
@@ -1573,6 +1589,7 @@ func TestRenderBrowserTypeScriptProjectsExcludeNodeAmbientDeclarations(t *testin
 	req := &normalizedRequest{
 		WorkDir:        "/work",
 		RuntimeBackend: RuntimeBackendBrowser,
+		Browser:        BrowserNameChromium,
 	}
 
 	packageTSConfig := renderTypeScriptProject(req, "/work/output/package-0", "runner-0.ts", "tsconfig-0.json", false)

@@ -42,6 +42,8 @@ type Request struct {
 	Parallelism int
 	// RuntimeBackend selects the JavaScript host used for package runtime tests.
 	RuntimeBackend RuntimeBackend
+	// Browser selects the Playwright browser when RuntimeBackendBrowser is used.
+	Browser BrowserName
 	// RuntimeGroups allows package runtimes to share worker Bun processes.
 	RuntimeGroups bool
 	// IncrementalTypeCheck reuses TypeScript build-info files inside WorkDir.
@@ -64,6 +66,7 @@ type normalizedRequest struct {
 	OutputRoot                string
 	Parallelism               int
 	RuntimeBackend            RuntimeBackend
+	Browser                   BrowserName
 	RuntimeGroups             bool
 	IncrementalTypeCheck      bool
 }
@@ -74,9 +77,33 @@ type RuntimeBackend string
 const (
 	// RuntimeBackendBun runs generated package-test modules directly in Bun.
 	RuntimeBackendBun RuntimeBackend = "bun"
-	// RuntimeBackendBrowser runs generated package-test modules in Chromium.
+	// RuntimeBackendBrowser runs generated package-test modules in a browser.
 	RuntimeBackendBrowser RuntimeBackend = "browser"
 )
+
+// BrowserName selects a Playwright browser engine.
+type BrowserName string
+
+const (
+	// BrowserNameChromium selects the Chromium Playwright browser.
+	BrowserNameChromium BrowserName = "chromium"
+	// BrowserNameWebKit selects the WebKit Playwright browser.
+	BrowserNameWebKit BrowserName = "webkit"
+)
+
+// ParseBrowserName validates a Playwright browser engine name.
+func ParseBrowserName(value string) (BrowserName, error) {
+	switch BrowserName(strings.TrimSpace(value)) {
+	case BrowserNameChromium:
+		return BrowserNameChromium, nil
+	case BrowserNameWebKit:
+		return BrowserNameWebKit, nil
+	case "":
+		return "", errors.New("browser name is required")
+	default:
+		return "", errors.Errorf("unsupported browser name %q (must be chromium or webkit)", value)
+	}
+}
 
 // DefaultParallelism returns the default package subprocess concurrency.
 func DefaultParallelism() int {
@@ -157,8 +184,17 @@ func (r *Request) normalize() (*normalizedRequest, error) {
 	if runtimeBackend == "" {
 		runtimeBackend = RuntimeBackendBun
 	}
+	var browser BrowserName
 	switch runtimeBackend {
-	case RuntimeBackendBun, RuntimeBackendBrowser:
+	case RuntimeBackendBun:
+		if r.Browser != "" {
+			return nil, errors.New("browser name requires browser runtime backend")
+		}
+	case RuntimeBackendBrowser:
+		browser, err = ParseBrowserName(string(r.Browser))
+		if err != nil {
+			return nil, err
+		}
 	default:
 		return nil, errors.Errorf("unsupported runtime backend %q", runtimeBackend)
 	}
@@ -179,6 +215,7 @@ func (r *Request) normalize() (*normalizedRequest, error) {
 		OutputRoot:                outputRoot,
 		Parallelism:               parallelism,
 		RuntimeBackend:            runtimeBackend,
+		Browser:                   browser,
 		RuntimeGroups:             r.RuntimeGroups,
 		IncrementalTypeCheck:      r.IncrementalTypeCheck,
 	}, nil

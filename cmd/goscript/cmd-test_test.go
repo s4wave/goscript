@@ -24,6 +24,41 @@ func TestTestCommandHelp(t *testing.T) {
 	}
 }
 
+func TestTestCommandBrowserSelector(t *testing.T) {
+	for _, browser := range []string{"chromium", "webkit"} {
+		t.Run(browser, func(t *testing.T) {
+			app := newApp()
+			if err := app.Run([]string{"goscript", "test", "--browser", browser, "--help"}); err != nil {
+				t.Fatalf("browser value %q rejected: %v", browser, err)
+			}
+		})
+	}
+
+	t.Run("bare", func(t *testing.T) {
+		app := newApp()
+		err := app.Run([]string{"goscript", "test", "--browser"})
+		if err == nil || !strings.Contains(err.Error(), "flag needs an argument") {
+			t.Fatalf("bare browser error = %v, want missing value", err)
+		}
+	})
+
+	t.Run("empty", func(t *testing.T) {
+		app := newApp()
+		err := app.Run([]string{"goscript", "test", "--browser=", "--dir", t.TempDir(), "."})
+		if err == nil || !strings.Contains(err.Error(), "browser name is required") {
+			t.Fatalf("empty browser error = %v, want missing value", err)
+		}
+	})
+
+	t.Run("unknown", func(t *testing.T) {
+		app := newApp()
+		err := app.Run([]string{"goscript", "test", "--browser", "firefox", "--dir", t.TempDir(), "."})
+		if err == nil || !strings.Contains(err.Error(), "unsupported browser name") {
+			t.Fatalf("unknown browser error = %v, want unsupported browser name", err)
+		}
+	})
+}
+
 func TestTestCommandRunsPackageTest(t *testing.T) {
 	dir := t.TempDir()
 	writeFile(t, filepath.Join(dir, "go.mod"), "module example.test/cmdtest\n\ngo 1.25.3\n")
