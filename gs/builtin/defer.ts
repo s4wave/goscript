@@ -1,5 +1,11 @@
 import { withRecoveringPanic } from './panic.js'
 
+const disposeSymbol: typeof Symbol.dispose =
+  Symbol.dispose ?? (Symbol.for('Symbol.dispose') as typeof Symbol.dispose)
+const asyncDisposeSymbol: typeof Symbol.asyncDispose =
+  Symbol.asyncDispose ??
+  (Symbol.for('Symbol.asyncDispose') as typeof Symbol.asyncDispose)
+
 /**
  * DisposableStack manages synchronous disposable resources, mimicking Go's defer behavior.
  * Functions added via `defer` are executed in LIFO order when the stack is disposed.
@@ -30,7 +36,7 @@ export class DisposableStack implements Disposable {
   /**
    * Disposes during ordinary scope exit.
    */
-  [Symbol.dispose](): void {
+  [disposeSymbol](): void {
     this.dispose()
   }
 }
@@ -68,11 +74,11 @@ export class AsyncDisposableStack implements AsyncDisposable {
     }
   }
 
-  async [Symbol.asyncDispose](): Promise<void> {
+  async [asyncDisposeSymbol](): Promise<void> {
     await this.dispose()
   }
 
-  [Symbol.dispose](): void {
+  [disposeSymbol](): void {
     while (this.stack.length) {
       const fn = this.stack.pop()!
       const result = fn()
