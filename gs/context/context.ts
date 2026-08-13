@@ -269,7 +269,7 @@ export function TODO(): Context {
 }
 
 // WithCancel returns a copy of parent with a new Done channel
-export function WithCancel(parent: Context): [ContextNonNil, CancelFunc] {
+export function WithCancel(parent: Context): [Context, CancelFunc] {
   if (parent === null) {
     throw new Error('cannot create context from nil parent')
   }
@@ -285,9 +285,7 @@ export function WithCancel(parent: Context): [ContextNonNil, CancelFunc] {
 }
 
 // WithCancelCause returns a copy of parent with a new Done channel and cause recording
-export function WithCancelCause(
-  parent: Context,
-): [ContextNonNil, CancelCauseFunc] {
+export function WithCancelCause(parent: Context): [Context, CancelCauseFunc] {
   if (parent === null) {
     throw new Error('cannot create context from nil parent')
   }
@@ -306,7 +304,7 @@ export function WithCancelCause(
 export function WithDeadline(
   parent: Context,
   d: time.Time,
-): [ContextNonNil, CancelFunc] {
+): [Context, CancelFunc] {
   return WithDeadlineCause(parent, d, null)
 }
 
@@ -315,7 +313,7 @@ export function WithDeadlineCause(
   parent: Context,
   d: time.Time,
   cause: $.GoError,
-): [ContextNonNil, CancelFunc] {
+): [Context, CancelFunc] {
   if (parent === null) {
     throw new Error('cannot create context from nil parent')
   }
@@ -342,7 +340,7 @@ export function WithDeadlineCause(
 export function WithTimeout(
   parent: Context,
   timeout: time.Duration,
-): [ContextNonNil, CancelFunc] {
+): [Context, CancelFunc] {
   return WithDeadline(parent, time.Now().Add(timeout))
 }
 
@@ -351,12 +349,12 @@ export function WithTimeoutCause(
   parent: Context,
   timeout: time.Duration,
   cause: $.GoError,
-): [ContextNonNil, CancelFunc] {
+): [Context, CancelFunc] {
   return WithDeadlineCause(parent, time.Now().Add(timeout), cause)
 }
 
 // WithValue returns a copy of parent with the value associated with key
-export function WithValue(parent: Context, key: any, val: any): ContextNonNil {
+export function WithValue(parent: Context, key: any, val: any): Context {
   if (parent === null) {
     throw new Error('cannot create context from nil parent')
   }
@@ -364,7 +362,7 @@ export function WithValue(parent: Context, key: any, val: any): ContextNonNil {
 }
 
 // WithoutCancel returns a context that inherits values but not cancellation
-export function WithoutCancel(parent: Context): ContextNonNil {
+export function WithoutCancel(parent: Context): Context {
   if (parent === null) {
     throw new Error('cannot create context from nil parent')
   }
