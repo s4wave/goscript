@@ -719,16 +719,16 @@ export class sysDialer {
 				return await $.pointerValue<Exclude<__goscript_net.Conn | null, null>>(this.Conn).Close()
 			}
 
-			public async LocalAddr(): globalThis.Promise<any> {
-				return await $.pointerValue<Exclude<__goscript_net.Conn | null, null>>(this.Conn).LocalAddr()
+			public LocalAddr(): any {
+				return $.pointerValue<Exclude<__goscript_net.Conn | null, null>>(this.Conn).LocalAddr()
 			}
 
 			public async Read(b: any): globalThis.Promise<any> {
 				return await $.pointerValue<Exclude<__goscript_net.Conn | null, null>>(this.Conn).Read(b)
 			}
 
-			public async RemoteAddr(): globalThis.Promise<any> {
-				return await $.pointerValue<Exclude<__goscript_net.Conn | null, null>>(this.Conn).RemoteAddr()
+			public RemoteAddr(): any {
+				return $.pointerValue<Exclude<__goscript_net.Conn | null, null>>(this.Conn).RemoteAddr()
 			}
 
 			public async SetDeadline(t: any): globalThis.Promise<any> {
