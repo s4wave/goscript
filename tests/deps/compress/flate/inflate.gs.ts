@@ -88,9 +88,9 @@ export class ReadError {
 		return $.markAsStructValue(cloned)
 	}
 
-	public Error(): string {
+	public async Error(): globalThis.Promise<string> {
 		const e: ReadError | $.VarRef<ReadError> | null = this
-		return (("flate: read error at offset " + strconv.FormatInt($.pointerValue<ReadError>(e).Offset, 10)) + ": ") + $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<ReadError>(e).Err).Error()
+		return (("flate: read error at offset " + strconv.FormatInt($.pointerValue<ReadError>(e).Offset, 10)) + ": ") + await $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<ReadError>(e).Err).Error()
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -138,9 +138,9 @@ export class WriteError {
 		return $.markAsStructValue(cloned)
 	}
 
-	public Error(): string {
+	public async Error(): globalThis.Promise<string> {
 		const e: WriteError | $.VarRef<WriteError> | null = this
-		return (("flate: write error at offset " + strconv.FormatInt($.pointerValue<WriteError>(e).Offset, 10)) + ": ") + $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<WriteError>(e).Err).Error()
+		return (("flate: write error at offset " + strconv.FormatInt($.pointerValue<WriteError>(e).Offset, 10)) + ": ") + await $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<WriteError>(e).Err).Error()
 	}
 
 	static __typeInfo = $.registerStructType(

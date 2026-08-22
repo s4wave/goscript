@@ -41,12 +41,12 @@ export async function main(): globalThis.Promise<void> {
 	let wrapped = wrap(open)
 	let [value, err] = await wrapped!("ok")
 	if (err != null) {
-		$.println("err")
+		await $.println("err")
 		return
 	}
-	$.println(value)
+	await $.println(value)
 	if (await run(noop) == null) {
-		$.println("run ok")
+		await $.println("run ok")
 	}
 }
 

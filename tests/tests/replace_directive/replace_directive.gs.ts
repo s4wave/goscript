@@ -7,7 +7,7 @@ import * as replaced from "@goscript/github.com/example/replaced/index.js"
 import "@goscript/github.com/example/replaced/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	$.println(replaced.Hello())
+	await $.println(replaced.Hello())
 }
 
 if ($.isMainScript(import.meta)) {

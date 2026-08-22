@@ -1744,7 +1744,7 @@ export async function MustCompile(str: string): globalThis.Promise<Regexp | $.Va
 	let regexp: Regexp | $.VarRef<Regexp> | null = __goscriptTuple22[0]
 	let err = __goscriptTuple22[1]
 	if (err != null) {
-		$.panic((("regexp: Compile(" + quote(str)) + "): ") + $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		$.panic((("regexp: Compile(" + quote(str)) + "): ") + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 	}
 	return regexp
 }
@@ -1754,7 +1754,7 @@ export async function MustCompilePOSIX(str: string): globalThis.Promise<Regexp |
 	let regexp: Regexp | $.VarRef<Regexp> | null = __goscriptTuple23[0]
 	let err = __goscriptTuple23[1]
 	if (err != null) {
-		$.panic((("regexp: CompilePOSIX(" + quote(str)) + "): ") + $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		$.panic((("regexp: CompilePOSIX(" + quote(str)) + "): ") + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 	}
 	return regexp
 }

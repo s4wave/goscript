@@ -9,54 +9,54 @@ import "@goscript/io/fs/index.js"
 export async function main(): globalThis.Promise<void> {
 	// Test ValidPath function
 	let valid1 = fs.ValidPath("hello/world.txt")
-	$.println("ValidPath('hello/world.txt'):", valid1)
+	await $.println("ValidPath('hello/world.txt'):", valid1)
 
 	let valid2 = fs.ValidPath("../invalid")
-	$.println("ValidPath('../invalid'):", valid2)
+	await $.println("ValidPath('../invalid'):", valid2)
 
 	let valid3 = fs.ValidPath(".")
-	$.println("ValidPath('.'):", valid3)
+	await $.println("ValidPath('.'):", valid3)
 
 	let valid4 = fs.ValidPath("")
-	$.println("ValidPath(''):", valid4)
+	await $.println("ValidPath(''):", valid4)
 
 	// Test error constants
-	$.println("ErrInvalid:", $.pointerValue<Exclude<$.GoError, null>>(fs.ErrInvalid).Error())
-	$.println("ErrNotExist:", $.pointerValue<Exclude<$.GoError, null>>(fs.ErrNotExist).Error())
-	$.println("ErrExist:", $.pointerValue<Exclude<$.GoError, null>>(fs.ErrExist).Error())
-	$.println("ErrPermission:", $.pointerValue<Exclude<$.GoError, null>>(fs.ErrPermission).Error())
-	$.println("ErrClosed:", $.pointerValue<Exclude<$.GoError, null>>(fs.ErrClosed).Error())
+	await $.println("ErrInvalid:", await $.pointerValue<Exclude<$.GoError, null>>(fs.ErrInvalid).Error())
+	await $.println("ErrNotExist:", await $.pointerValue<Exclude<$.GoError, null>>(fs.ErrNotExist).Error())
+	await $.println("ErrExist:", await $.pointerValue<Exclude<$.GoError, null>>(fs.ErrExist).Error())
+	await $.println("ErrPermission:", await $.pointerValue<Exclude<$.GoError, null>>(fs.ErrPermission).Error())
+	await $.println("ErrClosed:", await $.pointerValue<Exclude<$.GoError, null>>(fs.ErrClosed).Error())
 
 	// Test all FileMode constants
-	$.println("ModeDir:", $.int(fs.ModeDir))
-	$.println("ModeAppend:", $.int(fs.ModeAppend))
-	$.println("ModeExclusive:", $.int(fs.ModeExclusive))
-	$.println("ModeTemporary:", $.int(fs.ModeTemporary))
-	$.println("ModeSymlink:", $.int(fs.ModeSymlink))
-	$.println("ModeDevice:", $.int(fs.ModeDevice))
-	$.println("ModeNamedPipe:", $.int(fs.ModeNamedPipe))
-	$.println("ModeSocket:", $.int(fs.ModeSocket))
-	$.println("ModeSetuid:", $.int(fs.ModeSetuid))
-	$.println("ModeSetgid:", $.int(fs.ModeSetgid))
-	$.println("ModeCharDevice:", $.int(fs.ModeCharDevice))
-	$.println("ModeSticky:", $.int(fs.ModeSticky))
-	$.println("ModeIrregular:", $.int(fs.ModeIrregular))
-	$.println("ModeType:", $.int(fs.ModeType))
-	$.println("ModePerm:", $.int(fs.ModePerm))
+	await $.println("ModeDir:", $.int(fs.ModeDir))
+	await $.println("ModeAppend:", $.int(fs.ModeAppend))
+	await $.println("ModeExclusive:", $.int(fs.ModeExclusive))
+	await $.println("ModeTemporary:", $.int(fs.ModeTemporary))
+	await $.println("ModeSymlink:", $.int(fs.ModeSymlink))
+	await $.println("ModeDevice:", $.int(fs.ModeDevice))
+	await $.println("ModeNamedPipe:", $.int(fs.ModeNamedPipe))
+	await $.println("ModeSocket:", $.int(fs.ModeSocket))
+	await $.println("ModeSetuid:", $.int(fs.ModeSetuid))
+	await $.println("ModeSetgid:", $.int(fs.ModeSetgid))
+	await $.println("ModeCharDevice:", $.int(fs.ModeCharDevice))
+	await $.println("ModeSticky:", $.int(fs.ModeSticky))
+	await $.println("ModeIrregular:", $.int(fs.ModeIrregular))
+	await $.println("ModeType:", $.int(fs.ModeType))
+	await $.println("ModePerm:", $.int(fs.ModePerm))
 
 	// Test FileMode methods
 	let mode = $.uint(fs.ModeDir | 0o755, 32)
-	$.println("FileMode.IsDir():", fs.FileMode_IsDir(mode))
-	$.println("FileMode.IsRegular():", fs.FileMode_IsRegular(mode))
-	$.println("FileMode.Perm():", $.int(fs.FileMode_Perm(mode)))
-	$.println("FileMode.Type():", $.int(fs.FileMode_Type(mode)))
-	$.println("FileMode.String():", fs.FileMode_String(mode))
+	await $.println("FileMode.IsDir():", fs.FileMode_IsDir(mode))
+	await $.println("FileMode.IsRegular():", fs.FileMode_IsRegular(mode))
+	await $.println("FileMode.Perm():", $.int(fs.FileMode_Perm(mode)))
+	await $.println("FileMode.Type():", $.int(fs.FileMode_Type(mode)))
+	await $.println("FileMode.String():", fs.FileMode_String(mode))
 
 	let regularMode = $.uint(0o644, 32)
-	$.println("Regular file IsDir():", fs.FileMode_IsDir(regularMode))
-	$.println("Regular file IsRegular():", fs.FileMode_IsRegular(regularMode))
+	await $.println("Regular file IsDir():", fs.FileMode_IsDir(regularMode))
+	await $.println("Regular file IsRegular():", fs.FileMode_IsRegular(regularMode))
 
-	$.println("test finished")
+	await $.println("test finished")
 }
 
 if ($.isMainScript(import.meta)) {

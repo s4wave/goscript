@@ -126,7 +126,7 @@ export async function ParsePKCS8PrivateKey(der: $.Slice<number>): globalThis.Pro
 			key = $.interfaceValue(__goscriptTuple0[0], "*rsa.PrivateKey", { kind: $.TypeKind.Pointer, elemType: "rsa.PrivateKey" })
 			err = __goscriptTuple0[1]
 			if (err != null) {
-				return [null, errors.New("x509: failed to parse RSA private key embedded in PKCS#8: " + $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
+				return [null, errors.New("x509: failed to parse RSA private key embedded in PKCS#8: " + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
 			}
 			return [key, null]
 			break
@@ -145,7 +145,7 @@ export async function ParsePKCS8PrivateKey(der: $.Slice<number>): globalThis.Pro
 			key = $.interfaceValue(__goscriptTuple1[0], "*ecdsa.PrivateKey", { kind: $.TypeKind.Pointer, elemType: "ecdsa.PrivateKey" })
 			err = __goscriptTuple1[1]
 			if (err != null) {
-				return [null, errors.New("x509: failed to parse EC private key embedded in PKCS#8: " + $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
+				return [null, errors.New("x509: failed to parse EC private key embedded in PKCS#8: " + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
 			}
 			return [key, null]
 			break
@@ -235,7 +235,7 @@ export async function MarshalPKCS8PrivateKey(key: any): globalThis.Promise<[$.Sl
 					let oidBytes: $.Slice<number> = __goscriptTuple3[0]
 					let err = __goscriptTuple3[1]
 					if (err != null) {
-						return [null, errors.New("x509: failed to marshal curve OID: " + $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
+						return [null, errors.New("x509: failed to marshal curve OID: " + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
 					}
 					privKey.Algo = $.markAsStructValue(new pkix.AlgorithmIdentifier({Algorithm: (__goscript_x509.oidPublicKeyECDSA as asn1.ObjectIdentifier), Parameters: $.markAsStructValue(new asn1.RawValue({FullBytes: oidBytes}))}))
 					{
@@ -243,7 +243,7 @@ export async function MarshalPKCS8PrivateKey(key: any): globalThis.Promise<[$.Sl
 						privKey.PrivateKey = __goscriptTuple4[0]
 						err = __goscriptTuple4[1]
 						if (err != null) {
-							return [null, errors.New("x509: failed to marshal EC private key while building PKCS#8: " + $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
+							return [null, errors.New("x509: failed to marshal EC private key while building PKCS#8: " + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
 						}
 					}
 				}
@@ -286,7 +286,7 @@ export async function MarshalPKCS8PrivateKey(key: any): globalThis.Promise<[$.Sl
 						let oidBytes: $.Slice<number> = __goscriptTuple8[0]
 						let err = __goscriptTuple8[1]
 						if (err != null) {
-							return [null, errors.New("x509: failed to marshal curve OID: " + $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
+							return [null, errors.New("x509: failed to marshal curve OID: " + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
 						}
 						privKey.Algo = $.markAsStructValue(new pkix.AlgorithmIdentifier({Algorithm: (__goscript_x509.oidPublicKeyECDSA as asn1.ObjectIdentifier), Parameters: $.markAsStructValue(new asn1.RawValue({FullBytes: oidBytes}))}))
 						{
@@ -294,7 +294,7 @@ export async function MarshalPKCS8PrivateKey(key: any): globalThis.Promise<[$.Sl
 							privKey.PrivateKey = __goscriptTuple9[0]
 							err = __goscriptTuple9[1]
 							if (err != null) {
-								return [null, errors.New("x509: failed to marshal EC private key while building PKCS#8: " + $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
+								return [null, errors.New("x509: failed to marshal EC private key while building PKCS#8: " + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
 							}
 						}
 					}

@@ -5,9 +5,9 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	for (let i = 0; i < 1; i++) {
-		$.println(i)
+		await $.println(i)
 	}
-	$.println("done")
+	await $.println("done")
 }
 
 if ($.isMainScript(import.meta)) {

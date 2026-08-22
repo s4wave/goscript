@@ -66,16 +66,16 @@ export function chooseLookup(value: any, worker: Worker | $.VarRef<Worker> | nul
 
 export async function main(): globalThis.Promise<void> {
 	let worker: Worker | $.VarRef<Worker> | null = new Worker({ch: $.makeChannel<number>(1, 0, "both")})
-	$.println("lookup:", chooseLookup(null, worker))
+	await $.println("lookup:", chooseLookup(null, worker))
 
 	await $.chanSend($.pointerValue<Worker>(worker).ch, 1)
 	await $.chanRecv($.pointerValue<Worker>(worker).ch)
-	$.println("call:", await callLookup($.functionValue(((__receiver) => (network: string) => __receiver.lookup(network))($.pointerValue<Worker>(worker)), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo)), "tcp"))
+	await $.println("call:", await callLookup($.functionValue(((__receiver) => (network: string) => __receiver.lookup(network))($.pointerValue<Worker>(worker)), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo)), "tcp"))
 
 	let hook: ((fn: ((_p0: string) => number | globalThis.Promise<number>) | null, network: string) => number | globalThis.Promise<number>) | null = $.functionValue(async (fn: ((_p0: string) => number | globalThis.Promise<number>) | null, network: string): globalThis.Promise<number> => {
 		return fn!(network)
 	}, ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo), { kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))
-	$.println("hook:", await hook!(syncLookup, "ip"))
+	await $.println("hook:", await hook!(syncLookup, "ip"))
 	$.pointerValue<Worker>(worker).ch!.close()
 }
 

@@ -11,7 +11,7 @@ import "./register.gs.ts"
 
 export async function main(): globalThis.Promise<void> {
 	__goscript_consts.__goscript_get_Default()
-	$.println("seen:", __goscript_register.Seen)
+	await $.println("seen:", __goscript_register.Seen)
 }
 
 if ($.isMainScript(import.meta)) {

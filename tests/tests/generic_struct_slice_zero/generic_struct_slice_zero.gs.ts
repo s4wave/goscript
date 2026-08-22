@@ -91,7 +91,7 @@ export async function main(): globalThis.Promise<void> {
 	let a: $.VarRef<arena> = $.varRef($.markAsStructValue(new arena()))
 	let value: item | $.VarRef<item> | null = (a.value.New({[$.genericTypeArgsMarker]: true, T: { type: "main.item", zero: () => $.markAsStructValue(new item()) }}) as item | $.VarRef<item> | null)
 	$.pointerValue<item>(value).Text = "ok"
-	$.println($.pointerValue<item>(value).Text)
+	await $.println($.pointerValue<item>(value).Text)
 }
 
 if ($.isMainScript(import.meta)) {

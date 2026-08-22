@@ -82,7 +82,7 @@ export async function HandleProxyRpcStream(__typeArgs: $.GenericTypeArgs | undef
 	// send ack, but only if we have an error
 	// otherwise: we will proxy the ack from the remote stream.
 	if (err != null) {
-		let errStr = $.pointerValue<Exclude<$.GoError, null>>(err).Error()
+		let errStr = await $.pointerValue<Exclude<$.GoError, null>>(err).Error()
 		await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream, null>>(stream).Send(new __goscript_rpcstream_pb.RpcStreamPacket({Body: $.interfaceValue<__goscript_rpcstream_pb.isRpcStreamPacket_Body | null>(new __goscript_rpcstream_pb.RpcStreamPacket_Ack({Ack: new __goscript_rpcstream_pb.RpcAck({Error: errStr})}), "*rpcstream.RpcStreamPacket_Ack", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket_Ack" })}))
 		return err
 	}

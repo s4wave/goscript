@@ -423,7 +423,7 @@ export class commonRPC {
 			$.pointerValue<commonRPC>(c).localCompleted.Store(true)
 		}
 
-		let outPkt: __goscript_rpcproto_pb.Packet | $.VarRef<__goscript_rpcproto_pb.Packet> | null = __goscript_packet.NewCallDataPacket(data, ($.len(data) == 0) && dataIsZero, complete, err)
+		let outPkt: __goscript_rpcproto_pb.Packet | $.VarRef<__goscript_rpcproto_pb.Packet> | null = await __goscript_packet.NewCallDataPacket(data, ($.len(data) == 0) && dataIsZero, complete, err)
 		return $.pointerValue<Exclude<__goscript_writer.PacketWriter, null>>($.pointerValue<commonRPC>(c).writer).WritePacket(outPkt)
 	}
 

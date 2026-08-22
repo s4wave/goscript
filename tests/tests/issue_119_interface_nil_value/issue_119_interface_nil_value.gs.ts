@@ -128,17 +128,17 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test 1: The interface should NOT be nil
 	if (animal == null) {
-		$.println("animal is nil")
+		await $.println("animal is nil")
 	} else {
-		$.println("animal is not nil")
+		await $.println("animal is not nil")
 	}
 
 	// Test 2: Calling method on nil receiver should work
 	// The method dispatch uses the type (*Dog) to find Name()
 	// Then passes nil as the receiver
-	$.println(await $.pointerValue<Exclude<Animal, null>>(animal).Name())
+	await $.println(await $.pointerValue<Exclude<Animal, null>>(animal).Name())
 	let directNilDog: Dog | $.VarRef<Dog> | null = null! as Dog | $.VarRef<Dog> | null
-	$.println(Dog.prototype.Name.call(directNilDog))
+	await $.println(Dog.prototype.Name.call(directNilDog))
 
 	// Test 3: Type assertions preserve the typed nil pointer
 	{
@@ -146,9 +146,9 @@ export async function main(): globalThis.Promise<void> {
 		let d: Dog | $.VarRef<Dog> | null = __goscriptTuple0[0]
 		let ok = __goscriptTuple0[1]
 		if (ok && (d == null)) {
-			$.println("typed nil dog assertion ok")
+			await $.println("typed nil dog assertion ok")
 		} else {
-			$.println("typed nil dog assertion failed")
+			await $.println("typed nil dog assertion failed")
 		}
 	}
 	{
@@ -156,9 +156,9 @@ export async function main(): globalThis.Promise<void> {
 		let c: Cat | $.VarRef<Cat> | null = __goscriptTuple1[0]
 		let ok = __goscriptTuple1[1]
 		if (ok || (c != null)) {
-			$.println("typed nil cat assertion accepted")
+			await $.println("typed nil cat assertion accepted")
 		} else {
-			$.println("typed nil cat assertion rejected")
+			await $.println("typed nil cat assertion rejected")
 		}
 	}
 
@@ -167,17 +167,17 @@ export async function main(): globalThis.Promise<void> {
 	let a: Animal | null = $.interfaceValue<Animal | null>(dog, "*main.Dog", { kind: $.TypeKind.Pointer, elemType: "main.Dog" })
 
 	if (a == null) {
-		$.println("a is nil")
+		await $.println("a is nil")
 	} else {
-		$.println("a is not nil")
+		await $.println("a is not nil")
 	}
 
 	// Test 5: Truly nil interface
 	let b: Animal | null = null
 	if (b == null) {
-		$.println("b is nil")
+		await $.println("b is nil")
 	} else {
-		$.println("b is not nil")
+		await $.println("b is not nil")
 	}
 }
 

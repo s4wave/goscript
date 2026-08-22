@@ -122,7 +122,7 @@ export async function main(): globalThis.Promise<void> {
 	let fix: Fixed = ($.arrayIndex(fixed!, 0) as Fixed)
 	let fv = $.arrayIndex(fix!, 0)
 	if (await dep.ToKey(fv) != null) {
-		$.println("ok")
+		await $.println("ok")
 	}
 }
 

@@ -38,7 +38,7 @@ export function platform(): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println(platform())
+	await $.println(platform())
 }
 
 if ($.isMainScript(import.meta)) {

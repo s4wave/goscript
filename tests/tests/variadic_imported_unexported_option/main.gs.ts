@@ -8,8 +8,8 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/variadic_imported_unexp
 
 export async function main(): globalThis.Promise<void> {
 	let thing: subpkg.Thing | $.VarRef<subpkg.Thing> | null = await subpkg.New($.arrayToSlice<subpkg.option | null>([subpkg.WithValue(7), subpkg.WithLabel("hi")]))
-	$.println($.pointerValue<subpkg.Thing>(thing).Value)
-	$.println($.pointerValue<subpkg.Thing>(thing).Label)
+	await $.println($.pointerValue<subpkg.Thing>(thing).Value)
+	await $.println($.pointerValue<subpkg.Thing>(thing).Label)
 }
 
 if ($.isMainScript(import.meta)) {

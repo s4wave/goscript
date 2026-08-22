@@ -34,19 +34,19 @@ export async function main(): globalThis.Promise<void> {
 
 	let q: conc.ConcurrentQueue | $.VarRef<conc.ConcurrentQueue> | null = await conc.NewConcurrentQueue(2, $.arrayToSlice<(() => void) | null>([await makeJob!(0), await makeJob!(1)]))
 	let [queued, running] = await conc.ConcurrentQueue.prototype.Enqueue.call(q, $.arrayToSlice<(() => void) | null>([await makeJob!(2), await makeJob!(3), await makeJob!(4)]))
-	$.println((("queued=" + strconv.Itoa(queued)) + " running=") + strconv.Itoa(running))
+	await $.println((("queued=" + strconv.Itoa(queued)) + " running=") + strconv.Itoa(running))
 
 	release!.close()
 
 	{
 		let err = await conc.ConcurrentQueue.prototype.WaitIdle.call(q, context.Background(), null)
 		if (err != null) {
-			$.println("WaitIdle error: " + $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("WaitIdle error: " + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return
 		}
 	}
 
-	$.println((("completed=" + strconv.Itoa(count)) + " sum=") + strconv.Itoa(sum))
+	await $.println((("completed=" + strconv.Itoa(count)) + " sum=") + strconv.Itoa(sum))
 }
 
 if ($.isMainScript(import.meta)) {

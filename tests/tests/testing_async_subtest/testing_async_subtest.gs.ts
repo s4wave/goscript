@@ -15,7 +15,7 @@ export async function RunSubtest(t: testing.T | $.VarRef<testing.T> | null, ch: 
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println("testing async subtest compiled")
+	await $.println("testing async subtest compiled")
 }
 
 if ($.isMainScript(import.meta)) {

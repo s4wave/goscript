@@ -12,7 +12,7 @@ export function bytesAsString(): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println(bytesAsString())
+	await $.println(bytesAsString())
 }
 
 if ($.isMainScript(import.meta)) {

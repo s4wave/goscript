@@ -18,7 +18,7 @@ export async function main(): globalThis.Promise<void> {
 		decodeMap[$.indexStringOrBytes(encoder, i)] = $.uint($.uint(i, 8), 8)
 	}
 
-	$.println("Success: no duplicates")
+	await $.println("Success: no duplicates")
 }
 
 if ($.isMainScript(import.meta)) {

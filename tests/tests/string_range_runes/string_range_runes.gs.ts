@@ -5,7 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	for (const [i, r] of $.rangeString("a¢€")) {
-		$.println(i, $.int(r, 32))
+		await $.println(i, $.int(r, 32))
 	}
 }
 

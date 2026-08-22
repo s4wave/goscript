@@ -119,7 +119,7 @@ export function uint64Len(g: $.Slice<bigint>): number {
 export async function main(): globalThis.Promise<void> {
 	let g: $.Slice<bigint> = $.arrayToSlice<bigint>([7n, 11n, 22n, 33n])
 	let data: $.Slice<number> = new Uint8Array([1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0]) as $.Slice<number>
-	$.println("algo", algorithm(data, $.len(data), g, 3n, 1n, 0, 3))
+	await $.println("algo", algorithm(data, $.len(data), g, 3n, 1n, 0, 3))
 
 	let c: chunker | $.VarRef<chunker> | null = new chunker()
 	let totalSize: bigint = 0n
@@ -138,13 +138,13 @@ export async function main(): globalThis.Promise<void> {
 			break
 		}
 		if (err != null) {
-			$.println("err", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("err", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return
 		}
 	}
-	$.println("pos", $.pointerValue<chunker>(c).pos)
-	$.println("total", totalSize)
-	$.println("chkStart", chkStart)
+	await $.println("pos", $.pointerValue<chunker>(c).pos)
+	await $.println("total", totalSize)
+	await $.println("chkStart", chkStart)
 }
 
 export function newRepeatReader(n: number): repeatReader | $.VarRef<repeatReader> | null {

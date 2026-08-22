@@ -28,7 +28,7 @@ export async function run(ctx: context.Context | null): globalThis.Promise<void>
 			isSend: false,
 			channel: myCh,
 			onSelected: async (__goscriptSelect0Result) => {
-				$.println("myCh should not be readable yet")
+				await $.println("myCh should not be readable yet")
 			}
 		},
 		{
@@ -36,7 +36,7 @@ export async function run(ctx: context.Context | null): globalThis.Promise<void>
 			isSend: false,
 			channel: null,
 			onSelected: async (__goscriptSelect0Result) => {
-				$.println("myCh is not be readable yet")
+				await $.println("myCh is not be readable yet")
 			}
 		}
 	], true)
@@ -50,7 +50,7 @@ export async function run(ctx: context.Context | null): globalThis.Promise<void>
 	// Now myCh should become readable
 	await $.chanRecv(myCh)
 
-	$.println("read successfully")
+	await $.println("read successfully")
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -61,10 +61,10 @@ export async function main(): globalThis.Promise<void> {
 	let [deadlineCtx, cancel] = context.WithDeadline($.pointerValueOrNil(ctx)!, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(time.Now())).Add(3600000000000n))))
 	__defer.defer(async () => { await cancel!() })
 	let [deadline, ok] = await $.pointerValue<Exclude<context.Context, null>>(deadlineCtx).Deadline()
-	$.println("deadline ok:", ok)
-	$.println("deadline zero:", $.markAsStructValue($.cloneStructValue(deadline)).IsZero())
+	await $.println("deadline ok:", ok)
+	await $.println("deadline zero:", $.markAsStructValue($.cloneStructValue(deadline)).IsZero())
 
-	$.println("test finished")
+	await $.println("test finished")
 }
 
 if ($.isMainScript(import.meta)) {

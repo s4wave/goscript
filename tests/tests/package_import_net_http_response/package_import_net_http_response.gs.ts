@@ -9,7 +9,7 @@ import "@goscript/net/http/index.js"
 export async function main(): globalThis.Promise<void> {
 	let resp = $.markAsStructValue(new http.Response({StatusCode: http.StatusOK}))
 
-	$.println("status:", resp.StatusCode, http.StatusText(resp.StatusCode))
+	await $.println("status:", resp.StatusCode, http.StatusText(resp.StatusCode))
 }
 
 if ($.isMainScript(import.meta)) {

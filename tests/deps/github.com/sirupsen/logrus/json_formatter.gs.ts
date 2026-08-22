@@ -173,7 +173,7 @@ export class JSONFormatter {
 					case $.typeAssert<$.GoError>(__goscriptTypeSwitchValue, "error").ok:
 						{
 							let v: $.GoError = $.typeAssert<$.GoError>(__goscriptTypeSwitchValue, "error").value
-							$.mapSet(data, k, $.pointerValue<Exclude<$.GoError, null>>(v).Error())
+							$.mapSet(data, k, await $.pointerValue<Exclude<$.GoError, null>>(v).Error())
 						}
 						break
 					default:

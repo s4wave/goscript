@@ -76,19 +76,19 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = $.typeAssertTuple<globalThis.Map<string, number> | null>(mappedAny, { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } })
 	let mappedValue: globalThis.Map<string, number> | null = __goscriptTuple0[0]
 	let mappedOK = __goscriptTuple0[1]
-	$.println("map", mappedOK, mappedValue == null)
+	await $.println("map", mappedOK, mappedValue == null)
 
 	let channel: $.Channel<number> | null = null! as $.Channel<number> | null
 	let channelAny: any = $.interfaceValue(channel, "chan int", { kind: $.TypeKind.Channel, direction: "both", elemType: { kind: $.TypeKind.Basic, name: "int" } })
 	let __goscriptTuple1: any = $.typeAssertTuple<$.Channel<number> | null>(channelAny, { kind: $.TypeKind.Channel, direction: "both", elemType: { kind: $.TypeKind.Basic, name: "int" } })
 	let channelValue: $.Channel<number> | null = __goscriptTuple1[0]
 	let channelOK = __goscriptTuple1[1]
-	$.println("chan", channelOK, channelValue == null)
+	await $.println("chan", channelOK, channelValue == null)
 
 	let callback: (() => void) | null = null! as (() => void) | null
 	let callbackAny: any = $.interfaceValue(callback, "func()", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 	let [callbackValue, callbackOK] = $.typeAssertTuple<(() => void) | null>(callbackAny, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
-	$.println("func", callbackOK, callbackValue == null)
+	await $.println("func", callbackOK, callbackValue == null)
 
 	let pointer: source | $.VarRef<source> | null = null! as source | $.VarRef<source> | null
 	let pointerAny: any = $.interfaceValue(pointer, "*main.source", { kind: $.TypeKind.Pointer, elemType: "main.source" })
@@ -97,15 +97,15 @@ export async function main(): globalThis.Promise<void> {
 	if (err != null) {
 		$.panic((err as any))
 	}
-	$.println("reader", readerOK, count)
+	await $.println("reader", readerOK, count)
 
 	let mappedReflect = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(mapped, "map[string]int", { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } }))))
-	$.println("reflect-map", $.markAsStructValue($.cloneStructValue(mappedReflect)).Kind() == reflect.Map, $.markAsStructValue($.cloneStructValue(mappedReflect)).IsNil())
+	await $.println("reflect-map", $.markAsStructValue($.cloneStructValue(mappedReflect)).Kind() == reflect.Map, $.markAsStructValue($.cloneStructValue(mappedReflect)).IsNil())
 
 	let pointerReflect = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(pointer, "*main.source", { kind: $.TypeKind.Pointer, elemType: "main.source" }))))
-	$.println("reflect-pointer", $.markAsStructValue($.cloneStructValue(pointerReflect)).Kind() == reflect.Pointer, $.markAsStructValue($.cloneStructValue(pointerReflect)).IsNil(), await $.pointerValue<Exclude<reflect.Type, null>>((await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(pointerReflect)).Type()).Elem())).Kind() == reflect.Struct)
+	await $.println("reflect-pointer", $.markAsStructValue($.cloneStructValue(pointerReflect)).Kind() == reflect.Pointer, $.markAsStructValue($.cloneStructValue(pointerReflect)).IsNil(), await $.pointerValue<Exclude<reflect.Type, null>>((await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(pointerReflect)).Type()).Elem())).Kind() == reflect.Struct)
 
-	$.println("map-comparison-panics", mapComparisonPanics())
+	await $.println("map-comparison-panics", mapComparisonPanics())
 }
 
 if ($.isMainScript(import.meta)) {

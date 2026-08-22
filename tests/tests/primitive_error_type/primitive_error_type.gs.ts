@@ -24,16 +24,16 @@ export function mayFail(n: number): $.GoError {
 export async function main(): globalThis.Promise<void> {
 	let err = mayFail(5)
 	if (err == null) {
-		$.println("mayFail(5): no error")
+		await $.println("mayFail(5): no error")
 	} else {
-		$.println("mayFail(5):", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("mayFail(5):", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 	}
 
 	err = mayFail(-1)
 	if (err == null) {
-		$.println("mayFail(-1): no error")
+		await $.println("mayFail(-1): no error")
 	} else {
-		$.println("mayFail(-1):", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("mayFail(-1):", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 	}
 
 	{
@@ -41,12 +41,12 @@ export async function main(): globalThis.Promise<void> {
 		switch (true) {
 			case $.comparableEqual(__goscriptSwitch0, $.namedValueInterfaceValue<$.GoError>(-1, "main.MyError", {"Error": MyError_Error}, { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyError" })):
 			{
-				$.println("switch: matched primitive error")
+				await $.println("switch: matched primitive error")
 				break
 			}
 			default:
 			{
-				$.println("switch: missed primitive error")
+				await $.println("switch: missed primitive error")
 				break
 			}
 		}

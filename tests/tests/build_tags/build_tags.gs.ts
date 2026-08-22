@@ -10,16 +10,16 @@ import "./build_tags_generic.gs.ts"
 import "./build_tags_js.gs.ts"
 
 export async function main(): globalThis.Promise<void> {
-	$.println("=== Build Tags Test ===")
+	await $.println("=== Build Tags Test ===")
 
 	// Test that platform-specific files are handled correctly
 	// This should only compile files with js/wasm build tags
 	// and exclude files with other platform tags
 
-	__goscript_build_tags_js.testJSWasm()
-	__goscript_build_tags_generic.testGeneric()
+	await __goscript_build_tags_js.testJSWasm()
+	await __goscript_build_tags_generic.testGeneric()
 
-	$.println("=== End Build Tags Test ===")
+	await $.println("=== End Build Tags Test ===")
 }
 
 if ($.isMainScript(import.meta)) {

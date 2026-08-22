@@ -51,7 +51,7 @@ const __goscriptTuple1 = newItem(13)
 export let second: item | $.VarRef<item> | null = __goscriptTuple1[0]
 
 export async function main(): globalThis.Promise<void> {
-	$.println($.pointerValue<item>(first).value + $.pointerValue<item>(second).value)
+	await $.println($.pointerValue<item>(first).value + $.pointerValue<item>(second).value)
 }
 
 if ($.isMainScript(import.meta)) {

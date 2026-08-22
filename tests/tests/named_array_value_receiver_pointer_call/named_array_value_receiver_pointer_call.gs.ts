@@ -18,8 +18,8 @@ export function flags_values(__goscriptReceiver0: flags): [number, number] {
 
 export async function main(): globalThis.Promise<void> {
 	let [left, right] = flags_values([0, 0])
-	$.println(left)
-	$.println(right)
+	await $.println(left)
+	await $.println(right)
 }
 
 if ($.isMainScript(import.meta)) {

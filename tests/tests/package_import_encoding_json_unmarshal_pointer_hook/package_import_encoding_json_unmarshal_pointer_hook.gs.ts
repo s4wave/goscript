@@ -103,11 +103,11 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = json.Unmarshal(new Uint8Array([123, 34, 118, 97, 108, 117, 101, 34, 58, 123, 34, 105, 103, 110, 111, 114, 101, 100, 34, 58, 48, 125, 125]), $.interfaceValue(box, "*main.Box", { kind: $.TypeKind.Pointer, elemType: "main.Box" }))
 		if (err != null) {
-			fmt.Println("unmarshal error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await fmt.Println("unmarshal error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return
 		}
 	}
-	fmt.Printf("calls=%d seen=%s\n", $.basicInterfaceValue($.pointerValue<Hooked>(box.value.Value).Calls, "int"), $.pointerValue<Hooked>(box.value.Value).Seen)
+	await fmt.Printf("calls=%d seen=%s\n", $.basicInterfaceValue($.pointerValue<Hooked>(box.value.Value).Calls, "int"), $.pointerValue<Hooked>(box.value.Value).Seen)
 }
 
 if ($.isMainScript(import.meta)) {

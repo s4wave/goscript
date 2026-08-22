@@ -15,8 +15,8 @@ export function isMinInt64(v: bigint): boolean {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println(aboveSignedLimit(10n))
-	$.println(isMinInt64(0n))
+	await $.println(aboveSignedLimit(10n))
+	await $.println(isMinInt64(0n))
 }
 
 if ($.isMainScript(import.meta)) {

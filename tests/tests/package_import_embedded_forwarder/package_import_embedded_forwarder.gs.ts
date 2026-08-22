@@ -84,9 +84,9 @@ export function NewVerboseStore(name: string): VerboseStore | $.VarRef<VerboseSt
 export async function useStore(store: Store | null): globalThis.Promise<void> {
 	let read: tx.Tx | $.VarRef<tx.Tx> | null = await $.pointerValue<Exclude<Store, null>>(store).NewTransaction(false)
 	let write: tx.Tx | $.VarRef<tx.Tx> | null = await $.pointerValue<Exclude<Store, null>>(store).NewTransaction(true)
-	$.println(await $.pointerValue<Exclude<Store, null>>(store).Execute())
-	$.println($.pointerValue<dep.Tx>(read).Name)
-	$.println($.pointerValue<dep.Tx>(write).Name)
+	await $.println(await $.pointerValue<Exclude<Store, null>>(store).Execute())
+	await $.println($.pointerValue<dep.Tx>(read).Name)
+	await $.println($.pointerValue<dep.Tx>(write).Name)
 }
 
 export async function main(): globalThis.Promise<void> {

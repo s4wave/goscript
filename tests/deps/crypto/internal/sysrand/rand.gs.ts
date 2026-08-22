@@ -26,8 +26,8 @@ export function __goscript_set_firstUse(__goscriptValue: atomic.Bool): void {
 	firstUse.value = __goscriptValue
 }
 
-export function warnBlocked(): void {
-	$.println("crypto/rand: blocked for 60 seconds waiting to read random data from the kernel")
+export async function warnBlocked(): globalThis.Promise<void> {
+	await $.println("crypto/rand: blocked for 60 seconds waiting to read random data from the kernel")
 }
 
 export function fatal(_p0: string): void {
@@ -39,7 +39,7 @@ export function __goscript_set_testingOnlyFailRead(__goscriptValue: boolean): vo
 	testingOnlyFailRead = __goscriptValue
 }
 
-export function Read(b: $.Slice<number>): void {
+export async function Read(b: $.Slice<number>): globalThis.Promise<void> {
 	using __defer = new $.DisposableStack()
 	if (firstUse.value.CompareAndSwap(false, true)) {
 		// First use of randomness. Start timer to warn about
@@ -52,7 +52,7 @@ export function Read(b: $.Slice<number>): void {
 		if ((err != null) || testingOnlyFailRead) {
 			let errStr: string = ""
 			if (!testingOnlyFailRead) {
-				errStr = $.pointerValue<Exclude<$.GoError, null>>(err).Error()
+				errStr = await $.pointerValue<Exclude<$.GoError, null>>(err).Error()
 			} else {
 				errStr = "testing simulated failure"
 			}

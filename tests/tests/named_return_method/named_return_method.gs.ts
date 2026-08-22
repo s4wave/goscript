@@ -84,40 +84,40 @@ export async function main(): globalThis.Promise<void> {
 	// Test ReadAt method
 	let buf: $.Slice<number> = $.makeSlice<number>(5, undefined, "byte")
 	let [n1, err1] = content.prototype.ReadAt.call(c, buf, 0n)
-	$.println(n1)
+	await $.println(n1)
 	if (err1 == null) {
-		$.println("nil")
+		await $.println("nil")
 	} else {
-		$.println("error")
+		await $.println("error")
 	}
-	$.println($.bytesToString(buf))
+	await $.println($.bytesToString(buf))
 
 	// Test ReadAt with different offset
 	let buf2: $.Slice<number> = $.makeSlice<number>(6, undefined, "byte")
 	let [n2, err2] = content.prototype.ReadAt.call(c, buf2, 7n)
-	$.println(n2)
+	await $.println(n2)
 	if (err2 == null) {
-		$.println("nil")
+		await $.println("nil")
 	} else {
-		$.println("error")
+		await $.println("error")
 	}
-	$.println($.bytesToString(buf2))
+	await $.println($.bytesToString(buf2))
 
 	// Test ProcessData method
 	let [r1, s1, v1] = content.prototype.ProcessData.call(c, 15)
-	$.println(r1)
-	$.println(s1)
-	$.println(v1)
+	await $.println(r1)
+	await $.println(s1)
+	await $.println(v1)
 
 	let [r2, s2, v2] = content.prototype.ProcessData.call(c, 5)
-	$.println(r2)
-	$.println(s2)
-	$.println(v2)
+	await $.println(r2)
+	await $.println(s2)
+	await $.println(v2)
 
 	let [r3, s3, v3] = content.prototype.ProcessData.call(c, -1)
-	$.println(r3)
-	$.println(s3)
-	$.println(v3)
+	await $.println(r3)
+	await $.println(s3)
+	await $.println(v3)
 }
 
 if ($.isMainScript(import.meta)) {

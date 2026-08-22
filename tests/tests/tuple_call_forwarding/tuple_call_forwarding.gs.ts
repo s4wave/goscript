@@ -69,9 +69,9 @@ export function shift(p: point | $.VarRef<point> | null): [point | $.VarRef<poin
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println("sum:", sum(...(pair(2, 3) as [number, number])))
+	await $.println("sum:", sum(...(pair(2, 3) as [number, number])))
 	let p: point | $.VarRef<point> | null = makePoint(...(triple(4, 5, 6) as [number, number, number]))
-	$.println("point:", $.pointerValue<point>(p).x, $.pointerValue<point>(p).y)
+	await $.println("point:", $.pointerValue<point>(p).x, $.pointerValue<point>(p).y)
 	let x: point | $.VarRef<point> | null = new point()
 	let y: point | $.VarRef<point> | null = new point()
 	let z: point | $.VarRef<point> | null = new point()
@@ -79,7 +79,7 @@ export async function main(): globalThis.Promise<void> {
 	x = __goscriptTuple0[0]
 	y = __goscriptTuple0[1]
 	z = __goscriptTuple0[2]
-	$.println("shift:", $.pointerValue<point>(x).x, $.pointerValue<point>(y).x, $.pointerValue<point>(z).x)
+	await $.println("shift:", $.pointerValue<point>(x).x, $.pointerValue<point>(y).x, $.pointerValue<point>(z).x)
 }
 
 if ($.isMainScript(import.meta)) {

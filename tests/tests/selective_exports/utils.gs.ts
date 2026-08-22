@@ -3,10 +3,10 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-export function ExportedFromUtils(): void {
-	$.println("ExportedFromUtils called")
+export async function ExportedFromUtils(): globalThis.Promise<void> {
+	await $.println("ExportedFromUtils called")
 }
 
-export function unexportedFromUtils(): void {
-	$.println("unexportedFromUtils called")
+export async function unexportedFromUtils(): globalThis.Promise<void> {
+	await $.println("unexportedFromUtils called")
 }

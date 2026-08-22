@@ -9,7 +9,7 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo))
 
 	let message = await greet!("world")
-	$.println(message)
+	await $.println(message)
 }
 
 if ($.isMainScript(import.meta)) {

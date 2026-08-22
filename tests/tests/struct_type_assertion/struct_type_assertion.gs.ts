@@ -8,16 +8,16 @@ export async function main(): globalThis.Promise<void> {
 
 	let [s, ok] = $.typeAssertTuple<{"Name": string, "Number": number}>(i, { kind: $.TypeKind.Struct, methods: [], fields: [{ name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" }, index: [0], offset: 0, exported: true }, { name: "Number", key: "Number", type: { kind: $.TypeKind.Basic, name: "int" }, index: [1], offset: 16, exported: true }] })
 	if (ok) {
-		$.println("Name:", s.Name, "Number:", s.Number)
+		await $.println("Name:", s.Name, "Number:", s.Number)
 	} else {
-		$.println("Type assertion failed")
+		await $.println("Type assertion failed")
 	}
 
 	let [j, ok2] = $.typeAssertTuple<{"Age": number}>(i, { kind: $.TypeKind.Struct, methods: [], fields: [{ name: "Age", key: "Age", type: { kind: $.TypeKind.Basic, name: "int" }, index: [0], offset: 0, exported: true }] })
 	if (ok2) {
-		$.println("Age:", j.Age)
+		await $.println("Age:", j.Age)
 	} else {
-		$.println("Second type assertion failed as expected")
+		await $.println("Second type assertion failed as expected")
 	}
 }
 

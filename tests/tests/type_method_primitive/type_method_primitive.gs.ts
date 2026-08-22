@@ -64,38 +64,38 @@ export function newMyBool(value: boolean, target: $.VarRef<boolean> | null): $.V
 export async function main(): globalThis.Promise<void> {
 	// Test direct method call on type conversion
 	let result = MyInt_Double(5)
-	$.println("Direct call:", result)
+	await $.println("Direct call:", result)
 
 	// Test storing method reference (this is the failing case)
 	let fn: (() => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => () => MyInt_Double(__receiver))(10), ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))
-	$.println("Method ref call:", await fn!())
+	await $.println("Method ref call:", await fn!())
 
 	let d: Doubler | null = $.namedValueInterfaceValue<Doubler | null>(12, "main.MyInt", {Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyInt" }, [{ name: "Double", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }])
-	$.println("Interface method call:", await $.pointerValue<Exclude<Doubler, null>>(d).Double())
+	await $.println("Interface method call:", await $.pointerValue<Exclude<Doubler, null>>(d).Double())
 
 	let ret = asDoubler(13)
-	$.println("Returned interface call:", await $.pointerValue<Exclude<Doubler, null>>(ret).Double())
+	await $.println("Returned interface call:", await $.pointerValue<Exclude<Doubler, null>>(ret).Double())
 
 	let [asserted, ok] = $.typeAssertTuple<MyInt>(ret, { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyInt" })
-	$.println("Interface assertion:", $.int(asserted), ok)
+	await $.println("Interface assertion:", $.int(asserted), ok)
 
 	let vals: $.Slice<Doubler | null> = null! as $.Slice<Doubler | null>
 	vals = $.append(vals, $.namedValueInterfaceValue<Doubler | null>(14, "main.MyInt", {Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyInt" }, [{ name: "Double", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]), $.namedValueInterfaceValue<Doubler | null>(15, "main.MyInt", {Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyInt" }, [{ name: "Double", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }]), $.appendZeros.nil)
-	$.println("Interface slice append:", await sumDoublers(vals))
+	await $.println("Interface slice append:", await sumDoublers(vals))
 
 	let __goscriptTuple0: any = assertDoubler({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyInt" }, zero: () => 0, methods: {Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: "Double", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }] }}, ret)
 	let genericAsserted = (__goscriptTuple0[0] as MyInt)
 	let genericOK = __goscriptTuple0[1]
-	$.println("Generic interface assertion:", $.int(genericAsserted), genericOK)
+	await $.println("Generic interface assertion:", $.int(genericAsserted), genericOK)
 
 	let flag: $.VarRef<boolean> = $.varRef(false)
 	let stringer: Stringer | null = $.namedValueInterfaceValue<Stringer | null>(newMyBool(true, flag), "*main.MyBool", {String: (receiver: any, ...args: any[]) => (MyBool_String as any)(receiver, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "bool", typeName: "main.MyBool" } }, [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])
-	$.println("Pointer primitive interface:", await $.pointerValue<Exclude<Stringer, null>>(stringer).String(), flag.value)
+	await $.println("Pointer primitive interface:", await $.pointerValue<Exclude<Stringer, null>>(stringer).String(), flag.value)
 
 	let __goscriptTuple1: any = assertStringer({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "bool", typeName: "main.MyBool" } }, zero: () => null, methods: {String: (receiver: any, ...args: any[]) => (MyBool_String as any)(receiver, ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] }}, stringer)
 	let genericPointer: $.VarRef<MyBool> | null = (__goscriptTuple1[0] as $.VarRef<MyBool> | null)
 	let genericPointerOK = __goscriptTuple1[1]
-	$.println("Generic pointer interface assertion:", MyBool_String(genericPointer), genericPointerOK)
+	await $.println("Generic pointer interface assertion:", MyBool_String(genericPointer), genericPointerOK)
 }
 
 if ($.isMainScript(import.meta)) {

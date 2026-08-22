@@ -7,8 +7,8 @@ import * as slices from "@goscript/slices/index.js"
 import "@goscript/slices/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	$.println("max int:", slices.Max($.arrayToSlice<number>([3, 1, 4, 2])))
-	$.println("max string:", slices.Max($.arrayToSlice<string>(["beta", "alpha", "gamma"])))
+	await $.println("max int:", slices.Max($.arrayToSlice<number>([3, 1, 4, 2])))
+	await $.println("max string:", slices.Max($.arrayToSlice<string>(["beta", "alpha", "gamma"])))
 }
 
 if ($.isMainScript(import.meta)) {

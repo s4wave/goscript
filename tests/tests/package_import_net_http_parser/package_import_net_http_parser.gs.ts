@@ -24,26 +24,26 @@ export async function main(): globalThis.Promise<void> {
 	let req: http.Request | $.VarRef<http.Request> | null = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
-		fmt.Println("request error:", (err as any))
+		await fmt.Println("request error:", (err as any))
 		return
 	}
 	let __goscriptTuple1: any = await io.ReadAll($.pointerValueOrNil(($.pointerValue<http.Request>(req).Body as io.Reader | null))!)
 	let reqBody: $.Slice<number> = __goscriptTuple1[0]
 	let reqBodyErr = __goscriptTuple1[1]
-	fmt.Printf("request %s %s %s %s %d %d %s %d %d %t %d %q %v\n", $.pointerValue<http.Request>(req).Method, $.pointerValue<http.Request>(req).Host, $.pointerValue<any>($.pointerValue<http.Request>(req).URL).Path, $.pointerValue<any>($.pointerValue<http.Request>(req).URL).RawQuery, $.basicInterfaceValue($.pointerValue<http.Request>(req).ProtoMajor, "int"), $.basicInterfaceValue($.pointerValue<http.Request>(req).ProtoMinor, "int"), http.Request.prototype.UserAgent.call($.pointerValue<http.Request>(req)), $.basicInterfaceValue($.len(http.Header_Values($.pointerValue<http.Request>(req).Header, "X-Test")), "int"), $.basicInterfaceValue($.pointerValue<http.Request>(req).ContentLength, "int64"), $.pointerValue<http.Request>(req).Close, $.basicInterfaceValue($.len($.pointerValue<http.Request>(req).TransferEncoding), "int"), $.bytesToString(reqBody), (reqBodyErr as any))
+	await fmt.Printf("request %s %s %s %s %d %d %s %d %d %t %d %q %v\n", $.pointerValue<http.Request>(req).Method, $.pointerValue<http.Request>(req).Host, $.pointerValue<any>($.pointerValue<http.Request>(req).URL).Path, $.pointerValue<any>($.pointerValue<http.Request>(req).URL).RawQuery, $.basicInterfaceValue($.pointerValue<http.Request>(req).ProtoMajor, "int"), $.basicInterfaceValue($.pointerValue<http.Request>(req).ProtoMinor, "int"), http.Request.prototype.UserAgent.call($.pointerValue<http.Request>(req)), $.basicInterfaceValue($.len(http.Header_Values($.pointerValue<http.Request>(req).Header, "X-Test")), "int"), $.basicInterfaceValue($.pointerValue<http.Request>(req).ContentLength, "int64"), $.pointerValue<http.Request>(req).Close, $.basicInterfaceValue($.len($.pointerValue<http.Request>(req).TransferEncoding), "int"), $.bytesToString(reqBody), (reqBodyErr as any))
 
 	let responseWire = ((("HTTP/1.1 201 Created\r\n" + "Content-Type: text/plain\r\n") + "Content-Length: 5\r\n") + "\r\n") + "hello"
 	let __goscriptTuple2: any = await http.ReadResponse(bufio.NewReader($.interfaceValue<io.Reader | null>(strings.NewReader(responseWire), "*strings.Reader", { kind: $.TypeKind.Pointer, elemType: "strings.Reader" })), req)
 	let resp: http.Response | $.VarRef<http.Response> | null = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	if (err != null) {
-		fmt.Println("response error:", (err as any))
+		await fmt.Println("response error:", (err as any))
 		return
 	}
 	let __goscriptTuple3: any = await io.ReadAll($.pointerValueOrNil(($.pointerValue<http.Response>(resp).Body as io.Reader | null))!)
 	let respBody: $.Slice<number> = __goscriptTuple3[0]
 	let respBodyErr = __goscriptTuple3[1]
-	fmt.Printf("response %s %d %d %d %s %d %t %d %q %v\n", $.pointerValue<http.Response>(resp).Status, $.basicInterfaceValue($.pointerValue<http.Response>(resp).StatusCode, "int"), $.basicInterfaceValue($.pointerValue<http.Response>(resp).ProtoMajor, "int"), $.basicInterfaceValue($.pointerValue<http.Response>(resp).ProtoMinor, "int"), await http.Header_Get($.pointerValue<http.Response>(resp).Header, "Content-Type"), $.basicInterfaceValue($.pointerValue<http.Response>(resp).ContentLength, "int64"), $.pointerValue<http.Response>(resp).Close, $.basicInterfaceValue($.len($.pointerValue<http.Response>(resp).TransferEncoding), "int"), $.bytesToString(respBody), (respBodyErr as any))
+	await fmt.Printf("response %s %d %d %d %s %d %t %d %q %v\n", $.pointerValue<http.Response>(resp).Status, $.basicInterfaceValue($.pointerValue<http.Response>(resp).StatusCode, "int"), $.basicInterfaceValue($.pointerValue<http.Response>(resp).ProtoMajor, "int"), $.basicInterfaceValue($.pointerValue<http.Response>(resp).ProtoMinor, "int"), await http.Header_Get($.pointerValue<http.Response>(resp).Header, "Content-Type"), $.basicInterfaceValue($.pointerValue<http.Response>(resp).ContentLength, "int64"), $.pointerValue<http.Response>(resp).Close, $.basicInterfaceValue($.len($.pointerValue<http.Response>(resp).TransferEncoding), "int"), $.bytesToString(respBody), (respBodyErr as any))
 }
 
 if ($.isMainScript(import.meta)) {

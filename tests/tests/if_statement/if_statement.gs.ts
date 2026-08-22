@@ -7,9 +7,9 @@ export async function main(): globalThis.Promise<void> {
 	// === If Statement ===
 	let n = 7
 	if ((n % 2) == 0) {
-		$.println("Even: Expected: (no output)")
+		await $.println("Even: Expected: (no output)")
 	} else {
-		$.println("Odd: Expected: Odd, Actual: Odd")
+		await $.println("Odd: Expected: Odd, Actual: Odd")
 	}
 }
 

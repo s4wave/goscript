@@ -26,7 +26,7 @@ export async function main(): globalThis.Promise<void> {
 		}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo))
 		fn
 	}
-	fmt.Println("select literal ok")
+	await fmt.Println("select literal ok")
 }
 
 if ($.isMainScript(import.meta)) {

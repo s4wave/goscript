@@ -10,9 +10,9 @@ export async function main(): globalThis.Promise<void> {
 	let and = a && b
 	let or = a || b
 	let notA = !a
-	$.println("AND: Expected: false, Actual:", and)
-	$.println("OR: Expected: true, Actual:", or)
-	$.println("NOT: Expected: false, Actual:", notA)
+	await $.println("AND: Expected: false, Actual:", and)
+	await $.println("OR: Expected: true, Actual:", or)
+	await $.println("NOT: Expected: false, Actual:", notA)
 }
 
 if ($.isMainScript(import.meta)) {

@@ -19,8 +19,8 @@ export function externalPair(): [number, boolean] {
 export async function main(): globalThis.Promise<void> {
 	externalVoid()
 	let [n, ok] = externalPair()
-	$.println("int:", externalInt())
-	$.println("pair:", n, ok)
+	await $.println("int:", externalInt())
+	await $.println("pair:", n, ok)
 }
 
 if ($.isMainScript(import.meta)) {

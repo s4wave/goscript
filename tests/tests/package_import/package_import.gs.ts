@@ -7,7 +7,7 @@ import * as subpkg from "@goscript/github.com/s4wave/goscript/tests/tests/packag
 import "@goscript/github.com/s4wave/goscript/tests/tests/package_import/subpkg/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	$.println(subpkg.Greet("world"))
+	await $.println(subpkg.Greet("world"))
 }
 
 if ($.isMainScript(import.meta)) {

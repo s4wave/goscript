@@ -17,11 +17,11 @@ export function multiReturnThree(): [string, number, number] {
 export async function main(): globalThis.Promise<void> {
 	// Test simple destructuring that should work
 	let [x, y] = multiReturn()
-	fmt.Printf("x=%d, y=%d\n", $.basicInterfaceValue(x, "int"), $.basicInterfaceValue(y, "int"))
+	await fmt.Printf("x=%d, y=%d\n", $.basicInterfaceValue(x, "int"), $.basicInterfaceValue(y, "int"))
 
 	// Test three-value destructuring
 	let [name, line, col] = multiReturnThree()
-	fmt.Printf("name=%s, line=%d, col=%d\n", name, $.basicInterfaceValue(line, "int"), $.basicInterfaceValue(col, "int"))
+	await fmt.Printf("name=%s, line=%d, col=%d\n", name, $.basicInterfaceValue(line, "int"), $.basicInterfaceValue(col, "int"))
 
 	// Test reassignment to existing variables
 	let a: number = 0
@@ -29,7 +29,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = multiReturn()
 	a = __goscriptTuple0[0]
 	b = __goscriptTuple0[1]
-	fmt.Printf("a=%d, b=%d\n", $.basicInterfaceValue(a, "int"), $.basicInterfaceValue(b, "int"))
+	await fmt.Printf("a=%d, b=%d\n", $.basicInterfaceValue(a, "int"), $.basicInterfaceValue(b, "int"))
 }
 
 if ($.isMainScript(import.meta)) {

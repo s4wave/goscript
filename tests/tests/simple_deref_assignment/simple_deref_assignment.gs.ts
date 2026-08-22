@@ -55,9 +55,9 @@ export async function main(): globalThis.Promise<void> {
 	// Modifying the copy does not affect the original struct pointed to by structPointer.
 	simpleDereferencedCopy.MyString = "modified dereferenced copy"
 	// Expected: "hello world"
-	$.println("Original structPointer after modifying simpleDereferencedCopy: Expected: hello world, Actual: " + $.pointerValue<MyStruct>(structPointer).MyString)
+	await $.println("Original structPointer after modifying simpleDereferencedCopy: Expected: hello world, Actual: " + $.pointerValue<MyStruct>(structPointer).MyString)
 	// Expected: "modified dereferenced copy"
-	$.println("Simple Dereferenced Copy: Expected: modified dereferenced copy, Actual: " + simpleDereferencedCopy.MyString)
+	await $.println("Simple Dereferenced Copy: Expected: modified dereferenced copy, Actual: " + simpleDereferencedCopy.MyString)
 }
 
 if ($.isMainScript(import.meta)) {

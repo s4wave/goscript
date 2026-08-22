@@ -60,7 +60,7 @@ export async function main(): globalThis.Promise<void> {
 				isSend: false,
 				channel: timeout,
 				onSelected: async (__goscriptSelect0Result) => {
-					$.println("TIMEOUT: goroutine starvation detected")
+					await $.println("TIMEOUT: goroutine starvation detected")
 					return $.selectVoidReturn()
 				}
 			},
@@ -78,9 +78,9 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Both workers completed
-	$.println("worker1 completed")
-	$.println("worker2 completed")
-	$.println("no starvation detected")
+	await $.println("worker1 completed")
+	await $.println("worker2 completed")
+	await $.println("no starvation detected")
 }
 
 if ($.isMainScript(import.meta)) {

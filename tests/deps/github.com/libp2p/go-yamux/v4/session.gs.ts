@@ -1284,7 +1284,7 @@ export class Session {
 				{
 					let [, __goscriptShadow3] = await io.ReadFull($.pointerValueOrNil($.pointerValue<Session>(s).reader)!, $.goSlice(hdr, undefined, undefined))
 					if (__goscriptShadow3 != null) {
-						if (((!$.comparableEqual(__goscriptShadow3, io.EOF)) && !strings.Contains($.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow3).Error(), "closed")) && !strings.Contains($.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow3).Error(), "reset by peer")) {
+						if (((!$.comparableEqual(__goscriptShadow3, io.EOF)) && !strings.Contains(await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow3).Error(), "closed")) && !strings.Contains(await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow3).Error(), "reset by peer")) {
 							await log.Logger.prototype.Printf.call($.pointerValue<Session>(s).logger, "[ERR] yamux: Failed to read header: %v", $.arrayToSlice<any>([(__goscriptShadow3 as any)]))
 						}
 						const __goscriptReturn6: $.GoError = __goscriptShadow3

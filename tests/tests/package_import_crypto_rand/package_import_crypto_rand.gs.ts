@@ -12,22 +12,22 @@ import "@goscript/io/index.js"
 export async function main(): globalThis.Promise<void> {
 	let buf: $.Slice<number> = $.makeSlice<number>(32, undefined, "byte")
 	let [n, err] = rand.Read(buf)
-	$.println("read len", n)
-	$.println("read err nil", err == null)
-	$.println("read has data", hasData(buf))
+	await $.println("read len", n)
+	await $.println("read err nil", err == null)
+	await $.println("read has data", hasData(buf))
 
 	let r: io.Reader | null = rand.Reader
 	let small: $.Slice<number> = $.makeSlice<number>(4, undefined, "byte")
 	let __goscriptTuple0: any = await $.pointerValue<Exclude<io.Reader, null>>(r).Read(small)
 	n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
-	$.println("reader len", n)
-	$.println("reader err nil", err == null)
-	$.println("reader has data", hasData(small))
+	await $.println("reader len", n)
+	await $.println("reader err nil", err == null)
+	await $.println("reader has data", hasData(small))
 
-	let token = rand.Text()
-	$.println("text len", $.len(token))
-	$.println("text alphabet", isBase32(token))
+	let token = await rand.Text()
+	await $.println("text len", $.len(token))
+	await $.println("text alphabet", isBase32(token))
 }
 
 export function hasData(buf: $.Slice<number>): boolean {

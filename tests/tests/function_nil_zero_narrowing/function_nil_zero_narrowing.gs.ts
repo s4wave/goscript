@@ -18,7 +18,7 @@ export async function main(): globalThis.Promise<void> {
 	if (cancel2 != null) {
 		await cancel2!()
 	}
-	$.println("ok")
+	await $.println("ok")
 }
 
 if ($.isMainScript(import.meta)) {

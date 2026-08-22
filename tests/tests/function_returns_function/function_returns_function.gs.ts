@@ -12,7 +12,7 @@ export function getAdder(x: number): ((_p0: number) => number | globalThis.Promi
 export async function main(): globalThis.Promise<void> {
 	let adder: ((_p0: number) => number | globalThis.Promise<number>) | null = getAdder(5)
 	let result = await adder!(3)
-	$.println("Result:", result)
+	await $.println("Result:", result)
 }
 
 if ($.isMainScript(import.meta)) {

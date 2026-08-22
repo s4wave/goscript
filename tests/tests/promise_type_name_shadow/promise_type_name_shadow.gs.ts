@@ -40,7 +40,7 @@ export class Promise {
 
 export async function main(): globalThis.Promise<void> {
 	let p = $.markAsStructValue(new Promise({value: "ok"}))
-	$.println(p.value)
+	await $.println(p.value)
 }
 
 if ($.isMainScript(import.meta)) {

@@ -270,21 +270,21 @@ export async function rangeFuncBreakIterator(_yield: ((_p0: number) => boolean |
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println("skip negative:", skipToLabel(-1))
-	$.println("skip positive:", skipToLabel(1))
-	$.println("loop skipped:", skipLoop(0))
-	$.println("loop included:", skipLoop(2))
-	$.println("mixed small:", mixedForwardBackward(1))
-	$.println("mixed large:", mixedForwardBackward(5))
-	$.println("label decl:", labelBeforeShortDecl(2))
-	$.println("overlap fallthrough:", overlappingSequentialForward(0))
-	$.println("overlap exponent:", overlappingSequentialForward(1))
-	$.println("overlap exit:", overlappingSequentialForward(2))
-	$.println("mixed decl:", mixedForwardBackwardDecl(2))
-	$.println("state zero:", stateMachineGoto(0))
-	$.println("state one:", stateMachineGoto(1))
-	$.println("nested restart:", nestedBackwardGoto(5))
-	$.println("nested break:", nestedInnerBreakWithGoto(25))
+	await $.println("skip negative:", skipToLabel(-1))
+	await $.println("skip positive:", skipToLabel(1))
+	await $.println("loop skipped:", skipLoop(0))
+	await $.println("loop included:", skipLoop(2))
+	await $.println("mixed small:", mixedForwardBackward(1))
+	await $.println("mixed large:", mixedForwardBackward(5))
+	await $.println("label decl:", labelBeforeShortDecl(2))
+	await $.println("overlap fallthrough:", overlappingSequentialForward(0))
+	await $.println("overlap exponent:", overlappingSequentialForward(1))
+	await $.println("overlap exit:", overlappingSequentialForward(2))
+	await $.println("mixed decl:", mixedForwardBackwardDecl(2))
+	await $.println("state zero:", stateMachineGoto(0))
+	await $.println("state one:", stateMachineGoto(1))
+	await $.println("nested restart:", nestedBackwardGoto(5))
+	await $.println("nested break:", nestedInnerBreakWithGoto(25))
 
 	let rangeTotal = 0
 	let __goscriptGotoState3 = "rangeRestart"
@@ -334,7 +334,7 @@ export async function main(): globalThis.Promise<void> {
 			}
 			case "rangeDone":
 			{
-				$.println("range func break:", rangeTotal)
+				await $.println("range func break:", rangeTotal)
 				break __goscriptGotoLoop3
 				break
 			}

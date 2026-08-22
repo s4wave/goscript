@@ -47,12 +47,12 @@ export class pooledElement {
 	)
 }
 
-export function printList(name: string, values: list.List | $.VarRef<list.List> | null): void {
-	fmt.Print(name)
+export async function printList(name: string, values: list.List | $.VarRef<list.List> | null): globalThis.Promise<void> {
+	await fmt.Print(name)
 	for (let element: list.Element | $.VarRef<list.Element> | null = list.List.prototype.Front.call(values); element != null; element = list.Element.prototype.Next.call(element)) {
-		fmt.Print(" ", $.pointerValue<list.Element>(element).Value)
+		await fmt.Print(" ", $.pointerValue<list.Element>(element).Value)
 	}
-	fmt.Println()
+	await fmt.Println()
 }
 
 export function newElementPool(__typeArgs: $.GenericTypeArgs | undefined): sync.Pool | $.VarRef<sync.Pool> | null {
@@ -72,19 +72,19 @@ export async function main(): globalThis.Promise<void> {
 	let middle: list.Element | $.VarRef<list.Element> | null = list.List.prototype.PushFront.call(values, "middle")
 	let back: list.Element | $.VarRef<list.Element> | null = list.List.prototype.PushBack.call(values, "back")
 	list.List.prototype.PushFront.call(values, "front")
-	printList("seed", values)
+	await printList("seed", values)
 
 	let boxed: any = $.interfaceValue(back, "*list.Element", { kind: $.TypeKind.Pointer, elemType: "list.Element" })
 	list.List.prototype.MoveToFront.call(values, $.mustTypeAssert<list.Element | $.VarRef<list.Element> | null>(boxed, { kind: $.TypeKind.Pointer, elemType: "list.Element" }))
-	printList("moved", values)
+	await printList("moved", values)
 
-	fmt.Println("removed", list.List.prototype.Remove.call(values, middle))
-	printList("final", values)
+	await fmt.Println("removed", list.List.prototype.Remove.call(values, middle))
+	await printList("final", values)
 	let pool: sync.Pool | $.VarRef<sync.Pool> | null = newElementPool({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }})
 	let pooled: pooledElement | $.VarRef<pooledElement> | null = (await pushPooled({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, pool, "pooled") as pooledElement | $.VarRef<pooledElement> | null)
-	fmt.Println("pool", $.pointerValue<pooledElement>(pooled).Value)
+	await fmt.Println("pool", $.pointerValue<pooledElement>(pooled).Value)
 	sync.Pool.prototype.Put.call($.pointerValue<sync.Pool>(pool), $.interfaceValue(pooled, "*main.pooledElement", { kind: $.TypeKind.Pointer, elemType: "main.pooledElement" }))
-	fmt.Println("pool-reused", $.pointerValue<pooledElement>(await pushPooled({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, pool, "reused")).Value)
+	await fmt.Println("pool-reused", $.pointerValue<pooledElement>(await pushPooled({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, pool, "reused")).Value)
 }
 
 if ($.isMainScript(import.meta)) {

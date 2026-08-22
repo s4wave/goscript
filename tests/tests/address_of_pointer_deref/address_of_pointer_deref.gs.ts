@@ -63,14 +63,14 @@ export async function main(): globalThis.Promise<void> {
 	// Local: q := &*p must alias v, so writing through q changes v.
 	let q = p
 	q!.value = 20
-	$.println("alias write through &*p:", v.value)
+	await $.println("alias write through &*p:", v.value)
 
 	// Field selector: out.Default = &(*out.Default) keeps the same pointee.
 	let c: Col | $.VarRef<Col> | null = new Col({Name: "c", Default: v})
 	let out: Col | $.VarRef<Col> | null = cloneColField(c)
-	$.println("field alias same pointee:", $.pointerEqual($.pointerValue<Col>(out).Default, $.pointerValue<Col>(c).Default))
+	await $.println("field alias same pointee:", $.pointerEqual($.pointerValue<Col>(out).Default, $.pointerValue<Col>(c).Default))
 	$.pointerValue<Col>(out).Default!.value = 30
-	$.println("field alias write:", v.value)
+	await $.println("field alias write:", v.value)
 }
 
 if ($.isMainScript(import.meta)) {

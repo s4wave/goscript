@@ -212,10 +212,10 @@ export class retransmissionQueueInitialAckHandler {
 		const q: retransmissionQueueInitialAckHandler | $.VarRef<retransmissionQueueInitialAckHandler> | null = this
 	}
 
-	public OnLost(_p0: wireFrame | null): void {
+	public async OnLost(_p0: wireFrame | null): globalThis.Promise<void> {
 		let q: retransmissionQueueInitialAckHandler | $.VarRef<retransmissionQueueInitialAckHandler> | null = this
 		$.pointerValue<retransmissionQueueInitialAckHandler>(q).lost++
-		$.println("initial")
+		await $.println("initial")
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -257,10 +257,10 @@ export class retransmissionQueueHandshakeAckHandler {
 		const q: retransmissionQueueHandshakeAckHandler | $.VarRef<retransmissionQueueHandshakeAckHandler> | null = this
 	}
 
-	public OnLost(_p0: wireFrame | null): void {
+	public async OnLost(_p0: wireFrame | null): globalThis.Promise<void> {
 		let q: retransmissionQueueHandshakeAckHandler | $.VarRef<retransmissionQueueHandshakeAckHandler> | null = this
 		$.pointerValue<retransmissionQueueHandshakeAckHandler>(q).lost++
-		$.println("handshake")
+		await $.println("handshake")
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -302,10 +302,10 @@ export class retransmissionQueueAppDataAckHandler {
 		const q: retransmissionQueueAppDataAckHandler | $.VarRef<retransmissionQueueAppDataAckHandler> | null = this
 	}
 
-	public OnLost(_p0: wireFrame | null): void {
+	public async OnLost(_p0: wireFrame | null): globalThis.Promise<void> {
 		let q: retransmissionQueueAppDataAckHandler | $.VarRef<retransmissionQueueAppDataAckHandler> | null = this
 		$.pointerValue<retransmissionQueueAppDataAckHandler>(q).lost++
-		$.println("app")
+		await $.println("app")
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -330,8 +330,8 @@ export async function main(): globalThis.Promise<void> {
 	let q: retransmissionQueue | $.VarRef<retransmissionQueue> | null = new retransmissionQueue()
 	let p: packet | $.VarRef<packet> | null = new packet({Frames: $.arrayToSlice<Frame>([(() => { const __goscriptLiteralField0 = retransmissionQueue.prototype.InitialAckHandler.call(q); return $.markAsStructValue(new Frame({Frame: $.interfaceValue<wireFrame | null>($.markAsStructValue(new pingFrame()), "main.pingFrame", "main.pingFrame"), Handler: __goscriptLiteralField0})) })(), (() => { const __goscriptLiteralField1 = retransmissionQueue.prototype.HandshakeAckHandler.call(q); return $.markAsStructValue(new Frame({Frame: $.interfaceValue<wireFrame | null>($.markAsStructValue(new pingFrame()), "main.pingFrame", "main.pingFrame"), Handler: __goscriptLiteralField1})) })(), (() => { const __goscriptLiteralField2 = retransmissionQueue.prototype.AppDataAckHandler.call(q); return $.markAsStructValue(new Frame({Frame: $.interfaceValue<wireFrame | null>($.markAsStructValue(new pingFrame()), "main.pingFrame", "main.pingFrame"), Handler: __goscriptLiteralField2})) })()])})
 	await queueFramesForRetransmission(p)
-	$.println("lost:", $.pointerValue<retransmissionQueue>(q).lost)
-	$.println("done")
+	await $.println("lost:", $.pointerValue<retransmissionQueue>(q).lost)
+	await $.println("done")
 }
 
 if ($.isMainScript(import.meta)) {

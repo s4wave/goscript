@@ -51,18 +51,18 @@ export class namedItem {
 export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget0 = $.arrayToSlice<{"name": string, "input": string, "count": number}>([{name: "first", input: "alpha", count: 1}, {name: "second", input: "beta", count: 2}]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let tt = __goscriptRangeTarget0![__rangeIndex]
-		$.println(tt.name, tt.input, tt.count)
+		await $.println(tt.name, tt.input, tt.count)
 	}
 
 	let x = {Name: "third", Offsets: (null as $.Slice<number>), Count: 3}
 	x.Offsets = $.append(x.Offsets, 5)
-	$.println(x.Name, $.arrayIndex(x.Offsets!, 0), x.Count)
+	await $.println(x.Name, $.arrayIndex(x.Offsets!, 0), x.Count)
 
 	let __goscriptTuple0: any = buildNamedItems()
 	let items: $.Slice<namedItem> = __goscriptTuple0[0]
 	for (let __goscriptRangeTarget1 = $.goSlice(items, 1, undefined), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
 		let item = __goscriptRangeTarget1![__rangeIndex]
-		$.println(item.key, $.len(item.data))
+		await $.println(item.key, $.len(item.data))
 	}
 }
 

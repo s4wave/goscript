@@ -67,12 +67,12 @@ export async function main(): globalThis.Promise<void> {
 	let otherOne = $.markAsStructValue(new ObjectID({hash: new Uint8Array([0, $.uint(7, 8), 0, 0])}))
 	let different = $.markAsStructValue(new ObjectID({hash: new Uint8Array([0, 0, $.uint(7, 8), 0])}))
 
-	$.println("zero is zero:", $.markAsStructValue($.cloneStructValue(zero)).IsZero())
-	$.println("zero valid:", $.markAsStructValue($.cloneStructValue(zero)).Valid())
-	$.println("zero equals zero:", $.comparableEqual(zero, otherZero))
-	$.println("one valid:", $.markAsStructValue($.cloneStructValue(one)).Valid())
-	$.println("one equals other one:", $.comparableEqual(one, otherOne))
-	$.println("one differs:", !$.comparableEqual(one, different))
+	await $.println("zero is zero:", $.markAsStructValue($.cloneStructValue(zero)).IsZero())
+	await $.println("zero valid:", $.markAsStructValue($.cloneStructValue(zero)).Valid())
+	await $.println("zero equals zero:", $.comparableEqual(zero, otherZero))
+	await $.println("one valid:", $.markAsStructValue($.cloneStructValue(one)).Valid())
+	await $.println("one equals other one:", $.comparableEqual(one, otherOne))
+	await $.println("one differs:", !$.comparableEqual(one, different))
 }
 
 if ($.isMainScript(import.meta)) {

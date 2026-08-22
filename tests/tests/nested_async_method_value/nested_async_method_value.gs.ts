@@ -59,9 +59,9 @@ export class Worker {
 export async function run(fn: (() => $.GoError | globalThis.Promise<$.GoError>) | null): globalThis.Promise<void> {
 	let err = await fn!()
 	if (err == null) {
-		$.println("func value err: nil")
+		await $.println("func value err: nil")
 	} else {
-		$.println("func value err: non-nil")
+		await $.println("func value err: non-nil")
 	}
 }
 
@@ -72,9 +72,9 @@ export async function main(): globalThis.Promise<void> {
 	let s: Spawner | null = $.interfaceValue<Spawner | null>(w, "*main.Worker", { kind: $.TypeKind.Pointer, elemType: "main.Worker" })
 	let err = await $.pointerValue<Exclude<Spawner, null>>(s).Spawn()
 	if (err == null) {
-		$.println("iface err: nil")
+		await $.println("iface err: nil")
 	} else {
-		$.println("iface err: non-nil")
+		await $.println("iface err: non-nil")
 	}
 	await $.chanSend($.pointerValue<Worker>(w).ch, 1)
 }

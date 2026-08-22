@@ -56,7 +56,7 @@ export function entries(): $.VarRef<entry[]> | null {
 export async function main(): globalThis.Promise<void> {
 	let table: $.VarRef<entry[]> | null = entries()
 	$.arrayIndex($.pointerValue<entry[]>(table), 0).add(5)
-	$.println($.arrayIndex($.pointerValue<entry[]>(table), 0).value)
+	await $.println($.arrayIndex($.pointerValue<entry[]>(table), 0).value)
 }
 
 if ($.isMainScript(import.meta)) {

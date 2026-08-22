@@ -15,7 +15,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = os.WriteFile(fileName, new Uint8Array([99, 111, 110, 116, 101, 110, 116, 115]), $.uint(0o644, 32))
 		if (err != null) {
-			$.println("write error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("write error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return
 		}
 	}
@@ -24,13 +24,13 @@ export async function main(): globalThis.Promise<void> {
 	await (async (): globalThis.Promise<void> => {
 		let [info, err] = os.Stat(fileName)
 		if (err != null) {
-			$.println("stat error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("stat error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return
 		}
 		if (false) {
-			$.println("size:", await $.pointerValue<Exclude<fs.FileInfo, null>>(info).Size())
+			await $.println("size:", await $.pointerValue<Exclude<fs.FileInfo, null>>(info).Size())
 		} else {
-			$.println("stat closure ok")
+			await $.println("stat closure ok")
 		}
 	})()
 }

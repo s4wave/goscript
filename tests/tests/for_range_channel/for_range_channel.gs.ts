@@ -14,7 +14,7 @@ export async function main(): globalThis.Promise<void> {
 			break
 		}
 		let x = __goscriptRange0.value
-		$.println(x)
+		await $.println(x)
 	}
 
 	// test with = instead of := within the for range
@@ -29,7 +29,7 @@ export async function main(): globalThis.Promise<void> {
 			break
 		}
 		y = __goscriptRange1.value
-		$.println(y)
+		await $.println(y)
 	}
 }
 

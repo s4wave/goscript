@@ -66,22 +66,22 @@ export async function main(): globalThis.Promise<void> {
 	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.markAsStructValue($.cloneStructValue(p)), "main.Person", "main.Person"))))
 	let t = $.markAsStructValue($.cloneStructValue(v)).Type()
 
-	$.println("Type:", await $.pointerValue<Exclude<reflect.Type, null>>(t).Name())
-	$.println("Kind:", reflect.Kind_String((await $.pointerValue<Exclude<reflect.Type, null>>(t).Kind())))
-	$.println("NumField:", await $.pointerValue<Exclude<reflect.Type, null>>(t).NumField())
+	await $.println("Type:", await $.pointerValue<Exclude<reflect.Type, null>>(t).Name())
+	await $.println("Kind:", reflect.Kind_String((await $.pointerValue<Exclude<reflect.Type, null>>(t).Kind())))
+	await $.println("NumField:", await $.pointerValue<Exclude<reflect.Type, null>>(t).NumField())
 
 	for (let i = 0; i < await $.pointerValue<Exclude<reflect.Type, null>>(t).NumField(); i++) {
 		let sf = $.markAsStructValue($.cloneStructValue(await $.pointerValue<Exclude<reflect.Type, null>>(t).Field(i)))
 		let fv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Field(i)))
 
-		$.println("Field", i, ":", sf.Name)
-		$.println("  FieldValue Kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(fv)).Kind()))
-		$.println("  FieldValue CanInterface:", $.markAsStructValue($.cloneStructValue(fv)).CanInterface())
+		await $.println("Field", i, ":", sf.Name)
+		await $.println("  FieldValue Kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(fv)).Kind()))
+		await $.println("  FieldValue CanInterface:", $.markAsStructValue($.cloneStructValue(fv)).CanInterface())
 
 		switch ($.markAsStructValue($.cloneStructValue(fv)).Kind()) {
 			case reflect.String:
 			{
-				$.println("  Value:", $.markAsStructValue($.cloneStructValue(fv)).String())
+				await $.println("  Value:", $.markAsStructValue($.cloneStructValue(fv)).String())
 				break
 			}
 			case reflect.Int:
@@ -90,12 +90,12 @@ export async function main(): globalThis.Promise<void> {
 			case reflect.Int32:
 			case reflect.Int64:
 			{
-				$.println("  Value:", $.markAsStructValue($.cloneStructValue(fv)).Int())
+				await $.println("  Value:", $.markAsStructValue($.cloneStructValue(fv)).Int())
 				break
 			}
 			case reflect.Bool:
 			{
-				$.println("  Value:", $.markAsStructValue($.cloneStructValue(fv)).Bool())
+				await $.println("  Value:", $.markAsStructValue($.cloneStructValue(fv)).Bool())
 				break
 			}
 		}

@@ -18,7 +18,7 @@ export async function main(): globalThis.Promise<void> {
 	await call($.functionValue((): void => {
 		state__set(s, 7)
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	$.println($.int(s.value))
+	await $.println($.int(s.value))
 }
 
 if ($.isMainScript(import.meta)) {

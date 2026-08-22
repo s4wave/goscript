@@ -3,6 +3,6 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-export function testJSWasm(): void {
-	$.println("JS/WASM specific code compiled - CORRECT")
+export async function testJSWasm(): globalThis.Promise<void> {
+	await $.println("JS/WASM specific code compiled - CORRECT")
 }

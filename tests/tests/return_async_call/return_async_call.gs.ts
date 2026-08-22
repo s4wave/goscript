@@ -30,15 +30,15 @@ export async function WrapperWithError(ctx: context.Context | null): globalThis.
 export async function main(): globalThis.Promise<void> {
 	// These calls should work properly with async/await
 	let result1 = await SyncWrapper()
-	$.println("Result1:", result1)
+	await $.println("Result1:", result1)
 
 	let ctx = context.Background()
 	let [result2, err] = await WrapperWithError(ctx)
 	if (err != null) {
-		$.println("Error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("Error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
 	}
-	$.println("Result2:", result2)
+	await $.println("Result2:", result2)
 }
 
 if ($.isMainScript(import.meta)) {

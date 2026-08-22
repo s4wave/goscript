@@ -12,80 +12,80 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test Base
 	let base = filepath.Base(path)
-	$.println("Base:", base)
+	await $.println("Base:", base)
 
 	// Test Dir
 	let dir = filepath.Dir(path)
-	$.println("Dir:", dir)
+	await $.println("Dir:", dir)
 
 	// Test Ext
 	let ext = filepath.Ext(path)
-	$.println("Ext:", ext)
+	await $.println("Ext:", ext)
 
 	// Test Clean
 	let dirty = "dir//subdir/../subdir/./file.txt"
 	let clean = filepath.Clean(dirty)
-	$.println("Clean:", clean)
+	await $.println("Clean:", clean)
 
 	// Test Join
 	let joined = filepath.Join("dir", "subdir", "file.txt")
-	$.println("Join:", joined)
+	await $.println("Join:", joined)
 	let joinedSpread = filepath.Join(...($.arrayToSlice<string>(["dir", "spread.txt"]) ?? []))
-	$.println("Join spread:", joinedSpread)
+	await $.println("Join spread:", joinedSpread)
 
 	// Test Split
 	let [dir2, file] = filepath.Split(path)
-	$.println("Split dir:", dir2)
-	$.println("Split file:", file)
+	await $.println("Split dir:", dir2)
+	await $.println("Split file:", file)
 
 	// Test IsAbs
 	let abs = filepath.IsAbs("/absolute/path")
-	$.println("IsAbs /absolute/path:", abs)
+	await $.println("IsAbs /absolute/path:", abs)
 	let rel = filepath.IsAbs("relative/path")
-	$.println("IsAbs relative/path:", rel)
+	await $.println("IsAbs relative/path:", rel)
 
 	// Test ToSlash and FromSlash
 	let windowsPath = "dir\\subdir\\file.txt"
 	let slashed = filepath.ToSlash(windowsPath)
-	$.println("ToSlash:", slashed)
+	await $.println("ToSlash:", slashed)
 	let backslashed = filepath.FromSlash("dir/subdir/file.txt")
-	$.println("FromSlash:", backslashed)
+	await $.println("FromSlash:", backslashed)
 
 	// Test VolumeName
 	let vol = filepath.VolumeName("C:\\Windows\\System32")
-	$.println("VolumeName:", vol)
+	await $.println("VolumeName:", vol)
 
 	// Test Match
 	let [matched, err] = filepath.Match("*.txt", "file.txt")
 	if (err == null) {
-		$.println("Match *.txt file.txt:", matched)
+		await $.println("Match *.txt file.txt:", matched)
 	}
 
 	let [matched2, err2] = filepath.Match("dir/*", "dir/file.txt")
 	if (err2 == null) {
-		$.println("Match dir/* dir/file.txt:", matched2)
+		await $.println("Match dir/* dir/file.txt:", matched2)
 	}
 
 	// Test HasPrefix
 	let hasPrefix = filepath.HasPrefix("/usr/local/bin", "/usr/local")
-	$.println("HasPrefix /usr/local/bin /usr/local:", hasPrefix)
+	await $.println("HasPrefix /usr/local/bin /usr/local:", hasPrefix)
 
 	// Test IsLocal
 	let local = filepath.IsLocal("file.txt")
-	$.println("IsLocal file.txt:", local)
+	await $.println("IsLocal file.txt:", local)
 	let nonLocal = filepath.IsLocal("../file.txt")
-	$.println("IsLocal ../file.txt:", nonLocal)
+	await $.println("IsLocal ../file.txt:", nonLocal)
 
 	// Test SplitList
 	let pathList = "/usr/bin:/usr/local/bin:/bin"
 	let split: $.Slice<string> = filepath.SplitList(pathList)
-	$.println("SplitList length:", $.len(split))
+	await $.println("SplitList length:", $.len(split))
 	for (let __goscriptRangeTarget0 = split, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
 		let p = __goscriptRangeTarget0![i]
-		$.println("SplitList", i, ":", p)
+		await $.println("SplitList", i, ":", p)
 	}
 
-	$.println("test finished")
+	await $.println("test finished")
 }
 
 if ($.isMainScript(import.meta)) {

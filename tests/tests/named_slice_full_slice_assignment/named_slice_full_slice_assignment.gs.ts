@@ -22,9 +22,9 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let raw: $.Slice<number> = $.arrayToSlice<number>([4, 5])
 	let size = filters_size((raw as filters))
-	$.println("len:", $.len((out as filters)))
-	$.println("cap:", $.cap((out as filters)))
-	$.println("size:", size)
+	await $.println("len:", $.len((out as filters)))
+	await $.println("cap:", $.cap((out as filters)))
+	await $.println("size:", size)
 }
 
 if ($.isMainScript(import.meta)) {

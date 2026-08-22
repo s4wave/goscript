@@ -69,13 +69,13 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = trace.Start($.pointerValueOrNil($.interfaceValue<io.Writer | null>(sink, "*main.byteSink", { kind: $.TypeKind.Pointer, elemType: "main.byteSink" }))!)
 		if (err != null) {
-			fmt.Println("ERROR:" + $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await fmt.Println("ERROR:" + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return
 		}
 	}
 	trace.Stop()
 
-	fmt.Println(toHex($.pointerValue<byteSink>(sink).data))
+	await fmt.Println(toHex($.pointerValue<byteSink>(sink).data))
 }
 
 if ($.isMainScript(import.meta)) {

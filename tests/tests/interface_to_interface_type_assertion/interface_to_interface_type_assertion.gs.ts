@@ -70,9 +70,9 @@ export async function main(): globalThis.Promise<void> {
 
 	let [, ok] = $.typeAssertTuple<MyOtherInterface | null>(i, "main.MyOtherInterface")
 	if (ok) {
-		$.println("Type assertion successful")
+		await $.println("Type assertion successful")
 	} else {
-		$.println("Type assertion failed")
+		await $.println("Type assertion failed")
 	}
 }
 

@@ -12,9 +12,9 @@ export async function main(): globalThis.Promise<void> {
 	for (let __rangeIndex = 0; __rangeIndex < 1; __rangeIndex++) {
 		x = 1
 		let [y, __goscriptShadow0] = pair()
-		$.println("inner:", y, __goscriptShadow0)
+		await $.println("inner:", y, __goscriptShadow0)
 	}
-	$.println("outer:", x)
+	await $.println("outer:", x)
 }
 
 if ($.isMainScript(import.meta)) {

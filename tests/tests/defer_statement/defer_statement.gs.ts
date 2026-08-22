@@ -4,16 +4,16 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	using __defer = new $.DisposableStack()
-	__defer.defer(() => { $.println("deferred") })
-	let release: ((name: string) => void) | null = $.functionValue((name: string): void => {
-		using __defer = new $.DisposableStack()
-		__defer.defer(() => { $.println("func deferred", name) })
-		$.println("func body", name)
+	await using __defer = new $.AsyncDisposableStack()
+	__defer.defer(async () => { await $.println("deferred") })
+	let release: ((name: string) => void) | null = $.functionValue(async (name: string): globalThis.Promise<void> => {
+		await using __defer = new $.AsyncDisposableStack()
+		__defer.defer(async () => { await $.println("func deferred", name) })
+		await $.println("func body", name)
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [] } as $.FunctionTypeInfo))
 	await release!("first")
 	await release!("second")
-	$.println("main")
+	await $.println("main")
 }
 
 if ($.isMainScript(import.meta)) {

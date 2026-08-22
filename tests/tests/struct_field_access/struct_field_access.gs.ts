@@ -51,8 +51,8 @@ export class MyStruct {
 export async function main(): globalThis.Promise<void> {
 	// === Struct Field Access ===
 	let ms = $.markAsStructValue(new MyStruct({MyInt: 42, MyString: "foo"}))
-	$.println("MyInt: Expected: 42, Actual:", ms.MyInt)
-	$.println("MyString: Expected: foo, Actual:", ms.MyString)
+	await $.println("MyInt: Expected: 42, Actual:", ms.MyInt)
+	await $.println("MyString: Expected: foo, Actual:", ms.MyString)
 }
 
 if ($.isMainScript(import.meta)) {

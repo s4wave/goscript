@@ -74,11 +74,11 @@ export class Derived {
 export async function main(): globalThis.Promise<void> {
 	let base: any = $.interfaceValue($.markAsStructValue(new Base()), "main.Base", "main.Base")
 	let [, baseOK] = $.typeAssertTuple<Stringer | null>(base, "main.Stringer")
-	$.println("base implements Stringer:", baseOK)
+	await $.println("base implements Stringer:", baseOK)
 
 	let derived: any = $.interfaceValue($.markAsStructValue(new Derived()), "main.Derived", "main.Derived")
 	let [, derivedOK] = $.typeAssertTuple<Stringer | null>(derived, "main.Stringer")
-	$.println("derived implements Stringer:", derivedOK)
+	await $.println("derived implements Stringer:", derivedOK)
 }
 
 if ($.isMainScript(import.meta)) {

@@ -14,26 +14,26 @@ import "@goscript/io/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let sum = await sha1.Sum(new Uint8Array([97, 98, 99]))
-	$.println("sum len", $.len(sum))
-	$.println("sum first", $.uint($.arrayIndex(sum, 0), 8))
-	$.println("sum last", $.uint($.arrayIndex(sum, 19), 8))
+	await $.println("sum len", $.len(sum))
+	await $.println("sum first", $.uint($.arrayIndex(sum, 0), 8))
+	await $.println("sum last", $.uint($.arrayIndex(sum, 19), 8))
 
 	let h: hash.Hash | null = sha1.New()
 	let [n, err] = await $.pointerValue<Exclude<hash.Hash, null>>(h).Write(new Uint8Array([97]))
-	$.println("write a", n, err == null)
+	await $.println("write a", n, err == null)
 	let __goscriptTuple0: any = await $.pointerValue<Exclude<hash.Hash, null>>(h).Write(new Uint8Array([98, 99]))
 	n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
-	$.println("write bc", n, err == null)
+	await $.println("write bc", n, err == null)
 	let stream: $.Slice<number> = await $.pointerValue<Exclude<hash.Hash, null>>(h).Sum(new Uint8Array([1, 2]) as $.Slice<number>)
-	$.println("stream len", $.len(stream))
-	$.println("stream prefix", $.uint($.arrayIndex(stream!, 0), 8), $.uint($.arrayIndex(stream!, 1), 8))
-	$.println("stream digest", $.uint($.arrayIndex(stream!, 2), 8), $.uint($.arrayIndex(stream!, 21), 8))
+	await $.println("stream len", $.len(stream))
+	await $.println("stream prefix", $.uint($.arrayIndex(stream!, 0), 8), $.uint($.arrayIndex(stream!, 1), 8))
+	await $.println("stream digest", $.uint($.arrayIndex(stream!, 2), 8), $.uint($.arrayIndex(stream!, 21), 8))
 
 	let backing: $.Slice<number> = $.makeSlice<number>(sha1.Size, undefined, "byte")
 	let backed: $.Slice<number> = await $.pointerValue<Exclude<hash.Hash, null>>(h).Sum($.goSlice(backing, undefined, 0))
-	$.println("backed len", $.len(backed), $.len(backing))
-	$.println("backed digest", $.uint($.arrayIndex(backing!, 0), 8), $.uint($.arrayIndex(backing!, 19), 8), $.uint($.arrayIndex(backed!, 0), 8), $.uint($.arrayIndex(backed!, 19), 8))
+	await $.println("backed len", $.len(backed), $.len(backing))
+	await $.println("backed digest", $.uint($.arrayIndex(backing!, 0), 8), $.uint($.arrayIndex(backing!, 19), 8), $.uint($.arrayIndex(backed!, 0), 8), $.uint($.arrayIndex(backed!, 19), 8))
 }
 
 if ($.isMainScript(import.meta)) {

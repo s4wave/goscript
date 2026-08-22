@@ -37,8 +37,8 @@ export function collect(_arguments: string): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println($.markAsStructValue($.cloneStructValue($.markAsStructValue(new Parser()))).Parse($.arrayToSlice<string>(["a", "b"])))
-	$.println(collect("ok"))
+	await $.println($.markAsStructValue($.cloneStructValue($.markAsStructValue(new Parser()))).Parse($.arrayToSlice<string>(["a", "b"])))
+	await $.println(collect("ok"))
 }
 
 if ($.isMainScript(import.meta)) {

@@ -65,12 +65,12 @@ export function __goscript_set_shared(__goscriptValue: number): void {
 	__goscript_get_shared().value = __goscriptValue
 }
 
-export function readTable(): void {
+export async function readTable(): globalThis.Promise<void> {
 	__goscript_set_counter(__goscript_get_counter() + 1n)
 	__goscript_a.__goscript_set_remoteCounter(__goscript_a.__goscript_get_remoteCounter() + 1)
 	__goscript_set_shared(7)
 	let ptr = shared
-	$.println($.len(__goscript_a.__goscript_get_table()), $.len(__goscript_get_registry()), __goscript_get_counter(), __goscript_a.__goscript_get_remoteCounter(), $.pointerValue<number>(ptr), __goscript_a.__goscript_get_stringType() != null)
+	await $.println($.len(__goscript_a.__goscript_get_table()), $.len(__goscript_get_registry()), __goscript_get_counter(), __goscript_a.__goscript_get_remoteCounter(), $.pointerValue<number>(ptr), __goscript_a.__goscript_get_stringType() != null)
 }
 
 export async function main(): globalThis.Promise<void> {

@@ -29,8 +29,8 @@ export class task {
 		return $.markAsStructValue(cloned)
 	}
 
-	public Run(): void {
-		$.println("run")
+	public async Run(): globalThis.Promise<void> {
+		await $.println("run")
 	}
 
 	static __typeInfo = $.registerStructType(

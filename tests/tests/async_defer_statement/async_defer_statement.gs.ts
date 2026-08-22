@@ -8,15 +8,15 @@ export async function main(): globalThis.Promise<void> {
 	let ch: $.Channel<boolean> | null = $.makeChannel<boolean>(1, false, "both")
 
 	__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
-		$.println("deferred start")
+		await $.println("deferred start")
 		await $.chanRecv(ch)
-		$.println("deferred end")
+		await $.println("deferred end")
 	})() })
 
-	$.println("main start")
-	$.println("main signaling defer")
+	await $.println("main start")
+	await $.println("main signaling defer")
 	await $.chanSend(ch, true)
-	$.println("main end")
+	await $.println("main end")
 }
 
 if ($.isMainScript(import.meta)) {

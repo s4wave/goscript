@@ -59,7 +59,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = getCoords()
 	p.X = __goscriptTuple0[0]
 	p.Y = __goscriptTuple0[1]
-	$.println(p.X, p.Y)
+	await $.println(p.X, p.Y)
 }
 
 if ($.isMainScript(import.meta)) {

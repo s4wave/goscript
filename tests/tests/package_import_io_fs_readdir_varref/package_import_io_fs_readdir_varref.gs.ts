@@ -56,12 +56,12 @@ export async function main(): globalThis.Promise<void> {
 	let entries: $.Slice<fs.DirEntry | null> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
-		$.println("err:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("err:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
 	}
 	for (let __goscriptRangeTarget0 = entries, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let entry = __goscriptRangeTarget0![__rangeIndex]
-		$.println(await $.pointerValue<Exclude<fs.DirEntry, null>>(entry).Name(), await $.pointerValue<Exclude<fs.DirEntry, null>>(entry).IsDir())
+		await $.println(await $.pointerValue<Exclude<fs.DirEntry, null>>(entry).Name(), await $.pointerValue<Exclude<fs.DirEntry, null>>(entry).IsDir())
 	}
 }
 

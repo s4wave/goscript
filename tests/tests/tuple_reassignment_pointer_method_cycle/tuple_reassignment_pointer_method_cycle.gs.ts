@@ -80,7 +80,7 @@ export async function main(): globalThis.Promise<void> {
 		z = __goscriptTuple0[2]
 	}
 
-	$.println($.pointerValue<box>(x).value, $.pointerValue<box>(y).value, $.pointerValue<box>(z).value)
+	await $.println($.pointerValue<box>(x).value, $.pointerValue<box>(y).value, $.pointerValue<box>(z).value)
 }
 
 if ($.isMainScript(import.meta)) {

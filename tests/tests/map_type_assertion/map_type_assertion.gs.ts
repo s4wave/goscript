@@ -11,9 +11,9 @@ export async function main(): globalThis.Promise<void> {
 	let m: globalThis.Map<string, number> | null = __goscriptTuple0[0]
 	let ok = __goscriptTuple0[1]
 	if (ok) {
-		$.println("Age:", $.mapGet<string, number, number>(m, "age", 0)[0])
+		await $.println("Age:", $.mapGet<string, number, number>(m, "age", 0)[0])
 	} else {
-		$.println("Type assertion failed")
+		await $.println("Type assertion failed")
 	}
 
 	let [, ok2] = $.typeAssertTuple<globalThis.Map<string, string> | null>(i, { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "string" } })
@@ -22,17 +22,17 @@ export async function main(): globalThis.Promise<void> {
 		// Depending on how Go handles failed assertions with incorrect types,
 		// accessing n["key"] might panic if n is nil.
 		// For safety and clarity, we'll just print a generic message if it passes unexpectedly.
-		$.println("Unexpected success for map[string]string assertion")
+		await $.println("Unexpected success for map[string]string assertion")
 	} else {
-		$.println("Second type assertion (map[string]string) failed as expected")
+		await $.println("Second type assertion (map[string]string) failed as expected")
 	}
 
 	let [, ok3] = $.typeAssertTuple<globalThis.Map<number, number> | null>(i, { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "int" }, elemType: { kind: $.TypeKind.Basic, name: "int" } })
 	if (ok3) {
 		// Similar to the above, this block should not be reached.
-		$.println("Unexpected success for map[int]int assertion")
+		await $.println("Unexpected success for map[int]int assertion")
 	} else {
-		$.println("Third type assertion (map[int]int) failed as expected")
+		await $.println("Third type assertion (map[int]int) failed as expected")
 	}
 }
 

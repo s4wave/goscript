@@ -55,10 +55,10 @@ export function __goscript_set_Reader(__goscriptValue: io.Reader | null): void {
 
 export async function main(): globalThis.Promise<void> {
 	if (Reader == null) {
-		$.println(0)
+		await $.println(0)
 		return
 	}
-	$.println(3)
+	await $.println(3)
 }
 
 if ($.isMainScript(import.meta)) {

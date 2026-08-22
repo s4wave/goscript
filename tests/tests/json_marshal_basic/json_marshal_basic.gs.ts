@@ -67,9 +67,9 @@ export async function main(): globalThis.Promise<void> {
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
-		$.println("Marshal error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("Marshal error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 	} else {
-		$.println("Marshal:", $.bytesToString(b))
+		await $.println("Marshal:", $.bytesToString(b))
 	}
 }
 

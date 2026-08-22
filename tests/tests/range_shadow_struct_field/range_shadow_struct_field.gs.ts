@@ -90,7 +90,7 @@ export class Matcher {
 
 export async function main(): globalThis.Promise<void> {
 	let m: Matcher | $.VarRef<Matcher> | null = new Matcher({matches: $.arrayToSlice<Match>([$.markAsStructValue(new Match({Size: 3})), $.markAsStructValue(new Match({Size: 4}))])})
-	$.println(Matcher.prototype.Total.call(m))
+	await $.println(Matcher.prototype.Total.call(m))
 }
 
 if ($.isMainScript(import.meta)) {

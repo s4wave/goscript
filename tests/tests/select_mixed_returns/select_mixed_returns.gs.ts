@@ -25,7 +25,7 @@ export async function testMixedReturns(ctx: context.Context | null): globalThis.
 			isSend: false,
 			channel: await $.pointerValue<Exclude<context.Context, null>>(ctx).Done(),
 			onSelected: async (__goscriptSelect0Result) => {
-				$.println("Context done, returning")
+				await $.println("Context done, returning")
 				return "context_done"
 			}
 		},
@@ -35,7 +35,7 @@ export async function testMixedReturns(ctx: context.Context | null): globalThis.
 			channel: ch1,
 			onSelected: async (__goscriptSelect0Result) => {
 				let msg = __goscriptSelect0Result.value
-				$.println("Received from ch1:", msg)
+				await $.println("Received from ch1:", msg)
 				return "ch1_result"
 			}
 		},
@@ -45,8 +45,8 @@ export async function testMixedReturns(ctx: context.Context | null): globalThis.
 			channel: ch2,
 			onSelected: async (__goscriptSelect0Result) => {
 				let num = __goscriptSelect0Result.value
-				$.println("Received from ch2:", num)
-				$.println("Processing ch2 value...")
+				await $.println("Received from ch2:", num)
+				await $.println("Processing ch2 value...")
 			}
 		},
 		{
@@ -55,7 +55,7 @@ export async function testMixedReturns(ctx: context.Context | null): globalThis.
 			channel: ch3,
 			onSelected: async (__goscriptSelect0Result) => {
 				let flag = __goscriptSelect0Result.value
-				$.println("Received from ch3:", flag)
+				await $.println("Received from ch3:", flag)
 				return "ch3_result"
 			}
 		},
@@ -65,8 +65,8 @@ export async function testMixedReturns(ctx: context.Context | null): globalThis.
 			channel: ch4,
 			onSelected: async (__goscriptSelect0Result) => {
 				let val = __goscriptSelect0Result.value
-				$.println("Received from ch4:", val)
-				$.println("Processing ch4 value...")
+				await $.println("Received from ch4:", val)
+				await $.println("Processing ch4 value...")
 			}
 		},
 		{
@@ -74,8 +74,8 @@ export async function testMixedReturns(ctx: context.Context | null): globalThis.
 			isSend: false,
 			channel: ch5,
 			onSelected: async (__goscriptSelect0Result) => {
-				$.println("Received from ch5")
-				$.println("Processing ch5 data...")
+				await $.println("Received from ch5")
+				await $.println("Processing ch5 data...")
 			}
 		},
 		{
@@ -83,7 +83,7 @@ export async function testMixedReturns(ctx: context.Context | null): globalThis.
 			isSend: false,
 			channel: null,
 			onSelected: async (__goscriptSelect0Result) => {
-				$.println("No channels ready, using default")
+				await $.println("No channels ready, using default")
 			}
 		}
 	], true)
@@ -92,8 +92,8 @@ export async function testMixedReturns(ctx: context.Context | null): globalThis.
 	}
 
 	// This code should execute when cases 2, 4, 5, or default are selected
-	$.println("Continuing execution after select")
-	$.println("Performing additional work...")
+	await $.println("Continuing execution after select")
+	await $.println("Performing additional work...")
 
 	// Simulate some work
 	await time.Sleep(10000000n)
@@ -118,7 +118,7 @@ export async function testReturnCase(ctx: context.Context | null): globalThis.Pr
 			channel: ch1,
 			onSelected: async (__goscriptSelect1Result) => {
 				let msg = __goscriptSelect1Result.value
-				$.println("Received from ch1:", msg)
+				await $.println("Received from ch1:", msg)
 				return "ch1_result"
 			}
 		},
@@ -128,8 +128,8 @@ export async function testReturnCase(ctx: context.Context | null): globalThis.Pr
 			channel: ch2,
 			onSelected: async (__goscriptSelect1Result) => {
 				let num = __goscriptSelect1Result.value
-				$.println("Received from ch2:", num)
-				$.println("Processing ch2 value...")
+				await $.println("Received from ch2:", num)
+				await $.println("Processing ch2 value...")
 			}
 		},
 		{
@@ -138,7 +138,7 @@ export async function testReturnCase(ctx: context.Context | null): globalThis.Pr
 			channel: ch3,
 			onSelected: async (__goscriptSelect1Result) => {
 				let flag = __goscriptSelect1Result.value
-				$.println("Received from ch3:", flag)
+				await $.println("Received from ch3:", flag)
 				return "ch3_result"
 			}
 		},
@@ -148,8 +148,8 @@ export async function testReturnCase(ctx: context.Context | null): globalThis.Pr
 			channel: ch4,
 			onSelected: async (__goscriptSelect1Result) => {
 				let val = __goscriptSelect1Result.value
-				$.println("Received from ch4:", val)
-				$.println("Processing ch4 value...")
+				await $.println("Received from ch4:", val)
+				await $.println("Processing ch4 value...")
 			}
 		},
 		{
@@ -157,8 +157,8 @@ export async function testReturnCase(ctx: context.Context | null): globalThis.Pr
 			isSend: false,
 			channel: ch5,
 			onSelected: async (__goscriptSelect1Result) => {
-				$.println("Received from ch5")
-				$.println("Processing ch5 data...")
+				await $.println("Received from ch5")
+				await $.println("Processing ch5 data...")
 			}
 		},
 		{
@@ -166,7 +166,7 @@ export async function testReturnCase(ctx: context.Context | null): globalThis.Pr
 			isSend: false,
 			channel: null,
 			onSelected: async (__goscriptSelect1Result) => {
-				$.println("No channels ready, using default")
+				await $.println("No channels ready, using default")
 			}
 		}
 	], true)
@@ -175,8 +175,8 @@ export async function testReturnCase(ctx: context.Context | null): globalThis.Pr
 	}
 
 	// This code should NOT execute for ch1 case (which returns)
-	$.println("Continuing execution after select")
-	$.println("Performing additional work...")
+	await $.println("Continuing execution after select")
+	await $.println("Performing additional work...")
 
 	// Simulate some work
 	await time.Sleep(10000000n)
@@ -187,17 +187,17 @@ export async function testReturnCase(ctx: context.Context | null): globalThis.Pr
 export async function main(): globalThis.Promise<void> {
 	let ctx = context.Background()
 
-	$.println("Test 1: Non-returning case (ch2)")
+	await $.println("Test 1: Non-returning case (ch2)")
 	let result1 = await testMixedReturns(ctx)
-	$.println("Final result:", result1)
+	await $.println("Final result:", result1)
 
-	$.println()
-	$.println("Test 2: Returning case (ch1)")
+	await $.println()
+	await $.println("Test 2: Returning case (ch1)")
 	let result2 = await testReturnCase(ctx)
-	$.println("Final result:", result2)
+	await $.println("Final result:", result2)
 
-	$.println()
-	$.println("All tests completed")
+	await $.println()
+	await $.println("All tests completed")
 }
 
 if ($.isMainScript(import.meta)) {

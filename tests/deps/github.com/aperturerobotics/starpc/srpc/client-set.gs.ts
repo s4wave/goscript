@@ -114,7 +114,7 @@ export class ClientSet {
 						}
 				}
 			}
-			if ($.stringEqual($.pointerValue<Exclude<$.GoError, null>>(err).Error(), $.pointerValue<Exclude<$.GoError, null>>(__goscript_errors.ErrUnimplemented).Error())) {
+			if ($.stringEqual(await $.pointerValue<Exclude<$.GoError, null>>(err).Error(), await $.pointerValue<Exclude<$.GoError, null>>(__goscript_errors.ErrUnimplemented).Error())) {
 				continue
 			}
 			return err

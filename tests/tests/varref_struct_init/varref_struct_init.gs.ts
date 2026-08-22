@@ -53,13 +53,13 @@ export async function main(): globalThis.Promise<void> {
 
 	// Accessing field on pointer type: Should generate ptr.MyInt
 	$.pointerValue<MyStruct>(ptr).MyInt = 40
-	$.println("ptr.MyInt:", $.pointerValue<MyStruct>(ptr).MyInt)
+	await $.println("ptr.MyInt:", $.pointerValue<MyStruct>(ptr).MyInt)
 
 	// Accessing pointer value, should use .value
-	$.println("ptrToVal.MyInt:", $.pointerValue<MyStruct>(ptrToVal).MyInt)
+	await $.println("ptrToVal.MyInt:", $.pointerValue<MyStruct>(ptrToVal).MyInt)
 
 	let myIntVal = $.pointerValue<MyStruct>(ptrToVal).MyInt
-	$.println("myIntVal:", myIntVal)
+	await $.println("myIntVal:", myIntVal)
 }
 
 if ($.isMainScript(import.meta)) {

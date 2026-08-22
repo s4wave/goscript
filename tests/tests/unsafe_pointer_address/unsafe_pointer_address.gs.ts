@@ -24,11 +24,11 @@ export async function main(): globalThis.Promise<void> {
 	let right: $.Slice<number> = $.goSlice(buf, 2, 4)
 	let other: $.Slice<number> = new Uint8Array([8, 9]) as $.Slice<number>
 
-	$.println("overlap:", anyOverlap(left, right))
-	$.println("separate:", anyOverlap(left, other))
-	$.println("same:", sameStart(left, $.goSlice(buf, 1, undefined)))
-	$.println("different:", sameStart(left, right))
-	$.println("paren:", $.uint(parenIndexValue(buf, 2), 8))
+	await $.println("overlap:", anyOverlap(left, right))
+	await $.println("separate:", anyOverlap(left, other))
+	await $.println("same:", sameStart(left, $.goSlice(buf, 1, undefined)))
+	await $.println("different:", sameStart(left, right))
+	await $.println("paren:", $.uint(parenIndexValue(buf, 2), 8))
 }
 
 if ($.isMainScript(import.meta)) {

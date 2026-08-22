@@ -3,6 +3,6 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-export function testGeneric(): void {
-	$.println("Generic code compiled - CORRECT")
+export async function testGeneric(): globalThis.Promise<void> {
+	await $.println("Generic code compiled - CORRECT")
 }

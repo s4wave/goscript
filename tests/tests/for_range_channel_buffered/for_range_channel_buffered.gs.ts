@@ -6,7 +6,7 @@ import * as $ from "@goscript/builtin/index.js"
 export async function main(): globalThis.Promise<void> {
 	let ch: $.Channel<string> | null = $.makeChannel<string>(15, "", "both")
 	for (let i = 0; i < 10; i++) {
-		$.println("Hello", i)
+		await $.println("Hello", i)
 		await $.chanSend(ch, "testing")
 	}
 	ch!.close()
@@ -16,7 +16,7 @@ export async function main(): globalThis.Promise<void> {
 			break
 		}
 		let val = __goscriptRange0.value
-		$.println("from ch", val)
+		await $.println("from ch", val)
 	}
 }
 

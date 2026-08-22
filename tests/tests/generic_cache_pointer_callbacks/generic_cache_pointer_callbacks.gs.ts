@@ -145,7 +145,7 @@ export async function main(): globalThis.Promise<void> {
 	if (err != null) {
 		$.panic((err as any))
 	}
-	$.println("cached:", $.pointerValue<privateKey>(v).D)
+	await $.println("cached:", $.pointerValue<privateKey>(v).D)
 }
 
 if ($.isMainScript(import.meta)) {

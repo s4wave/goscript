@@ -55,61 +55,61 @@ export class byteFormatter {
 
 export async function main(): globalThis.Promise<void> {
 	// Test basic Print functions
-	fmt.Print("Hello")
-	fmt.Print(" ")
-	fmt.Print("World")
-	fmt.Println()
+	await fmt.Print("Hello")
+	await fmt.Print(" ")
+	await fmt.Print("World")
+	await fmt.Println()
 
 	// Test Printf with basic formatting
 	let name = "Go"
 	let version = 1.21
-	fmt.Printf("Welcome to %s %.2f\n", name, $.basicInterfaceValue(version, "float64"))
+	await fmt.Printf("Welcome to %s %.2f\n", name, $.basicInterfaceValue(version, "float64"))
 
 	// Test Println
-	fmt.Println("This is println")
+	await fmt.Println("This is println")
 
 	// Test Sprint functions
-	let result = fmt.Sprint("Sprint", " ", "result")
-	fmt.Println("Sprint result:", result)
+	let result = await fmt.Sprint("Sprint", " ", "result")
+	await fmt.Println("Sprint result:", result)
 	let parts: $.Slice<any> = $.arrayToSlice<any>(["Spread", " ", "result"])
-	let spreadResult = fmt.Sprint(...(parts ?? []))
-	fmt.Println("Sprint spread result:", spreadResult)
+	let spreadResult = await fmt.Sprint(...(parts ?? []))
+	await fmt.Println("Sprint spread result:", spreadResult)
 
 	// Test Sprintf
 	let formatted = await fmt.Sprintf("Number: %d, String: %s", $.basicInterfaceValue(42, "int"), "test")
-	fmt.Println("Sprintf result:", formatted)
+	await fmt.Println("Sprintf result:", formatted)
 	let formatArgs: $.Slice<any> = $.arrayToSlice<any>([$.basicInterfaceValue(7, "int"), "spread"])
 	let formattedSpread = await fmt.Sprintf("Spread Number: %d, String: %s", ...(formatArgs ?? []))
-	fmt.Println("Sprintf spread result:", formattedSpread)
+	await fmt.Println("Sprintf spread result:", formattedSpread)
 
 	// Test Sprintln
-	let sprintln_result = fmt.Sprintln("Sprintln", "result")
-	fmt.Print("Sprintln result:", sprintln_result)
+	let sprintln_result = await fmt.Sprintln("Sprintln", "result")
+	await fmt.Print("Sprintln result:", sprintln_result)
 
 	// Test Errorf
 	let err = fmt.Errorf("error code: %d", $.basicInterfaceValue(404, "int"))
-	fmt.Println("Error:", (err as any))
+	await fmt.Println("Error:", (err as any))
 
 	// Test various format verbs
-	fmt.Printf("Boolean: %t\n", true)
-	fmt.Printf("Integer: %d\n", $.basicInterfaceValue(123, "int"))
-	fmt.Printf("Float: %f\n", $.basicInterfaceValue(3.14159, "float64"))
-	fmt.Printf("String: %s\n", "hello")
-	fmt.Printf("Type: %T\n", $.basicInterfaceValue(42, "int"))
-	fmt.Printf("Value: %v\n", $.interfaceValue($.arrayToSlice<number>([1, 2, 3]), "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }))
+	await fmt.Printf("Boolean: %t\n", true)
+	await fmt.Printf("Integer: %d\n", $.basicInterfaceValue(123, "int"))
+	await fmt.Printf("Float: %f\n", $.basicInterfaceValue(3.14159, "float64"))
+	await fmt.Printf("String: %s\n", "hello")
+	await fmt.Printf("Type: %T\n", $.basicInterfaceValue(42, "int"))
+	await fmt.Printf("Value: %v\n", $.interfaceValue($.arrayToSlice<number>([1, 2, 3]), "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }))
 
 	// Test width and precision
-	fmt.Printf("Width: '%5s'\n", "hi")
-	fmt.Printf("Precision: '%.2f'\n", $.basicInterfaceValue(3.14159, "float64"))
-	fmt.Printf("Both: '%5.2f'\n", $.basicInterfaceValue(3.14159, "float64"))
-	fmt.Printf("Formatter: %v\n", $.interfaceValue($.markAsStructValue(new byteFormatter({prefix: new Uint8Array([98, 121, 116, 101, 45])})), "main.byteFormatter", "main.byteFormatter"))
-	let appended: $.Slice<number> = fmt.Append(new Uint8Array([98, 97, 115, 101, 45]), "tail")
-	fmt.Println("Append bytes:", $.bytesToString(appended))
+	await fmt.Printf("Width: '%5s'\n", "hi")
+	await fmt.Printf("Precision: '%.2f'\n", $.basicInterfaceValue(3.14159, "float64"))
+	await fmt.Printf("Both: '%5.2f'\n", $.basicInterfaceValue(3.14159, "float64"))
+	await fmt.Printf("Formatter: %v\n", $.interfaceValue($.markAsStructValue(new byteFormatter({prefix: new Uint8Array([98, 121, 116, 101, 45])})), "main.byteFormatter", "main.byteFormatter"))
+	let appended: $.Slice<number> = await fmt.Append(new Uint8Array([98, 97, 115, 101, 45]), "tail")
+	await fmt.Println("Append bytes:", $.bytesToString(appended))
 	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	await fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!, "Buffered writer")
-	fmt.Print(buf.value.String())
+	await fmt.Print(buf.value.String())
 
-	$.println("test finished")
+	await $.println("test finished")
 }
 
 if ($.isMainScript(import.meta)) {

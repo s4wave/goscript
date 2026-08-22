@@ -7,7 +7,7 @@ import * as errors from "@goscript/errors/index.js"
 import "@goscript/errors/index.js"
 
 export type healthError = {
-	Error(): string
+	Error(): string | globalThis.Promise<string>
 	Health(): string | globalThis.Promise<string>
 }
 
@@ -43,7 +43,7 @@ export class wrappedHealthError {
 		return $.markAsStructValue(cloned)
 	}
 
-	public Error(): string {
+	public async Error(): globalThis.Promise<string> {
 		const e: wrappedHealthError | $.VarRef<wrappedHealthError> | null = this
 		return $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<wrappedHealthError>(e).err).Error()
 	}
@@ -72,9 +72,9 @@ export async function main(): globalThis.Promise<void> {
 
 	let target: $.VarRef<healthError | null> = $.varRef(null! as healthError | null)
 	let ok = errors.As($.pointerValueOrNil($.interfaceValue<$.GoError>(err, "*main.wrappedHealthError", { kind: $.TypeKind.Pointer, elemType: "main.wrappedHealthError" }))!, $.interfaceValue(target, "*main.healthError", { kind: $.TypeKind.Pointer, elemType: "main.healthError" }))
-	$.println("matched:", ok)
+	await $.println("matched:", ok)
 	if (ok) {
-		$.println("health:", await $.pointerValue<Exclude<healthError, null>>(target.value).Health())
+		await $.println("health:", await $.pointerValue<Exclude<healthError, null>>(target.value).Health())
 	}
 }
 

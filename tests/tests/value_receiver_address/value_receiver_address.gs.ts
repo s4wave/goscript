@@ -53,8 +53,8 @@ export async function main(): globalThis.Promise<void> {
 	let original = $.varRef($.markAsStructValue(new Counter({value: 10})))
 	let pointerFromValue: Counter | $.VarRef<Counter> | null = $.markAsStructValue($.cloneStructValue(original.value)).PointerAfterIncrement()
 
-	$.println("Value receiver pointer value:", Counter.prototype.Value.call(pointerFromValue))
-	$.println("Original after PointerAfterIncrement:", original.value.Value())
+	await $.println("Value receiver pointer value:", Counter.prototype.Value.call(pointerFromValue))
+	await $.println("Original after PointerAfterIncrement:", original.value.Value())
 }
 
 if ($.isMainScript(import.meta)) {

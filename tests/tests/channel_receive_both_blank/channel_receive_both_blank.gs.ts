@@ -12,7 +12,7 @@ export async function main(): globalThis.Promise<void> {
 	// Receive with both value and ok discarded
 	let __goscriptRecv0 = await $.chanRecvWithOk(ch)
 
-	$.println("received and discarded value and ok")
+	await $.println("received and discarded value and ok")
 
 	// Close the channel
 	ch!.close()
@@ -20,7 +20,7 @@ export async function main(): globalThis.Promise<void> {
 	// Receive from closed channel with both discarded
 	let __goscriptRecv1 = await $.chanRecvWithOk(ch)
 
-	$.println("received from closed channel, both discarded")
+	await $.println("received from closed channel, both discarded")
 }
 
 if ($.isMainScript(import.meta)) {

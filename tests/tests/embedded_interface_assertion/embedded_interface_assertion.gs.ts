@@ -78,9 +78,9 @@ export async function main(): globalThis.Promise<void> {
 
 	let [, ok] = $.typeAssertTuple<ReadCloser | null>(rwc, "main.ReadCloser")
 	if (ok) {
-		$.println("Embedded interface assertion successful")
+		await $.println("Embedded interface assertion successful")
 	} else {
-		$.println("Embedded interface assertion failed")
+		await $.println("Embedded interface assertion failed")
 	}
 }
 

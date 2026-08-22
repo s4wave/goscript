@@ -78,9 +78,9 @@ $.registerInterfaceType(
 
 export type Conn = {
 	Close(): $.GoError | globalThis.Promise<$.GoError>
-	LocalAddr(): Addr | null
+	LocalAddr(): Addr | null | globalThis.Promise<Addr | null>
 	Read(b: $.Slice<number>): [number, $.GoError] | globalThis.Promise<[number, $.GoError]>
-	RemoteAddr(): Addr | null
+	RemoteAddr(): Addr | null | globalThis.Promise<Addr | null>
 	SetDeadline(t: time.Time): $.GoError | globalThis.Promise<$.GoError>
 	SetReadDeadline(t: time.Time): $.GoError | globalThis.Promise<$.GoError>
 	SetWriteDeadline(t: time.Time): $.GoError | globalThis.Promise<$.GoError>
@@ -111,7 +111,7 @@ $.registerInterfaceType(
 
 export type Listener = {
 	Accept(): [Conn | null, $.GoError] | globalThis.Promise<[Conn | null, $.GoError]>
-	Addr(): Addr | null
+	Addr(): Addr | null | globalThis.Promise<Addr | null>
 	Close(): $.GoError | globalThis.Promise<$.GoError>
 }
 
@@ -122,7 +122,7 @@ $.registerInterfaceType(
 );
 
 export type Error = {
-	Error(): string
+	Error(): string | globalThis.Promise<string>
 	Temporary(): boolean | globalThis.Promise<boolean>
 	Timeout(): boolean | globalThis.Promise<boolean>
 }
@@ -478,7 +478,7 @@ export class OpError {
 			}
 			s = s + (await $.pointerValue<Exclude<Addr, null>>($.pointerValue<OpError>(e).Addr).String())
 		}
-		s = s + (": " + $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<OpError>(e).Err).Error())
+		s = s + (": " + await $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<OpError>(e).Err).Error())
 		return s
 	}
 
@@ -733,9 +733,9 @@ export class DNSConfigError {
 		return $.markAsStructValue(cloned)
 	}
 
-	public Error(): string {
+	public async Error(): globalThis.Promise<string> {
 		const e: DNSConfigError | $.VarRef<DNSConfigError> | null = this
-		return "error reading DNS config: " + $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<DNSConfigError>(e).Err).Error()
+		return "error reading DNS config: " + await $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<DNSConfigError>(e).Err).Error()
 	}
 
 	public Temporary(): boolean {
@@ -1472,7 +1472,7 @@ export async function newDNSError(err: $.GoError, name: string, server: string):
 	}
 
 	let [, isNotFound] = $.typeAssertTuple<notFoundError | $.VarRef<notFoundError> | null>(err, { kind: $.TypeKind.Pointer, elemType: "net.notFoundError" })
-	return (() => { const __goscriptLiteralField0 = $.pointerValue<Exclude<$.GoError, null>>(err).Error(); return new DNSError({UnwrapErr: unwrapErr, Err: __goscriptLiteralField0, Name: name, Server: server, IsTimeout: isTimeout, IsTemporary: isTemporary, IsNotFound: isNotFound}) })()
+	return (await (async () => { const __goscriptLiteralField0 = await $.pointerValue<Exclude<$.GoError, null>>(err).Error(); return new DNSError({UnwrapErr: unwrapErr, Err: __goscriptLiteralField0, Name: name, Server: server, IsTimeout: isTimeout, IsTemporary: isTemporary, IsNotFound: isNotFound}) })())
 }
 
 export let errClosed: poll.errNetClosing = $.markAsStructValue($.cloneStructValue($.pointerValue<poll.errNetClosing>(poll.ErrNetClosing)))

@@ -15,10 +15,10 @@ export async function main(): globalThis.Promise<void> {
 	let slice: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3])
 	modifyGenericSlice({[$.genericTypeArgsMarker]: true, S: { type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }, zero: () => null }, E: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, slice, 1, 42)
 
-	$.println("slice[0]:", $.arrayIndex(slice!, 0))
-	$.println("slice[1]:", $.arrayIndex(slice!, 1))
-	$.println("slice[2]:", $.arrayIndex(slice!, 2))
-	$.println("test finished")
+	await $.println("slice[0]:", $.arrayIndex(slice!, 0))
+	await $.println("slice[1]:", $.arrayIndex(slice!, 1))
+	await $.println("slice[2]:", $.arrayIndex(slice!, 2))
+	await $.println("test finished")
 }
 
 if ($.isMainScript(import.meta)) {

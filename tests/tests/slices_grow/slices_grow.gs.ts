@@ -8,10 +8,10 @@ import "@goscript/slices/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let s: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3])
-	$.println("Before Grow: len=", $.len(s), "cap=", $.cap(s))
+	await $.println("Before Grow: len=", $.len(s), "cap=", $.cap(s))
 	s = (slices.Grow(s, 5) as $.Slice<number>)
-	$.println("After Grow: len=", $.len(s), "cap=", $.cap(s))
-	$.println("slices.Grow test finished")
+	await $.println("After Grow: len=", $.len(s), "cap=", $.cap(s))
+	await $.println("slices.Grow test finished")
 }
 
 if ($.isMainScript(import.meta)) {

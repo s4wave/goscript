@@ -12,13 +12,13 @@ export async function main(): globalThis.Promise<void> {
 	let divTrunc = Math.trunc(5 / 2)
 	let divNegative = Math.trunc(-5 / 2)
 	let mod = 17 % 3
-	$.println("Addition: Expected: 5, Actual:", add)
-	$.println("Subtraction: Expected: 6, Actual:", sub)
-	$.println("Multiplication: Expected: 42, Actual:", mul)
-	$.println("Division: Expected: 4, Actual:", div)
-	$.println("Division truncates: Expected: 2, Actual:", divTrunc)
-	$.println("Division truncates negative: Expected: -2, Actual:", divNegative)
-	$.println("Modulus: Expected: 2, Actual:", mod)
+	await $.println("Addition: Expected: 5, Actual:", add)
+	await $.println("Subtraction: Expected: 6, Actual:", sub)
+	await $.println("Multiplication: Expected: 42, Actual:", mul)
+	await $.println("Division: Expected: 4, Actual:", div)
+	await $.println("Division truncates: Expected: 2, Actual:", divTrunc)
+	await $.println("Division truncates negative: Expected: -2, Actual:", divNegative)
+	await $.println("Modulus: Expected: 2, Actual:", mod)
 }
 
 if ($.isMainScript(import.meta)) {

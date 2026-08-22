@@ -41,7 +41,7 @@ export class MyStruct {
 export async function main(): globalThis.Promise<void> {
 	let myStruct: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({myPrivate: 4})
 	$.pointerValue<MyStruct>(myStruct).myPrivate = 10
-	$.println($.pointerValue<MyStruct>(myStruct).myPrivate)
+	await $.println($.pointerValue<MyStruct>(myStruct).myPrivate)
 }
 
 if ($.isMainScript(import.meta)) {

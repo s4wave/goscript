@@ -61,7 +61,7 @@ export function wrap(p: dep.Public | $.VarRef<dep.Public> | null): Wrapped | $.V
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println("ok")
+	await $.println("ok")
 }
 
 if ($.isMainScript(import.meta)) {

@@ -195,15 +195,15 @@ export async function main(): globalThis.Promise<void> {
 	// Test with ChannelProcessor (naturally async)
 	let channelProc: ChannelProcessor | $.VarRef<ChannelProcessor> | null = new ChannelProcessor({ch: ch})
 	let result1 = await processViaInterface($.interfaceValue<AsyncProcessor | null>(channelProc, "*main.ChannelProcessor", { kind: $.TypeKind.Pointer, elemType: "main.ChannelProcessor" }), 5)
-	$.println("ChannelProcessor result:", result1)
+	await $.println("ChannelProcessor result:", result1)
 
 	// Test with SimpleProcessor (forced async for compatibility)
 	let simpleProc: SimpleProcessor | $.VarRef<SimpleProcessor> | null = new SimpleProcessor({value: 100})
 	let result2 = await processViaInterface($.interfaceValue<AsyncProcessor | null>(simpleProc, "*main.SimpleProcessor", { kind: $.TypeKind.Pointer, elemType: "main.SimpleProcessor" }), 5)
-	$.println("SimpleProcessor result:", result2)
+	await $.println("SimpleProcessor result:", result2)
 
 	let genericStore = (newGenericStore({[$.genericTypeArgsMarker]: true, V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 7) as GenericStore | null)
-	$.println("GenericStore result:", await loadGenericStore(genericStore))
+	await $.println("GenericStore result:", await loadGenericStore(genericStore))
 
 	ch!.close()
 }

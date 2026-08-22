@@ -63,13 +63,13 @@ export class asyncBuffer {
 		return $.markAsStructValue(cloned)
 	}
 
-	public Reset(w: io.Writer | null): void {
+	public async Reset(w: io.Writer | null): globalThis.Promise<void> {
 		const b: asyncBuffer | $.VarRef<asyncBuffer> | null = this
 		if ($.comparableEqual(b, w)) {
-			$.println("Reset same writer")
+			await $.println("Reset same writer")
 			return
 		}
-		$.println("Reset different writer")
+		await $.println("Reset different writer")
 	}
 
 	public async Write(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
@@ -303,68 +303,68 @@ export async function copyInterfaces(dst: io.Writer | null, src: io.Reader | nul
 
 export async function main(): globalThis.Promise<void> {
 	// Test basic error variables
-	$.println("EOF:", $.pointerValue<Exclude<$.GoError, null>>(io.EOF).Error())
-	$.println("ErrClosedPipe:", $.pointerValue<Exclude<$.GoError, null>>(io.ErrClosedPipe).Error())
-	$.println("ErrShortWrite:", $.pointerValue<Exclude<$.GoError, null>>(io.ErrShortWrite).Error())
-	$.println("ErrUnexpectedEOF:", $.pointerValue<Exclude<$.GoError, null>>(io.ErrUnexpectedEOF).Error())
+	await $.println("EOF:", await $.pointerValue<Exclude<$.GoError, null>>(io.EOF).Error())
+	await $.println("ErrClosedPipe:", await $.pointerValue<Exclude<$.GoError, null>>(io.ErrClosedPipe).Error())
+	await $.println("ErrShortWrite:", await $.pointerValue<Exclude<$.GoError, null>>(io.ErrShortWrite).Error())
+	await $.println("ErrUnexpectedEOF:", await $.pointerValue<Exclude<$.GoError, null>>(io.ErrUnexpectedEOF).Error())
 
 	// Test seek constants
-	$.println("SeekStart:", io.SeekStart)
-	$.println("SeekCurrent:", io.SeekCurrent)
-	$.println("SeekEnd:", io.SeekEnd)
+	await $.println("SeekStart:", io.SeekStart)
+	await $.println("SeekCurrent:", io.SeekCurrent)
+	await $.println("SeekEnd:", io.SeekEnd)
 
 	// Test Discard writer
 	let [n, err] = await io.WriteString($.pointerValueOrNil(io.Discard)!, "hello world")
-	$.println("WriteString to Discard - bytes:", n, "err:", err == null)
+	await $.println("WriteString to Discard - bytes:", n, "err:", err == null)
 
 	let holder = $.markAsStructValue(new writerHolder({w: io.Discard}))
 	let __goscriptTuple0: any = await io.WriteString($.pointerValueOrNil(holder.w)!, "field writer")
 	n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
-	$.println("WriteString field writer - bytes:", n, "err:", err == null)
+	await $.println("WriteString field writer - bytes:", n, "err:", err == null)
 
 	let buf: asyncBuffer | $.VarRef<asyncBuffer> | null = new asyncBuffer()
-	asyncBuffer.prototype.Reset.call(buf, $.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", { kind: $.TypeKind.Pointer, elemType: "main.asyncBuffer" }))
-	asyncBuffer.prototype.Reset.call(buf, null)
+	await asyncBuffer.prototype.Reset.call(buf, $.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", { kind: $.TypeKind.Pointer, elemType: "main.asyncBuffer" }))
+	await asyncBuffer.prototype.Reset.call(buf, null)
 	let __goscriptTuple1: any = await copyInterfaces(io.Discard, $.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", { kind: $.TypeKind.Pointer, elemType: "main.staticReader" }))
 	let n64 = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
-	$.println("Copy interface - bytes:", n64, "err:", err == null)
+	await $.println("Copy interface - bytes:", n64, "err:", err == null)
 	let __goscriptTuple2: any = await io.Copy($.pointerValueOrNil(io.Discard)!, {Reader: $.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", { kind: $.TypeKind.Pointer, elemType: "main.staticReader" })})
 	n64 = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
-	$.println("Copy embedded reader - bytes:", n64, "err:", err == null)
+	await $.println("Copy embedded reader - bytes:", n64, "err:", err == null)
 	let __goscriptTuple3: any = await io.Copy({Writer: io.Discard}, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", { kind: $.TypeKind.Pointer, elemType: "main.staticReader" }))!)
 	n64 = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
-	$.println("Copy embedded writer - bytes:", n64, "err:", err == null)
+	await $.println("Copy embedded writer - bytes:", n64, "err:", err == null)
 	let __goscriptTuple4: any = await io.Copy($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", { kind: $.TypeKind.Pointer, elemType: "main.asyncBuffer" }))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", { kind: $.TypeKind.Pointer, elemType: "main.staticReader" }))!)
 	n64 = __goscriptTuple4[0]
 	err = __goscriptTuple4[1]
-	$.println("Copy async writer - bytes:", n64, "err:", err == null)
+	await $.println("Copy async writer - bytes:", n64, "err:", err == null)
 	let __goscriptTuple5: any = await io.CopyN($.pointerValueOrNil(io.Discard)!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new asyncReader(), "*main.asyncReader", { kind: $.TypeKind.Pointer, elemType: "main.asyncReader" }))!, 5n)
 	n64 = __goscriptTuple5[0]
 	err = __goscriptTuple5[1]
-	$.println("CopyN async reader - bytes:", n64, "err:", err == null)
+	await $.println("CopyN async reader - bytes:", n64, "err:", err == null)
 	let __goscriptTuple6: any = await io.Copy($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", { kind: $.TypeKind.Pointer, elemType: "main.asyncBuffer" }))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewBuffer(new Uint8Array([99, 111, 112, 121])), "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!)
 	n64 = __goscriptTuple6[0]
 	err = __goscriptTuple6[1]
-	$.println("Copy bytes WriteTo async writer - bytes:", n64, "err:", err == null)
+	await $.println("Copy bytes WriteTo async writer - bytes:", n64, "err:", err == null)
 	let viewBacking: $.Slice<number> = new Uint8Array([0, 0, 0, 0, 99]) as $.Slice<number>
 	let __goscriptTuple7: any = bytes.Buffer.prototype.Read.call($.pointerValue<bytes.Buffer>(bytes.NewBuffer(new Uint8Array([118, 105, 101, 119]))), $.goSlice(viewBacking, undefined, 4))
 	n = __goscriptTuple7[0]
 	err = __goscriptTuple7[1]
-	$.println("Read into byte slice view - bytes:", n, "data:", $.bytesToString(viewBacking), "err:", err == null)
+	await $.println("Read into byte slice view - bytes:", n, "data:", $.bytesToString(viewBacking), "err:", err == null)
 	let dst: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	let __goscriptTuple8: any = await io.Copy($.pointerValueOrNil($.interfaceValue<io.Writer | null>(dst, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new asyncReader(), "*main.asyncReader", { kind: $.TypeKind.Pointer, elemType: "main.asyncReader" }))!)
 	n64 = __goscriptTuple8[0]
 	err = __goscriptTuple8[1]
-	$.println("Copy bytes ReadFrom async reader - bytes:", n64, "data:", dst.value.String(), "err:", err == null)
+	await $.println("Copy bytes ReadFrom async reader - bytes:", n64, "data:", dst.value.String(), "err:", err == null)
 	let sectionReader: io.SectionReader | $.VarRef<io.SectionReader> | null = io.NewSectionReader($.pointerValueOrNil($.interfaceValue<io.ReaderAt | null>(new asyncReaderAt({data: new Uint8Array([97, 98, 99, 100, 101, 102])}), "*main.asyncReaderAt", { kind: $.TypeKind.Pointer, elemType: "main.asyncReaderAt" }))!, 1n, 3n)
 	let __goscriptTuple9: any = await io.CopyBuffer($.pointerValueOrNil(io.Discard)!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(sectionReader, "*io.SectionReader", { kind: $.TypeKind.Pointer, elemType: "io.SectionReader" }))!, $.makeSlice<number>(2, undefined, "byte"))
 	n64 = __goscriptTuple9[0]
 	err = __goscriptTuple9[1]
-	$.println("Copy section async readerat - bytes:", n64, "err:", err == null)
+	await $.println("Copy section async readerat - bytes:", n64, "err:", err == null)
 
 	let __goscriptTuple10: any = io.Pipe()
 	let reader: io.PipeReader | $.VarRef<io.PipeReader> | null = __goscriptTuple10[0]
@@ -384,18 +384,18 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple12: any = await io.PipeWriter.prototype.Write.call($.pointerValue<io.PipeWriter>(writer), new Uint8Array([104, 101, 108, 108, 111]))
 	n = __goscriptTuple12[0]
 	err = __goscriptTuple12[1]
-	$.println("Pipe write - bytes:", n, "err:", err == null)
+	await $.println("Pipe write - bytes:", n, "err:", err == null)
 	err = io.PipeWriter.prototype.Close.call($.pointerValue<io.PipeWriter>(writer))
-	$.println("Pipe close err:", err == null)
+	await $.println("Pipe close err:", err == null)
 	await $.chanRecv(done)
 	let firstRead = await $.chanRecv(pipeReads)
 	let eofRead = await $.chanRecv(pipeReads)
-	$.println("Pipe read - bytes:", firstRead.n, "data:", firstRead.data, "err:", firstRead.errNil)
-	$.println("Pipe read EOF - bytes:", eofRead.n, "err EOF:", eofRead.errEOF)
+	await $.println("Pipe read - bytes:", firstRead.n, "data:", firstRead.data, "err:", firstRead.errNil)
+	await $.println("Pipe read EOF - bytes:", eofRead.n, "err EOF:", eofRead.errEOF)
 	let __goscriptTuple13: any = await io.PipeWriter.prototype.Write.call($.pointerValue<io.PipeWriter>(writer), new Uint8Array([97, 103, 97, 105, 110]))
 	n = __goscriptTuple13[0]
 	err = __goscriptTuple13[1]
-	$.println("Pipe write after close - bytes:", n, "err closed:", $.comparableEqual(err, io.ErrClosedPipe))
+	await $.println("Pipe write after close - bytes:", n, "err closed:", $.comparableEqual(err, io.ErrClosedPipe))
 
 	let __goscriptTuple14: any = io.Pipe()
 	reader = __goscriptTuple14[0]
@@ -413,12 +413,12 @@ export async function main(): globalThis.Promise<void> {
 	n = __goscriptTuple15[0]
 	err = __goscriptTuple15[1]
 	let delayed = await $.chanRecv(readResult)
-	$.println("Pipe delayed write - bytes:", n, "err:", err == null)
-	$.println("Pipe delayed read - bytes:", delayed.n, "data:", delayed.data, "err:", delayed.errNil, "err EOF:", delayed.errEOF)
+	await $.println("Pipe delayed write - bytes:", n, "err:", err == null)
+	await $.println("Pipe delayed read - bytes:", delayed.n, "data:", delayed.data, "err:", delayed.errNil, "err EOF:", delayed.errEOF)
 	err = io.PipeWriter.prototype.Close.call($.pointerValue<io.PipeWriter>(writer))
-	$.println("Pipe delayed close err:", err == null)
+	await $.println("Pipe delayed close err:", err == null)
 
-	$.println("test finished")
+	await $.println("test finished")
 }
 
 if ($.isMainScript(import.meta)) {

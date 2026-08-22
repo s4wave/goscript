@@ -81,7 +81,7 @@ export function __goscript_set_defaultOuter(__goscriptValue: outer): void {
 
 export async function main(): globalThis.Promise<void> {
 	defaultOuter.inner.value = 7
-	$.println(defaultOuter.inner.value)
+	await $.println(defaultOuter.inner.value)
 }
 
 if ($.isMainScript(import.meta)) {

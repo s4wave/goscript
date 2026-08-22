@@ -16,9 +16,9 @@ export async function main(): globalThis.Promise<void> {
 				let val = __goscriptSelect0Result.value
 				let ok = __goscriptSelect0Result.ok
 				if (ok) {
-					$.println("Received value with ok==true:", val)
+					await $.println("Received value with ok==true:", val)
 				} else {
-					$.println("Received zero value with ok==false:", val)
+					await $.println("Received zero value with ok==false:", val)
 				}
 			}
 		}

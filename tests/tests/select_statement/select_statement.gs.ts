@@ -16,7 +16,7 @@ export async function main(): globalThis.Promise<void> {
 			channel: ch1,
 			onSelected: async (__goscriptSelect0Result) => {
 				let msg = __goscriptSelect0Result.value
-				$.println("TEST1: Received unexpected value:", msg)
+				await $.println("TEST1: Received unexpected value:", msg)
 			}
 		},
 		{
@@ -24,7 +24,7 @@ export async function main(): globalThis.Promise<void> {
 			isSend: false,
 			channel: null,
 			onSelected: async (__goscriptSelect0Result) => {
-				$.println("TEST1: Default case hit correctly")
+				await $.println("TEST1: Default case hit correctly")
 			}
 		}
 	], true)
@@ -43,7 +43,7 @@ export async function main(): globalThis.Promise<void> {
 			channel: ch1,
 			onSelected: async (__goscriptSelect1Result) => {
 				let msg = __goscriptSelect1Result.value
-				$.println("TEST2: Received expected value:", msg)
+				await $.println("TEST2: Received expected value:", msg)
 			}
 		},
 		{
@@ -51,7 +51,7 @@ export async function main(): globalThis.Promise<void> {
 			isSend: false,
 			channel: null,
 			onSelected: async (__goscriptSelect1Result) => {
-				$.println("TEST2: Default case hit unexpectedly")
+				await $.println("TEST2: Default case hit unexpectedly")
 			}
 		}
 	], true)
@@ -74,9 +74,9 @@ export async function main(): globalThis.Promise<void> {
 				let val = __goscriptSelect2Result.value
 				let ok = __goscriptSelect2Result.ok
 				if (ok) {
-					$.println("TEST3: Received buffered value with ok==true:", val)
+					await $.println("TEST3: Received buffered value with ok==true:", val)
 				} else {
-					$.println("TEST3: Unexpected ok==false")
+					await $.println("TEST3: Unexpected ok==false")
 				}
 			}
 		},
@@ -85,7 +85,7 @@ export async function main(): globalThis.Promise<void> {
 			isSend: false,
 			channel: null,
 			onSelected: async (__goscriptSelect2Result) => {
-				$.println("TEST3: Default hit unexpectedly")
+				await $.println("TEST3: Default hit unexpectedly")
 			}
 		}
 	], true)
@@ -103,9 +103,9 @@ export async function main(): globalThis.Promise<void> {
 				let val = __goscriptSelect3Result.value
 				let ok = __goscriptSelect3Result.ok
 				if (ok) {
-					$.println("TEST4: Unexpected ok==true:", val)
+					await $.println("TEST4: Unexpected ok==true:", val)
 				} else {
-					$.println("TEST4: Received zero value with ok==false:", val)
+					await $.println("TEST4: Received zero value with ok==false:", val)
 				}
 			}
 		},
@@ -114,7 +114,7 @@ export async function main(): globalThis.Promise<void> {
 			isSend: false,
 			channel: null,
 			onSelected: async (__goscriptSelect3Result) => {
-				$.println("TEST4: Default hit unexpectedly")
+				await $.println("TEST4: Default hit unexpectedly")
 			}
 		}
 	], true)
@@ -133,7 +133,7 @@ export async function main(): globalThis.Promise<void> {
 			channel: ch3,
 			value: 5,
 			onSelected: async (__goscriptSelect4Result) => {
-				$.println("TEST5: Sent value successfully")
+				await $.println("TEST5: Sent value successfully")
 			}
 		},
 		{
@@ -141,7 +141,7 @@ export async function main(): globalThis.Promise<void> {
 			isSend: false,
 			channel: null,
 			onSelected: async (__goscriptSelect4Result) => {
-				$.println("TEST5: Default hit unexpectedly")
+				await $.println("TEST5: Default hit unexpectedly")
 			}
 		}
 	], true)
@@ -157,7 +157,7 @@ export async function main(): globalThis.Promise<void> {
 			channel: ch3,
 			value: 10,
 			onSelected: async (__goscriptSelect5Result) => {
-				$.println("TEST6: Sent unexpectedly")
+				await $.println("TEST6: Sent unexpectedly")
 			}
 		},
 		{
@@ -165,7 +165,7 @@ export async function main(): globalThis.Promise<void> {
 			isSend: false,
 			channel: null,
 			onSelected: async (__goscriptSelect5Result) => {
-				$.println("TEST6: Default hit correctly (channel full)")
+				await $.println("TEST6: Default hit correctly (channel full)")
 			}
 		}
 	], true)
@@ -187,7 +187,7 @@ export async function main(): globalThis.Promise<void> {
 			channel: ch4,
 			onSelected: async (__goscriptSelect6Result) => {
 				let msg = __goscriptSelect6Result.value
-				$.println("TEST7: Selected ch4 correctly:", msg)
+				await $.println("TEST7: Selected ch4 correctly:", msg)
 			}
 		},
 		{
@@ -196,7 +196,7 @@ export async function main(): globalThis.Promise<void> {
 			channel: ch5,
 			onSelected: async (__goscriptSelect6Result) => {
 				let msg = __goscriptSelect6Result.value
-				$.println("TEST7: Selected ch5 unexpectedly:", msg)
+				await $.println("TEST7: Selected ch5 unexpectedly:", msg)
 			}
 		}
 	], false)
@@ -215,7 +215,7 @@ export async function main(): globalThis.Promise<void> {
 			channel: ch4,
 			onSelected: async (__goscriptSelect7Result) => {
 				let msg = __goscriptSelect7Result.value
-				$.println("TEST8: Selected ch4 unexpectedly:", msg)
+				await $.println("TEST8: Selected ch4 unexpectedly:", msg)
 			}
 		},
 		{
@@ -224,7 +224,7 @@ export async function main(): globalThis.Promise<void> {
 			channel: ch5,
 			onSelected: async (__goscriptSelect7Result) => {
 				let msg = __goscriptSelect7Result.value
-				$.println("TEST8: Selected ch5 correctly:", msg)
+				await $.println("TEST8: Selected ch5 correctly:", msg)
 			}
 		}
 	], false)
@@ -239,9 +239,9 @@ export async function main(): globalThis.Promise<void> {
 	let val = __goscriptRecv0.value
 	let ok = __goscriptRecv0.ok
 	if (!ok) {
-		$.println("TEST9: Channel is closed, ok is false, val:", val)
+		await $.println("TEST9: Channel is closed, ok is false, val:", val)
 	} else {
-		$.println("TEST9: Channel reports as not closed")
+		await $.println("TEST9: Channel reports as not closed")
 	}
 }
 

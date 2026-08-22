@@ -70,9 +70,9 @@ export async function main(): globalThis.Promise<void> {
 	s.count.Store($.int(42, 32))
 	s.flag.Store($.uint(100, 32))
 
-	$.println("closed:", s.closed.Load())
-	$.println("count:", $.int(s.count.Load(), 32))
-	$.println("flag:", $.uint(s.flag.Load(), 32))
+	await $.println("closed:", s.closed.Load())
+	await $.println("count:", $.int(s.count.Load(), 32))
+	await $.println("flag:", $.uint(s.flag.Load(), 32))
 
 	// Test struct initialization with init values
 	let s2 = $.markAsStructValue(new MyStruct({closed: $.markAsStructValue(new atomic.Bool()), count: $.markAsStructValue(new atomic.Int32()), flag: $.markAsStructValue(new atomic.Uint32())}))
@@ -81,11 +81,11 @@ export async function main(): globalThis.Promise<void> {
 	s2.count.Store($.int(24, 32))
 	s2.flag.Store($.uint(50, 32))
 
-	$.println("s2 closed:", s2.closed.Load())
-	$.println("s2 count:", $.int(s2.count.Load(), 32))
-	$.println("s2 flag:", $.uint(s2.flag.Load(), 32))
+	await $.println("s2 closed:", s2.closed.Load())
+	await $.println("s2 count:", $.int(s2.count.Load(), 32))
+	await $.println("s2 flag:", $.uint(s2.flag.Load(), 32))
 
-	$.println("atomic struct field test finished")
+	await $.println("atomic struct field test finished")
 }
 
 if ($.isMainScript(import.meta)) {

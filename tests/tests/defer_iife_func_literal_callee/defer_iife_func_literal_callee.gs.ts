@@ -4,23 +4,23 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	using __defer = new $.DisposableStack()
+	await using __defer = new $.AsyncDisposableStack()
 	let messages: $.Channel<string> | null = $.makeChannel<string>(0, "", "both")
 	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
 		await $.chanSend(messages, "go")
 	})() })
-	$.println(await $.chanRecv(messages))
+	await $.println(await $.chanRecv(messages))
 
-	void ((): void => {
-		$.println("plain")
+	await (async (): globalThis.Promise<void> => {
+		await $.println("plain")
 	})()
 
-	__defer.defer(() => { ((): void => {
-		$.println("defer")
+	__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
+		await $.println("defer")
 	})() })
 
-	let stored: (() => void) | null = $.functionValue((): void => {
-		$.println("value")
+	let stored: (() => void) | null = $.functionValue(async (): globalThis.Promise<void> => {
+		await $.println("value")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 	await stored!()
 }

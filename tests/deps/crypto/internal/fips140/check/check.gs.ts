@@ -52,7 +52,7 @@ async function __goscriptInit0(): globalThis.Promise<void> {
 	{
 		let err = fips140.Supported()
 		if (err != null) {
-			$.panic("fips140: " + $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			$.panic("fips140: " + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		}
 	}
 
@@ -98,7 +98,7 @@ async function __goscriptInit0(): globalThis.Promise<void> {
 	await hmac.HMAC.prototype.Reset.call(h)
 
 	if ($.stringEqual(godebug.Value("fips140"), "debug")) {
-		$.println("fips140: verified code+data")
+		await $.println("fips140: verified code+data")
 	}
 
 	Verified = true

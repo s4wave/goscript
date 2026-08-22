@@ -9,9 +9,9 @@ export function valid(n1: number, n2: number, n3: number, n4: number): boolean {
 
 export async function main(): globalThis.Promise<void> {
 	if (valid(1, 2, 4, 0)) {
-		$.println("or equals")
+		await $.println("or equals")
 	} else {
-		$.println("or differs")
+		await $.println("or differs")
 	}
 }
 

@@ -12,12 +12,12 @@ export async function main(): globalThis.Promise<void> {
 	let sliceStringType = reflect.SliceOf($.pointerValueOrNil(stringType)!)
 
 	let fnType = reflect.FuncOf($.arrayToSlice<reflect.Type | null>([intType]), $.arrayToSlice<reflect.Type | null>([stringType]), false)
-	$.println("func:", await $.pointerValue<Exclude<reflect.Type, null>>(fnType).String(), await $.pointerValue<Exclude<reflect.Type, null>>(fnType).Kind() == reflect.Func, await $.pointerValue<Exclude<reflect.Type, null>>(fnType).NumIn(), await $.pointerValue<Exclude<reflect.Type, null>>((await $.pointerValue<Exclude<reflect.Type, null>>(fnType).In(0))).String(), await $.pointerValue<Exclude<reflect.Type, null>>(fnType).NumOut(), await $.pointerValue<Exclude<reflect.Type, null>>((await $.pointerValue<Exclude<reflect.Type, null>>(fnType).Out(0))).String(), await $.pointerValue<Exclude<reflect.Type, null>>(fnType).IsVariadic())
+	await $.println("func:", await $.pointerValue<Exclude<reflect.Type, null>>(fnType).String(), await $.pointerValue<Exclude<reflect.Type, null>>(fnType).Kind() == reflect.Func, await $.pointerValue<Exclude<reflect.Type, null>>(fnType).NumIn(), await $.pointerValue<Exclude<reflect.Type, null>>((await $.pointerValue<Exclude<reflect.Type, null>>(fnType).In(0))).String(), await $.pointerValue<Exclude<reflect.Type, null>>(fnType).NumOut(), await $.pointerValue<Exclude<reflect.Type, null>>((await $.pointerValue<Exclude<reflect.Type, null>>(fnType).Out(0))).String(), await $.pointerValue<Exclude<reflect.Type, null>>(fnType).IsVariadic())
 
 	let variadicType = reflect.FuncOf($.arrayToSlice<reflect.Type | null>([sliceStringType]), $.arrayToSlice<reflect.Type | null>([intType]), true)
-	$.println("variadic:", await $.pointerValue<Exclude<reflect.Type, null>>(variadicType).String(), await $.pointerValue<Exclude<reflect.Type, null>>(variadicType).NumIn(), await $.pointerValue<Exclude<reflect.Type, null>>((await $.pointerValue<Exclude<reflect.Type, null>>(variadicType).In(0))).String(), await $.pointerValue<Exclude<reflect.Type, null>>(variadicType).NumOut(), await $.pointerValue<Exclude<reflect.Type, null>>((await $.pointerValue<Exclude<reflect.Type, null>>(variadicType).Out(0))).String(), await $.pointerValue<Exclude<reflect.Type, null>>(variadicType).IsVariadic())
+	await $.println("variadic:", await $.pointerValue<Exclude<reflect.Type, null>>(variadicType).String(), await $.pointerValue<Exclude<reflect.Type, null>>(variadicType).NumIn(), await $.pointerValue<Exclude<reflect.Type, null>>((await $.pointerValue<Exclude<reflect.Type, null>>(variadicType).In(0))).String(), await $.pointerValue<Exclude<reflect.Type, null>>(variadicType).NumOut(), await $.pointerValue<Exclude<reflect.Type, null>>((await $.pointerValue<Exclude<reflect.Type, null>>(variadicType).Out(0))).String(), await $.pointerValue<Exclude<reflect.Type, null>>(variadicType).IsVariadic())
 
-	$.println("reflect_func_of test finished")
+	await $.println("reflect_func_of test finished")
 }
 
 if ($.isMainScript(import.meta)) {

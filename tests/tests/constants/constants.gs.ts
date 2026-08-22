@@ -28,13 +28,13 @@ export function __goscript_set_Nothing(__goscriptValue: any): void {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println(157/50)
-	$.println(false)
+	await $.println(157/50)
+	await $.println(false)
 	// println(Big) // Commented out until large integer handling is implemented
 	// println(Small) // Commented out as it depends on Big
-	$.println("Hello, Constants!")
-	$.println($.uint($.arrayIndex(DigestIV, 0), 32), $.uint($.arrayIndex(DigestIV, 1), 32), $.uint($.arrayIndex(DigestIV, 2), 32))
-	$.println($.uint($.uint(4, 8), 8))
+	await $.println("Hello, Constants!")
+	await $.println($.uint($.arrayIndex(DigestIV, 0), 32), $.uint($.arrayIndex(DigestIV, 1), 32), $.uint($.arrayIndex(DigestIV, 2), 32))
+	await $.println($.uint($.uint(4, 8), 8))
 }
 
 if ($.isMainScript(import.meta)) {

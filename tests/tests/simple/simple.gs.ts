@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	$.println("Hello world!")
+	await $.println("Hello world!")
 }
 
 if ($.isMainScript(import.meta)) {

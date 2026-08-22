@@ -80,7 +80,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptAssign0_1: queue | $.VarRef<queue> | null = left
 	left = __goscriptAssign0_0
 	right = __goscriptAssign0_1
-	$.println($.pointerValue<queue>(left).value, $.pointerValue<queue>(right).value)
+	await $.println($.pointerValue<queue>(left).value, $.pointerValue<queue>(right).value)
 
 	let nodes = [$.markAsStructValue(new node({next: 1})), $.markAsStructValue(new node({next: 0}))]
 	let pc = 0
@@ -89,7 +89,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptAssign1_1: node | $.VarRef<node> | null = $.indexRef(nodes, $.pointerValue<node>(inst).next)
 	pc = __goscriptAssign1_0
 	inst = __goscriptAssign1_1
-	$.println(pc, $.pointerValue<node>(inst).next)
+	await $.println(pc, $.pointerValue<node>(inst).next)
 }
 
 if ($.isMainScript(import.meta)) {

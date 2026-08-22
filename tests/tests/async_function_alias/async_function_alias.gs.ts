@@ -29,7 +29,7 @@ export async function main(): globalThis.Promise<void> {
 	let err = await use(newOpener(ch), $.functionValue((): $.GoError => {
 		return null
 	}, ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo)))
-	$.println("alias opener ok", err == null)
+	await $.println("alias opener ok", err == null)
 }
 
 if ($.isMainScript(import.meta)) {

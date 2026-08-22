@@ -80,17 +80,17 @@ export async function main(): globalThis.Promise<void> {
 	// Successful type assertion to an inline interface
 	let [g, ok] = $.typeAssertTuple<any>(i, { kind: $.TypeKind.Interface, methods: [{ name: "Greet", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] })
 	if (ok) {
-		$.println("Greet assertion successful:", await $.pointerValue<any>(g).Greet())
+		await $.println("Greet assertion successful:", await $.pointerValue<any>(g).Greet())
 	} else {
-		$.println("Greet assertion failed")
+		await $.println("Greet assertion failed")
 	}
 
 	// Failing type assertion to a different inline interface
 	let [s, ok2] = $.typeAssertTuple<any>(i, { kind: $.TypeKind.Interface, methods: [{ name: "NonExistentMethod", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }] })
 	if (ok2) {
-		$.println("NonExistentMethod assertion successful (unexpected):", await $.pointerValue<any>(s).NonExistentMethod())
+		await $.println("NonExistentMethod assertion successful (unexpected):", await $.pointerValue<any>(s).NonExistentMethod())
 	} else {
-		$.println("NonExistentMethod assertion failed as expected")
+		await $.println("NonExistentMethod assertion failed as expected")
 	}
 
 	// Successful type assertion to a named interface, where the asserted value also implements an inline interface method
@@ -100,9 +100,9 @@ export async function main(): globalThis.Promise<void> {
 	// Assert 'j' (which holds MyStringer) to an inline interface that MyStringer satisfies.
 	let [inlineMs, ok4] = $.typeAssertTuple<any>(j, { kind: $.TypeKind.Interface, methods: [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] })
 	if (ok4) {
-		$.println("Inline String assertion successful:", await $.pointerValue<any>(inlineMs).String())
+		await $.println("Inline String assertion successful:", await $.pointerValue<any>(inlineMs).String())
 	} else {
-		$.println("Inline String assertion failed")
+		await $.println("Inline String assertion failed")
 	}
 
 	// Test case: variable of named interface type, asserted to inline interface
@@ -111,9 +111,9 @@ export async function main(): globalThis.Promise<void> {
 
 	let [inlineK, ok5] = $.typeAssertTuple<any>(k, { kind: $.TypeKind.Interface, methods: [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] })
 	if (ok5) {
-		$.println("k.(interface{ String() string }) successful:", await $.pointerValue<any>(inlineK).String())
+		await $.println("k.(interface{ String() string }) successful:", await $.pointerValue<any>(inlineK).String())
 	} else {
-		$.println("k.(interface{ String() string }) failed")
+		await $.println("k.(interface{ String() string }) failed")
 	}
 
 	// Test case: nil value of an inline interface type assigned to interface{}
@@ -122,12 +122,12 @@ export async function main(): globalThis.Promise<void> {
 	let [ptr, ok6] = $.typeAssertTuple<$.VarRef<{"Name": string}> | null>(l, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Struct, methods: [], fields: [{ name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" }, index: [0], offset: 0, exported: true }] } })
 	if (ok6) {
 		if (ptr == null) {
-			$.println("l.(*struct{ Name string }) successful, ptr is nil as expected")
+			await $.println("l.(*struct{ Name string }) successful, ptr is nil as expected")
 		} else {
-			$.println("l.(*struct{ Name string }) successful, but ptr is not nil (unexpected)")
+			await $.println("l.(*struct{ Name string }) successful, but ptr is not nil (unexpected)")
 		}
 	} else {
-		$.println("l.(*struct{ Name string }) failed (unexpected)")
+		await $.println("l.(*struct{ Name string }) failed (unexpected)")
 	}
 }
 

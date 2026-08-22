@@ -51,8 +51,8 @@ export async function main(): globalThis.Promise<void> {
 	let ptr = reflect.PointerTo($.pointerValueOrNil(t)!)
 	let iface = reflect.TypeFor({[$.genericTypeArgsMarker]: true, T: { type: "main.Stringer", zero: () => null, methods: {String: (receiver: any, ...args: any[]) => receiver.String(...$.stripGenericTypeArgs(args))} }})
 
-	$.println("MyType implements Stringer:", await $.pointerValue<Exclude<reflect.Type, null>>(t).Implements($.pointerValueOrNil(iface)!))
-	$.println("*MyType implements Stringer:", await $.pointerValue<Exclude<reflect.Type, null>>(ptr).Implements($.pointerValueOrNil(iface)!))
+	await $.println("MyType implements Stringer:", await $.pointerValue<Exclude<reflect.Type, null>>(t).Implements($.pointerValueOrNil(iface)!))
+	await $.println("*MyType implements Stringer:", await $.pointerValue<Exclude<reflect.Type, null>>(ptr).Implements($.pointerValueOrNil(iface)!))
 }
 
 if ($.isMainScript(import.meta)) {

@@ -140,117 +140,117 @@ export async function main(): globalThis.Promise<void> {
 	// Test Mutex
 	let mu: $.VarRef<sync.Mutex> = $.varRef($.markAsStructValue(new sync.Mutex()))
 	await mu.value.Lock()
-	$.println("Mutex locked")
+	await $.println("Mutex locked")
 	mu.value.Unlock()
-	$.println("Mutex unlocked")
+	await $.println("Mutex unlocked")
 
 	let embedded: $.VarRef<embeddedMutex> = $.varRef($.markAsStructValue(new embeddedMutex()))
 	await embedded.value.Mutex.Lock()
 	embedded.value.value = 7
 	embedded.value.Mutex.Unlock()
-	$.println("Embedded Mutex value:", embedded.value.value)
+	await $.println("Embedded Mutex value:", embedded.value.value)
 
 	let embeddedRW: $.VarRef<embeddedRWMutex> = $.varRef($.markAsStructValue(new embeddedRWMutex()))
 	await embeddedRW.value.RWMutex.RLock()
-	$.println("Embedded RWMutex read lock")
+	await $.println("Embedded RWMutex read lock")
 	embeddedRW.value.RWMutex.RUnlock()
 	await embeddedRW.value.RWMutex.Lock()
 	embeddedRW.value.value = 9
 	embeddedRW.value.RWMutex.Unlock()
-	$.println("Embedded RWMutex value:", embeddedRW.value.value)
+	await $.println("Embedded RWMutex value:", embeddedRW.value.value)
 
 	// Test TryLock
 	if (mu.value.TryLock()) {
-		$.println("TryLock succeeded")
+		await $.println("TryLock succeeded")
 		mu.value.Unlock()
 	} else {
-		$.println("TryLock failed")
+		await $.println("TryLock failed")
 	}
 
 	// Test WaitGroup
 	let wg: $.VarRef<sync.WaitGroup> = $.varRef($.markAsStructValue(new sync.WaitGroup()))
 	wg.value.Add(1)
-	$.println("WaitGroup counter set to 1")
+	await $.println("WaitGroup counter set to 1")
 	wg.value.Done()
-	$.println("WaitGroup counter decremented")
+	await $.println("WaitGroup counter decremented")
 	await wg.value.Wait()
-	$.println("WaitGroup wait completed")
+	await $.println("WaitGroup wait completed")
 
 	// Test Once
 	let once: $.VarRef<sync.Once> = $.varRef($.markAsStructValue(new sync.Once()))
 	let counter = 0
-	await once.value.Do($.functionValue((): void => {
+	await once.value.Do($.functionValue(async (): globalThis.Promise<void> => {
 		counter++
-		$.println("Once function executed, counter:", counter)
+		await $.println("Once function executed, counter:", counter)
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await once.value.Do($.functionValue((): void => {
+	await once.value.Do($.functionValue(async (): globalThis.Promise<void> => {
 		counter++
-		$.println("This should not execute")
+		await $.println("This should not execute")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	$.println("Final counter:", counter)
+	await $.println("Final counter:", counter)
 
 	// Test OnceFunc
-	let onceFunc: (() => void) | null = sync.OnceFunc($.functionValue((): void => {
-		$.println("OnceFunc executed")
+	let onceFunc: (() => void) | null = sync.OnceFunc($.functionValue(async (): globalThis.Promise<void> => {
+		await $.println("OnceFunc executed")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await onceFunc!()
 	await onceFunc!()
 
 	// Test OnceValue
-	let onceValue: (() => number | globalThis.Promise<number>) | null = (sync.OnceValue($.functionValue((): number => {
-		$.println("OnceValue function executed")
+	let onceValue: (() => number | globalThis.Promise<number>) | null = (sync.OnceValue($.functionValue(async (): globalThis.Promise<number> => {
+		await $.println("OnceValue function executed")
 		return 42
 	}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))) as (() => number | globalThis.Promise<number>) | null)
 	let val1 = await onceValue!()
 	let val2 = await onceValue!()
-	$.println("OnceValue results:", val1, val2)
+	await $.println("OnceValue results:", val1, val2)
 
 	// Test sync.Map
 	let m: $.VarRef<sync.Map> = $.varRef($.markAsStructValue(new sync.Map()))
 	await m.value.Store("key1", "value1")
-	$.println("Stored key1")
+	await $.println("Stored key1")
 
 	{
 		let [val, ok] = await m.value.Load("key1")
 		if (ok) {
-			$.println("Loaded key1:", val)
+			await $.println("Loaded key1:", val)
 		}
 	}
 
 	{
 		let [val, loaded] = await m.value.LoadOrStore("key2", "value2")
 		if (!loaded) {
-			$.println("Stored key2:", val)
+			await $.println("Stored key2:", val)
 		}
 	}
 
 	{
 		let [val, loaded] = await m.value.Swap("key2", "value3")
 		if (loaded) {
-			$.println("Swapped key2 previous:", val)
+			await $.println("Swapped key2 previous:", val)
 		}
 	}
 	{
 		let [val, ok] = await m.value.Load("key2")
 		if (ok) {
-			$.println("Loaded key2 after swap:", val)
+			await $.println("Loaded key2 after swap:", val)
 		}
 	}
 	if (!await m.value.CompareAndDelete("key2", "other")) {
-		$.println("CompareAndDelete mismatch preserved key2")
+		await $.println("CompareAndDelete mismatch preserved key2")
 	}
 	if (await m.value.CompareAndDelete("key2", "value3")) {
-		$.println("CompareAndDelete removed key2")
+		await $.println("CompareAndDelete removed key2")
 	}
 	{
 		let [, ok] = await m.value.Load("key2")
 		if (!ok) {
-			$.println("key2 compare deleted successfully")
+			await $.println("key2 compare deleted successfully")
 		}
 	}
 
-	await m.value.Range($.functionValue((key: any, value: any): boolean => {
-		$.println("Range:", key, "->", value)
+	await m.value.Range($.functionValue(async (key: any, value: any): globalThis.Promise<boolean> => {
+		await $.println("Range:", key, "->", value)
 		return true
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }, { kind: $.TypeKind.Interface, methods: [] }], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo)))
 
@@ -258,23 +258,23 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let [, ok] = await m.value.Load("key1")
 		if (!ok) {
-			$.println("key1 deleted successfully")
+			await $.println("key1 deleted successfully")
 		}
 	}
 
 	// Test Pool
-	let pool: sync.Pool | $.VarRef<sync.Pool> | null = new sync.Pool({New: $.functionValue((): any => {
-		$.println("Pool creating new object")
+	let pool: sync.Pool | $.VarRef<sync.Pool> | null = new sync.Pool({New: $.functionValue(async (): globalThis.Promise<any> => {
+		await $.println("Pool creating new object")
 		return "new object"
 	}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))})
 
 	let obj1 = await sync.Pool.prototype.Get.call($.pointerValue<sync.Pool>(pool))
-	$.println("Got from pool:", obj1)
+	await $.println("Got from pool:", obj1)
 	sync.Pool.prototype.Put.call($.pointerValue<sync.Pool>(pool), "reused object")
 	let obj2 = await sync.Pool.prototype.Get.call($.pointerValue<sync.Pool>(pool))
-	$.println("Got from pool:", obj2)
+	await $.println("Got from pool:", obj2)
 
-	$.println("test finished")
+	await $.println("test finished")
 }
 
 if ($.isMainScript(import.meta)) {

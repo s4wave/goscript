@@ -17,7 +17,7 @@ export async function main(): globalThis.Promise<void> {
 	await once.value.Do($.functionValue((): void => {
 		value = 99
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	$.println("once", value)
+	await $.println("once", value)
 }
 
 if ($.isMainScript(import.meta)) {

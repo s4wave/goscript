@@ -42,21 +42,21 @@ export class Pair {
 
 export async function main(): globalThis.Promise<void> {
 	let untypedInt = $.varRef<number>(42)
-	$.println("untyped int:", $.pointerValue<number>(untypedInt))
+	await $.println("untyped int:", $.pointerValue<number>(untypedInt))
 
 	let untypedBool = $.varRef<boolean>(true)
-	$.println("untyped bool:", $.pointerValue<boolean>(untypedBool))
+	await $.println("untyped bool:", $.pointerValue<boolean>(untypedBool))
 
 	let value = 7
 	let typedValue = $.varRef<number>(value)
-	$.println("typed value:", $.pointerValue<number>(typedValue))
+	await $.println("typed value:", $.pointerValue<number>(typedValue))
 
 	let namedValue = 9
 	let namedPointer: $.VarRef<Number> | null = $.varRef<Number>(namedValue)
-	$.println("named value:", $.pointerValue<Number>(namedPointer))
+	await $.println("named value:", $.pointerValue<Number>(namedPointer))
 
 	let pairPointer: Pair | $.VarRef<Pair> | null = $.varRef<Pair>($.markAsStructValue(new Pair({Value: 11})))
-	$.println("struct value:", $.pointerValue<Pair>(pairPointer).Value)
+	await $.println("struct value:", $.pointerValue<Pair>(pairPointer).Value)
 }
 
 if ($.isMainScript(import.meta)) {

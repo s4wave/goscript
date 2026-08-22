@@ -13,7 +13,7 @@ export function __goscript_set_cached(__goscriptValue: number): void {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println("cached:", cached)
+	await $.println("cached:", cached)
 }
 
 if ($.isMainScript(import.meta)) {

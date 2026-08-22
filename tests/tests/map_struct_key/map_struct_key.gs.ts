@@ -64,14 +64,14 @@ export async function main(): globalThis.Promise<void> {
 	$.mapSet(status, $.markAsStructValue(new requestKey({soID: "so-1", inviteID: "inv-1", peerID: "peer-1"})), "accepted")
 
 	let [got, ok] = $.mapGet<requestKey, string, string>(status, $.markAsStructValue(new requestKey({soID: "so-1", inviteID: "inv-1", peerID: "peer-1"})), "")
-	$.println("same struct key:", got, ok, $.len(status))
+	await $.println("same struct key:", got, ok, $.len(status))
 
 	let [, missing] = $.mapGet<requestKey, string, string>(status, $.markAsStructValue(new requestKey({soID: "so-2", inviteID: "inv-1", peerID: "peer-1"})), "")
-	$.println("different struct key:", missing)
+	await $.println("different struct key:", missing)
 
 	$.deleteMapEntry(status, $.markAsStructValue(new requestKey({soID: "so-1", inviteID: "inv-1", peerID: "peer-1"})))
 	let [, deleted] = $.mapGet<requestKey, string, string>(status, $.markAsStructValue(new requestKey({soID: "so-1", inviteID: "inv-1", peerID: "peer-1"})), "")
-	$.println("deleted struct key:", deleted, $.len(status))
+	await $.println("deleted struct key:", deleted, $.len(status))
 }
 
 if ($.isMainScript(import.meta)) {

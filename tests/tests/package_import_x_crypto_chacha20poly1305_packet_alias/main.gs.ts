@@ -27,7 +27,7 @@ export async function main(): globalThis.Promise<void> {
 	let alias: $.Slice<number> = $.goSlice(dst, undefined, $.cap(dst))
 	let sealed: $.Slice<number> = await $.pointerValue<Exclude<cipher.AEAD, null>>(aead).Seal(dst, nonce, plaintext, null)
 
-	$.println("alias sees ciphertext:", bytes.Equal($.goSlice(alias, $.len(dst), $.len(sealed)), $.goSlice(sealed, $.len(dst), undefined)))
+	await $.println("alias sees ciphertext:", bytes.Equal($.goSlice(alias, $.len(dst), $.len(sealed)), $.goSlice(sealed, $.len(dst), undefined)))
 }
 
 if ($.isMainScript(import.meta)) {

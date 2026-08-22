@@ -9,9 +9,9 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget0 = slice, idx = 0; idx < $.len(__goscriptRangeTarget0); idx++) {
 		let val = __goscriptRangeTarget0![idx]
 		sum = sum + (val)
-		$.println("Range idx:", idx, "val:", val)
+		await $.println("Range idx:", idx, "val:", val)
 	}
-	$.println("Sum:", sum)
+	await $.println("Sum:", sum)
 }
 
 if ($.isMainScript(import.meta)) {

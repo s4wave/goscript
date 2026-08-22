@@ -12,7 +12,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptRecv0 = await $.chanRecvWithOk(channel)
 	let header: http.Header = __goscriptRecv0.value
 	let ok = __goscriptRecv0.ok
-	$.println(header == null, ok)
+	await $.println(header == null, ok)
 }
 
 if ($.isMainScript(import.meta)) {

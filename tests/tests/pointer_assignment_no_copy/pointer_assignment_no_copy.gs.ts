@@ -60,14 +60,14 @@ export async function main(): globalThis.Promise<void> {
 
 	// The change should be reflected when accessing through the copied pointer.
 	// Expected: "modified original"
-	$.println("Pointer copy value: Expected: modified original, Actual: " + $.pointerValue<MyStruct>(pointerCopy).MyString)
+	await $.println("Pointer copy value: Expected: modified original, Actual: " + $.pointerValue<MyStruct>(pointerCopy).MyString)
 
 	// Modify the struct through the copied pointer.
 	$.pointerValue<MyStruct>(pointerCopy).MyInt = 20
 
 	// The change should be reflected when accessing through the original pointer.
 	// Expected: 20
-	$.println("Original value after pointer copy modification: Expected: 20, Actual:", $.pointerValue<MyStruct>(original).MyInt)
+	await $.println("Original value after pointer copy modification: Expected: 20, Actual:", $.pointerValue<MyStruct>(original).MyInt)
 }
 
 if ($.isMainScript(import.meta)) {

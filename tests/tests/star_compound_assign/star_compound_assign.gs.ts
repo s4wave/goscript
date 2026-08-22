@@ -51,33 +51,33 @@ export async function main(): globalThis.Promise<void> {
 	let p: $.VarRef<number> | null = x
 
 	p!.value = p!.value + (3)
-	$.println(x.value)
+	await $.println(x.value)
 
 	p!.value = p!.value & ~((1))
 	// 5 (0101) &^ 1 (0001) = 4 (0100)
-	$.println(x.value)
+	await $.println(x.value)
 
 	p!.value = p!.value << (2)
-	$.println(x.value)
+	await $.println(x.value)
 
 	p!.value = p!.value >> (1)
-	$.println(x.value)
+	await $.println(x.value)
 
 	p!.value = p!.value | (3)
-	$.println(x.value)
+	await $.println(x.value)
 
 	p!.value++
-	$.println(x.value)
+	await $.println(x.value)
 
 	p!.value--
-	$.println(x.value)
+	await $.println(x.value)
 
 	let values: $.VarRef<$.Slice<number>> = $.varRef($.arrayToSlice<number>([1, 2, 3, 4]))
 	let h: holder | $.VarRef<holder> | null = new holder({values: values})
 	trim(h)
-	$.println("len after star:", $.len($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)))
+	await $.println("len after star:", $.len($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)))
 	trimParen(h)
-	$.println("len after paren star:", $.len($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)))
+	await $.println("len after paren star:", $.len($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)))
 }
 
 if ($.isMainScript(import.meta)) {

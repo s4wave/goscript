@@ -16,7 +16,7 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))
 	fn = wrap(fn, ch)
 	await $.chanSend(ch, 9)
-	$.println(await fn!())
+	await $.println(await fn!())
 }
 
 if ($.isMainScript(import.meta)) {

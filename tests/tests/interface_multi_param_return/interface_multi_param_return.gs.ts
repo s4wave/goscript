@@ -29,14 +29,14 @@ export class MyProcessor {
 		return $.markAsStructValue(cloned)
 	}
 
-	public Process(data: $.Slice<number>, count: number, _p2: string): [boolean, $.GoError] {
+	public async Process(data: $.Slice<number>, count: number, _p2: string): globalThis.Promise<[boolean, $.GoError]> {
 		const p = this
 		// Dummy implementation
 		if ((count > 0) && ($.len(data) > 0)) {
-			$.println("Processing successful")
+			await $.println("Processing successful")
 			return [true, null]
 		}
-		$.println("Processing failed")
+		await $.println("Processing failed")
 		return [false, null]
 	}
 
@@ -56,18 +56,18 @@ export async function main(): globalThis.Promise<void> {
 	let [success, ] = await $.pointerValue<Exclude<MultiParamReturner, null>>(processor).Process(data, 5, "unused")
 
 	if (success) {
-		$.println("Main: Success reported")
+		await $.println("Main: Success reported")
 	} else {
-		$.println("Main: Failure reported")
+		await $.println("Main: Failure reported")
 	}
 
 	// test case: re-use success variable, ignore second variable
 	let __goscriptTuple0: any = await $.pointerValue<Exclude<MultiParamReturner, null>>(processor).Process(data, 5, "unused")
 	success = __goscriptTuple0[0]
 	if (success) {
-		$.println("Main: Success reported")
+		await $.println("Main: Success reported")
 	} else {
-		$.println("Main: Failure reported")
+		await $.println("Main: Failure reported")
 	}
 }
 

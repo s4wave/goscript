@@ -43,7 +43,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let [__goscriptShadow0, ok] = $.mapGet<string, item, item>(items, "one", $.markAsStructValue(new item()))
 		if (ok) {
-			$.println("values:", $.len(__goscriptShadow0.values))
+			await $.println("values:", $.len(__goscriptShadow0.values))
 		}
 	}
 }

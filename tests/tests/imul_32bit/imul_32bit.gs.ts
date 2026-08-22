@@ -73,53 +73,53 @@ export async function main(): globalThis.Promise<void> {
 
 	for (let __goscriptRangeTarget0 = cases, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let tc = __goscriptRangeTarget0![__rangeIndex]
-		checkUint32($.uint(tc.x, 32), $.uint(tc.y, 32), $.uint(tc.unsigned, 32))
-		checkInt32($.int($.int(tc.x, 32), 32), $.int($.int(tc.y, 32), 32), $.int(tc.signed, 32))
+		await checkUint32($.uint(tc.x, 32), $.uint(tc.y, 32), $.uint(tc.unsigned, 32))
+		await checkInt32($.int($.int(tc.x, 32), 32), $.int($.int(tc.y, 32), 32), $.int(tc.signed, 32))
 	}
 
-	checkInt32($.int(-2147483647, 32), $.int(-2147483647, 32), $.int(1, 32))
-	checkInt32($.int(-2147483648, 32), $.int(-1, 32), $.int(-2147483648, 32))
+	await checkInt32($.int(-2147483647, 32), $.int(-2147483647, 32), $.int(1, 32))
+	await checkInt32($.int(-2147483648, 32), $.int(-1, 32), $.int(-2147483648, 32))
 
-	checkPlatformIntWidths()
-	$.println("ok")
+	await checkPlatformIntWidths()
+	await $.println("ok")
 }
 
-export function checkUint32(x: number, y: number, want: number): void {
+export async function checkUint32(x: number, y: number, want: number): globalThis.Promise<void> {
 	let got = $.uint(Math.imul(x, y) >>> 0, 32)
 	if ($.uint(got, 32) != $.uint(want, 32)) {
-		$.println("uint32", $.uint(x, 32), "*", $.uint(y, 32), "got", $.uint(got, 32), "want", $.uint(want, 32))
+		await $.println("uint32", $.uint(x, 32), "*", $.uint(y, 32), "got", $.uint(got, 32), "want", $.uint(want, 32))
 	}
 
 	let compound = $.uint(x, 32)
 	compound = Math.imul(compound, $.uint(y, 32)) >>> 0
 	if ($.uint(compound, 32) != $.uint(want, 32)) {
-		$.println("uint32 *=", $.uint(x, 32), "*", $.uint(y, 32), "got", $.uint(compound, 32), "want", $.uint(want, 32))
+		await $.println("uint32 *=", $.uint(x, 32), "*", $.uint(y, 32), "got", $.uint(compound, 32), "want", $.uint(want, 32))
 	}
 }
 
-export function checkInt32(x: number, y: number, want: number): void {
+export async function checkInt32(x: number, y: number, want: number): globalThis.Promise<void> {
 	let got = $.int(Math.imul(x, y), 32)
 	if ($.int(got, 32) != $.int(want, 32)) {
-		$.println("int32", $.int(x, 32), "*", $.int(y, 32), "got", $.int(got, 32), "want", $.int(want, 32))
+		await $.println("int32", $.int(x, 32), "*", $.int(y, 32), "got", $.int(got, 32), "want", $.int(want, 32))
 	}
 
 	let compound = $.int(x, 32)
 	compound = Math.imul(compound, $.int(y, 32))
 	if ($.int(compound, 32) != $.int(want, 32)) {
-		$.println("int32 *=", $.int(x, 32), "*", $.int(y, 32), "got", $.int(compound, 32), "want", $.int(want, 32))
+		await $.println("int32 *=", $.int(x, 32), "*", $.int(y, 32), "got", $.int(compound, 32), "want", $.int(want, 32))
 	}
 }
 
-export function checkPlatformIntWidths(): void {
+export async function checkPlatformIntWidths(): globalThis.Promise<void> {
 	let neg: bigint = -1n
 	if ($.uint(neg, 64) == $.uint(0xffffffff, 64)) {
-		$.println("uint is 32-bit")
+		await $.println("uint is 32-bit")
 	}
 	if ($.int(neg) == $.int(0xffffffff)) {
-		$.println("int is 32-bit")
+		await $.println("int is 32-bit")
 	}
 	if ($.uint($.uint(neg, 64), 64) == $.uint($.uint(0xffffffff, 64), 64)) {
-		$.println("uintptr is 32-bit")
+		await $.println("uintptr is 32-bit")
 	}
 }
 

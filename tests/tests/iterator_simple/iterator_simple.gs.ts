@@ -22,11 +22,11 @@ export async function keyValueIterator(_yield: ((_p0: number, _p1: string) => bo
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println("Testing single value iterator:")
+	await $.println("Testing single value iterator:")
 	let __goscriptRangeReturn0 = false
 	;await (async () => {
 		await simpleIterator!(async (v) => {
-			$.println("value:", v)
+			await $.println("value:", v)
 			return true
 		})
 	})()
@@ -34,11 +34,11 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 
-	$.println("Testing key-value iterator:")
+	await $.println("Testing key-value iterator:")
 	let __goscriptRangeReturn1 = false
 	;await (async () => {
 		await keyValueIterator!(async (k, v) => {
-			$.println("key:", k, "value:", v)
+			await $.println("key:", k, "value:", v)
 			return true
 		})
 	})()
@@ -46,7 +46,7 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 
-	$.println("test finished")
+	await $.println("test finished")
 }
 
 if ($.isMainScript(import.meta)) {

@@ -32,30 +32,30 @@ export async function main(): globalThis.Promise<void> {
 	let buckets: bigint[][] = Array.from({ length: 2 }, () => Array.from({ length: 3 }, () => 0n))
 	let cache: $.VarRef<bigint[]> | null = $.indexRef(buckets, 1)
 
-	$.println("len:", $.len($.pointerValue<bigint[]>(cache)))
+	await $.println("len:", $.len($.pointerValue<bigint[]>(cache)))
 
 	$.pointerValue<bigint[]>(cache)[0] = 5n
 	$.pointerValue<bigint[]>(cache)[1] = 7n
-	$.println("index:", $.arrayIndex($.pointerValue<bigint[]>(cache), 0), $.arrayIndex($.pointerValue<bigint[]>(cache), 1))
+	await $.println("index:", $.arrayIndex($.pointerValue<bigint[]>(cache), 0), $.arrayIndex($.pointerValue<bigint[]>(cache), 1))
 
 	for (let __goscriptRangeTarget2 = $.pointerValue<bigint[]>(cache), i = 0; i < $.len(__goscriptRangeTarget2); i++) {
 		let x = __goscriptRangeTarget2![i]
-		$.println("range:", i, x)
+		await $.println("range:", i, x)
 	}
 
 	let view: $.Slice<bigint> = $.goSlice($.pointerValue<bigint[]>(cache), undefined, undefined)
-	$.println("slice:", $.len(view), $.arrayIndex(view!, 2))
+	await $.println("slice:", $.len(view), $.arrayIndex(view!, 2))
 
 	let buf: $.Slice<number> = new Uint8Array([9, 0, 0, 0, 0]) as $.Slice<number>
 	fillArray(($.sliceToArrayPointer<number>($.goSlice(buf, 1, undefined), 4, "byte") as $.VarRef<Uint8Array> | null))
-	$.println("converted:", $.uint($.arrayIndex(buf!, 0), 8), $.uint($.arrayIndex(buf!, 1), 8), $.uint($.arrayIndex(buf!, 2), 8), $.uint($.arrayIndex(buf!, 3), 8), $.uint($.arrayIndex(buf!, 4), 8))
-	$.println("converted sum:", sumArray(($.sliceToArrayPointer<number>($.goSlice(buf, 1, undefined), 4, "byte") as $.VarRef<Uint8Array> | null)))
+	await $.println("converted:", $.uint($.arrayIndex(buf!, 0), 8), $.uint($.arrayIndex(buf!, 1), 8), $.uint($.arrayIndex(buf!, 2), 8), $.uint($.arrayIndex(buf!, 3), 8), $.uint($.arrayIndex(buf!, 4), 8))
+	await $.println("converted sum:", sumArray(($.sliceToArrayPointer<number>($.goSlice(buf, 1, undefined), 4, "byte") as $.VarRef<Uint8Array> | null)))
 
 	let literal: $.VarRef<Uint8Array> | null = $.varRef(new Uint8Array([$.uint(4, 8), $.uint(3, 8), $.uint(2, 8), $.uint(1, 8)]))
-	$.println("literal sum:", sumArray(literal))
+	await $.println("literal sum:", sumArray(literal))
 	fillArray(literal)
-	$.println("literal filled:", $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 0), 8), $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 1), 8), $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 2), 8), $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 3), 8))
-	$.println("closure ptr:", closureArrayAddress())
+	await $.println("literal filled:", $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 0), 8), $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 1), 8), $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 2), 8), $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 3), 8))
+	await $.println("closure ptr:", closureArrayAddress())
 }
 
 if ($.isMainScript(import.meta)) {

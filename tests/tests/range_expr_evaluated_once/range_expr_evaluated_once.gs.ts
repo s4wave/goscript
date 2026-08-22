@@ -20,8 +20,8 @@ export async function main(): globalThis.Promise<void> {
 		let value = __goscriptRangeTarget0![__rangeIndex]
 		sum = sum + ($.int(value))
 	}
-	$.println("calls:", calls)
-	$.println("sum:", sum)
+	await $.println("calls:", calls)
+	await $.println("sum:", sum)
 }
 
 if ($.isMainScript(import.meta)) {

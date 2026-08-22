@@ -9,25 +9,25 @@ export async function main(): globalThis.Promise<void> {
 	let c: number = 0
 
 	c = a + b
-	$.println("a + b =", c)
+	await $.println("a + b =", c)
 
 	c = a - b
-	$.println("a - b =", c)
+	await $.println("a - b =", c)
 
 	c = a * b
-	$.println("a * b =", c)
+	await $.println("a * b =", c)
 
 	c = a / b
-	$.println("a / b =", c)
+	await $.println("a / b =", c)
 
 	// Assignment
 	let d = 7.89
 	c = d
-	$.println("c =", c)
+	await $.println("c =", c)
 
 	// More complex expression
 	let e = ((a + b) * (c - d)) / a
-	$.println("(a + b) * (c - d) / a =", e)
+	await $.println("(a + b) * (c - d) / a =", e)
 }
 
 if ($.isMainScript(import.meta)) {

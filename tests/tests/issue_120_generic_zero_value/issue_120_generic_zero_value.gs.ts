@@ -53,31 +53,31 @@ export function Sum<T>(__typeArgs: $.GenericTypeArgs | undefined, vals: $.Slice<
 export async function main(): globalThis.Promise<void> {
 	// Test 1: Zero value of IntVal should be 0
 	let zeroInt = (ZeroValue({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int", typeName: "main.IntVal" }, zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (IntVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] }}) as IntVal)
-	$.println("ZeroValue[IntVal]:", IntVal_String(zeroInt))
+	await $.println("ZeroValue[IntVal]:", IntVal_String(zeroInt))
 
 	// Test 2: Zero value of StringVal should be ""
 	let zeroStr = (ZeroValue({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string", typeName: "main.StringVal" }, zero: () => "", methods: {String: (receiver: any, ...args: any[]) => (StringVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] }}) as StringVal)
-	$.println("ZeroValue[StringVal] len:", $.len(StringVal_String(zeroStr)))
+	await $.println("ZeroValue[StringVal] len:", $.len(StringVal_String(zeroStr)))
 
 	// Test 3: CallString on zero value
-	$.println("CallString on zero IntVal:", await CallString({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int", typeName: "main.IntVal" }, zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (IntVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] }}, zeroInt))
-	$.println("CallString on zero StringVal len:", $.len(await CallString({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string", typeName: "main.StringVal" }, zero: () => "", methods: {String: (receiver: any, ...args: any[]) => (StringVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] }}, zeroStr)))
+	await $.println("CallString on zero IntVal:", await CallString({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int", typeName: "main.IntVal" }, zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (IntVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] }}, zeroInt))
+	await $.println("CallString on zero StringVal len:", $.len(await CallString({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string", typeName: "main.StringVal" }, zero: () => "", methods: {String: (receiver: any, ...args: any[]) => (StringVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] }}, zeroStr)))
 
 	// Test 4: Sum returns zero value
 	let sumInt = (Sum({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int", typeName: "main.IntVal" }, zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (IntVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] }}, null) as IntVal)
-	$.println("Sum[IntVal]():", IntVal_String(sumInt))
+	await $.println("Sum[IntVal]():", IntVal_String(sumInt))
 
 	let sumStr = (Sum({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string", typeName: "main.StringVal" }, zero: () => "", methods: {String: (receiver: any, ...args: any[]) => (StringVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] }}, null) as StringVal)
-	$.println("Sum[StringVal]() len:", $.len(StringVal_String(sumStr)))
+	await $.println("Sum[StringVal]() len:", $.len(StringVal_String(sumStr)))
 
 	// Test 5: Verify the actual values
-	$.println("zeroInt == 0:", zeroInt == 0)
-	$.println("zeroStr == \"\":", $.stringEqual(zeroStr, ""))
+	await $.println("zeroInt == 0:", zeroInt == 0)
+	await $.println("zeroStr == \"\":", $.stringEqual(zeroStr, ""))
 
 	// Test 6: T{} returns the instantiated array zero value.
 	let zeroPair = (ZeroArrayLiteral({[$.genericTypeArgsMarker]: true, T: { type: "main.Pair", zero: () => Array.from({ length: 2 }, () => 0) }}) as Pair)
-	$.println("ZeroArrayLiteral[Pair] len:", $.len(zeroPair))
-	$.println("ZeroArrayLiteral[Pair] zero:", ($.arrayIndex(zeroPair, 0) == 0) && ($.arrayIndex(zeroPair, 1) == 0))
+	await $.println("ZeroArrayLiteral[Pair] len:", $.len(zeroPair))
+	await $.println("ZeroArrayLiteral[Pair] zero:", ($.arrayIndex(zeroPair, 0) == 0) && ($.arrayIndex(zeroPair, 1) == 0))
 }
 
 if ($.isMainScript(import.meta)) {

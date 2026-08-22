@@ -166,16 +166,16 @@ export class conf {
 		const c: conf | $.VarRef<conf> | null = this
 		let ret: __goscript_dnsclient_unix.hostLookupOrder = 0
 		let dnsConf: __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null = null! as __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null
-		using __defer = new $.DisposableStack()
+		await using __defer = new $.AsyncDisposableStack()
 		if ($.pointerValue<conf>(c).dnsDebugLevel > 1) {
-			__defer.defer(() => { ((): void => {
-				$.print("go package net: addrLookupOrder(", addr, ") = ", __goscript_dnsclient_unix.hostLookupOrder_String(ret), "\n")
+			__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
+				await $.print("go package net: addrLookupOrder(", addr, ") = ", __goscript_dnsclient_unix.hostLookupOrder_String(ret), "\n")
 			})() })
 		}
 		const __goscriptReturn1: [__goscript_dnsclient_unix.hostLookupOrder, __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null] = await conf.prototype.lookupOrder.call(c, r, "")
 		ret = __goscriptReturn1[0]
 		dnsConf = __goscriptReturn1[1]
-		__defer.dispose()
+		await __defer.dispose()
 		return [ret, dnsConf]
 		throw new globalThis.Error("goscript: unreachable return")
 	}
@@ -184,16 +184,16 @@ export class conf {
 		const c: conf | $.VarRef<conf> | null = this
 		let ret: __goscript_dnsclient_unix.hostLookupOrder = 0
 		let dnsConf: __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null = null! as __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null
-		using __defer = new $.DisposableStack()
+		await using __defer = new $.AsyncDisposableStack()
 		if ($.pointerValue<conf>(c).dnsDebugLevel > 1) {
-			__defer.defer(() => { ((): void => {
-				$.print("go package net: hostLookupOrder(", hostname, ") = ", __goscript_dnsclient_unix.hostLookupOrder_String(ret), "\n")
+			__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
+				await $.print("go package net: hostLookupOrder(", hostname, ") = ", __goscript_dnsclient_unix.hostLookupOrder_String(ret), "\n")
 			})() })
 		}
 		const __goscriptReturn3: [__goscript_dnsclient_unix.hostLookupOrder, __goscript_dnsconfig.dnsConfig | $.VarRef<__goscript_dnsconfig.dnsConfig> | null] = await conf.prototype.lookupOrder.call(c, r, hostname)
 		ret = __goscriptReturn3[0]
 		dnsConf = __goscriptReturn3[1]
-		__defer.dispose()
+		await __defer.dispose()
 		return [ret, dnsConf]
 		throw new globalThis.Error("goscript: unreachable return")
 	}
@@ -541,48 +541,48 @@ export async function systemConf(): globalThis.Promise<conf | $.VarRef<conf> | n
 }
 
 export async function initConfVal(): globalThis.Promise<void> {
-	using __defer = new $.DisposableStack()
+	await using __defer = new $.AsyncDisposableStack()
 	let [dnsMode, debugLevel] = await goDebugNetDNS()
 	$.pointerValue<conf>(confVal).netGo = false || ($.stringEqual(dnsMode, "go"))
 	$.pointerValue<conf>(confVal).netCgo = false || ($.stringEqual(dnsMode, "cgo"))
 	$.pointerValue<conf>(confVal).dnsDebugLevel = debugLevel
 
 	if ($.pointerValue<conf>(confVal).dnsDebugLevel > 0) {
-		__defer.defer(() => { ((): void => {
+		__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
 			if ($.pointerValue<conf>(confVal).dnsDebugLevel > 1) {
-				$.println("go package net: confVal.netCgo =", $.pointerValue<conf>(confVal).netCgo, " netGo =", $.pointerValue<conf>(confVal).netGo)
+				await $.println("go package net: confVal.netCgo =", $.pointerValue<conf>(confVal).netCgo, " netGo =", $.pointerValue<conf>(confVal).netGo)
 			}
 			if (((!$.stringEqual(dnsMode, "go")) && (!$.stringEqual(dnsMode, "cgo"))) && (!$.stringEqual(dnsMode, ""))) {
-				$.println("go package net: GODEBUG=netdns contains an invalid dns mode, ignoring it")
+				await $.println("go package net: GODEBUG=netdns contains an invalid dns mode, ignoring it")
 			}
 			switch ((true as boolean)) {
 				case false || !false:
 				{
 					if ($.stringEqual(dnsMode, "cgo")) {
-						$.println("go package net: ignoring GODEBUG=netdns=cgo as the binary was compiled without support for the cgo resolver")
+						await $.println("go package net: ignoring GODEBUG=netdns=cgo as the binary was compiled without support for the cgo resolver")
 					} else {
-						$.println("go package net: using the Go DNS resolver")
+						await $.println("go package net: using the Go DNS resolver")
 					}
 					break
 				}
 				case false:
 				{
 					if ($.stringEqual(dnsMode, "go")) {
-						$.println("go package net: GODEBUG setting forcing use of the Go resolver")
+						await $.println("go package net: GODEBUG setting forcing use of the Go resolver")
 					} else {
-						$.println("go package net: using the cgo DNS resolver")
+						await $.println("go package net: using the cgo DNS resolver")
 					}
 					break
 				}
 				default:
 				{
 					if ($.stringEqual(dnsMode, "go")) {
-						$.println("go package net: GODEBUG setting forcing use of the Go resolver")
+						await $.println("go package net: GODEBUG setting forcing use of the Go resolver")
 					} else {
 						if ($.stringEqual(dnsMode, "cgo")) {
-							$.println("go package net: GODEBUG setting forcing use of the cgo resolver")
+							await $.println("go package net: GODEBUG setting forcing use of the cgo resolver")
 						} else {
-							$.println("go package net: dynamic selection of DNS resolver")
+							await $.println("go package net: dynamic selection of DNS resolver")
 						}
 					}
 					break

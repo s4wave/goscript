@@ -406,7 +406,7 @@ export class TextFormatter {
 				case $.typeAssert<$.GoError>(__goscriptTypeSwitchValue, "error").ok:
 					{
 						let v: $.GoError = $.typeAssert<$.GoError>(__goscriptTypeSwitchValue, "error").value
-						TextFormatter.prototype.appendString.call(f, b, $.pointerValue<Exclude<$.GoError, null>>(v).Error())
+						TextFormatter.prototype.appendString.call(f, b, await $.pointerValue<Exclude<$.GoError, null>>(v).Error())
 						return
 					}
 					break
@@ -508,7 +508,7 @@ export class TextFormatter {
 				default:
 					{
 						let v: any = __goscriptTypeSwitchValue
-						TextFormatter.prototype.appendString.call(f, b, fmt.Sprint(value))
+						TextFormatter.prototype.appendString.call(f, b, await fmt.Sprint(value))
 						return
 					}
 					break

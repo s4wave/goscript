@@ -66,12 +66,12 @@ export function __goscript_set_featureBlock(__goscriptValue: {"_blank0": padded,
 
 export async function main(): globalThis.Promise<void> {
 	featureBlock.Enabled = true
-	$.println(featureBlock.Enabled)
+	await $.println(featureBlock.Enabled)
 
 	let original = $.markAsStructValue(new padded({Value: 7}))
 	let copy = $.markAsStructValue($.cloneStructValue(original))
 	copy.Value = 8
-	$.println(original.Value, copy.Value)
+	await $.println(original.Value, copy.Value)
 }
 
 if ($.isMainScript(import.meta)) {

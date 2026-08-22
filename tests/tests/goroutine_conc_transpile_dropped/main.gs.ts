@@ -55,15 +55,15 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await conc.ConcurrentQueue.prototype.WaitIdle.call(q, context.Background(), null)
 		if (err != null) {
-			$.println("WaitIdle error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("WaitIdle error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return
 		}
 	}
 
 	if (completed == (16 * 8)) {
-		$.println("all 128 leaves completed")
+		await $.println("all 128 leaves completed")
 	} else {
-		$.println("INCOMPLETE")
+		await $.println("INCOMPLETE")
 	}
 }
 

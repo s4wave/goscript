@@ -52,16 +52,16 @@ export function uintShiftAssign(n: number): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println($.uint(hash6(4328719365n, 14), 32))
-	$.println(mix(17361641481138401520n, 1085102592571150095n))
-	$.println($.uint($.uint($.uint64Shr(highAfterMask(4660n), 48n), 32), 32))
-	$.println($.uint($.uint($.uint64Shr(combineHighLow(4660n, 48879n), 48n), 32), 32))
-	$.println($.uint($.uint($.uint64And(combineHighLow(4660n, 48879n), 65535n), 32), 32))
-	$.println(maxUint64Divisor(4114n))
-	$.println(maxUint64Remainder(4114n))
-	$.println(setHighBit(maxUint64Remainder(128n)))
-	$.println(uintBitLen($.uint("18446744073709551615", 64)))
-	$.println(uintShiftAssign($.uint("18446744073709551615", 64)))
+	await $.println($.uint(hash6(4328719365n, 14), 32))
+	await $.println(mix(17361641481138401520n, 1085102592571150095n))
+	await $.println($.uint($.uint($.uint64Shr(highAfterMask(4660n), 48n), 32), 32))
+	await $.println($.uint($.uint($.uint64Shr(combineHighLow(4660n, 48879n), 48n), 32), 32))
+	await $.println($.uint($.uint($.uint64And(combineHighLow(4660n, 48879n), 65535n), 32), 32))
+	await $.println(maxUint64Divisor(4114n))
+	await $.println(maxUint64Remainder(4114n))
+	await $.println(setHighBit(maxUint64Remainder(128n)))
+	await $.println(uintBitLen($.uint("18446744073709551615", 64)))
+	await $.println(uintShiftAssign($.uint("18446744073709551615", 64)))
 }
 
 if ($.isMainScript(import.meta)) {

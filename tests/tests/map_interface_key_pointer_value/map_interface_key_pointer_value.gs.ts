@@ -62,7 +62,7 @@ export async function main(): globalThis.Promise<void> {
 		let ok = __goscriptTuple0[1]
 		if (ok) {
 			let [value, found] = $.mapGet<Node | null, boolean, boolean>(seen, $.interfaceValue<Node | null>(table, "*main.Table", { kind: $.TypeKind.Pointer, elemType: "main.Table" }), false)
-			$.println(value, found)
+			await $.println(value, found)
 		}
 	}
 }

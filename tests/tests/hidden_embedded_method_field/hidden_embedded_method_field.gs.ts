@@ -82,7 +82,7 @@ export function value(h: holder): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println(value($.markAsStructValue(new holder({Database: "field"}))))
+	await $.println(value($.markAsStructValue(new holder({Database: "field"}))))
 }
 
 if ($.isMainScript(import.meta)) {

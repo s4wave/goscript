@@ -255,7 +255,7 @@ export function basicMul(z: __goscript_nat.nat, x: __goscript_nat.nat, y: __gosc
 }
 
 export async function karatsuba(stk: __goscript_nat.stack | $.VarRef<__goscript_nat.stack> | null, z: __goscript_nat.nat, x: __goscript_nat.nat, y: __goscript_nat.nat): globalThis.Promise<void> {
-	using __defer = new $.DisposableStack()
+	await using __defer = new $.AsyncDisposableStack()
 	let n = $.len((y as __goscript_nat.nat))
 	if (($.len((x as __goscript_nat.nat)) != n) || ($.len((z as __goscript_nat.nat)) != (2 * n))) {
 		$.panic("bad karatsuba length")
@@ -325,7 +325,7 @@ export async function karatsuba(stk: __goscript_nat.stack | $.VarRef<__goscript_
 			ty = __goscript_int.Int.prototype.Sub.call(new __goscript_int.Int(), y0, y1)
 			z2 = new __goscript_int.Int()
 			await __goscript_int.Int.prototype.mul.call(z2, stk, x1, y1)
-			$.print("karatsuba wrong\n")
+			await $.print("karatsuba wrong\n")
 			await trace("x ", new __goscript_int.Int({abs: (x as __goscript_nat.nat)}))
 			await trace("y ", new __goscript_int.Int({abs: (y as __goscript_nat.nat)}))
 			await trace("z ", new __goscript_int.Int({abs: (z as __goscript_nat.nat)}))
@@ -345,7 +345,7 @@ export async function karatsuba(stk: __goscript_nat.stack | $.VarRef<__goscript_
 }
 
 export async function karatsubaSqr(stk: __goscript_nat.stack | $.VarRef<__goscript_nat.stack> | null, z: __goscript_nat.nat, x: __goscript_nat.nat): globalThis.Promise<void> {
-	using __defer = new $.DisposableStack()
+	await using __defer = new $.AsyncDisposableStack()
 	let n = $.len((x as __goscript_nat.nat))
 	if ($.len((z as __goscript_nat.nat)) != (2 * n)) {
 		$.panic("bad karatsubaSqr length")
@@ -409,7 +409,7 @@ export async function karatsubaSqr(stk: __goscript_nat.stack | $.VarRef<__goscri
 			__goscript_int.Int.prototype.Neg.call(z1, z1)
 			__goscript_int.Int.prototype.Add.call(z1, z1, z0)
 			__goscript_int.Int.prototype.Add.call(z1, z1, z2)
-			$.print("karatsubaSqr wrong\n")
+			await $.print("karatsubaSqr wrong\n")
 			await trace("x ", new __goscript_int.Int({abs: (x as __goscript_nat.nat)}))
 			await trace("z ", new __goscript_int.Int({abs: (z as __goscript_nat.nat)}))
 			await trace("zz", new __goscript_int.Int({abs: (zz as __goscript_nat.nat)}))
@@ -449,5 +449,5 @@ export async function ifmt(x: __goscript_int.Int | $.VarRef<__goscript_int.Int> 
 }
 
 export async function trace(name: string, x: __goscript_int.Int | $.VarRef<__goscript_int.Int> | null): globalThis.Promise<void> {
-	$.print(name, "=", await ifmt(x), "\n")
+	await $.print(name, "=", await ifmt(x), "\n")
 }

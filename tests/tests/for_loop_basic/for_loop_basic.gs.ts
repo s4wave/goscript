@@ -4,19 +4,19 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	$.println("Starting loop")
+	await $.println("Starting loop")
 	for (let i = 0; i < 3; i++) {
-		$.println("Iteration:", i)
+		await $.println("Iteration:", i)
 	}
-	$.println("Loop finished")
+	await $.println("Loop finished")
 
-	$.println("Starting loop")
+	await $.println("Starting loop")
 	let x = 0
 	for (let __rangeIndex = 0; __rangeIndex < 5; __rangeIndex++) {
-		$.println("Iteration:", x)
+		await $.println("Iteration:", x)
 		x++
 	}
-	$.println("Loop finished")
+	await $.println("Loop finished")
 }
 
 if ($.isMainScript(import.meta)) {

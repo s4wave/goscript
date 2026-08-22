@@ -30,19 +30,19 @@ export async function main(): globalThis.Promise<void> {
 			value = __goscriptTuple0[1]
 			err = __goscriptTuple0[2]
 			if (err != null) {
-				$.println("Error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+				await $.println("Error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			}
-			$.println("Month:", month, "Value:", value)
+			await $.println("Month:", month, "Value:", value)
 			break
 		}
 		case 3:
 		{
-			$.println("Std is 3")
+			await $.println("Std is 3")
 			break
 		}
 		default:
 		{
-			$.println("Default case")
+			await $.println("Default case")
 			break
 		}
 	}
@@ -57,19 +57,19 @@ export async function main(): globalThis.Promise<void> {
 			value = __goscriptTuple1[1]
 			err = __goscriptTuple1[2]
 			if (err != null) {
-				$.println("Error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+				await $.println("Error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			}
-			$.println("Month:", month, "Value:", value)
+			await $.println("Month:", month, "Value:", value)
 			break
 		}
 		case 3:
 		{
-			$.println("Std is 3")
+			await $.println("Std is 3")
 			break
 		}
 		default:
 		{
-			$.println("Default case")
+			await $.println("Default case")
 			break
 		}
 	}

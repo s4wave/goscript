@@ -8,7 +8,7 @@ export function _throw(value: string): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println(_throw("ok"))
+	await $.println(_throw("ok"))
 }
 
 if ($.isMainScript(import.meta)) {

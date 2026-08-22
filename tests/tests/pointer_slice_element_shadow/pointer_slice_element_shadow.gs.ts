@@ -87,18 +87,18 @@ export function parseKey(): [string, $.GoError] {
 	return ["parsed", null]
 }
 
-export function printInterfaceSpareZero(): void {
+export async function printInterfaceSpareZero(): globalThis.Promise<void> {
 	let values: $.Slice<any> = $.makeSlice<any>(0, 2)
 	values = $.append(values, $.interfaceValue($.markAsStructValue(new entry({key: "value"})), "main.entry", "main.entry"), $.appendZeros.nil)
 	values = $.goSlice(values, undefined, 2)
-	$.println($.arrayIndex(values!, 1) == null)
+	await $.println($.arrayIndex(values!, 1) == null)
 }
 
-export function printInterfaceAppendSliceSpareZero(): void {
+export async function printInterfaceAppendSliceSpareZero(): globalThis.Promise<void> {
 	let values: $.Slice<any> = $.makeSlice<any>(0, 2)
 	values = $.appendSlice(values, $.arrayToSlice<any>([$.interfaceValue($.markAsStructValue(new entry({key: "value"})), "main.entry", "main.entry")]), $.appendZeros.nil)
 	values = $.goSlice(values, undefined, 2)
-	$.println($.arrayIndex(values!, 1) == null)
+	await $.println($.arrayIndex(values!, 1) == null)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -106,7 +106,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let i = 0; i < 4; i++) {
 		let __goscriptShadow0: entry | $.VarRef<entry> | null = _object.prototype.next.call(o)
 		$.pointerValue<entry>(__goscriptShadow0).key = "set"
-		$.println(i, $.pointerValue<entry>(__goscriptShadow0).key)
+		await $.println(i, $.pointerValue<entry>(__goscriptShadow0).key)
 	}
 
 	let __goscriptShadow1: entry | $.VarRef<entry> | null = _object.prototype.next.call(o)
@@ -114,9 +114,9 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = parseKey()
 	$.pointerValue<entry>(__goscriptShadow1).key = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
-	$.println($.pointerValue<entry>(__goscriptShadow1).key, err == null)
-	printInterfaceSpareZero()
-	printInterfaceAppendSliceSpareZero()
+	await $.println($.pointerValue<entry>(__goscriptShadow1).key, err == null)
+	await printInterfaceSpareZero()
+	await printInterfaceAppendSliceSpareZero()
 }
 
 if ($.isMainScript(import.meta)) {

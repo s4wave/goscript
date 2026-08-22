@@ -57,7 +57,7 @@ export class reader {
 			{
 				let [, __goscriptShadow0] = boring.randReader_Read(boring.RandReader, b)
 				if (__goscriptShadow0 != null) {
-					$.panic("crypto/rand: boring RandReader failed: " + $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0).Error())
+					$.panic("crypto/rand: boring RandReader failed: " + await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0).Error())
 				}
 			}
 			return [$.len(b), null]

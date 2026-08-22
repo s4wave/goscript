@@ -60,27 +60,27 @@ export async function main(): globalThis.Promise<void> {
 
 	let [, ok] = $.typeAssertTuple<MyStruct>(i, "main.MyStruct")
 	if (ok) {
-		$.println("Type assertion successful")
+		await $.println("Type assertion successful")
 	} else {
-		$.println("Type assertion failed")
+		await $.println("Type assertion failed")
 	}
 
 	// try a second time since this generates something different when using = and not :=
 	let __goscriptTuple0: any = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
 	ok = __goscriptTuple0[1]
 	if (ok) {
-		$.println("Type assertion successful")
+		await $.println("Type assertion successful")
 	} else {
 		// expected
-		$.println("Type assertion failed")
+		await $.println("Type assertion failed")
 	}
 
 	// assign result to a variable
 	let [val, ok2] = $.typeAssertTuple<MyStruct>(i, "main.MyStruct")
 	if (!ok2) {
-		$.println("type assertion failed")
+		await $.println("type assertion failed")
 	} else {
-		$.println("type assertion success", val.Value)
+		await $.println("type assertion success", val.Value)
 	}
 
 	let nilInterface: MyInterface | null = null! as MyInterface | null
@@ -88,9 +88,9 @@ export async function main(): globalThis.Promise<void> {
 	let nilVal: MyStruct | $.VarRef<MyStruct> | null = __goscriptTuple1[0]
 	let ok3 = __goscriptTuple1[1]
 	if (ok3 && ($.pointerValue<MyStruct>(nilVal).Value == 0)) {
-		$.println("nil interface pointer assertion succeeded")
+		await $.println("nil interface pointer assertion succeeded")
 	} else {
-		$.println("nil interface pointer assertion failed")
+		await $.println("nil interface pointer assertion failed")
 	}
 }
 

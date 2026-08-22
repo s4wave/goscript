@@ -80,10 +80,10 @@ export async function main(): globalThis.Promise<void> {
 	let a2 = $.markAsStructValue(new A({BB: $.arrayToSlice<B>([$.markAsStructValue($.cloneStructValue(b1))])}))
 	let b2 = $.markAsStructValue(new B({AA: $.arrayToSlice<A>([$.markAsStructValue($.cloneStructValue(a1))])}))
 
-	$.println("a1:", a1.BB == null)
-	$.println("b1:", b1.AA == null)
-	$.println("a2 has", $.len(a2.BB), "B items")
-	$.println("b2 has", $.len(b2.AA), "A items")
+	await $.println("a1:", a1.BB == null)
+	await $.println("b1:", b1.AA == null)
+	await $.println("a2 has", $.len(a2.BB), "B items")
+	await $.println("b2 has", $.len(b2.AA), "A items")
 }
 
 if ($.isMainScript(import.meta)) {

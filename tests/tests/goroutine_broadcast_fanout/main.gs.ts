@@ -53,7 +53,7 @@ export async function main(): globalThis.Promise<void> {
 				isSend: false,
 				channel: await $.pointerValue<Exclude<context.Context, null>>(ctx).Done(),
 				onSelected: async (__goscriptSelect0Result) => {
-					$.println("ctx canceled")
+					await $.println("ctx canceled")
 					return $.selectVoidReturn()
 				}
 			},
@@ -71,9 +71,9 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	if (completed == 16) {
-		$.println("all 16 workers completed")
+		await $.println("all 16 workers completed")
 	} else {
-		$.println("INCOMPLETE")
+		await $.println("INCOMPLETE")
 	}
 }
 

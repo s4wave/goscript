@@ -126,10 +126,10 @@ export class outer {
 export async function main(): globalThis.Promise<void> {
 	let o: outer | $.VarRef<outer> | null = new outer({inner: new inner({name: "ready", count: $.markAsStructValue(new counter({value: 7}))})})
 
-	$.println("name:", $.pointerValue<inner>($.pointerValue<outer>(o).inner).name)
+	await $.println("name:", $.pointerValue<inner>($.pointerValue<outer>(o).inner).name)
 	$.pointerValue<inner>($.pointerValue<outer>(o).inner).name = "done"
-	$.println("renamed:", $.pointerValue<inner>($.pointerValue<outer>(o).inner).name, $.pointerValue<inner>($.pointerValue<outer>(o).inner).name)
-	$.println("count:", $.pointerValue<inner>($.pointerValue<outer>(o).inner).count.Load())
+	await $.println("renamed:", $.pointerValue<inner>($.pointerValue<outer>(o).inner).name, $.pointerValue<inner>($.pointerValue<outer>(o).inner).name)
+	await $.println("count:", $.pointerValue<inner>($.pointerValue<outer>(o).inner).count.Load())
 }
 
 if ($.isMainScript(import.meta)) {

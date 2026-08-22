@@ -122,7 +122,7 @@ export class client {
 		{
 			let __goscriptShadow1 = await $.pointerValue<Exclude<protobuf_go_lite.Message, null>>(out).UnmarshalVT(msg)
 			if (__goscriptShadow1 != null) {
-				return errors.Wrap($.pointerValueOrNil(__goscript_errors.ErrInvalidMessage)!, $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow1).Error())
+				return errors.Wrap($.pointerValueOrNil(__goscript_errors.ErrInvalidMessage)!, await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow1).Error())
 			}
 		}
 

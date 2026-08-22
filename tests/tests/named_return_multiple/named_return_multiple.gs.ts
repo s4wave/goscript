@@ -19,14 +19,14 @@ export function processValues(input: number): [number, string, boolean] {
 
 export async function main(): globalThis.Promise<void> {
 	let [n1, t1, o1] = processValues(10)
-	$.println(n1)
-	$.println(t1)
-	$.println(o1)
+	await $.println(n1)
+	await $.println(t1)
+	await $.println(o1)
 
 	let [n2, t2, o2] = processValues(3)
-	$.println(n2)
-	$.println(t2)
-	$.println(o2)
+	await $.println(n2)
+	await $.println(t2)
+	await $.println(o2)
 
 	// Test with an anonymous function and potentially unassigned named returns
 	let [n3, t3, o3] = ((val: number): [number, string, boolean] => {
@@ -44,9 +44,9 @@ export async function main(): globalThis.Promise<void> {
 		return [resInt, resStr, resBool]
 	})(1)
 
-	$.println(n3)
-	$.println(t3)
-	$.println(o3)
+	await $.println(n3)
+	await $.println(t3)
+	await $.println(o3)
 
 	let [n4, t4, o4] = ((val: number): [number, string, boolean] => {
 		let resInt: number = 0
@@ -63,9 +63,9 @@ export async function main(): globalThis.Promise<void> {
 		return [resInt, resStr, resBool]
 	})(2)
 
-	$.println(n4)
-	$.println(t4)
-	$.println(o4)
+	await $.println(n4)
+	await $.println(t4)
+	await $.println(o4)
 
 	let [n5, t5, o5] = ((val: number): [number, string, boolean] => {
 		let resInt: number = 0
@@ -82,9 +82,9 @@ export async function main(): globalThis.Promise<void> {
 		return [resInt, resStr, resBool]
 	})(3)
 
-	$.println(n5)
-	$.println(t5)
-	$.println(o5)
+	await $.println(n5)
+	await $.println(t5)
+	await $.println(o5)
 }
 
 if ($.isMainScript(import.meta)) {

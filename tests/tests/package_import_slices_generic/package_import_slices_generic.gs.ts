@@ -18,10 +18,10 @@ export function siblings<T>(__typeArgs: $.GenericTypeArgs | undefined, value: an
 
 export async function main(): globalThis.Promise<void> {
 	let grown: $.Slice<number> = (grow({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 3) as $.Slice<number>)
-	$.println("grow:", $.len(grown), $.cap(grown))
+	await $.println("grow:", $.len(grown), $.cap(grown))
 
 	let values: $.Slice<number> = (siblings({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 7) as $.Slice<number>)
-	$.println("siblings:", $.len(values), $.arrayIndex(values!, 0))
+	await $.println("siblings:", $.len(values), $.arrayIndex(values!, 0))
 }
 
 if ($.isMainScript(import.meta)) {

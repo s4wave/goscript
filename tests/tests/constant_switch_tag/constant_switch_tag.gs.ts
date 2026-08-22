@@ -10,17 +10,17 @@ export async function main(): globalThis.Promise<void> {
 	switch ((64 as number)) {
 		case 32:
 		{
-			$.println("word: 32")
+			await $.println("word: 32")
 			break
 		}
 		case 64:
 		{
-			$.println("word: 64")
+			await $.println("word: 64")
 			break
 		}
 		default:
 		{
-			$.println("word: other")
+			await $.println("word: other")
 			break
 		}
 	}
@@ -28,31 +28,31 @@ export async function main(): globalThis.Promise<void> {
 	switch ((false as boolean)) {
 		case true:
 		{
-			$.println("cgo: on")
+			await $.println("cgo: on")
 			break
 		}
 		case false:
 		{
-			$.println("cgo: off")
+			await $.println("cgo: off")
 			break
 		}
 	}
 
 	if ((64 as number) == 32) {
-		$.println("compare: 32")
+		await $.println("compare: 32")
 	} else {
-		$.println("compare: not 32")
+		await $.println("compare: not 32")
 	}
 
 	switch ((true as boolean)) {
 		case false || !false:
 		{
-			$.println("resolver: go")
+			await $.println("resolver: go")
 			break
 		}
 		case false:
 		{
-			$.println("resolver: cgo")
+			await $.println("resolver: cgo")
 			break
 		}
 	}

@@ -119,19 +119,19 @@ export class StringReader {
 
 export async function main(): globalThis.Promise<void> {
 	let mr1: MyReader | $.VarRef<MyReader> | null = new MyReader({name: "test1"})
-	$.println($.pointerValue<MyReader>(mr1).Reader == null)
+	await $.println($.pointerValue<MyReader>(mr1).Reader == null)
 
 	let sr: StringReader | $.VarRef<StringReader> | null = new StringReader({data: "hello", pos: 0})
 	let mr2: MyReader | $.VarRef<MyReader> | null = new MyReader({Reader: $.interfaceValue<Reader | null>(sr, "*main.StringReader", { kind: $.TypeKind.Pointer, elemType: "main.StringReader" }), name: "test2"})
-	$.println($.pointerValue<MyReader>(mr2).Reader != null)
+	await $.println($.pointerValue<MyReader>(mr2).Reader != null)
 
 	let buf: $.Slice<number> = $.makeSlice<number>(5, undefined, "byte")
 	let [n, ] = await $.pointerValue<Exclude<Reader, null>>($.pointerValue<MyReader>(mr2).Reader).Read(buf)
-	$.println(n == 5)
+	await $.println(n == 5)
 
-	$.println(10)
-	$.println(15)
-	$.println(true)
+	await $.println(10)
+	await $.println(15)
+	await $.println(true)
 }
 
 if ($.isMainScript(import.meta)) {

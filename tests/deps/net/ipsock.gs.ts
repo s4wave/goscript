@@ -340,7 +340,7 @@ export async function filterAddrList(filter: ((_p0: __goscript_iprawsock.IPAddr)
 		}
 	}
 	if ($.len((addrs as addrList)) == 0) {
-		return [(null as addrList), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField2 = $.pointerValue<Exclude<$.GoError, null>>(__goscript_net.errNoSuitableAddress).Error(); return new __goscript_net.AddrError({Err: __goscriptLiteralField2, Addr: originalAddr}) })(), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
+		return [(null as addrList), $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField2 = await $.pointerValue<Exclude<$.GoError, null>>(__goscript_net.errNoSuitableAddress).Error(); return new __goscript_net.AddrError({Err: __goscriptLiteralField2, Addr: originalAddr}) })()), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })]
 	}
 	return [(addrs as addrList), null]
 }

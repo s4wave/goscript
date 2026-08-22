@@ -25,9 +25,9 @@ export async function main(): globalThis.Promise<void> {
 					break
 				}
 		}
-		$.println("selected", i)
+		await $.println("selected", i)
 	}
-	$.println("done")
+	await $.println("done")
 }
 
 if ($.isMainScript(import.meta)) {

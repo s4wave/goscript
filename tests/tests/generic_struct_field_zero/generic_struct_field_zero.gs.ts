@@ -75,19 +75,19 @@ export class point {
 
 export async function main(): globalThis.Promise<void> {
 	let intBox: box = $.markAsStructValue(new box({Value: 0}))
-	$.println("int", intBox.Value)
+	await $.println("int", intBox.Value)
 
 	let stringBox: box = $.markAsStructValue(new box({Value: ""}))
-	$.println("string", $.stringEqual(stringBox.Value, ""))
+	await $.println("string", $.stringEqual(stringBox.Value, ""))
 
 	let mapBox: box = $.markAsStructValue(new box({Value: null! as globalThis.Map<string, number> | null}))
-	$.println("map", mapBox.Value == null)
+	await $.println("map", mapBox.Value == null)
 
 	let pointBox: box = $.markAsStructValue(new box({Value: $.markAsStructValue(new point())}))
-	$.println("struct", pointBox.Value.X)
+	await $.println("struct", pointBox.Value.X)
 
 	let explicit = $.markAsStructValue(new box({Value: 0}))
-	$.println("literal", explicit.Value)
+	await $.println("literal", explicit.Value)
 }
 
 if ($.isMainScript(import.meta)) {

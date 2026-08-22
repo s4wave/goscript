@@ -142,16 +142,16 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await $.pointerValue<Exclude<Resolver, null>>(resolver).Resolve(context.Background(), $.interfaceValue<Handler | null>($.markAsStructValue(new handler()), "main.handler", "main.handler"))
 		if (err != null) {
-			$.println("resolve failed")
+			await $.println("resolve failed")
 			return
 		}
 	}
-	$.println("resolve ok")
+	await $.println("resolve ok")
 	let g = $.markAsStructValue(new genericValue({value: 7}))
 	let reader: ValueReader | null = $.namedValueInterfaceValue<ValueReader | null>($.markAsStructValue($.cloneStructValue(g)), "main.genericValue", {Get: (receiver: any, ...args: any[]) => receiver.Get({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, "main.genericValue", [{ name: "Get", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }])
 	g.value = 9
 	if (await $.pointerValue<Exclude<ValueReader, null>>(reader).Get() != 7) {
-		$.println("value copy failed")
+		await $.println("value copy failed")
 		return
 	}
 }
