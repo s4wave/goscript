@@ -7,6 +7,65 @@ import (
 	"testing"
 )
 
+func TestCompileCommandAccumulatesBindingRoots(t *testing.T) {
+	dir := t.TempDir()
+	dependencyDir := filepath.Join(dir, "dependency")
+	firstRoot := filepath.Join(dir, "first-root")
+	outputDir := filepath.Join(dir, "output")
+	if err := os.MkdirAll(dependencyDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(firstRoot, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	writeFile(t, filepath.Join(dir, "go.mod"), strings.Join([]string{
+		"module example.test/cli-binding-roots",
+		"",
+		"go 1.25.3",
+		"",
+		"require example.test/dependency v0.0.0",
+		"",
+		"replace example.test/dependency => ./dependency",
+		"",
+	}, "\n"))
+	writeFile(t, filepath.Join(dependencyDir, "go.mod"), "module example.test/dependency\n\ngo 1.25.3\n")
+	writeFile(t, filepath.Join(dependencyDir, "message.pb.go"), "package dependency\n\ntype Message struct { Name string }\n")
+	writeFile(t, filepath.Join(dependencyDir, "message.pb.ts"), "export interface Message { name?: string }\nexport const Message = {} as any\n")
+	writeFile(t, filepath.Join(dir, "main.go"), "package clibindingroots\n\nimport \"example.test/dependency\"\n\nfunc Use() dependency.Message { return dependency.Message{} }\n")
+
+	app := newApp()
+	err := app.Run([]string{
+		"goscript",
+		"compile",
+		"--package",
+		".",
+		"--dir",
+		dir,
+		"--output",
+		outputDir,
+		"--all-dependencies",
+		"--protobuf-ts-binding",
+		"--binding-root",
+		firstRoot,
+		"--binding-root",
+		dependencyDir,
+	})
+	if err != nil {
+		t.Fatalf("compile command failed: %v", err)
+	}
+	packageDir := filepath.Join(outputDir, "@goscript", "example.test", "dependency")
+	if _, err := os.Stat(filepath.Join(packageDir, "message.pb.gs.ts")); !os.IsNotExist(err) {
+		t.Fatalf("second binding root was ignored, generated protobuf output exists (stat err=%v)", err)
+	}
+	binding, err := os.ReadFile(filepath.Join(packageDir, "message.pb.ts"))
+	if err != nil {
+		t.Fatalf("read bound protobuf output: %v", err)
+	}
+	if !strings.Contains(string(binding), "__protobufTypeScriptMessage") {
+		t.Fatalf("protobuf output was not bound through the second root:\n%s", binding)
+	}
+}
+
 func TestCompileCommandForwardsBuildFlags(t *testing.T) {
 	dir := t.TempDir()
 	outputDir := filepath.Join(dir, "output")
