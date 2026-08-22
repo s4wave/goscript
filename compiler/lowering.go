@@ -1248,25 +1248,28 @@ func safeParamName(param *types.Var, idx int) string {
 }
 
 type lowerFileContext struct {
-	model                         *SemanticModel
-	semPkg                        *semanticPackage
-	file                          *ast.File
-	importAliases                 map[string]string
-	importPaths                   map[string]string
-	importNames                   map[string]string
-	importObjects                 map[*types.PkgName]string
-	sourcePath                    string
-	localAliases                  map[types.Object]string
-	lazyPackageVars               map[types.Object]bool
-	lazyPackageVarsByPkg          *lazyPackageVarCache
-	asyncLazy                     *asyncLazyState
-	identAliases                  map[types.Object]string
-	identAliasRefs                map[types.Object]bool
-	tempNames                     *tempNameOwner
-	signature                     *types.Signature
-	typeParams                    map[string]bool
-	staticTypeParams              map[string]bool
-	asyncFunction                 bool
+	model                *SemanticModel
+	semPkg               *semanticPackage
+	file                 *ast.File
+	importAliases        map[string]string
+	importPaths          map[string]string
+	importNames          map[string]string
+	importObjects        map[*types.PkgName]string
+	sourcePath           string
+	localAliases         map[types.Object]string
+	lazyPackageVars      map[types.Object]bool
+	lazyPackageVarsByPkg *lazyPackageVarCache
+	asyncLazy            *asyncLazyState
+	identAliases         map[types.Object]string
+	identAliasRefs       map[types.Object]bool
+	tempNames            *tempNameOwner
+	signature            *types.Signature
+	typeParams           map[string]bool
+	staticTypeParams     map[string]bool
+	asyncFunction        bool
+	// syncFunctionValue prevents awaits in a callback passed to an override
+	// whose callback contract is synchronous.
+	syncFunctionValue             bool
 	protobufGeneratedSyncFunction bool
 	functionTypeDepth             int
 	deferState                    *loweredDeferState
@@ -4054,6 +4057,11 @@ func (ctx lowerFileContext) withReceiverTypeParams(params []*types.TypeParam) lo
 
 func (ctx lowerFileContext) withAsyncFunction(async bool) lowerFileContext {
 	ctx.asyncFunction = async
+	return ctx
+}
+
+func (ctx lowerFileContext) withSyncFunctionValue(sync bool) lowerFileContext {
+	ctx.syncFunctionValue = sync
 	return ctx
 }
 
@@ -8044,6 +8052,9 @@ func (o *LoweringOwner) lowerFuncLitArrowWithAsyncCalls(
 	signature, _ := ctx.semPkg.source.TypesInfo.TypeOf(lit).(*types.Signature)
 	deferState := &loweredDeferState{}
 	bodyCtx := ctx.withSignature(signature).withAsyncFunction(false).withDeferState(deferState).withoutRangeBranch()
+	if !allowAsyncCalls {
+		bodyCtx = bodyCtx.withSyncFunctionValue(true)
+	}
 	asyncCompatibleParams := funcLiteralNeedsAsyncFunctionParamCalls(signature)
 	if allowAsyncCalls && (asyncCompatibleParams || funcLiteralUsesAwaitableCall(ctx, lit)) {
 		bodyCtx = bodyCtx.withAsyncFunction(true)
@@ -13629,6 +13640,9 @@ func (o *LoweringOwner) objectIsAsyncLazyPackageVar(ctx lowerFileContext, obj ty
 }
 
 func (o *LoweringOwner) callNeedsAwait(ctx lowerFileContext, fun ast.Expr) bool {
+	if ctx.syncFunctionValue {
+		return false
+	}
 	for {
 		switch typed := fun.(type) {
 		case *ast.IndexExpr:
