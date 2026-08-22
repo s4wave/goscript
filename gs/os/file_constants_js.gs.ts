@@ -73,9 +73,15 @@ export class LinkError {
 		}
 	}
 
-	public Error(): string {
-		const e = this
-		return e.Op + " " + e.Old + " " + e.New + ": " + (e.Err?.Error() ?? "")
+	public Error(): string | PromiseLike<string> {
+		const e = this;
+		// Err.Error() may be async, so resolve it lazily instead of
+		// interpolating a possible Promise into the text.
+		const inner = e.Err?.Error();
+		if (inner == null || typeof inner === "string") {
+			return e.Op + " " + e.Old + " " + e.New + ": " + (inner ?? "");
+		}
+		return Promise.resolve(inner).then((text) => e.Op + " " + e.Old + " " + e.New + ": " + text);
 	}
 
 	public Unwrap(): $.GoError {

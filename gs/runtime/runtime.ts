@@ -230,9 +230,10 @@ function updateMemoryStats(m: MemStats): void {
   m.StackSys = 0
 }
 
-// Error interface for runtime errors
+// Error interface for runtime errors. Error may be async: a transpiled Go
+// Error() method that awaits returns a Promise, so callers must await.
 export interface Error {
-  Error(): string
+  Error(): string | PromiseLike<string>
 }
 
 // TypeAssertionError represents a failed type assertion

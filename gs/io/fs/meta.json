@@ -6,5 +6,8 @@
     "Stat": true,
     "Sub": true,
     "WalkDir": true
+  },
+  "asyncMethods": {
+    "PathError.Error": true
   }
 }

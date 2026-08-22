@@ -3,6 +3,7 @@
     "io"
   ],
   "asyncFunctions": {
-    "Prime": true
+    "Prime": true,
+    "Text": true
   }
 }

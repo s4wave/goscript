@@ -96,9 +96,15 @@ export class SyscallError {
 		return cloned
 	}
 
-	public Error(): string {
-		const e = this
-		return e.Syscall + ": " + e.Err!.Error()
+	public Error(): string | PromiseLike<string> {
+		const e = this;
+		// Err.Error() may be async, so resolve it lazily instead of
+		// interpolating a possible Promise into the text.
+		const inner = e.Err!.Error();
+		if (typeof inner === "string") {
+			return e.Syscall + ": " + inner;
+		}
+		return Promise.resolve(inner).then((text) => e.Syscall + ": " + text);
 	}
 
 	public Unwrap(): $.GoError {

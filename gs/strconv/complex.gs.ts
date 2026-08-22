@@ -16,10 +16,10 @@ export function FormatComplex(
   return `(${real}${sign}${imagText}i)`
 }
 
-export function ParseComplex(
+export async function ParseComplex(
   s: string,
   bitSize: number,
-): [$.Complex, $.GoError] {
+): Promise<[$.Complex, $.GoError]> {
   if (/\s/.test(s)) {
     return [$.complex(0, 0), complexSyntaxError(s)]
   }
@@ -35,7 +35,10 @@ export function ParseComplex(
   if (!inner.endsWith('i')) {
     const [real, err] = parseComplexFloat(inner, bitSize)
     if (err !== null) {
-      return [$.complex(isRangeError(err) ? real : 0, 0), complexError(s, err)]
+      return [
+        $.complex((await isRangeError(err)) ? real : 0, 0),
+        await complexError(s, err),
+      ]
     }
     return [$.complex(real, 0), null]
   }
@@ -48,7 +51,7 @@ export function ParseComplex(
   if (pureImagErr === null) {
     return [$.complex(0, pureImag), null]
   }
-  if (isRangeError(pureImagErr)) {
+  if (await isRangeError(pureImagErr)) {
     return [$.complex(0, pureImag), complexRangeError(s)]
   }
 
@@ -59,11 +62,17 @@ export function ParseComplex(
   const [realText, imagText] = split
   const [real, realErr] = parseComplexFloat(realText, bitSize)
   if (realErr !== null) {
-    return [$.complex(isRangeError(realErr) ? real : 0, 0), complexError(s, realErr)]
+    return [
+      $.complex((await isRangeError(realErr)) ? real : 0, 0),
+      await complexError(s, realErr),
+    ]
   }
   const [imag, imagErr] = parseComplexFloat(imagText, bitSize)
   if (imagErr !== null) {
-    return [$.complex(real, isRangeError(imagErr) ? imag : 0), complexError(s, imagErr)]
+    return [
+      $.complex(real, (await isRangeError(imagErr)) ? imag : 0),
+      await complexError(s, imagErr),
+    ]
   }
   return [$.complex(real, imag), null]
 }
@@ -165,10 +174,10 @@ function complexRangeError(s: string): $.GoError {
   return new NumError({ Func: 'ParseComplex', Num: s, Err: ErrRange })
 }
 
-function complexError(s: string, err: $.GoError): $.GoError {
-  return isRangeError(err) ? complexRangeError(s) : complexSyntaxError(s)
+async function complexError(s: string, err: $.GoError): Promise<$.GoError> {
+  return (await isRangeError(err)) ? complexRangeError(s) : complexSyntaxError(s)
 }
 
-function isRangeError(err: $.GoError): boolean {
-  return err !== null && err.Error().includes('value out of range')
+async function isRangeError(err: $.GoError): Promise<boolean> {
+  return err !== null && (await err.Error()).includes('value out of range')
 }

@@ -180,28 +180,28 @@ export function Log(
   }
 }
 
-export function Logf(
+export async function Logf(
   ctx: context.Context | null,
   category: string,
   format: string,
   ...args: unknown[]
-): void {
+): Promise<void> {
   if (rec.enabled) {
-    Log(ctx, category, fmt.Sprintf(format, ...(args as unknown[])))
+    Log(ctx, category, await fmt.Sprintf(format, ...(args as unknown[])))
   }
 }
 
-export function WithRegion(
+export async function WithRegion(
   ctx: context.Context | null,
   regionType: string,
-  fn: (() => void) | null,
-): void {
+  fn: (() => void | PromiseLike<void>) | null,
+): Promise<void> {
   const task = taskIDFromContext(ctx)
   if (rec.enabled) {
     record(kindRegionBegin, task, 0, regionType, '')
   }
   try {
-    fn?.()
+    await fn?.()
   } finally {
     if (rec.enabled) {
       record(kindRegionEnd, task, 0, regionType, '')

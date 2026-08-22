@@ -190,7 +190,11 @@ export function ErrorList_RemoveMultiples(list: $.VarRef<ErrorList>): void {
   })
 }
 
-export function ErrorList_Error(list: ErrorList): string {
+// Element Error() results may be async, so the joined text resolves them
+// lazily and returns a Promise only when an element does.
+export function ErrorList_Error(
+  list: ErrorList,
+): string | PromiseLike<string> {
   const errors = $.asArray(list).filter((err) => err !== null)
   if (errors.length === 0) {
     return 'no errors'
@@ -198,10 +202,18 @@ export function ErrorList_Error(list: ErrorList): string {
   if (errors.length === 1) {
     return errors[0]!.Error()
   }
-  return `${errors[0]!.Error()} (and ${errors.length - 1} more errors)`
+  const first = errors[0]!.Error()
+  if (typeof first === 'string') {
+    return `${first} (and ${errors.length - 1} more errors)`
+  }
+  return Promise.resolve(first).then(
+    (text) => `${text} (and ${errors.length - 1} more errors)`,
+  )
 }
 
-type errorListWithError = ErrorList & { Error?: () => string }
+type errorListWithError = ErrorList & {
+  Error?: () => string | PromiseLike<string>
+}
 
 export function ErrorList_Err(list: ErrorList): $.GoError {
   if ($.len(list) === 0) {
@@ -212,7 +224,7 @@ export function ErrorList_Err(list: ErrorList): $.GoError {
   return err as $.GoError
 }
 
-export function PrintError(w: io.Writer, err: $.GoError): void {
+export async function PrintError(w: io.Writer, err: $.GoError): Promise<void> {
   if (err === null) {
     return
   }
@@ -221,11 +233,11 @@ export function PrintError(w: io.Writer, err: $.GoError): void {
       if (entry == null) {
         continue
       }
-      w.Write($.stringToBytes(`${entry.Error()}\n`))
+      w.Write($.stringToBytes(`${await entry.Error()}\n`))
     }
     return
   }
-  const text = err.Error()
+  const text = await err.Error()
   for (const line of text.split('\n')) {
     w.Write($.stringToBytes(line + '\n'))
   }

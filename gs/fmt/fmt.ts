@@ -65,20 +65,15 @@ function formatInt(
   }
   return sign + prefix + digits
 }
-// Simple printf-style formatting implementation
+// Simple printf-style formatting implementation for verbs that cannot
+// produce async results (numbers, runes, booleans). Value formatting that can
+// consult Error/String/GoString goes through formatValueMaybe instead.
 function formatValue(value: any, verb: string, flags = ''): string {
   if (value === null || value === undefined) {
     return '<nil>'
   }
 
   switch (verb) {
-    case 'v': // default format
-      if (flags.includes('#') && hasGoString(value)) {
-        return defaultFormat(value.GoString())
-      }
-      return defaultFormat(value)
-    case 'w': // wrapped error
-      return defaultFormat(value)
     case 'd': // decimal integer
       return formatInt(value, 10, flags, false)
     case 'f': // decimal point, no exponent
@@ -86,7 +81,7 @@ function formatValue(value: any, verb: string, flags = ''): string {
     case 's': // string
       if (typeof value === 'string') return value
       if (value instanceof Uint8Array) return $.bytesToString(value)
-      return defaultFormat(value)
+      return String(defaultFormatMaybe(value))
     case 't': // boolean
       return value ? 'true' : 'false'
     case 'T': // type (approximate Go names for primitives we need)
@@ -185,14 +180,6 @@ function joinMaybe(
   return `${prefix}${(parts as string[]).join(separator)}${suffix}`
 }
 
-function defaultFormat(value: any): string {
-  const formatted = defaultFormatMaybe(value)
-  if (isPromiseLike(formatted)) {
-    return String(formatted)
-  }
-  return formatted
-}
-
 function defaultFormatMaybe(value: any): MaybeString {
   if (value === null || value === undefined) return '<nil>'
   if (typeof value === 'boolean') return value ? 'true' : 'false'
@@ -274,14 +261,6 @@ function defaultFormatMaybe(value: any): MaybeString {
   return String(value)
 }
 
-function parseFormat(format: string, args: any[]): string {
-  const formatted = parseFormatMaybe(format, args, false)
-  if (isPromiseLike(formatted)) {
-    return String(formatted)
-  }
-  return formatted
-}
-
 function formatValueMaybe(value: any, verb: string, flags = ''): MaybeString {
   switch (verb) {
     case 'v':
@@ -345,11 +324,7 @@ function applyFormatOptions(
   return apply(formatted)
 }
 
-function parseFormatMaybe(
-  format: string,
-  args: any[],
-  allowAsync = true,
-): MaybeString {
+function parseFormatMaybe(format: string, args: any[]): MaybeString {
   const parts: MaybeString[] = []
   let argIndex = 0
 
@@ -396,15 +371,15 @@ function parseFormatMaybe(
 
           if (argIndex < args.length) {
             const arg = args[argIndex]
-            let formatted: MaybeString | null =
-              allowAsync ?
-                formatWithStateMaybe(arg, verb, flags, width, precision)
-              : formatWithState(arg, verb, flags, width, precision)
+            let formatted: MaybeString | null = formatWithStateMaybe(
+              arg,
+              verb,
+              flags,
+              width,
+              precision,
+            )
             if (formatted === null) {
-              formatted =
-                allowAsync ?
-                  formatValueMaybe(arg, verb, flags)
-                : formatValue(arg, verb, flags)
+              formatted = formatValueMaybe(arg, verb, flags)
             }
 
             parts.push(
@@ -428,39 +403,6 @@ function parseFormatMaybe(
   }
 
   return joinMaybe(parts, '')
-}
-
-function formatWithState(
-  value: any,
-  verb: string,
-  flags: string,
-  width: string,
-  precision: string,
-): string | null {
-  if (!value || typeof value.Format !== 'function' || value.Format.length < 2) {
-    return null
-  }
-
-  let out = ''
-  const state: State = {
-    Flag(c: number): boolean {
-      return flags.includes(String.fromCharCode(c))
-    },
-    Precision(): [number, boolean] {
-      return precision === '' ? [0, false] : [parseInt(precision), true]
-    },
-    Width(): [number, boolean] {
-      return width === '' ? [0, false] : [parseInt(width), true]
-    },
-    Write(b: $.Bytes): [number, $.GoError | null] {
-      const text = $.bytesToString(b)
-      out += text
-      return [text.length, null]
-    },
-  }
-
-  value.Format(state, verb.codePointAt(0) ?? 0)
-  return out
 }
 
 function formatWithStateMaybe(
@@ -506,9 +448,15 @@ let stdout = {
   },
 }
 
-// Print functions
-export function Print(...a: any[]): [number, $.GoError | null] {
-  // Go rule: add spaces between operands only when neither is a string
+// Print functions.
+//
+// Operands may implement Error/String/GoString asynchronously (a transpiled
+// Go method that awaits), so every operand renders through the Maybe pipeline
+// and these functions resolve before writing or returning text.
+
+// sprintOperands renders operands with Go's Print spacing rule: a space is
+// added between operands only when neither side is a string.
+async function sprintOperands(a: any[]): Promise<string> {
   let out = ''
   for (let i = 0; i < a.length; i++) {
     if (i > 0) {
@@ -516,50 +464,56 @@ export function Print(...a: any[]): [number, $.GoError | null] {
       const currIsString = typeof a[i] === 'string'
       if (!prevIsString && !currIsString) out += ' '
     }
-    out += defaultFormat(a[i])
+    out += await defaultFormatMaybe(a[i])
   }
+  return out
+}
+
+// sprintlnOperands renders operands with Go's Println rule: always
+// space-separated, terminated by a newline.
+async function sprintlnOperands(a: any[]): Promise<string> {
+  const parts = await Promise.all(
+    a.map((operand) => Promise.resolve(defaultFormatMaybe(operand))),
+  )
+  return parts.join(' ') + '\n'
+}
+
+export async function Print(
+  ...a: any[]
+): Promise<[number, $.GoError | null]> {
+  const out = await sprintOperands(a)
   stdout.write(out)
   return [out.length, null]
 }
 
-export function Printf(
+export async function Printf(
   format: string,
   ...a: any[]
-): [number, $.GoError | null] {
-  const result = parseFormat(format, a)
+): Promise<[number, $.GoError | null]> {
+  const result = await parseFormatMaybe(format, a)
   stdout.write(result)
   return [result.length, null]
 }
 
-export function Println(...a: any[]): [number, $.GoError | null] {
-  // Go Println: always space-separate operands, then newline
-  const body = a.map(defaultFormat).join(' ')
-  const result = body + '\n'
+export async function Println(
+  ...a: any[]
+): Promise<[number, $.GoError | null]> {
+  const result = await sprintlnOperands(a)
   stdout.write(result)
   return [result.length, null]
 }
 
 // Sprint functions (return strings)
-export function Sprint(...a: any[]): string {
-  // Go rule: add spaces between operands only when neither is a string
-  let out = ''
-  for (let i = 0; i < a.length; i++) {
-    if (i > 0) {
-      const prevIsString = typeof a[i - 1] === 'string'
-      const currIsString = typeof a[i] === 'string'
-      if (!prevIsString && !currIsString) out += ' '
-    }
-    out += defaultFormat(a[i])
-  }
-  return out
+export async function Sprint(...a: any[]): Promise<string> {
+  return sprintOperands(a)
 }
 
-export function Sprintf(format: string, ...a: any[]): string {
-  return parseFormatMaybe(format, a) as string
+export async function Sprintf(format: string, ...a: any[]): Promise<string> {
+  return parseFormatMaybe(format, a)
 }
 
-export function Sprintln(...a: any[]): string {
-  return a.map(defaultFormat).join(' ') + '\n'
+export async function Sprintln(...a: any[]): Promise<string> {
+  return sprintlnOperands(a)
 }
 
 async function writeToWriter(
@@ -572,21 +526,13 @@ async function writeToWriter(
   return [0, $.newError('Writer does not implement Write method')]
 }
 
-// Fprint functions (write to Writer) - simplified implementation
+// Fprint functions (write to Writer)
 export async function Fprint(
   w: any,
   ...a: any[]
 ): Promise<[number, $.GoError | null]> {
   // Same spacing as Print
-  let out = ''
-  for (let i = 0; i < a.length; i++) {
-    if (i > 0) {
-      const prevIsString = typeof a[i - 1] === 'string'
-      const currIsString = typeof a[i] === 'string'
-      if (!prevIsString && !currIsString) out += ' '
-    }
-    out += defaultFormat(a[i])
-  }
+  const out = await sprintOperands(a)
   return await writeToWriter(w, out)
 }
 
@@ -595,7 +541,7 @@ export async function Fprintf(
   format: string,
   ...a: any[]
 ): Promise<[number, $.GoError | null]> {
-  const result = parseFormat(format, a)
+  const result = await parseFormatMaybe(format, a)
   return await writeToWriter(w, result)
 }
 
@@ -604,34 +550,31 @@ export async function Fprintln(
   ...a: any[]
 ): Promise<[number, $.GoError | null]> {
   // Same behavior as Println
-  const body = a.map(defaultFormat).join(' ')
-  const result = body + '\n'
+  const result = await sprintlnOperands(a)
   return await writeToWriter(w, result)
 }
 
 // Append functions (append to byte slice)
-export function Append(b: $.Bytes, ...a: any[]): $.Bytes {
-  const result = a.map(defaultFormat).join(' ')
-  const encoded = new TextEncoder().encode(result)
-  const base = $.bytesToUint8Array(b)
-  const newArray = new Uint8Array(base.length + encoded.length)
-  newArray.set(base)
-  newArray.set(encoded, base.length)
-  return newArray
+export async function Append(b: $.Bytes, ...a: any[]): Promise<$.Bytes> {
+  const result = await sprintOperands(a)
+  return appendText(b, result)
 }
 
-export function Appendf(b: $.Bytes, format: string, ...a: any[]): $.Bytes {
-  const result = parseFormat(format, a)
-  const encoded = new TextEncoder().encode(result)
-  const base = $.bytesToUint8Array(b)
-  const newArray = new Uint8Array(base.length + encoded.length)
-  newArray.set(base)
-  newArray.set(encoded, base.length)
-  return newArray
+export async function Appendf(
+  b: $.Bytes,
+  format: string,
+  ...a: any[]
+): Promise<$.Bytes> {
+  const result = await parseFormatMaybe(format, a)
+  return appendText(b, result)
 }
 
-export function Appendln(b: $.Bytes, ...a: any[]): $.Bytes {
-  const result = a.map(defaultFormat).join(' ') + '\n'
+export async function Appendln(b: $.Bytes, ...a: any[]): Promise<$.Bytes> {
+  const result = await sprintlnOperands(a)
+  return appendText(b, result)
+}
+
+function appendText(b: $.Bytes, result: string): $.Bytes {
   const encoded = new TextEncoder().encode(result)
   const base = $.bytesToUint8Array(b)
   const newArray = new Uint8Array(base.length + encoded.length)
@@ -641,8 +584,8 @@ export function Appendln(b: $.Bytes, ...a: any[]): $.Bytes {
 }
 
 // Error creation
-export function Errorf(format: string, ...a: any[]): any {
-  const message = parseFormat(format, a)
+export async function Errorf(format: string, ...a: any[]): Promise<any> {
+  const message = await parseFormatMaybe(format, a)
   const err = errors.New(message)
   // %w operands are wrapped: the result must Unwrap to them so errors.Is/As can
   // walk the chain. One %w unwraps to a single error; multiple %w (Go 1.20+)

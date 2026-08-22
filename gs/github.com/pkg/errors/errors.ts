@@ -181,8 +181,9 @@ class withStack {
     return w!.error
   }
 
-  public Error(): string {
-    return this.error?.Error() ?? ''
+  public Error(): string | PromiseLike<string> {
+    const inner = this.error?.Error()
+    return inner == null ? '' : Promise.resolve(inner)
   }
 
   public StackTrace(): StackTrace {
@@ -350,9 +351,15 @@ class withMessage {
     return cloned
   }
 
-  public Error(): string {
+  // cause.Error() may be async, so the message resolves it lazily instead of
+  // interpolating a possible Promise into the text.
+  public Error(): string | PromiseLike<string> {
     const w = this
-    return w!.msg + ': ' + w!.cause!.Error()
+    const inner = w!.cause!.Error()
+    if (typeof inner === 'string') {
+      return w!.msg + ': ' + inner
+    }
+    return Promise.resolve(inner).then((text) => w!.msg + ': ' + text)
   }
 
   public Cause(): $.GoError {

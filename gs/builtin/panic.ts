@@ -2,11 +2,22 @@
 // deferred recover() reads its value and sets recovered; an unrecovered GoPanic
 // surfaces as a thrown error whose message is "panic: <value>", matching Go's
 // crash output.
+//
+// The value's Error() method may be async (a transpiled Go method that
+// awaits), so the constructor renders what it can synchronously and replaces
+// the message as soon as the microtask queue delivers the resolved text.
+// Observers that read .message after an await boundary see the final text.
 export class GoPanic extends Error {
   recovered = false
 
   constructor(public readonly value: unknown) {
-    super(`panic: ${formatPanicValue(value)}`)
+    const text = formatPanicValue(value)
+    super(typeof text === 'string' ? `panic: ${text}` : 'panic:')
+    if (typeof text !== 'string') {
+      void Promise.resolve(text).then((resolved) => {
+        ;(this as { message: string }).message = `panic: ${resolved}`
+      })
+    }
   }
 }
 
@@ -71,7 +82,10 @@ export function panicValue(value: unknown): unknown {
   return value
 }
 
-function formatPanicValue(value: unknown): string {
+function formatPanicValue(value: unknown): string | PromiseLike<string> {
+  if (isThenableText(value)) {
+    return value
+  }
   if (value instanceof Error) {
     return value.message
   }
@@ -81,9 +95,17 @@ function formatPanicValue(value: unknown): string {
     'Error' in value &&
     typeof (value as { Error?: unknown }).Error === 'function'
   ) {
-    return String((value as { Error(): string }).Error())
+    return (value as { Error(): string | PromiseLike<string> }).Error()
   }
   return String(value)
+}
+
+function isThenableText(value: unknown): value is PromiseLike<string> {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    typeof (value as { then?: unknown }).then === 'function'
+  )
 }
 
 // recover stops the panic currently unwinding this defer stack and returns its

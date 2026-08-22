@@ -835,12 +835,12 @@ export function UnmarshalBoundMessageProtoJSON<T>(
   }
 }
 
-export function MarshalBoundMessageProtoText<T>(
+export async function MarshalBoundMessageProtoText<T>(
   ctor: BoundMessageCtor<T>,
   value: T | $.VarRef<T> | null,
-): string {
+): Promise<string> {
   const [data, err] = MarshalBoundMessageJSON(ctor, value)
-  return err == null ? $.bytesToString(data) : err.Error()
+  return err == null ? $.bytesToString(data) : await err.Error()
 }
 
 export function EncodeVarint(

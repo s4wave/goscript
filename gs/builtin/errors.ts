@@ -1,8 +1,11 @@
 /**
  * Represents the Go error type (interface).
+ *
+ * Error may be async: a Go Error() method that awaits transpiles to an async
+ * method, so callers must await the result before using it as a string.
  */
 export type GoError = {
-  Error(): string
+  Error(): string | PromiseLike<string>
 } | null
 
 // newError creates a new Go error with the given message
@@ -22,16 +25,4 @@ export function toGoError(err: Error): GoError {
     JsError: err,
     Error: () => err.message,
   } as GoError
-}
-
-// wrapPrimitiveError wraps a primitive value that implements the error interface
-// by creating an object with an Error() method that calls the type's Error function.
-// This is needed for types like `type MyError int` with `func (e MyError) Error() string`
-export function wrapPrimitiveError<T>(
-  value: T,
-  errorFn: (v: T) => string,
-): GoError {
-  return {
-    Error: () => errorFn(value),
-  }
 }

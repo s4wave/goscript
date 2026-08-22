@@ -6,7 +6,7 @@ import * as token from '@goscript/go/token/index.js'
 import { Error as ScannerError, ErrorList_Err, PrintError } from './index.js'
 
 describe('go/scanner override', () => {
-  it('prints errors to an io.Writer', () => {
+  it('prints errors to an io.Writer', async () => {
     const chunks: string[] = []
     const writer = {
       Write(p: $.Bytes): [number, $.GoError] {
@@ -15,12 +15,12 @@ describe('go/scanner override', () => {
       },
     }
 
-    PrintError(writer, $.newError('scan failed'))
+    await PrintError(writer, $.newError('scan failed'))
 
     expect(chunks).toEqual(['scan failed\n'])
   })
 
-  it('prints every ErrorList entry', () => {
+  it('prints every ErrorList entry', async () => {
     const chunks: string[] = []
     const writer = {
       Write(p: $.Bytes): [number, $.GoError] {
@@ -40,15 +40,15 @@ describe('go/scanner override', () => {
       }),
     ]
 
-    PrintError(writer, errors as $.GoError)
+    await PrintError(writer, errors as $.GoError)
 
     expect(chunks).toEqual(['a.go:1:2: first\n', 'a.go:3:4: second\n'])
 
     chunks.length = 0
     const err = ErrorList_Err(errors)
     expect(Array.isArray(err)).toBe(true)
-    expect(err?.Error()).toBe('a.go:1:2: first (and 1 more errors)')
-    PrintError(writer, err)
+    expect(await err!.Error()).toBe('a.go:1:2: first (and 1 more errors)')
+    await PrintError(writer, err)
 
     expect(chunks).toEqual(['a.go:1:2: first\n', 'a.go:3:4: second\n'])
   })

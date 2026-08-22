@@ -101,16 +101,16 @@ describe('runtime/trace override', () => {
     expect(Start(null)?.Error()).toBe('runtime/trace: nil trace writer')
   })
 
-  it('emits a trace v2 stream for user tasks', () => {
+  it('emits a trace v2 stream for user tasks', async () => {
     const capture = captureWriter()
 
     expect(Start(writerOf(capture.chunks))).toBeNull()
     expect(IsEnabled()).toBe(true)
 
     const [ctx, task] = NewTask(context.Background(), 'proof-task')
-    WithRegion(ctx, 'proof-region', () => {
+    await WithRegion(ctx, 'proof-region', async () => {
       Log(ctx, 'proof-key', 'proof-value')
-      Logf(ctx, 'proof-format', 'value=%s count=%d', 'ok', 3)
+      await Logf(ctx, 'proof-format', 'value=%s count=%d', 'ok', 3)
     })
     task.End()
 

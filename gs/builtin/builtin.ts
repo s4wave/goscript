@@ -11,19 +11,25 @@ import { isSliceProxy, runeToString } from './slice.js'
 import { isVarRef, type VarRef } from './varRef.js'
 
 /**
- * Implementation of Go's built-in print function
+ * Implementation of Go's built-in print function. An operand rendered through
+ * an async transpiled Error/String/GoString method resolves on the microtask
+ * queue, so the write lands one microtask after the call in that case.
  * @param args Arguments to print
  */
-export function print(...args: any[]): void {
-  writeHostStdoutText(args.length === 0 ? '' : formatPrintedArgs(args))
+export async function print(...args: any[]): Promise<void> {
+  writeHostStdoutText(
+    args.length === 0 ? '' : await formatPrintedArgs(args),
+  )
 }
 
 /**
- * Implementation of Go's built-in println function
+ * Implementation of Go's built-in println function. Operand rendering follows
+ * the same MaybePromise convention as print.
  * @param args Arguments to print
  */
-export function println(...args: any[]): void {
-  const message = (args.length === 0 ? '' : formatPrintedArgs(args)) + '\n'
+export async function println(...args: any[]): Promise<void> {
+  const message =
+    (args.length === 0 ? '' : await formatPrintedArgs(args)) + '\n'
   writeHostStdoutText(message)
 }
 

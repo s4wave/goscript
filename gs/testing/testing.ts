@@ -48,6 +48,7 @@ export class T {
   private failed = false
   private skipped = false
   private logs: string[] = []
+  private pendingLogText: Promise<void>[] = []
   private cleanups: (() => void | Promise<void>)[] = []
   private tempDirs: string[] = []
 
@@ -93,11 +94,30 @@ export class T {
   }
 
   public Log(...args: unknown[]): void {
-    this.logs.push(args.map(formatValue).join(' '))
+    this.pushLog(args.map(formatValue))
   }
 
   public Logf(format: string, ...args: unknown[]): void {
-    this.logs.push(formatMessage(format, args))
+    this.pushLog([formatMessage(format, args)])
+  }
+
+  // pushLog appends a rendered entry. When an operand resolves
+  // asynchronously, a placeholder entry holds its position and the resolved
+  // text replaces it once the microtask queue runs; flushLogs awaits these
+  // before printing so no entry is lost or flushed as a placeholder.
+  private pushLog(parts: MaybeText[]): void {
+    const joined = joinMaybeText(parts, ' ')
+    if (typeof joined === 'string') {
+      this.logs.push(joined)
+      return
+    }
+    const index = this.logs.length
+    this.logs.push('')
+    this.pendingLogText.push(
+      Promise.resolve(joined).then((text) => {
+        this.logs[index] = text
+      }),
+    )
   }
 
   public Skip(...args: unknown[]): never {
@@ -143,7 +163,7 @@ export class T {
       } else {
         child.Fail()
         if (!(err instanceof TestControl)) {
-          child.Log(formatValue(err))
+          child.Log(err)
         }
       }
     }
@@ -155,12 +175,12 @@ export class T {
       }
       child.Fail()
       if (!(err instanceof TestControl)) {
-        child.Log(formatValue(err))
+        child.Log(err)
       }
     }
     if (child.Failed()) {
       this.Fail()
-      child.flushLogs()
+      await child.flushLogs()
       return false
     }
     return true
@@ -247,7 +267,13 @@ export class T {
     }
   }
 
-  public flushLogs(): void {
+  public async flushLogs(): Promise<void> {
+    // Entries rendered through an async transpiled Error()/String() method
+    // resolve after the microtask queue runs; settle them before flushing so
+    // the printed log carries the final text.
+    const pending = this.pendingLogText
+    this.pendingLogText = []
+    await Promise.all(pending)
     for (const line of this.logs) {
       console.log('    ' + line)
     }
@@ -360,7 +386,7 @@ export async function runTests(
           } else {
             t.Fail()
             if (!(err instanceof TestControl)) {
-              t.Log(formatValue(err))
+              t.Log(err)
             }
           }
         }
@@ -368,19 +394,19 @@ export async function runTests(
         const elapsed = ((Date.now() - start) / 1000).toFixed(2)
         if (t.Skipped()) {
           if (options.verbose) {
-            t.flushLogs()
+            await t.flushLogs()
           }
           console.log('--- SKIP: ' + test.name + ' (' + elapsed + 's)')
           continue
         }
         if (t.Failed()) {
           failed++
-          t.flushLogs()
+          await t.flushLogs()
           console.log('--- FAIL: ' + test.name + ' (' + elapsed + 's)')
           continue
         }
         if (options.verbose) {
-          t.flushLogs()
+          await t.flushLogs()
           console.log('--- PASS: ' + test.name + ' (' + elapsed + 's)')
         }
       }
@@ -398,15 +424,26 @@ export async function runTests(
   }
 }
 
-function formatMessage(format: string, args: unknown[]): string {
+function formatMessage(format: string, args: unknown[]): MaybeText {
+  const parts: MaybeText[] = []
   let index = 0
-  return format.replace(/%#v|%\+v|%q|%[vds]/g, (verb) => {
-    const value = args[index++]
-    if (verb === '%q') {
-      return JSON.stringify(String(value))
+  let cursor = 0
+  const verbPattern = /%#v|%\+v|%q|%[vds]/g
+  let match: RegExpExecArray | null
+  while ((match = verbPattern.exec(format)) !== null) {
+    if (match.index > cursor) {
+      parts.push(format.slice(cursor, match.index))
     }
-    return formatValue(value)
-  })
+    const value = args[index++]
+    parts.push(
+      match[0] === '%q' ? JSON.stringify(String(value)) : formatValue(value),
+    )
+    cursor = verbPattern.lastIndex
+  }
+  if (cursor < format.length) {
+    parts.push(format.slice(cursor))
+  }
+  return joinMaybeText(parts, '')
 }
 
 function requireHostModule<T>(name: string, api: string): T {
@@ -451,7 +488,23 @@ function isProcessExitError(err: unknown): boolean {
   return typeof code === 'number'
 }
 
-function formatValue(value: unknown): string {
+// A transpiled Go Error() or String() method may be async, so log operands
+// render through the MaybePromise convention: text when synchronous, a
+// Promise that pushResolvedText settles onto the log entry otherwise.
+type MaybeText = string | PromiseLike<string>
+
+function isThenableText(value: unknown): value is PromiseLike<string> {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    typeof (value as { then?: unknown }).then === 'function'
+  )
+}
+
+function formatValue(value: unknown): MaybeText {
+  if (isThenableText(value)) {
+    return value
+  }
   if (value instanceof Error) {
     return value.message
   }
@@ -461,10 +514,21 @@ function formatValue(value: unknown): string {
     'Error' in value &&
     typeof value.Error === 'function'
   ) {
-    return String(value.Error())
+    return value.Error() as MaybeText
   }
   if (value === null) {
     return '<nil>'
   }
   return String(value)
+}
+
+// joinMaybeText joins rendered operands, returning a Promise only when one of
+// them is still resolving.
+function joinMaybeText(parts: MaybeText[], separator: string): MaybeText {
+  if (parts.some(isThenableText)) {
+    return Promise.all(parts.map((part) => Promise.resolve(part))).then(
+      (resolved) => resolved.join(separator),
+    )
+  }
+  return (parts as string[]).join(separator)
 }

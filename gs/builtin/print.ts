@@ -1,16 +1,52 @@
 import { asArray, isSliceProxy, type Slice } from './slice.js'
 
-/**
- * formatPrintedArgs formats builtin println arguments deterministically.
- */
-export function formatPrintedArgs(args: readonly any[]): string {
-  return args.map((arg) => formatPrintedValue(arg)).join(' ')
+// A transpiled Go Error(), String(), or GoString() method may be async, so
+// printed operands render through the MaybePromise convention: text when the
+// method is synchronous, a Promise that joinMaybeText settles otherwise. No
+// sink stringifies a Promise in place of the rendered text.
+type MaybeText = string | PromiseLike<string>
+
+function isThenableText(value: unknown): value is PromiseLike<string> {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    typeof (value as { then?: unknown }).then === 'function'
+  )
+}
+
+function joinMaybeText(parts: MaybeText[], separator: string): MaybeText {
+  if (parts.some(isThenableText)) {
+    return Promise.all(parts.map((part) => Promise.resolve(part))).then(
+      (resolved) => resolved.join(separator),
+    )
+  }
+  return (parts as string[]).join(separator)
+}
+
+function surroundMaybeText(
+  parts: MaybeText[],
+  separator: string,
+  open: string,
+  close: string,
+): MaybeText {
+  const joined = joinMaybeText(parts, separator)
+  if (isThenableText(joined)) {
+    return Promise.resolve(joined).then((text) => `${open}${text}${close}`)
+  }
+  return `${open}${joined}${close}`
 }
 
 /**
- * formatPrintedValue formats a single builtin println argument deterministically.
+ * formatPrintedArgs formats builtin print/println arguments deterministically.
  */
-export function formatPrintedValue(value: any): string {
+export function formatPrintedArgs(args: readonly any[]): MaybeText {
+  return surroundMaybeText(args.map(formatPrintedValue), ' ', '', '')
+}
+
+/**
+ * formatPrintedValue formats a single builtin print/println argument.
+ */
+export function formatPrintedValue(value: any): MaybeText {
   return formatValue(value, 0, false, new WeakSet<object>())
 }
 
@@ -19,7 +55,7 @@ function formatValue(
   depth: number,
   nested: boolean,
   seen: WeakSet<object>,
-): string {
+): MaybeText {
   if (value === null) {
     return 'null'
   }
@@ -78,9 +114,11 @@ function formatValue(
   try {
     if (value instanceof Map) {
       return formatArray(
-        Array.from(value.entries()).map(
-          ([k, v]) =>
-            `${formatValue(k, depth + 1, true, seen)} => ${formatValue(v, depth + 1, true, seen)}`,
+        Array.from(value.entries()).map(([k, v]) =>
+          joinMaybeText(
+            [formatValue(k, depth + 1, true, seen), formatValue(v, depth + 1, true, seen)],
+            ' => ',
+          ),
         ),
         depth,
         seen,
@@ -96,15 +134,15 @@ function formatValue(
     }
 
     if (typeof value.GoString === 'function') {
-      return value.GoString()
+      return value.GoString() as MaybeText
     }
 
     if (typeof value.Error === 'function') {
-      return value.Error()
+      return value.Error() as MaybeText
     }
 
     if (typeof value.String === 'function') {
-      return value.String()
+      return value.String() as MaybeText
     }
 
     const entries = getObjectEntries(value)
@@ -130,29 +168,34 @@ function formatArray(
   value: readonly any[],
   depth: number,
   seen: WeakSet<object>,
-): string {
+): MaybeText {
   if (value.length === 0) {
     return '[]'
   }
 
-  return `[ ${value.map((item) => formatValue(item, depth + 1, true, seen)).join(', ')} ]`
+  return surroundMaybeText(
+    value.map((item) => formatValue(item, depth + 1, true, seen)),
+    ', ',
+    '[ ',
+    ' ]',
+  )
 }
 
 function formatObject(
   entries: readonly [string, any][],
   depth: number,
   seen: WeakSet<object>,
-): string {
+): MaybeText {
   const pad = '  '.repeat(depth + 1)
   const closePad = '  '.repeat(depth)
-  const body = entries
-    .map(
-      ([key, value]) =>
-        `${pad}${key}: ${formatValue(value, depth + 1, true, seen)},`,
-    )
-    .join('\n')
+  const lines = entries.map(([key, value]) =>
+    joinMaybeText(
+      [`${pad}${key}: `, formatValue(value, depth + 1, true, seen), ','],
+      '',
+    ),
+  )
 
-  return `{\n${body}\n${closePad}}`
+  return surroundMaybeText(lines, '\n', '{\n', `\n${closePad}}`)
 }
 
 function getObjectEntries(value: Record<string, any>): [string, any][] {

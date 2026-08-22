@@ -4,5 +4,9 @@
     "errors",
     "fmt",
     "io"
-  ]
+  ],
+  "asyncFunctions": {
+    "Logf": true,
+    "WithRegion": true
+  }
 }
