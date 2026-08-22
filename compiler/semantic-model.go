@@ -808,6 +808,11 @@ func (o *SemanticModelOwner) collectFunctionFacts(
 				if called := calledFunction(pkg, typed.Fun); called != nil {
 					semFn.calls[functionOriginOrSelf(called)] = true
 				}
+				if isBuiltinPrintCall(pkg, typed.Fun) {
+					// The print helpers await their rendered operands, so the
+					// enclosing function suspends until the write lands.
+					markFunctionAsync(semFn, "builtin-print")
+				}
 				if fun, ok := ast.Unparen(typed.Fun).(*ast.FuncLit); ok {
 					recordImmediateFuncLitAsyncFacts(model, pkg, overrideFacts, semFn, fun)
 				}
@@ -853,6 +858,18 @@ func rangeFunctionExprNeedsAwait(
 	return callUsesFunctionValue(pkg, expr)
 }
 
+// isBuiltinPrintCall reports whether the call targets the print or println
+// builtin. Both lower to awaited runtime helpers, so any function whose body
+// contains one renders output asynchronously.
+func isBuiltinPrintCall(pkg *packages.Package, fun ast.Expr) bool {
+	ident, ok := ast.Unparen(fun).(*ast.Ident)
+	if !ok || ident.Name != "print" && ident.Name != "println" {
+		return false
+	}
+	builtin, ok := pkg.TypesInfo.Uses[ident].(*types.Builtin)
+	return ok && (builtin.Name() == "print" || builtin.Name() == "println")
+}
+
 func recordImmediateFuncLitAsyncFacts(
 	model *SemanticModel,
 	pkg *packages.Package,
@@ -879,6 +896,9 @@ func recordImmediateFuncLitAsyncFacts(
 			called := calledFunction(pkg, typed.Fun)
 			if called != nil {
 				semFn.calls[functionOriginOrSelf(called)] = true
+			}
+			if isBuiltinPrintCall(pkg, typed.Fun) {
+				markFunctionAsync(semFn, "builtin-print")
 			}
 			if callUsesFunctionValue(pkg, typed.Fun) {
 				markFunctionAsync(semFn, "async-function-literal-call")
@@ -1626,7 +1646,7 @@ func (o *SemanticModelOwner) applyUnknownInterfaceAsyncMethods(
 	}
 	for method := range model.functionCallers {
 		method = functionOriginOrSelf(method)
-		if method == nil || known[method] || isSyncErrorMethodFunc(method) {
+		if method == nil || known[method] {
 			continue
 		}
 		signature, _ := method.Type().(*types.Signature)
@@ -1662,9 +1682,6 @@ func (o *SemanticModelOwner) buildInterfaceAsyncMarks(
 		}
 		for methodName, ifaceMethod := range graphEntry.ifaceMethods {
 			implMethod := graphEntry.implMethods[methodName]
-			if isSyncErrorMethodFunc(ifaceMethod) || isSyncErrorMethodFunc(implMethod) {
-				continue
-			}
 			// A pair with no semantic implementation can never fire, so it is
 			// dropped here rather than resolved again on every pass.
 			if implFn := semanticFunctionFor(model, implMethod); implFn != nil {
@@ -1717,9 +1734,6 @@ func (o *SemanticModelOwner) applyAnonymousInterfaceAsyncMethods(
 		}
 		for methodName, ifaceMethod := range graphEntry.ifaceMethods {
 			implMethod := graphEntry.implMethods[methodName]
-			if isSyncErrorMethodFunc(ifaceMethod) || isSyncErrorMethodFunc(implMethod) {
-				continue
-			}
 			if model.functionAsync(implMethod) {
 				model.markInterfaceMethodAsync(ifaceMethod)
 			}

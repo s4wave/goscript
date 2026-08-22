@@ -1628,7 +1628,7 @@ export function FileServer(root: fileServerFileSystem | null): Handler {
       try {
         const [info, statErr] = await file.Stat()
         if (statErr != null) {
-          Error(w, statErr.Error(), StatusInternalServerError)
+          Error(w, await statErr.Error(), StatusInternalServerError)
           return
         }
         if (info?.IsDir?.() === true) {
@@ -1691,7 +1691,7 @@ export async function ServeFileFS(
   try {
     const [info, statErr] = await file.Stat()
     if (statErr != null) {
-      Error(w, statErr.Error(), StatusInternalServerError)
+      Error(w, await statErr.Error(), StatusInternalServerError)
       return
     }
     if (info?.IsDir?.() === true) {
@@ -1827,14 +1827,14 @@ export class CrossOriginProtection {
 
   public Handler(handler: Handler | null): Handler {
     return {
-      ServeHTTP: (w, r) => {
+      ServeHTTP: async (w, r) => {
         const err = this.Check(r)
         if (err != null) {
           const deny = this.denyHandler
           if (deny != null) {
             return deny.ServeHTTP(w, r)
           }
-          Error(w, err.Error(), StatusForbidden)
+          Error(w, await err.Error(), StatusForbidden)
           return
         }
         return handler?.ServeHTTP(w, r)
@@ -3214,7 +3214,7 @@ async function serveContent(
   if (typeof seeker.Seek !== 'function') {
     const [data, err] = await io.ReadAll(content)
     if (err != null) {
-      Error(w, err.Error(), StatusInternalServerError)
+      Error(w, await err.Error(), StatusInternalServerError)
       return
     }
     const body = data ?? new Uint8Array(0)
@@ -3230,14 +3230,14 @@ async function serveContent(
   if (size == null) {
     const [end, err] = await seeker.Seek(0n, io.SeekEnd)
     if (err != null) {
-      Error(w, err.Error(), StatusInternalServerError)
+      Error(w, await err.Error(), StatusInternalServerError)
       return
     }
     size = Number(end)
   }
   const [, seekErr] = await seeker.Seek(0n, io.SeekStart)
   if (seekErr != null) {
-    Error(w, seekErr.Error(), StatusInternalServerError)
+    Error(w, await seekErr.Error(), StatusInternalServerError)
     return
   }
 
@@ -3268,7 +3268,7 @@ async function serveContent(
 
   const [, rangeSeekErr] = await seeker.Seek(BigInt(start), io.SeekStart)
   if (rangeSeekErr != null) {
-    Error(w, rangeSeekErr.Error(), StatusInternalServerError)
+    Error(w, await rangeSeekErr.Error(), StatusInternalServerError)
     return
   }
   await w.WriteHeader(status)

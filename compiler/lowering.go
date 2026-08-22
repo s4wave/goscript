@@ -8339,7 +8339,14 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 				if fun.Name == "print" {
 					helper = RuntimeHelperPrint
 				}
-				return o.runtimeOwner.QualifiedHelper(helper) + "(" + strings.Join(args, ", ") + ")", diagnostics
+				// The print helpers render operands through the async
+				// MaybePromise convention, so the write is awaited to keep
+				// host output in Go call order relative to other awaited
+				// writers.
+				if ctx.deferState != nil {
+					ctx.deferState.async = true
+				}
+				return "await " + o.runtimeOwner.QualifiedHelper(helper) + "(" + strings.Join(args, ", ") + ")", diagnostics
 			case "append":
 				if len(expr.Args) > 0 {
 					if slice, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(expr.Args[0])).Underlying().(*types.Slice); ok {
@@ -13682,29 +13689,7 @@ func callUsesInterfaceMethod(pkg *packages.Package, fun ast.Expr) bool {
 	if selection == nil || selection.Kind() != types.MethodVal {
 		return false
 	}
-	if selectionUsesSyncErrorMethod(selection) {
-		return false
-	}
 	return isInterfaceType(selection.Recv())
-}
-
-func selectionUsesSyncErrorMethod(selection *types.Selection) bool {
-	if selection == nil || selection.Kind() != types.MethodVal {
-		return false
-	}
-	method, _ := selection.Obj().(*types.Func)
-	return isSyncErrorMethodFunc(method)
-}
-
-func isSyncErrorMethodFunc(fn *types.Func) bool {
-	if fn == nil || fn.Name() != "Error" {
-		return false
-	}
-	signature, _ := fn.Type().(*types.Signature)
-	if signature == nil || signature.Params().Len() != 0 || signature.Results().Len() != 1 {
-		return false
-	}
-	return types.Identical(signature.Results().At(0).Type(), types.Typ[types.String])
 }
 
 func (o *LoweringOwner) overrideCallNeedsAwait(ctx lowerFileContext, fun ast.Expr) bool {

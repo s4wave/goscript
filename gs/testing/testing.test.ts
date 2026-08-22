@@ -196,7 +196,7 @@ describe('testing.T', () => {
     expect(existsSync(second)).toBe(false)
   })
 
-  it('formats common testing printf verbs', () => {
+  it('formats common testing printf verbs', async () => {
     const t = new T('root')
     const messages: string[] = []
     const originalLog = console.log
@@ -213,7 +213,7 @@ describe('testing.T', () => {
         'ok',
         true,
       )
-      t.flushLogs()
+      await t.flushLogs()
     } finally {
       console.log = originalLog
     }
@@ -223,7 +223,7 @@ describe('testing.T', () => {
     ])
   })
 
-  it('formats Go-style error objects with Error methods', () => {
+  it('formats Go-style error objects with Error methods', async () => {
     const t = new T('root')
     const messages: string[] = []
     const originalLog = console.log
@@ -232,7 +232,7 @@ describe('testing.T', () => {
     }
     try {
       t.Logf('err=%v', { Error: () => 'host path missing' })
-      t.flushLogs()
+      await t.flushLogs()
     } finally {
       console.log = originalLog
     }

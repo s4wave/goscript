@@ -52,9 +52,13 @@ export class NumError {
 		return cloned;
 	}
 
-	public Error(): string {
+	public Error(): string | PromiseLike<string> {
 		const e = this;
-		return "strconv." + e.Func + ": " + "parsing " + JSON.stringify(e.Num) + ": " + e.Err!.Error();
+		const inner = e.Err!.Error();
+		if (typeof inner === "string") {
+			return "strconv." + e.Func + ": " + "parsing " + JSON.stringify(e.Num) + ": " + inner;
+		}
+		return Promise.resolve(inner).then((text) => "strconv." + e.Func + ": " + "parsing " + JSON.stringify(e.Num) + ": " + text);
 	}
 
 	public Unwrap(): $.GoError {

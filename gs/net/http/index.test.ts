@@ -604,7 +604,7 @@ describe('net/http override', () => {
     expect(protection.Check(methodBypass)).toBeNull()
   })
 
-  it('routes cross-origin protection handlers through deny and success paths', () => {
+  it('routes cross-origin protection handlers through deny and success paths', async () => {
     const protection = NewCrossOriginProtection()
     let served = false
     const handler = protection.Handler({
@@ -621,7 +621,7 @@ describe('net/http override', () => {
     Header_Set(blocked!.Header, 'Sec-Fetch-Site', 'cross-site')
     const blockedWriter = new testResponseWriter()
 
-    handler.ServeHTTP(blockedWriter, blocked)
+    await handler.ServeHTTP(blockedWriter, blocked)
 
     expect(served).toBe(false)
     expect(blockedWriter.Code).toBe(StatusForbidden)
@@ -632,12 +632,12 @@ describe('net/http override', () => {
       },
     })
     const deniedWriter = new testResponseWriter()
-    handler.ServeHTTP(deniedWriter, blocked)
+    await handler.ServeHTTP(deniedWriter, blocked)
     expect(deniedWriter.Code).toBe(StatusTeapot)
 
     const [safe] = NewRequest(MethodGet, 'https://example.invalid/update', null)
     const allowedWriter = new testResponseWriter()
-    handler.ServeHTTP(allowedWriter, safe)
+    await handler.ServeHTTP(allowedWriter, safe)
     expect(served).toBe(true)
     expect(allowedWriter.Code).toBe(StatusOK)
   })

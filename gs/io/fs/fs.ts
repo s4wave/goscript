@@ -551,9 +551,17 @@ export class PathError {
     return cloned
   }
 
-  public Error(): string {
+  // Err.Error() may be async, so the message resolves it lazily instead of
+  // interpolating a possible Promise into the text.
+  public Error(): string | PromiseLike<string> {
     const e = this
-    return e!.Op + ' ' + e!.Path + ': ' + e!.Err!.Error()
+    const inner = e!._fields.Err.value!.Error()
+    if (typeof inner === 'string') {
+      return e!.Op + ' ' + e!.Path + ': ' + inner
+    }
+    return Promise.resolve(inner).then(
+      (text) => e!.Op + ' ' + e!.Path + ': ' + text,
+    )
   }
 
   public Unwrap(): $.GoError {

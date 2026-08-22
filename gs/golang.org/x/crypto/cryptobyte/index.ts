@@ -241,8 +241,8 @@ export class BuildError {
     this.Err = init?.Err ?? null
   }
 
-  public Error(): string {
-    return this.Err == null ? '' : this.Err.Error()
+  public Error(): string | PromiseLike<string> {
+    return this.Err == null ? '' : Promise.resolve(this.Err.Error())
   }
 }
 

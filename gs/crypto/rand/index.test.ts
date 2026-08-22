@@ -74,8 +74,8 @@ describe('crypto/rand override', () => {
     expect(Array.from(buf ?? []).some((b) => b !== 0)).toBe(true)
   })
 
-  it('generates base32 text tokens', () => {
-    const token = Text()
+  it('generates base32 text tokens', async () => {
+    const token = await Text()
 
     expect(token).toHaveLength(26)
     expect(token).toMatch(/^[A-Z2-7]+$/)

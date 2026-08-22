@@ -1,7 +1,9 @@
 {
   "asyncMethods": {
     "File.ReadFrom": true,
-    "File.WriteTo": true
+    "File.WriteTo": true,
+    "SyscallError.Error": true,
+    "LinkError.Error": true
   },
   "dependencies": [
     "errors",

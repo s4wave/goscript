@@ -107,11 +107,11 @@ export async function Prime(
   }
 }
 
-export function Text(): string {
+export async function Text(): Promise<string> {
   const src = new Uint8Array(26)
   const [, err] = Read(src)
   if (err != null) {
-    throw new Error(err.Error())
+    throw new Error(await err.Error())
   }
 
   let out = ''

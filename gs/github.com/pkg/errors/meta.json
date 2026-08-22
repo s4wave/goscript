@@ -1,0 +1,6 @@
+{
+  "asyncMethods": {
+    "withStack.Error": true,
+    "withMessage.Error": true
+  }
+}

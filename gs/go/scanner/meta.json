@@ -1,0 +1,9 @@
+{
+  "asyncFunctions": {
+    "ErrorList_Error": true,
+    "PrintError": true
+  },
+  "asyncMethods": {
+    "ErrorList.Error": true
+  }
+}

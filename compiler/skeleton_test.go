@@ -3998,7 +3998,9 @@ func TestCompilePackagesKeepsTailAwaitBeforeDefer(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"using __defer = new $.DisposableStack()",
+		// The deferred closure awaits an async print helper, so disposal
+		// uses the async stack and still completes before Use returns.
+		"await using __defer = new $.AsyncDisposableStack()",
 		"return await Worker.prototype.Recv.call(w)",
 	} {
 		if !strings.Contains(text, want) {
@@ -5334,7 +5336,7 @@ func TestCompilePackagesAwaitsAsyncMethodValuesInAssignmentsAndReceivers(t *test
 	}
 }
 
-func TestCompilePackagesKeepsErrorInterfaceErrorSynchronous(t *testing.T) {
+func TestCompilePackagesWidensErrorInterfaceABI(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod": "module example.test/syncerrorstring\n\ngo 1.25.3\n",
 		"main.go": strings.Join([]string{
@@ -5388,22 +5390,25 @@ func TestCompilePackagesKeepsErrorInterfaceErrorSynchronous(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"public Error(): string {",
-		"return ($.pointerValue<wrappedError>(w).msg + \": \") + $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<wrappedError>(w).cause).Error()",
-		"return $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<healthError>(h).cause).Error()",
+		// The interface member carries the widened GoError ABI so any
+		// implementation may render asynchronously.
+		"Error(): string | globalThis.Promise<string>",
+		// Concrete implementations become async and await inner error
+		// dispatch whose text may resolve on the microtask queue.
+		"public async Error(): globalThis.Promise<string>",
+		"+ await $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<wrappedError>(w).cause).Error()",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
 		}
 	}
 	for _, bad := range []string{
-		"public async Error(): globalThis.Promise<string>",
-		"await $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<wrappedError>(w).cause).Error()",
-		"await $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<healthError>(h).cause).Error()",
-		"await $.pointerValue<HealthError>(h).Error()",
+		// A rendered operand must never collapse into "[object Promise]" or
+		// lose its await by stringifying the promise in place.
+		"String(await $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<wrappedError>(w).cause).Error())",
 	} {
 		if strings.Contains(text, bad) {
-			t.Fatalf("error stringification became async at %q:\n%s", bad, text)
+			t.Fatalf("error rendering collapsed a promise at %q:\n%s", bad, text)
 		}
 	}
 }
@@ -5524,11 +5529,11 @@ func TestCompilePackagesLowersSwitchesAndFunctionValueCalls(t *testing.T) {
 		"continue Again",
 		"Drive: while (true)",
 		"var window = value + 1",
-		"$.println(window)",
+		"await $.println(window)",
 		"($.pointerValue<(() => void) | null>(rel))!()",
-		"$.functionValue((): void => {\n\t\tusing __defer = new $.DisposableStack()",
-		"__defer.defer(() => { $.println(\"wrapped deferred\") })",
-		"$.println(\"wrapped body\")",
+		"$.functionValue(async (): globalThis.Promise<void> => {\n\t\tawait using __defer = new $.AsyncDisposableStack()",
+		"__defer.defer(async () => { await $.println(\"wrapped deferred\") })",
+		"await $.println(\"wrapped body\")",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -6238,4 +6243,59 @@ func requireDiagnostic(t *testing.T, err error, code string) {
 		}
 	}
 	t.Fatalf("missing diagnostic %q in %#v", code, compileErr.Diagnostics)
+}
+
+func TestCompilePackagesAwaitsAsyncErrorMethod(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/errasync\n\ngo 1.25.3\n",
+		"main.go": strings.Join([]string{
+			"package main",
+			"",
+			"// formatter is implemented outside the compiled package, so its",
+			"// methods color async through unknown-interface handling.",
+			"type formatter interface {",
+			"	Format() string",
+			"}",
+			"",
+			"var active formatter",
+			"",
+			"type boom struct{}",
+			"",
+			"func (b *boom) Error() string {",
+			"	return active.Format()",
+			"}",
+			"",
+			"func main() {",
+			"	var err error = &boom{}",
+			"	msg := err.Error()",
+			"	println(msg, len(msg))",
+			"}",
+			"",
+		}, "\n"),
+	})
+	outputDir := filepath.Join(t.TempDir(), "output")
+	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir}, nil, nil)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatal(err.Error())
+	}
+	outputFile := filepath.Join(outputDir, "@goscript", "example.test", "errasync", "main.gs.ts")
+	content, err := os.ReadFile(outputFile)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	text := string(content)
+	// The concrete Error implementation must be async: it dispatches an
+	// unknown-interface method that may suspend.
+	if !strings.Contains(text, "async Error()") {
+		t.Fatalf("expected async Error() implementation in generated output:\n%s", text)
+	}
+	// Dispatching Error() through the error interface must await the
+	// implementation instead of storing a Promise in a string variable.
+	if !strings.Contains(text, "msg = await ") || !strings.Contains(text, ".Error()") {
+		t.Fatalf("error interface dispatch did not await async implementation:\n%s", text)
+	}
 }

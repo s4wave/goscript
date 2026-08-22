@@ -1,5 +1,11 @@
 {
   "dependencies": [
     "errors"
-  ]
-} 
+  ],
+  "asyncFunctions": {
+    "ParseComplex": true
+  },
+  "asyncMethods": {
+    "NumError.Error": true
+  }
+}

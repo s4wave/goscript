@@ -11,15 +11,15 @@ describe('strconv complex helpers', () => {
     )
   })
 
-  it('parses signed complex values', () => {
-    const [value, err] = ParseComplex('(1.5-2i)', 128)
+  it('parses signed complex values', async () => {
+    const [value, err] = await ParseComplex('(1.5-2i)', 128)
 
     expect(err).toBeNull()
     expect($.real(value)).toBe(1.5)
     expect($.imag(value)).toBe(-2)
   })
 
-  it('parses real, imaginary, parenthesized, and signed imaginary forms', () => {
+  it('parses real, imaginary, parenthesized, and signed imaginary forms', async () => {
     const cases = [
       ['1', 1, 0],
       ['(1)', 1, 0],
@@ -39,7 +39,7 @@ describe('strconv complex helpers', () => {
     ] as const
 
     for (const [input, real, imag] of cases) {
-      const [value, err] = ParseComplex(input, 128)
+      const [value, err] = await ParseComplex(input, 128)
 
       expect(err, input).toBeNull()
       expect($.real(value)).toBe(real)
@@ -47,7 +47,7 @@ describe('strconv complex helpers', () => {
     }
   })
 
-  it('rejects whitespace and malformed imaginary forms', () => {
+  it('rejects whitespace and malformed imaginary forms', async () => {
     for (const input of [
       ' 1+2i',
       '1+2i ',
@@ -59,7 +59,7 @@ describe('strconv complex helpers', () => {
       '1-+2i',
       '0xp1',
     ]) {
-      const [, err] = ParseComplex(input, 128)
+      const [, err] = await ParseComplex(input, 128)
 
       expect(err?.Error(), input).toBe(
         `strconv.ParseComplex: parsing "${input}": invalid syntax`,
@@ -67,8 +67,8 @@ describe('strconv complex helpers', () => {
     }
   })
 
-  it('reports hexadecimal range errors', () => {
-    const [value, err] = ParseComplex('0x1p1025', 128)
+  it('reports hexadecimal range errors', async () => {
+    const [value, err] = await ParseComplex('0x1p1025', 128)
 
     expect($.real(value)).toBe(Infinity)
     expect($.imag(value)).toBe(0)

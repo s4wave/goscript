@@ -29,7 +29,17 @@ export function Wrapf(
 }
 
 function wrapError(err: Exclude<$.GoError, null>, message: string): $.GoError {
-  const wrapped = $.newError(`${message}: ${err.Error()}`)
+  // err.Error() may be async, so the wrapper resolves it lazily instead of
+  // interpolating a possible Promise into the message.
+  const wrapped: Exclude<$.GoError, null> = {
+    Error: (): string | PromiseLike<string> => {
+      const inner = err.Error()
+      if (typeof inner === 'string') {
+        return `${message}: ${inner}`
+      }
+      return Promise.resolve(inner).then((text) => `${message}: ${text}`)
+    },
+  }
   ;(wrapped as any).Unwrap = function (): $.GoError {
     return err
   }
@@ -375,8 +385,19 @@ export function Join(...errs: $.GoError[]): $.GoError {
     return nonNilErrs[0]
   }
 
-  const message = nonNilErrs.map((err) => err!.Error()).join('\n')
-  const joinedError = $.newError(message)
+  // Each element's Error() may be async, so the joined message resolves the
+  // elements when Error is called instead of interpolating Promises here.
+  const joinedError: Exclude<$.GoError, null> = {
+    Error: (): string | PromiseLike<string> => {
+      const messages = nonNilErrs.map((err) => err!.Error())
+      if (messages.every((message) => typeof message === 'string')) {
+        return (messages as string[]).join('\n')
+      }
+      return Promise.all(messages.map((message) => Promise.resolve(message))).then(
+        (resolved) => resolved.join('\n'),
+      )
+    },
+  }
 
   // Add Unwrap method that returns the array of errors
   ;(joinedError as any).Unwrap = function (): $.GoError[] {

@@ -102,7 +102,7 @@ afterEach(() => {
 })
 
 describe('builtin runtime contract helpers', () => {
-  it('writes print and println through the host runtime owner', () => {
+  it('writes print and println through the host runtime owner', async () => {
     const writes: Array<{ fd: number; text: string }> = []
     const writeSync = vi.fn(
       (
@@ -131,9 +131,11 @@ describe('builtin runtime contract helpers', () => {
     }
     resetHostRuntimeForTests()
 
-    print('value:', 3)
-    println('done')
+    await print('value:', 3)
+    await println('done')
 
+    // print/println resolve async Error/String operands on the microtask
+    // queue, so the awaited writes carry the fully rendered text.
     expect(writes).toEqual([
       { fd: 1, text: 'value: 3' },
       { fd: 1, text: 'done\n' },

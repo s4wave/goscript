@@ -845,7 +845,11 @@ function readAllSync(r: io.Reader): [$.Bytes, $.GoError] {
       chunks.push(...$.bytesToUint8Array($.goSlice(buf, 0, n)))
     }
     if (err !== null) {
-      if (err.Error() === 'EOF') {
+      // io.EOF is constructed by the runtime with a synchronous Error(), so a
+      // Promise here can never be the EOF sentinel; resolving it would force
+      // the sync Decoder pipeline to become async for no reachable case.
+      const text = err.Error()
+      if (typeof text === 'string' && text === 'EOF') {
         return [new Uint8Array(chunks), null]
       }
       return [null, err]
