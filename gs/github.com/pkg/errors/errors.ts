@@ -183,7 +183,15 @@ class withStack {
 
   public Error(): string | PromiseLike<string> {
     const inner = this.error?.Error()
-    return inner == null ? '' : Promise.resolve(inner)
+    if (inner == null) {
+      return ''
+    }
+    // A synchronous cause keeps the whole WithStack chain synchronous; only
+    // an async transpiled Error() resolves through a Promise.
+    if (typeof inner === 'string') {
+      return inner
+    }
+    return Promise.resolve(inner)
   }
 
   public StackTrace(): StackTrace {
