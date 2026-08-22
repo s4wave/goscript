@@ -1633,8 +1633,12 @@ func (o *SemanticModelOwner) applyUnknownInterfaceAsyncMethods(
 		if signature == nil || signature.Recv() == nil || !isInterfaceType(signature.Recv().Type()) {
 			continue
 		}
-		// An implementation outside the compiled graph may suspend.
-		model.markInterfaceMethodAsync(method)
+		// An implementation outside the compiled graph may suspend. Mark only
+		// the callers that invoke this method. The interface method itself stays
+		// synchronous until a compiled implementation proves it can suspend.
+		for _, caller := range model.functionCallers[method] {
+			markFunctionAsync(caller, "unknown-interface-method")
+		}
 	}
 }
 

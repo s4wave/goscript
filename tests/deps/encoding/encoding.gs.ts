@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type BinaryMarshaler = {
-	MarshalBinary(): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>
+	MarshalBinary(): [$.Slice<number>, $.GoError]
 }
 
 $.registerInterfaceType(
@@ -14,7 +14,7 @@ $.registerInterfaceType(
 );
 
 export type BinaryUnmarshaler = {
-	UnmarshalBinary(data: $.Slice<number>): $.GoError | globalThis.Promise<$.GoError>
+	UnmarshalBinary(data: $.Slice<number>): $.GoError
 }
 
 $.registerInterfaceType(
@@ -24,7 +24,7 @@ $.registerInterfaceType(
 );
 
 export type BinaryAppender = {
-	AppendBinary(b: $.Slice<number>): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>
+	AppendBinary(b: $.Slice<number>): [$.Slice<number>, $.GoError]
 }
 
 $.registerInterfaceType(

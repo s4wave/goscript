@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type clonable = {
-	CloneVT(__typeArgs: $.GenericTypeArgs | undefined): any | globalThis.Promise<any>
+	CloneVT(__typeArgs: $.GenericTypeArgs | undefined): any
 }
 
 $.registerInterfaceType(

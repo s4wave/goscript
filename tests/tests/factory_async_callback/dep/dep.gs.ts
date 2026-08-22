@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type Factory = {
-	GetConfigID(): string | globalThis.Promise<string>
+	GetConfigID(): string
 }
 
 $.registerInterfaceType(

@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type hidden = {
-	Ping(): string | globalThis.Promise<string>
+	Ping(): string
 }
 
 $.registerInterfaceType(

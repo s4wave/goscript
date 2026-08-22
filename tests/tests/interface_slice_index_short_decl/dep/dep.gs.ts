@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type Ref = {
-	Key(): any | globalThis.Promise<any>
+	Key(): any
 }
 
 $.registerInterfaceType(

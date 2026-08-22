@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type Provider = {
-	Value(__typeArgs: $.GenericTypeArgs | undefined): any | globalThis.Promise<any>
+	Value(__typeArgs: $.GenericTypeArgs | undefined): any
 }
 
 $.registerInterfaceType(

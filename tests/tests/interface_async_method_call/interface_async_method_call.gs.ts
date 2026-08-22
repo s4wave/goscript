@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type AsyncProcessor = {
-	GetResult(): number | globalThis.Promise<number>
+	GetResult(): number
 	Process(data: number): number | globalThis.Promise<number>
 }
 

@@ -25,7 +25,7 @@ export type Curve = {
 	Add(x1: big.Int | $.VarRef<big.Int> | null, y1: big.Int | $.VarRef<big.Int> | null, x2: big.Int | $.VarRef<big.Int> | null, y2: big.Int | $.VarRef<big.Int> | null): [big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null] | globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]>
 	Double(x1: big.Int | $.VarRef<big.Int> | null, y1: big.Int | $.VarRef<big.Int> | null): [big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null] | globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]>
 	IsOnCurve(x: big.Int | $.VarRef<big.Int> | null, y: big.Int | $.VarRef<big.Int> | null): boolean | globalThis.Promise<boolean>
-	Params(): __goscript_params.CurveParams | $.VarRef<__goscript_params.CurveParams> | null | globalThis.Promise<__goscript_params.CurveParams | $.VarRef<__goscript_params.CurveParams> | null>
+	Params(): __goscript_params.CurveParams | $.VarRef<__goscript_params.CurveParams> | null
 	ScalarBaseMult(k: $.Slice<number>): [big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null] | globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]>
 	ScalarMult(x1: big.Int | $.VarRef<big.Int> | null, y1: big.Int | $.VarRef<big.Int> | null, k: $.Slice<number>): [big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null] | globalThis.Promise<[big.Int | $.VarRef<big.Int> | null, big.Int | $.VarRef<big.Int> | null]>
 }

@@ -7,7 +7,7 @@ import * as strconv from "@goscript/strconv/index.js"
 import "@goscript/strconv/index.js"
 
 export type Stringer = {
-	String(): string | globalThis.Promise<string>
+	String(): string
 }
 
 $.registerInterfaceType(

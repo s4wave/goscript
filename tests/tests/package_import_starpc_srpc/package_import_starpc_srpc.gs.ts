@@ -119,8 +119,8 @@ export class embeddedStream {
 		return await $.pointerValue<Exclude<srpc.Stream | null, null>>(this.Stream).CloseSend()
 	}
 
-	public async Context(): globalThis.Promise<any> {
-		return await $.pointerValue<Exclude<srpc.Stream | null, null>>(this.Stream).Context()
+	public Context(): any {
+		return $.pointerValue<Exclude<srpc.Stream | null, null>>(this.Stream).Context()
 	}
 
 	public async MsgRecv(msg: any): globalThis.Promise<any> {

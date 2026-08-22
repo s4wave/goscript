@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type base = {
-	Value(__typeArgs: $.GenericTypeArgs | undefined): any | globalThis.Promise<any>
+	Value(__typeArgs: $.GenericTypeArgs | undefined): any
 }
 
 $.registerInterfaceType(
@@ -15,7 +15,7 @@ $.registerInterfaceType(
 
 export type derived = {
 	Other(__typeArgs: $.GenericTypeArgs | undefined): any
-	Value(__typeArgs: $.GenericTypeArgs | undefined): any | globalThis.Promise<any>
+	Value(__typeArgs: $.GenericTypeArgs | undefined): any
 }
 
 $.registerInterfaceType(

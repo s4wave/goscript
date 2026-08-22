@@ -8,7 +8,7 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/generic_cross_package_r
 
 export type Derived = {
 	Other(__typeArgs: $.GenericTypeArgs | undefined): any
-	Value(__typeArgs: $.GenericTypeArgs | undefined): any | globalThis.Promise<any>
+	Value(__typeArgs: $.GenericTypeArgs | undefined): any
 }
 
 $.registerInterfaceType(

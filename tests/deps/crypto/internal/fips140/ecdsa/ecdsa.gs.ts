@@ -45,12 +45,12 @@ import "./hmacdrbg.gs.ts"
 export type curveID = string
 
 export type Point = {
-	Add(__typeArgs: $.GenericTypeArgs | undefined, p1: any, p2: any): any | globalThis.Promise<any>
-	Bytes(__typeArgs: $.GenericTypeArgs | undefined): $.Slice<number> | globalThis.Promise<$.Slice<number>>
-	BytesX(__typeArgs: $.GenericTypeArgs | undefined): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>
-	ScalarBaseMult(__typeArgs: $.GenericTypeArgs | undefined, _p0: $.Slice<number>): [any, $.GoError] | globalThis.Promise<[any, $.GoError]>
-	ScalarMult(__typeArgs: $.GenericTypeArgs | undefined, _p0: any, _p1: $.Slice<number>): [any, $.GoError] | globalThis.Promise<[any, $.GoError]>
-	SetBytes(__typeArgs: $.GenericTypeArgs | undefined, _p0: $.Slice<number>): [any, $.GoError] | globalThis.Promise<[any, $.GoError]>
+	Add(__typeArgs: $.GenericTypeArgs | undefined, p1: any, p2: any): any
+	Bytes(__typeArgs: $.GenericTypeArgs | undefined): $.Slice<number>
+	BytesX(__typeArgs: $.GenericTypeArgs | undefined): [$.Slice<number>, $.GoError]
+	ScalarBaseMult(__typeArgs: $.GenericTypeArgs | undefined, _p0: $.Slice<number>): [any, $.GoError]
+	ScalarMult(__typeArgs: $.GenericTypeArgs | undefined, _p0: any, _p1: $.Slice<number>): [any, $.GoError]
+	SetBytes(__typeArgs: $.GenericTypeArgs | undefined, _p0: $.Slice<number>): [any, $.GoError]
 }
 
 $.registerInterfaceType(

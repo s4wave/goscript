@@ -16,12 +16,12 @@ import "@goscript/math/big/index.js"
 import "./params.gs.ts"
 
 export type nistPoint = {
-	Add(__typeArgs: $.GenericTypeArgs | undefined, _p0: any, _p1: any): any | globalThis.Promise<any>
-	Bytes(__typeArgs: $.GenericTypeArgs | undefined): $.Slice<number> | globalThis.Promise<$.Slice<number>>
-	Double(__typeArgs: $.GenericTypeArgs | undefined, _p0: any): any | globalThis.Promise<any>
-	ScalarBaseMult(__typeArgs: $.GenericTypeArgs | undefined, _p0: $.Slice<number>): [any, $.GoError] | globalThis.Promise<[any, $.GoError]>
-	ScalarMult(__typeArgs: $.GenericTypeArgs | undefined, _p0: any, _p1: $.Slice<number>): [any, $.GoError] | globalThis.Promise<[any, $.GoError]>
-	SetBytes(__typeArgs: $.GenericTypeArgs | undefined, _p0: $.Slice<number>): [any, $.GoError] | globalThis.Promise<[any, $.GoError]>
+	Add(__typeArgs: $.GenericTypeArgs | undefined, _p0: any, _p1: any): any
+	Bytes(__typeArgs: $.GenericTypeArgs | undefined): $.Slice<number>
+	Double(__typeArgs: $.GenericTypeArgs | undefined, _p0: any): any
+	ScalarBaseMult(__typeArgs: $.GenericTypeArgs | undefined, _p0: $.Slice<number>): [any, $.GoError]
+	ScalarMult(__typeArgs: $.GenericTypeArgs | undefined, _p0: any, _p1: $.Slice<number>): [any, $.GoError]
+	SetBytes(__typeArgs: $.GenericTypeArgs | undefined, _p0: $.Slice<number>): [any, $.GoError]
 }
 
 $.registerInterfaceType(

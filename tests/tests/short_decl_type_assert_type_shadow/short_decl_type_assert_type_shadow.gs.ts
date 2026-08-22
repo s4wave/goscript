@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type dumper = {
-	Dump(): string | globalThis.Promise<string>
+	Dump(): string
 }
 
 $.registerInterfaceType(

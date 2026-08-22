@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type Expr = {
-	Value(): number | globalThis.Promise<number>
+	Value(): number
 }
 
 $.registerInterfaceType(

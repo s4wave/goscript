@@ -31,7 +31,7 @@ $.registerInterfaceType(
 );
 
 export type Signer = {
-	Public(): PublicKey | null | globalThis.Promise<PublicKey | null>
+	Public(): PublicKey | null
 	Sign(rand: io.Reader | null, digest: $.Slice<number>, opts: SignerOpts | null): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>
 }
 
@@ -42,9 +42,9 @@ $.registerInterfaceType(
 );
 
 export type MessageSigner = {
-	Public(): PublicKey | null | globalThis.Promise<PublicKey | null>
+	Public(): PublicKey | null
 	Sign(rand: io.Reader | null, digest: $.Slice<number>, opts: SignerOpts | null): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>
-	SignMessage(rand: io.Reader | null, msg: $.Slice<number>, opts: SignerOpts | null): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>
+	SignMessage(rand: io.Reader | null, msg: $.Slice<number>, opts: SignerOpts | null): [$.Slice<number>, $.GoError]
 }
 
 $.registerInterfaceType(
@@ -54,7 +54,7 @@ $.registerInterfaceType(
 );
 
 export type SignerOpts = {
-	HashFunc(): Hash | globalThis.Promise<Hash>
+	HashFunc(): Hash
 }
 
 $.registerInterfaceType(

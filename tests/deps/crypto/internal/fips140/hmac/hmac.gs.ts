@@ -25,8 +25,8 @@ import "@goscript/hash/index.js"
 import "@goscript/io/index.js"
 
 export type marshalable = {
-	MarshalBinary(): [$.Slice<number>, $.GoError] | globalThis.Promise<[$.Slice<number>, $.GoError]>
-	UnmarshalBinary(_p0: $.Slice<number>): $.GoError | globalThis.Promise<$.GoError>
+	MarshalBinary(): [$.Slice<number>, $.GoError]
+	UnmarshalBinary(_p0: $.Slice<number>): $.GoError
 }
 
 $.registerInterfaceType(

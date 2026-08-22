@@ -663,6 +663,54 @@ func TestCompilePackagesAwaitsAsyncSlicesSortFuncComparator(t *testing.T) {
 	}
 }
 
+func TestCompilePackagesKeepsSyncSlicesBinarySearchFuncComparator(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/slicesasyncbinarysearch\n\ngo 1.25.3\n",
+		"main.go": strings.Join([]string{
+			"package main",
+			"import \"slices\"",
+			"type Node interface { ID() int64 }",
+			"func MarkAsync(n Node) { _ = n.ID() }",
+			"func Use(queue []int, n Node) {",
+			"  _, _ = slices.BinarySearchFunc(queue, 1, func(a, b int) int {",
+			"    return int(n.ID())",
+			"  })",
+			"}",
+			"",
+		}, "\n"),
+	})
+	out := filepath.Join(t.TempDir(), "out")
+	comp, err := NewCompiler(&Config{
+		Dir:             moduleDir,
+		OutputPath:      out,
+		AllDependencies: true,
+	}, nil, nil)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatal(err.Error())
+	}
+	content, err := os.ReadFile(filepath.Join(out, "@goscript", "example.test", "slicesasyncbinarysearch", "main.gs.ts"))
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	text := string(content)
+	if !strings.Contains(text, "export async function MarkAsync") {
+		t.Fatalf("interface method did not become async in the coloring setup:\n%s", text)
+	}
+	if !strings.Contains(text, "export function Use") {
+		t.Fatalf("BinarySearchFunc caller became async:\n%s", text)
+	}
+	if !strings.Contains(text, "$.functionValue((a: number, b: number): number =>") {
+		t.Fatalf("BinarySearchFunc comparator was lowered as async:\n%s", text)
+	}
+	if strings.Contains(text, "$.functionValue(async (a: number, b: number)") {
+		t.Fatalf("BinarySearchFunc comparator was lowered as async:\n%s", text)
+	}
+}
+
 func TestCompilePackagesElidesReflectValueCallTailReturn(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod": "module example.test/reflectcallasync\n\ngo 1.25.3\n",

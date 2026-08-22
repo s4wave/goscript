@@ -203,8 +203,8 @@ export class PublicKey {
 		return await $.pointerValue<Exclude<elliptic.Curve | null, null>>(this.Curve).IsOnCurve(x, y)
 	}
 
-	public async Params(): globalThis.Promise<any> {
-		return await $.pointerValue<Exclude<elliptic.Curve | null, null>>(this.Curve).Params()
+	public Params(): any {
+		return $.pointerValue<Exclude<elliptic.Curve | null, null>>(this.Curve).Params()
 	}
 
 	public async ScalarBaseMult(k: any): globalThis.Promise<any> {
@@ -355,8 +355,8 @@ export class PrivateKey {
 		return await $.pointerValue<any>($.pointerValue<PublicKey>(this.PublicKey).Curve).IsOnCurve(x, y)
 	}
 
-	public async Params(): globalThis.Promise<any> {
-		return await $.pointerValue<any>($.pointerValue<PublicKey>(this.PublicKey).Curve).Params()
+	public Params(): any {
+		return $.pointerValue<any>($.pointerValue<PublicKey>(this.PublicKey).Curve).Params()
 	}
 
 	public async ScalarBaseMult(k: any): globalThis.Promise<any> {

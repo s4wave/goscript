@@ -4568,7 +4568,7 @@ export async function CreateCertificate(rand: io.Reader | null, template: Certif
 
 	// Check that the signer's public key matches the private key, if available.
 	type privateKey = {
-		Equal(_p0: crypto.PublicKey | null): boolean | globalThis.Promise<boolean>
+		Equal(_p0: crypto.PublicKey | null): boolean
 	}
 
 	$.registerInterfaceType(

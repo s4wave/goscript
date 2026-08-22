@@ -7,7 +7,7 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/reflect/index.js"
 
 export type reader = {
-	Read(_p0: $.Slice<number>): [number, $.GoError] | globalThis.Promise<[number, $.GoError]>
+	Read(_p0: $.Slice<number>): [number, $.GoError]
 }
 
 $.registerInterfaceType(

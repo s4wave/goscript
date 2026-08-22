@@ -27,7 +27,7 @@ $.registerInterfaceType(
 );
 
 export type ValueReader = {
-	Get(): number | globalThis.Promise<number>
+	Get(): number
 }
 
 $.registerInterfaceType(

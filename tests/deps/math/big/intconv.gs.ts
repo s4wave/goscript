@@ -71,7 +71,7 @@ export class byteReader {
 
 	public async ReadByte(): globalThis.Promise<[number, $.GoError]> {
 		const r = this
-		let __goscriptTuple1: any = await $.pointerValue<Exclude<fmt.ScanState, null>>(r.ScanState).ReadRune()
+		let __goscriptTuple1: any = $.pointerValue<Exclude<fmt.ScanState, null>>(r.ScanState).ReadRune()
 		let ch = $.int(__goscriptTuple1[0], 32)
 		let size = __goscriptTuple1[1]
 		let err = __goscriptTuple1[2]
@@ -90,20 +90,20 @@ export class byteReader {
 		return $.pointerValue<Exclude<fmt.ScanState | null, null>>(this.ScanState).Read(buf)
 	}
 
-	public async ReadRune(): globalThis.Promise<any> {
-		return await $.pointerValue<Exclude<fmt.ScanState | null, null>>(this.ScanState).ReadRune()
+	public ReadRune(): any {
+		return $.pointerValue<Exclude<fmt.ScanState | null, null>>(this.ScanState).ReadRune()
 	}
 
-	public async SkipSpace(): globalThis.Promise<any> {
-		return await $.pointerValue<Exclude<fmt.ScanState | null, null>>(this.ScanState).SkipSpace()
+	public SkipSpace(): any {
+		return $.pointerValue<Exclude<fmt.ScanState | null, null>>(this.ScanState).SkipSpace()
 	}
 
-	public async Token(skipSpace: any, f: any): globalThis.Promise<any> {
-		return await $.pointerValue<Exclude<fmt.ScanState | null, null>>(this.ScanState).Token(skipSpace, f)
+	public Token(skipSpace: any, f: any): any {
+		return $.pointerValue<Exclude<fmt.ScanState | null, null>>(this.ScanState).Token(skipSpace, f)
 	}
 
-	public async UnreadRune(): globalThis.Promise<any> {
-		return await $.pointerValue<Exclude<fmt.ScanState | null, null>>(this.ScanState).UnreadRune()
+	public UnreadRune(): any {
+		return $.pointerValue<Exclude<fmt.ScanState | null, null>>(this.ScanState).UnreadRune()
 	}
 
 	public Width(): any {

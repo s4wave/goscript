@@ -80,8 +80,8 @@ export class RpcStreamWriter {
 		return await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream | null, null>>(this.RpcStream).CloseSend()
 	}
 
-	public async Context(): globalThis.Promise<any> {
-		return await $.pointerValue<Exclude<__goscript_rpcstream.RpcStream | null, null>>(this.RpcStream).Context()
+	public Context(): any {
+		return $.pointerValue<Exclude<__goscript_rpcstream.RpcStream | null, null>>(this.RpcStream).Context()
 	}
 
 	public async MsgRecv(msg: any): globalThis.Promise<any> {

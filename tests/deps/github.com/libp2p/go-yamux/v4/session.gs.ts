@@ -69,7 +69,7 @@ import "./util.gs.ts"
 export type MemoryManager = {
 	Done(): void
 	ReleaseMemory(size: number): void
-	ReserveMemory(size: number, prio: number): $.GoError | globalThis.Promise<$.GoError>
+	ReserveMemory(size: number, prio: number): $.GoError
 }
 
 $.registerInterfaceType(

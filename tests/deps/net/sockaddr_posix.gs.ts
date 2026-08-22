@@ -42,8 +42,8 @@ import "./udpsock_posix.gs.ts"
 import "./unixsock_posix.gs.ts"
 
 export type sockaddr = {
-	Network(): string | globalThis.Promise<string>
-	String(): string | globalThis.Promise<string>
+	Network(): string
+	String(): string
 	family(): number
 	isWildcard(): boolean
 	sockaddr(family: number): [syscall.Sockaddr | null, $.GoError] | globalThis.Promise<[syscall.Sockaddr | null, $.GoError]>
