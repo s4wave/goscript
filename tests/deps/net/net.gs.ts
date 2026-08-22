@@ -122,7 +122,7 @@ $.registerInterfaceType(
 );
 
 export type Error = {
-	Error(): string | globalThis.Promise<string>
+	Error(): string
 	Temporary(): boolean | globalThis.Promise<boolean>
 	Timeout(): boolean | globalThis.Promise<boolean>
 }
@@ -478,7 +478,7 @@ export class OpError {
 			}
 			s = s + (await $.pointerValue<Exclude<Addr, null>>($.pointerValue<OpError>(e).Addr).String())
 		}
-		s = s + (": " + await $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<OpError>(e).Err).Error())
+		s = s + (": " + $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<OpError>(e).Err).Error())
 		return s
 	}
 
@@ -733,9 +733,9 @@ export class DNSConfigError {
 		return $.markAsStructValue(cloned)
 	}
 
-	public async Error(): globalThis.Promise<string> {
+	public Error(): string {
 		const e: DNSConfigError | $.VarRef<DNSConfigError> | null = this
-		return "error reading DNS config: " + await $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<DNSConfigError>(e).Err).Error()
+		return "error reading DNS config: " + $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<DNSConfigError>(e).Err).Error()
 	}
 
 	public Temporary(): boolean {
@@ -1472,7 +1472,7 @@ export async function newDNSError(err: $.GoError, name: string, server: string):
 	}
 
 	let [, isNotFound] = $.typeAssertTuple<notFoundError | $.VarRef<notFoundError> | null>(err, { kind: $.TypeKind.Pointer, elemType: "net.notFoundError" })
-	return (await (async () => { const __goscriptLiteralField0 = await $.pointerValue<Exclude<$.GoError, null>>(err).Error(); return new DNSError({UnwrapErr: unwrapErr, Err: __goscriptLiteralField0, Name: name, Server: server, IsTimeout: isTimeout, IsTemporary: isTemporary, IsNotFound: isNotFound}) })())
+	return (() => { const __goscriptLiteralField0 = $.pointerValue<Exclude<$.GoError, null>>(err).Error(); return new DNSError({UnwrapErr: unwrapErr, Err: __goscriptLiteralField0, Name: name, Server: server, IsTimeout: isTimeout, IsTemporary: isTemporary, IsNotFound: isNotFound}) })()
 }
 
 export let errClosed: poll.errNetClosing = $.markAsStructValue($.cloneStructValue($.pointerValue<poll.errNetClosing>(poll.ErrNetClosing)))

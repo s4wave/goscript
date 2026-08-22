@@ -5,6 +5,7 @@
         "./*"
       ],
       "@goscript/*": [
+        "../../../tests/tests/goroutine_conc_concurrency_limit/run/output/@goscript/*",
         "../../../gs/*",
         "../../../tests/deps/*"
       ],

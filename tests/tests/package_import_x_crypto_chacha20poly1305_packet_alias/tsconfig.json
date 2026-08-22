@@ -5,6 +5,7 @@
         "./*"
       ],
       "@goscript/*": [
+        "../../../tests/tests/package_import_x_crypto_chacha20poly1305_packet_alias/run/output/@goscript/*",
         "../../../gs/*",
         "../../../tests/deps/*"
       ],

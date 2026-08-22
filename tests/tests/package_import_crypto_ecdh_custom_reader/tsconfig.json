@@ -5,6 +5,7 @@
         "./*"
       ],
       "@goscript/*": [
+        "../../../tests/tests/package_import_crypto_ecdh_custom_reader/run/output/@goscript/*",
         "../../../gs/*",
         "../../../tests/deps/*"
       ],

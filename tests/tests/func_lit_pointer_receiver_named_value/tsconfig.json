@@ -5,6 +5,7 @@
         "./*"
       ],
       "@goscript/*": [
+        "../../../tests/tests/func_lit_pointer_receiver_named_value/run/output/@goscript/*",
         "../../../gs/*",
         "../../../tests/deps/*"
       ],

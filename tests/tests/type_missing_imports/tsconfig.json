@@ -5,6 +5,7 @@
         "./*"
       ],
       "@goscript/*": [
+        "../../../tests/tests/type_missing_imports/run/output/@goscript/*",
         "../../../gs/*",
         "../../../tests/deps/*"
       ],

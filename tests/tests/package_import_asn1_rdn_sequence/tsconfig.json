@@ -5,6 +5,7 @@
         "./*"
       ],
       "@goscript/*": [
+        "../../../tests/tests/package_import_asn1_rdn_sequence/run/output/@goscript/*",
         "../../../gs/*",
         "../../../tests/deps/*"
       ],

@@ -183,7 +183,7 @@ export function __goscript_set_doDerived(__goscriptValue: (() => void) | null): 
 
 export async function Initialize(env: string): globalThis.Promise<void> {
 	__goscript_cpu_wasm.doinit()
-	await processOptions(env)
+	processOptions(env)
 	if (doDerived != null) {
 		await doDerived!()
 	}
@@ -195,7 +195,7 @@ export function __goscript_set_options(__goscriptValue: $.Slice<option>): void {
 	options = __goscriptValue
 }
 
-export async function processOptions(env: string): globalThis.Promise<void> {
+export function processOptions(env: string): void {
 	field: while (!$.stringEqual(env, "")) {
 		let field = ""
 		let i = indexByte(env, $.uint(44, 8))
@@ -215,7 +215,7 @@ export async function processOptions(env: string): globalThis.Promise<void> {
 		}
 		i = indexByte(field, $.uint(61, 8))
 		if (i < 0) {
-			await $.print("GODEBUG: no value specified for \"", field, "\"\n")
+			$.print("GODEBUG: no value specified for \"", field, "\"\n")
 			continue
 		}
 		let key = $.sliceStringOrBytes(field, 4, i)
@@ -235,7 +235,7 @@ export async function processOptions(env: string): globalThis.Promise<void> {
 			}
 			default:
 			{
-				await $.print("GODEBUG: value \"", value, "\" not supported for cpu option \"", key, "\"\n")
+				$.print("GODEBUG: value \"", value, "\" not supported for cpu option \"", key, "\"\n")
 				continue field
 				break
 			}
@@ -257,7 +257,7 @@ export async function processOptions(env: string): globalThis.Promise<void> {
 			}
 		}
 
-		await $.print("GODEBUG: unknown cpu feature \"", key, "\"\n")
+		$.print("GODEBUG: unknown cpu feature \"", key, "\"\n")
 	}
 
 	for (let __goscriptRangeTarget2 = options, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget2); __rangeIndex++) {
@@ -267,7 +267,7 @@ export async function processOptions(env: string): globalThis.Promise<void> {
 		}
 
 		if (o.Enable && !$.pointerValue<boolean>(o.Feature)) {
-			await $.print("GODEBUG: can not enable \"", o.Name, "\", missing CPU support\n")
+			$.print("GODEBUG: can not enable \"", o.Name, "\", missing CPU support\n")
 			continue
 		}
 

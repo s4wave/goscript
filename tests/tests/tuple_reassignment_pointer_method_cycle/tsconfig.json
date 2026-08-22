@@ -5,6 +5,7 @@
         "./*"
       ],
       "@goscript/*": [
+        "../../../tests/tests/tuple_reassignment_pointer_method_cycle/run/output/@goscript/*",
         "../../../gs/*",
         "../../../tests/deps/*"
       ],

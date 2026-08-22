@@ -380,11 +380,11 @@ export class SystemRootsError {
 		return $.markAsStructValue(cloned)
 	}
 
-	public async Error(): globalThis.Promise<string> {
+	public Error(): string {
 		const se = this
 		let msg = "x509: failed to load system roots and no roots provided"
 		if (se.Err != null) {
-			return (msg + "; ") + await $.pointerValue<Exclude<$.GoError, null>>(se.Err).Error()
+			return (msg + "; ") + $.pointerValue<Exclude<$.GoError, null>>(se.Err).Error()
 		}
 		return msg
 	}

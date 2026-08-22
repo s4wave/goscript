@@ -747,8 +747,8 @@ export class sysDialer {
 				return await $.pointerValue<Exclude<__goscript_net.Conn | null, null>>(this.Conn).Write(b)
 			}
 
-			public async Error(): globalThis.Promise<any> {
-				return await $.pointerValue<Exclude<$.GoError, null>>(this.error).Error()
+			public Error(): any {
+				return $.pointerValue<Exclude<$.GoError, null>>(this.error).Error()
 			}
 
 			static __typeInfo = $.registerStructType(
