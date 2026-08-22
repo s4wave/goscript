@@ -265,13 +265,8 @@ func CompileGoToTypeScript(t *testing.T, parentModulePath, testDir, tempDir, out
 	}
 
 	t.Logf("Compiling packages: %v", pkgsToCompile)
-	compilationResult, cmpErr := comp.CompilePackages(context.Background(), pkgsToCompile...)
-	// We will check cmpErr after attempting to copy files.
-
-	// Copy dependency packages to tests/deps/ for git tracking
-	if compilationResult != nil {
-		copyDependenciesToDepsFromResult(t, parentModulePath, testDir, compilationResult)
-	}
+	_, cmpErr := comp.CompilePackages(context.Background(), pkgsToCompile...)
+	// cmpErr is checked after the generated files are copied back.
 
 	// Log generated TypeScript files and copy them back to testDir
 	testName := filepath.Base(testDir)
@@ -351,114 +346,6 @@ func CompileGoToTypeScript(t *testing.T, parentModulePath, testDir, tempDir, out
 	}
 	if cmpErr != nil {
 		t.Fatalf("compilation failed: %v", cmpErr)
-	}
-}
-
-// copyDependenciesToDepsFromResult detects and copies dependency packages to tests/deps/
-// for git tracking using the compilation result information.
-func copyDependenciesToDepsFromResult(t *testing.T, parentModulePath, testDir string, compilationResult *compiler.CompilationResult) {
-	t.Helper()
-
-	// Find the workspace directory (parent of tests/)
-	workspaceDir := filepath.Dir(filepath.Dir(filepath.Dir(testDir))) // testDir is workspace/tests/tests/testname (nesting is intentional)
-	depsDir := filepath.Join(workspaceDir, "tests", "deps")
-
-	// Global lock for thread safety when copying dependencies
-	depsCopyMutex.Lock()
-	defer depsCopyMutex.Unlock()
-
-	// Create a set of original package paths for quick lookup
-	originalPkgSet := make(map[string]bool)
-	for _, pkg := range compilationResult.OriginalPackages {
-		originalPkgSet[pkg] = true
-	}
-
-	// Identify dependency packages (compiled packages that are not original packages)
-	var dependencyPackages []string
-	testModulePrefix := parentModulePath + "/tests/tests"
-
-	for _, pkg := range compilationResult.CompiledPackages {
-		// Skip test packages
-		if strings.HasPrefix(pkg, testModulePrefix) {
-			continue
-		}
-		// Skip original packages
-		if originalPkgSet[pkg] {
-			continue
-		}
-		// This is a dependency
-		dependencyPackages = append(dependencyPackages, pkg)
-	}
-
-	// Also include copied packages as dependencies (like handwritten packages)
-	for _, pkg := range compilationResult.CopiedPackages {
-		// Skip test packages
-		if strings.HasPrefix(pkg, testModulePrefix) {
-			continue
-		}
-		// Skip original packages
-		if originalPkgSet[pkg] {
-			continue
-		}
-		// Skip builtin package as it's not a dependency in the traditional sense
-		if pkg == "builtin" {
-			continue
-		}
-		// This is a dependency
-		dependencyPackages = append(dependencyPackages, pkg)
-	}
-
-	if len(dependencyPackages) == 0 {
-		// t.Logf("No dependency packages found for test %s", filepath.Base(testDir))
-		return
-	}
-
-	// For each dependency package, copy it to tests/deps/
-	for _, depPkg := range dependencyPackages {
-		// Preserve the full package path structure in deps/
-		destDir := filepath.Join(depsDir, depPkg)
-
-		// Find the source directory in the output
-		// We need to construct the path based on the compiler's output structure
-		sourcePath := filepath.Join(workspaceDir, "tests", "tests", filepath.Base(testDir), "run", "output", "@goscript", depPkg)
-
-		// Check if the source path exists
-		if _, err := os.Stat(sourcePath); os.IsNotExist(err) {
-			continue
-		}
-
-		// Remove existing directory if it exists
-		if err := os.RemoveAll(destDir); err != nil {
-			t.Fatal(err.Error())
-		}
-
-		// Create destination directory
-		if err := os.MkdirAll(destDir, 0o755); err != nil {
-			t.Fatal(err.Error())
-		}
-
-		// Copy all files from the dependency package
-		err := filepath.WalkDir(sourcePath, func(srcPath string, srcInfo os.DirEntry, srcErr error) error {
-			if srcErr != nil {
-				return srcErr
-			}
-
-			srcRel, err := filepath.Rel(sourcePath, srcPath)
-			if err != nil {
-				return err
-			}
-
-			destPath := filepath.Join(destDir, srcRel)
-
-			if srcInfo.IsDir() {
-				return os.MkdirAll(destPath, 0o755)
-			}
-
-			return copyFile(srcPath, destPath)
-		})
-		if err != nil {
-			t.Fatal(err.Error())
-		}
 	}
 }
 
@@ -690,14 +577,19 @@ func WriteTypeCheckConfig(t *testing.T, parentModulePath, workspaceDir, testDir 
 	testName := filepath.Base(testDir)
 	compilerOptions := maps.Clone(tsconfig["compilerOptions"].(map[string]any))
 
-	// Alias for this test's own generated packages
+	// Alias for this test's own generated packages. Dependency packages
+	// resolve to this fixture's own emitted run/output closure first, so each
+	// fixture typechecks against exactly the bytes its own graph produced;
+	// gs/ holds the handwritten runtime and tests/deps is a legacy explicit
+	// repository test-library input that nothing writes at test time.
 	builtinTsRelPath := filepath.ToSlash(filepath.Join(relWorkspacePath, "gs", "*"))
+	runOutputRelPath := filepath.ToSlash(filepath.Join(relWorkspacePath, "tests", "tests", testName, "run", "output", "@goscript", "*"))
 	depsRelPath := filepath.ToSlash(filepath.Join(relWorkspacePath, "tests", "deps", "*"))
 	testPkgGoPathPrefix := fmt.Sprintf("%s/tests/tests/%s", parentModulePath, testName)
 	compilerOptions["paths"] = map[string][]string{
 		"*": {"./*"},
 		fmt.Sprintf("@goscript/%s/*", testPkgGoPathPrefix): {"./*"},
-		"@goscript/*": {builtinTsRelPath, depsRelPath},
+		"@goscript/*": {runOutputRelPath, builtinTsRelPath, depsRelPath},
 	}
 	tsconfig["compilerOptions"] = compilerOptions
 

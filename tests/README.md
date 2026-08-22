@@ -38,7 +38,7 @@ When a compliance test runs, the following steps occur:
 - Outputs to `run/output/@goscript/MODULE_PATH/tests/tests/TEST_NAME/`
 - Copies generated `.gs.ts` and `index.ts` files back to the test directory
 - Adds header comments to `.gs.ts` files indicating they're auto-generated
-- Copies dependency packages to `tests/deps/` for git tracking
+- Type checking resolves each fixture's own emitted `run/output/@goscript/` closure first
 
 ### 3. Execution (unless `expect-fail` present)
 - Generates a `runner.ts` script that imports and executes the main function
@@ -78,13 +78,13 @@ The compiler auto-detects packages by scanning for `.go` files, or uses the `pac
 
 ## Dependency Management
 
-The test system automatically handles dependencies:
+The test system handles dependencies per fixture:
 
 1. **Builtin packages** - Handwritten TypeScript in `gs/` directory
-2. **Test dependencies** - Automatically compiled and cached in `tests/deps/`
-3. **Path mapping** - TypeScript imports resolved via `@goscript/*` paths
+2. **Fixture dependencies** - Compiled into the fixture's own `run/output/@goscript/` closure and type checked from there
+3. **Path mapping** - TypeScript imports resolve `@goscript/*` to the fixture's emitted output first, then `gs/`, then the legacy `tests/deps/` tree
 
-Dependencies are copied to `tests/deps/` to ensure they're tracked in git and available for type checking.
+Each fixture type checks against exactly the bytes its own compilation graph produced; no test writes to `tests/deps/`. That tree is a legacy explicit repository test-library input kept for older consumers and is scheduled for removal.
 
 ## Running Tests
 

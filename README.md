@@ -402,6 +402,7 @@ website build.
 - [example/simple](./example/simple): smallest package compile-and-run workflow.
 - [example/app](./example/app): full-stack application example using generated TypeScript.
 - [tests/tests](./tests/tests): inherited compliance fixtures and generated output snapshots.
+- [tests/deps](./tests/deps): legacy snapshot tree of compiled test-library dependencies; explicit input only, not written by test runs.
 
 ## Contributing
 
