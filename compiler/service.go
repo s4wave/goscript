@@ -201,6 +201,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		DisplayRoot:               req.Dir,
 		OutputPath:                req.OutputPath,
 		ProtobufTypeScriptBinding: req.ProtobufTypeScriptBinding,
+		AdditionalBindingRoots:    append([]string(nil), req.AdditionalBindingRoots...),
 		TrimTypeInfo:              !packageGraphContainsPackage(graph, "reflect"),
 	})
 	diagnostics = append(diagnostics, loweringDiagnostics...)

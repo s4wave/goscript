@@ -38,7 +38,7 @@ func protobufTypeScriptBindings(semPkg *semanticPackage, options LoweringOptions
 		if strings.HasSuffix(filepath.Base(sourcePath), "_srpc.pb.go") {
 			continue
 		}
-		if !protobufTypeScriptBindingInSourceRoot(options.SourceRoot, sourcePath) {
+		if !protobufTypeScriptBindingInSourceRoot(options.SourceRoot, sourcePath, options.AdditionalBindingRoots...) {
 			continue
 		}
 		tsPath := strings.TrimSuffix(sourcePath, ".go") + ".ts"
@@ -106,15 +106,27 @@ func protobufTypeScriptBindingRoot(dir string) string {
 	}
 }
 
-func protobufTypeScriptBindingInSourceRoot(sourceRoot, sourcePath string) bool {
+func protobufTypeScriptBindingInSourceRoot(sourceRoot, sourcePath string, additionalRoots ...string) bool {
 	if strings.TrimSpace(sourceRoot) == "" {
 		return true
 	}
-	rootAbs, err := filepath.Abs(sourceRoot)
+	sourceAbs, err := filepath.Abs(sourcePath)
 	if err != nil {
 		return false
 	}
-	sourceAbs, err := filepath.Abs(sourcePath)
+	for _, root := range append([]string{sourceRoot}, additionalRoots...) {
+		if strings.TrimSpace(root) == "" {
+			continue
+		}
+		if protobufTypeScriptBindingInRoot(root, sourceAbs) {
+			return true
+		}
+	}
+	return false
+}
+
+func protobufTypeScriptBindingInRoot(root, sourceAbs string) bool {
+	rootAbs, err := filepath.Abs(root)
 	if err != nil {
 		return false
 	}

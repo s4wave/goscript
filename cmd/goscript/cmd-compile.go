@@ -20,6 +20,7 @@ func newCompileCommand() *cli.Command {
 	var buildFlags rawStringSlice
 	var overrideDirs cli.StringSlice
 	var packageBlocklist cli.StringSlice
+	var bindingRoots cli.StringSlice
 
 	return &cli.Command{
 		Name:     "compile",
@@ -29,6 +30,7 @@ func newCompileCommand() *cli.Command {
 			config.BuildFlags = buildFlags.Value()
 			config.OverrideDirs = slices.Clone(overrideDirs.Value())
 			config.PackageBlocklist = slices.Clone(packageBlocklist.Value())
+			config.AdditionalBindingRoots = slices.Clone(bindingRoots.Value())
 			return compilePackage(c.Context, &config, packages.Value())
 		},
 		Flags: []cli.Flag{
@@ -101,6 +103,12 @@ func newCompileCommand() *cli.Command {
 				Destination: &config.ProtobufTypeScriptBinding,
 				Value:       false,
 				EnvVars:     []string{"GOSCRIPT_PROTOBUF_TS_BINDING"},
+			},
+			&cli.StringSliceFlag{
+				Name:        "binding-root",
+				Usage:       "additional root containing protobuf TypeScript bindings (repeatable)",
+				Destination: &bindingRoots,
+				EnvVars:     []string{"GOSCRIPT_BINDING_ROOT"},
 			},
 		},
 	}

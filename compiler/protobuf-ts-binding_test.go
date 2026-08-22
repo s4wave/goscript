@@ -616,6 +616,62 @@ type Dep struct{}
 	}
 }
 
+func TestProtobufTypeScriptBindingRoots(t *testing.T) {
+	sourceRoot := t.TempDir()
+	additionalRoot := t.TempDir()
+	cases := []struct {
+		name       string
+		sourcePath string
+		want       bool
+	}{
+		{name: "source root", sourcePath: filepath.Join(sourceRoot, "message.pb.go"), want: true},
+		{name: "additional root", sourcePath: filepath.Join(additionalRoot, "message.pb.go"), want: true},
+		{name: "outside roots", sourcePath: filepath.Join(t.TempDir(), "message.pb.go"), want: false},
+		{name: "source root vendor", sourcePath: filepath.Join(sourceRoot, "vendor", "dep", "message.pb.go"), want: false},
+		{name: "additional root vendor", sourcePath: filepath.Join(additionalRoot, "vendor", "dep", "message.pb.go"), want: false},
+		{name: "root prefix sibling", sourcePath: sourceRoot + "-sibling/message.pb.go", want: false},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := protobufTypeScriptBindingInSourceRoot(sourceRoot, tc.sourcePath, additionalRoot); got != tc.want {
+				t.Fatalf("binding root containment = %v, want %v for %q", got, tc.want, tc.sourcePath)
+			}
+		})
+	}
+}
+
+func TestProtobufTypeScriptBindingUsesAdditionalRoot(t *testing.T) {
+	root := t.TempDir()
+	additionalRoot := t.TempDir()
+	sourcePath := filepath.Join(additionalRoot, "dependency.pb.go")
+	tsPath := filepath.Join(additionalRoot, "dependency.pb.ts")
+	writeTestFile(t, additionalRoot, "dependency.pb.ts", "export const Dependency = {} as any\n")
+	semPkg := &semanticPackage{
+		pkgPath: "example.test/dependency",
+		source: &packages.Package{
+			CompiledGoFiles: []string{sourcePath},
+			GoFiles:         []string{sourcePath},
+			Syntax:          make([]*ast.File, 1),
+		},
+	}
+	bindings, diagnostics := protobufTypeScriptBindings(semPkg, LoweringOptions{
+		SourceRoot:                root,
+		AdditionalBindingRoots:    []string{additionalRoot},
+		OutputPath:                filepath.Join(root, "out"),
+		ProtobufTypeScriptBinding: true,
+	})
+	if len(diagnostics) != 0 {
+		t.Fatalf("additional root diagnostics = %#v", diagnostics)
+	}
+	binding, ok := bindings[sourcePath]
+	if !ok {
+		t.Fatalf("additional root should bind %q", sourcePath)
+	}
+	if binding.sourcePath != sourcePath || binding.outputName != filepath.Base(tsPath) {
+		t.Fatalf("additional root binding = %#v", binding)
+	}
+}
+
 func TestProtobufTypeScriptBindingRootFindsParentModule(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, dir, "go.mod", "module example.test/root\n\ngo 1.25\n")

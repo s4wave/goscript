@@ -420,6 +420,9 @@ func writeRequestIdentity(b *strings.Builder, req *CompileRequest) {
 	writeKeyField(b, "dir", cleanAbs(req.Dir))
 	if req.ProtobufTypeScriptBinding {
 		writeKeyField(b, "protobuf-output", cleanAbs(req.OutputPath))
+		for _, root := range req.AdditionalBindingRoots {
+			writeKeyField(b, "protobuf-binding-root", cleanAbs(root))
+		}
 	}
 	for _, flag := range goScriptBuildFlags(req.BuildFlags) {
 		writeKeyField(b, "build-flag", flag)
@@ -583,7 +586,7 @@ func compilerCacheProtobufSideInputs(req *CompileRequest, node *PackageGraphNode
 	for _, sourcePath := range node.CompiledGoFiles {
 		if !strings.HasSuffix(sourcePath, ".pb.go") ||
 			strings.HasSuffix(filepath.Base(sourcePath), "_srpc.pb.go") ||
-			!protobufTypeScriptBindingInSourceRoot(sourceRoot, sourcePath) {
+			!protobufTypeScriptBindingInSourceRoot(sourceRoot, sourcePath, req.AdditionalBindingRoots...) {
 			continue
 		}
 		tsPath := strings.TrimSuffix(sourcePath, ".go") + ".ts"

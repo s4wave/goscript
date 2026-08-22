@@ -28,6 +28,8 @@ type Config struct {
 	DisableEmitBuiltin bool
 	// ProtobufTypeScriptBinding binds .pb.go files to sibling .pb.ts files.
 	ProtobufTypeScriptBinding bool
+	// AdditionalBindingRoots extends the roots searched for protobuf TypeScript bindings.
+	AdditionalBindingRoots []string
 }
 
 // Validate checks the config and initializes owned defaults.

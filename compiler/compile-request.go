@@ -48,6 +48,8 @@ type CompileRequest struct {
 	RuntimeEmissionMode RuntimeEmissionMode
 	// ProtobufTypeScriptBinding binds .pb.go files to sibling .pb.ts files.
 	ProtobufTypeScriptBinding bool
+	// AdditionalBindingRoots extends the roots searched for protobuf TypeScript bindings.
+	AdditionalBindingRoots []string
 	// Tests controls whether package loading includes Go package-test variants.
 	Tests bool
 	// AllDependencies controls whether the package graph should include deps.
@@ -91,6 +93,7 @@ func (o *CompileRequestOwner) NewRequest(conf Config, patterns []string) *Compil
 		DependencyMode:            dependencyMode,
 		RuntimeEmissionMode:       runtimeEmissionMode,
 		ProtobufTypeScriptBinding: conf.ProtobufTypeScriptBinding,
+		AdditionalBindingRoots:    append([]string(nil), conf.AdditionalBindingRoots...),
 		AllDependencies:           conf.AllDependencies,
 		DisableEmitBuiltin:        conf.DisableEmitBuiltin,
 	}

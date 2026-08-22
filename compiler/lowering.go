@@ -40,6 +40,8 @@ type LoweringOptions struct {
 	OutputPath string
 	// ProtobufTypeScriptBinding binds .pb.go files to sibling .pb.ts files.
 	ProtobufTypeScriptBinding bool
+	// AdditionalBindingRoots extends the roots searched for protobuf TypeScript bindings.
+	AdditionalBindingRoots []string
 	// TrimTypeInfo drops metadata used only by reflect from named type registration payloads.
 	TrimTypeInfo bool
 }
