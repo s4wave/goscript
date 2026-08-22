@@ -11,7 +11,7 @@ export async function main(): globalThis.Promise<void> {
 	})() })
 
 	let msg = await $.chanRecv(messages)
-	$.println(msg)
+	await $.println(msg)
 }
 
 if ($.isMainScript(import.meta)) {

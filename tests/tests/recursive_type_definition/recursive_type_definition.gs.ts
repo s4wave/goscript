@@ -63,7 +63,7 @@ export class B {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println("recursive type definition test")
+	await $.println("recursive type definition test")
 }
 
 if ($.isMainScript(import.meta)) {

@@ -9,16 +9,16 @@ export function multipleReturnValues(): [number, string, boolean] {
 
 export async function main(): globalThis.Promise<void> {
 	let [a, b, c] = multipleReturnValues()
-	$.println(a)
-	$.println(b)
-	$.println(c)
+	await $.println(a)
+	await $.println(b)
+	await $.println(c)
 
 	let [x, , z] = multipleReturnValues()
-	$.println(x)
-	$.println(z)
+	await $.println(x)
+	await $.println(z)
 
 	let [, y, ] = multipleReturnValues()
-	$.println(y)
+	await $.println(y)
 }
 
 if ($.isMainScript(import.meta)) {

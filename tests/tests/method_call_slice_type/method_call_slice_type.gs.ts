@@ -23,10 +23,10 @@ export async function main(): globalThis.Promise<void> {
 	MySlice_Add(myList, 10)
 	MySlice_Add(myList, 20)
 	let ptr: $.VarRef<MySlice> | null = myList
-	$.println("length:", $.len((myList.value as MySlice)))
-	$.println("first:", $.arrayIndex(myList.value!, 0))
-	$.println("second:", $.arrayIndex(myList.value!, 1))
-	$.println("sum:", MySlice_Sum($.pointerValue<MySlice>(ptr)))
+	await $.println("length:", $.len((myList.value as MySlice)))
+	await $.println("first:", $.arrayIndex(myList.value!, 0))
+	await $.println("second:", $.arrayIndex(myList.value!, 1))
+	await $.println("sum:", MySlice_Sum($.pointerValue<MySlice>(ptr)))
 }
 
 if ($.isMainScript(import.meta)) {

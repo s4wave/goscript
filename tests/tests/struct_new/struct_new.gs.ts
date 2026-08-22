@@ -61,31 +61,31 @@ export class MyStruct {
 export async function main(): globalThis.Promise<void> {
 	// Test new(MyStruct)
 	let ptr: MyStruct | $.VarRef<MyStruct> | null = new MyStruct()
-	$.println("ptr.MyInt (default):", $.pointerValue<MyStruct>(ptr).MyInt)
-	$.println("ptr.MyString (default):", $.pointerValue<MyStruct>(ptr).MyString)
-	$.println("ptr.myBool (default):", $.pointerValue<MyStruct>(ptr).myBool)
+	await $.println("ptr.MyInt (default):", $.pointerValue<MyStruct>(ptr).MyInt)
+	await $.println("ptr.MyString (default):", $.pointerValue<MyStruct>(ptr).MyString)
+	await $.println("ptr.myBool (default):", $.pointerValue<MyStruct>(ptr).myBool)
 
 	$.pointerValue<MyStruct>(ptr).MyInt = 42
 	$.pointerValue<MyStruct>(ptr).MyString = "hello"
 	$.pointerValue<MyStruct>(ptr).myBool = true
 
-	$.println("ptr.MyInt (assigned):", $.pointerValue<MyStruct>(ptr).MyInt)
-	$.println("ptr.MyString (assigned):", $.pointerValue<MyStruct>(ptr).MyString)
-	$.println("ptr.myBool (assigned):", $.pointerValue<MyStruct>(ptr).myBool)
+	await $.println("ptr.MyInt (assigned):", $.pointerValue<MyStruct>(ptr).MyInt)
+	await $.println("ptr.MyString (assigned):", $.pointerValue<MyStruct>(ptr).MyString)
+	await $.println("ptr.myBool (assigned):", $.pointerValue<MyStruct>(ptr).myBool)
 
 	// Test assignment to a dereferenced new struct
 	let s: MyStruct = $.markAsStructValue($.cloneStructValue($.pointerValue<MyStruct>(new MyStruct())))
-	$.println("s.MyInt (default):", s.MyInt)
-	$.println("s.MyString (default):", s.MyString)
-	$.println("s.myBool (default):", s.myBool)
+	await $.println("s.MyInt (default):", s.MyInt)
+	await $.println("s.MyString (default):", s.MyString)
+	await $.println("s.myBool (default):", s.myBool)
 
 	s.MyInt = 100
 	s.MyString = "world"
 	s.myBool = false
 
-	$.println("s.MyInt (assigned):", s.MyInt)
-	$.println("s.MyString (assigned):", s.MyString)
-	$.println("s.myBool (assigned):", s.myBool)
+	await $.println("s.MyInt (assigned):", s.MyInt)
+	await $.println("s.MyString (assigned):", s.MyString)
+	await $.println("s.myBool (assigned):", s.myBool)
 }
 
 if ($.isMainScript(import.meta)) {

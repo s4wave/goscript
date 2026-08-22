@@ -13,7 +13,7 @@ export function fail(): $.GoError {
 export async function main(): globalThis.Promise<void> {
 	let err = fail()
 	if (err != null) {
-		$.println($.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println(await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 	}
 }
 

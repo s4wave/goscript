@@ -12,11 +12,11 @@ export async function main(): globalThis.Promise<void> {
 	// where lhs has 2 variables but rhs has 1 expression that returns 2 values
 	// but is not a map access
 	for (let [value, ok] = getValues(); ok; ) {
-		$.println("value:", value)
+		await $.println("value:", value)
 		break
 	}
 
-	$.println("done")
+	await $.println("done")
 }
 
 if ($.isMainScript(import.meta)) {

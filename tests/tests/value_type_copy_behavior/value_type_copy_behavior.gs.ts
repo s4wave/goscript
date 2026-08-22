@@ -95,9 +95,9 @@ export class NestedStruct {
 
 export async function main(): globalThis.Promise<void> {
 	// Horizontal line for output clarity
-	$.println("----------------------------------------------------------")
-	$.println("VALUE TYPE COPY BEHAVIOR TEST")
-	$.println("----------------------------------------------------------")
+	await $.println("----------------------------------------------------------")
+	await $.println("VALUE TYPE COPY BEHAVIOR TEST")
+	await $.println("----------------------------------------------------------")
 
 	// original is the starting struct instance.
 	// We take its address later for pointerCopy, so it might be allocated on the heap (varrefed).
@@ -117,19 +117,19 @@ export async function main(): globalThis.Promise<void> {
 	original.value.MyString = "original modified"
 	valueCopy2.MyString = "value copy 2"
 
-	$.println("Value Copy Test:")
+	await $.println("Value Copy Test:")
 	// valueCopy1 was modified independently.
-	$.println("  valueCopy1.MyString: " + valueCopy1.MyString)
+	await $.println("  valueCopy1.MyString: " + valueCopy1.MyString)
 	// original was modified after copies, showing its current state.
-	$.println("  original.MyString: " + original.value.MyString)
+	await $.println("  original.MyString: " + original.value.MyString)
 	// valueCopy2 was modified independently.
-	$.println("  valueCopy2.MyString: " + valueCopy2.MyString)
+	await $.println("  valueCopy2.MyString: " + valueCopy2.MyString)
 
 	// === Pointer Behavior ===
 	// Demonstrate how modifications via a pointer affect the original struct.
-	$.println("\nPointer Behavior Test:")
+	await $.println("\nPointer Behavior Test:")
 	// Show the state of 'original' before modification via the pointer.
-	$.println("  Before pointer modification - original.MyString: " + original.value.MyString)
+	await $.println("  Before pointer modification - original.MyString: " + original.value.MyString)
 
 	// Modify the struct 'original' *through* the pointerCopy.
 	$.pointerValue<MyStruct>(pointerCopy).MyString = "modified through pointer"
@@ -137,12 +137,12 @@ export async function main(): globalThis.Promise<void> {
 
 	// Show the state of 'original' *after* modification via the pointer.
 	// Both fields reflect the changes made through pointerCopy.
-	$.println("  After pointer modification - original.MyString:", original.value.MyString)
-	$.println("  After pointer modification - original.MyInt:", original.value.MyInt)
+	await $.println("  After pointer modification - original.MyString:", original.value.MyString)
+	await $.println("  After pointer modification - original.MyInt:", original.value.MyInt)
 
 	// === Nested Struct Behavior ===
 	// Demonstrate copy behavior with structs containing other structs.
-	$.println("\nNested Struct Test:")
+	await $.println("\nNested Struct Test:")
 	let nestedOriginal = $.markAsStructValue(new NestedStruct({Value: 10, InnerStruct: $.markAsStructValue(new MyStruct({MyInt: 20, MyString: "inner original"}))}))
 
 	// Create a value copy of the nested struct. This copies both the outer
@@ -154,12 +154,12 @@ export async function main(): globalThis.Promise<void> {
 	nestedCopy.Value = 30
 
 	// Show that modifications to nestedCopy did not affect nestedOriginal.
-	$.println("  nestedCopy.Value: ", nestedCopy.Value)
-	$.println("  nestedOriginal.Value: ", nestedOriginal.Value)
-	$.println("  nestedCopy.InnerStruct.MyString: " + nestedCopy.InnerStruct.MyString)
-	$.println("  nestedOriginal.InnerStruct.MyString: " + nestedOriginal.InnerStruct.MyString)
+	await $.println("  nestedCopy.Value: ", nestedCopy.Value)
+	await $.println("  nestedOriginal.Value: ", nestedOriginal.Value)
+	await $.println("  nestedCopy.InnerStruct.MyString: " + nestedCopy.InnerStruct.MyString)
+	await $.println("  nestedOriginal.InnerStruct.MyString: " + nestedOriginal.InnerStruct.MyString)
 
-	$.println("----------------------------------------------------------")
+	await $.println("----------------------------------------------------------")
 }
 
 if ($.isMainScript(import.meta)) {

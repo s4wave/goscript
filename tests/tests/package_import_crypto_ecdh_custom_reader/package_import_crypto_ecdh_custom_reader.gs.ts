@@ -122,29 +122,29 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = await $.pointerValue<Exclude<ecdh.Curve, null>>(ecdh.X25519()).GenerateKey($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(deterministicBytes), "*bytes.Reader", { kind: $.TypeKind.Pointer, elemType: "bytes.Reader" }))!)
 	let deterministic: ecdh.PrivateKey | $.VarRef<ecdh.PrivateKey> | null = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
-	$.println("deterministic err nil", err == null)
-	$.println("deterministic private matches", bytes.Equal(ecdh.PrivateKey.prototype.Bytes.call($.pointerValue<ecdh.PrivateKey>(deterministic)), $.goSlice(deterministicBytes, undefined, 32)))
-	$.println("deterministic public len", $.len(ecdh.PublicKey.prototype.Bytes.call($.pointerValue<ecdh.PublicKey>(ecdh.PrivateKey.prototype.PublicKey.call($.pointerValue<ecdh.PrivateKey>(deterministic))))))
+	await $.println("deterministic err nil", err == null)
+	await $.println("deterministic private matches", bytes.Equal(ecdh.PrivateKey.prototype.Bytes.call($.pointerValue<ecdh.PrivateKey>(deterministic)), $.goSlice(deterministicBytes, undefined, 32)))
+	await $.println("deterministic public len", $.len(ecdh.PublicKey.prototype.Bytes.call($.pointerValue<ecdh.PublicKey>(ecdh.PrivateKey.prototype.PublicKey.call($.pointerValue<ecdh.PrivateKey>(deterministic))))))
 
 	let segmentedBytes: $.Slice<number> = bytes.Repeat(new Uint8Array([43]) as $.Slice<number>, 64)
 	let __goscriptTuple1: any = await $.pointerValue<Exclude<ecdh.Curve, null>>(ecdh.X25519()).GenerateKey($.pointerValueOrNil($.interfaceValue<io.Reader | null>(new segmentedReader({data: segmentedBytes, step: 5}), "*main.segmentedReader", { kind: $.TypeKind.Pointer, elemType: "main.segmentedReader" }))!)
 	let segmented: ecdh.PrivateKey | $.VarRef<ecdh.PrivateKey> | null = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
-	$.println("segmented err nil", err == null)
-	$.println("segmented private matches", bytes.Equal(ecdh.PrivateKey.prototype.Bytes.call($.pointerValue<ecdh.PrivateKey>(segmented)), $.goSlice(segmentedBytes, undefined, 32)))
-	$.println("segmented public len", $.len(ecdh.PublicKey.prototype.Bytes.call($.pointerValue<ecdh.PublicKey>(ecdh.PrivateKey.prototype.PublicKey.call($.pointerValue<ecdh.PrivateKey>(segmented))))))
+	await $.println("segmented err nil", err == null)
+	await $.println("segmented private matches", bytes.Equal(ecdh.PrivateKey.prototype.Bytes.call($.pointerValue<ecdh.PrivateKey>(segmented)), $.goSlice(segmentedBytes, undefined, 32)))
+	await $.println("segmented public len", $.len(ecdh.PublicKey.prototype.Bytes.call($.pointerValue<ecdh.PublicKey>(ecdh.PrivateKey.prototype.PublicKey.call($.pointerValue<ecdh.PrivateKey>(segmented))))))
 
 	let __goscriptTuple2: any = await $.pointerValue<Exclude<ecdh.Curve, null>>(ecdh.X25519()).GenerateKey($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader($.goSlice(deterministicBytes, undefined, 31)), "*bytes.Reader", { kind: $.TypeKind.Pointer, elemType: "bytes.Reader" }))!)
 	let short: ecdh.PrivateKey | $.VarRef<ecdh.PrivateKey> | null = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
-	$.println("premature key nil", short == null)
-	$.println("premature unexpected EOF", errors.Is($.pointerValueOrNil(err)!, $.pointerValueOrNil(io.ErrUnexpectedEOF)!))
+	await $.println("premature key nil", short == null)
+	await $.println("premature unexpected EOF", errors.Is($.pointerValueOrNil(err)!, $.pointerValueOrNil(io.ErrUnexpectedEOF)!))
 
 	let __goscriptTuple3: any = await $.pointerValue<Exclude<ecdh.Curve, null>>(ecdh.X25519()).GenerateKey($.pointerValueOrNil($.interfaceValue<io.Reader | null>(new failingReader(), "*main.failingReader", { kind: $.TypeKind.Pointer, elemType: "main.failingReader" }))!)
 	let failed: ecdh.PrivateKey | $.VarRef<ecdh.PrivateKey> | null = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
-	$.println("explicit key nil", failed == null)
-	$.println("explicit error propagated", errors.Is($.pointerValueOrNil(err)!, $.pointerValueOrNil(errReaderFailed)!))
+	await $.println("explicit key nil", failed == null)
+	await $.println("explicit error propagated", errors.Is($.pointerValueOrNil(err)!, $.pointerValueOrNil(errReaderFailed)!))
 }
 
 if ($.isMainScript(import.meta)) {

@@ -74,9 +74,9 @@ export class wrappedErr {
 		return $.markAsStructValue(cloned)
 	}
 
-	public Error(): string {
+	public async Error(): globalThis.Promise<string> {
 		const e = this
-		return "wrapped: " + $.pointerValue<Exclude<$.GoError, null>>(e.err).Error()
+		return "wrapped: " + await $.pointerValue<Exclude<$.GoError, null>>(e.err).Error()
 	}
 
 	public Unwrap(): $.GoError {
@@ -102,34 +102,34 @@ export async function main(): globalThis.Promise<void> {
 	let err1 = errors.New("first error")
 	let err2 = errors.New("second error")
 
-	$.println("err1:", $.pointerValue<Exclude<$.GoError, null>>(err1).Error())
-	$.println("err2:", $.pointerValue<Exclude<$.GoError, null>>(err2).Error())
+	await $.println("err1:", await $.pointerValue<Exclude<$.GoError, null>>(err1).Error())
+	await $.println("err2:", await $.pointerValue<Exclude<$.GoError, null>>(err2).Error())
 
 	// Test error comparison
-	$.println("err1 == err2:", $.comparableEqual(err1, err2))
-	$.println("err1 == nil:", err1 == null)
+	await $.println("err1 == err2:", $.comparableEqual(err1, err2))
+	await $.println("err1 == nil:", err1 == null)
 
 	// Test nil error
 	let nilErr: $.GoError = null! as $.GoError
-	$.println("nilErr == nil:", nilErr == null)
+	await $.println("nilErr == nil:", nilErr == null)
 
 	let typedErr: customErr | $.VarRef<customErr> | null = new customErr({msg: "typed error"})
 	let __goscriptTuple0: any = errors.AsType({[$.genericTypeArgsMarker]: true, E: { type: { kind: $.TypeKind.Pointer, elemType: "main.customErr" }, zero: () => null, methods: {Error: (receiver: any, ...args: any[]) => receiver.Error(...$.stripGenericTypeArgs(args))} }}, $.interfaceValue<$.GoError>($.markAsStructValue(new wrappedErr({err: $.interfaceValue<$.GoError>(typedErr, "*main.customErr", { kind: $.TypeKind.Pointer, elemType: "main.customErr" })})), "main.wrappedErr", "main.wrappedErr"))
 	let matched: customErr | $.VarRef<customErr> | null = (__goscriptTuple0[0] as customErr | $.VarRef<customErr> | null)
 	let ok = __goscriptTuple0[1]
-	$.println("AsType matched:", ok)
+	await $.println("AsType matched:", ok)
 	if (ok) {
-		$.println("AsType message:", $.pointerValue<customErr>(matched).msg)
+		await $.println("AsType message:", $.pointerValue<customErr>(matched).msg)
 	}
 	let __goscriptTuple1: any = errors.AsType({[$.genericTypeArgsMarker]: true, E: { type: { kind: $.TypeKind.Pointer, elemType: "main.customErr" }, zero: () => null, methods: {Error: (receiver: any, ...args: any[]) => receiver.Error(...$.stripGenericTypeArgs(args))} }}, $.pointerValueOrNil(err1)!)
 	ok = __goscriptTuple1[1]
-	$.println("AsType missing:", ok)
+	await $.println("AsType missing:", ok)
 
 	let scalarTarget: $.VarRef<scalarErr> = $.varRef(0)
-	$.println("As scalar missing:", errors.As($.pointerValueOrNil(err1)!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", {Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" } }, [{ name: "Error", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])), $.uint(scalarTarget.value, 8))
-	$.println("As scalar matched:", errors.As($.namedValueInterfaceValue<$.GoError>(42, "main.scalarErr", {"Error": scalarErr_Error}, { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" }), $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", {Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" } }, [{ name: "Error", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])), $.uint(scalarTarget.value, 8))
+	await $.println("As scalar missing:", errors.As($.pointerValueOrNil(err1)!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", {Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" } }, [{ name: "Error", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])), $.uint(scalarTarget.value, 8))
+	await $.println("As scalar matched:", errors.As($.namedValueInterfaceValue<$.GoError>(42, "main.scalarErr", {"Error": scalarErr_Error}, { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" }), $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", {Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" } }, [{ name: "Error", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])), $.uint(scalarTarget.value, 8))
 
-	$.println("test finished")
+	await $.println("test finished")
 }
 
 if ($.isMainScript(import.meta)) {

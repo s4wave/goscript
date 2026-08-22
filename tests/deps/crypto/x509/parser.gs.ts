@@ -695,7 +695,7 @@ export async function parseNameConstraintsExtension(out: __goscript_x509.Certifi
 		return [false, errors.New("x509: empty name constraints extension")]
 	}
 
-	let getValues: ((subtrees: cryptobyte.String) => [$.Slice<string>, $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>, $.Slice<string>, $.Slice<string>, $.GoError] | globalThis.Promise<[$.Slice<string>, $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>, $.Slice<string>, $.Slice<string>, $.GoError]>) | null = $.functionValue((__goscriptParam9: cryptobyte.String): [$.Slice<string>, $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>, $.Slice<string>, $.Slice<string>, $.GoError] => {
+	let getValues: ((subtrees: cryptobyte.String) => [$.Slice<string>, $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>, $.Slice<string>, $.Slice<string>, $.GoError] | globalThis.Promise<[$.Slice<string>, $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>, $.Slice<string>, $.Slice<string>, $.GoError]>) | null = $.functionValue(async (__goscriptParam9: cryptobyte.String): globalThis.Promise<[$.Slice<string>, $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>, $.Slice<string>, $.Slice<string>, $.GoError]> => {
 		let subtrees: $.VarRef<cryptobyte.String> = $.varRef(__goscriptParam9)
 		let dnsNames: $.Slice<string> = null! as $.Slice<string>
 		let ips: $.Slice<net.IPNet | $.VarRef<net.IPNet> | null> = null! as $.Slice<net.IPNet | $.VarRef<net.IPNet> | null>
@@ -722,7 +722,7 @@ export async function parseNameConstraintsExtension(out: __goscript_x509.Certifi
 					{
 						let __goscriptShadow4 = __goscript_x509.isIA5String(domain)
 						if (__goscriptShadow4 != null) {
-							return [null, null, null, null, errors.New("x509: invalid constraint value: " + $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow4).Error())]
+							return [null, null, null, null, errors.New("x509: invalid constraint value: " + await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow4).Error())]
 						}
 					}
 
@@ -771,7 +771,7 @@ export async function parseNameConstraintsExtension(out: __goscript_x509.Certifi
 					{
 						let __goscriptShadow5 = __goscript_x509.isIA5String(constraint)
 						if (__goscriptShadow5 != null) {
-							return [null, null, null, null, errors.New("x509: invalid constraint value: " + $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow5).Error())]
+							return [null, null, null, null, errors.New("x509: invalid constraint value: " + await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow5).Error())]
 						}
 					}
 
@@ -798,7 +798,7 @@ export async function parseNameConstraintsExtension(out: __goscript_x509.Certifi
 					{
 						let __goscriptShadow6 = __goscript_x509.isIA5String(domain)
 						if (__goscriptShadow6 != null) {
-							return [null, null, null, null, errors.New("x509: invalid constraint value: " + $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow6).Error())]
+							return [null, null, null, null, errors.New("x509: invalid constraint value: " + await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow6).Error())]
 						}
 					}
 

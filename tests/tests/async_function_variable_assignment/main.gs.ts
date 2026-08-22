@@ -46,7 +46,7 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [], results: ["main.result"] } as $.FunctionTypeInfo))
 	await $.chanSend(ch, $.markAsStructValue(new result({value: 8})))
 	let got = $.markAsStructValue($.cloneStructValue(await fn!()))
-	$.println(got.value)
+	await $.println(got.value)
 }
 
 if ($.isMainScript(import.meta)) {

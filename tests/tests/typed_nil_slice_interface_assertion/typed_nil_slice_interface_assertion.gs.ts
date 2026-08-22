@@ -41,12 +41,12 @@ export class item {
 export async function main(): globalThis.Promise<void> {
 	let boxed: any = $.interfaceValue(null, "[]*main.item", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.item" } })
 	let asserted: $.Slice<item | $.VarRef<item> | null> = $.mustTypeAssert<$.Slice<item | $.VarRef<item> | null>>(boxed, { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.item" } })
-	$.println(asserted == null)
+	await $.println(asserted == null)
 
 	let __goscriptTuple0: any = $.typeAssertTuple<$.Slice<item | $.VarRef<item> | null>>(boxed, { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.item" } })
 	let commaOK: $.Slice<item | $.VarRef<item> | null> = __goscriptTuple0[0]
 	let ok = __goscriptTuple0[1]
-	$.println(ok, commaOK == null)
+	await $.println(ok, commaOK == null)
 }
 
 if ($.isMainScript(import.meta)) {

@@ -6,10 +6,10 @@ import * as $ from "@goscript/builtin/index.js"
 export async function main(): globalThis.Promise<void> {
 	let i = 0
 	while (i < 3) {
-		$.println("Current value:", i)
+		await $.println("Current value:", i)
 		i = i + 1
 	}
-	$.println("Loop finished")
+	await $.println("Loop finished")
 }
 
 if ($.isMainScript(import.meta)) {

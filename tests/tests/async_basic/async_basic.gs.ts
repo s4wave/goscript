@@ -21,7 +21,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Call the async caller function
 	let finalResult = await caller(myChan)
-	$.println(finalResult)
+	await $.println(finalResult)
 
 	myChan!.close()
 }

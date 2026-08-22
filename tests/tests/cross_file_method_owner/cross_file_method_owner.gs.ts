@@ -11,7 +11,7 @@ export function box_total(b: __goscript_box.box): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println(box_total(3))
+	await $.println(box_total(3))
 }
 
 if ($.isMainScript(import.meta)) {

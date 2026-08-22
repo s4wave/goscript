@@ -186,14 +186,14 @@ export class printer {
 		return $.markAsStructValue(cloned)
 	}
 
-	public format(verb: number): void {
+	public async format(verb: number): globalThis.Promise<void> {
 		const p: printer | $.VarRef<printer> | null = this
 		// Use the formatter
 		if ($.pointerValue<printer>(p).fmt.minus) {
-			$.println("minus flag set")
+			await $.println("minus flag set")
 		}
 		if ($.pointerValue<printer>(p).fmt.plus) {
-			$.println("plus flag set")
+			await $.println("plus flag set")
 		}
 	}
 
@@ -214,8 +214,8 @@ export class printer {
 export async function main(): globalThis.Promise<void> {
 	let p: printer | $.VarRef<printer> | null = new printer()
 	printer.prototype.init.call(p)
-	printer.prototype.format.call(p, $.int(100, 32))
-	$.println("Formatter test completed")
+	await printer.prototype.format.call(p, $.int(100, 32))
+	await $.println("Formatter test completed")
 }
 
 if ($.isMainScript(import.meta)) {

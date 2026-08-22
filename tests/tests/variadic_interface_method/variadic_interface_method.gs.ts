@@ -59,20 +59,20 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test with multiple arguments
 	let result1 = await $.pointerValue<Exclude<Basic, null>>(b).Join($.arrayToSlice<string>(["path", "to", "file"]))
-	$.println("Result1:", result1)
+	await $.println("Result1:", result1)
 
 	// Test with single argument
 	let result2 = await $.pointerValue<Exclude<Basic, null>>(b).Join($.arrayToSlice<string>(["single"]))
-	$.println("Result2:", result2)
+	await $.println("Result2:", result2)
 
 	// Test with no arguments
 	let result3 = await $.pointerValue<Exclude<Basic, null>>(b).Join(null)
-	$.println("Result3:", result3)
+	await $.println("Result3:", result3)
 
 	// Test with slice expansion
 	let parts: $.Slice<string> = $.arrayToSlice<string>(["another", "path", "here"])
 	let result4 = await $.pointerValue<Exclude<Basic, null>>(b).Join(parts)
-	$.println("Result4:", result4)
+	await $.println("Result4:", result4)
 }
 
 if ($.isMainScript(import.meta)) {

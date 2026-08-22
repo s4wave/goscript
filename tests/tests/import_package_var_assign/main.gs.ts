@@ -8,18 +8,18 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/import_package_var_assi
 
 export async function main(): globalThis.Promise<void> {
 	dep.__goscript_set_Count(7)
-	$.println(dep.Current())
+	await $.println(dep.Current())
 	dep.__goscript_set_Hook($.functionValue(async (): globalThis.Promise<$.GoError> => {
 		return await dep.Wait()
 	}, ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo)))
 	{
 		let err = await dep.Run()
 		if (err != null) {
-			$.println("hook error")
+			await $.println("hook error")
 			return
 		}
 	}
-	$.println("hook ok")
+	await $.println("hook ok")
 }
 
 if ($.isMainScript(import.meta)) {

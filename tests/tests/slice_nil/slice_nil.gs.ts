@@ -5,19 +5,19 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let s: $.Slice<number> = null! as $.Slice<number>
-	$.println("s == nil:", s == null)
+	await $.println("s == nil:", s == null)
 
 	// Slicing nil with valid bounds should work
 	let s2: $.Slice<number> = $.goSlice(s, 0, 0)
-	$.println("s[0:0] == nil:", s2 == null)
+	await $.println("s[0:0] == nil:", s2 == null)
 
 	let s3: $.Slice<number> = $.goSlice(s, undefined, 0)
-	$.println("s[:0] == nil:", s3 == null)
+	await $.println("s[:0] == nil:", s3 == null)
 
 	let s4: $.Slice<number> = $.goSlice(s, undefined, undefined)
-	$.println("s[:] == nil:", s4 == null)
+	await $.println("s[:] == nil:", s4 == null)
 
-	$.println("slice_nil test passed")
+	await $.println("slice_nil test passed")
 }
 
 if ($.isMainScript(import.meta)) {

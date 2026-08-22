@@ -15,8 +15,8 @@ export async function main(): globalThis.Promise<void> {
 	// Test function parameter named 'in'
 	let result = double(_in)
 
-	$.println(_in)
-	$.println(result)
+	await $.println(_in)
+	await $.println(result)
 }
 
 if ($.isMainScript(import.meta)) {

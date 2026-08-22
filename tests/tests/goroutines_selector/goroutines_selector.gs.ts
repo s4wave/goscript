@@ -31,7 +31,7 @@ export class Foo {
 
 	public async Bar(): globalThis.Promise<void> {
 		const f: Foo | $.VarRef<Foo> | null = this
-		$.println("Foo.Bar called")
+		await $.println("Foo.Bar called")
 		await $.chanSend($.pointerValue<Foo>(f).done, true)
 	}
 
@@ -52,7 +52,7 @@ export async function main(): globalThis.Promise<void> {
 	let f: Foo | $.VarRef<Foo> | null = NewFoo()
 	queueMicrotask(async () => { await Foo.prototype.Bar.call(f) })
 	await $.chanRecv($.pointerValue<Foo>(f).done)
-	$.println("main done")
+	await $.println("main done")
 }
 
 if ($.isMainScript(import.meta)) {

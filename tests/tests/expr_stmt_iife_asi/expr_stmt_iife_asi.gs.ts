@@ -10,7 +10,7 @@ export async function main(): globalThis.Promise<void> {
 			_unique = false
 		}
 	})()
-	$.println(_unique)
+	await $.println(_unique)
 }
 
 if ($.isMainScript(import.meta)) {

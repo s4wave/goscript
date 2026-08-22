@@ -67,7 +67,7 @@ export async function main(): globalThis.Promise<void> {
 	// Print sorted results
 	for (let __goscriptRangeTarget0 = results, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let result = __goscriptRangeTarget0![__rangeIndex]
-		$.println("Result:", result)
+		await $.println("Result:", result)
 	}
 
 	let dst: globalThis.Map<string, number> | null = new globalThis.Map<string, number>([["base", 1]])
@@ -75,12 +75,12 @@ export async function main(): globalThis.Promise<void> {
 	maps.Copy(dst, src)
 	let nilSrc: globalThis.Map<string, number> | null = null! as globalThis.Map<string, number> | null
 	maps.Copy(dst, nilSrc)
-	$.println("Copy result:", $.mapGet<string, number, number>(dst, "base", 0)[0], $.mapGet<string, number, number>(dst, "copied", 0)[0], $.len(dst))
+	await $.println("Copy result:", $.mapGet<string, number, number>(dst, "base", 0)[0], $.mapGet<string, number, number>(dst, "copied", 0)[0], $.len(dst))
 	let cloned: globalThis.Map<string, number> | null = (maps.Clone(dst) as globalThis.Map<string, number> | null)
 	let nilMap: globalThis.Map<string, number> | null = null! as globalThis.Map<string, number> | null
-	$.println("Clone result:", $.mapGet<string, number, number>(cloned, "base", 0)[0], $.mapGet<string, number, number>(cloned, "copied", 0)[0], maps.Clone(nilMap) == null)
+	await $.println("Clone result:", $.mapGet<string, number, number>(cloned, "base", 0)[0], $.mapGet<string, number, number>(cloned, "copied", 0)[0], maps.Clone(nilMap) == null)
 
-	$.println("test finished")
+	await $.println("test finished")
 }
 
 if ($.isMainScript(import.meta)) {

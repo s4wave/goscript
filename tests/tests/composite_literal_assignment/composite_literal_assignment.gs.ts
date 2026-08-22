@@ -66,9 +66,9 @@ export async function main(): globalThis.Promise<void> {
 	let structLiteralCopy = $.markAsStructValue($.cloneStructValue(structLiteral))
 	structLiteralCopy.MyString = "modified composite literal copy"
 	// Expected: "composite literal"
-	$.println("Original struct literal: Expected: composite literal, Actual: " + structLiteral.MyString)
+	await $.println("Original struct literal: Expected: composite literal, Actual: " + structLiteral.MyString)
 	// Expected: "modified composite literal copy"
-	$.println("Modified struct literal copy: Expected: modified composite literal copy, Actual: " + structLiteralCopy.MyString)
+	await $.println("Modified struct literal copy: Expected: modified composite literal copy, Actual: " + structLiteralCopy.MyString)
 }
 
 if ($.isMainScript(import.meta)) {

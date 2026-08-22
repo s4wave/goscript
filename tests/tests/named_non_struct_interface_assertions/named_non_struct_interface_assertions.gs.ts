@@ -66,10 +66,10 @@ export async function check(value: any): globalThis.Promise<void> {
 	let __goscriptShadow0 = __goscriptTuple0[0]
 	let ok = __goscriptTuple0[1]
 	if (!ok) {
-		$.println(false)
+		await $.println(false)
 		return
 	}
-	$.println(ok, await $.pointerValue<Exclude<adder, null>>(__goscriptShadow0).Add(3))
+	await $.println(ok, await $.pointerValue<Exclude<adder, null>>(__goscriptShadow0).Add(3))
 }
 
 export async function main(): globalThis.Promise<void> {

@@ -4,27 +4,27 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function recoverMsg(label: string, fn: (() => void) | null): globalThis.Promise<void> {
-	const __defer = new $.DisposableStack()
+	const __defer = new $.AsyncDisposableStack()
 	try {
-		__defer.defer(() => { ((): void => {
+		__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
 			{
 				let r = $.recover()
 				if (r != null) {
 					{
 						let [err, ok] = $.typeAssertTuple<$.GoError>(r, "error")
 						if (ok) {
-							$.println(label, $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+							await $.println(label, await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 						} else {
-							$.println(label, "non-error panic")
+							await $.println(label, "non-error panic")
 						}
 					}
 				}
 			}
 		})() })
 		await fn!()
-		__defer.dispose()
+		await __defer.dispose()
 	} catch (e) {
-		__defer.disposePanic(e)
+		await __defer.disposePanic(e)
 		if (!$.recovered(e)) {
 			throw e
 		}
@@ -32,37 +32,37 @@ export async function recoverMsg(label: string, fn: (() => void) | null): global
 }
 
 export async function main(): globalThis.Promise<void> {
-	await recoverMsg("slice:", $.functionValue((): void => {
+	await recoverMsg("slice:", $.functionValue(async (): globalThis.Promise<void> => {
 		let s: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3])
 		let i = 5
-		$.println($.arrayIndex(s!, i))
+		await $.println($.arrayIndex(s!, i))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await recoverMsg("array:", $.functionValue((): void => {
+	await recoverMsg("array:", $.functionValue(async (): globalThis.Promise<void> => {
 		let a: number[] = Array.from({ length: 3 }, () => 0)
 		let i = 7
-		$.println($.arrayIndex(a, i))
+		await $.println($.arrayIndex(a, i))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await recoverMsg("negative:", $.functionValue((): void => {
+	await recoverMsg("negative:", $.functionValue(async (): globalThis.Promise<void> => {
 		let s: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3])
 		let i = -1
-		$.println($.arrayIndex(s!, i))
+		await $.println($.arrayIndex(s!, i))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await recoverMsg("string:", $.functionValue((): void => {
+	await recoverMsg("string:", $.functionValue(async (): globalThis.Promise<void> => {
 		let s = "abc"
 		let i = 9
-		$.println($.uint($.indexStringOrBytes(s, i), 8))
+		await $.println($.uint($.indexStringOrBytes(s, i), 8))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await recoverMsg("string-negative:", $.functionValue((): void => {
+	await recoverMsg("string-negative:", $.functionValue(async (): globalThis.Promise<void> => {
 		let s = "abc"
 		let i = -1
-		$.println($.uint($.indexStringOrBytes(s, i), 8))
+		await $.println($.uint($.indexStringOrBytes(s, i), 8))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await recoverMsg("bytes-negative:", $.functionValue((): void => {
+	await recoverMsg("bytes-negative:", $.functionValue(async (): globalThis.Promise<void> => {
 		let b: $.Slice<number> = new Uint8Array([97, 98, 99])
 		let i = -1
-		$.println($.uint($.arrayIndex(b!, i), 8))
+		await $.println($.uint($.arrayIndex(b!, i), 8))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	$.println("done")
+	await $.println("done")
 }
 
 if ($.isMainScript(import.meta)) {

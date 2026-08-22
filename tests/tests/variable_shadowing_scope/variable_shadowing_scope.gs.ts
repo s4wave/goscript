@@ -46,9 +46,9 @@ export function firstFunc(): [string, number] {
 	return ["", 42]
 }
 
-export function secondFunc(x: number): number {
+export async function secondFunc(x: number): globalThis.Promise<number> {
 	if (x != 0) {
-		$.println("Got value:", x)
+		await $.println("Got value:", x)
 		return 0
 	}
 	return 99
@@ -61,11 +61,11 @@ export async function describe(value: any): globalThis.Promise<void> {
 		let __goscriptShadow1 = __goscriptTuple0[0]
 		let ok = __goscriptTuple0[1]
 		if (ok) {
-			$.println("Shadowed name:", await $.pointerValue<Exclude<named, null>>(__goscriptShadow1).Name())
+			await $.println("Shadowed name:", await $.pointerValue<Exclude<named, null>>(__goscriptShadow1).Name())
 			return
 		}
 	}
-	$.println("Shadowed name: missing")
+	await $.println("Shadowed name: missing")
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -73,13 +73,13 @@ export async function main(): globalThis.Promise<void> {
 	// This is the problematic pattern: x is shadowed but also used in the call
 	let __goscriptShadow2 = x
 	{
-		let __goscriptShadow3 = secondFunc(__goscriptShadow2)
+		let __goscriptShadow3 = await secondFunc(__goscriptShadow2)
 		if (__goscriptShadow3 != 0) {
-			$.println("Function returned value")
+			await $.println("Function returned value")
 			return
 		}
 	}
-	$.println("Completed successfully")
+	await $.println("Completed successfully")
 	await describe($.interfaceValue($.markAsStructValue(new item()), "main.item", "main.item"))
 	await describe("nope")
 }

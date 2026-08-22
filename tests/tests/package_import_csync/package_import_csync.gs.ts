@@ -36,7 +36,7 @@ export async function main(): globalThis.Promise<void> {
 		// Try to acquire the lock
 		let [relLock, err] = await mtx.value.Lock(ctx)
 		if (err != null) {
-			$.println("worker", id, "failed to acquire lock:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("worker", id, "failed to acquire lock:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return
 		}
 		__defer.defer(async () => { await relLock!() })
@@ -66,7 +66,7 @@ export async function main(): globalThis.Promise<void> {
 			isSend: false,
 			channel: done,
 			onSelected: async (__goscriptSelect0Result) => {
-				$.println("All workers completed successfully")
+				await $.println("All workers completed successfully")
 			}
 		},
 		{
@@ -74,7 +74,7 @@ export async function main(): globalThis.Promise<void> {
 			isSend: false,
 			channel: await $.pointerValue<Exclude<context.Context, null>>(ctx).Done(),
 			onSelected: async (__goscriptSelect0Result) => {
-				$.println("Test timed out:", $.pointerValue<Exclude<$.GoError, null>>((await $.pointerValue<Exclude<context.Context, null>>(ctx).Err())).Error())
+				await $.println("Test timed out:", await $.pointerValue<Exclude<$.GoError, null>>((await $.pointerValue<Exclude<context.Context, null>>(ctx).Err())).Error())
 			}
 		}
 	], false)
@@ -82,12 +82,12 @@ export async function main(): globalThis.Promise<void> {
 		return __goscriptSelect0Value
 	}
 
-	$.println("Final counter value:", counter)
+	await $.println("Final counter value:", counter)
 	if (counter != numWorkers) {
 		$.panic("counter does not match expected value")
 	}
 
-	$.println("success: csync.Mutex test completed")
+	await $.println("success: csync.Mutex test completed")
 }
 
 if ($.isMainScript(import.meta)) {

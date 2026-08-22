@@ -11,19 +11,19 @@ export async function main(): globalThis.Promise<void> {
 		{
 			let y = 10
 			let z = 20
-			$.println(y + z)
+			await $.println(y + z)
 			break
 		}
 		case 2:
 		{
 			let y = 30
 			let z = 40
-			$.println(y + z)
+			await $.println(y + z)
 			break
 		}
 	}
 
-	$.println("done")
+	await $.println("done")
 }
 
 if ($.isMainScript(import.meta)) {

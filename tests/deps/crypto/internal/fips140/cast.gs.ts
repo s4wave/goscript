@@ -39,11 +39,11 @@ export async function CAST(name: string, f: (() => $.GoError | globalThis.Promis
 		err = errors.New("simulated CAST failure")
 	}
 	if (err != null) {
-		fatal((("FIPS 140-3 self-test failed: " + name) + ": ") + $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		fatal((("FIPS 140-3 self-test failed: " + name) + ": ") + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		$.panic("unreachable")
 	}
 	if (__goscript_fips140.debug) {
-		$.println("FIPS 140-3 self-test passed:", name)
+		await $.println("FIPS 140-3 self-test passed:", name)
 	}
 }
 
@@ -60,10 +60,10 @@ export async function PCT(name: string, f: (() => $.GoError | globalThis.Promise
 		err = errors.New("simulated PCT failure")
 	}
 	if (err != null) {
-		fatal((("FIPS 140-3 self-test failed: " + name) + ": ") + $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		fatal((("FIPS 140-3 self-test failed: " + name) + ": ") + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		$.panic("unreachable")
 	}
 	if (__goscript_fips140.debug) {
-		$.println("FIPS 140-3 PCT passed:", name)
+		await $.println("FIPS 140-3 PCT passed:", name)
 	}
 }

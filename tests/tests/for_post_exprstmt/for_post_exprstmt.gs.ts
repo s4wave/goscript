@@ -9,20 +9,20 @@ export function __goscript_set_counter(__goscriptValue: number): void {
 	counter = __goscriptValue
 }
 
-export function increment_counter(): void {
+export async function increment_counter(): globalThis.Promise<void> {
 	counter++
-	$.println("counter incremented to", counter)
+	await $.println("counter incremented to", counter)
 }
 
 export async function main(): globalThis.Promise<void> {
-	for (let i = 0; i < 2; increment_counter()) {
-		$.println("loop iteration:", i)
+	for (let i = 0; i < 2; await increment_counter()) {
+		await $.println("loop iteration:", i)
 		// We need to manually increment i or change the condition
 		// to ensure the loop terminates as increment_counter() in post
 		// does not affect 'i'.
 		i++
 	}
-	$.println("done", "final counter:", counter)
+	await $.println("done", "final counter:", counter)
 }
 
 if ($.isMainScript(import.meta)) {

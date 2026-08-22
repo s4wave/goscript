@@ -48,10 +48,10 @@ export function newHolder(w: io.Writer | null): holder | $.VarRef<holder> | null
 export async function main(): globalThis.Promise<void> {
 	let h: holder | $.VarRef<holder> | null = newHolder(null)
 	if ($.pointerValue<holder>(h).w == null) {
-		$.println("nil writer")
+		await $.println("nil writer")
 		return
 	}
-	$.println("writer present")
+	await $.println("writer present")
 }
 
 if ($.isMainScript(import.meta)) {

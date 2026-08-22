@@ -45,7 +45,7 @@ export async function main(): globalThis.Promise<void> {
 	let jAlias: any = $.interfaceValue(pAlias, "*main.MyStruct", { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
 
 	let [, ok] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(jAlias, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
-	$.println("pointer assertion result:", ok)
+	await $.println("pointer assertion result:", ok)
 }
 
 if ($.isMainScript(import.meta)) {

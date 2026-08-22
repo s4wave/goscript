@@ -23,9 +23,9 @@ export function classify(value: number): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println(classify(0))
-	$.println(classify(1))
-	$.println(classify(2))
+	await $.println(classify(0))
+	await $.println(classify(1))
+	await $.println(classify(2))
 }
 
 if ($.isMainScript(import.meta)) {

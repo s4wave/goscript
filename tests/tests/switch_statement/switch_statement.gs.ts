@@ -5,105 +5,105 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let i = 2
-	$.println("Integer switch:")
+	await $.println("Integer switch:")
 	switch (i) {
 		case 1:
 		{
-			$.println("one")
+			await $.println("one")
 			break
 		}
 		case 2:
 		{
-			$.println("two")
+			await $.println("two")
 			break
 		}
 		case 3:
 		{
-			$.println("three")
+			await $.println("three")
 			break
 		}
 		default:
 		{
-			$.println("other integer")
+			await $.println("other integer")
 			break
 		}
 	}
 
 	let s = "hello"
-	$.println("\nString switch:")
+	await $.println("\nString switch:")
 	switch (s) {
 		case "world":
 		{
-			$.println("world")
+			await $.println("world")
 			break
 		}
 		case "hello":
 		{
-			$.println("hello")
+			await $.println("hello")
 			break
 		}
 		default:
 		{
-			$.println("other string")
+			await $.println("other string")
 			break
 		}
 	}
 	let x = -5
-	$.println("\nSwitch without expression:")
+	await $.println("\nSwitch without expression:")
 	switch (true) {
 		case x < 0:
 		{
-			$.println("negative")
+			await $.println("negative")
 			break
 		}
 		case x == 0:
 		{
-			$.println("zero")
+			await $.println("zero")
 			break
 		}
 		default:
 		{
-			$.println("positive")
+			await $.println("positive")
 			break
 		}
 	}
 
 	x = 0
-	$.println("\nSwitch without expression (zero):")
+	await $.println("\nSwitch without expression (zero):")
 	switch (true) {
 		case x < 0:
 		{
-			$.println("negative")
+			await $.println("negative")
 			break
 		}
 		case x == 0:
 		{
-			$.println("zero")
+			await $.println("zero")
 			break
 		}
 		default:
 		{
-			$.println("positive")
+			await $.println("positive")
 			break
 		}
 	}
 
 	x = 10
-	$.println("\nSwitch without expression (positive):")
+	await $.println("\nSwitch without expression (positive):")
 	switch (true) {
 		case x < 0:
 		{
-			$.println("negative")
+			await $.println("negative")
 			break
 		}
 		case x == 0:
 		{
-			$.println("zero")
+			await $.println("zero")
 			break
 		}
 		default:
 		{
-			$.println("positive")
+			await $.println("positive")
 			break
 		}
 	}

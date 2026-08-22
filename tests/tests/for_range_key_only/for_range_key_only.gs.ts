@@ -5,9 +5,9 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let s: $.Slice<number> = $.arrayToSlice<number>([10, 20, 30])
-	$.println("Looping over slice (key only):")
+	await $.println("Looping over slice (key only):")
 	for (let __goscriptRangeTarget0 = s, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
-		$.println(i)
+		await $.println(i)
 	}
 	// Expected output:
 	// 0
@@ -15,9 +15,9 @@ export async function main(): globalThis.Promise<void> {
 	// 2
 
 	let a = ["alpha", "beta"]
-	$.println("Looping over array (key only):")
+	await $.println("Looping over array (key only):")
 	for (let __goscriptRangeTarget1 = a, k = 0; k < $.len(__goscriptRangeTarget1); k++) {
-		$.println(k)
+		await $.println(k)
 	}
 }
 

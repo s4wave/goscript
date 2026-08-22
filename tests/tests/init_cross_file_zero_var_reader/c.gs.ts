@@ -25,8 +25,8 @@ export function __goscript_set_marker(__goscriptValue: number): void {
 	marker = __goscriptValue
 }
 
-function __goscriptInit0(): void {
-	__goscript_b.readTable()
+async function __goscriptInit0(): globalThis.Promise<void> {
+	await __goscript_b.readTable()
 }
 
-__goscriptInit0()
+await __goscriptInit0()

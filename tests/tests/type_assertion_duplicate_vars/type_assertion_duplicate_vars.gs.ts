@@ -129,8 +129,8 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple1: any = $.typeAssertTuple<ConcreteB>(iface, "main.ConcreteB")
 	$.pointerValue<Container>(c).hasB = __goscriptTuple1[1]
 
-	$.println("hasA:", $.pointerValue<Container>(c).hasA)
-	$.println("hasB:", $.pointerValue<Container>(c).hasB)
+	await $.println("hasA:", $.pointerValue<Container>(c).hasA)
+	await $.println("hasB:", $.pointerValue<Container>(c).hasB)
 }
 
 if ($.isMainScript(import.meta)) {

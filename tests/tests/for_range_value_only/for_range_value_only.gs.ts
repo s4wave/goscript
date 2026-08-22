@@ -12,26 +12,26 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget0 = s, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let v = __goscriptRangeTarget0![__rangeIndex]
 		sum = sum + (v)
-		$.println(v)
+		await $.println(v)
 	}
-	$.println(sum)
+	await $.println(sum)
 
 	let arr = ["a", "b", "c"]
 	let concat: $.VarRef<strings.Builder> = $.varRef($.markAsStructValue(new strings.Builder()))
 	for (let __goscriptRangeTarget1 = arr, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
 		let val = __goscriptRangeTarget1[__rangeIndex]
 		concat.value.WriteString(val)
-		$.println(val)
+		await $.println(val)
 	}
-	$.println(concat.value.String())
+	await $.println(concat.value.String())
 
 	// Test with blank identifier for value (should still iterate)
-	$.println("Ranging with blank identifier for value:")
+	await $.println("Ranging with blank identifier for value:")
 	let count = 0
 	for (let __goscriptRangeTarget2 = s, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget2); __rangeIndex++) {
 		count++
 	}
-	$.println(count)
+	await $.println(count)
 }
 
 if ($.isMainScript(import.meta)) {

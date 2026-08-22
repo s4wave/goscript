@@ -44,7 +44,7 @@ export class parser {
 export async function main(): globalThis.Promise<void> {
 	let p: parser = $.markAsStructValue(new parser())
 	p.errors = (errlist.ErrorList_Add(p.errors, "error") as errlist.ErrorList)
-	$.println($.arrayIndex(p.errors!, 0))
+	await $.println($.arrayIndex(p.errors!, 0))
 }
 
 if ($.isMainScript(import.meta)) {

@@ -50,8 +50,8 @@ export async function main(): globalThis.Promise<void> {
 	let childInode: MockInode | $.VarRef<MockInode> | null = new MockInode({Value: 42})
 
 	// Use the pointer
-	$.println("childInode.Value:", $.pointerValue<MockInode>(childInode).Value)
-	$.println("childInode.getValue():", MockInode.prototype.getValue.call(childInode))
+	await $.println("childInode.Value:", $.pointerValue<MockInode>(childInode).Value)
+	await $.println("childInode.getValue():", MockInode.prototype.getValue.call(childInode))
 }
 
 if ($.isMainScript(import.meta)) {

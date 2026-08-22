@@ -16,7 +16,7 @@ export async function main(): globalThis.Promise<void> {
 	// should be: p1.value = y
 	p1.value = y
 
-	$.println("***p3 ==", $.pointerValue<number>($.pointerValue<$.VarRef<number> | null>($.pointerValue<$.VarRef<$.VarRef<number> | null> | null>(p3))))
+	await $.println("***p3 ==", $.pointerValue<number>($.pointerValue<$.VarRef<number> | null>($.pointerValue<$.VarRef<$.VarRef<number> | null> | null>(p3))))
 }
 
 if ($.isMainScript(import.meta)) {

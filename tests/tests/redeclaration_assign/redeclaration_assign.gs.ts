@@ -25,7 +25,7 @@ export async function selectResultRedeclare(): globalThis.Promise<void> {
 			channel: resultCh,
 			onSelected: async (__goscriptSelect0Result) => {
 				let result = __goscriptSelect0Result.value
-				$.println("select result:", result)
+				await $.println("select result:", result)
 			}
 		}
 	], false)
@@ -34,20 +34,20 @@ export async function selectResultRedeclare(): globalThis.Promise<void> {
 	}
 }
 
-export function typeSwitchCaseRedeclare(value: any): void {
+export async function typeSwitchCaseRedeclare(value: any): globalThis.Promise<void> {
 	{
 		const __goscriptTypeSwitchValue = value
 		switch (true) {
 			case $.typeAssert<number>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "int" }).ok:
 				{
 					let hashed = "int"
-					$.println("type hashed:", hashed)
+					await $.println("type hashed:", hashed)
 				}
 				break
 			case $.typeAssert<string>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "string" }).ok:
 				{
 					let hashed = "string"
-					$.println("type hashed:", hashed)
+					await $.println("type hashed:", hashed)
 				}
 				break
 		}
@@ -56,7 +56,7 @@ export function typeSwitchCaseRedeclare(value: any): void {
 
 export async function main(): globalThis.Promise<void> {
 	let i: number = 0
-	$.println("initial i:", i)
+	await $.println("initial i:", i)
 
 	// i already exists from the var declaration above.
 	// err is a new variable being declared.
@@ -64,11 +64,11 @@ export async function main(): globalThis.Promise<void> {
 	i = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 
-	$.println("after assign i:", i)
+	await $.println("after assign i:", i)
 	if (err) {
-		$.println("err is true")
+		await $.println("err is true")
 	} else {
-		$.println("err is false")
+		await $.println("err is false")
 	}
 
 	let value = "outer"
@@ -77,7 +77,7 @@ export async function main(): globalThis.Promise<void> {
 		let __goscriptTuple1: any = shadowTupleInput(__goscriptShadow0)
 		let __goscriptShadow1 = __goscriptTuple1[0]
 		let ok = __goscriptTuple1[1]
-		$.println("shadow tuple:", __goscriptShadow1, ok)
+		await $.println("shadow tuple:", __goscriptShadow1, ok)
 	}
 
 	{
@@ -86,12 +86,12 @@ export async function main(): globalThis.Promise<void> {
 		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo)))
 		let k = __goscriptTuple2[0]
 		let ok = __goscriptTuple2[1]
-		$.println("callback shadow:", k, ok)
+		await $.println("callback shadow:", k, ok)
 	}
 
 	await selectResultRedeclare()
-	typeSwitchCaseRedeclare($.basicInterfaceValue(1, "int"))
-	typeSwitchCaseRedeclare("two")
+	await typeSwitchCaseRedeclare($.basicInterfaceValue(1, "int"))
+	await typeSwitchCaseRedeclare("two")
 }
 
 if ($.isMainScript(import.meta)) {

@@ -19,10 +19,10 @@ export async function main(): globalThis.Promise<void> {
 	let w: $.VarRef<words> | null = __goscriptTuple0[0]
 	let ok = __goscriptTuple0[1]
 	if (!ok) {
-		$.println("missing")
+		await $.println("missing")
 		return
 	}
-	$.println(words_Rsh(w, 1))
+	await $.println(words_Rsh(w, 1))
 }
 
 if ($.isMainScript(import.meta)) {

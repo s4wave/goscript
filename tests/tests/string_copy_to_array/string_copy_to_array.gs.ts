@@ -14,7 +14,7 @@ export async function main(): globalThis.Promise<void> {
 			$.panic("copy failed")
 		}
 	}
-	$.println("Copy succeeded")
+	await $.println("Copy succeeded")
 }
 
 if ($.isMainScript(import.meta)) {

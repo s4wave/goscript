@@ -10,13 +10,13 @@ export async function main(): globalThis.Promise<void> {
 
 	type MySlice = $.Slice<number>
 	let s: MySlice = ($.makeSlice<number>(5, undefined, "number") as MySlice)
-	$.println("Length:", $.len((s as MySlice)))
+	await $.println("Length:", $.len((s as MySlice)))
 
 	// Test make() with named map type
 	type MyMap = globalThis.Map<string, number> | null
 	let m: MyMap = $.makeMap<string, number>()
 	$.mapSet(m, "test", 42)
-	$.println("Value:", $.mapGet<string, number, number>(m, "test", 0)[0])
+	await $.println("Value:", $.mapGet<string, number, number>(m, "test", 0)[0])
 }
 
 if ($.isMainScript(import.meta)) {

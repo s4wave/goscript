@@ -58,14 +58,14 @@ export async function run(s: scanner | null): globalThis.Promise<$.GoError> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println(await run($.interfaceValue<scanner | null>($.markAsStructValue(new listScanner()), "main.listScanner", "main.listScanner")) == null)
+	await $.println(await run($.interfaceValue<scanner | null>($.markAsStructValue(new listScanner()), "main.listScanner", "main.listScanner")) == null)
 
 	let m: $.VarRef<sync.Map> = $.varRef($.markAsStructValue(new sync.Map()))
 	let callbacks = [$.functionValue(async (v: number): globalThis.Promise<$.GoError> => {
 		await m.value.Load($.basicInterfaceValue(v, "int"))
 		return null
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: ["error"] } as $.FunctionTypeInfo))]
-	$.println(await $.arrayIndex(callbacks, 0)!(1) == null)
+	await $.println(await $.arrayIndex(callbacks, 0)!(1) == null)
 }
 
 if ($.isMainScript(import.meta)) {

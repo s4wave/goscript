@@ -157,7 +157,7 @@ export async function parseECPrivateKey(namedCurveOID: $.VarRef<asn1.ObjectIdent
 					return [null, errors.New("x509: failed to parse private key (use ParsePKCS1PrivateKey instead for this key format)")]
 				}
 			}
-			return [null, errors.New("x509: failed to parse EC private key: " + $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0).Error())]
+			return [null, errors.New("x509: failed to parse EC private key: " + await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0).Error())]
 		}
 	}
 	if (privKey.value.Version != 1) {

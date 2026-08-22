@@ -47,7 +47,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = $.typeAssertTuple<number>(x, { kind: $.TypeKind.Basic, name: "int" })
 	result.ok = __goscriptTuple0[1]
 
-	$.println("Type assertion successful:", result.ok)
+	await $.println("Type assertion successful:", result.ok)
 }
 
 if ($.isMainScript(import.meta)) {

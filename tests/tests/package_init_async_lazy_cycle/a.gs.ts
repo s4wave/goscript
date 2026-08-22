@@ -65,7 +65,7 @@ export async function useFirst(): globalThis.Promise<number> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println("main:", await useFirst())
+	await $.println("main:", await useFirst())
 }
 
 if ($.isMainScript(import.meta)) {

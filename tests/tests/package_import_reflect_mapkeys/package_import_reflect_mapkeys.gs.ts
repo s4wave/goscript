@@ -15,9 +15,9 @@ export async function main(): globalThis.Promise<void> {
 		$.mapSet(seen, $.markAsStructValue($.cloneStructValue(key)).String(), true)
 	}
 
-	$.println("keys:", $.len(keys))
-	$.println("alpha:", $.mapGet<string, boolean, boolean>(seen, "alpha", false)[0])
-	$.println("beta:", $.mapGet<string, boolean, boolean>(seen, "beta", false)[0])
+	await $.println("keys:", $.len(keys))
+	await $.println("alpha:", $.mapGet<string, boolean, boolean>(seen, "alpha", false)[0])
+	await $.println("beta:", $.mapGet<string, boolean, boolean>(seen, "beta", false)[0])
 }
 
 if ($.isMainScript(import.meta)) {

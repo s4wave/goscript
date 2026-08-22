@@ -5,7 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	/* Another single-line block comment */
-	$.println("testing block comments")
+	await $.println("testing block comments")
 
 	/*
 			Multi-line comment
@@ -13,7 +13,7 @@ export async function main(): globalThis.Promise<void> {
 		*/
 
 	let x = 42
-	$.println("x =", x)
+	await $.println("x =", x)
 }
 
 if ($.isMainScript(import.meta)) {

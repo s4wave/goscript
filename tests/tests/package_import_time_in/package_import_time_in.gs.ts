@@ -10,7 +10,7 @@ export async function main(): globalThis.Promise<void> {
 	let utc = $.markAsStructValue($.cloneStructValue(time.Date(2025, time.May, 15, 1, 10, 42, 0, time.UTC)))
 	let pdt: time.Location | $.VarRef<time.Location> | null = time.FixedZone("PDT", (-7 * 60) * 60)
 
-	$.println("in pdt:", $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(utc)).In(pdt))).Format(time.RFC3339))
+	await $.println("in pdt:", $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(utc)).In(pdt))).Format(time.RFC3339))
 }
 
 if ($.isMainScript(import.meta)) {

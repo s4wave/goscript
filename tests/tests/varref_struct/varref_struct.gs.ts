@@ -44,11 +44,11 @@ export async function main(): globalThis.Promise<void> {
 	let ptrToVal: MyStruct | $.VarRef<MyStruct> | null = val
 
 	// Accessing pointer value, should use .value
-	$.println("ptrToVal.MyInt:", $.pointerValue<MyStruct>(ptrToVal).MyInt)
+	await $.println("ptrToVal.MyInt:", $.pointerValue<MyStruct>(ptrToVal).MyInt)
 
 	// Accessing pointer value, should use .value
 	let myIntVal = $.pointerValue<MyStruct>(ptrToVal).MyInt
-	$.println("myIntVal:", myIntVal)
+	await $.println("myIntVal:", myIntVal)
 }
 
 if ($.isMainScript(import.meta)) {

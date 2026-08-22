@@ -36,7 +36,7 @@ export class AsyncResource {
 			await $.chanSend(ch, true)
 		})() })
 		await $.chanRecv(ch)
-		$.println("Released", $.pointerValue<AsyncResource>(r).name)
+		await $.println("Released", $.pointerValue<AsyncResource>(r).name)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -52,7 +52,7 @@ export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
 	let res: AsyncResource | $.VarRef<AsyncResource> | null = new AsyncResource({name: "test"})
 	__defer.defer(async () => { await AsyncResource.prototype.Release.call(res) })
-	$.println("main function")
+	await $.println("main function")
 }
 
 if ($.isMainScript(import.meta)) {

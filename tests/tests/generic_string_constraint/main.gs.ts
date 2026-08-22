@@ -25,15 +25,15 @@ export function toStringGeneric(__typeArgs: $.GenericTypeArgs | undefined, v: an
 
 export async function main(): globalThis.Promise<void> {
 	// string-only
-	$.println(toStringString({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, "hello"))
+	await $.println(toStringString({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, "hello"))
 
 	// bytes-only
-	$.println(toStringBytes({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, zero: () => null }}, new Uint8Array([119, 111, 114, 108, 100]) as $.Slice<number>))
+	await $.println(toStringBytes({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, zero: () => null }}, new Uint8Array([119, 111, 114, 108, 100]) as $.Slice<number>))
 
 	// union: string
-	$.println(toStringGeneric({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, "foo"))
+	await $.println(toStringGeneric({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, "foo"))
 	// union: []byte
-	$.println(toStringGeneric({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, zero: () => null }}, new Uint8Array([98, 97, 114]) as $.Slice<number>))
+	await $.println(toStringGeneric({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, zero: () => null }}, new Uint8Array([98, 97, 114]) as $.Slice<number>))
 }
 
 if ($.isMainScript(import.meta)) {

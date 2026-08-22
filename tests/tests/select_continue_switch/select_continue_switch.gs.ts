@@ -110,7 +110,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.chanSend(frames, 1)
 	await $.chanSend(frames, 3)
 	await $.chanSend(done, "done ")
-	$.println(await run(frames, done))
+	await $.println(await run(frames, done))
 }
 
 if ($.isMainScript(import.meta)) {

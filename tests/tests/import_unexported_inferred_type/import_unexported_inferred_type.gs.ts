@@ -13,7 +13,7 @@ export function __goscript_set_closed(__goscriptValue: dep.hiddenError): void {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println($.markAsStructValue($.cloneStructValue(closed)).Error())
+	await $.println($.markAsStructValue($.cloneStructValue(closed)).Error())
 }
 
 if ($.isMainScript(import.meta)) {

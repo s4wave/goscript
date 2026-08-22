@@ -9,7 +9,7 @@ export async function main(): globalThis.Promise<void> {
 		return value + 1
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo)), $.appendZeros.nil)
 	let value = await $.arrayIndex(callbacks!, 0)!(2)
-	$.println("value:", value)
+	await $.println("value:", value)
 }
 
 if ($.isMainScript(import.meta)) {

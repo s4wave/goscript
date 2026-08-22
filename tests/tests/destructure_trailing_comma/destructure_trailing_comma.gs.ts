@@ -15,7 +15,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = returnTwoValues()
 	nref = __goscriptTuple0[0]
 
-	$.println("nref:", nref)
+	await $.println("nref:", nref)
 }
 
 if ($.isMainScript(import.meta)) {

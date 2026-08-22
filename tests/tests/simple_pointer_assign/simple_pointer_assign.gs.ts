@@ -9,9 +9,9 @@ export async function main(): globalThis.Promise<void> {
 	let p1 = x
 	let p2 = p1
 
-	$.println("p1==p2:", $.pointerEqual(p1, p2))
-	$.println("*p1:", $.pointerValue<number>(p1))
-	$.println("*p2:", $.pointerValue<number>(p2))
+	await $.println("p1==p2:", $.pointerEqual(p1, p2))
+	await $.println("*p1:", $.pointerValue<number>(p1))
+	await $.println("*p2:", $.pointerValue<number>(p2))
 }
 
 if ($.isMainScript(import.meta)) {

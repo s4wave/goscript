@@ -8,7 +8,7 @@ import "./info.gs.ts"
 
 export async function main(): globalThis.Promise<void> {
 	__goscript_info.infoPtr()
-	$.println($.pointerValue<__goscript_info.floatInfo>(__goscript_info.info).mantbits, $.pointerValue<__goscript_info.floatInfo>(__goscript_info.info).expbits)
+	await $.println($.pointerValue<__goscript_info.floatInfo>(__goscript_info.info).mantbits, $.pointerValue<__goscript_info.floatInfo>(__goscript_info.info).expbits)
 }
 
 if ($.isMainScript(import.meta)) {

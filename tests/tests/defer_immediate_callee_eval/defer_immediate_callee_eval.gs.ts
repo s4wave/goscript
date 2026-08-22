@@ -4,20 +4,20 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function register(cb: (() => void) | null): globalThis.Promise<(() => void) | null> {
-	$.println("register")
+	await $.println("register")
 	await cb!()
-	return $.functionValue((): void => {
-		$.println("release")
+	return $.functionValue(async (): globalThis.Promise<void> => {
+		await $.println("release")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 }
 
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	const __goscriptDeferCallee0 = await register($.functionValue((): void => {
-		$.println("callback")
+	const __goscriptDeferCallee0 = await register($.functionValue(async (): globalThis.Promise<void> => {
+		await $.println("callback")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	__defer.defer(async () => { await __goscriptDeferCallee0!() })
-	$.println("body")
+	await $.println("body")
 }
 
 if ($.isMainScript(import.meta)) {

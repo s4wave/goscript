@@ -96,16 +96,16 @@ export function unicodeNames(_u3c6: number, _u3b2: number): [number, number] {
 
 export async function main(): globalThis.Promise<void> {
 	let p = $.markAsStructValue(new Packer())
-	$.println(blanks(1, "x"))
-	$.println($.len($.markAsStructValue($.cloneStructValue(p)).pack(null, null, 0)))
+	await $.println(blanks(1, "x"))
+	await $.println($.len($.markAsStructValue($.cloneStructValue(p)).pack(null, null, 0)))
 
 	let f: ((_p0: number, _p1: number) => number | globalThis.Promise<number>) | null = $.functionValue((_p0: number, _p1: number): number => {
 		return 9
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))
-	$.println(await f!(1, 2))
+	await $.println(await f!(1, 2))
 
 	let [left, right] = unicodeNames(3, 4)
-	$.println(left, right)
+	await $.println(left, right)
 }
 
 if ($.isMainScript(import.meta)) {

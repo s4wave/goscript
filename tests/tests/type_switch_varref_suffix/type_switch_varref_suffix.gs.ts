@@ -68,13 +68,13 @@ export async function main(): globalThis.Promise<void> {
 					let imprecise = $.varRef(0)
 					let ptr = imprecise
 					ptr!.value = 4
-					$.println("branch", accept(e), imprecise.value)
+					await $.println("branch", accept(e), imprecise.value)
 				}
 				break
 			default:
 				{
 					let e: any = __goscriptTypeSwitchValue
-					$.println("other")
+					await $.println("other")
 				}
 				break
 		}

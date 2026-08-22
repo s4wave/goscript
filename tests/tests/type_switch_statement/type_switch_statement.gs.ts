@@ -49,19 +49,19 @@ export async function main(): globalThis.Promise<void> {
 			case $.typeAssert<number>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "int" }).ok:
 				{
 					let v: number = $.typeAssert<number>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "int" }).value
-					$.println("int", v)
+					await $.println("int", v)
 				}
 				break
 			case $.typeAssert<string>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "string" }).ok:
 				{
 					let v: string = $.typeAssert<string>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "string" }).value
-					$.println("string", v)
+					await $.println("string", v)
 				}
 				break
 			default:
 				{
 					let v: any = __goscriptTypeSwitchValue
-					$.println("unknown")
+					await $.println("unknown")
 				}
 				break
 		}
@@ -74,12 +74,12 @@ export async function main(): globalThis.Promise<void> {
 		switch (true) {
 			case $.typeAssert<boolean>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "bool" }).ok:
 				{
-					$.println("bool")
+					await $.println("bool")
 				}
 				break
 			case $.typeAssert<number>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "int" }).ok:
 				{
-					$.println("int")
+					await $.println("int")
 				}
 				break
 		}
@@ -93,13 +93,13 @@ export async function main(): globalThis.Promise<void> {
 			case $.is(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "int" }) || $.is(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "float64" }):
 				{
 					let v = __goscriptTypeSwitchValue
-					$.println("number", v)
+					await $.println("number", v)
 				}
 				break
 			case $.is(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "string" }) || $.is(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "bool" }):
 				{
 					let v = __goscriptTypeSwitchValue
-					$.println("string or bool", v)
+					await $.println("string or bool", v)
 				}
 				break
 		}
@@ -113,7 +113,7 @@ export async function main(): globalThis.Promise<void> {
 			case $.typeAssert<number>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "int" }).ok:
 				{
 					let v: number = $.typeAssert<number>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "int" }).value
-					$.println("z is int", v)
+					await $.println("z is int", v)
 				}
 				break
 		}
@@ -126,7 +126,7 @@ export async function main(): globalThis.Promise<void> {
 		switch (true) {
 			default:
 				{
-					$.println("default only")
+					await $.println("default only")
 				}
 				break
 		}
@@ -136,7 +136,7 @@ export async function main(): globalThis.Promise<void> {
 		switch (true) {
 			default:
 				{
-					$.println("default only, value is", $.mustTypeAssert<string>(w, { kind: $.TypeKind.Basic, name: "string" }))
+					await $.println("default only, value is", $.mustTypeAssert<string>(w, { kind: $.TypeKind.Basic, name: "string" }))
 				}
 				break
 		}
@@ -150,7 +150,7 @@ export async function main(): globalThis.Promise<void> {
 				default:
 					{
 						let v: any = __goscriptTypeSwitchValue
-						$.println("shadow default", $.int($.mustTypeAssert<number>(v, { kind: $.TypeKind.Basic, name: "int32" }), 32))
+						await $.println("shadow default", $.int($.mustTypeAssert<number>(v, { kind: $.TypeKind.Basic, name: "int32" }), 32))
 					}
 					break
 			}
@@ -166,7 +166,7 @@ export async function main(): globalThis.Promise<void> {
 				case $.typeAssert<string>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "string" }).ok:
 					{
 						let v: string = $.typeAssert<string>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "string" }).value
-						$.println("continue", v)
+						await $.println("continue", v)
 						continue
 					}
 					break
@@ -178,9 +178,9 @@ export async function main(): globalThis.Promise<void> {
 					break
 			}
 		}
-		$.println("after switch")
+		await $.println("after switch")
 	}
-	$.println("type switch count", count)
+	await $.println("type switch count", count)
 
 	let oid: $.VarRef<ObjectIdentifier> = $.varRef(null! as ObjectIdentifier)
 	let ok = false
@@ -198,7 +198,7 @@ export async function main(): globalThis.Promise<void> {
 				break
 		}
 	}
-	$.println("oid", $.len((oid.value as ObjectIdentifier)), $.arrayIndex(oid.value!, 0), ok)
+	await $.println("oid", $.len((oid.value as ObjectIdentifier)), $.arrayIndex(oid.value!, 0), ok)
 
 	let raw: $.VarRef<RawValue> = $.varRef($.markAsStructValue(new RawValue()))
 	let rawValue: any = $.interfaceValue(raw, "*main.RawValue", { kind: $.TypeKind.Pointer, elemType: "main.RawValue" })
@@ -215,7 +215,7 @@ export async function main(): globalThis.Promise<void> {
 				break
 		}
 	}
-	$.println("raw", raw.value.Tag, ok)
+	await $.println("raw", raw.value.Tag, ok)
 }
 
 export function getInterface(): any {

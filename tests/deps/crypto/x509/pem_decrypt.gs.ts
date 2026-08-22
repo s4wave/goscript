@@ -235,7 +235,7 @@ export async function EncryptPEMBlock(rand: io.Reader | null, blockType: string,
 	{
 		let [, err] = await io.ReadFull($.pointerValueOrNil(rand)!, iv)
 		if (err != null) {
-			return [null, errors.New("x509: cannot generate IV: " + $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
+			return [null, errors.New("x509: cannot generate IV: " + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())]
 		}
 	}
 	// The salt is the first 8 bytes of the initialization vector,

@@ -11,9 +11,9 @@ export async function main(): globalThis.Promise<void> {
 	let anchored: regexp.Regexp | $.VarRef<regexp.Regexp> | null = await regexp.MustCompile("^a$")
 	let suffix: regexp.Regexp | $.VarRef<regexp.Regexp> | null = await regexp.MustCompile("a$")
 
-	$.println("label spacewave-web:", await regexp.Regexp.prototype.MatchString.call(label, "spacewave-web"))
-	$.println("anchored a:", await regexp.Regexp.prototype.MatchString.call(anchored, "a"))
-	$.println("suffix ba:", await regexp.Regexp.prototype.MatchString.call(suffix, "ba"))
+	await $.println("label spacewave-web:", await regexp.Regexp.prototype.MatchString.call(label, "spacewave-web"))
+	await $.println("anchored a:", await regexp.Regexp.prototype.MatchString.call(anchored, "a"))
+	await $.println("suffix ba:", await regexp.Regexp.prototype.MatchString.call(suffix, "ba"))
 }
 
 if ($.isMainScript(import.meta)) {

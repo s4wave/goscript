@@ -7,7 +7,7 @@ export async function main(): globalThis.Promise<void> {
 	// Test nil channel operations
 
 	// Test 1: Using nil channel in select with default
-	$.println("Test 1: Select with nil channel and default")
+	await $.println("Test 1: Select with nil channel and default")
 	let nilCh: $.Channel<number> | null = null! as $.Channel<number> | null
 
 	const [__goscriptSelect0HasReturn, __goscriptSelect0Value] = await $.selectStatement<any, void>([
@@ -17,7 +17,7 @@ export async function main(): globalThis.Promise<void> {
 			channel: nilCh,
 			value: 42,
 			onSelected: async (__goscriptSelect0Result) => {
-				$.println("ERROR: Should not send to nil channel")
+				await $.println("ERROR: Should not send to nil channel")
 			}
 		},
 		{
@@ -25,7 +25,7 @@ export async function main(): globalThis.Promise<void> {
 			isSend: false,
 			channel: nilCh,
 			onSelected: async (__goscriptSelect0Result) => {
-				$.println("ERROR: Should not receive from nil channel")
+				await $.println("ERROR: Should not receive from nil channel")
 			}
 		},
 		{
@@ -33,7 +33,7 @@ export async function main(): globalThis.Promise<void> {
 			isSend: false,
 			channel: null,
 			onSelected: async (__goscriptSelect0Result) => {
-				$.println("PASS: Default case executed correctly")
+				await $.println("PASS: Default case executed correctly")
 			}
 		}
 	], true)
@@ -42,7 +42,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Test 2: Multiple nil channels in select with default
-	$.println("\nTest 2: Select with multiple nil channels and default")
+	await $.println("\nTest 2: Select with multiple nil channels and default")
 	let nilCh1: $.Channel<string> | null = null! as $.Channel<string> | null
 	let nilCh2: $.Channel<string> | null = null! as $.Channel<string> | null
 
@@ -53,7 +53,7 @@ export async function main(): globalThis.Promise<void> {
 			channel: nilCh1,
 			value: "test",
 			onSelected: async (__goscriptSelect1Result) => {
-				$.println("ERROR: Should not send to nil channel 1")
+				await $.println("ERROR: Should not send to nil channel 1")
 			}
 		},
 		{
@@ -61,7 +61,7 @@ export async function main(): globalThis.Promise<void> {
 			isSend: false,
 			channel: nilCh2,
 			onSelected: async (__goscriptSelect1Result) => {
-				$.println("ERROR: Should not receive from nil channel 2")
+				await $.println("ERROR: Should not receive from nil channel 2")
 			}
 		},
 		{
@@ -70,7 +70,7 @@ export async function main(): globalThis.Promise<void> {
 			channel: nilCh1,
 			onSelected: async (__goscriptSelect1Result) => {
 				let msg = __goscriptSelect1Result.value
-				$.println("ERROR: Should not receive from nil channel 1:", msg)
+				await $.println("ERROR: Should not receive from nil channel 1:", msg)
 			}
 		},
 		{
@@ -78,7 +78,7 @@ export async function main(): globalThis.Promise<void> {
 			isSend: false,
 			channel: null,
 			onSelected: async (__goscriptSelect1Result) => {
-				$.println("PASS: Default case executed with multiple nil channels")
+				await $.println("PASS: Default case executed with multiple nil channels")
 			}
 		}
 	], true)
@@ -87,7 +87,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Test 3: Mix of nil and valid channels in select
-	$.println("\nTest 3: Select with mix of nil and valid channels")
+	await $.println("\nTest 3: Select with mix of nil and valid channels")
 	let nilCh3: $.Channel<boolean> | null = null! as $.Channel<boolean> | null
 	let validCh: $.Channel<boolean> | null = $.makeChannel<boolean>(1, false, "both")
 	await $.chanSend(validCh, true)
@@ -99,7 +99,7 @@ export async function main(): globalThis.Promise<void> {
 			channel: nilCh3,
 			value: true,
 			onSelected: async (__goscriptSelect2Result) => {
-				$.println("ERROR: Should not send to nil channel")
+				await $.println("ERROR: Should not send to nil channel")
 			}
 		},
 		{
@@ -107,7 +107,7 @@ export async function main(): globalThis.Promise<void> {
 			isSend: false,
 			channel: nilCh3,
 			onSelected: async (__goscriptSelect2Result) => {
-				$.println("ERROR: Should not receive from nil channel")
+				await $.println("ERROR: Should not receive from nil channel")
 			}
 		},
 		{
@@ -116,7 +116,7 @@ export async function main(): globalThis.Promise<void> {
 			channel: validCh,
 			onSelected: async (__goscriptSelect2Result) => {
 				let val = __goscriptSelect2Result.value
-				$.println("PASS: Received from valid channel:", val)
+				await $.println("PASS: Received from valid channel:", val)
 			}
 		},
 		{
@@ -124,7 +124,7 @@ export async function main(): globalThis.Promise<void> {
 			isSend: false,
 			channel: null,
 			onSelected: async (__goscriptSelect2Result) => {
-				$.println("ERROR: Should not hit default with valid channel ready")
+				await $.println("ERROR: Should not hit default with valid channel ready")
 			}
 		}
 	], true)
@@ -133,7 +133,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Test 4: Short-declared channel can later be disabled by assigning nil
-	$.println("\nTest 4: Short-declared channel can be nilled")
+	await $.println("\nTest 4: Short-declared channel can be nilled")
 	let ch: $.Channel<number> | null = $.makeChannel<number>(1, 0, "both")
 	await $.chanSend(ch, 7)
 
@@ -144,7 +144,7 @@ export async function main(): globalThis.Promise<void> {
 			channel: ch,
 			onSelected: async (__goscriptSelect3Result) => {
 				let val = __goscriptSelect3Result.value
-				$.println("PASS: Received from short-declared channel:", val)
+				await $.println("PASS: Received from short-declared channel:", val)
 			}
 		},
 		{
@@ -152,7 +152,7 @@ export async function main(): globalThis.Promise<void> {
 			isSend: false,
 			channel: null,
 			onSelected: async (__goscriptSelect3Result) => {
-				$.println("ERROR: Short-declared channel should be ready")
+				await $.println("ERROR: Short-declared channel should be ready")
 			}
 		}
 	], true)
@@ -167,7 +167,7 @@ export async function main(): globalThis.Promise<void> {
 			isSend: false,
 			channel: ch,
 			onSelected: async (__goscriptSelect4Result) => {
-				$.println("ERROR: Should not receive from nilled short-declared channel")
+				await $.println("ERROR: Should not receive from nilled short-declared channel")
 			}
 		},
 		{
@@ -175,7 +175,7 @@ export async function main(): globalThis.Promise<void> {
 			isSend: false,
 			channel: null,
 			onSelected: async (__goscriptSelect4Result) => {
-				$.println("PASS: Nilled short-declared channel is disabled")
+				await $.println("PASS: Nilled short-declared channel is disabled")
 			}
 		}
 	], true)
@@ -183,7 +183,7 @@ export async function main(): globalThis.Promise<void> {
 		return __goscriptSelect4Value
 	}
 
-	$.println("\nAll nil channel tests completed")
+	await $.println("\nAll nil channel tests completed")
 }
 
 if ($.isMainScript(import.meta)) {

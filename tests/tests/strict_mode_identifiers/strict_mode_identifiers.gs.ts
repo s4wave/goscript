@@ -13,7 +13,7 @@ export function choose(_arguments: number): number {
 export async function main(): globalThis.Promise<void> {
 	let _eval = choose(1)
 	let _arguments = _eval + 1
-	$.println(_eval, _arguments)
+	await $.println(_eval, _arguments)
 }
 
 if ($.isMainScript(import.meta)) {

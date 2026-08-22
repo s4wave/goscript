@@ -49,18 +49,18 @@ export function blankReturn(): [number, string] {
 
 export async function main(): globalThis.Promise<void> {
 	let [v, err] = syncReturn()
-	$.println("sync", v, err)
+	await $.println("sync", v, err)
 
 	let ch: $.Channel<string> | null = $.makeChannel<string>(1, "", "both")
 	let __goscriptTuple0: any = await asyncReturn(ch)
 	v = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
-	$.println("async", v, err)
+	await $.println("async", v, err)
 
 	let __goscriptTuple1: any = blankReturn()
 	v = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
-	$.println("blank", v, err)
+	await $.println("blank", v, err)
 }
 
 if ($.isMainScript(import.meta)) {

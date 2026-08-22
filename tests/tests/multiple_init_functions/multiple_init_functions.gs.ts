@@ -24,7 +24,7 @@ function __goscriptInit1(): void {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println("init value:", value)
+	await $.println("init value:", value)
 }
 
 __goscriptInit0()

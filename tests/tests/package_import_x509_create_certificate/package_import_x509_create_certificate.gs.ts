@@ -91,29 +91,29 @@ export async function main(): globalThis.Promise<void> {
 	let pub: ed25519.PublicKey = (__goscriptTuple0[0] as ed25519.PublicKey)
 	let priv: ed25519.PrivateKey = (__goscriptTuple0[1] as ed25519.PrivateKey)
 	let err = __goscriptTuple0[2]
-	$.println("keygen err nil", err == null)
+	await $.println("keygen err nil", err == null)
 	let __goscriptTuple1: any = await asn1.Marshal($.interfaceValue($.markAsStructValue(new signedKey({PubKey: new Uint8Array([8, 1, 18, 2, 3, 4]) as $.Slice<number>, Signature: new Uint8Array([5, 6]) as $.Slice<number>})), "main.signedKey", "main.signedKey"))
 	let extensionDER: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
-	$.println("extension marshal err nil", err == null)
+	await $.println("extension marshal err nil", err == null)
 
 	let template: x509.Certificate | $.VarRef<x509.Certificate> | null = (() => { const __goscriptLiteralField0 = big.NewInt(42n); const __goscriptLiteralField1 = $.markAsStructValue($.cloneStructValue(time.Unix(1700000000n, 0n))); const __goscriptLiteralField2 = $.markAsStructValue($.cloneStructValue(time.Unix(4900000000n, 0n))); return new x509.Certificate({SerialNumber: __goscriptLiteralField0, Subject: $.markAsStructValue(new pkix.Name({CommonName: "goscript.test", Organization: $.arrayToSlice<string>(["GoScript"])})), NotBefore: __goscriptLiteralField1, NotAfter: __goscriptLiteralField2, KeyUsage: x509.KeyUsageDigitalSignature, ExtKeyUsage: $.arrayToSlice<x509.ExtKeyUsage>([x509.ExtKeyUsageServerAuth]), BasicConstraintsValid: true, ExtraExtensions: $.arrayToSlice<pkix.Extension>([$.markAsStructValue(new pkix.Extension({Id: (extensionID as asn1.ObjectIdentifier), Critical: true, Value: extensionDER}))])}) })()
 	let __goscriptTuple2: any = await x509.CreateCertificate(rand.Reader, template, template, $.namedValueInterfaceValue<any>(pub, "ed25519.PublicKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PublicKey" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }]), $.namedValueInterfaceValue<any>(priv, "ed25519.PrivateKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Public: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Public as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Seed: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Seed as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Sign: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Sign as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "ed25519.PrivateKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PrivateKey" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Public", args: [], returns: [{ name: "_r0", type: "crypto.PublicKey" }] }, { name: "Seed", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Sign", args: [{ name: "rand", type: "io.Reader" }, { name: "message", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "opts", type: "crypto.SignerOpts" }], returns: [{ name: "signature", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "err", type: "error" }] }]))
 	let der: $.Slice<number> = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
-	$.println("create err nil", err == null)
-	$.println("der nonempty", $.len(der) != 0)
+	await $.println("create err nil", err == null)
+	await $.println("der nonempty", $.len(der) != 0)
 	if (err != null) {
-		$.println("create error", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("create error", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
 	}
 
 	let __goscriptTuple3: any = await x509.ParseCertificate(der)
 	let cert: x509.Certificate | $.VarRef<x509.Certificate> | null = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
-	$.println("parse err nil", err == null)
+	await $.println("parse err nil", err == null)
 	if (err != null) {
-		$.println("parse error", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("parse error", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
 	}
 	let keyExt: pkix.Extension = $.markAsStructValue(new pkix.Extension())
@@ -134,34 +134,34 @@ export async function main(): globalThis.Promise<void> {
 	let decoded: $.VarRef<signedKey> = $.varRef($.markAsStructValue(new signedKey()))
 	let __goscriptTuple4: any = await asn1.Unmarshal(keyExt.Value, $.interfaceValue(decoded, "*main.signedKey", { kind: $.TypeKind.Pointer, elemType: "main.signedKey" }))
 	err = __goscriptTuple4[1]
-	$.println("extension unmarshal", err == null, $.len(decoded.value.PubKey), $.uint($.arrayIndex(decoded.value.PubKey!, 0), 8), $.uint($.arrayIndex(decoded.value.PubKey!, 5), 8), $.len(decoded.value.Signature))
+	await $.println("extension unmarshal", err == null, $.len(decoded.value.PubKey), $.uint($.arrayIndex(decoded.value.PubKey!, 0), 8), $.uint($.arrayIndex(decoded.value.PubKey!, 5), 8), $.len(decoded.value.Signature))
 	let pool: x509.CertPool | $.VarRef<x509.CertPool> | null = x509.NewCertPool()
 	await x509.CertPool.prototype.AddCert.call(pool, cert)
 	let __goscriptTuple5: any = await x509.Certificate.prototype.Verify.call(cert, $.markAsStructValue(new x509.VerifyOptions({Roots: pool})))
 	err = __goscriptTuple5[1]
-	$.println("verify err nil", err == null)
+	await $.println("verify err nil", err == null)
 	if (err != null) {
-		$.println("verify error", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
-		$.println("verify error type", await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf((err as any))).String())
+		await $.println("verify error", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("verify error type", await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf((err as any))).String())
 		{
 			const __goscriptTypeSwitchValue = err
 			switch (true) {
 				case $.typeAssert<x509.CertificateInvalidError>(__goscriptTypeSwitchValue, "x509.CertificateInvalidError").ok:
 					{
 						let typed: x509.CertificateInvalidError = $.typeAssert<x509.CertificateInvalidError>(__goscriptTypeSwitchValue, "x509.CertificateInvalidError").value
-						$.println("certificate invalid", $.int(typed.Reason), typed.Detail)
+						await $.println("certificate invalid", $.int(typed.Reason), typed.Detail)
 					}
 					break
 				case $.typeAssert<x509.UnknownAuthorityError>(__goscriptTypeSwitchValue, "x509.UnknownAuthorityError").ok:
 					{
 						let typed: x509.UnknownAuthorityError = $.typeAssert<x509.UnknownAuthorityError>(__goscriptTypeSwitchValue, "x509.UnknownAuthorityError").value
-						$.println("unknown authority")
+						await $.println("unknown authority")
 					}
 					break
 				default:
 					{
 						let typed: any = __goscriptTypeSwitchValue
-						$.println("other error")
+						await $.println("other error")
 					}
 					break
 			}
@@ -169,12 +169,12 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 
-	$.println("serial", await big.Int.prototype.String.call($.pointerValue<x509.Certificate>(cert).SerialNumber))
-	$.println("common name", $.pointerValue<x509.Certificate>(cert).Subject.CommonName)
-	$.println("organization", $.arrayIndex($.pointerValue<x509.Certificate>(cert).Subject.Organization!, 0))
-	$.println("signature algorithm", x509.SignatureAlgorithm_String($.pointerValue<x509.Certificate>(cert).SignatureAlgorithm))
-	$.println("public key algorithm", x509.PublicKeyAlgorithm_String($.pointerValue<x509.Certificate>(cert).PublicKeyAlgorithm))
-	$.println("public key equal", ed25519.PublicKey_Equal($.mustTypeAssert<ed25519.PublicKey>($.pointerValue<x509.Certificate>(cert).PublicKey, { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }), $.namedValueInterfaceValue<crypto.PublicKey | null>(pub, "ed25519.PublicKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PublicKey" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }])))
+	await $.println("serial", await big.Int.prototype.String.call($.pointerValue<x509.Certificate>(cert).SerialNumber))
+	await $.println("common name", $.pointerValue<x509.Certificate>(cert).Subject.CommonName)
+	await $.println("organization", $.arrayIndex($.pointerValue<x509.Certificate>(cert).Subject.Organization!, 0))
+	await $.println("signature algorithm", x509.SignatureAlgorithm_String($.pointerValue<x509.Certificate>(cert).SignatureAlgorithm))
+	await $.println("public key algorithm", x509.PublicKeyAlgorithm_String($.pointerValue<x509.Certificate>(cert).PublicKeyAlgorithm))
+	await $.println("public key equal", ed25519.PublicKey_Equal($.mustTypeAssert<ed25519.PublicKey>($.pointerValue<x509.Certificate>(cert).PublicKey, { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }), $.namedValueInterfaceValue<crypto.PublicKey | null>(pub, "ed25519.PublicKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PublicKey" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }])))
 }
 
 if ($.isMainScript(import.meta)) {

@@ -49,13 +49,13 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = drbg2.Read()
 		if (err != null) {
-			$.println("error")
+			await $.println("error")
 			return
 		}
 	}
 
 	let __goscriptShadow0: local | $.VarRef<local> | null = newLocal(7)
-	$.println($.pointerValue<local>(__goscriptShadow0).value)
+	await $.println($.pointerValue<local>(__goscriptShadow0).value)
 }
 
 if ($.isMainScript(import.meta)) {

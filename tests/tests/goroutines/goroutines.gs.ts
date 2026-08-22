@@ -114,9 +114,9 @@ export async function main(): globalThis.Promise<void> {
 	// Print all messages in deterministic order
 	for (let __goscriptRangeTarget1 = allMessages, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
 		let msg = __goscriptRangeTarget1![__rangeIndex]
-		$.println(msg.priority, msg.text)
+		await $.println(msg.priority, msg.text)
 	}
-	$.println("done")
+	await $.println("done")
 }
 
 if ($.isMainScript(import.meta)) {

@@ -1827,7 +1827,7 @@ export async function validateResolvedAddr(net: string, family: number, sa: __go
 				{
 					let [, err] = os.Stat($.sliceStringOrBytes($.pointerValue<__goscript_unixsock.UnixAddr>(__goscriptShadow5).Name, undefined, i + 1))
 					if (err != null) {
-						return $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField9 = $.pointerValue<Exclude<$.GoError, null>>(err).Error(); return new __goscript_net.AddrError({Err: __goscriptLiteralField9, Addr: $.pointerValue<__goscript_unixsock.UnixAddr>(__goscriptShadow5).Name}) })(), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })
+						return $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField9 = await $.pointerValue<Exclude<$.GoError, null>>(err).Error(); return new __goscript_net.AddrError({Err: __goscriptLiteralField9, Addr: $.pointerValue<__goscript_unixsock.UnixAddr>(__goscriptShadow5).Name}) })()), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })
 					}
 				}
 			}
@@ -1947,7 +1947,7 @@ export async function fakeListen(fd: __goscript_fd_fake.netFD | $.VarRef<__goscr
 			{
 				let [, ok] = $.typeAssertTuple<__goscript_net.AddrError | $.VarRef<__goscript_net.AddrError> | null>(err, { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })
 				if (!ok) {
-					err = $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField15 = $.pointerValue<Exclude<$.GoError, null>>(err).Error(); const __goscriptLiteralField16 = await $.pointerValue<Exclude<__goscript_sockaddr_posix.sockaddr, null>>(laddr).String(); return new __goscript_net.AddrError({Err: __goscriptLiteralField15, Addr: __goscriptLiteralField16}) })()), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })
+					err = $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField15 = await $.pointerValue<Exclude<$.GoError, null>>(err).Error(); const __goscriptLiteralField16 = await $.pointerValue<Exclude<__goscript_sockaddr_posix.sockaddr, null>>(laddr).String(); return new __goscript_net.AddrError({Err: __goscriptLiteralField15, Addr: __goscriptLiteralField16}) })()), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })
 				}
 			}
 		}
@@ -2040,7 +2040,7 @@ export async function fakeConnect(ctx: context.Context | null, fd: __goscript_fd
 				{
 					let [, __goscriptShadow11] = $.typeAssertTuple<__goscript_net.AddrError | $.VarRef<__goscript_net.AddrError> | null>(err, { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })
 					if (!__goscriptShadow11) {
-						err = $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField17 = $.pointerValue<Exclude<$.GoError, null>>(err).Error(); const __goscriptLiteralField18 = await $.pointerValue<Exclude<__goscript_sockaddr_posix.sockaddr, null>>(raddr).String(); return new __goscript_net.AddrError({Err: __goscriptLiteralField17, Addr: __goscriptLiteralField18}) })()), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })
+						err = $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField17 = await $.pointerValue<Exclude<$.GoError, null>>(err).Error(); const __goscriptLiteralField18 = await $.pointerValue<Exclude<__goscript_sockaddr_posix.sockaddr, null>>(raddr).String(); return new __goscript_net.AddrError({Err: __goscriptLiteralField17, Addr: __goscriptLiteralField18}) })()), "*net.AddrError", { kind: $.TypeKind.Pointer, elemType: "net.AddrError" })
 					}
 				}
 			}

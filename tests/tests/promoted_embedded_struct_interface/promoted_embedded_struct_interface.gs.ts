@@ -132,7 +132,7 @@ export class pointerStopStream {
 }
 
 export async function closeIt(c: closer | null): globalThis.Promise<void> {
-	$.println(await $.pointerValue<Exclude<closer, null>>(c).Close())
+	await $.println(await $.pointerValue<Exclude<closer, null>>(c).Close())
 }
 
 export async function main(): globalThis.Promise<void> {

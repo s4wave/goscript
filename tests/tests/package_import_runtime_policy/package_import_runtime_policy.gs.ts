@@ -21,17 +21,17 @@ import "@goscript/runtime/pprof/index.js"
 import "@goscript/runtime/trace/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	$.println("runtime trace:", runtime.StartTrace() != null)
+	await $.println("runtime trace:", runtime.StartTrace() != null)
 
 	let profile: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
-	$.println("pprof:", pprof.StartCPUProfile($.pointerValueOrNil($.interfaceValue<io.Writer | null>(profile, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!) != null, pprof.Profile.prototype.WriteTo.call($.pointerValue<pprof.Profile>(pprof.Lookup("heap")), $.pointerValueOrNil($.interfaceValue<io.Writer | null>(profile, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!, 0) != null)
+	await $.println("pprof:", pprof.StartCPUProfile($.pointerValueOrNil($.interfaceValue<io.Writer | null>(profile, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!) != null, pprof.Profile.prototype.WriteTo.call($.pointerValue<pprof.Profile>(pprof.Lookup("heap")), $.pointerValueOrNil($.interfaceValue<io.Writer | null>(profile, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!, 0) != null)
 
 	let traceBuf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	let __goscriptTuple0: any = trace.NewTask($.pointerValueOrNil(context.Background())!, "task")
 	let ctx = __goscriptTuple0[0]
 	let task: trace.Task | $.VarRef<trace.Task> | null = __goscriptTuple0[1]
 	trace.Task.prototype.End.call($.pointerValue<trace.Task>(task))
-	$.println("trace:", trace.Start($.pointerValueOrNil($.interfaceValue<io.Writer | null>(traceBuf, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!) != null, trace.IsEnabled())
+	await $.println("trace:", trace.Start($.pointerValueOrNil($.interfaceValue<io.Writer | null>(traceBuf, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!) != null, trace.IsEnabled())
 	trace.Log($.pointerValueOrNil(ctx)!, "category", "message")
 	trace.Stop()
 }

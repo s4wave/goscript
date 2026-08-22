@@ -14,7 +14,7 @@ function __goscriptBlankFunc1(): void {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println("blank funcs ok")
+	await $.println("blank funcs ok")
 }
 
 if ($.isMainScript(import.meta)) {

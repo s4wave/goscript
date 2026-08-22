@@ -57,18 +57,18 @@ export function MyFileMode_String(m: MyFileMode): string {
 export async function main(): globalThis.Promise<void> {
 	// Test using the named type directly
 	let mode: MyFileMode = 0o644
-	$.println("Mode value:", $.int(mode))
-	$.println("Mode string:", MyFileMode_String(mode))
+	await $.println("Mode value:", $.int(mode))
+	await $.println("Mode string:", MyFileMode_String(mode))
 
 	// Test using in struct
 	let status = $.markAsStructValue(new FileStatus({mode: 0o755, size: 1024n}))
 
-	$.println("Status mode:", $.int(status.mode))
-	$.println("Status size:", status.size)
+	await $.println("Status mode:", $.int(status.mode))
+	await $.println("Status size:", status.size)
 
 	// Test type assertion and conversion
 	let genericMode: MyFileMode = 0o777
-	$.println("Generic mode:", $.int(genericMode))
+	await $.println("Generic mode:", $.int(genericMode))
 }
 
 if ($.isMainScript(import.meta)) {

@@ -42,7 +42,7 @@ export async function main(): globalThis.Promise<void> {
 	let ch: $.Channel<result> | null = $.makeChannel<result>(1, $.markAsStructValue(new result()), "both")
 	await $.chanSend(ch, $.markAsStructValue(new result({value: 7})))
 	let got = await $.chanRecv(ch)
-	$.println(got.value)
+	await $.println(got.value)
 }
 
 if ($.isMainScript(import.meta)) {

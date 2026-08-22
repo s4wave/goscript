@@ -8,8 +8,8 @@ export async function main(): globalThis.Promise<void> {
 	let name = $.sliceStringOrBytes(s, undefined, 2)
 	s = $.sliceStringOrBytes(s, 2, undefined)
 
-	$.println(name)
-	$.println(s)
+	await $.println(name)
+	await $.println(s)
 }
 
 if ($.isMainScript(import.meta)) {

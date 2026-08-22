@@ -12,9 +12,9 @@ export function byteWrap(v: number): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println("uint(-1) below length:", beforeStart(0, 3))
-	$.println("uint(0) below length:", beforeStart(1, 3))
-	$.println("uint8(-1):", $.uint(byteWrap(-1), 8))
+	await $.println("uint(-1) below length:", beforeStart(0, 3))
+	await $.println("uint(0) below length:", beforeStart(1, 3))
+	await $.println("uint8(-1):", $.uint(byteWrap(-1), 8))
 }
 
 if ($.isMainScript(import.meta)) {

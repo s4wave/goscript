@@ -142,18 +142,18 @@ export async function main(): globalThis.Promise<void> {
 	let structPointer: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({MyInt: 4, MyString: "hello world"})
 	// === Method Call on Pointer Receiver ===
 	// Calling a method with a pointer receiver (*MyStruct) using a pointer variable.
-	$.println("Method call on pointer (structPointer): Expected: hello world, Actual: " + MyStruct.prototype.GetMyString.call(structPointer))
+	await $.println("Method call on pointer (structPointer): Expected: hello world, Actual: " + MyStruct.prototype.GetMyString.call(structPointer))
 
 	let setter: setterStruct | $.VarRef<setterStruct> | null = new setterStruct()
 	setterStruct.prototype.set.call(setter, 9)
-	$.println("reserved pointer method:", setterStruct.prototype.get.call(setter))
+	await $.println("reserved pointer method:", setterStruct.prototype.get.call(setter))
 
 	let d: digest | $.VarRef<digest> | null = new digest()
 	let pad: $.Slice<number> = new Uint8Array([1, 2, 3]) as $.Slice<number>
 	{
 		digest.prototype.Write.call(d, pad)
 		let __goscriptShadow0: $.Slice<number> = new Uint8Array([4]) as $.Slice<number>
-		$.println("shadowed type name after method call:", $.pointerValue<digest>(d).writes, $.len(__goscriptShadow0))
+		await $.println("shadowed type name after method call:", $.pointerValue<digest>(d).writes, $.len(__goscriptShadow0))
 	}
 }
 

@@ -84,10 +84,10 @@ export class parent {
 export async function main(): globalThis.Promise<void> {
 	let p: parent = $.markAsStructValue(new parent())
 	if (child.prototype.Clone.call(p.child) == null) {
-		$.println("nil clone")
+		await $.println("nil clone")
 	}
 	p.child = new child({value: "ok"})
-	$.println($.pointerValue<child>(child.prototype.Clone.call(p.child)).value)
+	await $.println($.pointerValue<child>(child.prototype.Clone.call(p.child)).value)
 }
 
 if ($.isMainScript(import.meta)) {

@@ -53,14 +53,14 @@ export async function main(): globalThis.Promise<void> {
 	// Call the value-receiver method using the pointer variable.
 	// Go implicitly dereferences msPointer to call GetValue on the value.
 	// Expected: 100
-	$.println("Value via pointer call: Expected: 100, Actual:", $.markAsStructValue($.cloneStructValue($.pointerValue<MyStruct>(msPointer))).GetValue())
+	await $.println("Value via pointer call: Expected: 100, Actual:", $.markAsStructValue($.cloneStructValue($.pointerValue<MyStruct>(msPointer))).GetValue())
 
 	// Modify the value through the original value variable
 	msValue.value.MyInt = 200
 
 	// The pointer still points to the modified value
 	// Expected: 200
-	$.println("Value via pointer call after modification: Expected: 200, Actual:", $.markAsStructValue($.cloneStructValue($.pointerValue<MyStruct>(msPointer))).GetValue())
+	await $.println("Value via pointer call after modification: Expected: 200, Actual:", $.markAsStructValue($.cloneStructValue($.pointerValue<MyStruct>(msPointer))).GetValue())
 }
 
 if ($.isMainScript(import.meta)) {

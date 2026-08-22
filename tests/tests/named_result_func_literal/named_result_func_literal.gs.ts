@@ -20,14 +20,14 @@ export async function main(): globalThis.Promise<void> {
 	let lookup: ((_p0: boolean) => [number, string] | globalThis.Promise<[number, string]>) | null = makeLookup()
 
 	let [value, label] = await lookup!(false)
-	$.println(value)
-	$.println($.stringEqual(label, ""))
+	await $.println(value)
+	await $.println($.stringEqual(label, ""))
 
 	let __goscriptTuple0: any = await lookup!(true)
 	value = __goscriptTuple0[0]
 	label = __goscriptTuple0[1]
-	$.println(value)
-	$.println(label)
+	await $.println(value)
+	await $.println(label)
 }
 
 if ($.isMainScript(import.meta)) {

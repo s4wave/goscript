@@ -60,8 +60,8 @@ export function __goscript_set_Derived(__goscriptValue: T | $.VarRef<T> | null):
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println("Base:", $.pointerValue<T>(Base).val)
-	$.println("Derived:", $.pointerValue<T>(Derived).val)
+	await $.println("Base:", $.pointerValue<T>(Base).val)
+	await $.println("Derived:", $.pointerValue<T>(Derived).val)
 }
 
 if ($.isMainScript(import.meta)) {

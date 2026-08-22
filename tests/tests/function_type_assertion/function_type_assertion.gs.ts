@@ -63,9 +63,9 @@ export async function main(): globalThis.Promise<void> {
 	let i: any = $.interfaceValue($.namedFunction(greet, "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo)), "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo))
 	let [fn, ok] = $.typeAssertTuple<((name: string) => string | globalThis.Promise<string>) | null>(i, ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo))
 	if (ok) {
-		$.println(await fn!("World"))
+		await $.println(await fn!("World"))
 	} else {
-		$.println("Simple assertion failed")
+		await $.println("Simple assertion failed")
 	}
 
 	let j: any = $.interfaceValue($.namedFunction(add, "main.Adder", ({ kind: $.TypeKind.Function, name: "main.Adder", params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo)), "main.Adder", ({ kind: $.TypeKind.Function, name: "main.Adder", params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))
@@ -73,9 +73,9 @@ export async function main(): globalThis.Promise<void> {
 	let addFn = __goscriptTuple0[0]
 	ok = __goscriptTuple0[1]
 	if (ok) {
-		$.println(await addFn!(5, 3))
+		await $.println(await addFn!(5, 3))
 	} else {
-		$.println("Simple adder assertion failed")
+		await $.println("Simple adder assertion failed")
 	}
 
 	// 2. Type assertion of a function returned from another function
@@ -84,9 +84,9 @@ export async function main(): globalThis.Promise<void> {
 	let greetFn = __goscriptTuple1[0]
 	ok = __goscriptTuple1[1]
 	if (ok) {
-		$.println(await greetFn!("Gopher"))
+		await $.println(await greetFn!("Gopher"))
 	} else {
-		$.println("Returned function assertion failed")
+		await $.println("Returned function assertion failed")
 	}
 
 	let returnedAdder = getAdder()
@@ -94,9 +94,9 @@ export async function main(): globalThis.Promise<void> {
 	let addFnFromFunc = __goscriptTuple2[0]
 	ok = __goscriptTuple2[1]
 	if (ok) {
-		$.println(await addFnFromFunc!(10, 20))
+		await $.println(await addFnFromFunc!(10, 20))
 	} else {
-		$.println("Returned adder assertion failed")
+		await $.println("Returned adder assertion failed")
 	}
 
 	// 3. Type assertion of a function in a struct field
@@ -105,9 +105,9 @@ export async function main(): globalThis.Promise<void> {
 	let structFn = __goscriptTuple3[0]
 	ok = __goscriptTuple3[1]
 	if (ok) {
-		$.println(await structFn!("Struct"))
+		await $.println(await structFn!("Struct"))
 	} else {
-		$.println("Struct function assertion failed")
+		await $.println("Struct function assertion failed")
 	}
 
 	let adderContainer = $.markAsStructValue(new FuncContainer({myFunc: $.interfaceValue($.namedFunction(add, "main.Adder", ({ kind: $.TypeKind.Function, name: "main.Adder", params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo)), "main.Adder", ({ kind: $.TypeKind.Function, name: "main.Adder", params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))}))
@@ -115,9 +115,9 @@ export async function main(): globalThis.Promise<void> {
 	let structAdderFn = __goscriptTuple4[0]
 	ok = __goscriptTuple4[1]
 	if (ok) {
-		$.println(await structAdderFn!(7, 8))
+		await $.println(await structAdderFn!(7, 8))
 	} else {
-		$.println("Struct adder assertion failed")
+		await $.println("Struct adder assertion failed")
 	}
 
 	// 4. Type assertion of a function in a map
@@ -129,18 +129,18 @@ export async function main(): globalThis.Promise<void> {
 	let mapFn = __goscriptTuple5[0]
 	ok = __goscriptTuple5[1]
 	if (ok) {
-		$.println(await mapFn!("Map"))
+		await $.println(await mapFn!("Map"))
 	} else {
-		$.println("Map function assertion failed")
+		await $.println("Map function assertion failed")
 	}
 
 	let __goscriptTuple6: any = $.typeAssertTuple<((a: number, b: number) => number | globalThis.Promise<number>) | null>($.mapGet<string, any, any>(funcMap, "adder", null)[0], ({ kind: $.TypeKind.Function, name: "main.Adder", params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))
 	let mapAdderFn = __goscriptTuple6[0]
 	ok = __goscriptTuple6[1]
 	if (ok) {
-		$.println(await mapAdderFn!(1, 2))
+		await $.println(await mapAdderFn!(1, 2))
 	} else {
-		$.println("Map adder assertion failed")
+		await $.println("Map adder assertion failed")
 	}
 
 	// 5. Type assertion of a function in a slice
@@ -152,30 +152,30 @@ export async function main(): globalThis.Promise<void> {
 	let sliceFn = __goscriptTuple7[0]
 	ok = __goscriptTuple7[1]
 	if (ok) {
-		$.println(await sliceFn!("Slice"))
+		await $.println(await sliceFn!("Slice"))
 	} else {
-		$.println("Slice function assertion failed")
+		await $.println("Slice function assertion failed")
 	}
 	let __goscriptTuple8: any = $.typeAssertTuple<((a: number, b: number) => number | globalThis.Promise<number>) | null>($.arrayIndex(funcSlice!, 1), ({ kind: $.TypeKind.Function, name: "main.Adder", params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))
 	let sliceAdderFn = __goscriptTuple8[0]
 	ok = __goscriptTuple8[1]
 	if (ok) {
-		$.println(await sliceAdderFn!(9, 9))
+		await $.println(await sliceAdderFn!(9, 9))
 	} else {
-		$.println("Slice adder assertion failed")
+		await $.println("Slice adder assertion failed")
 	}
 
 	// 6. Type assertion with ok variable (successful and failing)
 	let k: any = $.interfaceValue($.namedFunction(greet, "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo)), "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo))
 	let [, ok1] = $.typeAssertTuple<((name: string) => string | globalThis.Promise<string>) | null>(k, ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo))
-	$.println(ok1)
+	await $.println(ok1)
 
 	let [, ok2] = $.typeAssertTuple<((a: number, b: number) => number | globalThis.Promise<number>) | null>(k, ({ kind: $.TypeKind.Function, name: "main.Adder", params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))
-	$.println(ok2)
+	await $.println(ok2)
 
 	let l: any = "not a function"
 	let [, ok3] = $.typeAssertTuple<((name: string) => string | globalThis.Promise<string>) | null>(l, ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo))
-	$.println(ok3)
+	await $.println(ok3)
 
 	// 7. Type assertion that should panic (commented out for now to allow test to run)
 	// defer func() {
@@ -191,18 +191,18 @@ export async function main(): globalThis.Promise<void> {
 	let nilInterface: any = null! as any
 	let [nilFn, okNil] = $.typeAssertTuple<((name: string) => string | globalThis.Promise<string>) | null>(nilInterface, ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo))
 	if (!okNil && (nilFn == null)) {
-		$.println("Nil interface assertion correct")
+		await $.println("Nil interface assertion correct")
 	} else {
-		$.println("Nil interface assertion failed")
+		await $.println("Nil interface assertion failed")
 	}
 
 	// Test assertion to wrong function type
 	let wrongFnInterface: any = $.interfaceValue($.namedFunction(greet, "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo)), "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo))
 	let [wrongFn, okWrong] = $.typeAssertTuple<((a: number, b: number) => number | globalThis.Promise<number>) | null>(wrongFnInterface, ({ kind: $.TypeKind.Function, name: "main.Adder", params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))
 	if (!okWrong && (wrongFn == null)) {
-		$.println("Wrong function type assertion correct")
+		await $.println("Wrong function type assertion correct")
 	} else {
-		$.println("Wrong function type assertion failed")
+		await $.println("Wrong function type assertion failed")
 	}
 }
 

@@ -76,7 +76,7 @@ export async function Read(b: $.Slice<number>): globalThis.Promise<void> {
 	}
 
 	if (!fips140.Enabled) {
-		sysrand.Read(b)
+		await sysrand.Read(b)
 		return
 	}
 
@@ -86,7 +86,7 @@ export async function Read(b: $.Slice<number>): globalThis.Promise<void> {
 	// 8.7.2: "Note that a DRBG does not rely on additional input to provide
 	// entropy, even though entropy could be provided in the additional input".
 	let additionalInput: $.VarRef<Uint8Array> | null = $.varRef<Uint8Array>(new Uint8Array(48))
-	sysrand.Read($.goSlice($.pointerValue<Uint8Array>(additionalInput), undefined, 16))
+	await sysrand.Read($.goSlice($.pointerValue<Uint8Array>(additionalInput), undefined, 16))
 
 	let drbg: __goscript_ctrdrbg.Counter | $.VarRef<__goscript_ctrdrbg.Counter> | null = (drbgInstance.value.Swap(null) as __goscript_ctrdrbg.Counter | $.VarRef<__goscript_ctrdrbg.Counter> | null)
 	if (drbg == null) {

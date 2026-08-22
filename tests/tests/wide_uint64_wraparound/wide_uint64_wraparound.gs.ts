@@ -30,7 +30,7 @@ export class BigInt {
 
 export async function main(): globalThis.Promise<void> {
 	let value = 18446744073709551615n
-	$.println($.uint64Add(value, 1n))
+	await $.println($.uint64Add(value, 1n))
 }
 
 if ($.isMainScript(import.meta)) {

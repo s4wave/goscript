@@ -461,7 +461,7 @@ export class fsTester {
 		{
 			let __goscriptShadow9 = await iotest.TestReader((f as io.Reader | null), data)
 			if (__goscriptShadow9 != null) {
-				fsTester.prototype.errorf.call(t, "%s: failed TestReader:\n\t%s", $.arrayToSlice<any>([file, strings.ReplaceAll($.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow9).Error(), "\n", "\n\t")]))
+				fsTester.prototype.errorf.call(t, "%s: failed TestReader:\n\t%s", $.arrayToSlice<any>([file, strings.ReplaceAll(await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow9).Error(), "\n", "\n\t")]))
 			}
 		}
 	}

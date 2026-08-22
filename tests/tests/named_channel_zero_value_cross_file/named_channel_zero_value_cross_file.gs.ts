@@ -10,7 +10,7 @@ import "./create.gs.ts"
 
 export async function main(): globalThis.Promise<void> {
 	let jobs: __goscript_types.Jobs = __goscript_create.MakeJobs()
-	$.println(jobs != null)
+	await $.println(jobs != null)
 }
 
 if ($.isMainScript(import.meta)) {

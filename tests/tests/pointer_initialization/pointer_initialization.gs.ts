@@ -53,7 +53,7 @@ export async function main(): globalThis.Promise<void> {
 	// Create a pointer to a MyStruct instance using a composite literal.
 	let structPointer: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({MyInt: 4, MyString: "hello world"})
 	// Expected: "hello world"
-	$.println("Initial MyString (via pointer): Expected: hello world, Actual: " + $.pointerValue<MyStruct>(structPointer).MyString)
+	await $.println("Initial MyString (via pointer): Expected: hello world, Actual: " + $.pointerValue<MyStruct>(structPointer).MyString)
 }
 
 if ($.isMainScript(import.meta)) {

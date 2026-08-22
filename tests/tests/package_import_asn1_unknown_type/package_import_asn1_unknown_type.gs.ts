@@ -8,9 +8,9 @@ import "@goscript/encoding/asn1/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let [, err] = await asn1.Marshal($.interfaceValue($.makeChannel<number>(0, 0, "both"), "chan int", { kind: $.TypeKind.Channel, direction: "both", elemType: { kind: $.TypeKind.Basic, name: "int" } }))
-	$.println("err nil", err == null)
+	await $.println("err nil", err == null)
 	if (err != null) {
-		$.println("err", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("err", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 	}
 }
 

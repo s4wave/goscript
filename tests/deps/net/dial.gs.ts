@@ -719,16 +719,16 @@ export class sysDialer {
 				return await $.pointerValue<Exclude<__goscript_net.Conn | null, null>>(this.Conn).Close()
 			}
 
-			public LocalAddr(): any {
-				return $.pointerValue<Exclude<__goscript_net.Conn | null, null>>(this.Conn).LocalAddr()
+			public async LocalAddr(): globalThis.Promise<any> {
+				return await $.pointerValue<Exclude<__goscript_net.Conn | null, null>>(this.Conn).LocalAddr()
 			}
 
 			public async Read(b: any): globalThis.Promise<any> {
 				return await $.pointerValue<Exclude<__goscript_net.Conn | null, null>>(this.Conn).Read(b)
 			}
 
-			public RemoteAddr(): any {
-				return $.pointerValue<Exclude<__goscript_net.Conn | null, null>>(this.Conn).RemoteAddr()
+			public async RemoteAddr(): globalThis.Promise<any> {
+				return await $.pointerValue<Exclude<__goscript_net.Conn | null, null>>(this.Conn).RemoteAddr()
 			}
 
 			public async SetDeadline(t: any): globalThis.Promise<any> {
@@ -747,8 +747,8 @@ export class sysDialer {
 				return await $.pointerValue<Exclude<__goscript_net.Conn | null, null>>(this.Conn).Write(b)
 			}
 
-			public Error(): any {
-				return $.pointerValue<Exclude<$.GoError, null>>(this.error).Error()
+			public async Error(): globalThis.Promise<any> {
+				return await $.pointerValue<Exclude<$.GoError, null>>(this.error).Error()
 			}
 
 			static __typeInfo = $.registerStructType(

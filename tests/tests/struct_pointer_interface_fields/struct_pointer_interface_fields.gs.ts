@@ -60,19 +60,19 @@ export class MyStruct {
 
 export async function main(): globalThis.Promise<void> {
 	let s = $.markAsStructValue(new MyStruct())
-	$.println(s.PointerField == null)
-	$.println(s.interfaceField == null)
+	await $.println(s.PointerField == null)
+	await $.println(s.interfaceField == null)
 
 	let i = $.varRef(10)
 	s.PointerField = i
-	$.println(s.PointerField != null)
-	$.println($.pointerValue<number>(s.PointerField))
+	await $.println(s.PointerField != null)
+	await $.println($.pointerValue<number>(s.PointerField))
 	i.value = 15
-	$.println($.pointerValue<number>(s.PointerField))
+	await $.println($.pointerValue<number>(s.PointerField))
 
 	let mi: MyInterface | null = null! as MyInterface | null
 	s.interfaceField = mi
-	$.println(s.interfaceField == null)
+	await $.println(s.interfaceField == null)
 }
 
 if ($.isMainScript(import.meta)) {

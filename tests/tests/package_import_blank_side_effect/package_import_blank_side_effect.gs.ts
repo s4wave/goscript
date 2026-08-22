@@ -12,7 +12,7 @@ export async function main(): globalThis.Promise<void> {
 	if (!registry.Registered("blank")) {
 		$.panic("blank import init did not run")
 	}
-	$.println("registered:", registry.Registered("blank"))
+	await $.println("registered:", registry.Registered("blank"))
 }
 
 if ($.isMainScript(import.meta)) {

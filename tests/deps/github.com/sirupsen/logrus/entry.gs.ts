@@ -275,7 +275,7 @@ export class Entry {
 	public async Log(level: __goscript_logrus.Level, args: $.Slice<any>): globalThis.Promise<void> {
 		const entry: Entry | $.VarRef<Entry> | null = this
 		if (__goscript_logger.Logger.prototype.IsLevelEnabled.call($.pointerValue<Entry>(entry).Logger, $.uint(level, 32))) {
-			await Entry.prototype.log.call(entry, $.uint(level, 32), fmt.Sprint(...(args ?? [])))
+			await Entry.prototype.log.call(entry, $.uint(level, 32), await fmt.Sprint(...(args ?? [])))
 		}
 	}
 
@@ -289,7 +289,7 @@ export class Entry {
 	public async Logln(level: __goscript_logrus.Level, args: $.Slice<any>): globalThis.Promise<void> {
 		const entry: Entry | $.VarRef<Entry> | null = this
 		if (__goscript_logger.Logger.prototype.IsLevelEnabled.call($.pointerValue<Entry>(entry).Logger, $.uint(level, 32))) {
-			await Entry.prototype.Log.call(entry, $.uint(level, 32), $.arrayToSlice<any>([Entry.prototype.sprintlnn.call(entry, args)]))
+			await Entry.prototype.Log.call(entry, $.uint(level, 32), $.arrayToSlice<any>([await Entry.prototype.sprintlnn.call(entry, args)]))
 		}
 	}
 
@@ -569,9 +569,9 @@ export class Entry {
 		}
 	}
 
-	public sprintlnn(args: $.Slice<any>): string {
+	public async sprintlnn(args: $.Slice<any>): globalThis.Promise<string> {
 		const entry: Entry | $.VarRef<Entry> | null = this
-		let msg = fmt.Sprintln(...(args ?? []))
+		let msg = await fmt.Sprintln(...(args ?? []))
 		return $.sliceStringOrBytes(msg, undefined, $.len(msg) - 1)
 	}
 

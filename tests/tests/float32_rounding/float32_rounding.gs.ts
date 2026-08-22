@@ -10,17 +10,17 @@ export async function main(): globalThis.Promise<void> {
 		sum32 = $.float32(sum32 + (0.1))
 		sum64 = sum64 + (0.1)
 	}
-	$.println("sum32:", sum32)
-	$.println("sum64:", sum64)
+	await $.println("sum32:", sum32)
+	await $.println("sum64:", sum64)
 
 	let onePointOne32 = $.float32(1.1)
-	$.println("widened32:", onePointOne32)
+	await $.println("widened32:", onePointOne32)
 
 	let max32: number = 3.4028234663852886e38
 	let overflow32 = $.float32(max32 * 2)
 	let finite64 = max32 * 2
-	$.println("overflow32:", overflow32)
-	$.println("finite64:", finite64)
+	await $.println("overflow32:", overflow32)
+	await $.println("finite64:", finite64)
 }
 
 if ($.isMainScript(import.meta)) {

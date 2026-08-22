@@ -15,10 +15,10 @@ export async function main(): globalThis.Promise<void> {
 	let other = new Uint8Array([0, $.uint(7, 8), 0, 0])
 	let different = new Uint8Array([0, 0, $.uint(7, 8), 0])
 
-	$.println("zero valid:", Hash_Valid(zero))
-	$.println("one valid:", Hash_Valid(one))
-	$.println("same:", $.arrayEqual(one, other))
-	$.println("different:", $.arrayEqual(one, different))
+	await $.println("zero valid:", Hash_Valid(zero))
+	await $.println("one valid:", Hash_Valid(one))
+	await $.println("same:", $.arrayEqual(one, other))
+	await $.println("different:", $.arrayEqual(one, different))
 }
 
 if ($.isMainScript(import.meta)) {

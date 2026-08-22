@@ -51,13 +51,13 @@ export function classifyI(v: bigint): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println(classifyU(0n))
-	$.println(classifyU(5n))
-	$.println(classifyU(1152921504606846976n))
-	$.println(classifyU(9n))
-	$.println(classifyI(-5n))
-	$.println(classifyI(7n))
-	$.println(classifyI(3n))
+	await $.println(classifyU(0n))
+	await $.println(classifyU(5n))
+	await $.println(classifyU(1152921504606846976n))
+	await $.println(classifyU(9n))
+	await $.println(classifyI(-5n))
+	await $.println(classifyI(7n))
+	await $.println(classifyI(3n))
 }
 
 if ($.isMainScript(import.meta)) {

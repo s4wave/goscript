@@ -1474,7 +1474,7 @@ export class Certificate {
 				let __goscriptShadow4 = await __goscript_constraints.checkChainConstraints(chain)
 				if (__goscriptShadow4 != null) {
 					if (constraintsHintErr == null) {
-						constraintsHintErr = $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField3 = $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow4).Error(); return $.markAsStructValue(new __goscript_verify.CertificateInvalidError({Cert: c, Reason: 2, Detail: __goscriptLiteralField3})) })(), "x509.CertificateInvalidError", "x509.CertificateInvalidError")
+						constraintsHintErr = $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField3 = await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow4).Error(); return $.markAsStructValue(new __goscript_verify.CertificateInvalidError({Cert: c, Reason: 2, Detail: __goscriptLiteralField3})) })()), "x509.CertificateInvalidError", "x509.CertificateInvalidError")
 					}
 					return true
 				}
@@ -4890,7 +4890,7 @@ export async function CreateCertificateRequest(rand: io.Reader | null, template:
 		let b: $.Slice<number> = __goscriptTuple53[0]
 		let __goscriptShadow14 = __goscriptTuple53[1]
 		if (__goscriptShadow14 != null) {
-			return [null, errors.New("x509: failed to serialise extensions attribute: " + $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow14).Error())]
+			return [null, errors.New("x509: failed to serialise extensions attribute: " + await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow14).Error())]
 		}
 
 		let rawValue: $.VarRef<asn1.RawValue> = $.varRef($.markAsStructValue(new asn1.RawValue()))

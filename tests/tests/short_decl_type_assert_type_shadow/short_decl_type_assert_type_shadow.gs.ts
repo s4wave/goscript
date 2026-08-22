@@ -53,7 +53,7 @@ export async function use(v: any): globalThis.Promise<string> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println(await use($.interfaceValue($.markAsStructValue(new item()), "main.item", "main.item")))
+	await $.println(await use($.interfaceValue($.markAsStructValue(new item()), "main.item", "main.item")))
 }
 
 if ($.isMainScript(import.meta)) {

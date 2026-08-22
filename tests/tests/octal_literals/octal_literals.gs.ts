@@ -10,12 +10,12 @@ export async function main(): globalThis.Promise<void> {
 	let perm3 = 0o644
 	let perm4 = 0o755
 
-	$.println("perm1:", perm1)
-	$.println("perm2:", perm2)
-	$.println("perm3:", perm3)
-	$.println("perm4:", perm4)
+	await $.println("perm1:", perm1)
+	await $.println("perm2:", perm2)
+	await $.println("perm3:", perm3)
+	await $.println("perm4:", perm4)
 
-	$.println("test finished")
+	await $.println("test finished")
 }
 
 if ($.isMainScript(import.meta)) {

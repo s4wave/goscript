@@ -49,7 +49,7 @@ export class responseWriter {
 export async function main(): globalThis.Promise<void> {
 	let writer: responseWriter | $.VarRef<responseWriter> | null = new responseWriter({header: new globalThis.Map<string, $.Slice<string>>([])})
 	http.Header_Set(responseWriter.prototype.Header.call(writer), "X-Test", "ok")
-	$.println(await http.Header_Get(responseWriter.prototype.Header.call(writer), "x-test"))
+	await $.println(await http.Header_Get(responseWriter.prototype.Header.call(writer), "x-test"))
 }
 
 if ($.isMainScript(import.meta)) {

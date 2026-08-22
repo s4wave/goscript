@@ -50,8 +50,8 @@ export class MyStruct {
 
 export async function main(): globalThis.Promise<void> {
 	let s: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({Value: 10})
-	$.println(MyStruct.prototype.UsesReceiver.call(s))
-	$.println(MyStruct.prototype.DoesNotUseReceiver.call(s))
+	await $.println(MyStruct.prototype.UsesReceiver.call(s))
+	await $.println(MyStruct.prototype.DoesNotUseReceiver.call(s))
 }
 
 if ($.isMainScript(import.meta)) {

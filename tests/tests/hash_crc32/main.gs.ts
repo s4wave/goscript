@@ -60,7 +60,7 @@ export async function main(): globalThis.Promise<void> {
 			if (($.uint(updated, 32) != $.uint(oneShot, 32)) || ($.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(stream).Sum32(), 32) != $.uint(oneShot, 32))) {
 				$.panic("checksum mismatch")
 			}
-			$.println(tc.name, length, $.uint(oneShot, 32))
+			await $.println(tc.name, length, $.uint(oneShot, 32))
 		}
 	}
 
@@ -71,13 +71,13 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let [, err] = await $.pointerValue<Exclude<hash.Hash32, null>>(ieee).Write($.goSlice(payload, undefined, 113))
 		if (err != null) {
-			$.panic($.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			$.panic(await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		}
 	}
 	{
 		let [, err] = await $.pointerValue<Exclude<hash.Hash32, null>>(ieee).Write($.goSlice(payload, 113, undefined))
 		if (err != null) {
-			$.panic($.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			$.panic(await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		}
 	}
 	if ($.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(ieee).Sum32(), 32) != $.uint(crc32.ChecksumIEEE(payload), 32)) {
@@ -89,7 +89,7 @@ export async function main(): globalThis.Promise<void> {
 	if (((($.len(summed) != ($.len(prefix) + crc32.Size)) || ($.uint($.arrayIndex(summed!, 0), 8) != $.uint(9, 8))) || ($.uint($.arrayIndex(summed!, 1), 8) != $.uint(8, 8))) || ($.uint($.arrayIndex(summed!, 2), 8) != $.uint(7, 8))) {
 		$.panic("prefix-preserving Sum")
 	}
-	$.println("sum", $.len(summed), $.uint($.arrayIndex(summed!, 3), 8), $.uint($.arrayIndex(summed!, 4), 8), $.uint($.arrayIndex(summed!, 5), 8), $.uint($.arrayIndex(summed!, 6), 8))
+	await $.println("sum", $.len(summed), $.uint($.arrayIndex(summed!, 3), 8), $.uint($.arrayIndex(summed!, 4), 8), $.uint($.arrayIndex(summed!, 5), 8), $.uint($.arrayIndex(summed!, 6), 8))
 
 	let [marshaler, ok] = $.typeAssertTuple<encoding.BinaryMarshaler | null>(ieee, "encoding.BinaryMarshaler")
 	if (!ok) {
@@ -99,7 +99,7 @@ export async function main(): globalThis.Promise<void> {
 	let state: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
-		$.panic($.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		$.panic(await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 	}
 	let __goscriptTuple1: any = $.typeAssertTuple<encoding.BinaryAppender | null>(ieee, "encoding.BinaryAppender")
 	let appender = __goscriptTuple1[0]
@@ -118,7 +118,7 @@ export async function main(): globalThis.Promise<void> {
 			$.panic("AppendBinary state")
 		}
 	}
-	$.println("state", $.len(state), $.uint($.arrayIndex(state!, 0), 8), $.uint($.arrayIndex(state!, 1), 8), $.uint($.arrayIndex(state!, 2), 8), $.uint($.arrayIndex(state!, 3), 8))
+	await $.println("state", $.len(state), $.uint($.arrayIndex(state!, 0), 8), $.uint($.arrayIndex(state!, 1), 8), $.uint($.arrayIndex(state!, 2), 8), $.uint($.arrayIndex(state!, 3), 8))
 
 	let restored = crc32.NewIEEE()
 	let __goscriptTuple3: any = $.typeAssertTuple<encoding.BinaryUnmarshaler | null>(restored, "encoding.BinaryUnmarshaler")
@@ -130,7 +130,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptShadow0 = await $.pointerValue<Exclude<encoding.BinaryUnmarshaler, null>>(unmarshaler).UnmarshalBinary(state)
 		if (__goscriptShadow0 != null) {
-			$.panic($.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0).Error())
+			$.panic(await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0).Error())
 		}
 	}
 	if ($.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(restored).Sum32(), 32) != $.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(ieee).Sum32(), 32)) {
@@ -139,7 +139,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let [, __goscriptShadow1] = await $.pointerValue<Exclude<hash.Hash32, null>>(restored).Write(new Uint8Array([116, 97, 105, 108]))
 		if (__goscriptShadow1 != null) {
-			$.panic($.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow1).Error())
+			$.panic(await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow1).Error())
 		}
 	}
 	if ($.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(restored).Sum32(), 32) != $.uint(crc32.Update($.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(ieee).Sum32(), 32), crc32.IEEETable, new Uint8Array([116, 97, 105, 108])), 32)) {
@@ -154,7 +154,7 @@ export async function main(): globalThis.Promise<void> {
 		if (__goscriptShadow2 == null) {
 			$.panic("invalid state accepted")
 		}
-		$.println("invalid", $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow2).Error())
+		await $.println("invalid", await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow2).Error())
 		if ($.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(restored).Sum32(), 32) != $.uint(beforeInvalid, 32)) {
 			$.panic("invalid state changed hash")
 		}
@@ -166,7 +166,7 @@ export async function main(): globalThis.Promise<void> {
 		if (__goscriptShadow3 == null) {
 			$.panic("table mismatch accepted")
 		} else {
-			$.println("invalid", $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow3).Error())
+			await $.println("invalid", await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow3).Error())
 		}
 	}
 
@@ -182,7 +182,7 @@ export async function main(): globalThis.Promise<void> {
 	let clonedHash = __goscriptTuple5[0]
 	err = __goscriptTuple5[1]
 	if (err != null) {
-		$.panic($.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		$.panic(await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 	}
 	let clone = $.mustTypeAssert<hash.Hash32 | null>(clonedHash, "hash.Hash32")
 	await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Write(new Uint8Array([108, 101, 102, 116]))
@@ -190,13 +190,13 @@ export async function main(): globalThis.Promise<void> {
 	if (($.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Sum32(), 32) != $.uint(crc32.ChecksumIEEE(new Uint8Array([112, 114, 101, 102, 105, 120, 108, 101, 102, 116])), 32)) || ($.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(clone).Sum32(), 32) != $.uint(crc32.ChecksumIEEE(new Uint8Array([112, 114, 101, 102, 105, 120, 114, 105, 103, 104, 116])), 32))) {
 		$.panic("clone independence")
 	}
-	$.println("clone", $.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Sum32(), 32), $.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(clone).Sum32(), 32))
+	await $.println("clone", $.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Sum32(), 32), $.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(clone).Sum32(), 32))
 
 	await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Reset()
 	if ((($.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Sum32(), 32) != $.uint(0, 32)) || (await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Size() != crc32.Size)) || (await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).BlockSize() != 1)) {
 		$.panic("Reset/Size/BlockSize")
 	}
-	$.println("reset", $.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Sum32(), 32), await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Size(), await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).BlockSize())
+	await $.println("reset", $.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Sum32(), 32), await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Size(), await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).BlockSize())
 }
 
 if ($.isMainScript(import.meta)) {

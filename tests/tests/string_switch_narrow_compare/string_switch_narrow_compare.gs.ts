@@ -20,7 +20,7 @@ export function valid(network: string): boolean {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println(valid("tcp"), valid(""))
+	await $.println(valid("tcp"), valid(""))
 }
 
 if ($.isMainScript(import.meta)) {

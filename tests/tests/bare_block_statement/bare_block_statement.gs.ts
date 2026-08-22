@@ -3,12 +3,12 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-export function scopedTotal(seed: number): number {
+export async function scopedTotal(seed: number): globalThis.Promise<number> {
 	let total = seed
 	{
 		total = total + (1)
 		let inner = total * 2
-		$.println("inner:", inner)
+		await $.println("inner:", inner)
 	}
 	{
 		total = total + (3)
@@ -16,11 +16,11 @@ export function scopedTotal(seed: number): number {
 	return total
 }
 
-export function shadowedValue(): number {
+export async function shadowedValue(): globalThis.Promise<number> {
 	let value = 7
 	{
 		let __goscriptShadow0 = 11
-		$.println("block value:", __goscriptShadow0)
+		await $.println("block value:", __goscriptShadow0)
 	}
 	return value
 }
@@ -35,9 +35,9 @@ export function emptyBodies(limit: number): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println("scoped total:", scopedTotal(1))
-	$.println("outer value:", shadowedValue())
-	$.println("empty bodies:", emptyBodies(3))
+	await $.println("scoped total:", await scopedTotal(1))
+	await $.println("outer value:", await shadowedValue())
+	await $.println("empty bodies:", emptyBodies(3))
 }
 
 if ($.isMainScript(import.meta)) {

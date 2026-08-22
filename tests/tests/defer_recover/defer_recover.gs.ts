@@ -35,44 +35,44 @@ export function safeDivide(a: number, b: number): [number, boolean] {
 	return [result, ok]
 }
 
-export function mustPanic(): void {
-	const __defer = new $.DisposableStack()
+export async function mustPanic(): globalThis.Promise<void> {
+	const __defer = new $.AsyncDisposableStack()
 	try {
-		__defer.defer(() => { ((): void => {
+		__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
 			{
 				let r = $.recover()
 				if (r != null) {
-					$.println("recovered:", $.mustTypeAssert<string>(r, { kind: $.TypeKind.Basic, name: "string" }))
+					await $.println("recovered:", $.mustTypeAssert<string>(r, { kind: $.TypeKind.Basic, name: "string" }))
 				}
 			}
 		})() })
 		$.panic("boom")
-		__defer.dispose()
+		await __defer.dispose()
 	} catch (e) {
-		__defer.disposePanic(e)
+		await __defer.disposePanic(e)
 		if (!$.recovered(e)) {
 			throw e
 		}
 	}
 }
 
-export function noPanic(): void {
-	const __defer = new $.DisposableStack()
+export async function noPanic(): globalThis.Promise<void> {
+	const __defer = new $.AsyncDisposableStack()
 	try {
-		__defer.defer(() => { ((): void => {
+		__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
 			{
 				let r = $.recover()
 				if (r != null) {
-					$.println("should not happen")
+					await $.println("should not happen")
 				} else {
-					$.println("nothing to recover")
+					await $.println("nothing to recover")
 				}
 			}
 		})() })
-		$.println("noPanic body")
-		__defer.dispose()
+		await $.println("noPanic body")
+		await __defer.dispose()
 	} catch (e) {
-		__defer.disposePanic(e)
+		await __defer.disposePanic(e)
 		if (!$.recovered(e)) {
 			throw e
 		}
@@ -81,14 +81,14 @@ export function noPanic(): void {
 
 export async function main(): globalThis.Promise<void> {
 	let [q, ok] = safeDivide(10, 2)
-	$.println("10/2 =", q, ok)
+	await $.println("10/2 =", q, ok)
 	let __goscriptTuple0: any = safeDivide(1, 0)
 	q = __goscriptTuple0[0]
 	ok = __goscriptTuple0[1]
-	$.println("1/0 =", q, ok)
-	mustPanic()
-	noPanic()
-	$.println("main done")
+	await $.println("1/0 =", q, ok)
+	await mustPanic()
+	await noPanic()
+	await $.println("main done")
 }
 
 if ($.isMainScript(import.meta)) {

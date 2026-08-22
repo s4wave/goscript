@@ -13,11 +13,11 @@ export function __goscript_set_linkinfo(__goscriptValue: {"Magic": Uint8Array, "
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println("magic len:", $.len(linkinfo.Magic))
-	$.println("magic zero:", $.uint($.arrayIndex(linkinfo.Magic, 0), 8))
-	$.println("sects len:", $.len(linkinfo.Sects))
-	$.println("pointer diff:", $.uint($.uint($.uint64Sub(($.arrayIndex(linkinfo.Sects, 0).End as any), ($.arrayIndex(linkinfo.Sects, 0).Start as any)), 64), 64))
-	$.println("start nil:", $.arrayIndex(linkinfo.Sects, 0).Start == null)
+	await $.println("magic len:", $.len(linkinfo.Magic))
+	await $.println("magic zero:", $.uint($.arrayIndex(linkinfo.Magic, 0), 8))
+	await $.println("sects len:", $.len(linkinfo.Sects))
+	await $.println("pointer diff:", $.uint($.uint($.uint64Sub(($.arrayIndex(linkinfo.Sects, 0).End as any), ($.arrayIndex(linkinfo.Sects, 0).Start as any)), 64), 64))
+	await $.println("start nil:", $.arrayIndex(linkinfo.Sects, 0).Start == null)
 }
 
 if ($.isMainScript(import.meta)) {

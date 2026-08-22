@@ -55,7 +55,7 @@ export class MyStruct {
 
 export async function main(): globalThis.Promise<void> {
 	let ms = $.markAsStructValue(new MyStruct({MyInt: 1, MyString: "bar"}))
-	$.println("Method call on value: Expected: bar, Actual:", $.markAsStructValue($.cloneStructValue(ms)).GetMyString())
+	await $.println("Method call on value: Expected: bar, Actual:", $.markAsStructValue($.cloneStructValue(ms)).GetMyString())
 }
 
 if ($.isMainScript(import.meta)) {

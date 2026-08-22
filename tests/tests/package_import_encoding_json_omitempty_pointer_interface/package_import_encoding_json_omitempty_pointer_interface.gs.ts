@@ -125,18 +125,18 @@ export async function main(): globalThis.Promise<void> {
 	let out: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
-		fmt.Println("marshal error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await fmt.Println("marshal error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
 	}
 	let text = $.bytesToString(out)
-	fmt.Println("ptr emitted:", strings.Contains(text, "\"ptr\":"))
-	fmt.Println("ifaceZero emitted:", strings.Contains(text, "\"ifaceZero\":"))
-	fmt.Println("ifaceFalse emitted:", strings.Contains(text, "\"ifaceFalse\":"))
-	fmt.Println("ifaceEmptyString emitted:", strings.Contains(text, "\"ifaceEmptyString\":"))
-	fmt.Println("ifaceEmptySlice emitted:", strings.Contains(text, "\"ifaceEmptySlice\":"))
-	fmt.Println("ifaceEmptyMap emitted:", strings.Contains(text, "\"ifaceEmptyMap\":"))
-	fmt.Println("ptrNilIface emitted as null:", strings.Contains(text, "\"ptrNilIface\":null"))
-	fmt.Println("ptrBool emitted:", strings.Contains(text, "\"ptrBool\":"))
+	await fmt.Println("ptr emitted:", strings.Contains(text, "\"ptr\":"))
+	await fmt.Println("ifaceZero emitted:", strings.Contains(text, "\"ifaceZero\":"))
+	await fmt.Println("ifaceFalse emitted:", strings.Contains(text, "\"ifaceFalse\":"))
+	await fmt.Println("ifaceEmptyString emitted:", strings.Contains(text, "\"ifaceEmptyString\":"))
+	await fmt.Println("ifaceEmptySlice emitted:", strings.Contains(text, "\"ifaceEmptySlice\":"))
+	await fmt.Println("ifaceEmptyMap emitted:", strings.Contains(text, "\"ifaceEmptyMap\":"))
+	await fmt.Println("ptrNilIface emitted as null:", strings.Contains(text, "\"ptrNilIface\":null"))
+	await fmt.Println("ptrBool emitted:", strings.Contains(text, "\"ptrBool\":"))
 }
 
 if ($.isMainScript(import.meta)) {

@@ -52,15 +52,15 @@ export function NewMyStruct(pub: string, priv: number): MyStruct {
 	return $.markAsStructValue(new MyStruct({publicField: pub, privateField: priv}))
 }
 
-export function accessPrivateField(s: MyStruct): void {
+export async function accessPrivateField(s: MyStruct): globalThis.Promise<void> {
 	// Accessing privateField directly from a function in the same package
 	// This should trigger the generation of the _private field
-	$.println("Accessing privateField:", s.privateField)
+	await $.println("Accessing privateField:", s.privateField)
 }
 
 export async function main(): globalThis.Promise<void> {
 	let s = $.markAsStructValue($.cloneStructValue(NewMyStruct("hello", 123)))
-	accessPrivateField($.markAsStructValue($.cloneStructValue(s)))
+	await accessPrivateField($.markAsStructValue($.cloneStructValue(s)))
 }
 
 if ($.isMainScript(import.meta)) {

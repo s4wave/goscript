@@ -15,7 +15,7 @@ export async function main(): globalThis.Promise<void> {
 	let castedGreeter = $.namedFunction(theInlineVar, "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo))
 
 	// 4. Call that
-	$.println(await castedGreeter!("Inline World"))
+	await $.println(await castedGreeter!("Inline World"))
 
 	// Test with a different signature
 	type Adder = ((a: number, b: number) => number | globalThis.Promise<number>) | null
@@ -23,7 +23,7 @@ export async function main(): globalThis.Promise<void> {
 		return a + b
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))
 	let castedAdder = $.namedFunction(theInlineAdder, "main.Adder", ({ kind: $.TypeKind.Function, name: "main.Adder", params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))
-	$.println(await castedAdder!(5, 7))
+	await $.println(await castedAdder!(5, 7))
 }
 
 if ($.isMainScript(import.meta)) {

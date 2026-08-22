@@ -10,7 +10,7 @@ export async function main(): globalThis.Promise<void> {
 		ch!.close()
 	})() })
 	await $.chanRecv(ch)
-	$.println("done")
+	await $.println("done")
 }
 
 if ($.isMainScript(import.meta)) {

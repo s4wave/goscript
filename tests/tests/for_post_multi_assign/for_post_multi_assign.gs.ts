@@ -108,13 +108,13 @@ export function findFrame(): frame | $.VarRef<frame> | null {
 
 export async function main(): globalThis.Promise<void> {
 	for (let i = 0, j = 5; i < j; [i, j] = [i + 1, j - 1]) {
-		$.println(i, j)
+		await $.println(i, j)
 	}
 	let found: frame | $.VarRef<frame> | null = findFrame()
 	if (found != null) {
-		$.println("frame:", $.pointerValue<frame>(found).name)
+		await $.println("frame:", $.pointerValue<frame>(found).name)
 	}
-	$.println("done")
+	await $.println("done")
 }
 
 if ($.isMainScript(import.meta)) {

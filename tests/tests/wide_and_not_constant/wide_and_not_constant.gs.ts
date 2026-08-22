@@ -11,15 +11,15 @@ export async function main(): globalThis.Promise<void> {
 	// exact math/rand/v2 Rand.Int64 pattern (clear the sign bit).
 	let x: bigint = 18446744073709551615n
 	let cleared = $.uint64AndNot(x, 9223372036854775808n)
-	$.println("cleared:", cleared)
+	await $.println("cleared:", cleared)
 
 	let y: bigint = 18446744073709551615n
 	y = $.uint64AndNot(y, 4611686018427387904n)
-	$.println("y:", y)
+	await $.println("y:", y)
 
 	let z: bigint = -1n
 	z = $.int64AndNot(z, 4611686018427387904n)
-	$.println("z:", z)
+	await $.println("z:", z)
 }
 
 if ($.isMainScript(import.meta)) {

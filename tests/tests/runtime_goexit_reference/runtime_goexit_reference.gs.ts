@@ -10,7 +10,7 @@ export async function main(): globalThis.Promise<void> {
 	if (false) {
 		runtime.Goexit()
 	}
-	$.println("ok")
+	await $.println("ok")
 }
 
 if ($.isMainScript(import.meta)) {

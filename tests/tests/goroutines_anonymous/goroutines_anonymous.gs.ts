@@ -9,7 +9,7 @@ export async function main(): globalThis.Promise<void> {
 	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
 		await $.chanSend(msgs, "anonymous function worker")
 	})() })
-	$.println(await $.chanRecv(msgs))
+	await $.println(await $.chanRecv(msgs))
 }
 
 if ($.isMainScript(import.meta)) {

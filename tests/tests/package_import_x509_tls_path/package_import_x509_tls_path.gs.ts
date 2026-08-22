@@ -34,35 +34,35 @@ export async function main(): globalThis.Promise<void> {
 	let pub: ed25519.PublicKey = (__goscriptTuple0[0] as ed25519.PublicKey)
 	let priv: ed25519.PrivateKey = (__goscriptTuple0[1] as ed25519.PrivateKey)
 	let err = __goscriptTuple0[2]
-	$.println("keygen err nil", err == null)
+	await $.println("keygen err nil", err == null)
 
 	let template: x509.Certificate | $.VarRef<x509.Certificate> | null = (() => { const __goscriptLiteralField0 = big.NewInt(84n); const __goscriptLiteralField1 = $.markAsStructValue($.cloneStructValue(time.Unix(1700000000n, 0n))); const __goscriptLiteralField2 = $.markAsStructValue($.cloneStructValue(time.Unix(1700003600n, 0n))); return new x509.Certificate({SerialNumber: __goscriptLiteralField0, Subject: $.markAsStructValue(new pkix.Name({CommonName: "bifrost.goscript.test"})), NotBefore: __goscriptLiteralField1, NotAfter: __goscriptLiteralField2, KeyUsage: x509.KeyUsageDigitalSignature, ExtKeyUsage: $.arrayToSlice<x509.ExtKeyUsage>([x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth]), BasicConstraintsValid: true}) })()
 	let __goscriptTuple1: any = await x509.CreateCertificate(rand.Reader, template, template, $.namedValueInterfaceValue<any>(pub, "ed25519.PublicKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PublicKey" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }]), $.namedValueInterfaceValue<any>(priv, "ed25519.PrivateKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Public: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Public as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Seed: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Seed as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Sign: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Sign as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "ed25519.PrivateKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PrivateKey" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Public", args: [], returns: [{ name: "_r0", type: "crypto.PublicKey" }] }, { name: "Seed", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Sign", args: [{ name: "rand", type: "io.Reader" }, { name: "message", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "opts", type: "crypto.SignerOpts" }], returns: [{ name: "signature", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "err", type: "error" }] }]))
 	let der: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
-	$.println("create err nil", err == null)
+	await $.println("create err nil", err == null)
 	if (err != null) {
-		$.println("create error", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("create error", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
 	}
 
 	let __goscriptTuple2: any = await x509.ParseCertificate(der)
 	let leaf: x509.Certificate | $.VarRef<x509.Certificate> | null = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
-	$.println("parse err nil", err == null)
+	await $.println("parse err nil", err == null)
 	if (err != null) {
-		$.println("parse error", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("parse error", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
 	}
 
 	let certificate = $.markAsStructValue(new tls.Certificate({Certificate: $.arrayToSlice<$.Slice<number>>([der]), PrivateKey: $.namedValueInterfaceValue<crypto.PrivateKey | null>(priv, "ed25519.PrivateKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Public: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Public as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Seed: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Seed as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Sign: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Sign as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "ed25519.PrivateKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PrivateKey" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Public", args: [], returns: [{ name: "_r0", type: "crypto.PublicKey" }] }, { name: "Seed", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }, { name: "Sign", args: [{ name: "rand", type: "io.Reader" }, { name: "message", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "opts", type: "crypto.SignerOpts" }], returns: [{ name: "signature", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "err", type: "error" }] }]), Leaf: leaf}))
 	let config: tls.Config | $.VarRef<tls.Config> | null = new tls.Config({Certificates: $.arrayToSlice<tls.Certificate>([$.markAsStructValue($.cloneStructValue(certificate))]), MinVersion: $.uint(tls.VersionTLS12, 16), NextProtos: $.arrayToSlice<string>(["bifrost"])})
-	$.println("certificate count", $.len($.pointerValue<tls.Config>(config).Certificates))
-	$.println("chain count", $.len($.arrayIndex($.pointerValue<tls.Config>(config).Certificates!, 0).Certificate))
-	$.println("leaf common name", $.pointerValue<x509.Certificate>($.arrayIndex($.pointerValue<tls.Config>(config).Certificates!, 0).Leaf).Subject.CommonName)
-	$.println("private key signer", ed25519.PublicKey_Equal($.mustTypeAssert<ed25519.PublicKey>(ed25519.PrivateKey_Public($.mustTypeAssert<ed25519.PrivateKey>($.arrayIndex($.pointerValue<tls.Config>(config).Certificates!, 0).PrivateKey, { kind: $.TypeKind.Slice, typeName: "ed25519.PrivateKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } })), { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }), $.namedValueInterfaceValue<crypto.PublicKey | null>(pub, "ed25519.PublicKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PublicKey" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }])))
-	$.println("min version", $.uint($.pointerValue<tls.Config>(config).MinVersion, 16))
-	$.println("next proto", $.arrayIndex($.pointerValue<tls.Config>(config).NextProtos!, 0))
+	await $.println("certificate count", $.len($.pointerValue<tls.Config>(config).Certificates))
+	await $.println("chain count", $.len($.arrayIndex($.pointerValue<tls.Config>(config).Certificates!, 0).Certificate))
+	await $.println("leaf common name", $.pointerValue<x509.Certificate>($.arrayIndex($.pointerValue<tls.Config>(config).Certificates!, 0).Leaf).Subject.CommonName)
+	await $.println("private key signer", ed25519.PublicKey_Equal($.mustTypeAssert<ed25519.PublicKey>(ed25519.PrivateKey_Public($.mustTypeAssert<ed25519.PrivateKey>($.arrayIndex($.pointerValue<tls.Config>(config).Certificates!, 0).PrivateKey, { kind: $.TypeKind.Slice, typeName: "ed25519.PrivateKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } })), { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }), $.namedValueInterfaceValue<crypto.PublicKey | null>(pub, "ed25519.PublicKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PublicKey" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }])))
+	await $.println("min version", $.uint($.pointerValue<tls.Config>(config).MinVersion, 16))
+	await $.println("next proto", $.arrayIndex($.pointerValue<tls.Config>(config).NextProtos!, 0))
 
 	let cache = tls.NewLRUClientSessionCache(2)
 	let session: tls.ClientSessionState | $.VarRef<tls.ClientSessionState> | null = new tls.ClientSessionState()
@@ -70,12 +70,12 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple3: any = await $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache).Get("one")
 	let cached: tls.ClientSessionState | $.VarRef<tls.ClientSessionState> | null = __goscriptTuple3[0]
 	let ok = __goscriptTuple3[1]
-	$.println("session cache hit", ok, $.pointerEqual(cached, session))
+	await $.println("session cache hit", ok, $.pointerEqual(cached, session))
 	await $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache).Put("two", new tls.ClientSessionState())
 	await $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache).Put("three", new tls.ClientSessionState())
 	let __goscriptTuple4: any = await $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache).Get("one")
 	ok = __goscriptTuple4[1]
-	$.println("session cache evicted", !ok)
+	await $.println("session cache evicted", !ok)
 }
 
 if ($.isMainScript(import.meta)) {

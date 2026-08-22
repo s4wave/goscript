@@ -115,16 +115,16 @@ export async function main(): globalThis.Promise<void> {
 	let p = ($.indexRef(values!, 1) as any)
 	let q = noescape(p)
 
-	$.println("same:", q == p)
-	$.println("nil:", q == null)
+	await $.println("same:", q == p)
+	await $.println("nil:", q == null)
 
 	let inline: $.Slice<number> = inlineSlice(values)
-	$.println("inline:", $.arrayIndex(inline!, 0), $.arrayIndex(inline!, 1))
+	await $.println("inline:", $.arrayIndex(inline!, 0), $.arrayIndex(inline!, 1))
 	inline![0] = 9
-	$.println("updated:", $.arrayIndex(values!, 0))
+	await $.println("updated:", $.arrayIndex(values!, 0))
 
 	let src: $.VarRef<sourceStruct> = $.varRef($.markAsStructValue(new sourceStruct()))
-	$.println("struct:", markThroughView(src), src.value.flag)
+	await $.println("struct:", markThroughView(src), src.value.flag)
 }
 
 if ($.isMainScript(import.meta)) {

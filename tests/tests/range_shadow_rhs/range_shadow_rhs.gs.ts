@@ -44,7 +44,7 @@ export async function main(): globalThis.Promise<void> {
 	for (const [__goscriptRangeShadow0, v] of k.values?.entries() ?? []) {
 		sum = sum + ($.len(__goscriptRangeShadow0) + v)
 	}
-	$.println(sum)
+	await $.println(sum)
 }
 
 if ($.isMainScript(import.meta)) {

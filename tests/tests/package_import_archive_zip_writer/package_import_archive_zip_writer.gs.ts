@@ -16,32 +16,32 @@ export async function main(): globalThis.Promise<void> {
 	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	let zw: zip.Writer | $.VarRef<zip.Writer> | null = zip.NewWriter($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))
 	let [w, err] = await zip.Writer.prototype.Create.call(zw, "hello.txt")
-	$.println("create", err == null)
+	await $.println("create", err == null)
 	let __goscriptTuple0: any = await $.pointerValue<Exclude<io.Writer, null>>(w).Write(new Uint8Array([104, 101, 108, 108, 111]))
 	let n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
-	$.println("write", n, err == null)
+	await $.println("write", n, err == null)
 	err = await zip.Writer.prototype.Close.call(zw)
-	$.println("close", err == null, buf.value.Len() > 0)
+	await $.println("close", err == null, buf.value.Len() > 0)
 
 	let __goscriptTuple1: any = await zip.NewReader($.interfaceValue<io.ReaderAt | null>(bytes.NewReader(buf.value.Bytes()), "*bytes.Reader", { kind: $.TypeKind.Pointer, elemType: "bytes.Reader" }), $.int64(buf.value.Len()))
 	let zr: zip.Reader | $.VarRef<zip.Reader> | null = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
-		$.println("open error", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("open error", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
 	}
-	$.println("open", err == null, $.len($.pointerValue<zip.Reader>(zr).File))
+	await $.println("open", err == null, $.len($.pointerValue<zip.Reader>(zr).File))
 	let __goscriptTuple2: any = await zip.File.prototype.Open.call($.arrayIndex($.pointerValue<zip.Reader>(zr).File!, 0))
 	let rc = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
-	$.println("file open", err == null)
+	await $.println("file open", err == null)
 	let __goscriptTuple3: any = await io.ReadAll($.pointerValueOrNil((rc as io.Reader | null))!)
 	let data: $.Slice<number> = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
-	$.println("file", $.pointerValue<zip.File>($.arrayIndex($.pointerValue<zip.Reader>(zr).File!, 0)).FileHeader.Name, $.bytesToString(data), err == null)
+	await $.println("file", $.pointerValue<zip.File>($.arrayIndex($.pointerValue<zip.Reader>(zr).File!, 0)).FileHeader.Name, $.bytesToString(data), err == null)
 	err = await $.pointerValue<Exclude<io.ReadCloser, null>>(rc).Close()
-	$.println("file close", err == null)
+	await $.println("file close", err == null)
 }
 
 if ($.isMainScript(import.meta)) {

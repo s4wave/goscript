@@ -22,9 +22,9 @@ export function __goscript_set_c(__goscriptValue: number): void {
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println("a:", a)
-	$.println("b:", b)
-	$.println("c:", c)
+	await $.println("a:", a)
+	await $.println("b:", b)
+	await $.println("c:", c)
 }
 
 if ($.isMainScript(import.meta)) {

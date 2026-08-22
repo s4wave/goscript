@@ -11,7 +11,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.chanSend(ch, 7)
 
 	await subpkg.Run("async callback", $.functionValue(async (): globalThis.Promise<$.GoError> => {
-		$.println("value:", await $.chanRecv(ch))
+		await $.println("value:", await $.chanRecv(ch))
 		return null
 	}, ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo)))
 }

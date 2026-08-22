@@ -180,16 +180,16 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test the walk function with a callback
 	let walkFunc: ((path: string, info: FileInfo | null, err: $.GoError) => $.GoError | globalThis.Promise<$.GoError>) | null = $.functionValue(async (path: string, info: FileInfo | null, err: $.GoError): globalThis.Promise<$.GoError> => {
-		$.println("Walking:", path, "size:", await $.pointerValue<Exclude<FileInfo, null>>(info).Size())
+		await $.println("Walking:", path, "size:", await $.pointerValue<Exclude<FileInfo, null>>(info).Size())
 		if (err != null) {
-			$.println("Error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("Error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		}
 		return null
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }, "main.FileInfo", "error"], results: ["error"] } as $.FunctionTypeInfo))
 
 	let err = await walk($.interfaceValue<Filesystem | null>(fs, "*main.MockFilesystem", { kind: $.TypeKind.Pointer, elemType: "main.MockFilesystem" }), "/test", $.interfaceValue<FileInfo | null>(fileInfo, "*main.MockFileInfo", { kind: $.TypeKind.Pointer, elemType: "main.MockFileInfo" }), walkFunc)
 	if (err != null) {
-		$.println("Walk error:", $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("Walk error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 	}
 
 	// Test the process function with a callback
@@ -199,23 +199,23 @@ export async function main(): globalThis.Promise<void> {
 
 	let [result, err2] = await processWithCallback("hello", processFunc)
 	if (err2 != null) {
-		$.println("Process error:", $.pointerValue<Exclude<$.GoError, null>>(err2).Error())
+		await $.println("Process error:", await $.pointerValue<Exclude<$.GoError, null>>(err2).Error())
 	} else {
-		$.println("Process result:", result)
+		await $.println("Process result:", result)
 	}
 
 	let [result3, err3] = await maybeProcess("ignored", (null as OptionalProcessFunc | null))
 	if (err3 != null) {
-		$.println("Optional process error:", $.pointerValue<Exclude<$.GoError, null>>(err3).Error())
+		await $.println("Optional process error:", await $.pointerValue<Exclude<$.GoError, null>>(err3).Error())
 	} else {
-		$.println("Optional process result:", result3)
+		await $.println("Optional process result:", result3)
 	}
 
 	let [result4, err4] = await maybeProcess("world", processFunc)
 	if (err4 != null) {
-		$.println("Optional process error:", $.pointerValue<Exclude<$.GoError, null>>(err4).Error())
+		await $.println("Optional process error:", await $.pointerValue<Exclude<$.GoError, null>>(err4).Error())
 	} else {
-		$.println("Optional process result:", result4)
+		await $.println("Optional process result:", result4)
 	}
 }
 

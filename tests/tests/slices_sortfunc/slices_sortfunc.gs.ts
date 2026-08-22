@@ -66,7 +66,7 @@ export async function main(): globalThis.Promise<void> {
 
 	for (let __goscriptRangeTarget0 = people, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let p = __goscriptRangeTarget0![__rangeIndex]
-		$.println(p.Name, p.Age)
+		await $.println(p.Name, p.Age)
 	}
 }
 

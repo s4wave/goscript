@@ -752,7 +752,7 @@ export async function RDNSequence_String(r: RDNSequence): globalThis.Promise<str
 				typeName = oidString
 			}
 
-			let valueString = fmt.Sprint(tv.Value)
+			let valueString = await fmt.Sprint(tv.Value)
 			let escaped: $.Slice<number> = $.makeSlice<number>(0, $.len(valueString), "number")
 
 			for (const [k, c] of $.rangeString(valueString)) {

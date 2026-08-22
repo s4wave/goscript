@@ -43,7 +43,7 @@ export class Holder {
 
 export async function main(): globalThis.Promise<void> {
 	let holder = (() => { const __goscriptLiteralField0 = _unique.NewBox(7); return $.markAsStructValue(new Holder({Box: __goscriptLiteralField0})) })()
-	$.println("box:", $.pointerValue<_unique.Box>(holder.Box).Value)
+	await $.println("box:", $.pointerValue<_unique.Box>(holder.Box).Value)
 }
 
 if ($.isMainScript(import.meta)) {

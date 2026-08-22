@@ -87,54 +87,54 @@ export function byFreq_Swap(s: byFreq, i: number, j: number): void {
 export async function main(): globalThis.Promise<void> {
 	// Test basic slice sorting
 	let ints: $.Slice<number> = $.arrayToSlice<number>([3, 1, 4, 1, 5, 9])
-	$.println("Original ints:", $.arrayIndex(ints!, 0), $.arrayIndex(ints!, 1), $.arrayIndex(ints!, 2), $.arrayIndex(ints!, 3), $.arrayIndex(ints!, 4), $.arrayIndex(ints!, 5))
+	await $.println("Original ints:", $.arrayIndex(ints!, 0), $.arrayIndex(ints!, 1), $.arrayIndex(ints!, 2), $.arrayIndex(ints!, 3), $.arrayIndex(ints!, 4), $.arrayIndex(ints!, 5))
 	sort2.Ints(ints)
-	$.println("Sorted ints:", $.arrayIndex(ints!, 0), $.arrayIndex(ints!, 1), $.arrayIndex(ints!, 2), $.arrayIndex(ints!, 3), $.arrayIndex(ints!, 4), $.arrayIndex(ints!, 5))
+	await $.println("Sorted ints:", $.arrayIndex(ints!, 0), $.arrayIndex(ints!, 1), $.arrayIndex(ints!, 2), $.arrayIndex(ints!, 3), $.arrayIndex(ints!, 4), $.arrayIndex(ints!, 5))
 
 	// Test if sorted
 	let isSorted = sort2.IntsAreSorted(ints)
-	$.println("Ints are sorted:", isSorted)
+	await $.println("Ints are sorted:", isSorted)
 
 	// Test string sorting
 	let strings: $.Slice<string> = $.arrayToSlice<string>(["banana", "apple", "cherry"])
-	$.println("Original strings:", $.arrayIndex(strings!, 0), $.arrayIndex(strings!, 1), $.arrayIndex(strings!, 2))
+	await $.println("Original strings:", $.arrayIndex(strings!, 0), $.arrayIndex(strings!, 1), $.arrayIndex(strings!, 2))
 	sort2.Strings(strings)
-	$.println("Sorted strings:", $.arrayIndex(strings!, 0), $.arrayIndex(strings!, 1), $.arrayIndex(strings!, 2))
+	await $.println("Sorted strings:", $.arrayIndex(strings!, 0), $.arrayIndex(strings!, 1), $.arrayIndex(strings!, 2))
 
 	// Test if strings are sorted
 	let stringSorted = sort2.StringsAreSorted(strings)
-	$.println("Strings are sorted:", stringSorted)
+	await $.println("Strings are sorted:", stringSorted)
 
 	// Test float64 sorting
 	let floats: $.Slice<number> = $.arrayToSlice<number>([3.14, 2.71, 1.41])
-	$.println("Original floats:", $.arrayIndex(floats!, 0), $.arrayIndex(floats!, 1), $.arrayIndex(floats!, 2))
+	await $.println("Original floats:", $.arrayIndex(floats!, 0), $.arrayIndex(floats!, 1), $.arrayIndex(floats!, 2))
 	sort2.Float64s(floats)
-	$.println("Sorted floats:", $.arrayIndex(floats!, 0), $.arrayIndex(floats!, 1), $.arrayIndex(floats!, 2))
+	await $.println("Sorted floats:", $.arrayIndex(floats!, 0), $.arrayIndex(floats!, 1), $.arrayIndex(floats!, 2))
 
 	// Test if floats are sorted
 	let floatSorted = sort2.Float64sAreSorted(floats)
-	$.println("Floats are sorted:", floatSorted)
+	await $.println("Floats are sorted:", floatSorted)
 
 	// Test search functions
 	let intIndex = sort2.SearchInts(ints, 4)
-	$.println("Index of 4 in sorted ints:", intIndex)
+	await $.println("Index of 4 in sorted ints:", intIndex)
 
 	let stringIndex = sort2.SearchStrings(strings, "banana")
-	$.println("Index of 'banana' in sorted strings:", stringIndex)
+	await $.println("Index of 'banana' in sorted strings:", stringIndex)
 
 	let floatIndex = sort2.SearchFloat64s(floats, 2.71)
-	$.println("Index of 2.71 in sorted floats:", floatIndex)
+	await $.println("Index of 2.71 in sorted floats:", floatIndex)
 
 	// Test generic Search function
 	let searchResult = await sort2.Search($.len(ints), $.functionValue((i: number): boolean => {
 		return $.arrayIndex(ints!, i) >= 5
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo)))
-	$.println("First index where value >= 5:", searchResult)
+	await $.println("First index where value >= 5:", searchResult)
 
 	// Test Slice function with custom comparator
 	let testSlice: $.Slice<number> = $.arrayToSlice<number>([5, 2, 8, 1, 9])
 	slices.Sort(testSlice)
-	$.println("Custom sorted slice:", $.arrayIndex(testSlice!, 0), $.arrayIndex(testSlice!, 1), $.arrayIndex(testSlice!, 2), $.arrayIndex(testSlice!, 3), $.arrayIndex(testSlice!, 4))
+	await $.println("Custom sorted slice:", $.arrayIndex(testSlice!, 0), $.arrayIndex(testSlice!, 1), $.arrayIndex(testSlice!, 2), $.arrayIndex(testSlice!, 3), $.arrayIndex(testSlice!, 4))
 
 	let asyncSlice: $.Slice<number> = $.arrayToSlice<number>([2, 1])
 	let ready: $.Channel<boolean> | null = $.makeChannel<boolean>(1, false, "both")
@@ -143,25 +143,25 @@ export async function main(): globalThis.Promise<void> {
 		await $.chanRecv(ready)
 		return $.arrayIndex(asyncSlice!, i) < $.arrayIndex(asyncSlice!, j)
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo)))
-	$.println("Async sorted slice:", $.arrayIndex(asyncSlice!, 0), $.arrayIndex(asyncSlice!, 1))
+	await $.println("Async sorted slice:", $.arrayIndex(asyncSlice!, 0), $.arrayIndex(asyncSlice!, 1))
 
 	// Test SliceIsSorted
 	let isSliceSorted = await sort2.SliceIsSorted($.interfaceValue(testSlice, "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }), $.functionValue((i: number, j: number): boolean => {
 		return $.arrayIndex(testSlice!, i) < $.arrayIndex(testSlice!, j)
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo)))
-	$.println("Custom slice is sorted:", isSliceSorted)
+	await $.println("Custom slice is sorted:", isSliceSorted)
 
 	// Test custom sort.Interface values.
 	let custom = $.markAsStructValue(new descending({values: $.arrayToSlice<number>([1, 3, 2])}))
 	await sort2.Sort($.interfaceValue<sort2.Interface | null>($.markAsStructValue($.cloneStructValue(custom)), "main.descending", "main.descending"))
-	$.println("Custom interface sort:", $.arrayIndex(custom.values!, 0), $.arrayIndex(custom.values!, 1), $.arrayIndex(custom.values!, 2))
+	await $.println("Custom interface sort:", $.arrayIndex(custom.values!, 0), $.arrayIndex(custom.values!, 1), $.arrayIndex(custom.values!, 2))
 
 	let namedSlice: $.Slice<number> = $.arrayToSlice<number>([4, 1, 3])
 	let namedSliceSorter: $.VarRef<byFreq> = $.varRef(null! as byFreq)
 	await byFreq_sort(namedSliceSorter, namedSlice)
-	$.println("Named slice pointer sort:", $.arrayIndex(namedSlice!, 0), $.arrayIndex(namedSlice!, 1), $.arrayIndex(namedSlice!, 2))
+	await $.println("Named slice pointer sort:", $.arrayIndex(namedSlice!, 0), $.arrayIndex(namedSlice!, 1), $.arrayIndex(namedSlice!, 2))
 
-	$.println("test finished")
+	await $.println("test finished")
 }
 
 if ($.isMainScript(import.meta)) {

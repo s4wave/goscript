@@ -25,22 +25,22 @@ export async function main(): globalThis.Promise<void> {
 	let pub: ed25519.PublicKey = (__goscriptTuple0[0] as ed25519.PublicKey)
 	let priv: ed25519.PrivateKey = (__goscriptTuple0[1] as ed25519.PrivateKey)
 	let err = __goscriptTuple0[2]
-	$.println("generate err nil", err == null)
-	$.println("pub len", $.len((pub as ed25519.PublicKey)))
-	$.println("priv len", $.len((priv as ed25519.PrivateKey)))
+	await $.println("generate err nil", err == null)
+	await $.println("pub len", $.len((pub as ed25519.PublicKey)))
+	await $.println("priv len", $.len((priv as ed25519.PrivateKey)))
 
 	let msg: $.Slice<number> = new Uint8Array([103, 111, 115, 99, 114, 105, 112, 116])
 	let sig: $.Slice<number> = await ed25519.Sign((priv as ed25519.PrivateKey), msg)
-	$.println("sig len", $.len(sig))
-	$.println("verify ok", await ed25519.Verify((pub as ed25519.PublicKey), msg, sig))
-	$.println("verify wrong", await ed25519.Verify((pub as ed25519.PublicKey), new Uint8Array([119, 114, 111, 110, 103]), sig))
+	await $.println("sig len", $.len(sig))
+	await $.println("verify ok", await ed25519.Verify((pub as ed25519.PublicKey), msg, sig))
+	await $.println("verify wrong", await ed25519.Verify((pub as ed25519.PublicKey), new Uint8Array([119, 114, 111, 110, 103]), sig))
 
 	let pubFromPriv: ed25519.PublicKey = ($.mustTypeAssert<ed25519.PublicKey>(ed25519.PrivateKey_Public(priv), { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: { kind: $.TypeKind.Basic, name: "uint8" } }) as ed25519.PublicKey)
-	$.println("public equal", bytes.Equal(pub, pubFromPriv))
-	$.println("private seed len", $.len(ed25519.PrivateKey_Seed(priv)))
-	$.println("nil literal reader err nil", await generateWithReader(null) == null)
+	await $.println("public equal", bytes.Equal(pub, pubFromPriv))
+	await $.println("private seed len", $.len(ed25519.PrivateKey_Seed(priv)))
+	await $.println("nil literal reader err nil", await generateWithReader(null) == null)
 	let src: io.Reader | null = null! as io.Reader | null
-	$.println("nil interface reader err nil", await generateWithReader(src) == null)
+	await $.println("nil interface reader err nil", await generateWithReader(src) == null)
 }
 
 if ($.isMainScript(import.meta)) {

@@ -9,7 +9,7 @@ export function identity(__typeArgs: $.GenericTypeArgs | undefined, value: any):
 
 export async function main(): globalThis.Promise<void> {
 	let fn: ((value: number) => number | globalThis.Promise<number>) | null = $.functionValue((value: any): any => identity({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, value), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
-	$.println(await fn!(7))
+	await $.println(await fn!(7))
 }
 
 if ($.isMainScript(import.meta)) {

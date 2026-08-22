@@ -59,7 +59,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Verify the value was modified through the method call.
 	// Expected: 200
-	$.println("Value after pointer method call via value: Expected: 200, Actual:", $.markAsStructValue($.cloneStructValue(msValue.value)).GetValue())
+	await $.println("Value after pointer method call via value: Expected: 200, Actual:", $.markAsStructValue($.cloneStructValue(msValue.value)).GetValue())
 }
 
 if ($.isMainScript(import.meta)) {

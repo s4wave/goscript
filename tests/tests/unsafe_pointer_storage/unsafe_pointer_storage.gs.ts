@@ -14,7 +14,7 @@ export function writeBytes(words: $.Slice<bigint>, bytes: $.Slice<number>): void
 }
 
 export async function main(): globalThis.Promise<void> {
-	$.println("unsafe pointer storage compiles")
+	await $.println("unsafe pointer storage compiles")
 }
 
 if ($.isMainScript(import.meta)) {

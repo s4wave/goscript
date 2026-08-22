@@ -111,10 +111,10 @@ export async function methodExpression(__typeArgs: $.GenericTypeArgs | undefined
 
 export async function main(): globalThis.Promise<void> {
 	let b: box | $.VarRef<box> | null = new box({value: 7})
-	$.println("direct:", direct({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, b))
-	$.println("interface:", await throughInterface({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, $.namedValueInterfaceValue<reader | null>(b, "*main.box", {Value: (receiver: any, ...args: any[]) => receiver.Value({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "main.box" }, [{ name: "Value", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }])))
-	$.println("promoted:", promoted({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, new holder({box: $.markAsStructValue($.cloneStructValue($.pointerValue<box>(b)))})))
-	$.println("expression:", await methodExpression({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, b))
+	await $.println("direct:", direct({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, b))
+	await $.println("interface:", await throughInterface({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, $.namedValueInterfaceValue<reader | null>(b, "*main.box", {Value: (receiver: any, ...args: any[]) => receiver.Value({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "main.box" }, [{ name: "Value", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }])))
+	await $.println("promoted:", promoted({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, new holder({box: $.markAsStructValue($.cloneStructValue($.pointerValue<box>(b)))})))
+	await $.println("expression:", await methodExpression({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, b))
 }
 
 if ($.isMainScript(import.meta)) {

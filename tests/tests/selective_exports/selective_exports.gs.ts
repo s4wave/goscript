@@ -7,29 +7,29 @@ import * as __goscript_utils from "./utils.gs.ts"
 import "./utils.gs.ts"
 
 export async function main(): globalThis.Promise<void> {
-	$.println("=== Selective Exports Test ===")
+	await $.println("=== Selective Exports Test ===")
 
 	// Call exported function
-	ExportedFunc()
+	await ExportedFunc()
 
 	// Call unexported function from same file
-	unexportedFunc()
+	await unexportedFunc()
 
 	// Call exported function from another file
-	__goscript_utils.ExportedFromUtils()
+	await __goscript_utils.ExportedFromUtils()
 
 	// Call unexported function from another file (should work due to auto-imports)
-	__goscript_utils.unexportedFromUtils()
+	await __goscript_utils.unexportedFromUtils()
 
-	$.println("=== End Selective Exports Test ===")
+	await $.println("=== End Selective Exports Test ===")
 }
 
-export function ExportedFunc(): void {
-	$.println("ExportedFunc called")
+export async function ExportedFunc(): globalThis.Promise<void> {
+	await $.println("ExportedFunc called")
 }
 
-export function unexportedFunc(): void {
-	$.println("unexportedFunc called")
+export async function unexportedFunc(): globalThis.Promise<void> {
+	await $.println("unexportedFunc called")
 }
 
 if ($.isMainScript(import.meta)) {

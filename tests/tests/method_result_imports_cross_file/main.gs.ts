@@ -30,7 +30,7 @@ export class Holder {
 
 	public async Run(): globalThis.Promise<void> {
 		let v = dep1.Make()
-		$.println(await $.pointerValue<Exclude<dep2.Value, null>>(v).Value())
+		await $.println(await $.pointerValue<Exclude<dep2.Value, null>>(v).Value())
 	}
 
 	static __typeInfo = $.registerStructType(

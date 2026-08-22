@@ -14,12 +14,12 @@ export async function main(): globalThis.Promise<void> {
 	switch (__goscriptShadow0) {
 		case 0:
 		{
-			$.println("raw")
+			await $.println("raw")
 			break
 		}
 		case 1:
 		{
-			$.println("rle")
+			await $.println("rle")
 			break
 		}
 	}

@@ -49,8 +49,8 @@ export class item {
 export async function main(): globalThis.Promise<void> {
 	let original = $.markAsStructValue(new item({n: 2}))
 	let out = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(original)).dec()))
-	$.println("original:", original.n)
-	$.println("out:", out.n)
+	await $.println("original:", original.n)
+	await $.println("out:", out.n)
 }
 
 if ($.isMainScript(import.meta)) {

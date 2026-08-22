@@ -152,14 +152,14 @@ export function newConnRunnerCallbacks(runner: connRunner | null): connRunnerCal
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: [] } as $.FunctionTypeInfo))}))
 }
 
-export function testVarRefConversion(): void {
+export async function testVarRefConversion(): globalThis.Promise<void> {
 	let value = $.varRef($.markAsStructValue(new transport({values: $.makeMap<number, number>()})))
 	let source: transport | $.VarRef<transport> | null = value
 	let destination: packetHandlerMap | $.VarRef<packetHandlerMap> | null = $.unsafePointerCast<packetHandlerMap | $.VarRef<packetHandlerMap> | null>(source, packetHandlerMap)
 	packetHandlerMap.prototype.Add.call(destination, 9)
 	value.value = $.markAsStructValue(new transport({values: $.makeMap<number, number>()}))
 	packetHandlerMap.prototype.Add.call(destination, 10)
-	$.println("varref destination:", $.mapGet<number, number, number>(value.value.values, 10, 0)[0])
+	await $.println("varref destination:", $.mapGet<number, number, number>(value.value.values, 10, 0)[0])
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -172,16 +172,16 @@ export async function main(): globalThis.Promise<void> {
 	let destinationInterface: connRunner | null = $.interfaceValue<connRunner | null>(runner, "*main.packetHandlerMap", { kind: $.TypeKind.Pointer, elemType: "main.packetHandlerMap" })
 	await connRunners_AddConnectionID(runners, 7)
 	let runnerAgain: transport | $.VarRef<transport> | null = $.unsafePointerCast<transport | $.VarRef<transport> | null>(runner, transport)
-	$.println("source:", $.mapGet<number, number, number>($.pointerValue<transport>(t).values, 3, 0)[0])
-	$.println("same destination view:", $.pointerEqual(runner, runnerAgainDest))
-	$.println("destination:", $.mapGet<number, number, number>($.pointerValue<transport>(t).values, 7, 0)[0])
-	$.println("same pointer:", $.pointerEqual(t, runnerAgain))
-	$.println("boxed same pointer:", $.pointerEqual(t, runnerAgain))
+	await $.println("source:", $.mapGet<number, number, number>($.pointerValue<transport>(t).values, 3, 0)[0])
+	await $.println("same destination view:", $.pointerEqual(runner, runnerAgainDest))
+	await $.println("destination:", $.mapGet<number, number, number>($.pointerValue<transport>(t).values, 7, 0)[0])
+	await $.println("same pointer:", $.pointerEqual(t, runnerAgain))
+	await $.println("boxed same pointer:", $.pointerEqual(t, runnerAgain))
 	await $.pointerValue<Exclude<sourceRunner, null>>(sourceInterface).SourceOnly(4)
 	await $.pointerValue<Exclude<connRunner, null>>(destinationInterface).Add(8)
 	let pointerValues: globalThis.Map<transport | $.VarRef<transport> | null, number> | null = new globalThis.Map<transport | $.VarRef<transport> | null, number>([[t, 42]])
-	$.println("map lookup:", $.mapGet<transport | $.VarRef<transport> | null, number, number>(pointerValues, runnerAgain, 0)[0])
-	testVarRefConversion()
+	await $.println("map lookup:", $.mapGet<transport | $.VarRef<transport> | null, number, number>(pointerValues, runnerAgain, 0)[0])
+	await testVarRefConversion()
 }
 
 if ($.isMainScript(import.meta)) {

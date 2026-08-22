@@ -13,9 +13,9 @@ export async function main(): globalThis.Promise<void> {
 	let otherBacking: $.Slice<number> = new Uint8Array([2]) as $.Slice<number>
 	let otherEmptyView: $.Slice<number> = $.goSlice(otherBacking, undefined, 0)
 
-	$.println("nil and view:", bytes.Equal(nilBytes, emptyView))
-	$.println("views:", bytes.Equal(emptyView, otherEmptyView))
-	$.println("strings:", $.stringEqual($.bytesToString(nilBytes), $.bytesToString(emptyView)))
+	await $.println("nil and view:", bytes.Equal(nilBytes, emptyView))
+	await $.println("views:", bytes.Equal(emptyView, otherEmptyView))
+	await $.println("strings:", $.stringEqual($.bytesToString(nilBytes), $.bytesToString(emptyView)))
 }
 
 if ($.isMainScript(import.meta)) {

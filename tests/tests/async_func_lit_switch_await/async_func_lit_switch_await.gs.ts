@@ -26,7 +26,7 @@ export async function main(): globalThis.Promise<void> {
 			}
 		}
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo))
-	$.println(await fn!(0))
+	await $.println(await fn!(0))
 }
 
 if ($.isMainScript(import.meta)) {

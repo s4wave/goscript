@@ -91,23 +91,23 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = json.RawMessage_MarshalJSON(raw)
 	let rawBytes: $.Slice<number> = __goscriptTuple0[0]
 	let [num, ] = json.Number_Int64(String("42"))
-	$.println("json:", json.Valid(rawBytes), $.bytesToString(rawBytes), num)
+	await $.println("json:", json.Valid(rawBytes), $.bytesToString(rawBytes), num)
 
 	let __goscriptTuple1: any = mime.ParseMediaType("text/plain; charset=utf-8")
 	let mediaType = __goscriptTuple1[0]
 	let params: globalThis.Map<string, string> | null = __goscriptTuple1[1]
-	$.println("mime:", mediaType, $.mapGet<string, string, string>(params, "charset", "")[0], mime.TypeByExtension(".json"), mime.WordEncoder_Encode(mime.BEncoding, "utf-8", "hi"))
+	await $.println("mime:", mediaType, $.mapGet<string, string, string>(params, "charset", "")[0], mime.TypeByExtension(".json"), mime.WordEncoder_Encode(mime.BEncoding, "utf-8", "hi"))
 
-	let [parsed, ] = strconv.ParseComplex("(1-2i)", 128)
-	$.println("time:", time.RFC1123, time.Month_String(time.May))
-	$.println("leaf:", $.uint(bits.Rem32($.uint(1, 32), $.uint(0, 32), $.uint(3, 32)), 32), strings.ToValidUTF8("abc", "?"), strconv.FormatComplex(parsed, $.uint(102, 8), -1, 128), $.int($.real(parsed)), $.int($.imag(parsed)), zlib.NoCompression, $.pointerValue<Exclude<$.GoError, null>>(os.ErrNoHandle).Error(), strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "go"), $.stringEqual(strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "iki"), "İKİ"))
+	let [parsed, ] = await strconv.ParseComplex("(1-2i)", 128)
+	await $.println("time:", time.RFC1123, time.Month_String(time.May))
+	await $.println("leaf:", $.uint(bits.Rem32($.uint(1, 32), $.uint(0, 32), $.uint(3, 32)), 32), strings.ToValidUTF8("abc", "?"), strconv.FormatComplex(parsed, $.uint(102, 8), -1, 128), $.int($.real(parsed)), $.int($.imag(parsed)), zlib.NoCompression, await $.pointerValue<Exclude<$.GoError, null>>(os.ErrNoHandle).Error(), strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "go"), $.stringEqual(strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "iki"), "İKİ"))
 
 	let scan: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
-	scanner.PrintError($.pointerValueOrNil($.interfaceValue<io.Writer | null>(scan, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!, $.pointerValueOrNil(errors.New("scan failed"))!)
-	$.println("scanner:", strings.TrimSpace(scan.value.String()))
+	await scanner.PrintError($.pointerValueOrNil($.interfaceValue<io.Writer | null>(scan, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!, $.pointerValueOrNil(errors.New("scan failed"))!)
+	await $.println("scanner:", strings.TrimSpace(scan.value.String()))
 
 	let h: hash.XOF | null = $.interfaceValue<hash.XOF | null>($.markAsStructValue(new xof()), "main.xof", "main.xof")
-	$.println("hash:", await $.pointerValue<Exclude<hash.XOF, null>>(h).BlockSize())
+	await $.println("hash:", await $.pointerValue<Exclude<hash.XOF, null>>(h).BlockSize())
 }
 
 if ($.isMainScript(import.meta)) {

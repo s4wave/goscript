@@ -72,7 +72,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = trace.Start($.pointerValueOrNil($.interfaceValue<io.Writer | null>(sink, "*main.byteSink", { kind: $.TypeKind.Pointer, elemType: "main.byteSink" }))!)
 		if (err != null) {
-			fmt.Println("ERROR:" + $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await fmt.Println("ERROR:" + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return
 		}
 	}
@@ -80,14 +80,14 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = trace.NewTask($.pointerValueOrNil(context.Background())!, "proof-task")
 	let ctx = __goscriptTuple0[0]
 	let task: trace.Task | $.VarRef<trace.Task> | null = __goscriptTuple0[1]
-	trace.WithRegion($.pointerValueOrNil(ctx)!, "proof-region", $.functionValue((): void => {
+	await trace.WithRegion($.pointerValueOrNil(ctx)!, "proof-region", $.functionValue((): void => {
 		trace.Log($.pointerValueOrNil(ctx)!, "proof-key", "proof-value")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	trace.Task.prototype.End.call($.pointerValue<trace.Task>(task))
 
 	trace.Stop()
 
-	fmt.Println(toHex($.pointerValue<byteSink>(sink).data))
+	await fmt.Println(toHex($.pointerValue<byteSink>(sink).data))
 }
 
 if ($.isMainScript(import.meta)) {

@@ -5,7 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let limit = (274877906944) - 64
-	$.println(limit > 1024, limit)
+	await $.println(limit > 1024, limit)
 }
 
 if ($.isMainScript(import.meta)) {

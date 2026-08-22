@@ -43,7 +43,7 @@ export async function main(): globalThis.Promise<void> {
 	let intVar: $.VarRef<number> = $.varRef(10)
 	$.pointerValue<MyStruct>(myStruct).myPrivate = intVar
 	intVar.value = 15
-	$.println($.pointerValue<number>($.pointerValue<MyStruct>(myStruct).myPrivate))
+	await $.println($.pointerValue<number>($.pointerValue<MyStruct>(myStruct).myPrivate))
 }
 
 if ($.isMainScript(import.meta)) {

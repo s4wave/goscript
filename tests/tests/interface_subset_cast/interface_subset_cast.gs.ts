@@ -86,17 +86,17 @@ export async function main(): globalThis.Promise<void> {
 	// Cast from larger interface to smaller interface (subset)
 	let i2: MyInterface2 | null = (i1 as MyInterface2 | null)
 
-	$.println("i1.MyString1():", await $.pointerValue<Exclude<MyInterface1, null>>(i1).MyString1())
-	$.println("i1.MyString2():", await $.pointerValue<Exclude<MyInterface1, null>>(i1).MyString2())
-	$.println("i2.MyString1():", await $.pointerValue<Exclude<MyInterface2, null>>(i2).MyString1())
+	await $.println("i1.MyString1():", await $.pointerValue<Exclude<MyInterface1, null>>(i1).MyString1())
+	await $.println("i1.MyString2():", await $.pointerValue<Exclude<MyInterface1, null>>(i1).MyString2())
+	await $.println("i2.MyString1():", await $.pointerValue<Exclude<MyInterface2, null>>(i2).MyString1())
 
 	// Type assertion from larger to smaller interface
 	let [i3, ok] = $.typeAssertTuple<MyInterface2 | null>(i1, "main.MyInterface2")
 	if (ok) {
-		$.println("Type assertion successful")
-		$.println("i3.MyString1():", await $.pointerValue<Exclude<MyInterface2, null>>(i3).MyString1())
+		await $.println("Type assertion successful")
+		await $.println("i3.MyString1():", await $.pointerValue<Exclude<MyInterface2, null>>(i3).MyString1())
 	} else {
-		$.println("Type assertion failed")
+		await $.println("Type assertion failed")
 	}
 }
 

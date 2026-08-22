@@ -21,7 +21,7 @@ export async function main(): globalThis.Promise<void> {
 	if (__goscriptRangeReturn0) {
 		return
 	}
-	$.println("keys:", count)
+	await $.println("keys:", count)
 }
 
 if ($.isMainScript(import.meta)) {
