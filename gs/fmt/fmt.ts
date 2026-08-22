@@ -2,7 +2,6 @@
 // Optimized for JavaScript runtime and simplified for common use cases
 
 import * as $ from '@goscript/builtin/index.js'
-import * as errors from '@goscript/errors/index.js'
 import { writeHostStdoutText } from '@goscript/builtin/hostio.js'
 
 // Basic interfaces
@@ -584,9 +583,15 @@ function appendText(b: $.Bytes, result: string): $.Bytes {
 }
 
 // Error creation
-export async function Errorf(format: string, ...a: any[]): Promise<any> {
-  const message = await parseFormatMaybe(format, a)
-  const err = errors.New(message)
+//
+// Errorf stays a synchronous Go API: it returns the error immediately and
+// resolves operand text lazily when Error is called, so protobuf-generated
+// sync methods can keep using it while async Error/String operands still
+// render through the MaybePromise convention.
+export function Errorf(format: string, ...a: any[]): any {
+  const err: Exclude<$.GoError, null> = {
+    Error: (): string | PromiseLike<string> => parseFormatMaybe(format, a),
+  }
   // %w operands are wrapped: the result must Unwrap to them so errors.Is/As can
   // walk the chain. One %w unwraps to a single error; multiple %w (Go 1.20+)
   // unwrap to an []error, matching the depth-first traversal in errors.Is.

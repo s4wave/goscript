@@ -1,20 +1,19 @@
 {
-    "asyncFunctions": {
-        "Append": true,
-        "Appendf": true,
-        "Appendln": true,
-        "Errorf": true,
-        "Fprint": true,
-        "Fprintf": true,
-        "Fprintln": true,
-        "Print": true,
-        "Printf": true,
-        "Println": true,
-        "Sprint": true,
-        "Sprintf": true,
-        "Sprintln": true
-    },
-    "dependencies": [
-        "errors"
-    ]
+  "asyncFunctions": {
+    "Append": true,
+    "Appendf": true,
+    "Appendln": true,
+    "Fprint": true,
+    "Fprintf": true,
+    "Fprintln": true,
+    "Print": true,
+    "Printf": true,
+    "Println": true,
+    "Sprint": true,
+    "Sprintf": true,
+    "Sprintln": true
+  },
+  "dependencies": [
+    "errors"
+  ]
 }
