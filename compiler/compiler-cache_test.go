@@ -221,6 +221,45 @@ func TestCompilePackagesCacheInvalidatesEmbedFileChange(t *testing.T) {
 	}
 }
 
+func TestCompilePackagesCacheInvalidatesAdditionalBindingRoots(t *testing.T) {
+	moduleDir := t.TempDir()
+	dependencyDir := t.TempDir()
+	writeFile := func(path, contents string) {
+		t.Helper()
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, []byte(contents), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	writeFile(filepath.Join(moduleDir, "go.mod"), "module example.test/cachepbroot\n\ngo 1.25.3\n\nrequire example.test/cachepbdep v0.0.0\n\nreplace example.test/cachepbdep => "+dependencyDir+"\n")
+	writeFile(filepath.Join(moduleDir, "main.go"), "package cachepbroot\n\nimport \"example.test/cachepbdep\"\n\nfunc Use() cachepbdep.Message { return cachepbdep.Message{} }\n")
+	writeFile(filepath.Join(dependencyDir, "go.mod"), "module example.test/cachepbdep\n\ngo 1.25.3\n")
+	writeFile(filepath.Join(dependencyDir, "message.pb.go"), "package cachepbdep\n\ntype Message struct { Name string }\n")
+	writeFile(filepath.Join(dependencyDir, "message.pb.ts"), "export interface Message { name?: string }\nexport const Message = {} as any\n")
+
+	cacheRoot := filepath.Join(t.TempDir(), "cache")
+	outputRoot := filepath.Join(t.TempDir(), "out")
+	baseConfig := Config{
+		AllDependencies:           true,
+		ProtobufTypeScriptBinding: true,
+	}
+	compileCacheFixtureConfig(t, baseConfig, moduleDir, outputRoot, cacheRoot)
+	if _, err := os.Stat(filepath.Join(outputRoot, "@goscript", "example.test", "cachepbdep", "message.pb.gs.ts")); err != nil {
+		t.Fatalf("initial compile should emit unbound protobuf file: %v", err)
+	}
+	if err := os.RemoveAll(outputRoot); err != nil {
+		t.Fatal(err)
+	}
+	baseConfig.AdditionalBindingRoots = []string{dependencyDir}
+	compileCacheFixtureConfig(t, baseConfig, moduleDir, outputRoot, cacheRoot)
+	bound := readOutputFile(t, outputRoot, "example.test/cachepbdep", "message.pb.ts")
+	if !strings.Contains(bound, "__protobufTypeScriptMessage = __protobuf_ts.Message") {
+		t.Fatalf("additional binding root was not reflected after cache replay:\n%s", bound)
+	}
+}
+
 func TestCompilePackagesCacheInvalidatesProtobufBindingFileChange(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod": "module example.test/cachepb\n\ngo 1.25.3\n",
