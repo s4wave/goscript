@@ -269,7 +269,7 @@ export function TODO(): Context {
 }
 
 // WithCancel returns a copy of parent with a new Done channel
-export function WithCancel(parent: Context): [ContextNonNil, CancelFunc] {
+export function WithCancel(parent: Context): [Context, CancelFunc] {
   if (parent === null) {
     throw new Error('cannot create context from nil parent')
   }
@@ -306,7 +306,7 @@ export function WithCancelCause(
 export function WithDeadline(
   parent: Context,
   d: time.Time,
-): [ContextNonNil, CancelFunc] {
+): [Context, CancelFunc] {
   return WithDeadlineCause(parent, d, null)
 }
 
@@ -315,7 +315,7 @@ export function WithDeadlineCause(
   parent: Context,
   d: time.Time,
   cause: $.GoError,
-): [ContextNonNil, CancelFunc] {
+): [Context, CancelFunc] {
   if (parent === null) {
     throw new Error('cannot create context from nil parent')
   }
@@ -342,7 +342,7 @@ export function WithDeadlineCause(
 export function WithTimeout(
   parent: Context,
   timeout: time.Duration,
-): [ContextNonNil, CancelFunc] {
+): [Context, CancelFunc] {
   return WithDeadline(parent, time.Now().Add(timeout))
 }
 
@@ -351,7 +351,7 @@ export function WithTimeoutCause(
   parent: Context,
   timeout: time.Duration,
   cause: $.GoError,
-): [ContextNonNil, CancelFunc] {
+): [Context, CancelFunc] {
   return WithDeadlineCause(parent, time.Now().Add(timeout), cause)
 }
 
