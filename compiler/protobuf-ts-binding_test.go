@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"go/ast"
+	"go/parser"
+	"go/token"
 	"os"
 	"path/filepath"
 	"strings"
@@ -871,6 +873,56 @@ export const Outer = {} as any
 	wantFields := `(Outer as any).__protobufTypeScriptFields = {"mapV": rdep.RemoteMsg, "ptr": rdep.RemoteMsg, "rep": rdep.RemoteMsg, "val": rdep.RemoteMsg};`
 	if !strings.Contains(binding, wantFields) {
 		t.Fatalf("binding metadata should resolve pointer, value, repeated, and map-value fields through the actual import alias rdep\nwant: %s\ngot:\n%s", wantFields, binding)
+	}
+}
+
+// TestProtobufTypeScriptBindingLeavesCollisionsUnbound verifies that the
+// case-insensitive fallback never binds when two exported consts collide
+// case-insensitively and skips a lowered match already claimed by an earlier
+// struct's exact binding.
+func TestProtobufTypeScriptBindingLeavesCollisionsUnbound(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, dir, "foo.pb.ts", `export interface V86fs {
+  name?: string
+}
+export const V86fs = {} as any
+export interface V86FS {
+  name?: string
+}
+export const V86FS = {} as any
+export interface Foo {
+  name?: string
+}
+export const Foo = {} as any
+`)
+	src := `package example
+
+type V86Fs struct {
+	Name string
+}
+
+type Foo struct {
+	Name string
+}
+
+type FoO struct {
+	Name string
+}
+`
+	file, err := parser.ParseFile(token.NewFileSet(), filepath.Join(dir, "foo.pb.go"), src, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	names := protobufTypeScriptBindingMessageNames(file, filepath.Join(dir, "foo.pb.ts"))
+
+	if _, ok := names["V86Fs"]; ok {
+		t.Fatalf("V86Fs must stay unbound when V86fs and V86FS collide case-insensitively, got: %v", names)
+	}
+	if names["Foo"] != "Foo" {
+		t.Fatalf("earlier struct should keep its exact binding to Foo, got: %v", names)
+	}
+	if _, ok := names["FoO"]; ok {
+		t.Fatalf("later struct must stay unbound when its only lowered match was claimed by an exact binding, got: %v", names)
 	}
 }
 

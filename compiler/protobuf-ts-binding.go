@@ -198,7 +198,11 @@ func protobufTypeScriptBindingMessageNames(file *ast.File, tsPath string) map[st
 	// Index exported consts case-insensitively so a Go safe identifier that
 	// differs from the protobuf-es const only in digit-camel capitalization,
 	// such as protoc-gen-go's V86Fs versus the exported const V86fs, still
-	// resolves to the actual exported spelling.
+	// resolves to the actual exported spelling. Exact safe-identifier matches
+	// stay authoritative and unchanged; this index is only a fallback that
+	// binds when exactly one exported const matches case-insensitively and
+	// that const is not yet claimed by another struct. Anything else stays
+	// unbound with the unresolved diagnostic.
 	loweredTSMessages := make(map[string][]string, len(exportedTSMessages))
 	for export := range exportedTSMessages {
 		lowered := strings.ToLower(export)
@@ -784,8 +788,8 @@ func protobufTypeScriptBindingFieldMessageRef(runtimeType string) (pkgName, type
 		return "", "", false
 	}
 	rest := runtimeType[idx+len(marker):]
-	before, _, ok0 := strings.Cut(rest, "\"")
-	if !ok0 {
+	before, _, found := strings.Cut(rest, "\"")
+	if !found {
 		return "", "", false
 	}
 	return protobufTypeScriptBindingSplitDotted(before)
