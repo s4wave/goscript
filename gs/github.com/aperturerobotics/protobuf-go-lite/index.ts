@@ -567,7 +567,11 @@ function toTypeScriptMessage(
 
 function fromTypeScriptScalarValue(value: any): any {
   if (value instanceof Uint8Array) {
-    return value
+    // Own a copy of the viewed range. protobuf-go-lite copies bytes fields
+    // while decoding (DecodeBytesAppend), so callers may scrub or reuse the
+    // wire buffer once UnmarshalVT returns; a view would read that scrub as
+    // zeroed field contents.
+    return value.slice()
   }
   return value
 }
