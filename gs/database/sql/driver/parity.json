@@ -89,6 +89,7 @@
     "RowsAffected": {
       "status": "real"
     },
+    "RowsColumnScanner": { "status": "blocked", "reason": "newer driver interface; not implemented by the wasm sql bridge" },
     "RowsColumnTypeDatabaseTypeName": {
       "status": "real"
     },
@@ -107,6 +108,7 @@
     "RowsNextResultSet": {
       "status": "real"
     },
+    "ScanContext": { "status": "blocked", "reason": "newer driver interface; not implemented by the wasm sql bridge" },
     "SessionResetter": {
       "status": "real"
     },
