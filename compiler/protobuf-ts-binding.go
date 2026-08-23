@@ -36,7 +36,13 @@ func protobufTypeScriptBindings(semPkg *semanticPackage, options LoweringOptions
 			continue
 		}
 		if strings.HasSuffix(filepath.Base(sourcePath), "_srpc.pb.go") {
-			continue
+			if protobufSRPCHasGoScriptReplacement(sourcePath) {
+				continue
+			}
+			tsPath := strings.TrimSuffix(sourcePath, ".go") + ".ts"
+			if _, err := os.Stat(tsPath); os.IsNotExist(err) {
+				continue
+			}
 		}
 		if !protobufTypeScriptBindingInSourceRoot(options.SourceRoot, sourcePath, options.AdditionalBindingRoots...) {
 			continue

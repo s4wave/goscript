@@ -80,6 +80,99 @@ func NewFoo() Foo {
 	}
 }
 
+func TestProtobufTypeScriptBindingSRPCSelection(t *testing.T) {
+	cases := []struct {
+		name          string
+		sibling       bool
+		replacement   bool
+		wantBinding   bool
+		wantStub      bool
+		wantGenerated bool
+	}{
+		{name: "sibling binding", sibling: true, wantBinding: true},
+		{name: "replacement stub", sibling: true, replacement: true, wantStub: true},
+		{name: "missing sibling", wantGenerated: true},
+		{name: "replacement without sibling", replacement: true},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			dir := t.TempDir()
+			writeTestFile(t, dir, "go.mod", "module example.test/srpcbinding\n\ngo 1.25\n")
+			writeTestFile(t, dir, "foo_srpc.pb.go", `package srpcbinding
+
+type Foo struct {
+	Name string
+}
+`)
+			if tc.sibling {
+				writeTestFile(t, dir, "foo_srpc.pb.ts", `export interface Foo {
+  name?: string
+}
+export const Foo = {} as any
+`)
+			}
+			if tc.replacement {
+				writeTestFile(t, dir, "foo-srpc-goscript.go", `package srpcbinding
+`)
+			}
+
+			out := filepath.Join(dir, "out")
+			comp, err := NewCompiler(&Config{
+				Dir:                       dir,
+				OutputPath:                out,
+				ProtobufTypeScriptBinding: true,
+			}, nil, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+				t.Fatalf("compile SRPC protobuf binding: %v", err)
+			}
+
+			pkgDir := filepath.Join(out, "@goscript", "example.test", "srpcbinding")
+			bindingPath := filepath.Join(pkgDir, "foo_srpc.pb.ts")
+			stubPath := filepath.Join(pkgDir, "foo_srpc.pb.gs.ts")
+			_, bindingErr := os.Stat(bindingPath)
+			_, stubErr := os.Stat(stubPath)
+			switch {
+			case tc.wantBinding:
+				if bindingErr != nil {
+					t.Fatalf("expected SRPC binding wrapper, stat err=%v", bindingErr)
+				}
+				if !errors.Is(stubErr, os.ErrNotExist) {
+					t.Fatalf("SRPC binding wrapper should replace generated output, stat err=%v", stubErr)
+				}
+				binding := readTestFile(t, bindingPath)
+				if !strings.Contains(binding, `import * as __protobuf_ts`) || !strings.Contains(binding, `class Foo`) {
+					t.Fatalf("SRPC binding wrapper should adapt sibling foo_srpc.pb.js, got:\n%s", binding)
+				}
+			case tc.wantStub:
+				if stubErr != nil {
+					t.Fatalf("expected SRPC replacement stub, stat err=%v", stubErr)
+				}
+				if !errors.Is(bindingErr, os.ErrNotExist) {
+					t.Fatalf("SRPC replacement should not emit a binding wrapper, stat err=%v", bindingErr)
+				}
+				stub := readTestFile(t, stubPath)
+				if !strings.Contains(stub, `export * from`) {
+					t.Fatalf("SRPC replacement should emit a re-export stub, got:\n%s", stub)
+				}
+			case tc.wantGenerated:
+				if stubErr != nil {
+					t.Fatalf("expected generated SRPC output, stat err=%v", stubErr)
+				}
+				if !errors.Is(bindingErr, os.ErrNotExist) {
+					t.Fatalf("missing sibling should not emit a binding wrapper, stat err=%v", bindingErr)
+				}
+			default:
+				if !errors.Is(bindingErr, os.ErrNotExist) || !errors.Is(stubErr, os.ErrNotExist) {
+					t.Fatalf("replacement without sibling should emit neither binding nor stub, binding=%v stub=%v", bindingErr, stubErr)
+				}
+			}
+		})
+	}
+}
+
 func TestProtobufTypeScriptBindingRewritesGeneratedMethodsToBoundHelpers(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, dir, "go.mod", `module example.test/protobufbindingmethods

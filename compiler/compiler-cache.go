@@ -585,8 +585,11 @@ func compilerCacheProtobufSideInputs(req *CompileRequest, node *PackageGraphNode
 	var inputs []string
 	for _, sourcePath := range node.CompiledGoFiles {
 		if !strings.HasSuffix(sourcePath, ".pb.go") ||
-			strings.HasSuffix(filepath.Base(sourcePath), "_srpc.pb.go") ||
 			!protobufTypeScriptBindingInSourceRoot(sourceRoot, sourcePath, req.AdditionalBindingRoots...) {
+			continue
+		}
+		if strings.HasSuffix(filepath.Base(sourcePath), "_srpc.pb.go") &&
+			protobufSRPCHasGoScriptReplacement(sourcePath) {
 			continue
 		}
 		tsPath := strings.TrimSuffix(sourcePath, ".go") + ".ts"
