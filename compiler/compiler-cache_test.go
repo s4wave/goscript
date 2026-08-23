@@ -335,6 +335,25 @@ func TestCompilerCacheKeyInvalidatesRequestAndModuleInputs(t *testing.T) {
 	}
 }
 
+// TestCompilerCacheKeyChangesWithSemanticsVersion pins that the semantics
+// version participates in the compiler identity, so bumping
+// compilerSemanticsVersion invalidates every cache entry.
+func TestCompilerCacheKeyChangesWithSemanticsVersion(t *testing.T) {
+	var previous, bumped strings.Builder
+	writeCompilerIdentityWithSemantics(&previous, "0")
+	writeCompilerIdentityWithSemantics(&bumped, "1")
+	if previous.String() == bumped.String() {
+		t.Fatal("semantics version did not change compiler identity")
+	}
+
+	var live, current strings.Builder
+	writeCompilerIdentity(&live)
+	writeCompilerIdentityWithSemantics(&current, compilerSemanticsVersion)
+	if live.String() != current.String() {
+		t.Fatal("writeCompilerIdentity does not embed compilerSemanticsVersion")
+	}
+}
+
 func TestCompilerCacheKeyTracksOverridesAndProtobufOutputRelation(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod":    "module example.test/cachekeypb\n\ngo 1.25.3\n",

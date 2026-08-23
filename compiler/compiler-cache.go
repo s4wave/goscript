@@ -21,7 +21,13 @@ import (
 	jsoniter "github.com/aperturerobotics/json-iterator-lite"
 )
 
+// compilerCacheSchema identifies the on-disk artifact entry format.
 const compilerCacheSchema = "goscript-package-artifact-v1"
+
+// compilerSemanticsVersion versions emitted-output semantics. Bump this value
+// with every behavior-changing compiler commit so artifacts cached by an
+// older binary miss and rebuild instead of replaying stale bytes.
+const compilerSemanticsVersion = "1"
 
 type compilerCacheEntryKind string
 
@@ -397,7 +403,16 @@ func (o *compilerCacheKeyOwner) nodeDigest(pkgPath string) string {
 	return digest
 }
 
+// writeCompilerIdentity writes the producing-binary identity fields of a
+// cache key.
 func writeCompilerIdentity(b *strings.Builder) {
+	writeCompilerIdentityWithSemantics(b, compilerSemanticsVersion)
+}
+
+// writeCompilerIdentityWithSemantics writes the identity fields with an
+// explicit semantics version so tests can pin that a bump invalidates keys.
+func writeCompilerIdentityWithSemantics(b *strings.Builder, semanticsVersion string) {
+	writeKeyField(b, "semantics-version", semanticsVersion)
 	writeKeyField(b, "go-version", runtime.Version())
 	if info, ok := debug.ReadBuildInfo(); ok {
 		writeKeyField(b, "module", info.Main.Path+"@"+info.Main.Version)
