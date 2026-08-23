@@ -50,7 +50,3 @@ describe('errors with async Error members', () => {
     expect(text as string).toBe('a\nb')
   })
 })
-
-// keep references to the exact member objects used in the Join test above
-const syncErr0 = (Join(syncError('a')) as any) && syncError('a')
-const joinedMembers = [syncError('a'), asyncError('b'), syncError('c')]
