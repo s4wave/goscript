@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 import * as $ from '@goscript/builtin/index.js'
-import * as errors from '@goscript/errors/index.js'
 import * as fmt from './fmt.js'
 import { Sprint, Sprintf } from './fmt.js'
 
