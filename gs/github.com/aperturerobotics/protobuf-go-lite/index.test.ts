@@ -1,3 +1,11 @@
+import { createHash } from 'node:crypto'
+
+import { createEnumType } from '@aptre/protobuf-es-lite/enum'
+import {
+  createMessageType,
+  type MessageType,
+} from '@aptre/protobuf-es-lite/message'
+import { ScalarType } from '@aptre/protobuf-es-lite/scalar'
 import { describe, expect, it } from 'vitest'
 
 import * as $ from '../../../builtin/index.js'
@@ -942,5 +950,341 @@ describe('protobuf-go-lite text helpers', () => {
     const mb = new Builder()
     TextWriteTextMarshaler(mb, { MarshalProtoText: () => 'inner {}' })
     expect(mb.String()).toBe('inner {}')
+  })
+})
+
+// The fixtures below mirror the Spacewave first-mount wire shapes: a blockenc
+// transform step config carried through nested grant wrappers, matching the
+// H0-H3 hops of the spacewave native twin fixture
+// core/sobject/goscript_binding_chain_test.go. Every hop hashes the leaf
+// step-config bytes; a changed digest names the layer that mutates them.
+const blockEncEnum = createEnumType('transform.blockenc.BlockEnc', [
+  { no: 0, name: 'BLOCK_ENC_UNKNOWN' },
+  { no: 1, name: 'BLOCK_ENC_NONE' },
+  { no: 2, name: 'BLOCK_ENC_XCHACHA20_POLY1305' },
+])
+
+interface StepConfigTs {
+  id?: string
+  config?: Uint8Array
+}
+
+interface TransformConfigTs {
+  steps?: StepConfigTs[]
+}
+
+interface GrantInnerTs {
+  transformConf?: TransformConfigTs
+}
+
+interface StateTs {
+  rootGrants?: GrantInnerTs[]
+}
+
+const stepConfigType: MessageType<StepConfigTs> = createMessageType({
+  typeName: 'test.StepConfig',
+  fields: [
+    { no: 1, name: 'id', kind: 'scalar', T: ScalarType.STRING },
+    { no: 2, name: 'config', kind: 'scalar', T: ScalarType.BYTES },
+  ],
+  packedByDefault: true,
+})
+
+const transformConfigType: MessageType<TransformConfigTs> = createMessageType({
+  typeName: 'test.TransformConfig',
+  fields: [
+    {
+      no: 1,
+      name: 'steps',
+      kind: 'message',
+      T: () => stepConfigType,
+      repeated: true,
+    },
+  ],
+  packedByDefault: true,
+})
+
+const grantInnerType: MessageType<GrantInnerTs> = createMessageType({
+  typeName: 'test.GrantInner',
+  fields: [
+    {
+      no: 1,
+      name: 'transform_conf',
+      kind: 'message',
+      T: () => transformConfigType,
+    },
+  ],
+  packedByDefault: true,
+})
+
+const stateType: MessageType<StateTs> = createMessageType({
+  typeName: 'test.State',
+  fields: [
+    {
+      no: 1,
+      name: 'root_grants',
+      kind: 'message',
+      T: () => grantInnerType,
+      repeated: true,
+    },
+  ],
+  packedByDefault: true,
+})
+
+const blockEncConfigType: MessageType<{
+  blockEnc?: number
+  key?: Uint8Array
+}> = createMessageType({
+  typeName: 'test.BlockEncConfig',
+  fields: [
+    { no: 1, name: 'block_enc', kind: 'enum', T: blockEncEnum },
+    { no: 2, name: 'key', kind: 'scalar', T: ScalarType.BYTES },
+  ],
+  packedByDefault: true,
+})
+
+class StepConfigBoundMessage {
+  public _fields: {
+    Id: $.VarRef<string>
+    Config: $.VarRef<Uint8Array | null>
+  }
+
+  constructor(init?: Partial<{ Id?: string; Config?: Uint8Array | null }>) {
+    this._fields = {
+      Id: $.varRef(init?.Id ?? ''),
+      Config: $.varRef(init?.Config ?? null),
+    }
+  }
+
+  public get Id(): string {
+    return this._fields.Id.value
+  }
+  public set Id(value: string) {
+    this._fields.Id.value = value
+  }
+
+  public get Config(): Uint8Array | null {
+    return this._fields.Config.value
+  }
+  public set Config(value: Uint8Array | null) {
+    this._fields.Config.value = value
+  }
+}
+
+;(StepConfigBoundMessage as any).__protobufTypeScriptMessage = stepConfigType
+;(StepConfigBoundMessage as any).__protobufTypeScriptFields = {}
+
+class TransformConfigBoundMessage {
+  public _fields: {
+    Steps: $.VarRef<$.Slice<StepConfigBoundMessage | null> | null>
+  }
+
+  constructor(init?: {
+    Steps?: $.Slice<StepConfigBoundMessage | null> | null
+  }) {
+    this._fields = { Steps: $.varRef(init?.Steps ?? null) }
+  }
+
+  public get Steps(): $.Slice<StepConfigBoundMessage | null> | null {
+    return this._fields.Steps.value
+  }
+  public set Steps(value: $.Slice<StepConfigBoundMessage | null> | null) {
+    this._fields.Steps.value = value
+  }
+}
+
+;(TransformConfigBoundMessage as any).__protobufTypeScriptFields = {
+  steps: StepConfigBoundMessage,
+}
+;(TransformConfigBoundMessage as any).__protobufTypeScriptMessage =
+  transformConfigType
+
+class GrantInnerBoundMessage {
+  public _fields: {
+    TransformConf: $.VarRef<TransformConfigBoundMessage | null>
+  }
+
+  constructor(init?: { TransformConf?: TransformConfigBoundMessage | null }) {
+    this._fields = { TransformConf: $.varRef(init?.TransformConf ?? null) }
+  }
+
+  public get TransformConf(): TransformConfigBoundMessage | null {
+    return this._fields.TransformConf.value
+  }
+  public set TransformConf(value: TransformConfigBoundMessage | null) {
+    this._fields.TransformConf.value = value
+  }
+}
+
+;(GrantInnerBoundMessage as any).__protobufTypeScriptFields = {
+  transformConf: TransformConfigBoundMessage,
+}
+;(GrantInnerBoundMessage as any).__protobufTypeScriptMessage = grantInnerType
+
+class StateBoundMessage {
+  public _fields: {
+    RootGrants: $.VarRef<$.Slice<GrantInnerBoundMessage | null> | null>
+  }
+
+  constructor(init?: {
+    RootGrants?: $.Slice<GrantInnerBoundMessage | null> | null
+  }) {
+    this._fields = { RootGrants: $.varRef(init?.RootGrants ?? null) }
+  }
+
+  public get RootGrants(): $.Slice<GrantInnerBoundMessage | null> | null {
+    return this._fields.RootGrants.value
+  }
+  public set RootGrants(value: $.Slice<GrantInnerBoundMessage | null> | null) {
+    this._fields.RootGrants.value = value
+  }
+}
+
+;(StateBoundMessage as any).__protobufTypeScriptFields = {
+  rootGrants: GrantInnerBoundMessage,
+}
+;(StateBoundMessage as any).__protobufTypeScriptMessage = stateType
+
+class BlockEncConfigBoundMessage {
+  public _fields: {
+    BlockEnc: $.VarRef<number>
+    Key: $.VarRef<Uint8Array | null>
+  }
+
+  constructor(init?: Partial<{ BlockEnc?: number; Key?: Uint8Array | null }>) {
+    this._fields = {
+      BlockEnc: $.varRef(init?.BlockEnc ?? 0),
+      Key: $.varRef(init?.Key ?? null),
+    }
+  }
+
+  public get BlockEnc(): number {
+    return this._fields.BlockEnc.value
+  }
+  public set BlockEnc(value: number) {
+    this._fields.BlockEnc.value = value
+  }
+
+  public get Key(): Uint8Array | null {
+    return this._fields.Key.value
+  }
+  public set Key(value: Uint8Array | null) {
+    this._fields.Key.value = value
+  }
+}
+
+;(BlockEncConfigBoundMessage as any).__protobufTypeScriptFields = {}
+;(BlockEncConfigBoundMessage as any).__protobufTypeScriptMessage =
+  blockEncConfigType
+
+describe('protobuf-go-lite binding chain hops', () => {
+  // Deterministic key matching the native twin fixture: byte(i), i=0..31.
+  const key = new Uint8Array(32).map((_, i) => i)
+  // Digest the native leg produced for the same logical content.
+  const nativeLeafSha =
+    '0de9a4c3db2d66ef044f3caa67325a33d43df4d22391d44331c145fa8180d0c7'
+
+  function hopLine(hop: string, data: Uint8Array): string {
+    const sha = createHash('sha256').update(data).digest('hex')
+    return `${hop} len=${data.length} sha256=${sha}`
+  }
+
+  function leafBytes(conf: TransformConfigBoundMessage): Uint8Array {
+    const config = conf.Steps?.[0]?.Config
+    if (config == null) {
+      throw new Error('hops: missing leaf step config bytes')
+    }
+    return config
+  }
+
+  it('keeps the blockenc step config bytes identical across bound hops', () => {
+    // H0: marshal the leaf config through the binding entry.
+    const [h0Bytes, h0Err] = MarshalBoundMessageVT(
+      BlockEncConfigBoundMessage as any,
+      new (class {
+        BlockEnc = 2
+        Key = key
+      })(),
+    )
+    expect(h0Err).toBeNull()
+    if (h0Bytes == null) {
+      throw new Error('H0: marshal returned no bytes')
+    }
+    const h0Line = hopLine('H0', h0Bytes)
+    expect(h0Line).toBe(`H0 len=36 sha256=${nativeLeafSha}`)
+
+    const inner = new GrantInnerBoundMessage({
+      TransformConf: new TransformConfigBoundMessage({
+        Steps: [
+          new StepConfigBoundMessage({
+            Id: 'hydra/transform/blockenc',
+            Config: h0Bytes,
+          }),
+        ],
+      }),
+    })
+
+    // H1: nested message marshal -> unmarshal -> re-marshal.
+    const [h1Wire, h1Err] = MarshalBoundMessageVT(
+      GrantInnerBoundMessage as any,
+      inner,
+    )
+    expect(h1Err).toBeNull()
+    const innerBack = new GrantInnerBoundMessage()
+    expect(
+      UnmarshalBoundMessageVT(
+        GrantInnerBoundMessage as any,
+        innerBack,
+        h1Wire!,
+      ),
+    ).toBeNull()
+    const [h1Re, h1ReErr] = MarshalBoundMessageVT(
+      GrantInnerBoundMessage as any,
+      innerBack,
+    )
+    expect(h1ReErr).toBeNull()
+    expect(Array.from(h1Re ?? [])).toEqual(Array.from(h1Wire!))
+    expect(hopLine('H1', leafBytes(innerBack.TransformConf!))).toBe(
+      `H1 len=36 sha256=${nativeLeafSha}`,
+    )
+
+    // H2: wrap in the repeated-grants state wrapper, cross the wire again.
+    const [h2Wire, h2Err] = MarshalBoundMessageVT(
+      StateBoundMessage as any,
+      new StateBoundMessage({ RootGrants: [inner] }),
+    )
+    expect(h2Err).toBeNull()
+    const stateBack = new StateBoundMessage()
+    expect(
+      UnmarshalBoundMessageVT(StateBoundMessage as any, stateBack, h2Wire!),
+    ).toBeNull()
+    const backInner = stateBack.RootGrants?.[0]
+    if (backInner == null) {
+      throw new Error('H2: missing decoded grant')
+    }
+    expect(hopLine('H2', leafBytes(backInner.TransformConf!))).toBe(
+      `H2 len=36 sha256=${nativeLeafSha}`,
+    )
+
+    // H3: parse the surviving leaf bytes through the bound unmarshal path
+    // with the same blockenc shape the native twin parses them with.
+    const target = new BlockEncConfigBoundMessage()
+    const h3Input = leafBytes(backInner.TransformConf!)
+    const h3Err = UnmarshalBoundMessageVT(
+      BlockEncConfigBoundMessage as any,
+      target,
+      leafBytes(backInner.TransformConf!),
+    )
+    expect(h3Err).toBeNull()
+    expect(target.BlockEnc).toBe(2)
+    expect(Array.from(target.Key ?? [])).toEqual(Array.from(key))
+    const [h3Bytes, h3Err2] = MarshalBoundMessageVT(
+      BlockEncConfigBoundMessage as any,
+      target,
+    )
+    expect(h3Err2).toBeNull()
+    expect(hopLine('H3-roundtrip', h3Bytes ?? new Uint8Array())).toBe(
+      `H3-roundtrip len=36 sha256=${nativeLeafSha}`,
+    )
   })
 })
