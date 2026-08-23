@@ -873,3 +873,62 @@ export const Outer = {} as any
 		t.Fatalf("binding metadata should resolve pointer, value, repeated, and map-value fields through the actual import alias rdep\nwant: %s\ngot:\n%s", wantFields, binding)
 	}
 }
+
+// TestProtobufTypeScriptBindingBindsDigitCamelCaseDivergence verifies that
+// messages whose protoc-gen-go safe identifier differs from the protobuf-es
+// exported const only in digit-camel capitalization still bind, while exact
+// matches continue to bind to their own consts.
+func TestProtobufTypeScriptBindingBindsDigitCamelCaseDivergence(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, dir, "go.mod", "module example.test/protobufbindingdigitcamel\n\ngo 1.25\n")
+	writeTestFile(t, dir, "foo.pb.go", `package protobufbindingdigitcamel
+
+type V86Fs struct {
+	Name string
+}
+
+type ExactName struct {
+	Name string
+}
+`)
+	writeTestFile(t, dir, "foo.pb.ts", `export interface V86fs {
+  name?: string
+}
+export const V86fs = {} as any
+export interface ExactName {
+  name?: string
+}
+export const ExactName = {} as any
+`)
+	writeTestFile(t, dir, "use.go", `package protobufbindingdigitcamel
+
+func NewV86Fs() V86Fs {
+	return V86Fs{Name: "bound"}
+}
+
+func NewExactName() ExactName {
+	return ExactName{Name: "exact"}
+}
+`)
+
+	out := filepath.Join(dir, "out")
+	comp, err := NewCompiler(&Config{
+		Dir:                       dir,
+		OutputPath:                out,
+		ProtobufTypeScriptBinding: true,
+	}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatalf("compile with protobuf TypeScript binding: %v", err)
+	}
+
+	binding := readTestFile(t, filepath.Join(out, "@goscript", "example.test", "protobufbindingdigitcamel", "foo.pb.ts"))
+	if !strings.Contains(binding, `__protobufTypeScriptMessage = __protobuf_ts.V86fs;`) {
+		t.Fatalf("digit-camel diverged message should bind to the protobuf-es const V86fs, got:\n%s", binding)
+	}
+	if !strings.Contains(binding, `__protobufTypeScriptMessage = __protobuf_ts.ExactName;`) {
+		t.Fatalf("exactly matching message should still bind to its own const, got:\n%s", binding)
+	}
+}

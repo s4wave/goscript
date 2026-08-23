@@ -194,6 +194,21 @@ func protobufTypeScriptBindingMessageNames(file *ast.File, tsPath string) map[st
 		return names
 	}
 	exportedTSMessages := protobufTypeScriptBindingExportedConsts(tsPath)
+
+	// Index exported consts case-insensitively so a Go safe identifier that
+	// differs from the protobuf-es const only in digit-camel capitalization,
+	// such as protoc-gen-go's V86Fs versus the exported const V86fs, still
+	// resolves to the actual exported spelling.
+	loweredTSMessages := make(map[string][]string, len(exportedTSMessages))
+	for export := range exportedTSMessages {
+		lowered := strings.ToLower(export)
+		loweredTSMessages[lowered] = append(loweredTSMessages[lowered], export)
+	}
+
+	// boundTSConsts records consts claimed by an earlier struct so two
+	// structs never bind to the same TypeScript const.
+	boundTSConsts := make(map[string]bool)
+
 	for _, decl := range file.Decls {
 		genDecl, ok := decl.(*ast.GenDecl)
 		if !ok {
@@ -209,10 +224,21 @@ func protobufTypeScriptBindingMessageNames(file *ast.File, tsPath string) map[st
 			}
 			name := typeSpec.Name.Name
 			safeName := protobufTypeScriptBindingSafeIdentifier(name)
-			if len(exportedTSMessages) != 0 && !exportedTSMessages[safeName] {
+			if len(exportedTSMessages) == 0 || exportedTSMessages[safeName] {
+				names[name] = safeName
+				boundTSConsts[safeName] = true
 				continue
 			}
-			names[name] = safeName
+
+			// Fall back to the case-insensitive index only when exactly one
+			// exported const matches; ambiguous or already-bound consts stay
+			// unbound and keep reporting the unresolved diagnostic.
+			matches := loweredTSMessages[strings.ToLower(safeName)]
+			if len(matches) != 1 || boundTSConsts[matches[0]] {
+				continue
+			}
+			names[name] = matches[0]
+			boundTSConsts[matches[0]] = true
 		}
 	}
 	return names
@@ -758,11 +784,11 @@ func protobufTypeScriptBindingFieldMessageRef(runtimeType string) (pkgName, type
 		return "", "", false
 	}
 	rest := runtimeType[idx+len(marker):]
-	end := strings.Index(rest, "\"")
-	if end < 0 {
+	before, _, ok0 := strings.Cut(rest, "\"")
+	if !ok0 {
 		return "", "", false
 	}
-	return protobufTypeScriptBindingSplitDotted(rest[:end])
+	return protobufTypeScriptBindingSplitDotted(before)
 }
 
 func protobufTypeScriptBindingSplitDotted(ref string) (pkgName, typeName string, ok bool) {
