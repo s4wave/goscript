@@ -774,12 +774,15 @@ func protobufTypeScriptBindingSplitDotted(ref string) (pkgName, typeName string,
 }
 
 // protobufTypeScriptBindingFieldCtor resolves the TypeScript class identifier
-// for a message-kind struct field from the lowered model instead of scanning
-// the declared type string, so non-pointer and aliased message fields resolve
-// the same way pointer fields do. It reports isMessage=false for fields that
-// reference no named struct. An unresolvable message-kind reference returns
-// ctor="" with isMessage=true so the caller can report a compile-time
-// diagnostic rather than silently omitting binding metadata.
+// for a message-kind struct field. The lowered runtime type expression remains
+// the authority for message kind and the referenced type name; the emitted
+// constructor comes from the declared field type so the qualifier is the
+// actual lowered import alias, which may differ from the dependency directory
+// basename and Go package clause. Same-package references resolve through the
+// bound message names. It reports isMessage=false for fields that reference
+// no named struct. An unresolvable message-kind reference returns ctor=""
+// with isMessage=true so the caller can report a compile-time diagnostic
+// rather than silently omitting binding metadata.
 func protobufTypeScriptBindingFieldCtor(field loweredStructField, pkgName string, file *loweredFile, binding protobufTypeScriptBinding) (ctor string, isMessage bool) {
 	refPkg, refType, ok := protobufTypeScriptBindingFieldMessageRef(field.runtimeType)
 	if !ok {
@@ -789,12 +792,58 @@ func protobufTypeScriptBindingFieldCtor(field loweredStructField, pkgName string
 		if _, bound := binding.messageNames[refType]; bound {
 			return refType, true
 		}
-	} else {
-		for _, imp := range file.imports {
-			if imp.alias == refPkg || strings.HasSuffix(imp.source, "/"+refPkg+"/index.js") {
-				return imp.alias + "." + refType, true
-			}
-		}
+		return "", true
 	}
-	return "", true
+	return protobufTypeScriptBindingImportedCtor(field.typ, refType, file), true
+}
+
+// protobufTypeScriptBindingImportedCtor resolves the emitted constructor for
+// an imported message reference by finding one lowered import whose alias
+// qualifies the referenced type name in the declared field type text. Only
+// named, non-type-only imports qualify; blank and type-only imports cannot
+// carry value constructors. Distinct qualifying imports leave the reference
+// ambiguous and return "" so the caller reports the unresolved diagnostic.
+func protobufTypeScriptBindingImportedCtor(typ, refType string, file *loweredFile) string {
+	matchAlias := ""
+	matchSource := ""
+	for _, imp := range file.imports {
+		if imp.alias == "" || imp.typeOnly {
+			continue
+		}
+		if !loweredTypQualifiesRef(typ, imp.alias, refType) {
+			continue
+		}
+		if matchAlias != "" && (matchAlias != imp.alias || matchSource != imp.source) {
+			return ""
+		}
+		matchAlias = imp.alias
+		matchSource = imp.source
+	}
+	if matchAlias == "" {
+		return ""
+	}
+	return matchAlias + "." + refType
+}
+
+// loweredTypQualifiesRef reports whether typ spells the referenced type name
+// qualified by exactly the given import alias at identifier boundaries.
+func loweredTypQualifiesRef(typ, alias, refType string) bool {
+	needle := alias + "." + refType
+	for offset := 0; ; offset++ {
+		idx := strings.Index(typ[offset:], needle)
+		if idx < 0 {
+			return false
+		}
+		idx += offset
+		start := idx + len(needle)
+		if (idx == 0 || !typIdentChar(typ[idx-1])) &&
+			(start == len(typ) || !typIdentChar(typ[start])) {
+			return true
+		}
+		offset = idx + 1
+	}
+}
+
+func typIdentChar(ch byte) bool {
+	return ch == '_' || ch == '$' || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9')
 }
