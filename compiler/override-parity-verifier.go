@@ -207,14 +207,33 @@ func verifyOverrideParityPackage(
 		}
 	}
 	for symbol := range ledger.Symbols {
-		if !goExportSet[symbol] {
+		if goExportSet[symbol] {
+			continue
+		}
+		// Cross-toolchain superset rule: a blocked entry may outlive the
+		// toolchain that exported its symbol. When this toolchain lacks the
+		// export and TypeScript does not provide one either, there is nothing
+		// to verify. A TypeScript export standing in for a blocked symbol
+		// stays an error, and every other status still rejects the row.
+		entry := ledger.Symbols[symbol]
+		if entry.Status == overrideParityStatusBlocked && !tsExports[symbol].present() {
+			continue
+		}
+		if entry.Status.forbidsExport() && tsExports[symbol].present() {
 			diagnostics = append(diagnostics, Diagnostic{
 				Severity: DiagnosticSeverityError,
-				Code:     "goscript/overrides:parity-unknown-symbol",
-				Message:  "override parity ledger references a symbol not exported by the Go package",
-				Detail:   pkgPath + "." + symbol,
+				Code:     "goscript/overrides:parity-unexpected-export",
+				Message:  "override parity ledger marks a Go export blocked, but TypeScript exports it",
+				Detail:   pkgPath + "." + symbol + " is classified as " + string(entry.Status),
 			})
+			continue
 		}
+		diagnostics = append(diagnostics, Diagnostic{
+			Severity: DiagnosticSeverityError,
+			Code:     "goscript/overrides:parity-unknown-symbol",
+			Message:  "override parity ledger references a symbol not exported by the Go package",
+			Detail:   pkgPath + "." + symbol,
+		})
 	}
 	return diagnostics
 }

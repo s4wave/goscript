@@ -2,6 +2,8 @@ package compiler
 
 import (
 	"context"
+	"go/token"
+	"go/types"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -97,4 +99,54 @@ func requireDiagnosticSeverity(t *testing.T, diagnostics []Diagnostic, code stri
 		}
 	}
 	t.Fatalf("missing diagnostic %q with severity %q in %#v", code, severity, diagnostics)
+}
+
+func TestOverrideParityVerifierBlockedToolchainSuperset(t *testing.T) {
+	pkg := types.NewPackage("example.test/future", "future")
+	ledger := overrideParityLedger{
+		SchemaVersion: 1,
+		Strict:        true,
+		Symbols: map[string]overrideParityEntry{
+			"FutureBlocked": {Status: overrideParityStatusBlocked, Reason: "newer stdlib surface"},
+			"FutureReal":    {Status: overrideParityStatusReal},
+		},
+	}
+
+	t.Run("blocked absent from go and typescript passes", func(t *testing.T) {
+		diagnostics := verifyOverrideParityPackage(pkg.Path(), pkg, ledger, nil, nil)
+		for _, diagnostic := range diagnostics {
+			if diagnostic.Code == "goscript/overrides:parity-unknown-symbol" &&
+				diagnostic.Detail == pkg.Path()+".FutureBlocked" {
+				t.Fatalf("blocked superset entry was rejected: %#v", diagnostic)
+			}
+		}
+	})
+
+	t.Run("real absent from go rejects", func(t *testing.T) {
+		diagnostics := verifyOverrideParityPackage(pkg.Path(), pkg, ledger, nil, nil)
+		requireDiagnosticCode(t, diagnostics, "goscript/overrides:parity-unknown-symbol")
+	})
+
+	t.Run("blocked absent from go but exported by typescript rejects", func(t *testing.T) {
+		tsExports := map[string]typeScriptExport{"FutureBlocked": {value: true}}
+		diagnostics := verifyOverrideParityPackage(pkg.Path(), pkg, ledger, tsExports, nil)
+		requireDiagnosticCode(t, diagnostics, "goscript/overrides:parity-unexpected-export")
+		requireDiagnosticSeverity(t, diagnostics, "goscript/overrides:parity-unexpected-export", DiagnosticSeverityError)
+	})
+
+	t.Run("blocked present in go and exported by typescript rejects", func(t *testing.T) {
+		present := types.NewPackage("example.test/present", "present")
+		signature := types.NewSignatureType(nil, nil, nil, types.NewTuple(), types.NewTuple(), false)
+		present.Scope().Insert(types.NewFunc(token.NoPos, present, "BlockedNow", signature))
+		tsExports := map[string]typeScriptExport{"BlockedNow": {value: true}}
+		blockedLedger := overrideParityLedger{
+			SchemaVersion: 1,
+			Strict:        true,
+			Symbols: map[string]overrideParityEntry{
+				"BlockedNow": {Status: overrideParityStatusBlocked, Reason: "unsupported surface"},
+			},
+		}
+		diagnostics := verifyOverrideParityPackage(present.Path(), present, blockedLedger, tsExports, nil)
+		requireDiagnosticCode(t, diagnostics, "goscript/overrides:parity-unexpected-export")
+	})
 }

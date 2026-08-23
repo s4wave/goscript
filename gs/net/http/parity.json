@@ -13,6 +13,7 @@
     "CrossOriginProtection": { "status": "real" },
     "DefaultClient": { "status": "real" },
     "DefaultMaxHeaderBytes": { "status": "real" },
+    "DefaultMaxHeaderValueCount": { "status": "blocked", "reason": "constant added in a newer stdlib; unused by the wasm http override" },
     "DefaultMaxIdleConnsPerHost": { "status": "real" },
     "DefaultServeMux": { "status": "real" },
     "DefaultTransport": { "status": "real" },

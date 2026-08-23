@@ -29,6 +29,7 @@
     "Cut": {
       "status": "real"
     },
+    "CutLast": { "status": "blocked", "reason": "stdlib function added in a newer toolchain; not implemented by the override" },
     "CutPrefix": {
       "status": "real"
     },
