@@ -625,6 +625,187 @@ describe('protobuf-go-lite TypeScript binding helpers', () => {
   })
 })
 
+class ViewLeafBoundMessage {
+  public _fields: {
+    Data: $.VarRef<Uint8Array | null>
+  }
+
+  constructor(init?: Partial<{ Data?: Uint8Array | null }>) {
+    this._fields = { Data: $.varRef(init?.Data ?? null) }
+  }
+
+  public get Data(): Uint8Array | null {
+    return this._fields.Data.value
+  }
+  public set Data(value: Uint8Array | null) {
+    this._fields.Data.value = value
+  }
+}
+
+const viewLeafType = {
+  typeName: 'test.ViewLeaf',
+  fields: {
+    list: () => [{ localName: 'data', kind: 'scalar', T: 12 }],
+  },
+}
+
+// ViewHolderBoundMessage mimics protobuf-es-lite decode semantics: bytes
+// fields decode as subarray views into the input buffer, so every decoded
+// byte aliases the caller-owned wire buffer until copied.
+class ViewHolderBoundMessage {
+  public _fields: {
+    Leaf: $.VarRef<ViewLeafBoundMessage | null>
+    Leaves: $.VarRef<$.Slice<ViewLeafBoundMessage | null> | null>
+    Entries: $.VarRef<Map<string, ViewLeafBoundMessage | null> | null>
+  }
+
+  constructor(init?: {
+    Leaf?: ViewLeafBoundMessage | null
+    Leaves?: $.Slice<ViewLeafBoundMessage | null> | null
+    Entries?: Map<string, ViewLeafBoundMessage | null> | null
+  }) {
+    this._fields = {
+      Leaf: $.varRef(init?.Leaf ?? null),
+      Leaves: $.varRef(init?.Leaves ?? null),
+      Entries: $.varRef(init?.Entries ?? null),
+    }
+  }
+
+  public get Leaf(): ViewLeafBoundMessage | null {
+    return this._fields.Leaf.value
+  }
+  public set Leaf(value: ViewLeafBoundMessage | null) {
+    this._fields.Leaf.value = value
+  }
+
+  public get Leaves(): $.Slice<ViewLeafBoundMessage | null> | null {
+    return this._fields.Leaves.value
+  }
+  public set Leaves(value: $.Slice<ViewLeafBoundMessage | null> | null) {
+    this._fields.Leaves.value = value
+  }
+
+  public get Entries(): Map<string, ViewLeafBoundMessage | null> | null {
+    return this._fields.Entries.value
+  }
+  public set Entries(value: Map<string, ViewLeafBoundMessage | null> | null) {
+    this._fields.Entries.value = value
+  }
+}
+
+;(ViewHolderBoundMessage as any).__protobufTypeScriptMessage = {
+  typeName: 'test.ViewHolder',
+  fields: {
+    list: () => [
+      { localName: 'leaf', kind: 'message', T: viewLeafType },
+      {
+        localName: 'leaves',
+        kind: 'message',
+        T: viewLeafType,
+        repeated: true,
+      },
+      {
+        localName: 'entries',
+        kind: 'map',
+        V: { kind: 'message', T: viewLeafType },
+      },
+    ],
+  },
+  fromBinary: (bytes: Uint8Array | null | undefined) => {
+    const b = bytes ?? new Uint8Array()
+    return {
+      leaf: { data: b.subarray(0, 4) },
+      leaves: [{ data: b.subarray(0, 4) }, { data: b.subarray(4, 8) }],
+      entries: {
+        first: { data: b.subarray(0, 4) },
+        second: { data: b.subarray(4, 8) },
+      },
+    }
+  },
+  toBinary: (value: {
+    leaf?: { data?: Uint8Array | null } | null
+    leaves?: ({ data?: Uint8Array | null } | null)[] | null
+    entries?: Record<string, { data?: Uint8Array | null } | null>
+  }) => {
+    const parts: Uint8Array[] = []
+    if (value.leaf?.data != null) {
+      parts.push(value.leaf.data)
+    }
+    for (const leaf of value.leaves ?? []) {
+      if (leaf?.data != null) {
+        parts.push(leaf.data)
+      }
+    }
+    for (const key of Object.keys(value.entries ?? {}).sort()) {
+      const leaf = (value.entries ?? {})[key]
+      if (leaf?.data != null) {
+        parts.push(leaf.data)
+      }
+    }
+    const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0))
+    let offset = 0
+    for (const part of parts) {
+      out.set(part, offset)
+      offset += part.length
+    }
+    return out
+  },
+}
+;(ViewHolderBoundMessage as any).__protobufTypeScriptFields = {
+  leaf: ViewLeafBoundMessage,
+  leaves: ViewLeafBoundMessage,
+  entries: ViewLeafBoundMessage,
+}
+
+describe('protobuf-go-lite bound unmarshal owns decoded bytes', () => {
+  it('retains singular, nested, repeated, and map bytes after scrubbing the input', () => {
+    // The payload sits at a nonzero offset inside a larger buffer so an
+    // aliased view keeps pointing at live memory even when lengths survive.
+    const backing = new Uint8Array(20)
+    backing.set([1, 2, 3, 4], 4)
+    backing.set([5, 6, 7, 8], 8)
+    const view = backing.subarray(4, 12)
+
+    const target = new ViewHolderBoundMessage()
+    expect(
+      UnmarshalBoundMessageVT(ViewHolderBoundMessage as any, target, view),
+    ).toBeNull()
+
+    // Capture the remarshal while the input buffer is still intact; the
+    // post-scrub remarshal must reproduce it exactly.
+    const [preScrubBytes, preScrubErr] = MarshalBoundMessageVT(
+      ViewHolderBoundMessage as any,
+      target,
+    )
+    expect(preScrubErr).toBeNull()
+
+    // Scrub the whole backing buffer, mirroring callers that zero decrypted
+    // key material once UnmarshalVT returns.
+    backing.fill(0)
+
+    const expectedFirst = [1, 2, 3, 4]
+    const expectedSecond = [5, 6, 7, 8]
+    expect(Array.from(target.Leaf?.Data ?? [])).toEqual(expectedFirst)
+    expect(Array.from(target.Leaves?.[0]?.Data ?? [])).toEqual(expectedFirst)
+    expect(Array.from(target.Leaves?.[1]?.Data ?? [])).toEqual(expectedSecond)
+    expect(Array.from(target.Entries?.get('first')?.Data ?? [])).toEqual(
+      expectedFirst,
+    )
+    expect(Array.from(target.Entries?.get('second')?.Data ?? [])).toEqual(
+      expectedSecond,
+    )
+
+    const [remarshalled, err] = MarshalBoundMessageVT(
+      ViewHolderBoundMessage as any,
+      target,
+    )
+    expect(err).toBeNull()
+    expect(Array.from(remarshalled ?? [])).toEqual(
+      Array.from(preScrubBytes ?? []),
+    )
+  })
+})
+
 describe('protobuf-go-lite wire helpers', () => {
   it('encodes and decodes varints', () => {
     const buf = new Uint8Array(4)
