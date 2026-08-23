@@ -814,3 +814,62 @@ export const Outer = {} as any
 		t.Fatalf("error should name the unresolved referenced type PlainHelper, got: %v", err)
 	}
 }
+
+func TestProtobufTypeScriptBindingResolvesAliasedCrossPackageCtors(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, dir, "go.mod", "module example.test/aliaspb\n\ngo 1.25\n")
+	// The dependency directory basename (depimpl), Go package clause
+	// (remoteclause), and explicit consumer import alias (rdep) all differ.
+	writeTestFile(t, dir, "dep/depimpl/remote.pb.go", `package remoteclause
+
+type RemoteMsg struct {
+	Name string `+"`"+`protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`+"`"+`
+}
+
+func (x *RemoteMsg) CloneVT() *RemoteMsg {
+	return &RemoteMsg{Name: x.Name}
+}
+`)
+	writeTestFile(t, dir, "dep/depimpl/remote.pb.ts", `export interface RemoteMsg {
+  name?: string
+}
+export const RemoteMsg = {} as any
+`)
+	writeTestFile(t, dir, "foo.pb.go", `package aliaspb
+
+import rdep "example.test/aliaspb/dep/depimpl"
+
+type Outer struct {
+	Ptr  *rdep.RemoteMsg        `+"`"+`protobuf:"bytes,1,opt,name=ptr,proto3" json:"ptr,omitempty"`+"`"+`
+	Val  rdep.RemoteMsg         `+"`"+`protobuf:"bytes,2,opt,name=val,proto3" json:"val,omitempty"`+"`"+`
+	Rep  []*rdep.RemoteMsg      `+"`"+`protobuf:"bytes,3,rep,name=rep,proto3" json:"rep,omitempty"`+"`"+`
+	MapV map[string]*rdep.RemoteMsg `+"`"+`protobuf:"bytes,4,rep,name=map_v,json=mapV,proto3" json:"map_v,omitempty" protobuf_key:"bytes,0,opt,name=key" protobuf_val:"bytes,1,opt,name=value"`+"`"+`
+}
+`)
+	writeTestFile(t, dir, "foo.pb.ts", `import type { RemoteMsg } from './dep/depimpl/remote.pb.js'
+
+export interface Outer {
+  ptr?: RemoteMsg
+}
+export const Outer = {} as any
+`)
+
+	out := filepath.Join(dir, "out")
+	comp, err := NewCompiler(&Config{
+		Dir:                       dir,
+		OutputPath:                out,
+		ProtobufTypeScriptBinding: true,
+	}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatalf("compile with protobuf TypeScript binding: %v", err)
+	}
+
+	binding := readTestFile(t, filepath.Join(out, "@goscript", "example.test", "aliaspb", "foo.pb.ts"))
+	wantFields := `(Outer as any).__protobufTypeScriptFields = {"mapV": rdep.RemoteMsg, "ptr": rdep.RemoteMsg, "rep": rdep.RemoteMsg, "val": rdep.RemoteMsg};`
+	if !strings.Contains(binding, wantFields) {
+		t.Fatalf("binding metadata should resolve pointer, value, repeated, and map-value fields through the actual import alias rdep\nwant: %s\ngot:\n%s", wantFields, binding)
+	}
+}
