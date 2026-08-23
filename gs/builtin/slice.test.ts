@@ -157,6 +157,30 @@ describe('append spare capacity', () => {
   })
 })
 
+describe('len() operand diagnostics', () => {
+  it('names the offending operand when len cannot measure the value', () => {
+    const bad = { customField: 1 }
+
+    let caught: unknown
+    try {
+      len(bad as never)
+    } catch (err) {
+      caught = err
+    }
+
+    expect(caught).toBeInstanceOf(Error)
+    const message = (caught as Error).message
+    expect(message).toContain('cannot determine len of this type')
+    expect(message).toContain('(unwrapped typeof=object')
+    expect(message).toContain('keys=[customField]')
+    expect(message).toContain('(original typeof=object')
+  })
+
+  it('unwraps boxed string values before measuring', () => {
+    expect(len({ __goType: 'string', __goValue: 'abcd' } as never)).toBe(4)
+  })
+})
+
 describe('builtin string byte representation', () => {
   it('appends large byte slices without JavaScript argument spreading', () => {
     const dst = new Uint8Array(0)

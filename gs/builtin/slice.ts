@@ -903,6 +903,7 @@ export const len = <T = unknown, V = unknown>(
     | null
     | undefined,
 ): number => {
+  const original = obj
   obj = collectionValue(obj) as typeof obj
   if (obj === null || obj === undefined) {
     return 0
@@ -940,7 +941,45 @@ export const len = <T = unknown, V = unknown>(
     return (obj as { len(): number }).len()
   }
 
-  throw new Error('cannot determine len of this type')
+  throw new Error(
+    'cannot determine len of this type' +
+      describeLenOperand(obj) +
+      describeLenOperand(original, 'original'),
+  )
+}
+
+// describeLenOperand renders diagnostics for a value that len() cannot
+// measure, so runtime panics name the offending type instead of failing
+// opaquely inside formatted output. It reports shape metadata only:
+// operand values themselves never appear in the message.
+function describeLenOperand(obj: unknown, label = 'unwrapped'): string {
+  try {
+    const parts: string[] = [label, `typeof=${typeof obj}`]
+    if (obj !== null && (typeof obj === 'object' || typeof obj === 'function')) {
+      const ctor = (obj as any).constructor?.name
+      if (ctor) {
+        parts.push(`ctor=${ctor}`)
+      }
+      if ('__goType' in (obj as any)) {
+        parts.push(`goType=${(obj as any).__goType}`)
+      }
+      const goValue = (obj as any).__goValue
+      if (goValue !== undefined) {
+        parts.push(`goValue typeof=${typeof goValue}`)
+        if (typeof goValue?.length === 'number') {
+          parts.push(`goValue len=${goValue.length}`)
+        }
+      }
+      if ((obj as any).__meta__ !== undefined) {
+        parts.push('has __meta__')
+      }
+      const keys = Object.keys(obj as object)
+      parts.push(`keys=[${keys.slice(0, 12).join(',')}${keys.length > 12 ? ',...' : ''}]`)
+    }
+    return ` (${parts.join(' ')})`
+  } catch {
+    return ''
+  }
 }
 
 /**
