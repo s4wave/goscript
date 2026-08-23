@@ -198,7 +198,7 @@ func (o *LoweringOwner) lowerPackage(
 				options.DisplayRoot,
 			)
 			diagnostics = append(diagnostics, fileDiagnostics...)
-			rewriteProtobufTypeScriptBindingFile(loweredFile, binding)
+			diagnostics = append(diagnostics, rewriteProtobufTypeScriptBindingFile(loweredFile, binding, semPkg.name)...)
 			if loweredFile != nil {
 				loweredPkg.files = append(loweredPkg.files, loweredFile)
 			}

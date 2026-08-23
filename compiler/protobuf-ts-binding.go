@@ -310,10 +310,11 @@ func protobufTypeScriptBindingSafeIdentifier(name string) string {
 	}
 }
 
-func rewriteProtobufTypeScriptBindingFile(file *loweredFile, binding protobufTypeScriptBinding) {
+func rewriteProtobufTypeScriptBindingFile(file *loweredFile, binding protobufTypeScriptBinding, pkgName string) []Diagnostic {
 	if file == nil {
-		return
+		return nil
 	}
+	var diagnostics []Diagnostic
 	file.outputName = binding.outputName
 	const importAlias = "__protobuf_ts"
 	file.imports = append(file.imports, loweredImport{
@@ -321,7 +322,7 @@ func rewriteProtobufTypeScriptBindingFile(file *loweredFile, binding protobufTyp
 		source:     binding.importSource,
 		sideEffect: true,
 	})
-	oneofCases := protobufTypeScriptBindingOneofCases(file)
+	oneofCases := protobufTypeScriptBindingOneofCases(file, pkgName, binding, &diagnostics)
 	oneofBranches := make(map[string]bool)
 	for _, cases := range oneofCases {
 		for _, oneofCase := range cases {
@@ -341,15 +342,17 @@ func rewriteProtobufTypeScriptBindingFile(file *loweredFile, binding protobufTyp
 		if !ok {
 			continue
 		}
-		setup := protobufTypeScriptBindingStructSetupDecl(decl.structType, importAlias, messageName, oneofCases[decl.structType.name])
+		setup, setupDiagnostics := protobufTypeScriptBindingStructSetupDecl(decl.structType, importAlias, messageName, pkgName, file, binding, oneofCases[decl.structType.name])
+		diagnostics = append(diagnostics, setupDiagnostics...)
 		if setup.code != "" {
 			setupDecls = append(setupDecls, setup)
 		}
 	}
 	file.decls = append(file.decls, setupDecls...)
+	return diagnostics
 }
 
-func protobufTypeScriptBindingOneofCases(file *loweredFile) map[string][]protobufTypeScriptBindingOneofCase {
+func protobufTypeScriptBindingOneofCases(file *loweredFile, pkgName string, binding protobufTypeScriptBinding, diagnostics *[]Diagnostic) map[string][]protobufTypeScriptBindingOneofCase {
 	parentByName := make(map[string]*loweredStruct)
 	for _, decl := range file.decls {
 		if decl.structType != nil {
@@ -378,11 +381,22 @@ func protobufTypeScriptBindingOneofCases(file *loweredFile) map[string][]protobu
 			if !strings.Contains(field.tag, "oneof") {
 				continue
 			}
+			valueCtor, isMessage := protobufTypeScriptBindingFieldCtor(field, pkgName, file, binding)
+			if isMessage && valueCtor == "" {
+				*diagnostics = append(*diagnostics, Diagnostic{
+					Severity: DiagnosticSeverityError,
+					Code:     "goscript/protobuf-ts-binding:unresolved",
+					Message:  "protobuf TypeScript binding cannot resolve a message-kind field reference",
+					Detail: fmt.Sprintf("%s.%s references %q, which is neither a bound message in this package nor an imported bound message",
+						branch.name, field.name, field.runtimeType),
+				})
+				continue
+			}
 			out[parent.name] = append(out[parent.name], protobufTypeScriptBindingOneofCase{
 				groupLocalName: groupLocalName,
 				caseLocalName:  protobufTypeScriptBindingFieldLocalName(field),
 				branchCtor:     branch.name,
-				valueCtor:      protobufTypeScriptBindingFieldCtor(field),
+				valueCtor:      valueCtor,
 			})
 		}
 	}
@@ -598,17 +612,31 @@ func protobufBindingParam(method *loweredFunction, idx int, fallback string) str
 	return method.params[idx].name
 }
 
-func protobufTypeScriptBindingStructSetupDecl(structType *loweredStruct, importAlias, messageName string, oneofCases []protobufTypeScriptBindingOneofCase) loweredDecl {
+func protobufTypeScriptBindingStructSetupDecl(structType *loweredStruct, importAlias, messageName, pkgName string, file *loweredFile, binding protobufTypeScriptBinding, oneofCases []protobufTypeScriptBindingOneofCase) (loweredDecl, []Diagnostic) {
 	if structType == nil {
-		return loweredDecl{}
+		return loweredDecl{}, nil
 	}
 	if messageName == "" {
 		messageName = structType.name
 	}
+	var diagnostics []Diagnostic
 	fieldEntries := make(map[string]string)
 	for _, field := range structType.fields {
-		ctor := protobufTypeScriptBindingFieldCtor(field)
+		if strings.Contains(field.tag, "protobuf_oneof") {
+			continue
+		}
+		ctor, isMessage := protobufTypeScriptBindingFieldCtor(field, pkgName, file, binding)
+		if !isMessage {
+			continue
+		}
 		if ctor == "" {
+			diagnostics = append(diagnostics, Diagnostic{
+				Severity: DiagnosticSeverityError,
+				Code:     "goscript/protobuf-ts-binding:unresolved",
+				Message:  "protobuf TypeScript binding cannot resolve a message-kind field reference",
+				Detail: fmt.Sprintf("%s.%s references %q, which is neither a bound message in this package nor an imported bound message",
+					structType.name, field.name, field.runtimeType),
+			})
 			continue
 		}
 		fieldEntries[protobufTypeScriptBindingFieldLocalName(field)] = ctor
@@ -632,7 +660,7 @@ func protobufTypeScriptBindingStructSetupDecl(structType *loweredStruct, importA
 	if len(oneofCases) != 0 {
 		code += "\n(" + structType.name + " as any).__protobufTypeScriptOneofFields = " + protobufTypeScriptBindingOneofFieldsLiteral(oneofCases) + ";"
 	}
-	return loweredDecl{code: code}
+	return loweredDecl{code: code}, diagnostics
 }
 
 func protobufTypeScriptBindingOneofFieldsLiteral(oneofCases []protobufTypeScriptBindingOneofCase) string {
@@ -712,31 +740,61 @@ func protobufTypeScriptBindingProtoCamel(name string) string {
 	return out.String()
 }
 
-func protobufTypeScriptBindingFieldCtor(field loweredStructField) string {
-	if !strings.Contains(field.runtimeType, "TypeKind.Pointer") {
-		return ""
+// protobufTypeScriptBindingFieldMessageRef extracts the referenced named
+// struct type from a lowered runtime type expression. Message-kind fields
+// appear either as a bare quoted canonical name for value structs
+// (`"pkg.Name"`) or as the innermost `elemType: "pkg.Name"` of a pointer,
+// slice-of-pointer, or similar wrapper. Non-message fields (basic kinds,
+// interfaces, maps of scalars) carry no quoted dotted name and return false.
+func protobufTypeScriptBindingFieldMessageRef(runtimeType string) (pkgName, typeName string, ok bool) {
+	trimmed := strings.TrimSpace(runtimeType)
+	if strings.HasPrefix(trimmed, "\"") && strings.HasSuffix(trimmed, "\"") && strings.Count(trimmed, "\"") == 2 {
+		pkgName, typeName, ok = protobufTypeScriptBindingSplitDotted(trimmed[1 : len(trimmed)-1])
+		return pkgName, typeName, ok
 	}
-	for _, token := range strings.FieldsFunc(field.typ, func(r rune) bool {
-		return !(r == '.' || r == '_' || r == '$' || r >= '0' && r <= '9' || r >= 'A' && r <= 'Z' || r >= 'a' && r <= 'z')
-	}) {
-		if protobufTypeScriptBindingCtorToken(token) {
-			return token
-		}
+	const marker = "elemType: \""
+	idx := strings.LastIndex(runtimeType, marker)
+	if idx < 0 {
+		return "", "", false
 	}
-	return ""
+	rest := runtimeType[idx+len(marker):]
+	end := strings.Index(rest, "\"")
+	if end < 0 {
+		return "", "", false
+	}
+	return protobufTypeScriptBindingSplitDotted(rest[:end])
 }
 
-func protobufTypeScriptBindingCtorToken(token string) bool {
-	if token == "" || strings.HasPrefix(token, "$.") || strings.HasPrefix(token, "globalThis.") {
-		return false
+func protobufTypeScriptBindingSplitDotted(ref string) (pkgName, typeName string, ok bool) {
+	idx := strings.LastIndex(ref, ".")
+	if idx <= 0 || idx == len(ref)-1 {
+		return "", "", false
 	}
-	switch token {
-	case "any", "bigint", "boolean", "Date", "Map", "null", "number", "Promise", "Set", "Slice", "string", "Uint8Array", "undefined", "unknown", "VarRef", "void":
-		return false
+	return ref[:idx], ref[idx+1:], true
+}
+
+// protobufTypeScriptBindingFieldCtor resolves the TypeScript class identifier
+// for a message-kind struct field from the lowered model instead of scanning
+// the declared type string, so non-pointer and aliased message fields resolve
+// the same way pointer fields do. It reports isMessage=false for fields that
+// reference no named struct. An unresolvable message-kind reference returns
+// ctor="" with isMessage=true so the caller can report a compile-time
+// diagnostic rather than silently omitting binding metadata.
+func protobufTypeScriptBindingFieldCtor(field loweredStructField, pkgName string, file *loweredFile, binding protobufTypeScriptBinding) (ctor string, isMessage bool) {
+	refPkg, refType, ok := protobufTypeScriptBindingFieldMessageRef(field.runtimeType)
+	if !ok {
+		return "", false
 	}
-	if strings.Contains(token, ".") {
-		return true
+	if refPkg == pkgName {
+		if _, bound := binding.messageNames[refType]; bound {
+			return refType, true
+		}
+	} else {
+		for _, imp := range file.imports {
+			if imp.alias == refPkg || strings.HasSuffix(imp.source, "/"+refPkg+"/index.js") {
+				return imp.alias + "." + refType, true
+			}
+		}
 	}
-	first := token[0]
-	return first >= 'A' && first <= 'Z'
+	return "", true
 }

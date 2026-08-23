@@ -703,3 +703,114 @@ func readTestFile(t *testing.T, path string) string {
 	}
 	return string(data)
 }
+
+func TestProtobufTypeScriptBindingEmitsMetadataForNonPointerFields(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, dir, "go.mod", `module example.test/nonpointerpb
+
+go 1.25
+
+require github.com/aperturerobotics/protobuf-go-lite v0.0.0
+
+replace github.com/aperturerobotics/protobuf-go-lite => ./protobuf-go-lite
+`)
+	writeTestFile(t, dir, "protobuf-go-lite/go.mod", `module github.com/aperturerobotics/protobuf-go-lite
+
+go 1.25
+`)
+	writeTestFile(t, dir, "foo.pb.go", `package nonpointerpb
+
+type Inner struct {
+	Name string `+"`"+`protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`+"`"+`
+}
+
+func (x *Inner) CloneVT() *Inner {
+	return &Inner{Name: x.Name}
+}
+
+type Outer struct {
+	Ptr    *Inner  `+"`"+`protobuf:"bytes,1,opt,name=ptr,proto3" json:"ptr,omitempty"`+"`"+`
+	Value  Inner   `+"`"+`protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`+"`"+`
+	AliasP *AliasT `+"`"+`protobuf:"bytes,3,opt,name=alias_p,json=aliasP,proto3" json:"alias_p,omitempty"`+"`"+`
+	AliasV AliasT  `+"`"+`protobuf:"bytes,4,opt,name=alias_v,json=aliasV,proto3" json:"alias_v,omitempty"`+"`"+`
+}
+`)
+	writeTestFile(t, dir, "bar.pb.go", `package nonpointerpb
+
+type AliasT = Inner
+`)
+	writeTestFile(t, dir, "foo.pb.ts", `export interface Inner {
+  name?: string
+}
+export const Inner = {} as any
+export interface Outer {
+  ptr?: Inner
+}
+export const Outer = {} as any
+`)
+
+	out := filepath.Join(dir, "out")
+	comp, err := NewCompiler(&Config{
+		Dir:                       dir,
+		OutputPath:                out,
+		ProtobufTypeScriptBinding: true,
+	}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatalf("compile with protobuf TypeScript binding: %v", err)
+	}
+
+	binding := readTestFile(t, filepath.Join(out, "@goscript", "example.test", "nonpointerpb", "foo.pb.ts"))
+	wantFields := `(Outer as any).__protobufTypeScriptFields = {"aliasP": Inner, "aliasV": Inner, "ptr": Inner, "value": Inner};`
+	if !strings.Contains(binding, wantFields) {
+		t.Fatalf("binding metadata should carry bound ctors for pointer, non-pointer, and aliased message fields\nwant: %s\ngot:\n%s", wantFields, binding)
+	}
+}
+
+func TestProtobufTypeScriptBindingReportsUnresolvedMessageReference(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, dir, "go.mod", `module example.test/unresolvedpb
+
+go 1.25
+
+require github.com/aperturerobotics/protobuf-go-lite v0.0.0
+
+replace github.com/aperturerobotics/protobuf-go-lite => ./protobuf-go-lite
+`)
+	writeTestFile(t, dir, "protobuf-go-lite/go.mod", `module github.com/aperturerobotics/protobuf-go-lite
+
+go 1.25
+`)
+	writeTestFile(t, dir, "foo.pb.go", `package unresolvedpb
+
+type Outer struct {
+	Missing *PlainHelper `+"`"+`protobuf:"bytes,1,opt,name=missing,proto3" json:"missing,omitempty"`+"`"+`
+}
+
+type PlainHelper struct {
+	Name string
+}
+`)
+	writeTestFile(t, dir, "foo.pb.ts", `export interface Outer {
+  missing?: unknown
+}
+export const Outer = {} as any
+`)
+
+	out := filepath.Join(dir, "out")
+	comp, err := NewCompiler(&Config{
+		Dir:                       dir,
+		OutputPath:                out,
+		ProtobufTypeScriptBinding: true,
+	}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := comp.CompilePackages(context.Background(), "."); err == nil {
+		t.Fatalf("compile should report the unresolvable message-kind reference instead of dropping metadata")
+	} else if !strings.Contains(err.Error(), "PlainHelper") {
+		t.Fatalf("error should name the unresolved referenced type PlainHelper, got: %v", err)
+	}
+}
