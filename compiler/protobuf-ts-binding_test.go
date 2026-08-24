@@ -984,3 +984,81 @@ func NewExactName() ExactName {
 		t.Fatalf("exactly matching message should still bind to its own const, got:\n%s", binding)
 	}
 }
+
+// TestProtobufTypeScriptBindingResolvesSamePackageCrossFileRefs verifies
+// that a message-kind field whose reference resolves to a message declared
+// in another binding file of the same proto package binds through the
+// sibling binding file's published message class.
+func TestProtobufTypeScriptBindingResolvesSamePackageCrossFileRefs(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, dir, "go.mod", "module example.test/crossfilepb\n\ngo 1.25\n")
+	writeTestFile(t, dir, "root.pb.go", `package crossfilepb
+
+type WorldSnapshot struct {
+	Tick int64 `+"`"+`protobuf:"varint,1,opt,name=tick,proto3" json:"tick,omitempty"`+"`"+`
+}
+
+type WorldEvent struct {
+	Name string `+"`"+`protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`+"`"+`
+}
+`)
+	writeTestFile(t, dir, "root.pb.ts", `export interface WorldSnapshot {
+  tick?: string
+}
+export const WorldSnapshot = {} as any
+export interface WorldEvent {
+  name?: string
+}
+export const WorldEvent = {} as any
+`)
+	writeTestFile(t, dir, "world_storage.pb.go", `package crossfilepb
+
+type MercuryWorldTickCommit struct {
+	SnapshotCheckpoint *WorldSnapshot `+"`"+`protobuf:"bytes,1,opt,name=snapshot_checkpoint,json=snapshotCheckpoint,proto3" json:"snapshot_checkpoint,omitempty"`+"`"+`
+}
+
+type MercuryWorldEventBatch struct {
+	Events []*WorldEvent `+"`"+`protobuf:"bytes,1,rep,name=events,proto3" json:"events,omitempty"`+"`"+`
+}
+`)
+	writeTestFile(t, dir, "world_storage.pb.ts", `import { WorldEvent, WorldSnapshot } from './root.pb.js'
+
+export interface MercuryWorldTickCommit {
+  snapshotCheckpoint?: WorldSnapshot
+}
+export const MercuryWorldTickCommit = {} as any
+export interface MercuryWorldEventBatch {
+  events?: WorldEvent[]
+}
+export const MercuryWorldEventBatch = {} as any
+`)
+
+	out := filepath.Join(dir, "out")
+	comp, err := NewCompiler(&Config{
+		Dir:                       dir,
+		OutputPath:                out,
+		ProtobufTypeScriptBinding: true,
+	}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatalf("compile with protobuf TypeScript binding: %v", err)
+	}
+
+	storage := readTestFile(t, filepath.Join(out, "@goscript", "example.test", "crossfilepb", "world_storage.pb.ts"))
+	wantSnippets := []string{
+		`(MercuryWorldTickCommit as any).__protobufTypeScriptFields = {"snapshotCheckpoint": __protobuf_ts_root_pb.WorldSnapshot};`,
+		`(MercuryWorldEventBatch as any).__protobufTypeScriptFields = {"events": __protobuf_ts_root_pb.WorldEvent};`,
+	}
+	for _, snippet := range wantSnippets {
+		if !strings.Contains(storage, snippet) {
+			t.Fatalf("storage binding should resolve same-package cross-file message fields through the sibling binding\nwant: %s\ngot:\n%s", snippet, storage)
+		}
+	}
+	root := readTestFile(t, filepath.Join(out, "@goscript", "example.test", "crossfilepb", "root.pb.ts"))
+	if !strings.Contains(root, `__protobufTypeScriptMessage = __protobuf_ts.WorldSnapshot;`) ||
+		!strings.Contains(root, `__protobufTypeScriptMessage = __protobuf_ts.WorldEvent;`) {
+		t.Fatalf("sibling binding should keep binding its own messages, got:\n%s", root)
+	}
+}
