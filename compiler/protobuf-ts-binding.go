@@ -22,10 +22,13 @@ type protobufTypeScriptBinding struct {
 }
 
 // protobufTypeScriptBoundMessage records the sibling binding file that
-// publishes a bound message class.
+// publishes a bound message class. messageNames is that file's bound
+// message names, so cross-file qualification emits the actual exported
+// TypeScript const spelling rather than the Go safe identifier.
 type protobufTypeScriptBoundMessage struct {
 	importSource string
 	outputName   string
+	messageNames map[string]string
 }
 
 // protobufTypeScriptBindingSiblingImports mints side-effect imports of
@@ -137,6 +140,7 @@ func protobufTypeScriptBindings(semPkg *semanticPackage, options LoweringOptions
 			packageMessages[name] = protobufTypeScriptBoundMessage{
 				importSource: binding.importSource,
 				outputName:   binding.outputName,
+				messageNames: binding.messageNames,
 			}
 		}
 	}
@@ -893,7 +897,14 @@ func protobufTypeScriptBindingFieldCtor(field loweredStructField, pkgName string
 		if !crossFile {
 			return "", true
 		}
-		return siblings.aliasFor(sibling.importSource, sibling.outputName) + "." + protobufTypeScriptBindingSafeIdentifier(refType), true
+
+		// Qualify the sibling binding's actual exported const spelling; the
+		// Go safe identifier can differ in digit-camel capitalization.
+		refName, bound := sibling.messageNames[refType]
+		if !bound {
+			refName = protobufTypeScriptBindingSafeIdentifier(refType)
+		}
+		return siblings.aliasFor(sibling.importSource, sibling.outputName) + "." + refName, true
 	}
 	return protobufTypeScriptBindingImportedCtor(field.typ, refType, file), true
 }
