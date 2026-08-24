@@ -286,7 +286,7 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("=== Interface constraint ===")
 	let items: $.Slice<Item | $.VarRef<Item> | null> = $.arrayToSlice<Item | $.VarRef<Item> | null>([new Item({Name: "alpha"}), new Item({Name: "beta"})])
-	let clones: $.Slice<Item | $.VarRef<Item> | null> = (await CloneAll({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Pointer, elemType: "main.Item" }, zero: () => null, methods: {Clone: (receiver: any, ...args: any[]) => receiver.Clone(...$.stripGenericTypeArgs(args))} }}, items) as $.Slice<Item | $.VarRef<Item> | null>)
+	let clones: $.Slice<Item | $.VarRef<Item> | null> = (await CloneAll({[$.genericTypeArgsMarker]: true, T: { type: { kind: $.TypeKind.Pointer, elemType: "main.Item" }, zero: () => null, methods: {Clone: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Clone(...$.stripGenericTypeArgs(args))} }}, items) as $.Slice<Item | $.VarRef<Item> | null>)
 	await $.println("clone:", $.pointerValue<Item>($.arrayIndex(clones!, 0)).Name, $.pointerValue<Item>($.arrayIndex(clones!, 1)).Name, $.pointerEqual($.arrayIndex(clones!, 0), $.arrayIndex(items!, 0)))
 
 	await $.println("=== Generic struct with map field ===")

@@ -240,7 +240,6 @@ func packageExecutionFanout(
 	var group errgroup.Group
 	group.SetLimit(max(parallelism, 1))
 	for _, idx := range indexes {
-		idx := idx
 		group.Go(func() error {
 			select {
 			case <-ctx.Done():
