@@ -11745,6 +11745,7 @@ func (o *LoweringOwner) lowerValueForTargetTypes(
 	}
 	return value
 }
+
 func (o *LoweringOwner) lowerInterfaceValueExpr(
 	ctx lowerFileContext,
 	targetType types.Type,
@@ -13769,12 +13770,15 @@ func (o *LoweringOwner) genericTypeArgsExpr(ctx lowerFileContext, callee ast.Exp
 		return "undefined"
 	}
 	typeParams := signature.TypeParams()
+	instanceArgs := instantiatedTypeArgs(ctx, callee)
 	entries := make([]string, 0, typeParams.Len())
 	for idx := range typeParams.Len() {
-		if idx >= len(typeArgExprs) {
-			break
+		var typ types.Type
+		if idx < len(typeArgExprs) {
+			typ = ctx.semPkg.source.TypesInfo.TypeOf(typeArgExprs[idx])
+		} else if instanceArgs != nil && idx < instanceArgs.Len() {
+			typ = instanceArgs.At(idx)
 		}
-		typ := ctx.semPkg.source.TypesInfo.TypeOf(typeArgExprs[idx])
 		if typ == nil {
 			continue
 		}
@@ -13784,6 +13788,30 @@ func (o *LoweringOwner) genericTypeArgsExpr(ctx lowerFileContext, callee ast.Exp
 		return "undefined"
 	}
 	return o.genericTypeArgsLiteral(entries)
+}
+
+// instantiatedTypeArgs resolves the full type argument list recorded for an
+// explicit generic instantiation, including trailing arguments Go inferred
+// through constraint core types rather than explicit syntax.
+func instantiatedTypeArgs(ctx lowerFileContext, callee ast.Expr) *types.TypeList {
+	if ctx.semPkg == nil || ctx.semPkg.source == nil {
+		return nil
+	}
+	instances := ctx.semPkg.source.TypesInfo.Instances
+	if instances == nil {
+		return nil
+	}
+	switch typed := callee.(type) {
+	case *ast.Ident:
+		if instance, ok := instances[typed]; ok {
+			return instance.TypeArgs
+		}
+	case *ast.SelectorExpr:
+		if instance, ok := instances[typed.Sel]; ok {
+			return instance.TypeArgs
+		}
+	}
+	return nil
 }
 
 func (o *LoweringOwner) inferredGenericTypeArgsExpr(
@@ -13924,12 +13952,20 @@ func (o *LoweringOwner) genericMethodDescriptorsForType(
 		}
 		genericArgs := o.genericReceiverTypeArgsExprForMethod(ctx, method, methodSetType)
 		if namedStructType(named) != nil || isInterfaceType(named) {
+			// A struct receiver may arrive as a VarRef when the caller
+			// converted the address of a variable to the constraint's
+			// pointer type-set element, so unwrap it before the
+			// property-keyed call. Instances pass through unchanged.
+			receiverExpr := "receiver"
+			if namedStructType(named) != nil {
+				receiverExpr = o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) + "(receiver)"
+			}
 			callArgs := make([]string, 0, 2)
 			if genericArgs != "" {
 				callArgs = append(callArgs, genericArgs)
 			}
 			callArgs = append(callArgs, "..."+o.runtimeOwner.QualifiedHelper(RuntimeHelperStripGenericTypeArgs)+"(args)")
-			methods = append(methods, method.Name()+": (receiver: any, ...args: any[]) => receiver."+method.Name()+"("+strings.Join(callArgs, ", ")+")")
+			methods = append(methods, method.Name()+": (receiver: any, ...args: any[]) => "+receiverExpr+"."+method.Name()+"("+strings.Join(callArgs, ", ")+")")
 			continue
 		}
 		receiver := "receiver"
