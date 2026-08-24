@@ -15,6 +15,52 @@ type protobufTypeScriptBinding struct {
 	importSource string
 	messageNames map[string]string
 	hasOneof     bool
+
+	// packageMessages maps every message bound by any binding file in the
+	// same package to the sibling binding that publishes it. Field
+	// resolution consults it for same-package cross-file references.
+	packageMessages map[string]protobufTypeScriptBoundMessage
+}
+
+// protobufTypeScriptBoundMessage records the sibling binding file that
+// publishes a bound message class.
+type protobufTypeScriptBoundMessage struct {
+	importSource string
+	outputName   string
+}
+
+// protobufTypeScriptBindingSiblingImports mints side-effect imports of
+// sibling binding files so a same-package cross-file field constructor can
+// qualify the referenced message class.
+type protobufTypeScriptBindingSiblingImports struct {
+	file    *loweredFile
+	aliases map[string]string
+}
+
+// aliasFor returns the import alias for a sibling binding file, adding the
+// side-effect import on first use.
+func (s *protobufTypeScriptBindingSiblingImports) aliasFor(importSource, outputName string) string {
+	if s.aliases == nil {
+		s.aliases = make(map[string]string)
+	}
+	if alias, ok := s.aliases[importSource]; ok {
+		return alias
+	}
+	base := "__protobuf_ts_" + safeIdentifier(strings.TrimSuffix(outputName, ".ts"))
+	reserved := make(map[string]bool, len(s.file.imports))
+	for _, imp := range s.file.imports {
+		if imp.alias != "" {
+			reserved[imp.alias] = true
+		}
+	}
+	alias := uniqueImportAlias(base, importSource, nil, reserved)
+	s.aliases[importSource] = alias
+	s.file.imports = append(s.file.imports, loweredImport{
+		alias:      alias,
+		source:     importSource,
+		sideEffect: true,
+	})
+	return alias
 }
 
 type protobufTypeScriptBindingOneofCase struct {
@@ -81,6 +127,23 @@ func protobufTypeScriptBindings(semPkg *semanticPackage, options LoweringOptions
 			messageNames: messageNames,
 			hasOneof:     protobufTypeScriptBindingHasOneof(syntax),
 		}
+	}
+
+	// Index the bound messages across all binding files so a field in one
+	// file can resolve a reference to a message declared in another file of
+	// the same package.
+	packageMessages := make(map[string]protobufTypeScriptBoundMessage, len(bindings))
+	for _, binding := range bindings {
+		for name := range binding.messageNames {
+			packageMessages[name] = protobufTypeScriptBoundMessage{
+				importSource: binding.importSource,
+				outputName:   binding.outputName,
+			}
+		}
+	}
+	for sourcePath, binding := range bindings {
+		binding.packageMessages = packageMessages
+		bindings[sourcePath] = binding
 	}
 	return bindings, diagnostics
 }
@@ -352,7 +415,8 @@ func rewriteProtobufTypeScriptBindingFile(file *loweredFile, binding protobufTyp
 		source:     binding.importSource,
 		sideEffect: true,
 	})
-	oneofCases := protobufTypeScriptBindingOneofCases(file, pkgName, binding, &diagnostics)
+	siblings := &protobufTypeScriptBindingSiblingImports{file: file}
+	oneofCases := protobufTypeScriptBindingOneofCases(file, pkgName, binding, siblings, &diagnostics)
 	oneofBranches := make(map[string]bool)
 	for _, cases := range oneofCases {
 		for _, oneofCase := range cases {
@@ -372,7 +436,7 @@ func rewriteProtobufTypeScriptBindingFile(file *loweredFile, binding protobufTyp
 		if !ok {
 			continue
 		}
-		setup, setupDiagnostics := protobufTypeScriptBindingStructSetupDecl(decl.structType, importAlias, messageName, pkgName, file, binding, oneofCases[decl.structType.name])
+		setup, setupDiagnostics := protobufTypeScriptBindingStructSetupDecl(decl.structType, importAlias, messageName, pkgName, file, binding, siblings, oneofCases[decl.structType.name])
 		diagnostics = append(diagnostics, setupDiagnostics...)
 		if setup.code != "" {
 			setupDecls = append(setupDecls, setup)
@@ -382,7 +446,7 @@ func rewriteProtobufTypeScriptBindingFile(file *loweredFile, binding protobufTyp
 	return diagnostics
 }
 
-func protobufTypeScriptBindingOneofCases(file *loweredFile, pkgName string, binding protobufTypeScriptBinding, diagnostics *[]Diagnostic) map[string][]protobufTypeScriptBindingOneofCase {
+func protobufTypeScriptBindingOneofCases(file *loweredFile, pkgName string, binding protobufTypeScriptBinding, siblings *protobufTypeScriptBindingSiblingImports, diagnostics *[]Diagnostic) map[string][]protobufTypeScriptBindingOneofCase {
 	parentByName := make(map[string]*loweredStruct)
 	for _, decl := range file.decls {
 		if decl.structType != nil {
@@ -411,7 +475,7 @@ func protobufTypeScriptBindingOneofCases(file *loweredFile, pkgName string, bind
 			if !strings.Contains(field.tag, "oneof") {
 				continue
 			}
-			valueCtor, isMessage := protobufTypeScriptBindingFieldCtor(field, pkgName, file, binding)
+			valueCtor, isMessage := protobufTypeScriptBindingFieldCtor(field, pkgName, file, binding, siblings)
 			if isMessage && valueCtor == "" {
 				*diagnostics = append(*diagnostics, Diagnostic{
 					Severity: DiagnosticSeverityError,
@@ -642,7 +706,7 @@ func protobufBindingParam(method *loweredFunction, idx int, fallback string) str
 	return method.params[idx].name
 }
 
-func protobufTypeScriptBindingStructSetupDecl(structType *loweredStruct, importAlias, messageName, pkgName string, file *loweredFile, binding protobufTypeScriptBinding, oneofCases []protobufTypeScriptBindingOneofCase) (loweredDecl, []Diagnostic) {
+func protobufTypeScriptBindingStructSetupDecl(structType *loweredStruct, importAlias, messageName, pkgName string, file *loweredFile, binding protobufTypeScriptBinding, siblings *protobufTypeScriptBindingSiblingImports, oneofCases []protobufTypeScriptBindingOneofCase) (loweredDecl, []Diagnostic) {
 	if structType == nil {
 		return loweredDecl{}, nil
 	}
@@ -655,7 +719,7 @@ func protobufTypeScriptBindingStructSetupDecl(structType *loweredStruct, importA
 		if strings.Contains(field.tag, "protobuf_oneof") {
 			continue
 		}
-		ctor, isMessage := protobufTypeScriptBindingFieldCtor(field, pkgName, file, binding)
+		ctor, isMessage := protobufTypeScriptBindingFieldCtor(field, pkgName, file, binding, siblings)
 		if !isMessage {
 			continue
 		}
@@ -809,11 +873,14 @@ func protobufTypeScriptBindingSplitDotted(ref string) (pkgName, typeName string,
 // constructor comes from the declared field type so the qualifier is the
 // actual lowered import alias, which may differ from the dependency directory
 // basename and Go package clause. Same-package references resolve through the
-// bound message names. It reports isMessage=false for fields that reference
-// no named struct. An unresolvable message-kind reference returns ctor=""
-// with isMessage=true so the caller can report a compile-time diagnostic
-// rather than silently omitting binding metadata.
-func protobufTypeScriptBindingFieldCtor(field loweredStructField, pkgName string, file *loweredFile, binding protobufTypeScriptBinding) (ctor string, isMessage bool) {
+// bound message names of the current file and then through the package-wide
+// registry for messages declared in another file of the same package,
+// qualifying the sibling binding's class with a dedicated import. It reports
+// isMessage=false for fields that reference no named struct. An unresolvable
+// message-kind reference returns ctor="" with isMessage=true so the caller
+// can report a compile-time diagnostic rather than silently omitting binding
+// metadata.
+func protobufTypeScriptBindingFieldCtor(field loweredStructField, pkgName string, file *loweredFile, binding protobufTypeScriptBinding, siblings *protobufTypeScriptBindingSiblingImports) (ctor string, isMessage bool) {
 	refPkg, refType, ok := protobufTypeScriptBindingFieldMessageRef(field.runtimeType)
 	if !ok {
 		return "", false
@@ -822,7 +889,14 @@ func protobufTypeScriptBindingFieldCtor(field loweredStructField, pkgName string
 		if _, bound := binding.messageNames[refType]; bound {
 			return refType, true
 		}
-		return "", true
+
+		// Same proto package, different file: bind through the sibling
+		// binding file's published message class.
+		sibling, crossFile := binding.packageMessages[refType]
+		if !crossFile {
+			return "", true
+		}
+		return siblings.aliasFor(sibling.importSource, sibling.outputName) + "." + protobufTypeScriptBindingSafeIdentifier(refType), true
 	}
 	return protobufTypeScriptBindingImportedCtor(field.typ, refType, file), true
 }
