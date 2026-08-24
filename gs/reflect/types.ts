@@ -1,11 +1,10 @@
 // Common types used throughout the reflect module
 import type { StringHeaderData } from '@goscript/builtin/index.js'
 
-
-// Basic Go types that need TypeScript equivalents
+// uintptr Basic Go types that need TypeScript equivalents.
 export type uintptr = number
 
-// Define a proper type-safe Pointer type
+// UnsafePointer Define a proper type-safe Pointer type.
 export interface UnsafePointer {
   readonly __unsafePointerBrand: unique symbol
   value: unknown
@@ -15,7 +14,7 @@ export type Pointer = UnsafePointer | null
 
 export type ReflectFunc = (...args: unknown[]) => unknown
 
-// Define the possible JavaScript values that can be reflected
+// ReflectValue Define the possible JavaScript values that can be reflected.
 export type ReflectValue =
   | null
   | undefined
@@ -45,7 +44,7 @@ type StructFieldInit = Omit<Partial<StructField>, 'Tag'> & {
   Tag?: StructTag | string
 }
 
-// Struct field representation
+// StructField Struct field representation.
 export class StructField {
   public Name: string = ''
   public PkgPath: string = ''
@@ -82,7 +81,7 @@ export class StructField {
   }
 }
 
-// Struct tag type
+// StructTag Struct tag type.
 export class StructTag {
   constructor(private _value: string) {}
 
@@ -106,7 +105,7 @@ export class StructTag {
   }
 }
 
-// Wrapper function for GoScript naming convention
+// StructTag_Get Wrapper function for GoScript naming convention.
 export function StructTag_Get(tag: StructTag | undefined, key: string): string {
   if (!tag) {
     return ''
@@ -127,7 +126,7 @@ export class Method {
   }
 }
 
-// Channel type for reflection
+// Channel type for reflection.
 export interface Channel<T = unknown> {
   readonly __channelBrand: unique symbol
   direction: ChanDir
@@ -136,7 +135,7 @@ export interface Channel<T = unknown> {
   closed: boolean
 }
 
-// Select case for channel operations
+// SelectCase Select case for channel operations.
 export class SelectCase {
   public Dir!: SelectDir
   public Chan?: Value // Value representing a channel - optional since default cases don't need it
@@ -149,7 +148,7 @@ export class SelectCase {
   }
 }
 
-// Select direction constants - SelectDir is just an int in Go
+// SelectDir Select direction constants - SelectDir is just an int in Go.
 export type SelectDir = number
 
 export const SelectSend: SelectDir = 1
@@ -179,8 +178,8 @@ export class StringHeader {
   }
 }
 
-// Map iterator with proper typing
-// Key() and Value() return reflect.Value to match Go's reflect.MapIter
+// MapIter Map iterator with proper typing
+// Key() and Value() return reflect.Value to match Go's reflect.MapIter.
 export interface MapIter<K = unknown, V = unknown> {
   map: Map<K, V>
   iterator: Iterator<[K, V]>
@@ -191,7 +190,7 @@ export interface MapIter<K = unknown, V = unknown> {
   Reset(m: Map<K, V>): void
 }
 
-// Bit vector for tracking pointers
+// bitVector Bit vector for tracking pointers.
 export class bitVector {
   private bits: number[] = []
 
@@ -214,7 +213,7 @@ export class bitVector {
   }
 }
 
-// Value error type
+// ValueError Value error type.
 export class ValueError extends Error {
   public Kind: Kind
   public Method: string

@@ -12,7 +12,7 @@ function pickFirstEnv(keys: string[]): string {
 	return ""
 }
 
-// File open flags - using values compatible with typical Unix systems
+// O_RDONLY File open flags - using values compatible with typical Unix systems.
 export const O_RDONLY = 0
 export const O_WRONLY = 1
 export const O_RDWR = 2
@@ -22,7 +22,7 @@ export const O_EXCL = 128
 export const O_SYNC = 1052672
 export const O_TRUNC = 512
 
-// Seek constants
+// SEEK_SET Seek constants.
 export const SEEK_SET = 0
 export const SEEK_CUR = 1
 export const SEEK_END = 2

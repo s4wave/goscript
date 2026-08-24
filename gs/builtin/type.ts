@@ -2,7 +2,7 @@ import { isVarRef } from './varRef.js'
 import { runtimePanic } from './panic.js'
 
 /**
- * Represents the kinds of Go types that can be registered at runtime.
+ * TypeKind Represents the kinds of Go types that can be registered at runtime.
  */
 export enum TypeKind {
   Basic = 'basic',
@@ -17,7 +17,7 @@ export enum TypeKind {
 }
 
 /**
- * Base type information shared by all type kinds
+ * BaseTypeInfo Base type information shared by all type kinds.
  */
 export interface BaseTypeInfo {
   name?: string
@@ -27,7 +27,7 @@ export interface BaseTypeInfo {
 }
 
 /**
- * Represents an argument or a return value of a method.
+ * MethodArg Represents an argument or a return value of a method.
  */
 export interface MethodArg {
   name?: string // Name of the argument/return value, if available
@@ -35,7 +35,7 @@ export interface MethodArg {
 }
 
 /**
- * Represents the signature of a method, including its name, arguments, and return types.
+ * MethodSignature Represents the signature of a method, including its name, arguments, and return types.
  */
 export interface MethodSignature {
   name: string
@@ -44,7 +44,7 @@ export interface MethodSignature {
 }
 
 /**
- * Information about a struct field including type and optional tag
+ * StructFieldInfo Information about a struct field including type and optional tag.
  */
 export interface StructFieldInfo {
   type: TypeInfo | string // The field's type
@@ -59,7 +59,7 @@ export interface StructFieldInfo {
 }
 
 /**
- * Type information for struct types
+ * StructTypeInfo Type information for struct types.
  */
 export interface StructTypeInfo extends BaseTypeInfo {
   kind: TypeKind.Struct
@@ -69,7 +69,7 @@ export interface StructTypeInfo extends BaseTypeInfo {
 }
 
 /**
- * Type information for interface types
+ * InterfaceTypeInfo Type information for interface types.
  */
 export interface InterfaceTypeInfo extends BaseTypeInfo {
   kind: TypeKind.Interface
@@ -77,14 +77,14 @@ export interface InterfaceTypeInfo extends BaseTypeInfo {
 }
 
 /**
- * Type information for basic types (string, number, boolean)
+ * BasicTypeInfo Type information for basic types (string, number, boolean).
  */
 export interface BasicTypeInfo extends BaseTypeInfo {
   kind: TypeKind.Basic
 }
 
 /**
- * Type information for map types
+ * MapTypeInfo Type information for map types.
  */
 export interface MapTypeInfo extends BaseTypeInfo {
   kind: TypeKind.Map
@@ -93,7 +93,7 @@ export interface MapTypeInfo extends BaseTypeInfo {
 }
 
 /**
- * Type information for slice types
+ * SliceTypeInfo Type information for slice types.
  */
 export interface SliceTypeInfo extends BaseTypeInfo {
   kind: TypeKind.Slice
@@ -101,7 +101,7 @@ export interface SliceTypeInfo extends BaseTypeInfo {
 }
 
 /**
- * Type information for array types
+ * ArrayTypeInfo Type information for array types.
  */
 export interface ArrayTypeInfo extends BaseTypeInfo {
   kind: TypeKind.Array
@@ -110,7 +110,7 @@ export interface ArrayTypeInfo extends BaseTypeInfo {
 }
 
 /**
- * Type information for pointer types
+ * PointerTypeInfo Type information for pointer types.
  */
 export interface PointerTypeInfo extends BaseTypeInfo {
   kind: TypeKind.Pointer
@@ -118,7 +118,7 @@ export interface PointerTypeInfo extends BaseTypeInfo {
 }
 
 /**
- * Type information for function types
+ * FunctionTypeInfo Type information for function types.
  */
 export interface FunctionTypeInfo extends BaseTypeInfo {
   kind: TypeKind.Function
@@ -128,7 +128,7 @@ export interface FunctionTypeInfo extends BaseTypeInfo {
 }
 
 /**
- * Type information for channel types
+ * ChannelTypeInfo Type information for channel types.
  */
 export interface ChannelTypeInfo extends BaseTypeInfo {
   kind: TypeKind.Channel
@@ -152,7 +152,7 @@ export type TypeInfo =
   | FunctionTypeInfo
   | ChannelTypeInfo
 
-// Type guard functions for TypeInfo variants
+// isStructTypeInfo Type guard functions for TypeInfo variants.
 export function isStructTypeInfo(info: TypeInfo): info is StructTypeInfo {
   return info.kind === TypeKind.Struct
 }
@@ -190,8 +190,8 @@ export function isChannelTypeInfo(info: TypeInfo): info is ChannelTypeInfo {
 }
 
 /**
- * Type guard to check if a field value is a StructFieldInfo (has 'type' property)
- * vs a direct TypeInfo or string
+ * isStructFieldInfo Type guard to check if a field value is a StructFieldInfo (has 'type' property)
+ * vs a direct TypeInfo or string.
  */
 export function isStructFieldInfo(
   fieldValue: unknown,
@@ -230,7 +230,7 @@ function registerTypeInfo(name: string, typeInfo: TypeInfo): void {
 }
 
 /**
- * Registers a struct type with the runtime type system.
+ * registerStructType Registers a struct type with the runtime type system.
  *
  * @param name The name of the type.
  * @param zeroValue The zero value for the type.
@@ -266,7 +266,7 @@ function resolveZeroValue<T>(zeroValue: any): T {
 }
 
 /**
- * Registers an interface type with the runtime type system.
+ * registerInterfaceType Registers an interface type with the runtime type system.
  *
  * @param name The name of the type.
  * @param zeroValue The zero value for the type (usually null).
@@ -302,7 +302,7 @@ registerInterfaceType('error', null, [
 ])
 
 /**
- * Gets a registered type by name from the type registry.
+ * getTypeByName Gets a registered type by name from the type registry.
  * Returns undefined if the type is not registered.
  */
 export const getTypeByName = (name: string): TypeInfo | undefined => {
@@ -310,7 +310,7 @@ export const getTypeByName = (name: string): TypeInfo | undefined => {
 }
 
 /**
- * Represents the result of a type assertion.
+ * TypeAssertResult Represents the result of a type assertion.
  */
 export interface TypeAssertResult<T> {
   value: T
@@ -1004,7 +1004,7 @@ function isNumberElementType(typeInfo: string | TypeInfo | undefined): boolean {
 // Symbol used to mark struct instances that represent values (not pointers)
 const STRUCT_VALUE_MARKER = Symbol('structValue')
 
-// Mark a struct instance as representing a value (not pointer)
+// markAsStructValue Mark a struct instance as representing a value (not pointer).
 export function markAsStructValue<T>(value: T): T {
   if (typeof value === 'object' && value !== null) {
     ;(value as any)[STRUCT_VALUE_MARKER] = true
@@ -1544,9 +1544,9 @@ function compareTypeStringWithTypeInfo(
 }
 
 /**
- * Performs a type assertion on a value against a specified type.
+ * typeAssert Performs a type assertion on a value against a specified type.
  * Returns an object containing the value (cast to type T) and a boolean indicating success.
- * This is used to implement Go's type assertion with comma-ok idiom: value, ok := x.(Type)
+ * This is used to implement Go's type assertion with comma-ok idiom: value, ok := x.(Type).
  *
  * @param value The value to check against the type
  * @param typeInfo The type information to check against (can be a string name or TypeInfo object)
@@ -1685,10 +1685,10 @@ export function typeAssertTuple<T>(
 }
 
 /**
- * Performs a type assertion on a value against a specified type.
+ * mustTypeAssert Performs a type assertion on a value against a specified type.
  * Returns the value (cast to type T) if the assertion is successful,
  * otherwise throws a runtime error.
- * This is used to implement Go's single-value type assertion: value := x.(Type)
+ * This is used to implement Go's single-value type assertion: value := x.(Type).
  *
  * @param value The value to check against the type
  * @param typeInfo The type information to check against (can be a string name or TypeInfo object)
@@ -1717,7 +1717,7 @@ export function mustTypeAssert<T>(value: any, typeInfo: string | TypeInfo): T {
 }
 
 /**
- * Checks if a value is of a specific type.
+ * is Checks if a value is of a specific type.
  * Similar to typeAssert but only returns a boolean without extracting the value.
  *
  * @param value The value to check
@@ -1729,7 +1729,7 @@ export function is(value: any, typeInfo: string | TypeInfo): boolean {
 }
 
 /**
- * Represents a case in a type switch statement.
+ * TypeSwitchCase Represents a case in a type switch statement.
  * Each case matches against one or more types and contains a body function to execute when matched.
  */
 export interface TypeSwitchCase {
@@ -1738,7 +1738,7 @@ export interface TypeSwitchCase {
 }
 
 /**
- * Helper for Go's type switch statement.
+ * typeSwitch Helper for Go's type switch statement.
  * Executes the body of the first case whose type matches the value.
  *
  * @param value The value being switched upon.
@@ -1949,7 +1949,7 @@ export function namedValueInterfaceValue<T>(
 }
 
 /**
- * Reports whether a value is a boxed named-type interface value produced by
+ * isNamedValueBox Reports whether a value is a boxed named-type interface value produced by
  * namedValueInterfaceValue. Both markers are required: an ordinary JS object
  * that merely happens to have a `__goValue` property (legal input elsewhere,
  * e.g. through json.Marshal) is not a box.

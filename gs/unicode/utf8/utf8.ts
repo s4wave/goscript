@@ -2,7 +2,7 @@
 
 import * as $ from '@goscript/builtin/index.js'
 
-// RuneError is the "error" Rune or "Unicode replacement character"
+// RuneError is the "error" Rune or "Unicode replacement character".
 export const RuneError = 0xfffd
 
 // RuneSelf is the maximum rune value that can be represented as a single byte.

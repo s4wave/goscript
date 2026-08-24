@@ -190,11 +190,9 @@ export function ErrorList_RemoveMultiples(list: $.VarRef<ErrorList>): void {
   })
 }
 
-// Element Error() results may be async, so the joined text resolves them
+// ErrorList_Error Element Error() results may be async, so the joined text resolves them
 // lazily and returns a Promise only when an element does.
-export function ErrorList_Error(
-  list: ErrorList,
-): string | PromiseLike<string> {
+export function ErrorList_Error(list: ErrorList): string | PromiseLike<string> {
   const errors = $.asArray(list).filter((err) => err !== null)
   if (errors.length === 0) {
     return 'no errors'

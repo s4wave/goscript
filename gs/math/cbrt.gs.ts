@@ -9,7 +9,7 @@ import { Float64bits, Float64frombits } from "./unsafe.gs.js";
 //
 //	Cbrt(±0) = ±0
 //	Cbrt(±Inf) = ±Inf
-//	Cbrt(NaN) = NaN
+//	Cbrt(NaN) = NaN.
 export function Cbrt(x: number): number {
 	return Math.cbrt(x)
 }

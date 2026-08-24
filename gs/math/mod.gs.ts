@@ -15,7 +15,7 @@ import { Ldexp } from "./ldexp.gs.js";
 //	Mod(NaN, y) = NaN
 //	Mod(x, 0) = NaN
 //	Mod(x, ±Inf) = x
-//	Mod(x, NaN) = NaN
+//	Mod(x, NaN) = NaN.
 export function Mod(x: number, y: number): number {
 	return mod(x, y)
 }

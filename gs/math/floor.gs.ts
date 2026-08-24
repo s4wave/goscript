@@ -10,7 +10,7 @@ import { Float64bits, Float64frombits } from "./unsafe.gs.js";
 //
 //	Floor(±0) = ±0
 //	Floor(±Inf) = ±Inf
-//	Floor(NaN) = NaN
+//	Floor(NaN) = NaN.
 export function Floor(x: number): number {
 	return Math.floor(x)
 }
@@ -25,7 +25,7 @@ export function floor(x: number): number {
 //
 //	Ceil(±0) = ±0
 //	Ceil(±Inf) = ±Inf
-//	Ceil(NaN) = NaN
+//	Ceil(NaN) = NaN.
 export function Ceil(x: number): number {
 	return Math.ceil(x)
 }
@@ -40,7 +40,7 @@ export function ceil(x: number): number {
 //
 //	Trunc(±0) = ±0
 //	Trunc(±Inf) = ±Inf
-//	Trunc(NaN) = NaN
+//	Trunc(NaN) = NaN.
 export function Trunc(x: number): number {
 	return Math.trunc(x)
 }
@@ -55,7 +55,7 @@ export function trunc(x: number): number {
 //
 //	Round(±0) = ±0
 //	Round(±Inf) = ±Inf
-//	Round(NaN) = NaN
+//	Round(NaN) = NaN.
 export function Round(x: number): number {
 	return Math.round(x)
 }
@@ -66,7 +66,7 @@ export function Round(x: number): number {
 //
 //	RoundToEven(±0) = ±0
 //	RoundToEven(±Inf) = ±Inf
-//	RoundToEven(NaN) = NaN
+//	RoundToEven(NaN) = NaN.
 export function RoundToEven(x: number): number {
 	// JavaScript doesn't have a built-in round-to-even, so we implement it
 	if (isNaN(x) || !isFinite(x)) {

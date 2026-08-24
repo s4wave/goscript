@@ -31,7 +31,7 @@ export function exp2(x: number): number {
 	return Math.pow(2, x)
 }
 
-// exp1 returns e**r × 2**k where r = hi - lo and |r| ≤ ln(2)/2.
+// expmulti exp1 returns e**r × 2**k where r = hi - lo and |r| ≤ ln(2)/2.
 export function expmulti(hi: number, lo: number, k: number): number {
 	const r = hi - lo
 	return Math.exp(r) * Math.pow(2, k)

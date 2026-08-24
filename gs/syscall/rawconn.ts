@@ -1,7 +1,7 @@
 import * as $ from '@goscript/builtin/index.js'
 import { RawConn, uintptr } from './types.js'
 
-// Stub implementation of RawConn that always returns ErrUnimplemented
+// StubRawConn Stub implementation of RawConn that always returns ErrUnimplemented.
 export class StubRawConn implements RawConn {
   Control(_f: (fd: uintptr) => void): $.GoError {
     return {

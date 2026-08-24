@@ -3,15 +3,19 @@
 // low-level library routines. Higher-level synchronization is better done via
 // channels and communication.
 
-import { comparableEqual } from '@goscript/builtin/index.js'
+import {
+  comparableEqual,
+  GoBinaryString,
+  stringEqual,
+} from '@goscript/builtin/index.js'
 
-// Locker represents an object that can be locked and unlocked
+// Locker represents an object that can be locked and unlocked.
 export interface Locker {
   Lock(): Promise<void>
   Unlock(): void
 }
 
-// Mutex is a mutual exclusion lock
+// Mutex is a mutual exclusion lock.
 export class Mutex implements Locker {
   private _locked: boolean = false
   private _waitQueue: Array<() => void> = []
@@ -65,7 +69,7 @@ export class Mutex implements Locker {
   }
 }
 
-// RWMutex is a reader/writer mutual exclusion lock
+// RWMutex is a reader/writer mutual exclusion lock.
 export class RWMutex {
   private _readers: number = 0
   private _writer: boolean = false
@@ -173,7 +177,7 @@ export class RWMutex {
   }
 }
 
-// WaitGroup waits for a collection of goroutines to finish
+// WaitGroup waits for a collection of goroutines to finish.
 export class WaitGroup {
   private _counter: number = 0
   private _waiters: Array<() => void> = []
@@ -231,7 +235,7 @@ export class WaitGroup {
   }
 }
 
-// Once is an object that will perform exactly one action
+// Once is an object that will perform exactly one action.
 export class Once {
   private _done: boolean = false
   private _m: Mutex = new Mutex()
@@ -266,7 +270,7 @@ export class Once {
   }
 }
 
-// Cond implements a condition variable, a rendezvous point for goroutines waiting for or announcing the occurrence of an event
+// Cond implements a condition variable, a rendezvous point for goroutines waiting for or announcing the occurrence of an event.
 export class Cond {
   public L: Locker
   private _waiters: Array<() => void> = []
@@ -309,12 +313,16 @@ export class Cond {
   }
 }
 
-// NewCond returns a new Cond with Locker l
+// NewCond returns a new Cond with Locker l.
 export function NewCond(l: Locker): Cond {
   return new Cond(l)
 }
 
-// Map is like a Go map[interface{}]interface{} but is safe for concurrent use by multiple goroutines
+function isGoStringKey(value: unknown): value is string | GoBinaryString {
+  return typeof value === 'string' || value instanceof GoBinaryString
+}
+
+// Map is like a Go map[interface{}]interface{} but is safe for concurrent use by multiple goroutines.
 export class Map {
   private _m: RWMutex = new RWMutex()
   private _data: globalThis.Map<any, any> = new globalThis.Map()
@@ -362,6 +370,7 @@ export class Map {
   }
 
   // CompareAndSwap swaps the old and new values for key if the stored value is old.
+  // The synchronous body has no await points, so the event loop cannot interleave it.
   public CompareAndSwap(key: any, old: any, value: any): boolean {
     const entry = this.findEntry(key)
     if (!entry.found || !comparableEqual(entry.value, old)) {
@@ -448,6 +457,12 @@ export class Map {
       return { found: true, key, value: this._data.get(key) }
     }
     for (const [candidate, value] of this._data.entries()) {
+      if (candidate !== key && isGoStringKey(candidate) && isGoStringKey(key)) {
+        if (stringEqual(candidate, key)) {
+          return { found: true, key: candidate, value }
+        }
+        continue
+      }
       if (candidate !== key && comparableEqual(candidate, key)) {
         return { found: true, key: candidate, value }
       }
@@ -459,10 +474,9 @@ export class Map {
   public async Swap(key: any, value: any): Promise<[any, boolean]> {
     await this._m.Lock()
     try {
-      const previous = this._data.get(key)
-      const loaded = this._data.has(key)
-      this._data.set(key, value)
-      return [previous, loaded]
+      const entry = this.findEntry(key)
+      this._data.set(entry.found ? entry.key : key, value)
+      return [entry.found ? entry.value : undefined, entry.found]
     } finally {
       this._m.Unlock()
     }
@@ -474,7 +488,7 @@ export class Map {
   }
 }
 
-// Pool is a set of temporary objects that may be individually saved and retrieved
+// Pool is a set of temporary objects that may be individually saved and retrieved.
 export class Pool {
   public New?: () => any
   private _pool: any[] = []
@@ -507,7 +521,7 @@ export class Pool {
   }
 }
 
-// OnceFunc returns a function that invokes f only once
+// OnceFunc returns a function that invokes f only once.
 export function OnceFunc(f: () => void): () => void {
   let called = false
   let panicked = false
@@ -530,7 +544,7 @@ export function OnceFunc(f: () => void): () => void {
   }
 }
 
-// OnceValue returns a function that invokes f only once and returns the value returned by f
+// OnceValue returns a function that invokes f only once and returns the value returned by f.
 export function OnceValue<T>(f: () => T): () => T {
   let value: T
   let called = false
@@ -555,7 +569,7 @@ export function OnceValue<T>(f: () => T): () => T {
   }
 }
 
-// OnceValues returns a function that invokes f only once and returns the values returned by f
+// OnceValues returns a function that invokes f only once and returns the values returned by f.
 export function OnceValues<T1, T2>(f: () => [T1, T2]): () => [T1, T2] {
   let value1: T1
   let value2: T2

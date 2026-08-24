@@ -2,7 +2,7 @@ import * as $ from '@goscript/builtin/index.js'
 import { callers } from './stack.js'
 import type { StackTrace } from './stack.js'
 
-// Type definitions
+// stack Type definitions.
 export type stack = any // Simplified stack type
 export type uintptr = number
 

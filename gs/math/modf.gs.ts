@@ -8,7 +8,7 @@ import { Float64bits, Float64frombits } from "./unsafe.gs.js";
 // Special cases are:
 //
 //	Modf(±Inf) = ±Inf, NaN
-//	Modf(NaN) = NaN, NaN
+//	Modf(NaN) = NaN, NaN.
 export function Modf(f: number): [number, number] {
 	return modf(f)
 }

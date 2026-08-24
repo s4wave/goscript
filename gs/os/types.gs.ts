@@ -6,7 +6,7 @@ import * as io from "@goscript/io/index.js"
 import * as time from "@goscript/time/index.js"
 import * as syscall from "@goscript/syscall/index.js"
 
-// Re-export essential types
+// Time Re-export essential types.
 export type Time = time.Time;
 export type FileInfo = fs.FileInfo;
 export type FileMode = fs.FileMode;
@@ -19,7 +19,7 @@ export function Getpagesize(): number {
 	return 4096
 }
 
-// Simplified File implementation for JavaScript environment
+// File Simplified File implementation for JavaScript environment.
 export class File {
 	public name: string = ""
 	public closed: boolean = false
@@ -144,7 +144,7 @@ export class File {
 	);
 }
 
-// File mode constants
+// ModeDir File mode constants.
 export let ModeDir: FileMode = fs.ModeDir
 export let ModeAppend: FileMode = fs.ModeAppend
 export let ModeExclusive: FileMode = fs.ModeExclusive

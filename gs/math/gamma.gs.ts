@@ -14,7 +14,7 @@ let _gamQ = $.arrayToSlice<number>([-2.31581873324120129819e-05, 5.3960558049330
 
 let _gamS = $.arrayToSlice<number>([7.87311395793093628397e-04, -2.29549961613378126380e-04, -2.68132617805781232825e-03, 3.47222221605458667310e-03, 8.33333333333482257126e-02])
 
-// Gamma function computed by Stirling's formula.
+// stirling Gamma function computed by Stirling's formula.
 // The pair of results must be multiplied together to get the actual answer.
 // The multiplication is left to the caller so that, if careful, the caller can avoid
 // infinity for 172 <= x <= 180.
@@ -52,7 +52,7 @@ export function stirling(x: number): [number, number] {
 //	Gamma(-0) = -Inf
 //	Gamma(x) = NaN for integer x < 0
 //	Gamma(-Inf) = NaN
-//	Gamma(NaN) = NaN
+//	Gamma(NaN) = NaN.
 export function Gamma(x: number): number {
 	// A001620
 	let Euler: number = 0.57721566490153286060651209008240243104215933593992

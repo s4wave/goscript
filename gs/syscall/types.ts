@@ -1,6 +1,6 @@
 import * as $ from '@goscript/builtin/index.js'
 
-// Essential type aliases
+// uintptr Essential type aliases.
 export type uintptr = number
 
 // Errno is a named numeric Go type. Constants use object values so they can
@@ -15,7 +15,7 @@ export interface ErrnoObject {
   Errno(): number
 }
 
-// RawConn interface - stub implementation for JavaScript environment
+// RawConn interface - stub implementation for JavaScript environment.
 export interface RawConn {
   Control(f: (fd: uintptr) => void): $.GoError
   Read(f: (fd: uintptr) => boolean): $.GoError

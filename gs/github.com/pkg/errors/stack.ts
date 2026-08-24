@@ -1,6 +1,6 @@
 import * as $ from '@goscript/builtin/index.js'
 
-// Type definitions
+// uintptr Type definitions.
 export type uintptr = number
 export type Frame = uintptr
 export type StackTrace = $.Slice<Frame>
@@ -71,7 +71,7 @@ class stack {
   }
 }
 
-// callers returns a simplified stack trace using JavaScript's native stack
+// callers returns a simplified stack trace using JavaScript's native stack.
 export function callers(): $.VarRef<stack> | null {
   try {
     // Get JavaScript stack trace
@@ -91,7 +91,7 @@ export function callers(): $.VarRef<stack> | null {
   }
 }
 
-// funcname extracts the function name from a full function path
+// funcname extracts the function name from a full function path.
 export function funcname(name: string): string {
   const lastDot = name.lastIndexOf('.')
   if (lastDot >= 0) {

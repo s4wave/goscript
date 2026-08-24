@@ -1,7 +1,7 @@
 import * as $ from '../builtin/index.js'
 import { makeChannel, ChannelRef, makeChannelRef } from '../builtin/channel.js'
 
-// Time represents a time instant with nanosecond precision
+// Time represents a time instant with nanosecond precision.
 export class Time {
   private _date: globalThis.Date
   private _nsec: number // nanoseconds within the second
@@ -727,7 +727,7 @@ export class Time {
   }
 }
 
-// Duration represents a span of time (nanoseconds)
+// Duration represents a span of time (nanoseconds).
 export type Duration = bigint
 
 const maxDuration = Number(9223372036854775807n)
@@ -777,12 +777,12 @@ function timeoutMilliseconds(d: Duration): number {
   return ms
 }
 
-// Duration comparison function
+// Duration_lt Duration comparison function.
 export function Duration_lt(receiver: Duration, other: Duration): boolean {
   return receiver < other
 }
 
-// Duration multiplication function
+// Duration_multiply Duration multiplication function.
 export function Duration_multiply(
   receiver: Duration,
   multiplier: number,
@@ -927,7 +927,7 @@ function formatUnit(nanos: number, unit: number, suffix: string): string {
   return `${whole}.${fraction}${suffix}`
 }
 
-// Location represents a time zone
+// Location represents a time zone.
 export class Location {
   private _name: string
   private _offsetSeconds?: number
@@ -951,10 +951,10 @@ export class Location {
   }
 }
 
-// Month represents a month of the year
+// Month represents a month of the year.
 export type Month = number
 
-// Weekday represents a day of the week
+// Weekday represents a day of the week.
 export enum Weekday {
   Sunday = 0,
   Monday = 1,
@@ -965,7 +965,7 @@ export enum Weekday {
   Saturday = 6,
 }
 
-// WeekdayString returns the string representation of a Weekday
+// WeekdayString returns the string representation of a Weekday.
 export function WeekdayString(w: Weekday): string {
   const names = [
     'Sunday',
@@ -998,12 +998,12 @@ export function Month_String(m: Month): string {
   return names[m] || `%!Month(${m})`
 }
 
-// Weekday_String returns the string representation of a Weekday (wrapper function naming)
+// Weekday_String returns the string representation of a Weekday (wrapper function naming).
 export function Weekday_String(w: Weekday): string {
   return WeekdayString(w)
 }
 
-// ParseError describes a problem parsing a time string
+// ParseError describes a problem parsing a time string.
 export class ParseError extends Error {
   public layout: string
   public value: string
@@ -1028,7 +1028,7 @@ export class ParseError extends Error {
   }
 }
 
-// Timer represents a single event timer
+// Timer represents a single event timer.
 export class Timer {
   private _timeout: ReturnType<typeof setTimeout>
   private _duration: Duration
@@ -1071,7 +1071,7 @@ export class Timer {
   }
 }
 
-// Ticker holds a channel that delivers ticks at intervals
+// Ticker holds a channel that delivers ticks at intervals.
 export class Ticker {
   private _interval: ReturnType<typeof setInterval>
   private _duration: Duration
@@ -1117,7 +1117,7 @@ export class Ticker {
   }
 }
 
-// Now returns the current local time with monotonic clock reading
+// Now returns the current local time with monotonic clock reading.
 export function Now(): Time {
   const date = new globalThis.Date()
   let monotonic: number | undefined
@@ -1137,7 +1137,7 @@ export function Now(): Time {
 // Date returns the Time corresponding to
 // yyyy-mm-dd hh:mm:ss + nsec nanoseconds
 // in the appropriate zone for that time in the given location
-// Does not include monotonic reading as per Go specification
+// Does not include monotonic reading as per Go specification.
 export function Date(
   year: number,
   month: Month,
@@ -1183,16 +1183,16 @@ export function Date(
   return Time.create(date, nsec % 1000000000, undefined, loc) // No monotonic reading
 }
 
-// Common locations
+// UTC Common locations.
 export const UTC = new Location('UTC', 0)
 export const Local = new Location('Local')
 
-// FixedZone returns a Location that always uses the given zone name and offset (seconds east of UTC)
+// FixedZone returns a Location that always uses the given zone name and offset (seconds east of UTC).
 export function FixedZone(name: string, offset: number): Location {
   return new Location(name, offset)
 }
 
-// Common durations (matching Go's time package constants)
+// Nanosecond Common durations (matching Go's time package constants).
 export const Nanosecond: Duration = 1n
 export const Microsecond: Duration = 1000n
 export const Millisecond: Duration = 1000000n
@@ -1201,13 +1201,13 @@ export const Minute: Duration = 60000000000n
 export const Hour: Duration = 3600000000000n
 
 // Since returns the time elapsed since t
-// Uses monotonic clock if available for accurate measurement
+// Uses monotonic clock if available for accurate measurement.
 export function Since(t: Time): Duration {
   return Now().Sub(t)
 }
 
 // Until returns the duration until t
-// Uses monotonic clock if available for accurate measurement
+// Uses monotonic clock if available for accurate measurement.
 export function Until(t: Time): Duration {
   return t.Sub(Now())
 }
@@ -1218,7 +1218,7 @@ export async function Sleep(d: Duration): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-// Export month constants
+// January Export month constants.
 export const January: Month = 1
 export const February: Month = 2
 export const March: Month = 3
@@ -1232,7 +1232,7 @@ export const October: Month = 10
 export const November: Month = 11
 export const December: Month = 12
 
-// Export weekday constants
+// Sunday Export weekday constants.
 export const Sunday = Weekday.Sunday
 export const Monday = Weekday.Monday
 export const Tuesday = Weekday.Tuesday
@@ -1241,7 +1241,7 @@ export const Thursday = Weekday.Thursday
 export const Friday = Weekday.Friday
 export const Saturday = Weekday.Saturday
 
-// Time layout constants (matching Go's time package)
+// Layout Time layout constants (matching Go's time package).
 export const Layout = "01/02 03:04:05PM '06 -0700"
 export const ANSIC = 'Mon Jan _2 15:04:05 2006'
 export const UnixDate = 'Mon Jan _2 15:04:05 MST 2006'
@@ -1263,7 +1263,7 @@ export const DateOnly = '2006-01-02'
 export const TimeOnly = '15:04:05'
 
 // Unix returns the local Time corresponding to the given Unix time,
-// sec seconds and nsec nanoseconds since January 1, 1970 UTC
+// sec seconds and nsec nanoseconds since January 1, 1970 UTC.
 export function Unix(sec: bigint, nsec: bigint = 0n): Time {
   const secNum = Number(sec)
   const nsecNum = Number(nsec)
@@ -1273,13 +1273,13 @@ export function Unix(sec: bigint, nsec: bigint = 0n): Time {
 }
 
 // UnixMilli returns the local Time corresponding to the given Unix time,
-// msec milliseconds since January 1, 1970 UTC
+// msec milliseconds since January 1, 1970 UTC.
 export function UnixMilli(msec: bigint): Time {
   return Time.create(new globalThis.Date(Number(msec)), 0, undefined, UTC)
 }
 
 // UnixMicro returns the local Time corresponding to the given Unix time,
-// usec microseconds since January 1, 1970 UTC
+// usec microseconds since January 1, 1970 UTC.
 export function UnixMicro(usec: bigint): Time {
   const usecNum = Number(usec)
   const ms = Math.floor(usecNum / 1000)
@@ -1288,7 +1288,7 @@ export function UnixMicro(usec: bigint): Time {
 }
 
 // UnixNano returns the local Time corresponding to the given Unix time,
-// nsec nanoseconds since January 1, 1970 UTC
+// nsec nanoseconds since January 1, 1970 UTC.
 export function UnixNano(nsec: bigint): Time {
   const nsecNum = Number(nsec)
   const ms = Math.floor(nsecNum / 1000000)
@@ -1298,7 +1298,7 @@ export function UnixNano(nsec: bigint): Time {
 
 // ParseDuration parses a duration string
 // A duration string is a possibly signed sequence of decimal numbers,
-// each with optional fraction and a unit suffix
+// each with optional fraction and a unit suffix.
 export function ParseDuration(s: string): [Duration, $.GoError] {
   const regex = /^([+-]?)(\d+(?:\.\d+)?)(ns|us|µs|ms|s|m|h)$/
   const match = s.match(regex)
@@ -1339,12 +1339,12 @@ export function ParseDuration(s: string): [Duration, $.GoError] {
   return [BigInt(Math.trunc(nanoseconds)), null]
 }
 
-// Parse parses a formatted string and returns the time value it represents
+// Parse parses a formatted string and returns the time value it represents.
 export function Parse(layout: string, value: string): [Time, $.GoError] {
   return ParseInLocation(layout, value, UTC)
 }
 
-// ParseInLocation is like Parse but differs in two important ways
+// ParseInLocation is like Parse but differs in two important ways.
 export function ParseInLocation(
   layout: string,
   value: string,
@@ -1573,7 +1573,7 @@ export function ParseInLocation(
   return [Time.create(date, 0, undefined, loc), null]
 }
 
-// After waits for the duration to elapse and then sends the current time on the returned channel
+// After waits for the duration to elapse and then sends the current time on the returned channel.
 export function After(d: Duration): ChannelRef<Time> {
   const ms = timeoutMilliseconds(d)
 
@@ -1588,28 +1588,28 @@ export function After(d: Duration): ChannelRef<Time> {
   return makeChannelRef(channel, 'receive')
 }
 
-// AfterFunc waits for the duration to elapse and then calls f
+// AfterFunc waits for the duration to elapse and then calls f.
 export function AfterFunc(d: Duration, f: () => void): Timer {
   return new Timer(d, f)
 }
 
-// NewTimer creates a new Timer that will fire after the given duration
+// NewTimer creates a new Timer that will fire after the given duration.
 export function NewTimer(d: Duration): Timer {
   return new Timer(d)
 }
 
-// NewTicker returns a new Ticker containing a channel that will send the current time
+// NewTicker returns a new Ticker containing a channel that will send the current time.
 export function NewTicker(d: Duration): Ticker {
   return new Ticker(d)
 }
 
-// Tick is a convenience wrapper for NewTicker providing access to the ticking channel only
+// Tick is a convenience wrapper for NewTicker providing access to the ticking channel only.
 export function Tick(d: Duration): ChannelRef<Time> {
   return new Ticker(d).C
 }
 
 // LoadLocation returns the Location with the given name
-// This is a simplified implementation that only supports UTC and Local
+// This is a simplified implementation that only supports UTC and Local.
 export function LoadLocation(name: string): [Location | null, $.GoError] {
   switch (name) {
     case '':
@@ -1623,7 +1623,7 @@ export function LoadLocation(name: string): [Location | null, $.GoError] {
 }
 
 // LoadLocationFromTZData returns a Location with the given name
-// This is a simplified implementation
+// This is a simplified implementation.
 export function LoadLocationFromTZData(
   name: string,
   _data: Uint8Array,

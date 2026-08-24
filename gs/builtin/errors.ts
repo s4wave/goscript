@@ -1,5 +1,5 @@
 /**
- * Represents the Go error type (interface).
+ * GoError Represents the Go error type (interface).
  *
  * Error may be async: a Go Error() method that awaits transpiles to an async
  * method, so callers must await the result before using it as a string.
@@ -8,7 +8,7 @@ export type GoError = {
   Error(): string | PromiseLike<string>
 } | null
 
-// newError creates a new Go error with the given message
+// newError creates a new Go error with the given message.
 export function newError(text: string): GoError {
   return {
     Error: () => text,
@@ -16,7 +16,7 @@ export function newError(text: string): GoError {
 }
 
 // toGoError converts a JavaScript Error to a Go error
-// if the error is already a Go error, it returns it unchanged
+// if the error is already a Go error, it returns it unchanged.
 export function toGoError(err: Error): GoError {
   if ('Error' in err) {
     return err as GoError

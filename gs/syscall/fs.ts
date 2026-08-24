@@ -3,7 +3,7 @@ import { RWMutex } from '@goscript/sync/index.js'
 import { ENOSYS } from './errors.js'
 import type { Iovec, Sockaddr } from './types.js'
 
-// Dirent structure with Reclen field
+// Dirent structure with Reclen field.
 export class Dirent {
   public Name: $.Bytes = new Uint8Array(0)
   public Reclen: number = 0
@@ -13,7 +13,7 @@ export class Dirent {
   }
 }
 
-// Stat_t structure stub
+// Stat_t structure stub.
 export class Stat_t {
   public Dev: number = 0
   public Ino: number = 0
@@ -43,7 +43,7 @@ export class Stat_t {
   }
 }
 
-// Additional missing syscall functions
+// Open Additional missing syscall functions.
 export function Open(
   _path: string,
   _flag: number,

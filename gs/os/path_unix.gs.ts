@@ -1,9 +1,9 @@
 import * as $ from "@goscript/builtin/index.js";
 
-// OS-specific path separator
+// PathSeparator OS-specific path separator.
 export let PathSeparator: number = 47
 
-// OS-specific path list separator
+// PathListSeparator OS-specific path list separator.
 export let PathListSeparator: number = 58
 
 // IsPathSeparator reports whether c is a directory separator character.

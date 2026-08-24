@@ -29,7 +29,7 @@ let _lgamW = $.arrayToSlice<number>([4.18938533204672725052e-01, 8.3333333333332
 //	Lgamma(0) = +Inf
 //	Lgamma(-integer) = +Inf
 //	Lgamma(-Inf) = -Inf
-//	Lgamma(NaN) = NaN
+//	Lgamma(NaN) = NaN.
 export function Lgamma(x: number): [number, number] {
 	let lgamma: number = 0;
 	let sign: number = 1;
@@ -201,7 +201,7 @@ export function Lgamma(x: number): [number, number] {
 	return [lgamma, sign];
 }
 
-// sinPi(x) is a helper function for negative x
+// sinPi(x) is a helper function for negative x.
 export function sinPi(x: number): number {
 	const Two52: number = (1 << 52);
 	const Two53: number = (1 << 53);

@@ -11,7 +11,7 @@ import { Mod } from "./mod.gs.js";
 //	Remainder(NaN, y) = NaN
 //	Remainder(x, 0) = NaN
 //	Remainder(x, ±Inf) = x
-//	Remainder(x, NaN) = NaN
+//	Remainder(x, NaN) = NaN.
 export function Remainder(x: number, y: number): number {
 	return remainder(x, y)
 }

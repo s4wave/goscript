@@ -12,7 +12,7 @@ import { Sqrt } from "./sqrt.gs.js";
 // Special cases are:
 //
 //	Jn(n, ±Inf) = 0
-//	Jn(n, NaN) = NaN
+//	Jn(n, NaN) = NaN.
 export function Jn(n: number, x: number): number {
 	// special cases
 
@@ -347,7 +347,7 @@ export function Jn(n: number, x: number): number {
 //	Yn(n ≥ 0, 0) = -Inf
 //	Yn(n < 0, 0) = +Inf if n is odd, -Inf if n is even
 //	Yn(n, x < 0) = NaN
-//	Yn(n, NaN) = NaN
+//	Yn(n, NaN) = NaN.
 export function Yn(n: number, x: number): number {
 	// special cases
 	switch (true) {

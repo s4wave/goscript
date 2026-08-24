@@ -145,7 +145,7 @@ class lazybuf {
 //
 // See also Rob Pike, "Lexical File Names in Plan 9 or
 // Getting Dot-Dot Right,"
-// https://9p.io/sys/doc/lexnames.html
+// https://9p.io/sys/doc/lexnames.html.
 export function Clean(path: string): string {
   if (path == '') {
     return '.'

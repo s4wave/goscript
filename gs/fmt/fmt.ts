@@ -4,7 +4,7 @@
 import * as $ from '@goscript/builtin/index.js'
 import { writeHostStdoutText } from '@goscript/builtin/hostio.js'
 
-// Basic interfaces
+// Stringer Basic interfaces.
 export interface Stringer {
   String(): string
 }
@@ -477,9 +477,7 @@ async function sprintlnOperands(a: any[]): Promise<string> {
   return parts.join(' ') + '\n'
 }
 
-export async function Print(
-  ...a: any[]
-): Promise<[number, $.GoError | null]> {
+export async function Print(...a: any[]): Promise<[number, $.GoError | null]> {
   const out = await sprintOperands(a)
   stdout.write(out)
   return [out.length, null]
@@ -582,7 +580,7 @@ function appendText(b: $.Bytes, result: string): $.Bytes {
   return newArray
 }
 
-// Error creation
+// Errorf Error creation
 //
 // Errorf stays a synchronous Go API: it returns the error immediately and
 // resolves operand text lazily when Error is called, so protobuf-generated
@@ -639,7 +637,7 @@ function errorfWrappedArgs(format: string, args: any[]): $.GoError[] {
   return wrapped
 }
 
-// FormatString - simplified implementation
+// FormatString - simplified implementation.
 export function FormatString(state: State, verb: number): string {
   let result = '%'
 
@@ -668,7 +666,7 @@ export function FormatString(state: State, verb: number): string {
   return result
 }
 
-// Scanning functions - stubbed for now
+// Scanning functions - stubbed for now.
 export function Scan(..._a: any[]): [number, $.GoError | null] {
   // TODO: Implement scanning from stdin
   return [0, $.newError('Scan not implemented')]
@@ -800,7 +798,7 @@ export function Fscanln(_r: any, ..._a: any[]): [number, $.GoError | null] {
   return [0, $.newError('Fscanln not implemented')]
 }
 
-// Scanner and ScanState interfaces - stubbed
+// Scanner and ScanState interfaces - stubbed.
 export interface Scanner {
   Scan(state: ScanState, verb: number): $.GoError | null
 }

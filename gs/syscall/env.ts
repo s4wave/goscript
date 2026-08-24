@@ -10,7 +10,7 @@ function hostEnv(): ProcessEnv | undefined {
   return (globalThis as { process?: ProcessLike }).process?.env
 }
 
-// Environment variable functions using Node.js/browser APIs
+// Getenv Environment variable functions using Node.js/browser APIs.
 export function Getenv(key: string): [string, boolean] {
   const env = hostEnv()
   if (env !== undefined) {

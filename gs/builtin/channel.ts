@@ -1,7 +1,7 @@
 import { queueTask } from './scheduler.js'
 
 /**
- * Represents the result of a channel receive operation with 'ok' value
+ * ChannelReceiveResult Represents the result of a channel receive operation with 'ok' value.
  */
 export interface ChannelReceiveResult<T> {
   value: T // Should be T | ZeroValue<T>
@@ -9,7 +9,7 @@ export interface ChannelReceiveResult<T> {
 }
 
 /**
- * Represents a result from a select operation
+ * SelectResult Represents a result from a select operation.
  */
 export interface SelectResult<T> {
   value: T // Should be T | ZeroValue<T>
@@ -51,7 +51,7 @@ function completeUnbufferedReceiveWithOk<T>(
 }
 
 /**
- * Represents a Go channel in TypeScript.
+ * Channel Represents a Go channel in TypeScript.
  * Supports asynchronous sending and receiving of values.
  */
 export interface Channel<T> {
@@ -141,7 +141,7 @@ export interface Channel<T> {
 }
 
 /**
- * Represents a case in a select statement.
+ * SelectCase Represents a case in a select statement.
  */
 export interface SelectCase<T> {
   id: number
@@ -356,7 +356,7 @@ export async function chanRecvWithOk<T>(
 }
 
 /**
- * Creates a new channel with the specified buffer size and zero value.
+ * makeChannel Creates a new channel with the specified buffer size and zero value.
  * @param bufferSize The size of the channel buffer. If 0, creates an unbuffered channel.
  * @param zeroValue The zero value for the channel's element type.
  * @param direction Optional direction for the channel. Default is 'both' (bidirectional).
@@ -754,7 +754,7 @@ class BufferedChannel<T> implements Channel<T> {
 }
 
 /**
- * Represents a reference to a channel with a specific direction.
+ * ChannelRef Represents a reference to a channel with a specific direction.
  */
 export interface ChannelRef<T> {
   /**
@@ -787,7 +787,7 @@ export interface ChannelRef<T> {
 }
 
 /**
- * A bidirectional channel reference.
+ * BidirectionalChannelRef A bidirectional channel reference.
  */
 export class BidirectionalChannelRef<T> implements ChannelRef<T> {
   direction = 'both' as const
@@ -849,7 +849,7 @@ export class BidirectionalChannelRef<T> implements ChannelRef<T> {
 }
 
 /**
- * A send-only channel reference.
+ * SendOnlyChannelRef A send-only channel reference.
  */
 export class SendOnlyChannelRef<T> implements ChannelRef<T> {
   direction = 'send' as const
@@ -913,7 +913,7 @@ export class SendOnlyChannelRef<T> implements ChannelRef<T> {
 }
 
 /**
- * A receive-only channel reference.
+ * ReceiveOnlyChannelRef A receive-only channel reference.
  */
 export class ReceiveOnlyChannelRef<T> implements ChannelRef<T> {
   direction = 'receive' as const
@@ -977,7 +977,7 @@ export class ReceiveOnlyChannelRef<T> implements ChannelRef<T> {
 }
 
 /**
- * Creates a new channel reference with the specified direction.
+ * makeChannelRef Creates a new channel reference with the specified direction.
  */
 export function makeChannelRef<T>(
   channel: Channel<T>,

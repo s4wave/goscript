@@ -12,7 +12,7 @@ let tanhQ = $.arrayToSlice<number>([1.12811678491632931402e2, 2.2354883906010044
 //
 //	Tanh(±0) = ±0
 //	Tanh(±Inf) = ±1
-//	Tanh(NaN) = NaN
+//	Tanh(NaN) = NaN.
 export function Tanh(x: number): number {
 	return Math.tanh(x)
 }

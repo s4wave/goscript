@@ -8,7 +8,7 @@ import { Exp } from "./exp.gs.js";
 //
 //	Sinh(±0) = ±0
 //	Sinh(±Inf) = ±Inf
-//	Sinh(NaN) = NaN
+//	Sinh(NaN) = NaN.
 export function Sinh(x: number): number {
 	return Math.sinh(x)
 }
@@ -23,7 +23,7 @@ export function sinh(x: number): number {
 //
 //	Cosh(±0) = 1
 //	Cosh(±Inf) = +Inf
-//	Cosh(NaN) = NaN
+//	Cosh(NaN) = NaN.
 export function Cosh(x: number): number {
 	return Math.cosh(x)
 }

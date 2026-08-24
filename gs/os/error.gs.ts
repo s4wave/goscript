@@ -6,28 +6,28 @@ import * as fs from "@goscript/io/fs/index.js"
 
 // ErrInvalid indicates an invalid argument.
 // Methods on File will return this error when the receiver is nil.
-// "invalid argument"
+// "invalid argument".
 export let ErrInvalid: $.GoError = fs.ErrInvalid
 
-// "permission denied"
+// ErrPermission "permission denied".
 export let ErrPermission: $.GoError = fs.ErrPermission
 
-// "file already exists"
+// ErrExist "file already exists".
 export let ErrExist: $.GoError = fs.ErrExist
 
-// "file does not exist"
+// ErrNotExist "file does not exist".
 export let ErrNotExist: $.GoError = fs.ErrNotExist
 
-// "file already closed"
+// ErrClosed "file already closed".
 export let ErrClosed: $.GoError = fs.ErrClosed
 
-// "file type does not support deadline"
+// ErrNoDeadline "file type does not support deadline".
 export let ErrNoDeadline: $.GoError = errNoDeadline()
 
-// "i/o timeout"
+// ErrDeadlineExceeded "i/o timeout".
 export let ErrDeadlineExceeded: $.GoError = errDeadlineExceeded()
 
-// "operation not implemented in JavaScript environment"
+// ErrUnimplemented "operation not implemented in JavaScript environment".
 export let ErrUnimplemented: $.GoError = {
 	Error: () => "operation not implemented in JavaScript environment"
 }

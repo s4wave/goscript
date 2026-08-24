@@ -56,7 +56,7 @@ export function Compare(a: any, b: any): number {
   return 0
 }
 
-// Additional functions needed by bytes package
+// Count Additional functions needed by bytes package.
 export function Count(s: any, b: number): number {
   const sNorm = normalizeBytes(s)
   let count = 0
@@ -128,7 +128,7 @@ export function IndexRabinKarp(s: any, sep: any): number {
   return Index(s, sep)
 }
 
-// Go bytealg operates on the UTF-8 byte representation of a string and returns
+// IndexByteString Go bytealg operates on the UTF-8 byte representation of a string and returns
 // byte indices, not UTF-16 code-unit indices. String.fromCharCode/indexOf would
 // search code units, mislocating any byte >127 or any multi-byte rune. Search
 // the Go bytes via the builtin string owner so indices match Go.
@@ -196,6 +196,6 @@ export function Cutover(_n: number): number {
   return 10 // Simple threshold
 }
 
-// Constants needed by bytes package
+// MaxBruteForce Constants needed by bytes package.
 export const MaxBruteForce = 64
 export const MaxLen = 32

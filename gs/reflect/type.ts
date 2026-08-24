@@ -17,7 +17,7 @@ import { Zero } from './value.js'
 import { DeepEqual } from './deepequal.js'
 import * as $ from '../builtin/index.js'
 
-// rtype is the common implementation of most values
+// rtype is the common implementation of most values.
 export class rtype {
   constructor(public kind: Kind) {}
 
@@ -35,7 +35,7 @@ export class rtype {
   }
 }
 
-// funcType represents a function type
+// funcType represents a function type.
 export class funcType extends rtype {
   constructor(
     kind: Kind,
@@ -46,7 +46,7 @@ export class funcType extends rtype {
   }
 }
 
-// flag type for internal use
+// flag type for internal use.
 export class flag {
   constructor(private _value: number | Kind) {
     if (typeof _value === 'number') {
@@ -65,7 +65,7 @@ export class flag {
   }
 }
 
-// bitVector class for tracking pointers
+// bitVector class for tracking pointers.
 export class bitVector {
   private bits: number[] = []
 
@@ -91,7 +91,7 @@ export class bitVector {
 // Kind represents the specific kind of type that a Type represents.
 export type Kind = number
 
-// Kind_String returns the string representation of a Kind (wrapper function naming)
+// Kind_String returns the string representation of a Kind (wrapper function naming).
 export function Kind_String(k: Kind): string {
   const kindNames = [
     'invalid',
@@ -128,7 +128,7 @@ export function Kind_String(k: Kind): string {
   return 'invalid'
 }
 
-// Channel direction constants and type
+// ChanDir Channel direction constants and type.
 export type ChanDir = number
 
 export const RecvDir: ChanDir = 1
@@ -148,7 +148,7 @@ export function ChanDir_String(d: ChanDir): string {
   }
 }
 
-// Kind constants
+// Invalid Kind constants.
 export const Invalid: Kind = 0
 export const Bool: Kind = 1
 export const Int: Kind = 2
@@ -517,7 +517,7 @@ class InvalidTypeClass implements Type {
 }
 const invalidTypeInstance = new InvalidTypeClass()
 
-// Value is the reflection interface to a Go value - consolidated from all implementations
+// Value is the reflection interface to a Go value - consolidated from all implementations.
 export class Value {
   private _value: ReflectValue
   private _type: Type
@@ -1526,7 +1526,7 @@ export class Value {
   }
 }
 
-// Basic type implementation - exported for compatibility
+// BasicType Basic type implementation - exported for compatibility.
 export class BasicType implements Type {
   constructor(
     private _kind: Kind,
@@ -4053,7 +4053,7 @@ function getTypeOf(value: ReflectValue): Type {
   }
 }
 
-// Exported functions as required by godoc.txt
+// TypeOf Exported functions as required by godoc.txt.
 export function TypeOf(i: ReflectValue): Type {
   return internType(getTypeOf(i))
 }
@@ -4786,7 +4786,7 @@ export function getInterfaceLiteralTypeByName(name: string): Type {
   return new InterfaceType('interface{}')
 }
 
-// Additional functions from merged files
+// canRangeFunc Additional functions from merged files.
 export function canRangeFunc(t: Type): boolean {
   const kind = t.Kind()
   return kind === Slice || kind === Array || kind === String

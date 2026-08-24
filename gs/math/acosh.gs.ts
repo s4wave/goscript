@@ -10,7 +10,7 @@ import { Sqrt } from "./sqrt.gs.js";
 //
 //	Acosh(+Inf) = +Inf
 //	Acosh(x) = NaN if x < 1
-//	Acosh(NaN) = NaN
+//	Acosh(NaN) = NaN.
 export function Acosh(x: number): number {
 	return Math.acosh(x)
 }

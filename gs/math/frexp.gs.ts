@@ -12,7 +12,7 @@ import { Float64bits, Float64frombits } from "./unsafe.gs.js";
 //
 //	Frexp(±0) = ±0, 0
 //	Frexp(±Inf) = ±Inf, 0
-//	Frexp(NaN) = NaN, 0
+//	Frexp(NaN) = NaN, 0.
 export function Frexp(f: number): [number, number] {
 	return frexp(f)
 }

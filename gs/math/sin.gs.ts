@@ -12,7 +12,7 @@ let _cos = $.arrayToSlice<number>([-1.13585365213876817300e-11, 2.08757008419747
 // Special cases are:
 //
 //	Cos(±Inf) = NaN
-//	Cos(NaN) = NaN
+//	Cos(NaN) = NaN.
 export function Cos(x: number): number {
 	return Math.cos(x)
 }
@@ -27,7 +27,7 @@ export function cos(x: number): number {
 //
 //	Sin(±0) = ±0
 //	Sin(±Inf) = NaN
-//	Sin(NaN) = NaN
+//	Sin(NaN) = NaN.
 export function Sin(x: number): number {
 	return Math.sin(x)
 }

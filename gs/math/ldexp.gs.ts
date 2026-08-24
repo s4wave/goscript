@@ -11,7 +11,7 @@ import { Float64bits, Float64frombits } from "./unsafe.gs.js";
 //
 //	Ldexp(±0, exp) = ±0
 //	Ldexp(±Inf, exp) = ±Inf
-//	Ldexp(NaN, exp) = NaN
+//	Ldexp(NaN, exp) = NaN.
 export function Ldexp(frac: number, exp: number): number {
 	return ldexp(frac, exp)
 }

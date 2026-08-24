@@ -55,7 +55,7 @@ export class RuntimeError extends Error {
 }
 
 /**
- * Implementation of Go's built-in panic function.
+ * panic Implementation of Go's built-in panic function.
  * @param args Arguments passed to panic
  */
 export function panic(...args: unknown[]): never {

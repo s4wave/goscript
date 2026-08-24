@@ -8,7 +8,7 @@ import {
 } from './type.js'
 import { Method } from './types.js'
 
-// Simple MapOf implementation using JavaScript Map
+// MapOf Simple MapOf implementation using JavaScript Map.
 export function MapOf(key: Type, elem: Type): Type {
   return new MapType(key, elem)
 }
@@ -181,7 +181,7 @@ export class MapIter<K = unknown, V = unknown> {
   }
 }
 
-// Helper functions for map operations
+// MakeMap Helper functions for map operations.
 export function MakeMap(typ: Type): Value {
   const map = new Map()
   return new Value(map, typ)

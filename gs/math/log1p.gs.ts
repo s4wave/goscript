@@ -13,7 +13,7 @@ import { Float64bits, Float64frombits } from "./unsafe.gs.js";
 //	Log1p(±0) = ±0
 //	Log1p(-1) = -Inf
 //	Log1p(x < -1) = NaN
-//	Log1p(NaN) = NaN
+//	Log1p(NaN) = NaN.
 export function Log1p(x: number): number {
 	return Math.log1p(x)
 }

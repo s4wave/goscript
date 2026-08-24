@@ -10,7 +10,7 @@ import { Sqrt } from "./sqrt.gs.js";
 //
 //	Asinh(±0) = ±0
 //	Asinh(±Inf) = ±Inf
-//	Asinh(NaN) = NaN
+//	Asinh(NaN) = NaN.
 export function Asinh(x: number): number {
 	return Math.asinh(x)
 }

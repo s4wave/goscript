@@ -106,7 +106,7 @@ interface ByteAddressSource {
 }
 
 /**
- * SliceProxy is a proxy object for complex slices
+ * SliceProxy is a proxy object for complex slices.
  */
 export type SliceProxy<T> = T[] & {
   __meta__: GoSliceObject<T>
@@ -379,14 +379,14 @@ function byteSliceView(
 
 /**
  * isSliceProxy checks if a slice is a SliceProxy (has __meta__ property)
- * This is an alias for isComplexSlice for better type hinting
+ * This is an alias for isComplexSlice for better type hinting.
  */
 export function isSliceProxy<T>(slice: Slice<T>): slice is SliceProxy<T> {
   return isComplexSlice(slice)
 }
 
 /**
- * Creates a new slice with the specified length and capacity.
+ * makeSlice Creates a new slice with the specified length and capacity.
  * @param length The length of the slice.
  * @param capacity The capacity of the slice (optional).
  * @returns A new slice.
@@ -529,14 +529,14 @@ export const makeSlice = <T>(
  * @param high Ending index (defaults to s.length)
  * @param max Capacity limit (defaults to original capacity)
  */
-// Overload for Uint8Array - returns Slice<number> (which includes Uint8Array)
+// goSlice Overload for Uint8Array - returns Slice<number> (which includes Uint8Array).
 export function goSlice(
   s: Uint8Array,
   low?: number,
   high?: number,
   max?: number,
 ): Slice<number>
-// Generic overload for other slice types
+// goSlice Generic overload for other slice types.
 export function goSlice<T>(
   s: Slice<T>,
   low?: number,
@@ -778,7 +778,7 @@ export function goSlice<T>( // T can be number for Uint8Array case
 }
 
 /**
- * Converts a JavaScript array to a Go slice.
+ * arrayToSlice Converts a JavaScript array to a Go slice.
  * For multi-dimensional arrays, recursively converts nested arrays to slices.
  * @param arr The JavaScript array to convert
  * @param depth How many levels of nesting to convert (default: 1, use Infinity for all levels)
@@ -887,7 +887,7 @@ export const arrayToSlice = <T>(
 }
 
 /**
- * Returns the length of a collection (string, array, slice, map, or set).
+ * len Returns the length of a collection (string, array, slice, map, or set).
  * @param obj The collection to get the length of.
  * @returns The length of the collection.
  */
@@ -944,7 +944,7 @@ export const len = <T = unknown, V = unknown>(
 }
 
 /**
- * Returns the capacity of a slice.
+ * cap Returns the capacity of a slice.
  * @param obj The slice.
  * @returns The capacity of the slice.
  */
@@ -1075,7 +1075,7 @@ function appendZeroValue(sample: unknown): unknown {
 }
 
 /**
- * Appends elements to a slice.
+ * append Appends elements to a slice.
  * Note: In Go, append can return a new slice if the underlying array is reallocated.
  * This helper emulates that by returning the modified or new slice.
  * @param slice The slice to append to.
@@ -1083,7 +1083,7 @@ function appendZeroValue(sample: unknown): unknown {
  * @returns The modified or new slice.
  */
 export function append(slice: Uint8Array, ...elements: unknown[]): Uint8Array
-// Null destinations carry no runtime element type, so compiler-only hint
+// append Null destinations carry no runtime element type, so compiler-only hint
 // values are accepted alongside the elements.
 export function append<T>(slice: null, ...elements: unknown[]): Slice<T>
 export function append<T>(slice: Slice<T>, ...elements: unknown[]): Slice<T>
@@ -1364,7 +1364,7 @@ function writeByteElements(
 }
 
 /**
- * Copies elements from src to dst.
+ * copy Copies elements from src to dst.
  * @param dst The destination slice.
  * @param src The source slice or string.
  * @returns The number of elements copied.
@@ -1534,11 +1534,11 @@ function copySliceValues<T>(src: Slice<T>, count: number): T[] {
 }
 
 /**
- * Accesses an element at a specific index for various Go-like types (string, slice, array).
+ * index Accesses an element at a specific index for various Go-like types (string, slice, array).
  * Mimics Go's indexing behavior: `myCollection[index]`
  * For strings, it returns the byte value at the specified byte index.
  * For slices/arrays, it returns the element at the specified index.
- * This is used when dealing with types like "string | []byte"
+ * This is used when dealing with types like "string | []byte".
  * @param collection The string, Slice, or Array to access.
  * @param index The index.
  * @returns The element or byte value at the specified index.
@@ -1987,7 +1987,7 @@ function byteArrayFromAddress(
 }
 
 /**
- * Converts a string to an array of Unicode code points (runes).
+ * stringToRunes Converts a string to an array of Unicode code points (runes).
  * @param str The input string.
  * @returns An array of numbers representing the Unicode code points.
  */
@@ -1996,7 +1996,7 @@ export const stringToRunes = (str: string): number[] => {
 }
 
 /**
- * Returns Go range pairs for a string: UTF-8 byte offset and rune value.
+ * rangeString Returns Go range pairs for a string: UTF-8 byte offset and rune value.
  * @param str The input string.
  * @returns Index/rune pairs matching Go's `for i, r := range str`.
  */
@@ -2011,7 +2011,7 @@ export const rangeString = (str: string): Array<[number, number]> => {
 }
 
 /**
- * Converts a single-character string to its Unicode code point (rune).
+ * stringToRune Converts a single-character string to its Unicode code point (rune).
  * Used for readable rune constants like $.stringToRune('/') instead of 47.
  * @param str A single-character string.
  * @returns The Unicode code point as a number.
@@ -2024,7 +2024,7 @@ export const stringToRune = (str: string): number => {
 }
 
 /**
- * Converts an array of Unicode code points (runes) to a string.
+ * runesToString Converts an array of Unicode code points (runes) to a string.
  * @param runes The input array of numbers representing Unicode code points.
  * @returns The resulting string.
  */
@@ -2052,7 +2052,7 @@ export function runeToString(r: number): string {
 }
 
 /**
- * Converts a number to a byte (uint8) by truncating to the range 0-255.
+ * byte Converts a number to a byte (uint8) by truncating to the range 0-255.
  * Equivalent to Go's byte() conversion.
  * @param n The number to convert to a byte.
  * @returns The byte value (0-255).
@@ -2062,8 +2062,8 @@ export const byte = (n: number): number => {
 }
 
 /**
- * Accesses the byte value at a specific index of a UTF-8 encoded string.
- * Mimics Go's string indexing behavior: `myString[index]`
+ * indexString Accesses the byte value at a specific index of a UTF-8 encoded string.
+ * Mimics Go's string indexing behavior: `myString[index]`.
  * @param str The string to access.
  * @param index The byte index.
  * @returns The byte value (0-255) at the specified index.
@@ -2098,7 +2098,7 @@ export const indexString = (
 }
 
 /**
- * Returns the byte length of a string.
+ * stringLen Returns the byte length of a string.
  * Mimics Go's `len(string)` behavior.
  * @param str The string.
  * @returns The number of bytes in the UTF-8 representation of the string.
@@ -2108,7 +2108,7 @@ export const stringLen = (str: GoStringValue): number => {
 }
 
 /**
- * Slices a string based on byte indices.
+ * sliceString Slices a string based on byte indices.
  * Mimics Go's string slicing behavior: `myString[low:high]` for valid UTF-8 slices only.
  * @param str The string to slice.
  * @param low The starting byte index (inclusive). Defaults to 0.
@@ -2147,7 +2147,7 @@ export const sliceString = (
 }
 
 /**
- * Converts a Slice<number> (byte array) to a string using TextDecoder.
+ * bytesToString Converts a Slice<number> (byte array) to a string using TextDecoder.
  * @param bytes The Slice<number> to convert.
  * @returns The resulting string.
  */
@@ -2298,7 +2298,7 @@ function binaryStringToBytes(value: string): Uint8Array {
 }
 
 /**
- * Converts a string to a Uint8Array (byte slice).
+ * stringToBytes Converts a string to a Uint8Array (byte slice).
  * @param s The input string.
  * @returns A Uint8Array representing the UTF-8 bytes of the string.
  */
@@ -2385,7 +2385,7 @@ export function sliceHeaderRef(b: VarRef<Slice<number>>): VarRef<{
 }
 
 /**
- * Handles string() conversion for values that could be either string or []byte.
+ * genericBytesOrStringToString Handles string() conversion for values that could be either string or []byte.
  * Used for generic type parameters with constraint []byte|string.
  * @param value Value that is either a string or Uint8Array
  * @returns The string representation
@@ -2403,7 +2403,7 @@ export function genericBytesOrStringToString(
 }
 
 /**
- * Indexes into a value that could be either a string or bytes.
+ * indexStringOrBytes Indexes into a value that could be either a string or bytes.
  * Used for generic type parameters with constraint string | []byte.
  * Both cases return a byte value (number).
  * @param value Value that is either a string or bytes (Uint8Array or Slice<number>)
@@ -2435,7 +2435,7 @@ export function indexStringOrBytes(
 }
 
 /**
- * Slices a value that could be either a string or bytes.
+ * sliceStringOrBytes Slices a value that could be either a string or bytes.
  * Used for generic type parameters with constraint string | []byte.
  * @param value Value that is either a string or bytes (Uint8Array or Slice<number>)
  * @param low Starting index (inclusive). Defaults to 0.

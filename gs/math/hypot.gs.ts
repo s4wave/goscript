@@ -12,7 +12,7 @@ import { Sqrt } from "./sqrt.gs.js";
 //	Hypot(±Inf, q) = +Inf
 //	Hypot(p, ±Inf) = +Inf
 //	Hypot(NaN, q) = NaN
-//	Hypot(p, NaN) = NaN
+//	Hypot(p, NaN) = NaN.
 export function Hypot(p: number, q: number): number {
 	return Math.hypot(p, q)
 }

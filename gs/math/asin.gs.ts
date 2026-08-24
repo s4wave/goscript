@@ -3,7 +3,7 @@
 // Special cases are:
 //
 //	Asin(±0) = ±0
-//	Asin(x) = NaN if x < -1 or x > 1
+//	Asin(x) = NaN if x < -1 or x > 1.
 export function Asin(x: number): number {
 	return Math.asin(x)
 }
@@ -16,7 +16,7 @@ export function asin(x: number): number {
 //
 // Special case is:
 //
-//	Acos(x) = NaN if x < -1 or x > 1
+//	Acos(x) = NaN if x < -1 or x > 1.
 export function Acos(x: number): number {
 	return Math.acos(x)
 }

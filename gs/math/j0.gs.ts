@@ -12,7 +12,7 @@ import { Sqrt } from "./sqrt.gs.js";
 //
 //	J0(±Inf) = 0
 //	J0(0) = 1
-//	J0(NaN) = NaN
+//	J0(NaN) = NaN.
 export function J0(x: number): number {
 	// Constants
 	const TwoM27: number = 1.0 / (1 << 27); // 2**-27
@@ -98,7 +98,7 @@ export function J0(x: number): number {
 //	Y0(+Inf) = 0
 //	Y0(0) = -Inf
 //	Y0(x < 0) = NaN
-//	Y0(NaN) = NaN
+//	Y0(NaN) = NaN.
 export function Y0(x: number): number {
 	// Constants
 	const TwoM27: number = 1.0 / (1 << 27); // 2**-27

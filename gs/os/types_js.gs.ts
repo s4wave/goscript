@@ -294,16 +294,16 @@ export function createHostFile(name: string, fd: number = -1, handle: DenoFileLi
 
 export { resetHostRuntimeForTests }
 
-// Re-export essential types
+// Time Re-export essential types.
 export type Time = time.Time;
 export type FileInfo = fs.FileInfo;
 export type FileMode = fs.FileMode;
 export type DirEntry = fs.DirEntry;
 
-// Export runtime values for ES module compatibility  
+// Time Export runtime values for ES module compatibility.
 export const Time = null as any;
 export const FileInfo = null as any;
-// FileMode is now a class, so we re-export it directly from fs
+// DirEntry FileMode is now a class, so we re-export it directly from fs.
 export const DirEntry = null as any;
 
 // Getpagesize returns the underlying system's memory page size.
@@ -845,7 +845,7 @@ const readdirName: readdirMode = 0
 const readdirDirEntry: readdirMode = 1
 const readdirFileInfo: readdirMode = 2
 
-// File mode constants
+// ModeDir File mode constants.
 export let ModeDir: fs.FileMode = fs.ModeDir
 export let ModeAppend: fs.FileMode = fs.ModeAppend
 export let ModeExclusive: fs.FileMode = fs.ModeExclusive
@@ -869,7 +869,7 @@ export function SameFile(fi1: fs.FileInfo, fi2: fs.FileInfo): boolean {
 	return false
 }
 
-// FileMode wrapper functions - re-export from fs module
+// FileMode_IsDir FileMode wrapper functions - re-export from fs module.
 export function FileMode_IsDir(receiver: fs.FileMode): boolean {
 	return fs.FileMode_IsDir(receiver)
 }

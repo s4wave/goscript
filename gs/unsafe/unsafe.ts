@@ -11,18 +11,18 @@ interface StringDataPointer {
   value: string
 }
 
-// ArbitraryType is a shorthand for an arbitrary Go type; it is not a real type
+// ArbitraryType is a shorthand for an arbitrary Go type; it is not a real type.
 export type ArbitraryType = unknown
 
-// Pointer is a pointer type but a Pointer value may not be dereferenced
+// Pointer is a pointer type but a Pointer value may not be dereferenced.
 export type Pointer = unknown
 
 // IntegerType is a shorthand for an integer type; it is not a real type
-// This is the only type from unsafe that can be meaningfully implemented in JavaScript
+// This is the only type from unsafe that can be meaningfully implemented in JavaScript.
 export type IntegerType = number
 
 // Alignof returns the alignment of the (type of the) variable in bytes
-// This operation is not meaningful in JavaScript/TypeScript
+// This operation is not meaningful in JavaScript/TypeScript.
 export function Alignof(_variable: ArbitraryType): number {
   throw new Error(
     'unsafe.Alignof is not supported in JavaScript/TypeScript: memory alignment is not a meaningful concept in JavaScript',
@@ -30,7 +30,7 @@ export function Alignof(_variable: ArbitraryType): number {
 }
 
 // Offsetof returns the field offset in bytes relative to the struct's address
-// This operation is not meaningful in JavaScript/TypeScript
+// This operation is not meaningful in JavaScript/TypeScript.
 export function Offsetof(_selector: ArbitraryType): number {
   throw new Error(
     'unsafe.Offsetof is not supported in JavaScript/TypeScript: memory layout and field offsets are not meaningful concepts in JavaScript',
@@ -38,7 +38,7 @@ export function Offsetof(_selector: ArbitraryType): number {
 }
 
 // Sizeof returns the size of the (type of the) variable in bytes
-// This operation is not meaningful in JavaScript/TypeScript
+// This operation is not meaningful in JavaScript/TypeScript.
 export function Sizeof(_variable: ArbitraryType): number {
   throw new Error(
     'unsafe.Sizeof is not supported in JavaScript/TypeScript: memory size is not a meaningful concept in JavaScript',
@@ -46,7 +46,7 @@ export function Sizeof(_variable: ArbitraryType): number {
 }
 
 // Add adds len to ptr and returns the updated pointer
-// Pointer arithmetic is not supported in JavaScript/TypeScript
+// Pointer arithmetic is not supported in JavaScript/TypeScript.
 export function Add(_ptr: Pointer, _len: IntegerType): Pointer {
   throw new Error(
     'unsafe.Add is not supported in JavaScript/TypeScript: pointer arithmetic is not available in JavaScript',
@@ -71,7 +71,7 @@ export function Slice(ptr: Pointer, len: IntegerType): $.Slice<number> {
 }
 
 // SliceData returns a pointer to the underlying array of the slice
-// This operation is not meaningful in JavaScript/TypeScript
+// This operation is not meaningful in JavaScript/TypeScript.
 export function SliceData(
   _slice: $.Slice<unknown> | Uint8Array | unknown[],
 ): Pointer {
@@ -81,7 +81,7 @@ export function SliceData(
 }
 
 // String returns a string value whose underlying bytes start at ptr
-// This operation is not meaningful in JavaScript/TypeScript
+// This operation is not meaningful in JavaScript/TypeScript.
 export function String(_ptr: Pointer, _len: IntegerType): string {
   throw new Error(
     'unsafe.String is not supported in JavaScript/TypeScript: direct memory access is not available in JavaScript',
@@ -94,7 +94,7 @@ export function StringData(str: string): Pointer {
 }
 
 // Pointer converts a value to an unsafe.Pointer for atomic operations
-// In JavaScript/TypeScript, this is just a pass-through function
+// In JavaScript/TypeScript, this is just a pass-through function.
 export function Pointer(value: unknown): Pointer {
   return value
 }

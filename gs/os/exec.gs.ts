@@ -7,7 +7,7 @@ import * as syscall from "@goscript/syscall/index.js"
 export let ErrProcessDone: $.GoError = errors.New("os: process already finished")
 export let ErrNoHandle: $.GoError = errors.New("os: process handle unavailable")
 
-// Simplified Process class for JavaScript environment
+// Process Simplified Process class for JavaScript environment.
 export class Process {
 	public get Pid(): number {
 		return this._fields.Pid.value
@@ -66,7 +66,7 @@ export class Process {
 	);
 }
 
-// Simplified ProcAttr class for JavaScript environment  
+// ProcAttr Simplified ProcAttr class for JavaScript environment.
 export class ProcAttr {
 	public get Dir(): string {
 		return this._fields.Dir.value
@@ -178,7 +178,7 @@ export function StartProcess(name: string, argv: $.Slice<string>, attr: ProcAttr
 	return [null, ErrUnimplemented]
 }
 
-// Internal functions used by exec_unix.gs.ts
+// newDoneProcess Internal functions used by exec_unix.gs.ts.
 export function newDoneProcess(pid: number): Process {
 	return new Process({Pid: pid})
 }

@@ -8,7 +8,7 @@ import * as time from '@goscript/time/index.js'
 // The output for a file named "hello.go", 100 bytes, mode 0o644, created
 // January 1, 1970 at noon is
 //
-//	-rw-r--r-- 100 1970-01-01 12:00:00 hello.go
+//	-rw-r--r-- 100 1970-01-01 12:00:00 hello.go.
 export function FormatFileInfo(info: FileInfo): string {
   let name = info!.Name()
   let b: string[] = []
@@ -41,7 +41,7 @@ export function FormatFileInfo(info: FileInfo): string {
 // The outputs for a directory named subdir and a file named hello.go are:
 //
 //	d subdir/
-//	- hello.go
+//	- hello.go.
 export function FormatDirEntry(dir: DirEntry): string {
   let name = dir!.Name()
   let b: string[] = []

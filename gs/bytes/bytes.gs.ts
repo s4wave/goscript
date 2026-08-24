@@ -261,7 +261,7 @@ export function LastIndexAny(s: $.Bytes, chars: string): number {
 	return lastIndex
 }
 
-// Generic split: splits after each instance of sep,
+// genSplit Generic split: splits after each instance of sep,
 // including sepSave bytes of sep in the subslices.
 export function genSplit(s: $.Bytes, sep: $.Bytes, sepSave: number, n: number): $.Slice<$.Bytes> {
 	if (n === 0) {

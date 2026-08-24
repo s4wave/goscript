@@ -12,7 +12,7 @@ let _tanQ = $.arrayToSlice<number>([1.00000000000000000000e0, 1.3681296347069295
 //
 //	Tan(±0) = ±0
 //	Tan(±Inf) = NaN
-//	Tan(NaN) = NaN
+//	Tan(NaN) = NaN.
 export function Tan(x: number): number {
 	return Math.tan(x)
 }

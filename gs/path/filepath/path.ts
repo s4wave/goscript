@@ -23,11 +23,11 @@ function normalizeJoinElements(elem: JoinElement[]): string[] {
   return elem as string[]
 }
 
-// Path separator constants
+// Separator Path separator constants.
 export const Separator = $.stringToRune('/')
 export const ListSeparator = $.stringToRune(':')
 
-// Error constants
+// SkipDir Error constants.
 export const SkipDir = $.newError('skip this directory')
 export const SkipAll = $.newError('skip everything and stop the walk')
 
@@ -208,7 +208,7 @@ export function VolumeName(_path: string): string {
 //   - is within the subtree rooted at the directory in which path is evaluated
 //   - is not an absolute path
 //   - is not empty
-//   - on Windows, is not a reserved name such as "NUL"
+//   - on Windows, is not a reserved name such as "NUL".
 export function IsLocal(path: string): boolean {
   if (path === '' || IsAbs(path)) {
     return false

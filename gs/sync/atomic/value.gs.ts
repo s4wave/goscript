@@ -147,7 +147,7 @@ class efaceWords {
 	);
 }
 
-// Runtime functions for pinning/unpinning (no-ops in JavaScript)
+// runtime_procPin Runtime functions for pinning/unpinning (no-ops in JavaScript).
 export function runtime_procPin(): number {
 	return 0; // No-op in JavaScript
 }

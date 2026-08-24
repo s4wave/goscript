@@ -104,7 +104,7 @@ function searchSync(n: number, f: (i: number) => boolean): number {
 //	    fmt.Printf("found %s at entry %d\n", target, i)
 //	} else {
 //	    fmt.Printf("%s not found, would insert at %d", target, i)
-//	}
+//	}.
 export function Find(n: number, cmp: (i: number) => number): [number, boolean] {
 	let left = 0
 	let right = n

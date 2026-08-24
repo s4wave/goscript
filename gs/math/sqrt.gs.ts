@@ -9,7 +9,7 @@ import { Float64bits, Float64frombits } from "./unsafe.gs.js";
 //	Sqrt(+Inf) = +Inf
 //	Sqrt(±0) = ±0
 //	Sqrt(x < 0) = NaN
-//	Sqrt(NaN) = NaN
+//	Sqrt(NaN) = NaN.
 export function Sqrt(x: number): number {
 	return Math.sqrt(x)
 }

@@ -42,7 +42,7 @@ function openOptionsFromFlags(flag: number): {
 	}
 }
 
-// Device null path for the host platform.
+// DevNull Device null path for the host platform.
 export const DevNull = getDevNullPath()
 
 const standardInputFD = 0
@@ -253,7 +253,7 @@ export function net_newUnixFile(fd: number, name: string): File | null {
 	return NewFile(fd, name)
 }
 
-// File kind enum for compatibility
+// newFileKind File kind enum for compatibility.
 export type newFileKind = number
 
 export function newFile(fd: number, name: string, _kind: newFileKind, _nonBlocking: boolean): File | null {

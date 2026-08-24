@@ -22,7 +22,7 @@ function newError(message: string): $.GoError {
   return new IOError(message)
 }
 
-// Error variables
+// EOF Error variables.
 export const EOF = newError('EOF')
 export const ErrClosedPipe = newError('io: read/write on closed pipe')
 export const ErrNoProgress = newError(
@@ -32,14 +32,14 @@ export const ErrShortBuffer = newError('short buffer')
 export const ErrShortWrite = newError('short write')
 export const ErrUnexpectedEOF = newError('unexpected EOF')
 
-// Seek whence values
+// SeekStart Seek whence values.
 export const SeekStart = 0 // seek relative to the origin of the file
 export const SeekCurrent = 1 // seek relative to the current offset
 export const SeekEnd = 2 // seek relative to the end
 
 // Core interfaces
 
-// Reader is the interface that wraps the basic Read method
+// Reader is the interface that wraps the basic Read method.
 export interface Reader {
   Read(p: $.Bytes): [number, $.GoError]
 }
@@ -48,7 +48,7 @@ export interface AsyncReader {
   Read(p: $.Bytes): Promise<[number, $.GoError]>
 }
 
-// Writer is the interface that wraps the basic Write method
+// Writer is the interface that wraps the basic Write method.
 export interface Writer {
   Write(p: $.Bytes): [number, $.GoError]
 }
@@ -56,17 +56,17 @@ export interface Writer {
 type ReaderLike = Reader | { Reader: Reader | null } | null
 type WriterLike = Writer | { Writer: Writer | null } | null
 
-// Closer is the interface that wraps the basic Close method
+// Closer is the interface that wraps the basic Close method.
 export interface Closer {
   Close(): $.GoError
 }
 
-// Seeker is the interface that wraps the basic Seek method
+// Seeker is the interface that wraps the basic Seek method.
 export interface Seeker {
   Seek(offset: bigint, whence: number): [bigint, $.GoError]
 }
 
-// Combined interfaces
+// ReadWriter Combined interfaces.
 export interface ReadWriter extends Reader, Writer {}
 export interface ReadCloser extends Reader, Closer {}
 export interface WriteCloser extends Writer, Closer {}
@@ -224,52 +224,52 @@ export function Pipe(): [PipeReader, PipeWriter] {
   return [new PipeReader(pipe), new PipeWriter(pipe)]
 }
 
-// ReaderAt is the interface that wraps the basic ReadAt method
+// ReaderAt is the interface that wraps the basic ReadAt method.
 export interface ReaderAt {
   ReadAt(p: $.Bytes, off: bigint): [number, $.GoError]
 }
 
-// WriterAt is the interface that wraps the basic WriteAt method
+// WriterAt is the interface that wraps the basic WriteAt method.
 export interface WriterAt {
   WriteAt(p: $.Bytes, off: bigint): [number, $.GoError]
 }
 
-// ByteReader is the interface that wraps the ReadByte method
+// ByteReader is the interface that wraps the ReadByte method.
 export interface ByteReader {
   ReadByte(): [number, $.GoError]
 }
 
-// ByteWriter is the interface that wraps the WriteByte method
+// ByteWriter is the interface that wraps the WriteByte method.
 export interface ByteWriter {
   WriteByte(c: number): $.GoError
 }
 
-// ByteScanner is the interface that adds the UnreadByte method to the basic ReadByte method
+// ByteScanner is the interface that adds the UnreadByte method to the basic ReadByte method.
 export interface ByteScanner extends ByteReader {
   UnreadByte(): $.GoError
 }
 
-// RuneReader is the interface that wraps the ReadRune method
+// RuneReader is the interface that wraps the ReadRune method.
 export interface RuneReader {
   ReadRune(): [number, number, $.GoError]
 }
 
-// RuneScanner is the interface that adds the UnreadRune method to the basic ReadRune method
+// RuneScanner is the interface that adds the UnreadRune method to the basic ReadRune method.
 export interface RuneScanner extends RuneReader {
   UnreadRune(): $.GoError
 }
 
-// StringWriter is the interface that wraps the WriteString method
+// StringWriter is the interface that wraps the WriteString method.
 export interface StringWriter {
   WriteString(s: string): [number, $.GoError]
 }
 
-// WriterTo is the interface that wraps the WriteTo method
+// WriterTo is the interface that wraps the WriteTo method.
 export interface WriterTo {
   WriteTo(w: Writer): [bigint, $.GoError]
 }
 
-// ReaderFrom is the interface that wraps the ReadFrom method
+// ReaderFrom is the interface that wraps the ReadFrom method.
 export interface ReaderFrom {
   ReadFrom(r: Reader): [bigint, $.GoError]
 }
@@ -298,7 +298,7 @@ export async function WriteString(
   return await (w.Write(bytes) as any)
 }
 
-// LimitedReader reads from R but limits the amount of data returned to just N bytes
+// LimitedReader reads from R but limits the amount of data returned to just N bytes.
 export class LimitedReader implements Reader {
   public R: Reader | null
   public N: bigint
@@ -338,12 +338,12 @@ export class LimitedReader implements Reader {
   }
 }
 
-// LimitReader returns a Reader that reads from r but stops with EOF after n bytes
+// LimitReader returns a Reader that reads from r but stops with EOF after n bytes.
 export function LimitReader(r: Reader, n: bigint): Reader {
   return new LimitedReader(r, n)
 }
 
-// SectionReader implements Read, Seek, and ReadAt on a section of an underlying ReaderAt
+// SectionReader implements Read, Seek, and ReadAt on a section of an underlying ReaderAt.
 export class SectionReader implements Reader, Seeker, ReaderAt {
   private r: ReaderAt
   private base: number
@@ -438,7 +438,7 @@ export class SectionReader implements Reader, Seeker, ReaderAt {
   }
 }
 
-// NewSectionReader returns a SectionReader that reads from r starting at offset off and stops with EOF after n bytes
+// NewSectionReader returns a SectionReader that reads from r starting at offset off and stops with EOF after n bytes.
 export function NewSectionReader(
   r: ReaderAt,
   off: bigint,
@@ -447,7 +447,7 @@ export function NewSectionReader(
   return new SectionReader(r, off, n)
 }
 
-// OffsetWriter maps writes at offset base to offset base+off in the underlying writer
+// OffsetWriter maps writes at offset base to offset base+off in the underlying writer.
 export class OffsetWriter implements Writer, WriterAt {
   private w: WriterAt
   private base: number
@@ -496,7 +496,7 @@ export class OffsetWriter implements Writer, WriterAt {
   }
 }
 
-// NewOffsetWriter returns an OffsetWriter that writes to w starting at offset off
+// NewOffsetWriter returns an OffsetWriter that writes to w starting at offset off.
 export function NewOffsetWriter(w: WriterAt, off: bigint): OffsetWriter {
   return new OffsetWriter(w, off)
 }
@@ -678,7 +678,7 @@ export async function ReadAll(
   return [result, readErr]
 }
 
-// NopCloser returns a ReadCloser with a no-op Close method wrapping the provided Reader r
+// NopCloser returns a ReadCloser with a no-op Close method wrapping the provided Reader r.
 export function NopCloser(r: Reader | null): ReadCloser {
   if (r == null) {
     return {
@@ -694,7 +694,7 @@ export function NopCloser(r: Reader | null): ReadCloser {
   }
 }
 
-// MultiReader returns a Reader that's the logical concatenation of the provided input readers
+// MultiReader returns a Reader that's the logical concatenation of the provided input readers.
 export function MultiReader(...readers: Reader[]): Reader {
   return new multiReader(readers.slice())
 }
@@ -735,7 +735,7 @@ class multiReader implements Reader {
   }
 }
 
-// MultiWriter creates a writer that duplicates its writes to all the provided writers
+// MultiWriter creates a writer that duplicates its writes to all the provided writers.
 export function MultiWriter(...writers: (Writer | null)[]): Writer {
   return new multiWriter(writers.slice()) as any
 }
@@ -764,7 +764,7 @@ class multiWriter {
   }
 }
 
-// TeeReader returns a Reader that writes to w what it reads from r
+// TeeReader returns a Reader that writes to w what it reads from r.
 export function TeeReader(r: Reader | null, w: Writer | null): Reader {
   return new teeReader(r, w)
 }

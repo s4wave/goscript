@@ -10,7 +10,7 @@ import { Sqrt } from "./sqrt.gs.js";
 // Special cases are:
 //
 //	J1(±Inf) = 0
-//	J1(NaN) = NaN
+//	J1(NaN) = NaN.
 export function J1(x: number): number {
 	// special cases
 	switch (true) {
@@ -83,7 +83,7 @@ export function J1(x: number): number {
 //	Y1(+Inf) = 0
 //	Y1(0) = -Inf
 //	Y1(x < 0) = NaN
-//	Y1(NaN) = NaN
+//	Y1(NaN) = NaN.
 export function Y1(x: number): number {
 	// special cases
 	switch (true) {

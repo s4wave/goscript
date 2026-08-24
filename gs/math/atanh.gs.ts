@@ -10,7 +10,7 @@ import { Log1p } from "./log1p.gs.js";
 //	Atanh(±0) = ±0
 //	Atanh(-1) = -Inf
 //	Atanh(x) = NaN if x < -1 or x > 1
-//	Atanh(NaN) = NaN
+//	Atanh(NaN) = NaN.
 export function Atanh(x: number): number {
 	return Math.atanh(x)
 }

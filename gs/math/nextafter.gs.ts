@@ -9,7 +9,7 @@ import { Float32bits, Float32frombits, Float64bits, Float64frombits } from "./un
 //
 //	Nextafter32(x, x)   = x
 //	Nextafter32(NaN, y) = NaN
-//	Nextafter32(x, NaN) = NaN
+//	Nextafter32(x, NaN) = NaN.
 export function Nextafter32(x: number, y: number): number {
 	let r: number = 0
 	{
@@ -42,7 +42,7 @@ export function Nextafter32(x: number, y: number): number {
 //
 //	Nextafter(x, x)   = x
 //	Nextafter(NaN, y) = NaN
-//	Nextafter(x, NaN) = NaN
+//	Nextafter(x, NaN) = NaN.
 export function Nextafter(x: number, y: number): number {
 	let r: number = 0
 	{

@@ -200,6 +200,23 @@ describe('sync.Map', () => {
     expect(visited).toEqual(['a:1'])
   })
 
+  it('Swap matches equivalent Go string keys', async () => {
+    const m = new Map()
+    const text = 'key'
+    const binary = new $.GoBinaryString(new TextEncoder().encode(text))
+
+    await m.Store(text, 'old')
+    expect(await m.Swap(binary, 'new')).toEqual(['old', true])
+    expect(await m.Load(text)).toEqual(['new', true])
+
+    const entries: unknown[] = []
+    await m.Range((key, value) => {
+      entries.push([key, value])
+      return true
+    })
+    expect(entries).toHaveLength(1)
+  })
+
   it('matches boxed comparable interface keys', async () => {
     const m = new Map()
     const first = $.namedValueInterfaceValue(

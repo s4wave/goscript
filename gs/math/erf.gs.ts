@@ -182,7 +182,7 @@ let sb7: number = -2.24409524465858183362e+01
 //
 //	Erf(+Inf) = 1
 //	Erf(-Inf) = -1
-//	Erf(NaN) = NaN
+//	Erf(NaN) = NaN.
 export function Erf(x: number): number {
 	return erf(x)
 }
@@ -292,7 +292,7 @@ export function erf(x: number): number {
 //
 //	Erfc(+Inf) = 0
 //	Erfc(-Inf) = 2
-//	Erfc(NaN) = NaN
+//	Erfc(NaN) = NaN.
 export function Erfc(x: number): number {
 	return erfc(x)
 }

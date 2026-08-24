@@ -20,7 +20,7 @@ interface SliceMetadata<T> {
   capacity: number
 }
 
-// IntSlice type for sorting integers
+// IntSlice type for sorting integers.
 export class IntSlice {
   constructor(private _value: $.Slice<number>) {}
 
@@ -46,7 +46,7 @@ export class IntSlice {
   }
 }
 
-// Float64Slice type for sorting float64s
+// Float64Slice type for sorting float64s.
 export class Float64Slice {
   constructor(private _value: $.Slice<number>) {}
 
@@ -75,7 +75,7 @@ export class Float64Slice {
   }
 }
 
-// StringSlice type for sorting strings
+// StringSlice type for sorting strings.
 export class StringSlice {
   constructor(private _value: $.Slice<string>) {}
 
@@ -138,7 +138,7 @@ export async function IsSorted(data: Interface | null): Promise<boolean> {
   return true
 }
 
-// Reverse returns the reverse order for data
+// Reverse returns the reverse order for data.
 export function Reverse(data: Interface | null): Interface {
   const sortData = $.pointerValue(data)
   return {
@@ -166,7 +166,7 @@ function swapInSlice<T>(slice: $.Slice<T>, i: number, j: number): void {
   }
 }
 
-// Ints sorts a slice of ints in increasing order
+// Ints sorts a slice of ints in increasing order.
 export function Ints(x: $.Slice<number>): void {
   if (!x) return
   
@@ -179,7 +179,7 @@ export function Ints(x: $.Slice<number>): void {
   }
 }
 
-// IntsAreSorted reports whether the slice x is sorted in increasing order
+// IntsAreSorted reports whether the slice x is sorted in increasing order.
 export function IntsAreSorted(x: $.Slice<number>): boolean {
   if (!x) return true
   
@@ -192,7 +192,7 @@ export function IntsAreSorted(x: $.Slice<number>): boolean {
   return true
 }
 
-// Float64s sorts a slice of float64s in increasing order
+// Float64s sorts a slice of float64s in increasing order.
 export function Float64s(x: $.Slice<number>): void {
   if (!x) return
   
@@ -210,7 +210,7 @@ export function Float64s(x: $.Slice<number>): void {
   }
 }
 
-// Float64sAreSorted reports whether the slice x is sorted in increasing order
+// Float64sAreSorted reports whether the slice x is sorted in increasing order.
 export function Float64sAreSorted(x: $.Slice<number>): boolean {
   if (!x) return true
   
@@ -223,7 +223,7 @@ export function Float64sAreSorted(x: $.Slice<number>): boolean {
   return true
 }
 
-// Strings sorts a slice of strings in increasing order
+// Strings sorts a slice of strings in increasing order.
 export function Strings(x: $.Slice<string>): void {
   if (!x) return
   
@@ -241,7 +241,7 @@ export function Strings(x: $.Slice<string>): void {
   }
 }
 
-// StringsAreSorted reports whether the slice x is sorted in increasing order
+// StringsAreSorted reports whether the slice x is sorted in increasing order.
 export function StringsAreSorted(x: $.Slice<string>): boolean {
   if (!x) return true
   

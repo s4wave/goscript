@@ -5,11 +5,11 @@ export const Canceled = $.newError('context canceled')
 
 export const DeadlineExceeded = $.newError('context deadline exceeded')
 
-// Function types
+// CancelFunc Function types.
 export type CancelFunc = (() => void) | null
 export type CancelCauseFunc = (cause: $.GoError) => void
 
-// Context interface matching Go's context.Context
+// Context interface matching Go's context.Context.
 export type Context = null | {
   // Deadline returns the time when work done on behalf of this context should be canceled
   Deadline(): [time.Time, boolean]
@@ -24,7 +24,7 @@ export type Context = null | {
   Value(key: any): any
 }
 
-// ContextNonNil is a non-nil context
+// ContextNonNil is a non-nil context.
 export type ContextNonNil = Exclude<Context, null>
 
 // Base implementation for all contexts
@@ -258,17 +258,17 @@ class withoutCancelContext extends baseContext {
 const background = new backgroundContext()
 const todo = new backgroundContext()
 
-// Background returns a non-nil, empty Context that is never canceled
+// Background returns a non-nil, empty Context that is never canceled.
 export function Background(): Context {
   return background
 }
 
-// TODO returns a non-nil, empty Context
+// TODO returns a non-nil, empty Context.
 export function TODO(): Context {
   return todo
 }
 
-// WithCancel returns a copy of parent with a new Done channel
+// WithCancel returns a copy of parent with a new Done channel.
 export function WithCancel(parent: Context): [Context, CancelFunc] {
   if (parent === null) {
     throw new Error('cannot create context from nil parent')
@@ -284,7 +284,7 @@ export function WithCancel(parent: Context): [Context, CancelFunc] {
   ]
 }
 
-// WithCancelCause returns a copy of parent with a new Done channel and cause recording
+// WithCancelCause returns a copy of parent with a new Done channel and cause recording.
 export function WithCancelCause(parent: Context): [Context, CancelCauseFunc] {
   if (parent === null) {
     throw new Error('cannot create context from nil parent')
@@ -300,7 +300,7 @@ export function WithCancelCause(parent: Context): [Context, CancelCauseFunc] {
   ]
 }
 
-// WithDeadline returns a copy of parent with the deadline adjusted to be no later than d
+// WithDeadline returns a copy of parent with the deadline adjusted to be no later than d.
 export function WithDeadline(
   parent: Context,
   d: time.Time,
@@ -308,7 +308,7 @@ export function WithDeadline(
   return WithDeadlineCause(parent, d, null)
 }
 
-// WithDeadlineCause is like WithDeadline but also sets the cause
+// WithDeadlineCause is like WithDeadline but also sets the cause.
 export function WithDeadlineCause(
   parent: Context,
   d: time.Time,
@@ -336,7 +336,7 @@ export function WithDeadlineCause(
   ]
 }
 
-// WithTimeout returns WithDeadline(parent, Date.now() + timeout)
+// WithTimeout returns WithDeadline(parent, Date.now() + timeout).
 export function WithTimeout(
   parent: Context,
   timeout: time.Duration,
@@ -344,7 +344,7 @@ export function WithTimeout(
   return WithDeadline(parent, time.Now().Add(timeout))
 }
 
-// WithTimeoutCause is like WithTimeout but also sets the cause
+// WithTimeoutCause is like WithTimeout but also sets the cause.
 export function WithTimeoutCause(
   parent: Context,
   timeout: time.Duration,
@@ -353,7 +353,7 @@ export function WithTimeoutCause(
   return WithDeadlineCause(parent, time.Now().Add(timeout), cause)
 }
 
-// WithValue returns a copy of parent with the value associated with key
+// WithValue returns a copy of parent with the value associated with key.
 export function WithValue(parent: Context, key: any, val: any): Context {
   if (parent === null) {
     throw new Error('cannot create context from nil parent')
@@ -361,7 +361,7 @@ export function WithValue(parent: Context, key: any, val: any): Context {
   return new valueContext(parent, key, val)
 }
 
-// WithoutCancel returns a context that inherits values but not cancellation
+// WithoutCancel returns a context that inherits values but not cancellation.
 export function WithoutCancel(parent: Context): Context {
   if (parent === null) {
     throw new Error('cannot create context from nil parent')
@@ -369,7 +369,7 @@ export function WithoutCancel(parent: Context): Context {
   return new withoutCancelContext(parent)
 }
 
-// Cause returns the underlying cause of the context's cancellation
+// Cause returns the underlying cause of the context's cancellation.
 export function Cause(ctx: Context): $.GoError {
   if (!ctx) return null
 

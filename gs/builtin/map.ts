@@ -2,7 +2,7 @@ import { comparableEqual } from './builtin.js'
 import { GoBinaryString, stringEqual } from './slice.js'
 
 /**
- * Creates a new map (TypeScript Map).
+ * makeMap Creates a new map (TypeScript Map).
  * @returns A new TypeScript Map.
  */
 export const makeMap = <K, V>(): Map<K, V> => {
@@ -10,7 +10,7 @@ export const makeMap = <K, V>(): Map<K, V> => {
 }
 
 /**
- * Gets a value from a map, returning a tuple [value, exists].
+ * mapGet Gets a value from a map, returning a tuple [value, exists].
  * @param map The map to get from.
  * @param key The key to get.
  * @param defaultValue The default value to return if the key doesn't exist.
@@ -30,7 +30,7 @@ export function mapGet<K, V, D>(
 }
 
 /**
- * Sets a value in a map.
+ * mapSet Sets a value in a map.
  * @param map The map to set in.
  * @param key The key to set.
  * @param value The value to set.
@@ -44,7 +44,7 @@ export const mapSet = <K, V>(map: Map<K, V> | null, key: K, value: V): void => {
 }
 
 /**
- * Deletes a key from a map.
+ * deleteMapEntry Deletes a key from a map.
  * @param map The map to delete from.
  * @param key The key to delete.
  */
@@ -56,7 +56,7 @@ export const deleteMapEntry = <K, V>(map: Map<K, V> | null, key: K): void => {
 }
 
 /**
- * Checks if a key exists in a map.
+ * mapHas Checks if a key exists in a map.
  * @param map The map to check in.
  * @param key The key to check.
  * @returns True if the key exists, false otherwise.

@@ -26,7 +26,7 @@ import { Signbit } from "./signbit.gs.js";
 //	Atan2(y>0, -Inf) = +Pi
 //	Atan2(y<0, -Inf) = -Pi
 //	Atan2(+Inf, x) = +Pi/2
-//	Atan2(-Inf, x) = -Pi/2
+//	Atan2(-Inf, x) = -Pi/2.
 export function Atan2(y: number, x: number): number {
 	return Math.atan2(y, x)
 }

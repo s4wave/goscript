@@ -44,7 +44,7 @@ export function isOddInt(x: number): boolean {
 //	Pow(+Inf, y) = +Inf for y > 0
 //	Pow(+Inf, y) = +0 for y < 0
 //	Pow(-Inf, y) = Pow(-0, -y)
-//	Pow(x, y) = NaN for finite x < 0 and finite non-integer y
+//	Pow(x, y) = NaN for finite x < 0 and finite non-integer y.
 export function Pow(x: number, y: number): number {
 	// Go defines Pow(1, y) == 1 for any y, including NaN and infinities, whereas
 	// JS Math.pow(1, NaN) is NaN.

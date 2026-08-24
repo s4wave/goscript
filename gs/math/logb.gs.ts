@@ -8,7 +8,7 @@ import { Float64bits } from "./unsafe.gs.js";
 //
 //	Logb(±Inf) = +Inf
 //	Logb(0) = -Inf
-//	Logb(NaN) = NaN
+//	Logb(NaN) = NaN.
 export function Logb(x: number): number {
 	// Handle special cases
 	if (x === 0) {
@@ -32,7 +32,7 @@ export function Logb(x: number): number {
 //
 //	Ilogb(±Inf) = MaxInt32
 //	Ilogb(0) = MinInt32
-//	Ilogb(NaN) = MaxInt32
+//	Ilogb(NaN) = MaxInt32.
 export function Ilogb(x: number): number {
 	// Handle special cases
 	if (x === 0) {

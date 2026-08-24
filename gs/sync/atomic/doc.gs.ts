@@ -2,14 +2,14 @@ import * as $ from "@goscript/builtin/index.js";
 
 import * as unsafe from "@goscript/unsafe/index.js"
 
-// Type alias for uintptr (pointer-sized unsigned integer)
+// uintptr Type alias for uintptr (pointer-sized unsigned integer).
 export type uintptr = number;
 export type Pointer = any;
 
 // SwapInt32 atomically stores new into *addr and returns the previous *addr value.
 // Consider using the more ergonomic and less error-prone [Int32.Swap] instead.
 //
-//go:noescape
+//go:noescape.
 export function SwapInt32(addr: $.VarRef<number> | null, _new: number): number {
 	if (!addr) return 0;
 	let old = addr.value;
@@ -20,7 +20,7 @@ export function SwapInt32(addr: $.VarRef<number> | null, _new: number): number {
 // SwapUint32 atomically stores new into *addr and returns the previous *addr value.
 // Consider using the more ergonomic and less error-prone [Uint32.Swap] instead.
 //
-//go:noescape
+//go:noescape.
 export function SwapUint32(addr: $.VarRef<number> | null, _new: number): number {
 	if (!addr) return 0;
 	let old = addr.value;
@@ -31,7 +31,7 @@ export function SwapUint32(addr: $.VarRef<number> | null, _new: number): number 
 // SwapUintptr atomically stores new into *addr and returns the previous *addr value.
 // Consider using the more ergonomic and less error-prone [Uintptr.Swap] instead.
 //
-//go:noescape
+//go:noescape.
 export function SwapUintptr(addr: $.VarRef<uintptr> | null, _new: uintptr): uintptr {
 	if (!addr) return 0;
 	let old = addr.value;
@@ -51,7 +51,7 @@ export function SwapPointer(addr: $.VarRef<Pointer> | null, _new: Pointer): Poin
 // CompareAndSwapInt32 executes the compare-and-swap operation for an int32 value.
 // Consider using the more ergonomic and less error-prone [Int32.CompareAndSwap] instead.
 //
-//go:noescape
+//go:noescape.
 export function CompareAndSwapInt32(addr: $.VarRef<number> | null, old: number, _new: number): boolean {
 	if (!addr) return false;
 	if (addr.value === old) {
@@ -64,7 +64,7 @@ export function CompareAndSwapInt32(addr: $.VarRef<number> | null, old: number, 
 // CompareAndSwapUint32 executes the compare-and-swap operation for a uint32 value.
 // Consider using the more ergonomic and less error-prone [Uint32.CompareAndSwap] instead.
 //
-//go:noescape
+//go:noescape.
 export function CompareAndSwapUint32(addr: $.VarRef<number> | null, old: number, _new: number): boolean {
 	if (!addr) return false;
 	if (addr.value === old) {
@@ -77,7 +77,7 @@ export function CompareAndSwapUint32(addr: $.VarRef<number> | null, old: number,
 // CompareAndSwapUintptr executes the compare-and-swap operation for a uintptr value.
 // Consider using the more ergonomic and less error-prone [Uintptr.CompareAndSwap] instead.
 //
-//go:noescape
+//go:noescape.
 export function CompareAndSwapUintptr(addr: $.VarRef<uintptr> | null, old: uintptr, _new: uintptr): boolean {
 	if (!addr) return false;
 	if (addr.value === old) {
@@ -101,7 +101,7 @@ export function CompareAndSwapPointer(addr: $.VarRef<Pointer> | null, old: Point
 // AddInt32 atomically adds delta to *addr and returns the new value.
 // Consider using the more ergonomic and less error-prone [Int32.Add] instead.
 //
-//go:noescape
+//go:noescape.
 export function AddInt32(addr: $.VarRef<number> | null, delta: number): number {
 	if (!addr) return 0;
 	addr.value = (addr.value + delta) | 0; // Use bitwise OR to ensure 32-bit signed integer
@@ -113,7 +113,7 @@ export function AddInt32(addr: $.VarRef<number> | null, delta: number): number {
 // In particular, to decrement x, do AddUint32(&x, ^uint32(0)).
 // Consider using the more ergonomic and less error-prone [Uint32.Add] instead.
 //
-//go:noescape
+//go:noescape.
 export function AddUint32(addr: $.VarRef<number> | null, delta: number): number {
 	if (!addr) return 0;
 	addr.value = (addr.value + delta) >>> 0; // Use unsigned right shift to ensure 32-bit unsigned integer
@@ -123,7 +123,7 @@ export function AddUint32(addr: $.VarRef<number> | null, delta: number): number 
 // AddUintptr atomically adds delta to *addr and returns the new value.
 // Consider using the more ergonomic and less error-prone [Uintptr.Add] instead.
 //
-//go:noescape
+//go:noescape.
 export function AddUintptr(addr: $.VarRef<uintptr> | null, delta: uintptr): uintptr {
 	if (!addr) return 0;
 	addr.value = (addr.value + delta) >>> 0; // Use unsigned right shift for uintptr
@@ -134,7 +134,7 @@ export function AddUintptr(addr: $.VarRef<uintptr> | null, delta: uintptr): uint
 // and returns the old value.
 // Consider using the more ergonomic and less error-prone [Int32.And] instead.
 //
-//go:noescape
+//go:noescape.
 export function AndInt32(addr: $.VarRef<number> | null, mask: number): number {
 	if (!addr) return 0;
 	let old = addr.value;
@@ -146,7 +146,7 @@ export function AndInt32(addr: $.VarRef<number> | null, mask: number): number {
 // and returns the old value.
 // Consider using the more ergonomic and less error-prone [Uint32.And] instead.
 //
-//go:noescape
+//go:noescape.
 export function AndUint32(addr: $.VarRef<number> | null, mask: number): number {
 	if (!addr) return 0;
 	let old = addr.value;
@@ -158,7 +158,7 @@ export function AndUint32(addr: $.VarRef<number> | null, mask: number): number {
 // and returns the old value.
 // Consider using the more ergonomic and less error-prone [Uintptr.And] instead.
 //
-//go:noescape
+//go:noescape.
 export function AndUintptr(addr: $.VarRef<uintptr> | null, mask: uintptr): uintptr {
 	if (!addr) return 0;
 	let old = addr.value;
@@ -170,7 +170,7 @@ export function AndUintptr(addr: $.VarRef<uintptr> | null, mask: uintptr): uintp
 // and returns the old value.
 // Consider using the more ergonomic and less error-prone [Int32.Or] instead.
 //
-//go:noescape
+//go:noescape.
 export function OrInt32(addr: $.VarRef<number> | null, mask: number): number {
 	if (!addr) return 0;
 	let old = addr.value;
@@ -182,7 +182,7 @@ export function OrInt32(addr: $.VarRef<number> | null, mask: number): number {
 // and returns the old value.
 // Consider using the more ergonomic and less error-prone [Uint32.Or] instead.
 //
-//go:noescape
+//go:noescape.
 export function OrUint32(addr: $.VarRef<number> | null, mask: number): number {
 	if (!addr) return 0;
 	let old = addr.value;
@@ -194,7 +194,7 @@ export function OrUint32(addr: $.VarRef<number> | null, mask: number): number {
 // and returns the old value.
 // Consider using the more ergonomic and less error-prone [Uintptr.Or] instead.
 //
-//go:noescape
+//go:noescape.
 export function OrUintptr(addr: $.VarRef<uintptr> | null, mask: uintptr): uintptr {
 	if (!addr) return 0;
 	let old = addr.value;
@@ -205,7 +205,7 @@ export function OrUintptr(addr: $.VarRef<uintptr> | null, mask: uintptr): uintpt
 // LoadInt32 atomically loads *addr.
 // Consider using the more ergonomic and less error-prone [Int32.Load] instead.
 //
-//go:noescape
+//go:noescape.
 export function LoadInt32(addr: $.VarRef<number> | null): number {
 	if (!addr) return 0;
 	return addr.value;
@@ -214,7 +214,7 @@ export function LoadInt32(addr: $.VarRef<number> | null): number {
 // LoadUint32 atomically loads *addr.
 // Consider using the more ergonomic and less error-prone [Uint32.Load] instead.
 //
-//go:noescape
+//go:noescape.
 export function LoadUint32(addr: $.VarRef<number> | null): number {
 	if (!addr) return 0;
 	return addr.value;
@@ -223,7 +223,7 @@ export function LoadUint32(addr: $.VarRef<number> | null): number {
 // LoadUintptr atomically loads *addr.
 // Consider using the more ergonomic and less error-prone [Uintptr.Load] instead.
 //
-//go:noescape
+//go:noescape.
 export function LoadUintptr(addr: $.VarRef<uintptr> | null): uintptr {
 	if (!addr) return 0;
 	return addr.value;
@@ -239,7 +239,7 @@ export function LoadPointer(addr: $.VarRef<Pointer> | null): Pointer {
 // StoreInt32 atomically stores val into *addr.
 // Consider using the more ergonomic and less error-prone [Int32.Store] instead.
 //
-//go:noescape
+//go:noescape.
 export function StoreInt32(addr: $.VarRef<number> | null, val: number): void {
 	if (addr) {
 		addr.value = val | 0; // Use bitwise OR to ensure 32-bit signed integer
@@ -249,7 +249,7 @@ export function StoreInt32(addr: $.VarRef<number> | null, val: number): void {
 // StoreUint32 atomically stores val into *addr.
 // Consider using the more ergonomic and less error-prone [Uint32.Store] instead.
 //
-//go:noescape
+//go:noescape.
 export function StoreUint32(addr: $.VarRef<number> | null, val: number): void {
 	if (addr) {
 		addr.value = val >>> 0; // Use unsigned right shift to ensure 32-bit unsigned integer
@@ -259,7 +259,7 @@ export function StoreUint32(addr: $.VarRef<number> | null, val: number): void {
 // StoreUintptr atomically stores val into *addr.
 // Consider using the more ergonomic and less error-prone [Uintptr.Store] instead.
 //
-//go:noescape
+//go:noescape.
 export function StoreUintptr(addr: $.VarRef<uintptr> | null, val: uintptr): void {
 	if (addr) {
 		addr.value = val >>> 0; // Use unsigned right shift for uintptr

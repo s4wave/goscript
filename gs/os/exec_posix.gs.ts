@@ -4,12 +4,12 @@ import { ErrUnimplemented } from "./error.gs.js";
 
 import * as syscall from "@goscript/syscall/index.js"
 
-// Signal constants for JavaScript environment
+// Interrupt Signal constants for JavaScript environment.
 export let Interrupt: Signal = null // syscall.SIGINT not available in JavaScript
 
 export let Kill: Signal = null // syscall.SIGKILL not available in JavaScript
 
-// Simplified ProcessState for JavaScript environment  
+// ProcessState Simplified ProcessState for JavaScript environment.
 export class ProcessState {
 	public get pid(): number {
 		return this._fields.pid.value

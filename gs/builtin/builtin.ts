@@ -17,9 +17,7 @@ import { isVarRef, type VarRef } from './varRef.js'
  * @param args Arguments to print
  */
 export async function print(...args: any[]): Promise<void> {
-  writeHostStdoutText(
-    args.length === 0 ? '' : await formatPrintedArgs(args),
-  )
+  writeHostStdoutText(args.length === 0 ? '' : await formatPrintedArgs(args))
 }
 
 /**
@@ -34,7 +32,7 @@ export async function println(...args: any[]): Promise<void> {
 }
 
 /**
- * Implementation of Go's built-in clear function.
+ * clear Implementation of Go's built-in clear function.
  * For slices, it sets all elements to their zero value.
  * For maps, it deletes all entries.
  * @param v The slice or map to clear
@@ -392,7 +390,7 @@ function unwrapGoValue<T>(value: T): T {
 }
 
 // Bytes represents all valid []byte representations in TypeScript
-// This includes Uint8Array (the preferred representation) and $.Slice<number> (which includes null)
+// This includes Uint8Array (the preferred representation) and $.Slice<number> (which includes null).
 export type Bytes = Uint8Array | Slice<number>
 type ByteData = Uint8Array | number[] | SliceProxy<number>
 
@@ -404,7 +402,7 @@ const maxUint64BigInt = 0xffffffffffffffffn
 const maxSafeUintBigInt = BigInt(Number.MAX_SAFE_INTEGER)
 
 // int converts a value to a Go int type, handling proper signed integer conversion
-// This ensures that values like 2147483648 (2^31) are properly handled according to Go semantics
+// This ensures that values like 2147483648 (2^31) are properly handled according to Go semantics.
 export function int(value: number | bigint | string, bits = 0): number {
   if (typeof value === 'string') {
     value = BigInt(value)
@@ -761,7 +759,7 @@ function uint64Result(value: bigint): bigint {
 }
 
 /**
- * Normalizes various byte representations into a `Uint8Array` for protobuf compatibility.
+ * normalizeBytes Normalizes various byte representations into a `Uint8Array` for protobuf compatibility.
  *
  * @param {Uint8Array | number[] | null | undefined | { data: number[] } | { valueOf(): number[] }} bytes
  *   The input to normalize. Accepted types:
@@ -1092,7 +1090,7 @@ export function bytesCount(bytes: Bytes | null, sep: Bytes | null): number {
   return count
 }
 
-// Math functions needed by various packages. Generic over number and bigint so
+// min Math functions needed by various packages. Generic over number and bigint so
 // the Go builtins min/max work for int64/uint64 operands as well; number keeps
 // Math.min/Math.max NaN semantics.
 export function min<T extends number | bigint>(a: T, b: T): T {
@@ -1116,7 +1114,7 @@ export function max<T extends number | bigint>(a: T, b: T): T {
 }
 
 /**
- * Converts a rune (number) or string to a string.
+ * runeOrStringToString Converts a rune (number) or string to a string.
  * This is used to replace String.fromCharCode() in Go string(rune) conversions.
  * Since sometimes single-char rune literals are compiled to strings, this function
  * needs to handle both numbers (runes) and strings.

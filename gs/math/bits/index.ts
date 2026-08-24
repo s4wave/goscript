@@ -1,7 +1,7 @@
 // Minimal stub for math/bits package
 // This replaces the auto-generated version that has TypeScript syntax errors
 
-// UintSize is the size of a uint in bits
+// UintSize is the size of a uint in bits.
 export const UintSize = 64
 
 type Word64 = number | bigint
@@ -50,7 +50,7 @@ function rotateCount(k: number, n: number): number {
   return ((k % n) + n) % n
 }
 
-// --- Leading zeros ---
+// LeadingZeros --- Leading zeros ---.
 export function LeadingZeros(x: Word64): number {
   return LeadingZeros64(x)
 }
@@ -75,7 +75,7 @@ export function LeadingZeros64(x: Word64): number {
   return hi !== 0 ? Math.clz32(hi) : 32 + Math.clz32(lo)
 }
 
-// --- Trailing zeros ---
+// TrailingZeros --- Trailing zeros ---.
 export function TrailingZeros(x: Word64): number {
   return TrailingZeros64(x)
 }
@@ -106,7 +106,7 @@ export function TrailingZeros64(x: Word64): number {
   return hi !== 0 ? 32 + trailingZeros32Nonzero(hi) : 64
 }
 
-// --- Ones count ---
+// OnesCount --- Ones count ---.
 export function OnesCount(x: Word64): number {
   return OnesCount64(x)
 }
@@ -131,7 +131,7 @@ export function OnesCount64(x: Word64): number {
   return OnesCount32(hi) + OnesCount32(lo)
 }
 
-// --- Rotate left ---
+// RotateLeft --- Rotate left ---.
 export function RotateLeft(x: number, k: number): number
 export function RotateLeft(x: bigint, k: number): bigint
 export function RotateLeft(x: Word64, k: number): number
@@ -174,7 +174,7 @@ export function RotateLeft64(x: Word64, k: number): Word64 {
   )
 }
 
-// --- Reverse ---
+// Reverse --- Reverse ---.
 export function Reverse(x: number): number
 export function Reverse(x: bigint): bigint
 export function Reverse(x: Word64): number
@@ -241,7 +241,7 @@ export function Reverse64(x: Word64): Word64 {
   return word64Result(word & uint64Mask, useBigInt)
 }
 
-// --- ReverseBytes ---
+// ReverseBytes --- ReverseBytes ---.
 export function ReverseBytes(x: number): number
 export function ReverseBytes(x: bigint): bigint
 export function ReverseBytes(x: Word64): number
@@ -285,7 +285,7 @@ export function ReverseBytes64(x: Word64): Word64 {
   )
 }
 
-// --- Len ---
+// Len --- Len ---.
 export function Len(x: Word64): number {
   return Len64(x)
 }
@@ -320,7 +320,7 @@ export function Len64(x: Word64): number {
   return 64 - LeadingZeros64(x)
 }
 
-// --- Multiplication functions ---
+// Mul --- Multiplication functions ---.
 export function Mul(x: number, y: number): [number, number]
 export function Mul(x: bigint, y: bigint): [bigint, bigint]
 export function Mul(x: Word64, y: Word64): [number, number]
@@ -362,7 +362,7 @@ export function Mul64(x: Word64, y: Word64): [Word64, Word64] {
   return [word64Result(hi & uint64Mask, useBigInt), word64Result(lo, useBigInt)]
 }
 
-// --- Division functions ---
+// Div --- Division functions ---.
 export function Div(hi: number, lo: number, y: number): [number, number]
 export function Div(hi: bigint, lo: bigint, y: bigint): [bigint, bigint]
 export function Div(hi: Word64, lo: Word64, y: Word64): [number, number]
@@ -421,7 +421,7 @@ export function Rem64(hi: Word64, lo: Word64, y: Word64): Word64 {
   return Div64(hi, lo, y)[1]
 }
 
-// --- Add and Sub with carry ---
+// Add --- Add and Sub with carry ---.
 export function Add(x: number, y: number, carry: number): [number, number]
 export function Add(x: bigint, y: bigint, carry: bigint): [bigint, bigint]
 export function Add(x: Word64, y: Word64, carry: Word64): [number, number]

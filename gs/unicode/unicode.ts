@@ -16,14 +16,14 @@ import {
 
 // Package unicode provides data and functions to test some properties of Unicode code points.
 
-// Constants
+// MaxRune Constants.
 export const MaxRune = 0x10ffff
 export const ReplacementChar = 0xfffd
 export const MaxASCII = 0x7f
 export const MaxLatin1 = 0xff
 export const Version = '15.0.0'
 
-// Case constants
+// UpperCase Case constants.
 export const UpperCase = 0
 export const LowerCase = 1
 export const TitleCase = 2
@@ -153,7 +153,7 @@ function sliceToArray<T>(value: Slice<T> | undefined): T[] {
   return Array.from(value as ArrayLike<T>)
 }
 
-// CaseRange represents a range of Unicode code points for case mapping
+// CaseRange represents a range of Unicode code points for case mapping.
 export class CaseRange {
   public Lo: number
   public Hi: number
@@ -219,7 +219,9 @@ function buildRangeTable(d: RangeData): RangeTable {
   )
 }
 
-function buildTableMap(data: Record<string, RangeData>): Map<string, RangeTable> {
+function buildTableMap(
+  data: Record<string, RangeData>,
+): Map<string, RangeTable> {
   const out = new Map<string, RangeTable>()
   for (const key of Object.keys(data)) {
     out.set(key, buildRangeTable(data[key]))
@@ -253,7 +255,7 @@ export const CategoryAliases = new Map<string, string>([
   ['digit', 'Nd'],
 ])
 
-// Named general category tables.
+// C Named general category tables.
 export const C = Categories.get('C')!
 export const Cc = Categories.get('Cc')!
 export const Cf = Categories.get('Cf')!
@@ -293,7 +295,7 @@ export const Zl = Categories.get('Zl')!
 export const Zp = Categories.get('Zp')!
 export const Zs = Categories.get('Zs')!
 
-// Friendly category aliases matching Go's exported names.
+// Letter Friendly category aliases matching Go's exported names.
 export const Letter = L
 export const Mark = M
 export const Number = N
@@ -361,7 +363,7 @@ function searchRanges(ranges: Array<Range16 | Range32>, r: number): boolean {
 export function Is(rangeTab: RangeTable, r: number): boolean {
   const r16 = rangeTab.R16
   // Compare as unsigned to correctly reject negative runes.
-  if (r16.length > 0 && (r >>> 0) <= (r16[r16.length - 1].Hi >>> 0)) {
+  if (r16.length > 0 && r >>> 0 <= r16[r16.length - 1].Hi >>> 0) {
     return searchRanges(r16, r & 0xffff)
   }
   const r32 = rangeTab.R32
@@ -393,7 +395,11 @@ export function IsOneOf(ranges: RangeTable[], r: number): boolean {
 
 // to maps the rune using the specified case and case-range table, returning the
 // mapped rune and whether a mapping was found.
-function to(_case: number, r: number, caseRange: CaseRange[]): [number, boolean] {
+function to(
+  _case: number,
+  r: number,
+  caseRange: CaseRange[],
+): [number, boolean] {
   if (_case < 0 || _case >= MaxCase) {
     return [ReplacementChar, false]
   }

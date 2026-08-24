@@ -109,7 +109,7 @@ let f7: number = 2.891024605872965461538222e-15
 //	Erfinv(1) = +Inf
 //	Erfinv(-1) = -Inf
 //	Erfinv(x) = NaN if x < -1 or x > 1
-//	Erfinv(NaN) = NaN
+//	Erfinv(NaN) = NaN.
 export function Erfinv(x: number): number {
 	// special cases
 	if (IsNaN(x) || x <= -1 || x >= 1) {
@@ -162,7 +162,7 @@ export function Erfinv(x: number): number {
 //	Erfcinv(0) = +Inf
 //	Erfcinv(2) = -Inf
 //	Erfcinv(x) = NaN if x < 0 or x > 2
-//	Erfcinv(NaN) = NaN
+//	Erfcinv(NaN) = NaN.
 export function Erfcinv(x: number): number {
 	return Erfinv(1 - x)
 }

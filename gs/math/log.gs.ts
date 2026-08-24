@@ -10,7 +10,7 @@ import { Frexp } from "./frexp.gs.js";
 //	Log(+Inf) = +Inf
 //	Log(0) = -Inf
 //	Log(x < 0) = NaN
-//	Log(NaN) = NaN
+//	Log(NaN) = NaN.
 export function Log(x: number): number {
 	return Math.log(x)
 }

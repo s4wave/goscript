@@ -289,19 +289,19 @@ $.registerInterfaceType(
   ],
 )
 
-// "invalid argument"
+// ErrInvalid "invalid argument".
 export let ErrInvalid: $.GoError = errInvalid()
 
-// "permission denied"
+// ErrPermission "permission denied".
 export let ErrPermission: $.GoError = errPermission()
 
-// "file already exists"
+// ErrExist "file already exists".
 export let ErrExist: $.GoError = errExist()
 
-// "file does not exist"
+// ErrNotExist "file does not exist".
 export let ErrNotExist: $.GoError = errNotExist()
 
-// "file already closed"
+// ErrClosed "file already closed".
 export let ErrClosed: $.GoError = errClosed()
 
 export function errInvalid(): $.GoError {
@@ -370,81 +370,81 @@ $.registerInterfaceType(
 
 export type FileMode = number
 
-// IsDir reports whether m describes a directory.
+// FileMode_IsDir IsDir reports whether m describes a directory.
 // That is, it tests for the ModeDir bit being set in m.
 export function FileMode_IsDir(receiver: FileMode): boolean {
   return (receiver & ModeDir) != 0
 }
 
-// IsRegular reports whether m describes a regular file.
+// FileMode_IsRegular IsRegular reports whether m describes a regular file.
 // That is, it tests that no mode type bits are set.
 export function FileMode_IsRegular(receiver: FileMode): boolean {
   return (receiver & ModeType) == 0
 }
 
-// Perm returns the Unix permission bits in m (m & ModePerm).
+// FileMode_Perm Perm returns the Unix permission bits in m (m & ModePerm).
 export function FileMode_Perm(receiver: FileMode): FileMode {
   return (receiver & ModePerm) as FileMode
 }
 
-// String returns a textual representation of the file mode.
+// FileMode_String String returns a textual representation of the file mode.
 export function FileMode_String(receiver: FileMode): string {
   return fileModeString(receiver)
 }
 
-// Type returns type bits in m (m & ModeType).
+// FileMode_Type Type returns type bits in m (m & ModeType).
 export function FileMode_Type(receiver: FileMode): FileMode {
   return ((receiver & ModeType) >>> 0) as FileMode
 }
 
-// The single letters are the abbreviations
+// ModeDir The single letters are the abbreviations
 // used by the String method's formatting.
-// d: is a directory
+// d: is a directory.
 export let ModeDir: FileMode = 2147483648 // 0x80000000
 
-// a: append-only
+// ModeAppend a: append-only.
 export let ModeAppend: FileMode = 1 << 30 // 0x40000000
 
-// l: exclusive use
+// ModeExclusive l: exclusive use.
 export let ModeExclusive: FileMode = 1 << 29 // 0x20000000
 
-// T: temporary file; Plan 9 only
+// ModeTemporary T: temporary file; Plan 9 only.
 export let ModeTemporary: FileMode = 1 << 28 // 0x10000000
 
-// L: symbolic link
+// ModeSymlink L: symbolic link.
 export let ModeSymlink: FileMode = 1 << 27 // 0x08000000
 
-// D: device file
+// ModeDevice D: device file.
 export let ModeDevice: FileMode = 1 << 26 // 0x04000000
 
-// p: named pipe (FIFO)
+// ModeNamedPipe p: named pipe (FIFO).
 export let ModeNamedPipe: FileMode = 1 << 25 // 0x02000000
 
-// S: Unix domain socket
+// ModeSocket S: Unix domain socket.
 export let ModeSocket: FileMode = 1 << 24 // 0x01000000
 
-// u: setuid
+// ModeSetuid u: setuid.
 export let ModeSetuid: FileMode = 1 << 23 // 0x00800000
 
-// g: setgid
+// ModeSetgid g: setgid.
 export let ModeSetgid: FileMode = 1 << 22 // 0x00400000
 
-// c: Unix character device, when ModeDevice is set
+// ModeCharDevice c: Unix character device, when ModeDevice is set.
 export let ModeCharDevice: FileMode = 1 << 21 // 0x00200000
 
-// t: sticky
+// ModeSticky t: sticky.
 export let ModeSticky: FileMode = 1 << 20 // 0x00100000
 
-// ?: non-regular file; nothing else is known about this file
+// ModeIrregular ?: non-regular file; nothing else is known about this file.
 export let ModeIrregular: FileMode = 1 << 19 // 0x00080000
 
-// Mask for the type bits. For regular files, none will be set.
+// ModeType Mask for the type bits. For regular files, none will be set.
 export let ModeType: FileMode = 2401763328
 
-// Unix permission bits
+// ModePerm Unix permission bits.
 export let ModePerm: FileMode = 0o777
 
-// FileMode methods
+// fileModeString FileMode methods.
 export function fileModeString(mode: FileMode): string {
   const buf: string[] = []
   const w = mode

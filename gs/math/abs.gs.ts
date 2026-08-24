@@ -6,7 +6,7 @@ import { Float64bits, Float64frombits } from "./unsafe.gs.js";
 // Special cases are:
 //
 //	Abs(±Inf) = +Inf
-//	Abs(NaN) = NaN
+//	Abs(NaN) = NaN.
 export function Abs(x: number): number {
 	return Math.abs(x)
 }

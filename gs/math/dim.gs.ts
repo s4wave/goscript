@@ -9,7 +9,7 @@ import { Signbit } from "./signbit.gs.js";
 //
 //	Dim(+Inf, +Inf) = NaN
 //	Dim(-Inf, -Inf) = NaN
-//	Dim(x, NaN) = Dim(NaN, x) = NaN
+//	Dim(x, NaN) = Dim(NaN, x) = NaN.
 export function Dim(x: number, y: number): number {
 	const v = x - y
 	return v <= 0 ? 0 : v

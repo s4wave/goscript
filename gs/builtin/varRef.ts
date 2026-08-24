@@ -12,7 +12,7 @@ export interface OwnedPointerHandle<T = unknown> {
  *
  * For example:
  *   var myVariable int // variable referenced
- *   myOtherVar := &myVariable
+ *   myOtherVar := &myVariable.
  */
 export type VarRef<T> = {
   value: T
@@ -68,7 +68,7 @@ function refPointer<T>(
   }
 }
 
-/** Wrap a non-null T in a variable reference. */
+/** varRef Wrap a non-null T in a variable reference. */
 export function varRef<T>(v: T): VarRef<T> {
   // We create a new object wrapper for every varRef call to ensure
   // distinct pointer identity, crucial for pointer comparisons (p1 == p2).
@@ -79,7 +79,7 @@ export function varRef<T>(v: T): VarRef<T> {
   return ref
 }
 
-/** Create a variable reference to an object field. */
+/** fieldRef Create a variable reference to an object field. */
 export function fieldRef<T extends object, K extends keyof T>(
   target: T,
   key: K,
@@ -99,7 +99,7 @@ export function fieldRef<T extends object, K extends keyof T>(
   return ref
 }
 
-/** Check if a value is a VarRef (pointer) */
+/** isVarRef Check if a value is a VarRef (pointer) .*/
 export function isVarRef(v: unknown): v is VarRef<unknown> {
   return v !== null && typeof v === 'object' && (v as any).__isVarRef === true
 }
@@ -128,7 +128,7 @@ export function ownedPointerRef<T>(pointer: OwnedPointerHandle<T>): VarRef<T> {
   return pointer.__goRef()
 }
 
-/** Dereference a variable reference; a null ref raises a Go runtime panic. */
+/** unref Dereference a variable reference; a null ref raises a Go runtime panic. */
 export function unref<T>(b: VarRef<T>): T {
   if (b === null) {
     runtimePanic(

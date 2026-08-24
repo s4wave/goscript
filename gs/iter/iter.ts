@@ -3,18 +3,18 @@
 
 export type YieldResult = boolean | globalThis.Promise<boolean>
 
-// Seq is an iterator over sequences of individual values
+// Seq is an iterator over sequences of individual values.
 export type Seq<V> = (
   _yield: ((value: V) => YieldResult) | null,
 ) => void | globalThis.Promise<void>
 
-// Seq2 is an iterator over sequences of pairs of values
+// Seq2 is an iterator over sequences of pairs of values.
 export type Seq2<K, V> = (
   _yield: ((key: K, value: V) => YieldResult) | null,
 ) => void | globalThis.Promise<void>
 
 // Pull converts the "push-style" iterator sequence seq into a "pull-style" iterator
-// Returns a function that returns the next value and a boolean indicating if iteration should continue
+// Returns a function that returns the next value and a boolean indicating if iteration should continue.
 export function Pull<V>(
   seq: Seq<V>,
 ): [() => [V | undefined, boolean], () => void] {
@@ -68,7 +68,7 @@ export function Pull<V>(
 }
 
 // Pull2 converts the "push-style" iterator sequence seq into a "pull-style" iterator
-// Returns a function that returns the next key-value pair and a boolean indicating if iteration should continue
+// Returns a function that returns the next key-value pair and a boolean indicating if iteration should continue.
 export function Pull2<K, V>(
   seq: Seq2<K, V>,
 ): [() => [K | undefined, V | undefined, boolean], () => void] {

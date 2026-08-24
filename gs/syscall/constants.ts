@@ -1,4 +1,4 @@
-// Essential syscall constants
+// O_RDONLY Essential syscall constants.
 export const O_RDONLY: number = 0
 export const O_WRONLY: number = 1
 export const O_RDWR: number = 2
@@ -31,7 +31,7 @@ export const IPV6_V6ONLY: number = 0x1a
 export const SOMAXCONN: number = 0x80
 export const F_DUPFD_CLOEXEC: number = 1
 
-// File mode constants
+// S_IFMT File mode constants.
 export const S_IFMT: number = 0o170000
 export const S_IFREG: number = 0o100000
 export const S_IFDIR: number = 0o040000

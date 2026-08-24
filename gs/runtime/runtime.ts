@@ -1,11 +1,11 @@
 import * as $ from '@goscript/builtin/index.js'
 
-// Runtime constants for the JavaScript/WebAssembly target
+// GOOS Runtime constants for the JavaScript/WebAssembly target.
 export const GOOS: string = 'js'
 export const GOARCH: string = 'wasm'
 export const Compiler: string = 'gc'
 
-// Version returns the Go version as a string
+// GOVERSION Version returns the Go version as a string.
 export const GOVERSION: string = 'go1.25.3'
 export function Version(): string {
   return GOVERSION
@@ -56,7 +56,7 @@ export function Gosched(): Promise<void> {
   })
 }
 
-// Goexit terminates the current goroutine after deferred calls run. The
+// GoexitError Goexit terminates the current goroutine after deferred calls run. The
 // JavaScript runtime has no goroutine cancellation primitive to resume from, so
 // throw a non-panic sentinel: generated defer stacks still dispose while
 // recover() cannot intercept it as a Go panic.
@@ -79,12 +79,12 @@ export function NumGoroutine(): number {
   return goroutineCount
 }
 
-// Internal function to track goroutine creation (called by goscript runtime)
+// _incrementGoroutineCount Internal function to track goroutine creation (called by goscript runtime).
 export function _incrementGoroutineCount(): void {
   goroutineCount++
 }
 
-// Internal function to track goroutine completion (called by goscript runtime)
+// _decrementGoroutineCount Internal function to track goroutine completion (called by goscript runtime).
 export function _decrementGoroutineCount(): void {
   if (goroutineCount > 0) {
     goroutineCount--
@@ -92,7 +92,7 @@ export function _decrementGoroutineCount(): void {
 }
 
 // Caller returns details about the calling goroutine's stack.
-// This is a simplified version for goscript
+// This is a simplified version for goscript.
 export function Caller(_skip: number): [number, string, number, boolean] {
   // In JavaScript, we can use Error stack trace, but it's limited
   // Return dummy values for goscript compatibility
@@ -177,14 +177,14 @@ export function CallersFrames(_callers: $.Slice<number>): Frames {
 }
 
 // Stack returns a formatted stack trace of the calling goroutine.
-// In JavaScript, we use Error.stack
+// In JavaScript, we use Error.stack.
 export function Stack(): Uint8Array {
   const stack = new Error().stack || 'stack trace unavailable'
   const encoder = new TextEncoder()
   return encoder.encode(stack)
 }
 
-// MemStats represents memory allocation statistics
+// MemStats represents memory allocation statistics.
 export class MemStats {
   // Simplified memory stats for goscript
   public Alloc: number = 0 // bytes allocated and not yet freed
@@ -210,7 +210,7 @@ export class MemStats {
   }
 }
 
-// ReadMemStats populates m with memory allocator statistics
+// ReadMemStats populates m with memory allocator statistics.
 export function ReadMemStats(m: MemStats | $.VarRef<MemStats> | null): void {
   m = $.pointerValue<MemStats>(m)
   updateMemoryStats(m)
@@ -236,7 +236,7 @@ export interface Error {
   Error(): string | PromiseLike<string>
 }
 
-// TypeAssertionError represents a failed type assertion
+// TypeAssertionError represents a failed type assertion.
 export class TypeAssertionError implements Error {
   constructor(
     public readonly interfaceType: string,
@@ -253,7 +253,7 @@ export class TypeAssertionError implements Error {
   }
 }
 
-// PanicError represents a panic
+// PanicError represents a panic.
 export class PanicError implements Error {
   constructor(public readonly value: any) {}
 
@@ -290,7 +290,7 @@ export function AddCleanup<T, S>(
   return new Cleanup()
 }
 
-// KeepAlive keeps obj reachable until the point where KeepAlive is called
+// KeepAlive keeps obj reachable until the point where KeepAlive is called.
 export function KeepAlive(obj: any): void {
   // In JavaScript, just accessing the object keeps it alive for this call
   // This is mostly a no-op but we touch the object to ensure it's not optimized away

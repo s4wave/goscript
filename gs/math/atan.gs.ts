@@ -16,7 +16,7 @@ export function satan(x: number): number {
 // Special cases are:
 //
 //	Atan(±0) = ±0
-//	Atan(±Inf) = ±Pi/2
+//	Atan(±Inf) = ±Pi/2.
 export function Atan(x: number): number {
 	return Math.atan(x)
 }

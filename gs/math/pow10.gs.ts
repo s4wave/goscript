@@ -12,7 +12,7 @@ let pow10negtab32 = $.arrayToSlice<number>([1e-00, 1e-32, 1e-64, 1e-96, 1e-128, 
 // Special cases are:
 //
 //	Pow10(n) =    0 for n < -323
-//	Pow10(n) = +Inf for n > 308
+//	Pow10(n) = +Inf for n > 308.
 export function Pow10(n: number): number {
 	return Math.pow(10, n)
 }
