@@ -48,6 +48,7 @@ type Request struct {
 	IncrementalTypeCheck bool
 }
 
+// normalizedRequest contains validated, absolute paths and normalized test options.
 type normalizedRequest struct {
 	Dir                       string
 	Patterns                  []string

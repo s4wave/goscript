@@ -121,7 +121,7 @@ func (o *PackageGraphOwner) load(ctx context.Context, req *CompileRequest, shape
 	}
 
 	graph := &PackageGraph{
-		RequestedPatterns:     append([]string(nil), req.Patterns...),
+		RequestedPatterns:     slices.Clone(req.Patterns),
 		NodesByPackagePath:    make(map[string]*PackageGraphNode),
 		packagesByPath:        make(map[string]*packages.Package),
 		RequestedPackagePaths: make([]string, 0, len(pkgs)),
@@ -265,8 +265,8 @@ func newPackageGraphNode(pkg *packages.Package, requested bool, overrideFacts *O
 		ModulePath:        modulePath,
 		ModuleDir:         moduleDir,
 		ForTest:           pkg.ForTest,
-		GoFiles:           append([]string(nil), pkg.GoFiles...),
-		CompiledGoFiles:   append([]string(nil), pkg.CompiledGoFiles...),
+		GoFiles:           slices.Clone(pkg.GoFiles),
+		CompiledGoFiles:   slices.Clone(pkg.CompiledGoFiles),
 		Imports:           imports,
 		Requested:         requested,
 		OverrideCandidate: overrideFacts.HasPackage(packagePath(pkg)),

@@ -78,22 +78,19 @@ func BenchmarkLoweringFile(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		if _, diagnostics := fixture.owner.lowerFile(
-			fixture.model,
-			fixture.semPkg,
-			fixture.file.file,
-			fixture.file.sourcePath,
-			fixture.file.declFiles,
-			fixture.file.outputNames,
-			buildPackageMethodIndex(fixture.semPkg),
-			fixture.file.lazyPackageVars,
-			fixture.lazyPackageVarsByPkg,
-			newAsyncLazyState(newAsyncLazyCache()),
-			newRuntimeMethodSetCache(),
-			false,
-			false,
-			"",
-		); diagnosticsHaveErrors(diagnostics) {
+		if _, diagnostics := fixture.owner.lowerFile(lowerFileRequest{
+			model:                fixture.model,
+			semPkg:               fixture.semPkg,
+			file:                 fixture.file.file,
+			sourcePath:           fixture.file.sourcePath,
+			declFiles:            fixture.file.declFiles,
+			outputNames:          fixture.file.outputNames,
+			methodIndex:          buildPackageMethodIndex(fixture.semPkg),
+			lazyPackageVars:      fixture.file.lazyPackageVars,
+			lazyPackageVarsByPkg: fixture.lazyPackageVarsByPkg,
+			asyncLazy:            newAsyncLazyState(newAsyncLazyCache()),
+			runtimeMethodSets:    newRuntimeMethodSetCache(),
+		}); diagnosticsHaveErrors(diagnostics) {
 			b.Fatal(diagnostics)
 		}
 	}

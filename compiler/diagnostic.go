@@ -2,6 +2,7 @@ package compiler
 
 import (
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -50,7 +51,7 @@ type CompileError struct {
 
 // NewCompileError creates a compile error from diagnostics.
 func NewCompileError(diagnostics []Diagnostic) *CompileError {
-	return &CompileError{Diagnostics: append([]Diagnostic(nil), diagnostics...)}
+	return &CompileError{Diagnostics: slices.Clone(diagnostics)}
 }
 
 // Error returns the human-readable diagnostic summary.

@@ -248,6 +248,7 @@ func (o *CompilerCacheOwner) replayManifest(req *CompileRequest, manifest compil
 	return true
 }
 
+// storeManifest writes cache metadata on a best-effort basis. A failed store leaves no entry, and the next compile rebuilds.
 func (o *CompilerCacheOwner) storeManifest(req *CompileRequest, manifest compilerCacheManifest) {
 	if len(manifest.files) == 0 {
 		return
@@ -280,6 +281,7 @@ func (o *CompilerCacheOwner) storeManifest(req *CompileRequest, manifest compile
 	}
 }
 
+// storeBlob writes a cache blob on a best-effort basis. A failed store leaves no blob, and the next compile rebuilds.
 func (o *CompilerCacheOwner) storeBlob(req *CompileRequest, data []byte) string {
 	digest := sha256Hex(data)
 	rel := path.Join("blobs", "sha256", digest[:2], digest)
@@ -770,7 +772,7 @@ func formatCompilerCacheManifest(manifest compilerCacheManifest) []byte {
 	if stream.Error != nil {
 		return nil
 	}
-	return append([]byte(nil), stream.Buffer()...)
+	return slices.Clone(stream.Buffer())
 }
 
 func writeStringArray(stream *jsoniter.Stream, field string, values []string) {

@@ -20,14 +20,14 @@ const (
 )
 
 type overrideParityLedger struct {
-	SchemaVersion int                            `json:"schemaVersion"`
-	Strict        bool                           `json:"strict"`
-	Symbols       map[string]overrideParityEntry `json:"symbols"`
+	SchemaVersion int
+	Strict        bool
+	Symbols       map[string]overrideParityEntry
 }
 
 type overrideParityEntry struct {
-	Status overrideParityStatus `json:"status"`
-	Reason string               `json:"reason,omitempty"`
+	Status overrideParityStatus
+	Reason string
 }
 
 func newOverrideParityLedger() overrideParityLedger {

@@ -8,7 +8,7 @@ import (
 const goScriptBuildTag = "goscript"
 
 func goScriptBuildFlags(flags []string) []string {
-	normalized := append([]string(nil), flags...)
+	normalized := slices.Clone(flags)
 	for i, flag := range normalized {
 		switch {
 		case flag == "-tags" && i+1 < len(normalized):
@@ -30,8 +30,5 @@ func appendBuildTag(value string, tag string) string {
 		return strings.Join(tags, " ")
 	}
 	tags = append(tags, tag)
-	if len(tags) == 0 {
-		return ""
-	}
 	return strings.Join(tags, " ")
 }

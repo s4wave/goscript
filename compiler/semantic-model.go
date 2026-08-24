@@ -310,38 +310,7 @@ func (o *SemanticModelOwner) collectFileFacts(
 	pkg *packages.Package,
 	file *ast.File,
 ) {
-	ast.Inspect(file, func(node ast.Node) bool {
-		switch typed := node.(type) {
-		case *ast.TypeSpec:
-			o.recordTypeSpec(model, semPkg, pkg, typed)
-		case *ast.Ident:
-			o.addDefinedObject(model, semPkg, pkg, typed)
-		case *ast.UnaryExpr:
-			if typed.Op == token.AND {
-				o.recordAddressTaken(model, pkg, typed.X)
-			}
-		case *ast.SelectorExpr:
-			o.recordPointerReceiverUse(model, pkg, typed)
-		case *ast.TypeAssertExpr:
-			o.recordTypeAssertion(semPkg, pkg, typed)
-		case *ast.ValueSpec:
-			o.recordValueSpecNilFacts(semPkg, pkg, typed)
-			names := make([]ast.Expr, 0, len(typed.Names))
-			for _, name := range typed.Names {
-				names = append(names, name)
-			}
-			o.recordAsyncCompatibleFunctionAssignments(model, pkg, names, typed.Values)
-		case *ast.AssignStmt:
-			o.recordAssignNilFacts(semPkg, pkg, typed)
-			o.recordAsyncCompatibleFunctionAssignments(model, pkg, typed.Lhs, typed.Rhs)
-		case *ast.FuncLit:
-			o.collectFuncLitFacts(model, semPkg, pkg, typed)
-			return false
-		case *ast.CallExpr:
-			o.recordCallSignatureImports(model, semPkg, pkg, typed)
-		}
-		return true
-	})
+	o.collectFacts(model, semPkg, pkg, file, nil)
 }
 
 func (o *SemanticModelOwner) collectFuncLitFacts(
@@ -350,11 +319,18 @@ func (o *SemanticModelOwner) collectFuncLitFacts(
 	pkg *packages.Package,
 	lit *ast.FuncLit,
 ) {
-	ast.Inspect(lit.Body, func(node ast.Node) bool {
+	o.collectFacts(model, semPkg, pkg, lit.Body, lit)
+}
+
+func (o *SemanticModelOwner) collectFacts(
+	model *SemanticModel,
+	semPkg *semanticPackage,
+	pkg *packages.Package,
+	node ast.Node,
+	lit *ast.FuncLit,
+) {
+	ast.Inspect(node, func(node ast.Node) bool {
 		switch typed := node.(type) {
-		case *ast.FuncLit:
-			o.collectFuncLitFacts(model, semPkg, pkg, typed)
-			return false
 		case *ast.TypeSpec:
 			o.recordTypeSpec(model, semPkg, pkg, typed)
 		case *ast.Ident:
@@ -377,13 +353,20 @@ func (o *SemanticModelOwner) collectFuncLitFacts(
 		case *ast.AssignStmt:
 			o.recordAssignNilFacts(semPkg, pkg, typed)
 			o.recordAsyncCompatibleFunctionAssignments(model, pkg, typed.Lhs, typed.Rhs)
-			for _, lhs := range typed.Lhs {
-				o.recordFuncLitAssignedCapture(model, pkg, lit, lhs)
+			if lit != nil {
+				for _, lhs := range typed.Lhs {
+					o.recordFuncLitAssignedCapture(model, pkg, lit, lhs)
+				}
 			}
+		case *ast.FuncLit:
+			o.collectFuncLitFacts(model, semPkg, pkg, typed)
+			return false
 		case *ast.CallExpr:
 			o.recordCallSignatureImports(model, semPkg, pkg, typed)
 		case *ast.IncDecStmt:
-			o.recordFuncLitAssignedCapture(model, pkg, lit, typed.X)
+			if lit != nil {
+				o.recordFuncLitAssignedCapture(model, pkg, lit, typed.X)
+			}
 		}
 		return true
 	})

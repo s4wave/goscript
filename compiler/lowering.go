@@ -3,7 +3,6 @@ package compiler
 import (
 	"cmp"
 	"context"
-	"fmt"
 	"go/ast"
 	"go/constant"
 	"go/token"
@@ -18,6 +17,8 @@ import (
 	"strings"
 	"sync"
 	"unicode/utf8"
+
+	"github.com/pkg/errors"
 
 	"golang.org/x/sync/errgroup"
 
@@ -168,7 +169,7 @@ func (o *LoweringOwner) lowerPackage(
 	}
 	methodIndex := buildPackageMethodIndex(semPkg)
 	lazyPackageVars := o.packageLazyVars(semPkg, lazyPackageVarsByPkg, declFiles)
-	diagnostics := append([]Diagnostic(nil), bindingDiagnostics...)
+	diagnostics := slices.Clone(bindingDiagnostics)
 	for idx, file := range semPkg.source.Syntax {
 		sourcePath := sourceFilePath(semPkg, idx, file)
 		if options.ProtobufTypeScriptBinding && protobufSRPCHasGoScriptReplacement(sourcePath) {
@@ -181,22 +182,22 @@ func (o *LoweringOwner) lowerPackage(
 		}
 		if binding, ok := protobufBindings[sourcePath]; ok {
 			protobufAdapter := !strings.HasSuffix(filepath.Base(binding.sourcePath), "_srpc.pb.go")
-			loweredFile, fileDiagnostics := o.lowerFile(
-				model,
-				semPkg,
-				file,
-				sourcePath,
-				declFiles,
-				outputNames,
-				methodIndex,
-				lazyPackageVars,
-				lazyPackageVarsByPkg,
-				asyncLazy,
-				runtimeMethodSets,
-				protobufAdapter,
-				options.TrimTypeInfo,
-				options.DisplayRoot,
-			)
+			loweredFile, fileDiagnostics := o.lowerFile(lowerFileRequest{
+				model:                     model,
+				semPkg:                    semPkg,
+				file:                      file,
+				sourcePath:                sourcePath,
+				declFiles:                 declFiles,
+				outputNames:               outputNames,
+				methodIndex:               methodIndex,
+				lazyPackageVars:           lazyPackageVars,
+				lazyPackageVarsByPkg:      lazyPackageVarsByPkg,
+				asyncLazy:                 asyncLazy,
+				runtimeMethodSets:         runtimeMethodSets,
+				protobufTypeScriptAdapter: protobufAdapter,
+				trimTypeInfo:              options.TrimTypeInfo,
+				displayRoot:               options.DisplayRoot,
+			})
 			diagnostics = append(diagnostics, fileDiagnostics...)
 			diagnostics = append(diagnostics, rewriteProtobufTypeScriptBindingFile(loweredFile, binding, semPkg.name)...)
 			if loweredFile != nil {
@@ -204,22 +205,21 @@ func (o *LoweringOwner) lowerPackage(
 			}
 			continue
 		}
-		loweredFile, fileDiagnostics := o.lowerFile(
-			model,
-			semPkg,
-			file,
-			sourcePath,
-			declFiles,
-			outputNames,
-			methodIndex,
-			lazyPackageVars,
-			lazyPackageVarsByPkg,
-			asyncLazy,
-			runtimeMethodSets,
-			false,
-			options.TrimTypeInfo,
-			options.DisplayRoot,
-		)
+		loweredFile, fileDiagnostics := o.lowerFile(lowerFileRequest{
+			model:                model,
+			semPkg:               semPkg,
+			file:                 file,
+			sourcePath:           sourcePath,
+			declFiles:            declFiles,
+			outputNames:          outputNames,
+			methodIndex:          methodIndex,
+			lazyPackageVars:      lazyPackageVars,
+			lazyPackageVarsByPkg: lazyPackageVarsByPkg,
+			asyncLazy:            asyncLazy,
+			runtimeMethodSets:    runtimeMethodSets,
+			trimTypeInfo:         options.TrimTypeInfo,
+			displayRoot:          options.DisplayRoot,
+		})
 		diagnostics = append(diagnostics, fileDiagnostics...)
 		if loweredFile != nil {
 			loweredPkg.files = append(loweredPkg.files, loweredFile)
@@ -243,22 +243,45 @@ func sourceOutputName(sourcePath string) string {
 	return strings.TrimSuffix(filepath.Base(sourcePath), ".go") + ".gs.ts"
 }
 
-func (o *LoweringOwner) lowerFile(
-	model *SemanticModel,
-	semPkg *semanticPackage,
-	file *ast.File,
-	sourcePath string,
-	declFiles map[types.Object]string,
-	outputNames map[string]string,
-	methodIndex packageMethodIndex,
-	lazyPackageVars map[types.Object]bool,
-	lazyPackageVarsByPkg *lazyPackageVarCache,
-	asyncLazy *asyncLazyState,
-	runtimeMethodSets *runtimeMethodSetCache,
-	protobufTypeScriptAdapter bool,
-	trimTypeInfo bool,
-	displayRoot string,
-) (*loweredFile, []Diagnostic) {
+// lowerFileImport is a resolved import shared by lowering passes.
+type lowerFileImport struct {
+	pkgName *types.PkgName
+	name    string
+}
+
+// lowerFileRequest carries the package state and per-file options for lowering one source file.
+type lowerFileRequest struct {
+	model                     *SemanticModel
+	semPkg                    *semanticPackage
+	file                      *ast.File
+	sourcePath                string
+	declFiles                 map[types.Object]string
+	outputNames               map[string]string
+	methodIndex               packageMethodIndex
+	lazyPackageVars           map[types.Object]bool
+	lazyPackageVarsByPkg      *lazyPackageVarCache
+	asyncLazy                 *asyncLazyState
+	runtimeMethodSets         *runtimeMethodSetCache
+	protobufTypeScriptAdapter bool
+	trimTypeInfo              bool
+	displayRoot               string
+}
+
+func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnostic) {
+	model := req.model
+	semPkg := req.semPkg
+	file := req.file
+	sourcePath := req.sourcePath
+	declFiles := req.declFiles
+	outputNames := req.outputNames
+	methodIndex := req.methodIndex
+	lazyPackageVars := req.lazyPackageVars
+	lazyPackageVarsByPkg := req.lazyPackageVarsByPkg
+	asyncLazy := req.asyncLazy
+	runtimeMethodSets := req.runtimeMethodSets
+	protobufTypeScriptAdapter := req.protobufTypeScriptAdapter
+	trimTypeInfo := req.trimTypeInfo
+	displayRoot := req.displayRoot
 	associatedMethods := o.methodDeclsForFileTypes(semPkg, file, methodIndex)
 	relevantImportFiles := map[string]bool{sourcePath: true}
 	for _, methodDecl := range associatedMethods {
@@ -283,6 +306,7 @@ func (o *LoweringOwner) lowerFile(
 	reservedImportAliases := localRefs.reservedNames
 	seenImport := make(map[string]bool)
 	namedImportPaths := make(map[string]bool)
+	imports := make([]lowerFileImport, 0)
 	for idx, importFile := range semPkg.source.Syntax {
 		importSourcePath := sourceFilePath(semPkg, idx, importFile)
 		if !relevantImportFiles[importSourcePath] {
@@ -300,63 +324,49 @@ func (o *LoweringOwner) lowerFile(
 			if importSpec.Name != nil {
 				name = importSpec.Name.Name
 			}
+			imports = append(imports, lowerFileImport{pkgName: pkgName, name: name})
 			if name != "." && name != "_" {
 				namedImportPaths[pkgName.Imported().Path()] = true
 			}
 		}
 	}
-	for idx, importFile := range semPkg.source.Syntax {
-		importSourcePath := sourceFilePath(semPkg, idx, importFile)
-		if !relevantImportFiles[importSourcePath] {
+	for _, imported := range imports {
+		pkgName := imported.pkgName
+		name := imported.name
+		if name == "." {
+			// Dot imports do not have a namespace owner in generated modules.
 			continue
 		}
-		for _, importSpec := range importFile.Imports {
-			pkgName, _ := semPkg.source.TypesInfo.Implicits[importSpec].(*types.PkgName)
-			if importSpec.Name != nil {
-				pkgName, _ = semPkg.source.TypesInfo.Defs[importSpec.Name].(*types.PkgName)
-			}
-			if pkgName == nil || pkgName.Imported() == nil {
-				continue
-			}
-			name := pkgName.Name()
-			if importSpec.Name != nil {
-				name = importSpec.Name.Name
-			}
-			if name == "." {
-				// Dot imports do not have a namespace owner in generated modules.
-				continue
-			}
-			if name == "_" {
-				// Blank imports preserve init registration through a bare module edge.
-				source := "@goscript/" + pkgName.Imported().Path() + "/index.js"
-				importKey := "\x00" + source
-				if namedImportPaths[pkgName.Imported().Path()] || seenImport[importKey] {
-					continue
-				}
-				seenImport[importKey] = true
-				loweredFile.imports = append(loweredFile.imports, loweredImport{
-					source: source,
-					bare:   true,
-				})
-				continue
-			}
-			alias := uniqueImportAlias(safeIdentifier(name), pkgName.Imported().Path(), importAliases, reservedImportAliases)
+		if name == "_" {
+			// Blank imports preserve init registration through a bare module edge.
 			source := "@goscript/" + pkgName.Imported().Path() + "/index.js"
-			importKey := alias + "\x00" + source
-			if seenImport[importKey] {
+			importKey := "\x00" + source
+			if namedImportPaths[pkgName.Imported().Path()] || seenImport[importKey] {
 				continue
 			}
 			seenImport[importKey] = true
-			importAliases[alias] = pkgName.Imported().Path()
-			importPaths[pkgName.Imported().Path()] = alias
-			importNames[name] = alias
-			importObjects[pkgName] = alias
 			loweredFile.imports = append(loweredFile.imports, loweredImport{
-				alias:      alias,
-				source:     source,
-				sideEffect: true,
+				source: source,
+				bare:   true,
 			})
+			continue
 		}
+		alias := uniqueImportAlias(safeIdentifier(name), pkgName.Imported().Path(), importAliases, reservedImportAliases)
+		source := "@goscript/" + pkgName.Imported().Path() + "/index.js"
+		importKey := alias + "\x00" + source
+		if seenImport[importKey] {
+			continue
+		}
+		seenImport[importKey] = true
+		importAliases[alias] = pkgName.Imported().Path()
+		importPaths[pkgName.Imported().Path()] = alias
+		importNames[name] = alias
+		importObjects[pkgName] = alias
+		loweredFile.imports = append(loweredFile.imports, loweredImport{
+			alias:      alias,
+			source:     source,
+			sideEffect: true,
+		})
 	}
 	implicitImportPaths := make([]string, 0, len(localRefs.implicitImports))
 	for pkgPath := range localRefs.implicitImports {
@@ -664,6 +674,7 @@ func buildPackageMethodIndex(semPkg *semanticPackage) packageMethodIndex {
 	return index
 }
 
+// localFileReferenceAnalysis records names reserved by local declarations in one source file.
 type localFileReferenceAnalysis struct {
 	reservedNames   map[string]bool
 	aliases         map[types.Object]string
@@ -2869,6 +2880,8 @@ type goEmbedFile struct {
 	data []byte
 }
 
+var errGoEmbedRead = errors.New("go:embed file read failed")
+
 func cleanGoEmbedFilePattern(ctx lowerFileContext, diagPos token.Pos, pattern string) (string, []Diagnostic) {
 	cleanPattern, _, diagnostics := cleanGoEmbedPattern(ctx, diagPos, pattern)
 	if len(diagnostics) != 0 {
@@ -2951,6 +2964,7 @@ func collectGoEmbedPath(ctx lowerFileContext, diagPos token.Pos, pkgDir, absPath
 	}
 
 	var files []goEmbedFile
+	var readDiagnostics []Diagnostic
 	if err := filepath.WalkDir(absPath, func(path string, entry os.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -2966,11 +2980,15 @@ func collectGoEmbedPath(ctx lowerFileContext, diagPos token.Pos, pkgDir, absPath
 		}
 		file, diagnostics := readGoEmbedAbsFile(ctx, pkgDir, path)
 		if len(diagnostics) != 0 {
-			return fmt.Errorf("%s", diagnostics[0].Detail)
+			readDiagnostics = diagnostics
+			return errGoEmbedRead
 		}
 		files = append(files, file)
 		return nil
 	}); err != nil {
+		if len(readDiagnostics) != 0 {
+			return nil, readDiagnostics
+		}
 		return nil, []Diagnostic{goEmbedReadDiagnostic(ctx, err)}
 	}
 	if len(files) == 0 {
@@ -8549,9 +8567,9 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 			call := o.lowerCallableExpr(ctx, expr.Fun, callee) + "(" + strings.Join(args, ", ") + ")"
 			return o.awaitCallIfNeeded(ctx, expr.Fun, call), append(diagnostics, calleeDiagnostics...)
 		}
-		return "undefined", append(diagnostics, loweringUnsupportedAt(ctx, expr.Fun, "call", ctx.semPkg.pkgPath, fmt.Sprintf("unsupported call target %T", expr.Fun)))
+		return "undefined", append(diagnostics, loweringUnsupportedAt(ctx, expr.Fun, "call", ctx.semPkg.pkgPath, errors.Errorf("unsupported call target %T", expr.Fun).Error()))
 	}
-	return "undefined", append(diagnostics, loweringUnsupportedAt(ctx, expr.Fun, "call", ctx.semPkg.pkgPath, fmt.Sprintf("unsupported call target %T", expr.Fun)))
+	return "undefined", append(diagnostics, loweringUnsupportedAt(ctx, expr.Fun, "call", ctx.semPkg.pkgPath, errors.Errorf("unsupported call target %T", expr.Fun).Error()))
 }
 
 func (o *LoweringOwner) lowerCallableExpr(ctx lowerFileContext, expr ast.Expr, callee string) string {

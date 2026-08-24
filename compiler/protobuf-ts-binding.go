@@ -1,7 +1,6 @@
 package compiler
 
 import (
-	"fmt"
 	"go/ast"
 	"os"
 	"path/filepath"
@@ -98,7 +97,7 @@ func protobufTypeScriptBindings(semPkg *semanticPackage, options LoweringOptions
 					Severity: DiagnosticSeverityError,
 					Code:     "goscript/protobuf-ts-binding:missing",
 					Message:  "protobuf TypeScript binding is missing sibling .pb.ts",
-					Detail:   fmt.Sprintf("%s requires %s", sourcePath, tsPath),
+					Detail:   sourcePath + " requires " + tsPath,
 				})
 				continue
 			}
@@ -481,8 +480,7 @@ func protobufTypeScriptBindingOneofCases(file *loweredFile, pkgName string, bind
 					Severity: DiagnosticSeverityError,
 					Code:     "goscript/protobuf-ts-binding:unresolved",
 					Message:  "protobuf TypeScript binding cannot resolve a message-kind field reference",
-					Detail: fmt.Sprintf("%s.%s references %q, which is neither a bound message in this package nor an imported bound message",
-						branch.name, field.name, field.runtimeType),
+					Detail:   branch.name + "." + field.name + " references \"" + field.runtimeType + "\", which is neither a bound message in this package nor an imported bound message",
 				})
 				continue
 			}
@@ -728,8 +726,7 @@ func protobufTypeScriptBindingStructSetupDecl(structType *loweredStruct, importA
 				Severity: DiagnosticSeverityError,
 				Code:     "goscript/protobuf-ts-binding:unresolved",
 				Message:  "protobuf TypeScript binding cannot resolve a message-kind field reference",
-				Detail: fmt.Sprintf("%s.%s references %q, which is neither a bound message in this package nor an imported bound message",
-					structType.name, field.name, field.runtimeType),
+				Detail:   structType.name + "." + field.name + " references \"" + field.runtimeType + "\", which is neither a bound message in this package nor an imported bound message",
 			})
 			continue
 		}

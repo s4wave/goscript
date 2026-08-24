@@ -148,9 +148,6 @@ func (o *OverrideRegistryOwner) CopyPackages(
 		}
 		copied = append(copied, pkg.path)
 	}
-	if diagnosticsHaveErrors(diagnostics) {
-		return copied, diagnostics
-	}
 	return copied, diagnostics
 }
 
