@@ -646,7 +646,11 @@ func protobufTypeScriptBindingMethodBody(structType *loweredStruct, method *lowe
 	case "MarshalProtoJSON":
 		return "protobuf_go_lite.MarshalBoundMessageProtoJSON(" + ctor + ", this, " + protobufBindingParam(method, 0, "null") + ")"
 	case "MarshalProtoText", "String":
-		return "return protobuf_go_lite.MarshalBoundMessageProtoText(" + ctor + ", this)"
+		// Keep the transpiled Go body: String() must stay synchronous and
+		// produce proto TEXT format to match native Go output. The async
+		// JSON-based helper broke the sync contract (returned a Promise)
+		// and emitted JSON instead of proto text.
+		return ""
 	case "MarshalToSizedBufferVT":
 		return "return protobuf_go_lite.MarshalBoundMessageToSizedBufferVT(" + ctor + ", this, " + protobufBindingParam(method, 0, "null") + ")"
 	case "MarshalVT":
@@ -685,13 +689,11 @@ func protobufTypeScriptBindingReplacesMethodName(name string) bool {
 		"EqualVT",
 		"MarshalJSON",
 		"MarshalProtoJSON",
-		"MarshalProtoText",
 		"MarshalToSizedBufferVT",
 		"MarshalVT",
 		"ProtoMessage",
 		"Reset",
 		"SizeVT",
-		"String",
 		"UnmarshalJSON",
 		"UnmarshalProtoJSON",
 		"UnmarshalVT":

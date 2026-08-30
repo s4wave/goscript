@@ -1,0 +1,8 @@
+syntax = "proto3";
+package protobuf_string_sync;
+
+option go_package = "github.com/s4wave/goscript/tests/tests/protobuf_string_sync;main";
+
+message ExampleMsg {
+    string example_text = 1;
+}

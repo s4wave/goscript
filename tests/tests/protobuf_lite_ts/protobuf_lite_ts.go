@@ -14,7 +14,7 @@ func main() {
 		return
 	}
 
-	println("data:", data)
+	println("data len:", len(data))
 
 	out := &ExampleMsg{}
 	err = out.UnmarshalVT(data)
@@ -23,7 +23,7 @@ func main() {
 		return
 	}
 
-	println("out:", out)
+	println("out:", out.String())
 
 	jdata, err := msg.MarshalJSON()
 	if err != nil {
@@ -40,7 +40,7 @@ func main() {
 		return
 	}
 
-	println("json unmarshaled:", out)
+	println("json unmarshaled:", out.String())
 
 	oneofMsg := &ExampleMsg{
 		ExampleText: "oneof",

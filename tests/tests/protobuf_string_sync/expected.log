@@ -1,0 +1,6 @@
+len: 34
+empty: false
+prefix ok: true
+text len: 34
+text: ExampleMsg {example_text: "world"}
+formatted len: 38
