@@ -839,12 +839,22 @@ export function UnmarshalBoundMessageProtoJSON<T>(
   }
 }
 
-export async function MarshalBoundMessageProtoText<T>(
+export function MarshalBoundMessageProtoText<T>(
   ctor: BoundMessageCtor<T>,
   value: T | $.VarRef<T> | null,
-): Promise<string> {
+): string {
   const [data, err] = MarshalBoundMessageJSON(ctor, value)
-  return err == null ? $.bytesToString(data) : await err.Error()
+  if (err != null) {
+    // The Go generated MarshalProtoText never fails; a failure here is a
+    // binding defect. The error message may be async if the error's Error()
+    // method was transpiled as async; unwrap it best-effort for the panic text.
+    const message = err.Error()
+    if (typeof message !== 'string') {
+      throw new Error('proto text marshal failed')
+    }
+    throw new Error(message)
+  }
+  return $.bytesToString(data)
 }
 
 export function EncodeVarint(

@@ -22,7 +22,7 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 
-	await $.println("data:", data)
+	await $.println("data len:", $.len(data))
 
 	let out: __goscript_protobuf_lite_ts_pb_ts.ExampleMsg | $.VarRef<__goscript_protobuf_lite_ts_pb_ts.ExampleMsg> | null = new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg()
 	err = __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.UnmarshalVT.call(out, data)
@@ -31,7 +31,7 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 
-	await $.println("out:", out)
+	await $.println("out:", __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.String.call(out))
 
 	let __goscriptTuple1: any = __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.MarshalJSON.call(msg)
 	let jdata: $.Slice<number> = __goscriptTuple1[0]
@@ -50,7 +50,7 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 
-	await $.println("json unmarshaled:", out)
+	await $.println("json unmarshaled:", __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.String.call(out))
 
 	let oneofMsg: __goscript_protobuf_lite_ts_pb_ts.ExampleMsg | $.VarRef<__goscript_protobuf_lite_ts_pb_ts.ExampleMsg> | null = new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg({ExampleText: "oneof", Choice: $.interfaceValue<__goscript_protobuf_lite_ts_pb_ts.isExampleMsg_Choice | null>(new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg_ChoiceData({ChoiceData: new Uint8Array([1, 2, 3]) as $.Slice<number>}), "*main.ExampleMsg_ChoiceData", { kind: $.TypeKind.Pointer, elemType: "main.ExampleMsg_ChoiceData" })})
 	let oneofClone: __goscript_protobuf_lite_ts_pb_ts.ExampleMsg | $.VarRef<__goscript_protobuf_lite_ts_pb_ts.ExampleMsg> | null = __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.CloneVT.call(oneofMsg)

@@ -1,7 +1,7 @@
-data: Uint8Array(14) [ 10, 5, 104, 101, 108, 108, 111, 18, 5, 119, 111, 114, 108, 100 ]
-out: {"exampleField":"aGVsbG8=","exampleText":"world"}
+data len: 14
+out: ExampleMsg {example_field: "aGVsbG8=" example_text: "world"}
 json marshaled: {"exampleField":"aGVsbG8=","exampleText":"world"}
-json unmarshaled: {"exampleField":"aGVsbG8=","exampleText":"world"}
+json unmarshaled: ExampleMsg {example_field: "aGVsbG8=" example_text: "world"}
 oneof clone equal: true
 oneof clone independent: true
 oneof size matches: true
