@@ -63,9 +63,9 @@ export class ObjectID {
 export async function main(): globalThis.Promise<void> {
 	let zero: Hash = $.markAsStructValue(new ObjectID())
 	let otherZero = $.markAsStructValue(new ObjectID())
-	let one = $.markAsStructValue(new ObjectID({hash: new Uint8Array([0, $.uint(7, 8), 0, 0])}))
-	let otherOne = $.markAsStructValue(new ObjectID({hash: new Uint8Array([0, $.uint(7, 8), 0, 0])}))
-	let different = $.markAsStructValue(new ObjectID({hash: new Uint8Array([0, 0, $.uint(7, 8), 0])}))
+	let one = $.markAsStructValue(new ObjectID({hash: new Uint8Array([0, 7, 0, 0])}))
+	let otherOne = $.markAsStructValue(new ObjectID({hash: new Uint8Array([0, 7, 0, 0])}))
+	let different = $.markAsStructValue(new ObjectID({hash: new Uint8Array([0, 0, 7, 0])}))
 
 	await $.println("zero is zero:", $.markAsStructValue($.cloneStructValue(zero)).IsZero())
 	await $.println("zero valid:", $.markAsStructValue($.cloneStructValue(zero)).Valid())

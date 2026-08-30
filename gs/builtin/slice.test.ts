@@ -7,6 +7,7 @@ import {
   appendZeros,
   arrayToSlice,
   byteSliceHint,
+  bytesFromHex,
   bytesToString,
   copy,
   goSlice,
@@ -21,6 +22,12 @@ import {
   stringToBytes,
 } from './slice.js'
 import { markAsStructValue } from './type.js'
+
+describe('compiler byte constants', () => {
+  it('decodes compact hexadecimal byte arrays', () => {
+    expect(bytesFromHex('00ff8041')).toEqual(new Uint8Array([0, 255, 128, 65]))
+  })
+})
 
 describe('rune to string encoding (Go string(rune) semantics)', () => {
   it('preserves astral-plane runes above U+FFFF', () => {

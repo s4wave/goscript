@@ -3,6 +3,7 @@ package compiler
 import (
 	"cmp"
 	"context"
+	"encoding/hex"
 	"go/ast"
 	"go/constant"
 	"go/token"
@@ -11361,6 +11362,7 @@ func (o *LoweringOwner) lowerArrayCompositeLit(
 		values[idx] = o.lowerZeroValueExprFor(ctx, array.Elem())
 	}
 	nextIndex := 0
+	allByteConstants := isByteType(array.Elem())
 	var diagnostics []Diagnostic
 	for _, elt := range lit.Elts {
 		index := nextIndex
@@ -11381,13 +11383,33 @@ func (o *LoweringOwner) lowerArrayCompositeLit(
 			}
 		}
 		if index >= 0 && index < len(values) {
+			if isByteType(array.Elem()) {
+				if folded, ok := foldByteConstant(ctx, valueExpr); ok {
+					values[index] = folded
+					nextIndex = index + 1
+					continue
+				}
+			}
 			value, valueDiagnostics := o.lowerExpr(ctx, valueExpr)
 			diagnostics = append(diagnostics, valueDiagnostics...)
-			values[index] = o.lowerValueForTarget(ctx, valueExpr, array.Elem(), value)
+			if isByteType(array.Elem()) {
+				allByteConstants = false
+				values[index] = value
+			} else {
+				values[index] = o.lowerValueForTarget(ctx, valueExpr, array.Elem(), value)
+			}
 		}
 		nextIndex = index + 1
 	}
 	if isByteType(array.Elem()) {
+		if allByteConstants && len(values) >= 1024 {
+			data := make([]byte, len(values))
+			for idx, value := range values {
+				parsed, _ := strconv.ParseUint(value, 10, 8)
+				data[idx] = byte(parsed)
+			}
+			return o.runtimeOwner.BuiltinImport().Alias + ".bytesFromHex(" + strconv.Quote(hex.EncodeToString(data)) + ")", diagnostics
+		}
 		return "new Uint8Array([" + strings.Join(values, ", ") + "])", diagnostics
 	}
 	return "[" + strings.Join(values, ", ") + "]", diagnostics

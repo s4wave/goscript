@@ -11,9 +11,9 @@ export function Hash_Valid(h: Hash): boolean {
 
 export async function main(): globalThis.Promise<void> {
 	let zero: Hash = new Uint8Array(4)
-	let one = new Uint8Array([0, $.uint(7, 8), 0, 0])
-	let other = new Uint8Array([0, $.uint(7, 8), 0, 0])
-	let different = new Uint8Array([0, 0, $.uint(7, 8), 0])
+	let one = new Uint8Array([0, 7, 0, 0])
+	let other = new Uint8Array([0, 7, 0, 0])
+	let different = new Uint8Array([0, 0, 7, 0])
 
 	await $.println("zero valid:", Hash_Valid(zero))
 	await $.println("one valid:", Hash_Valid(one))
