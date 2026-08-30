@@ -21,7 +21,7 @@ export function sumArray(src: $.VarRef<Uint8Array> | null): number {
 export function closureArrayAddress(): number {
 	let result = 0
 	void ((): void => {
-		let table = $.varRef(new Uint8Array([$.uint(6, 8), $.uint(7, 8), $.uint(8, 8), $.uint(9, 8)]))
+		let table = $.varRef(new Uint8Array([6, 7, 8, 9]))
 		let ptr: $.VarRef<Uint8Array> | null = table
 		result = $.int($.arrayIndex($.pointerValue<Uint8Array>(ptr), 2))
 	})()
@@ -51,7 +51,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("converted:", $.uint($.arrayIndex(buf!, 0), 8), $.uint($.arrayIndex(buf!, 1), 8), $.uint($.arrayIndex(buf!, 2), 8), $.uint($.arrayIndex(buf!, 3), 8), $.uint($.arrayIndex(buf!, 4), 8))
 	await $.println("converted sum:", sumArray(($.sliceToArrayPointer<number>($.goSlice(buf, 1, undefined), 4, "byte") as $.VarRef<Uint8Array> | null)))
 
-	let literal: $.VarRef<Uint8Array> | null = $.varRef(new Uint8Array([$.uint(4, 8), $.uint(3, 8), $.uint(2, 8), $.uint(1, 8)]))
+	let literal: $.VarRef<Uint8Array> | null = $.varRef(new Uint8Array([4, 3, 2, 1]))
 	await $.println("literal sum:", sumArray(literal))
 	fillArray(literal)
 	await $.println("literal filled:", $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 0), 8), $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 1), 8), $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 2), 8), $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 3), 8))

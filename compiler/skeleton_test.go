@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -1143,6 +1144,37 @@ func TestCompilePackagesAnnotatesNewPointerShortDecls(t *testing.T) {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
 		}
+	}
+}
+
+func TestCompilePackagesFoldsLargeByteArrayConstants(t *testing.T) {
+	const byteCount = 16 * 1024
+	values := make([]string, byteCount)
+	for idx := range values {
+		values[idx] = strconv.Itoa(idx % 256)
+	}
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod":  "module example.test/largebytearray\n\ngo 1.25.3\n",
+		"main.go": "package largebytearray\nvar Table = [...]byte{" + strings.Join(values, ",") + "}\n",
+	})
+	outputDir := filepath.Join(t.TempDir(), "output")
+	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir}, nil, nil)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatal(err.Error())
+	}
+	content, err := os.ReadFile(filepath.Join(outputDir, "@goscript", "example.test", "largebytearray", "main.gs.ts"))
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	text := string(content)
+	if strings.Contains(text, "$.uint(") {
+		t.Fatal("constant byte array retained per-element runtime conversions")
+	}
+	if !strings.Contains(text, "$.bytesFromHex(\"00010203") {
+		t.Fatalf("large constant byte array was not emitted as compact hex: %s", text)
 	}
 }
 

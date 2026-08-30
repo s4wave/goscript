@@ -19,7 +19,7 @@ export function nonZero(buf: Uint8Array): number {
 
 export async function main(): globalThis.Promise<void> {
 	await $.println($.int(nonZero(new Uint8Array(32)), 32))
-	await $.println($.int(nonZero(new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, $.uint(1, 8)])), 32))
+	await $.println($.int(nonZero(new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])), 32))
 }
 
 if ($.isMainScript(import.meta)) {

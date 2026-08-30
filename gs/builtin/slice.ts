@@ -2146,6 +2146,15 @@ export const sliceString = (
   return goStringFromBytes(bytes.subarray(actualLow, actualHigh))
 }
 
+/** bytesFromHex decodes compiler-emitted constant byte arrays. */
+export function bytesFromHex(hex: string): Uint8Array {
+  const bytes = new Uint8Array(hex.length / 2)
+  for (let index = 0; index < bytes.length; index++) {
+    bytes[index] = Number.parseInt(hex.slice(index * 2, index * 2 + 2), 16)
+  }
+  return bytes
+}
+
 /**
  * bytesToString Converts a Slice<number> (byte array) to a string using TextDecoder.
  * @param bytes The Slice<number> to convert.
