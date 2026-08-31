@@ -1,0 +1,9 @@
+clone nil: false
+child name: hello
+child ptr same: false
+children count: 2
+children[0]: one
+children[1]: two
+children ptr same: false
+equal: true
+parent untouched: true

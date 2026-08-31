@@ -988,7 +988,9 @@ func NewExactName() ExactName {
 // TestProtobufTypeScriptBindingResolvesSamePackageCrossFileRefs verifies
 // that a message-kind field whose reference resolves to a message declared
 // in another binding file of the same proto package binds through the
-// sibling binding file's published message class.
+// GoScript wrapper class emitted in the sibling module. Constructor metadata
+// is executed with new by the runtime, so it must reference the
+// constructible wrapper class rather than the sibling schema object.
 func TestProtobufTypeScriptBindingResolvesSamePackageCrossFileRefs(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, dir, "go.mod", "module example.test/crossfilepb\n\ngo 1.25\n")
@@ -1048,8 +1050,8 @@ export const MercuryWorldEventBatch = {} as any
 
 	storage := readTestFile(t, filepath.Join(out, "@goscript", "example.test", "crossfilepb", "world_storage.pb.ts"))
 	wantSnippets := []string{
-		`(MercuryWorldTickCommit as any).__protobufTypeScriptFields = {"snapshotCheckpoint": __protobuf_ts_root_pb.WorldSnapshot};`,
-		`(MercuryWorldEventBatch as any).__protobufTypeScriptFields = {"events": __protobuf_ts_root_pb.WorldEvent};`,
+		`(MercuryWorldTickCommit as any).__protobufTypeScriptFields = {"snapshotCheckpoint": __goscript_root_pb_ts.WorldSnapshot};`,
+		`(MercuryWorldEventBatch as any).__protobufTypeScriptFields = {"events": __goscript_root_pb_ts.WorldEvent};`,
 	}
 	for _, snippet := range wantSnippets {
 		if !strings.Contains(storage, snippet) {
