@@ -31,24 +31,37 @@ type protobufTypeScriptBoundMessage struct {
 	messageNames map[string]string
 }
 
-// protobufTypeScriptBindingSiblingImports mints side-effect imports of
-// sibling binding files so a same-package cross-file field constructor can
-// qualify the referenced message class.
+// protobufTypeScriptBindingSiblingImports mints imports of sibling binding
+// files so a same-package cross-file field constructor can qualify the
+// referenced message class. Constructor metadata needs the GoScript wrapper
+// class emitted in the sibling module, so the value import (not the
+// side-effect schema import) supplies the constructor.
 type protobufTypeScriptBindingSiblingImports struct {
 	file    *loweredFile
 	aliases map[string]string
 }
 
-// aliasFor returns the import alias for a sibling binding file, adding the
-// side-effect import on first use.
-func (s *protobufTypeScriptBindingSiblingImports) aliasFor(importSource, outputName string) string {
+// wrapperAliasFor returns the import alias qualifying the GoScript wrapper
+// classes emitted in the sibling binding module, adding a value import on
+// first use. It reuses an import of the same module that lowering already
+// added so the emitted file never declares the same module twice.
+func (s *protobufTypeScriptBindingSiblingImports) wrapperAliasFor(outputName string) string {
+	importSource := "./" + outputName
 	if s.aliases == nil {
 		s.aliases = make(map[string]string)
 	}
 	if alias, ok := s.aliases[importSource]; ok {
 		return alias
 	}
-	base := "__protobuf_ts_" + safeIdentifier(strings.TrimSuffix(outputName, ".ts"))
+	// Reuse an import of the same module that lowering already added so the
+	// emitted file never declares the same module twice.
+	for _, imp := range s.file.imports {
+		if imp.source == importSource && imp.alias != "" && !imp.typeOnly {
+			s.aliases[importSource] = imp.alias
+			return imp.alias
+		}
+	}
+	base := "__goscript_" + safeIdentifier(strings.TrimSuffix(outputName, ".ts"))
 	reserved := make(map[string]bool, len(s.file.imports))
 	for _, imp := range s.file.imports {
 		if imp.alias != "" {
@@ -58,9 +71,8 @@ func (s *protobufTypeScriptBindingSiblingImports) aliasFor(importSource, outputN
 	alias := uniqueImportAlias(base, importSource, nil, reserved)
 	s.aliases[importSource] = alias
 	s.file.imports = append(s.file.imports, loweredImport{
-		alias:      alias,
-		source:     importSource,
-		sideEffect: true,
+		alias:  alias,
+		source: importSource,
 	})
 	return alias
 }
@@ -900,13 +912,11 @@ func protobufTypeScriptBindingFieldCtor(field loweredStructField, pkgName string
 			return "", true
 		}
 
-		// Qualify the sibling binding's actual exported const spelling; the
-		// Go safe identifier can differ in digit-camel capitalization.
-		refName, bound := sibling.messageNames[refType]
-		if !bound {
-			refName = protobufTypeScriptBindingSafeIdentifier(refType)
-		}
-		return siblings.aliasFor(sibling.importSource, sibling.outputName) + "." + refName, true
+		// Qualify the GoScript wrapper class emitted in the sibling binding
+		// module. Constructor metadata is executed with new by the runtime,
+		// so it must reference the constructible wrapper class, not the
+		// sibling protobuf-es-lite schema object.
+		return siblings.wrapperAliasFor(sibling.outputName) + "." + refType, true
 	}
 	return protobufTypeScriptBindingImportedCtor(field.typ, refType, file), true
 }

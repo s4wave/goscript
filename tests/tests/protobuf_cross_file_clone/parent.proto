@@ -1,0 +1,11 @@
+syntax = "proto3";
+package protobuf_cross_file_clone;
+
+import "child.proto";
+
+option go_package = "github.com/s4wave/goscript/tests/tests/protobuf_cross_file_clone;main";
+
+message Parent {
+    Child child = 1;
+    repeated Child children = 2;
+}

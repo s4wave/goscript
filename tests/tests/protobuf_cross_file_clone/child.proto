@@ -1,0 +1,8 @@
+syntax = "proto3";
+package protobuf_cross_file_clone;
+
+option go_package = "github.com/s4wave/goscript/tests/tests/protobuf_cross_file_clone;main";
+
+message Child {
+    string name = 1;
+}
