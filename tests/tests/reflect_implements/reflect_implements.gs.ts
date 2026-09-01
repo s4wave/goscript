@@ -47,9 +47,9 @@ export class MyType {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let t = reflect.TypeFor({[$.genericTypeArgsMarker]: true, T: { type: "main.MyType", zero: () => $.markAsStructValue(new MyType()), methods: {String: (receiver: any, ...args: any[]) => $.pointerValue(receiver).String(...$.stripGenericTypeArgs(args))} }})
+	let t = reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.MyType", zero: () => $.markAsStructValue(new MyType()), methods: {String: (receiver: any, ...args: any[]) => $.pointerValue(receiver).String(...$.stripGenericTypeArgs(args))} }})
 	let ptr = reflect.PointerTo($.pointerValueOrNil(t)!)
-	let iface = reflect.TypeFor({[$.genericTypeArgsMarker]: true, T: { type: "main.Stringer", zero: () => null, methods: {String: (receiver: any, ...args: any[]) => receiver.String(...$.stripGenericTypeArgs(args))} }})
+	let iface = reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Stringer", zero: () => null, methods: {String: (receiver: any, ...args: any[]) => receiver.String(...$.stripGenericTypeArgs(args))} }})
 
 	await $.println("MyType implements Stringer:", await $.pointerValue<Exclude<reflect.Type, null>>(t).Implements($.pointerValueOrNil(iface)!))
 	await $.println("*MyType implements Stringer:", await $.pointerValue<Exclude<reflect.Type, null>>(ptr).Implements($.pointerValueOrNil(iface)!))

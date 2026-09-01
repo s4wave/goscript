@@ -2023,13 +2023,22 @@ export interface GenericTypeDescriptor<T = any> {
   methodSignatures?: MethodSignature[]
 }
 
-// genericTypeArgsMarker brands compiler-hidden descriptors.
-export const genericTypeArgsMarker: unique symbol = Symbol(
-  'goscript.genericTypeArgs',
-)
+// genericTypeArgsMarker brands compiler-hidden descriptors. This is a string
+// constant, not a Symbol: the compiler emits it as a computed property key,
+// and a minifier that inlines the descriptor's (often no-op) consumer turns
+// the object literal into a property-evaluation sequence that stringifies
+// the key. A Symbol key throws "Cannot convert a Symbol value to a string"
+// there; a string key survives minification and keeps the `in` check working.
+export const genericTypeArgsMarker = 'goscript.genericTypeArgs' as const
+
+// genericTypeArgsBrand is the value stored under the marker key. It is a
+// GenericTypeDescriptor-shaped placeholder so the marker property satisfies
+// the Record<string, GenericTypeDescriptor> index signature in
+// GenericTypeArgs while staying recognizable via the marker key.
+export const genericTypeArgsBrand: GenericTypeDescriptor = {}
 
 export type GenericTypeArgs = Record<string, GenericTypeDescriptor> & {
-  [genericTypeArgsMarker]?: true
+  [genericTypeArgsMarker]?: GenericTypeDescriptor
 }
 
 // stripGenericTypeArgs removes a hidden descriptor before interface dispatch.

@@ -12897,8 +12897,14 @@ func genericReceiverTypeParams(typ types.Type) []*types.TypeParam {
 }
 
 func (o *LoweringOwner) genericTypeArgsLiteral(entries []string) string {
+	// The marker value is a GenericTypeDescriptor-shaped brand so the marker
+	// property satisfies the GenericTypeArgs index signature now that the
+	// marker key is a string constant (minifier-safe; a Symbol key threw
+	// "Cannot convert a Symbol value to a string" when a minifier inlined the
+	// descriptor's consumer and stringified the computed key).
 	return "{[" + o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericTypeArgsMarker) +
-		"]: true, " + strings.Join(entries, ", ") + "}"
+		"]: " + o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericTypeArgsBrand) +
+		", " + strings.Join(entries, ", ") + "}"
 }
 
 func (o *LoweringOwner) genericReceiverTypeArgsExprForMethod(
