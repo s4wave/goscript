@@ -71,7 +71,7 @@ export async function encodeLocalPairing(__typeArgs: $.GenericTypeArgs | undefin
 }
 
 export async function main(): globalThis.Promise<void> {
-	let __goscriptTuple0: any = await decodeLocalPairing({[$.genericTypeArgsMarker]: true, M: { type: { kind: $.TypeKind.Pointer, elemType: "main.pairingOffer" }, zero: () => null, methods: {MarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalVT(...$.stripGenericTypeArgs(args)), UnmarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalVT(...$.stripGenericTypeArgs(args))} }, T: { type: "main.pairingOffer", zero: () => $.markAsStructValue(new pairingOffer()) }}, new Uint8Array([104, 105]))
+	let __goscriptTuple0: any = await decodeLocalPairing({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, M: { type: { kind: $.TypeKind.Pointer, elemType: "main.pairingOffer" }, zero: () => null, methods: {MarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalVT(...$.stripGenericTypeArgs(args)), UnmarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalVT(...$.stripGenericTypeArgs(args))} }, T: { type: "main.pairingOffer", zero: () => $.markAsStructValue(new pairingOffer()) }}, new Uint8Array([104, 105]))
 	let msg = (__goscriptTuple0[0] as pairingOffer)
 	let err = __goscriptTuple0[1]
 	if (err != null) {
@@ -80,7 +80,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println(msg.Note)
 
-	let __goscriptTuple1: any = await encodeLocalPairing({[$.genericTypeArgsMarker]: true, M: { type: { kind: $.TypeKind.Pointer, elemType: "main.pairingOffer" }, zero: () => null, methods: {MarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalVT(...$.stripGenericTypeArgs(args)), UnmarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalVT(...$.stripGenericTypeArgs(args))} }, T: { type: "main.pairingOffer", zero: () => $.markAsStructValue(new pairingOffer()) }}, new pairingOffer({Note: "note"}))
+	let __goscriptTuple1: any = await encodeLocalPairing({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, M: { type: { kind: $.TypeKind.Pointer, elemType: "main.pairingOffer" }, zero: () => null, methods: {MarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalVT(...$.stripGenericTypeArgs(args)), UnmarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalVT(...$.stripGenericTypeArgs(args))} }, T: { type: "main.pairingOffer", zero: () => $.markAsStructValue(new pairingOffer()) }}, new pairingOffer({Note: "note"}))
 	let encoded: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {

@@ -96,9 +96,9 @@ export function __goscript_set_curve(__goscriptValue: nistCurve | $.VarRef<nistC
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p: point | $.VarRef<point> | null = (await nistCurve.prototype.Add.call(curve, {[$.genericTypeArgsMarker]: true, Point: { type: { kind: $.TypeKind.Pointer, elemType: "main.point" }, zero: () => null, methods: {Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(...$.stripGenericTypeArgs(args))} }}, new point({N: 2}), new point({N: 3})) as point | $.VarRef<point> | null)
+	let p: point | $.VarRef<point> | null = (await nistCurve.prototype.Add.call(curve, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, Point: { type: { kind: $.TypeKind.Pointer, elemType: "main.point" }, zero: () => null, methods: {Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(...$.stripGenericTypeArgs(args))} }}, new point({N: 2}), new point({N: 3})) as point | $.VarRef<point> | null)
 	await $.println("sum:", $.pointerValue<point>(p).N)
-	if (nistCurve.prototype.Zero.call(curve, {[$.genericTypeArgsMarker]: true, Point: { type: { kind: $.TypeKind.Pointer, elemType: "main.point" }, zero: () => null, methods: {Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(...$.stripGenericTypeArgs(args))} }}) == null) {
+	if (nistCurve.prototype.Zero.call(curve, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, Point: { type: { kind: $.TypeKind.Pointer, elemType: "main.point" }, zero: () => null, methods: {Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(...$.stripGenericTypeArgs(args))} }}) == null) {
 		await $.println("zero")
 	}
 }

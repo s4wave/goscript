@@ -114,14 +114,14 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("nilErr == nil:", nilErr == null)
 
 	let typedErr: customErr | $.VarRef<customErr> | null = new customErr({msg: "typed error"})
-	let __goscriptTuple0: any = errors.AsType({[$.genericTypeArgsMarker]: true, E: { type: { kind: $.TypeKind.Pointer, elemType: "main.customErr" }, zero: () => null, methods: {Error: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Error(...$.stripGenericTypeArgs(args))} }}, $.interfaceValue<$.GoError>($.markAsStructValue(new wrappedErr({err: $.interfaceValue<$.GoError>(typedErr, "*main.customErr", { kind: $.TypeKind.Pointer, elemType: "main.customErr" })})), "main.wrappedErr", "main.wrappedErr"))
+	let __goscriptTuple0: any = errors.AsType({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: { kind: $.TypeKind.Pointer, elemType: "main.customErr" }, zero: () => null, methods: {Error: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Error(...$.stripGenericTypeArgs(args))} }}, $.interfaceValue<$.GoError>($.markAsStructValue(new wrappedErr({err: $.interfaceValue<$.GoError>(typedErr, "*main.customErr", { kind: $.TypeKind.Pointer, elemType: "main.customErr" })})), "main.wrappedErr", "main.wrappedErr"))
 	let matched: customErr | $.VarRef<customErr> | null = (__goscriptTuple0[0] as customErr | $.VarRef<customErr> | null)
 	let ok = __goscriptTuple0[1]
 	await $.println("AsType matched:", ok)
 	if (ok) {
 		await $.println("AsType message:", $.pointerValue<customErr>(matched).msg)
 	}
-	let __goscriptTuple1: any = errors.AsType({[$.genericTypeArgsMarker]: true, E: { type: { kind: $.TypeKind.Pointer, elemType: "main.customErr" }, zero: () => null, methods: {Error: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Error(...$.stripGenericTypeArgs(args))} }}, $.pointerValueOrNil(err1)!)
+	let __goscriptTuple1: any = errors.AsType({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: { kind: $.TypeKind.Pointer, elemType: "main.customErr" }, zero: () => null, methods: {Error: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Error(...$.stripGenericTypeArgs(args))} }}, $.pointerValueOrNil(err1)!)
 	ok = __goscriptTuple1[1]
 	await $.println("AsType missing:", ok)
 
