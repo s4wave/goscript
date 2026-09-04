@@ -8,7 +8,7 @@ import "@goscript/reflect/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	// Test creating a StructField value
-	let field = (() => { const __goscriptLiteralField0 = reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}); return $.markAsStructValue(new reflect.StructField({Name: "TestField", Type: __goscriptLiteralField0})) })()
+	let field = (() => { const __goscriptLiteralField0 = reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}); return $.markAsStructValue(new reflect.StructField({Name: "TestField", Type: __goscriptLiteralField0})) })()
 	await $.println("StructField Name:", field.Name)
 	await $.println("StructField Type:", await $.pointerValue<Exclude<reflect.Type, null>>(field.Type).String())
 }

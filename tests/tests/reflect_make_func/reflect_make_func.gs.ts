@@ -7,19 +7,19 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/reflect/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let intType = reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }})
-	let stringType = reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }})
-	let boolType = reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: "bool" }, zero: () => false }})
+	let intType = reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+	let stringType = reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
+	let boolType = reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("bool"), zero: () => false }})
 
 	let unaryType = reflect.FuncOf($.arrayToSlice<reflect.Type | null>([intType]), $.arrayToSlice<reflect.Type | null>([stringType]), false)
 	let unaryValue = $.markAsStructValue($.cloneStructValue(reflect.MakeFunc($.pointerValueOrNil(unaryType)!, $.functionValue((args: $.Slice<reflect.Value>): $.Slice<reflect.Value> => {
 		return $.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf("value-" + String.fromCodePoint($.int($.int64Add(48n, $.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).Int()), 32)))))])
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: "reflect.Value" }], results: [{ kind: $.TypeKind.Slice, elemType: "reflect.Value" }] } as $.FunctionTypeInfo)))))
-	let unary: ((_p0: number) => string | globalThis.Promise<string>) | null = $.mustTypeAssert<((_p0: number) => string | globalThis.Promise<string>) | null>($.markAsStructValue($.cloneStructValue(unaryValue)).Interface(), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo))
+	let unary: ((_p0: number) => string | globalThis.Promise<string>) | null = $.mustTypeAssert<((_p0: number) => string | globalThis.Promise<string>) | null>($.markAsStructValue($.cloneStructValue(unaryValue)).Interface(), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
 	await $.println("direct:", await unary!(7))
 	let reflectedUnary: $.Slice<reflect.Value> = await $.markAsStructValue($.cloneStructValue(unaryValue)).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(8, "int"))))]))
 	await $.println("reflected:", $.markAsStructValue($.cloneStructValue($.arrayIndex(reflectedUnary!, 0))).String())
-	let [, wrong] = $.typeAssertTuple<((_p0: string) => string | globalThis.Promise<string>) | null>($.markAsStructValue($.cloneStructValue(unaryValue)).Interface(), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }] } as $.FunctionTypeInfo))
+	let [, wrong] = $.typeAssertTuple<((_p0: string) => string | globalThis.Promise<string>) | null>($.markAsStructValue($.cloneStructValue(unaryValue)).Interface(), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
 	await $.println("wrong assertion:", wrong)
 
 	let zeroType = reflect.FuncOf(null, null, false)
@@ -35,7 +35,7 @@ export async function main(): globalThis.Promise<void> {
 	let tupleValue = $.markAsStructValue($.cloneStructValue(reflect.MakeFunc($.pointerValueOrNil(tupleType)!, $.functionValue((args: $.Slice<reflect.Value>): $.Slice<reflect.Value> => {
 		return $.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(3, "int")))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf(true)))])
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: "reflect.Value" }], results: [{ kind: $.TypeKind.Slice, elemType: "reflect.Value" }] } as $.FunctionTypeInfo)))))
-	let tuple: (() => [number, boolean] | globalThis.Promise<[number, boolean]>) | null = $.mustTypeAssert<(() => [number, boolean] | globalThis.Promise<[number, boolean]>) | null>($.markAsStructValue($.cloneStructValue(tupleValue)).Interface(), ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo))
+	let tuple: (() => [number, boolean] | globalThis.Promise<[number, boolean]>) | null = $.mustTypeAssert<(() => [number, boolean] | globalThis.Promise<[number, boolean]>) | null>($.markAsStructValue($.cloneStructValue(tupleValue)).Interface(), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))
 	let [_number, ok] = await tuple!()
 	await $.println("tuple direct:", _number, ok)
 	let reflectedTuple: $.Slice<reflect.Value> = await $.markAsStructValue($.cloneStructValue(tupleValue)).Call(null)
@@ -45,11 +45,11 @@ export async function main(): globalThis.Promise<void> {
 	let variadicValue = $.markAsStructValue($.cloneStructValue(reflect.MakeFunc($.pointerValueOrNil(variadicType)!, $.functionValue((args: $.Slice<reflect.Value>): $.Slice<reflect.Value> => {
 		return $.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue($.int($.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).Int()) + $.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 1))).Len(), "int"))))])
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: "reflect.Value" }], results: [{ kind: $.TypeKind.Slice, elemType: "reflect.Value" }] } as $.FunctionTypeInfo)))))
-	let variadic: ((_p0: number, _p1: $.Slice<string>) => number | globalThis.Promise<number>) | null = $.mustTypeAssert<((_p0: number, _p1: $.Slice<string>) => number | globalThis.Promise<number>) | null>($.markAsStructValue($.cloneStructValue(variadicValue)).Interface(), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } }], results: [{ kind: $.TypeKind.Basic, name: "int" }], isVariadic: true } as $.FunctionTypeInfo))
+	let variadic: ((_p0: number, _p1: $.Slice<string>) => number | globalThis.Promise<number>) | null = $.mustTypeAssert<((_p0: number, _p1: $.Slice<string>) => number | globalThis.Promise<number>) | null>($.markAsStructValue($.cloneStructValue(variadicValue)).Interface(), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("string") }], results: [/* @__PURE__ */ $.basicType("int")], isVariadic: true } as $.FunctionTypeInfo))
 	await $.println("variadic direct:", await variadic!(10, $.arrayToSlice<string>(["a", "b"])))
 	let reflectedVariadic: $.Slice<reflect.Value> = await $.markAsStructValue($.cloneStructValue(variadicValue)).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(20, "int")))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf("a"))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf("b"))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf("c")))]))
 	await $.println("variadic reflected:", $.markAsStructValue($.cloneStructValue($.arrayIndex(reflectedVariadic!, 0))).Int())
-	let reflectedSlice: $.Slice<reflect.Value> = await $.markAsStructValue($.cloneStructValue(variadicValue)).CallSlice($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(30, "int")))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<string>(["a", "b"]), "[]string", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } }))))]))
+	let reflectedSlice: $.Slice<reflect.Value> = await $.markAsStructValue($.cloneStructValue(variadicValue)).CallSlice($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(30, "int")))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<string>(["a", "b"]), "[]string", { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("string") }))))]))
 	await $.println("variadic callslice:", $.markAsStructValue($.cloneStructValue($.arrayIndex(reflectedSlice!, 0))).Int())
 
 	await $.println("reflect_make_func test finished")

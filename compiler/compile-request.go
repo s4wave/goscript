@@ -41,6 +41,9 @@ type CompileRequest struct {
 	BuildFlags []string
 	// OverrideDirs are additional GoScript override roots.
 	OverrideDirs []string
+	// DeferredFunctions selects exported package functions loaded through dynamic imports.
+	// Selected packages initialize on first invocation instead of during startup.
+	DeferredFunctions []string
 	// PackageBlocklist rejects package paths in the loaded dependency closure.
 	PackageBlocklist []string
 	// DependencyMode controls whether dependencies are included in the graph.
@@ -91,6 +94,7 @@ func (o *CompileRequestOwner) NewRequest(conf Config, patterns []string) *Compil
 		BuildFlags:                slices.Clone(conf.BuildFlags),
 		OverrideDirs:              slices.Clone(conf.OverrideDirs),
 		PackageBlocklist:          normalizePackageBlocklist(conf.PackageBlocklist),
+		DeferredFunctions:         normalizePackageBlocklist(conf.DeferredFunctions),
 		DependencyMode:            dependencyMode,
 		RuntimeEmissionMode:       runtimeEmissionMode,
 		ProtobufTypeScriptBinding: conf.ProtobufTypeScriptBinding,

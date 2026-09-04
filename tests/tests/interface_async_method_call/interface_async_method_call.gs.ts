@@ -11,7 +11,7 @@ export type AsyncProcessor = {
 $.registerInterfaceType(
 	"main.AsyncProcessor",
 	null,
-	[{ name: "GetResult", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "Process", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }]
+	[{ name: "GetResult", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Process", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }]
 );
 
 export type GenericStore = {
@@ -67,9 +67,9 @@ export class ChannelProcessor {
 	static __typeInfo = $.registerStructType(
 		"main.ChannelProcessor",
 		() => new ChannelProcessor(),
-		[{ name: "GetResult", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "Process", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }],
+		() => [{ name: "GetResult", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Process", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		ChannelProcessor,
-		[{ name: "ch", key: "ch", type: { kind: $.TypeKind.Channel, direction: "both", elemType: { kind: $.TypeKind.Basic, name: "int" } } }]
+		() => [{ name: "ch", key: "ch", type: { kind: $.TypeKind.Channel, direction: "both", elemType: /* @__PURE__ */ $.basicType("int") } }]
 	)
 }
 
@@ -113,9 +113,9 @@ export class SimpleProcessor {
 	static __typeInfo = $.registerStructType(
 		"main.SimpleProcessor",
 		() => new SimpleProcessor(),
-		[{ name: "GetResult", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "Process", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }],
+		() => [{ name: "GetResult", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Process", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		SimpleProcessor,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -164,9 +164,9 @@ export class GenericChannelStore {
 	static __typeInfo = $.registerStructType(
 		"main.GenericChannelStore",
 		() => new GenericChannelStore(),
-		[{ name: "Load", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }],
+		() => [{ name: "Load", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }],
 		GenericChannelStore,
-		[{ name: "ch", key: "ch", type: { kind: $.TypeKind.Channel, direction: "both", elemType: { kind: $.TypeKind.Interface, methods: [] } } }, { name: "value", key: "value", type: { kind: $.TypeKind.Interface, methods: [] } }]
+		() => [{ name: "ch", key: "ch", type: { kind: $.TypeKind.Channel, direction: "both", elemType: { kind: $.TypeKind.Interface, methods: [] } } }, { name: "value", key: "value", type: { kind: $.TypeKind.Interface, methods: [] } }]
 	)
 }
 
@@ -185,7 +185,7 @@ export function newGenericStore(__typeArgs: $.GenericTypeArgs | undefined, value
 }
 
 export async function loadGenericStore(store: GenericStore | null): globalThis.Promise<number> {
-	return (await $.callInterfaceMethod($.pointerValue<Exclude<GenericStore, null>>(store), "Load", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}) as number)
+	return (await $.callInterfaceMethod($.pointerValue<Exclude<GenericStore, null>>(store), "Load", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, V: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}) as number)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -202,7 +202,7 @@ export async function main(): globalThis.Promise<void> {
 	let result2 = await processViaInterface($.interfaceValue<AsyncProcessor | null>(simpleProc, "*main.SimpleProcessor", { kind: $.TypeKind.Pointer, elemType: "main.SimpleProcessor" }), 5)
 	await $.println("SimpleProcessor result:", result2)
 
-	let genericStore = (newGenericStore({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, V: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 7) as GenericStore | null)
+	let genericStore = (newGenericStore({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, V: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, 7) as GenericStore | null)
 	await $.println("GenericStore result:", await loadGenericStore(genericStore))
 
 	ch!.close()

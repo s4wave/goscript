@@ -10,7 +10,7 @@ export type MyInterface = {
 $.registerInterfaceType(
 	"main.MyInterface",
 	null,
-	[{ name: "Method1", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }]
+	[{ name: "Method1", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }]
 );
 
 export type MyOtherInterface = {
@@ -20,7 +20,7 @@ export type MyOtherInterface = {
 $.registerInterfaceType(
 	"main.MyOtherInterface",
 	null,
-	[{ name: "Method1", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }]
+	[{ name: "Method1", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }]
 );
 
 export class MyStruct {
@@ -57,9 +57,9 @@ export class MyStruct {
 	static __typeInfo = $.registerStructType(
 		"main.MyStruct",
 		() => new MyStruct(),
-		[{ name: "Method1", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }],
+		() => [{ name: "Method1", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		MyStruct,
-		[{ name: "Value", key: "Value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

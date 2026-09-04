@@ -10,7 +10,7 @@ export type Value = {
 $.registerInterfaceType(
 	"dep2.Value",
 	null,
-	[{ name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+	[{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
 );
 
 export type Result = {
@@ -20,5 +20,5 @@ export type Result = {
 $.registerInterfaceType(
 	"dep2.Result",
 	null,
-	[{ name: "Result", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+	[{ name: "Result", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
 );

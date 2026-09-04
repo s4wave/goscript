@@ -10,7 +10,7 @@ export type reader = {
 $.registerInterfaceType(
 	"main.reader",
 	null,
-	[{ name: "Read", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }]
+	[{ name: "Read", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }]
 );
 
 export class concrete {
@@ -36,9 +36,9 @@ export class concrete {
 	static __typeInfo = $.registerStructType(
 		"main.concrete",
 		() => new concrete(),
-		[{ name: "Read", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }],
+		() => [{ name: "Read", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		concrete,
-		[]
+		() => []
 	)
 }
 

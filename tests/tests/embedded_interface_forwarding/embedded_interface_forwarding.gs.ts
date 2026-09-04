@@ -10,7 +10,7 @@ export type Adder = {
 $.registerInterfaceType(
 	"main.Adder",
 	null,
-	[{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }]
+	[{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }]
 );
 
 export class Box {
@@ -46,9 +46,9 @@ export class Box {
 	static __typeInfo = $.registerStructType(
 		"main.Box",
 		() => new Box(),
-		[{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }],
+		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		Box,
-		[{ name: "Adder", key: "Adder", type: "main.Adder", anonymous: true }]
+		() => [{ name: "Adder", key: "Adder", type: "main.Adder", anonymous: true }]
 	)
 }
 
@@ -86,9 +86,9 @@ export class Counter {
 	static __typeInfo = $.registerStructType(
 		"main.Counter",
 		() => new Counter(),
-		[{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }],
+		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		Counter,
-		[{ name: "base", key: "base", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "base", key: "base", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

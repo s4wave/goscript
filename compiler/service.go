@@ -179,7 +179,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		}
 	}
 
-	semanticModel, semanticDiagnostics := s.semanticOwner.Build(ctx, graph)
+	semanticModel, semanticDiagnostics := s.semanticOwner.Build(ctx, graph, req.DeferredFunctions...)
 	diagnostics = append(diagnostics, semanticDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
 		result.Diagnostics = diagnostics

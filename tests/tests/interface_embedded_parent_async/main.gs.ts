@@ -14,7 +14,7 @@ export type Specific = {
 $.registerInterfaceType(
 	"main.Specific",
 	null,
-	[{ name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Validate", args: [], returns: [{ type: "error" }] }]
+	[{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Validate", args: [], returns: [{ type: "error" }] }]
 );
 
 export class impl {
@@ -50,9 +50,9 @@ export class impl {
 	static __typeInfo = $.registerStructType(
 		"main.impl",
 		() => new impl(),
-		[{ name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Validate", args: [], returns: [{ type: "error" }] }],
+		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Validate", args: [], returns: [{ type: "error" }] }],
 		impl,
-		[]
+		() => []
 	)
 }
 

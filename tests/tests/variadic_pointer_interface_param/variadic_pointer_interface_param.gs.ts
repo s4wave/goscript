@@ -10,7 +10,7 @@ export type Expr = {
 $.registerInterfaceType(
 	"main.Expr",
 	null,
-	[{ name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }]
+	[{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }]
 );
 
 export class lit {
@@ -47,9 +47,9 @@ export class lit {
 	static __typeInfo = $.registerStructType(
 		"main.lit",
 		() => new lit(),
-		[{ name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }],
+		() => [{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		lit,
-		[{ name: "n", key: "n", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "n", key: "n", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

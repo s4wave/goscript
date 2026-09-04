@@ -11,7 +11,7 @@ export type MyInterface1 = {
 $.registerInterfaceType(
 	"main.MyInterface1",
 	null,
-	[{ name: "MyString1", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "MyString2", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+	[{ name: "MyString1", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "MyString2", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
 );
 
 export type MyInterface2 = {
@@ -21,7 +21,7 @@ export type MyInterface2 = {
 $.registerInterfaceType(
 	"main.MyInterface2",
 	null,
-	[{ name: "MyString1", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+	[{ name: "MyString1", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
 );
 
 export class MyStruct {
@@ -73,9 +73,9 @@ export class MyStruct {
 	static __typeInfo = $.registerStructType(
 		"main.MyStruct",
 		() => new MyStruct(),
-		[{ name: "MyString1", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "MyString2", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "MyString1", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "MyString2", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		MyStruct,
-		[{ name: "Value1", key: "Value1", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "Value2", key: "Value2", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "Value1", key: "Value1", type: /* @__PURE__ */ $.basicType("string") }, { name: "Value2", key: "Value2", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 

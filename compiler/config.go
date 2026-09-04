@@ -20,6 +20,9 @@ type Config struct {
 	BuildFlags []string
 	// OverrideDirs are additional GoScript override roots.
 	OverrideDirs []string
+	// DeferredFunctions selects exported package functions loaded through dynamic imports.
+	// Selected packages initialize on first invocation instead of during startup.
+	DeferredFunctions []string
 	// PackageBlocklist rejects package paths in the loaded dependency closure.
 	PackageBlocklist []string
 	// AllDependencies controls whether dependencies are included in the graph.

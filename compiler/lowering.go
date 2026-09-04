@@ -283,6 +283,7 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 	protobufTypeScriptAdapter := req.protobufTypeScriptAdapter
 	trimTypeInfo := req.trimTypeInfo
 	displayRoot := req.displayRoot
+	var diagnostics []Diagnostic
 	associatedMethods := o.methodDeclsForFileTypes(semPkg, file, methodIndex)
 	relevantImportFiles := map[string]bool{sourcePath: true}
 	for _, methodDecl := range associatedMethods {
@@ -334,6 +335,10 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 	for _, imported := range imports {
 		pkgName := imported.pkgName
 		name := imported.name
+		deferredImport := model.hasDeferredPackage(pkgName.Imported().Path()) && !model.hasDeferredPackage(semPkg.pkgPath)
+		if deferredImport {
+			diagnostics = append(diagnostics, model.deferredImportDiagnostics(semPkg, pkgName.Imported().Path(), name)...)
+		}
 		if name == "." {
 			// Dot imports do not have a namespace owner in generated modules.
 			continue
@@ -366,7 +371,8 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 		loweredFile.imports = append(loweredFile.imports, loweredImport{
 			alias:      alias,
 			source:     source,
-			sideEffect: true,
+			sideEffect: !deferredImport,
+			typeOnly:   deferredImport,
 		})
 	}
 	implicitImportPaths := make([]string, 0, len(localRefs.implicitImports))
@@ -436,7 +442,6 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 		trimTypeInfo:         trimTypeInfo,
 		displayRoot:          displayRoot,
 	}
-	var diagnostics []Diagnostic
 	var packageInitCalls []string
 	appendDecls := func(decls []loweredDecl) {
 		for _, decl := range decls {
@@ -9787,6 +9792,10 @@ func (o *LoweringOwner) lowerSelectorExpr(ctx lowerFileContext, expr *ast.Select
 		if pkgName, _ := objectForIdent(ctx, ident).(*types.PkgName); pkgName != nil {
 			if alias := importAliasForPkgName(ctx, pkgName); alias != "" {
 				value := alias + "." + expr.Sel.Name
+				if fn, ok := ctx.semPkg.source.TypesInfo.Uses[expr.Sel].(*types.Func); ok && ctx.model.functionDeferred(fn) && !ctx.model.hasDeferredPackage(ctx.semPkg.pkgPath) {
+					source := strconvQuote("@goscript/" + pkgName.Imported().Path() + "/index.js")
+					return "(async (...__args: Parameters<typeof " + value + ">) => (await import(" + source + "))." + expr.Sel.Name + "(...__args))", nil
+				}
 				obj, _ := ctx.semPkg.source.TypesInfo.Uses[expr.Sel].(*types.Var)
 				if o.packageVarIsLazy(ctx, obj) ||
 					o.packageVarNameIsLazy(ctx, pkgName.Imported().Path(), expr.Sel.Name) {
@@ -12065,7 +12074,7 @@ func (o *LoweringOwner) runtimeTypeAssertInfoExprWithSeen(ctx lowerFileContext, 
 	}
 	if named := namedNonStructType(typ); named != nil {
 		if basic, ok := types.Unalias(named.Underlying()).(*types.Basic); ok {
-			return runtimeBasicTypeInfoExpr(typeKind, basic, runtimeNamedTypeName(named))
+			return runtimeBasicTypeInfoExpr(o.runtimeOwner.QualifiedHelper(RuntimeHelperBasicType), basic, runtimeNamedTypeName(named))
 		}
 		if slice, ok := types.Unalias(named.Underlying()).(*types.Slice); ok {
 			return "{ kind: " + typeKind + ".Slice, typeName: " +
@@ -12076,7 +12085,7 @@ func (o *LoweringOwner) runtimeTypeAssertInfoExprWithSeen(ctx lowerFileContext, 
 	}
 	switch typed := types.Unalias(typ).Underlying().(type) {
 	case *types.Basic:
-		return runtimeBasicTypeInfoExpr(typeKind, typed, "")
+		return runtimeBasicTypeInfoExpr(o.runtimeOwner.QualifiedHelper(RuntimeHelperBasicType), typed, "")
 	case *types.Pointer:
 		return "{ kind: " + typeKind + ".Pointer, elemType: " + o.runtimeTypeAssertInfoExprWithSeen(ctx, typed.Elem(), seen) + " }"
 	case *types.Struct:
@@ -12122,7 +12131,7 @@ func (o *LoweringOwner) runtimeTypeInfoExprWithSeen(typ types.Type, seen map[typ
 	}
 	if named := namedNonStructType(typ); named != nil {
 		if basic, ok := types.Unalias(named.Underlying()).(*types.Basic); ok {
-			return runtimeBasicTypeInfoExpr(typeKind, basic, runtimeNamedTypeName(named))
+			return runtimeBasicTypeInfoExpr(o.runtimeOwner.QualifiedHelper(RuntimeHelperBasicType), basic, runtimeNamedTypeName(named))
 		}
 		if slice, ok := types.Unalias(named.Underlying()).(*types.Slice); ok {
 			return "{ kind: " + typeKind + ".Slice, typeName: " +
@@ -12133,7 +12142,7 @@ func (o *LoweringOwner) runtimeTypeInfoExprWithSeen(typ types.Type, seen map[typ
 	}
 	switch typed := types.Unalias(typ).Underlying().(type) {
 	case *types.Basic:
-		return runtimeBasicTypeInfoExpr(typeKind, typed, "")
+		return runtimeBasicTypeInfoExpr(o.runtimeOwner.QualifiedHelper(RuntimeHelperBasicType), typed, "")
 	case *types.Pointer:
 		return "{ kind: " + typeKind + ".Pointer, elemType: " + o.runtimeTypeInfoExprWithSeen(typed.Elem(), seen) + " }"
 	case *types.Struct:
@@ -12156,7 +12165,7 @@ func (o *LoweringOwner) runtimeTypeInfoExprWithSeen(typ types.Type, seen map[typ
 	}
 }
 
-func runtimeBasicTypeInfoExpr(typeKind string, basic *types.Basic, typeName string) string {
+func runtimeBasicTypeInfoExpr(helper string, basic *types.Basic, typeName string) string {
 	name := "unknown"
 	switch {
 	case basic.Info()&types.IsBoolean != 0:
@@ -12166,11 +12175,11 @@ func runtimeBasicTypeInfoExpr(typeKind string, basic *types.Basic, typeName stri
 	case basic.Info()&types.IsNumeric != 0:
 		name = basicRuntimeName(basic)
 	}
-	parts := []string{"kind: " + typeKind + ".Basic", "name: " + strconv.Quote(name)}
+	parts := []string{strconv.Quote(name)}
 	if typeName != "" {
-		parts = append(parts, "typeName: "+strconv.Quote(typeName))
+		parts = append(parts, strconv.Quote(typeName))
 	}
-	return "{ " + strings.Join(parts, ", ") + " }"
+	return "/* @__PURE__ */ " + helper + "(" + strings.Join(parts, ", ") + ")"
 }
 
 func (o *LoweringOwner) shallowRuntimeTypeInfoExpr(typ types.Type) string {

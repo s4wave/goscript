@@ -35,9 +35,9 @@ export class holder {
 	static __typeInfo = $.registerStructType(
 		"main.holder",
 		() => new holder(),
-		[],
+		() => [],
 		holder,
-		[{ name: "w", key: "w", type: "io.Writer" }]
+		() => [{ name: "w", key: "w", type: "io.Writer" }]
 	)
 }
 

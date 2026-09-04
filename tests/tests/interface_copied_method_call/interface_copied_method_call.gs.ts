@@ -36,9 +36,9 @@ export class task {
 	static __typeInfo = $.registerStructType(
 		"main.task",
 		() => new task(),
-		[{ name: "Run", args: [], returns: [] }],
+		() => [{ name: "Run", args: [], returns: [] }],
 		task,
-		[]
+		() => []
 	)
 }
 

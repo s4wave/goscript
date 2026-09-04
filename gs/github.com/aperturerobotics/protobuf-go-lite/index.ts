@@ -683,6 +683,77 @@ function fromTypeScriptMessage(
   return out
 }
 
+/**
+ * Install the generated Go methods on a message prototype. Each closure captures
+ * its constructor because Go also invokes these methods with a nil receiver.
+ * Handwritten methods and proto-text methods are never selected by the compiler.
+ */
+export function BindMessageMethods(
+  ctor: BoundMessageCtor,
+  typeName: string,
+  names: readonly (keyof ReturnType<typeof boundMessageMethods>)[],
+): void {
+  const methods = boundMessageMethods(ctor, typeName)
+  for (const name of names) {
+    Object.defineProperty(ctor.prototype, name, {
+      value: methods[name],
+      writable: true,
+      configurable: true,
+    })
+  }
+}
+
+function boundMessageMethods(ctor: BoundMessageCtor, typeName: string) {
+  return {
+    CloneMessageVT(this: any) {
+      return $.interfaceValue<CloneMessage | null>(
+        CloneBoundMessage(ctor, this),
+        typeName,
+      )
+    },
+    CloneVT(this: any) {
+      return CloneBoundMessage(ctor, this)
+    },
+    EqualVT(this: any, other: any) {
+      return EqualBoundMessage(ctor, this, other)
+    },
+    MarshalVT(this: any) {
+      return MarshalBoundMessageVT(ctor, this)
+    },
+    MarshalToSizedBufferVT(this: any, data: $.Slice<number>) {
+      return MarshalBoundMessageToSizedBufferVT(ctor, this, data)
+    },
+    SizeVT(this: any) {
+      return SizeBoundMessageVT(ctor, this)
+    },
+    UnmarshalVT(this: any, data: $.Slice<number>) {
+      return UnmarshalBoundMessageVT(ctor, this, data)
+    },
+    MarshalJSON(this: any) {
+      return MarshalBoundMessageJSON(ctor, this)
+    },
+    UnmarshalJSON(this: any, data: $.Slice<number>) {
+      return UnmarshalBoundMessageJSON(ctor, this, data)
+    },
+    MarshalProtoJSON(
+      this: any,
+      state: Parameters<typeof MarshalBoundMessageProtoJSON>[2],
+    ) {
+      MarshalBoundMessageProtoJSON(ctor, this, state)
+    },
+    UnmarshalProtoJSON(
+      this: any,
+      state: Parameters<typeof UnmarshalBoundMessageProtoJSON>[2],
+    ) {
+      UnmarshalBoundMessageProtoJSON(ctor, this, state)
+    },
+    ProtoMessage() {},
+    Reset(this: any) {
+      $.assignStruct($.pointerValue(this), $.markAsStructValue(new ctor()))
+    },
+  }
+}
+
 export function CloneBoundMessage<T>(
   ctor: BoundMessageCtor<T>,
   value: T | $.VarRef<T> | null,

@@ -17,7 +17,7 @@ export type Shape = {
 $.registerInterfaceType(
 	"main.Shape",
 	null,
-	[{ name: "Mark", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }]
+	[{ name: "Mark", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }]
 );
 
 export class Action {
@@ -72,9 +72,9 @@ export class Action {
 	static __typeInfo = $.registerStructType(
 		"main.Action",
 		() => new Action(),
-		[{ name: "Mark", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "SetFilter", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "Mark", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "SetFilter", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
 		Action,
-		[{ name: "Result", key: "Result", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "Filter", key: "Filter", type: { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "int" }, elemType: "dep.Ref" } }]
+		() => [{ name: "Result", key: "Result", type: /* @__PURE__ */ $.basicType("int") }, { name: "Filter", key: "Filter", type: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("int"), elemType: "dep.Ref" } }]
 	)
 }
 
@@ -87,7 +87,7 @@ export function Fixed_Mark(f: Fixed): boolean {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let shapes: $.Slice<Shape | null> = $.arrayToSlice<Shape | null>([$.namedValueInterfaceValue<Shape | null>($.arrayToSlice<dep.Ref | null>([$.namedValueInterfaceValue<dep.Ref | null>(new Uint8Array([1, 2]), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [{ name: "Key", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }])]), "main.Fixed", {Mark: (receiver: any, ...args: any[]) => (Fixed_Mark as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "main.Fixed", elemType: "dep.Ref" }, [{ name: "Mark", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }]), $.interfaceValue<Shape | null>($.markAsStructValue(new Action({Result: 1, Filter: $.makeMap<number, dep.Ref | null>([[1, $.namedValueInterfaceValue<dep.Ref | null>(new Uint8Array([1, 2]), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [{ name: "Key", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }])]])})), "main.Action", "main.Action")])
+	let shapes: $.Slice<Shape | null> = $.arrayToSlice<Shape | null>([$.namedValueInterfaceValue<Shape | null>($.arrayToSlice<dep.Ref | null>([$.namedValueInterfaceValue<dep.Ref | null>(new Uint8Array([1, 2]), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [{ name: "Key", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }])]), "main.Fixed", {Mark: (receiver: any, ...args: any[]) => (Fixed_Mark as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "main.Fixed", elemType: "dep.Ref" }, [{ name: "Mark", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("bool") }] }]), $.interfaceValue<Shape | null>($.markAsStructValue(new Action({Result: 1, Filter: $.makeMap<number, dep.Ref | null>([[1, $.namedValueInterfaceValue<dep.Ref | null>(new Uint8Array([1, 2]), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [{ name: "Key", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }])]])})), "main.Action", "main.Action")])
 	let fixed: $.Slice<Fixed> = null! as $.Slice<Fixed>
 	for (let __goscriptRangeTarget0 = shapes, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let shape = __goscriptRangeTarget0![__rangeIndex]

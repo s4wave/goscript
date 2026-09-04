@@ -10,7 +10,7 @@ export type Animal = {
 $.registerInterfaceType(
 	"main.Animal",
 	null,
-	[{ name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+	[{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
 );
 
 export class Dog {
@@ -50,9 +50,9 @@ export class Dog {
 	static __typeInfo = $.registerStructType(
 		"main.Dog",
 		() => new Dog(),
-		[{ name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		Dog,
-		[{ name: "name", key: "name", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
@@ -93,9 +93,9 @@ export class Cat {
 	static __typeInfo = $.registerStructType(
 		"main.Cat",
 		() => new Cat(),
-		[{ name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		Cat,
-		[{ name: "name", key: "name", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 

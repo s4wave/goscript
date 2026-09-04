@@ -134,6 +134,7 @@ const (
 	RuntimeHelperNewError  RuntimeHelper = "error.newError"
 	RuntimeHelperToGoError RuntimeHelper = "error.toGoError"
 
+	RuntimeHelperBasicType                RuntimeHelper = "type.basicType"
 	RuntimeHelperTypeKind                 RuntimeHelper = "type.TypeKind"
 	RuntimeHelperRegisterStructType       RuntimeHelper = "type.registerStructType"
 	RuntimeHelperRegisterInterfaceType    RuntimeHelper = "type.registerInterfaceType"
@@ -382,6 +383,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperDeleteMapEntry, "deleteMapEntry", RuntimeHelperCategoryMap),
 		runtimeHelper(RuntimeHelperNewError, "newError", RuntimeHelperCategoryError),
 		runtimeHelper(RuntimeHelperToGoError, "toGoError", RuntimeHelperCategoryError),
+		runtimeHelper(RuntimeHelperBasicType, "basicType", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperTypeKind, "TypeKind", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperRegisterStructType, "registerStructType", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperRegisterInterfaceType, "registerInterfaceType", RuntimeHelperCategoryType),

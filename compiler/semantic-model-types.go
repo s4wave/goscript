@@ -15,6 +15,7 @@ type SemanticModel struct {
 	functions           map[*types.Func]*semanticFunction
 	functionCallers     map[*types.Func][]*semanticFunction
 	functionsByFullName map[string]*semanticFunction
+	deferredPackages    map[string]bool
 	// functionFullNames and functionAliases memoize lookups that lowering
 	// performs concurrently. Both derive their value from the key alone, so a
 	// racing store writes the same answer.
@@ -102,6 +103,7 @@ type semanticFunction struct {
 	position        sourcePosition
 	hasBody         bool
 	async           bool
+	deferred        bool
 	asyncReasons    []string
 	calls           map[*types.Func]bool
 }

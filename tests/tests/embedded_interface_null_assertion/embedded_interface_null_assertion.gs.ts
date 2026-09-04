@@ -10,7 +10,7 @@ export type Reader = {
 $.registerInterfaceType(
 	"main.Reader",
 	null,
-	[{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }, { type: "error" }] }]
+	[{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }]
 );
 
 export class MyReader {
@@ -56,9 +56,9 @@ export class MyReader {
 	static __typeInfo = $.registerStructType(
 		"main.MyReader",
 		() => new MyReader(),
-		[{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }, { type: "error" }] }],
+		() => [{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
 		MyReader,
-		[{ name: "Reader", key: "Reader", type: "main.Reader", anonymous: true }, { name: "name", key: "name", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "Reader", key: "Reader", type: "main.Reader", anonymous: true }, { name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
@@ -111,9 +111,9 @@ export class StringReader {
 	static __typeInfo = $.registerStructType(
 		"main.StringReader",
 		() => new StringReader(),
-		[{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }, { type: "error" }] }],
+		() => [{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
 		StringReader,
-		[{ name: "data", key: "data", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "pos", key: "pos", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "data", key: "data", type: /* @__PURE__ */ $.basicType("string") }, { name: "pos", key: "pos", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

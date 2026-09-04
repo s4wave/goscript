@@ -564,6 +564,11 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 		b.WriteString("\n")
 		renderMethod(b, &method)
 	}
+	if structType.prototypeSetup != "" {
+		b.WriteString("\n\tstatic { ")
+		b.WriteString(structType.prototypeSetup)
+		b.WriteString(" }\n")
+	}
 	b.WriteString("\n\tstatic __typeInfo = ")
 	b.WriteString(registerStructType)
 	b.WriteString("(\n")
@@ -571,7 +576,7 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	b.WriteString(strconvQuote(structType.typeName))
 	b.WriteString(",\n\t\t() => new ")
 	b.WriteString(structType.name)
-	b.WriteString("(),\n\t\t[")
+	b.WriteString("(),\n\t\t() => [")
 	for idx, method := range structType.methods {
 		if idx != 0 {
 			b.WriteString(", ")
@@ -580,7 +585,7 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	}
 	b.WriteString("],\n\t\t")
 	b.WriteString(structType.name)
-	b.WriteString(",\n\t\t[")
+	b.WriteString(",\n\t\t() => [")
 	for idx, field := range structType.fields {
 		if idx != 0 {
 			b.WriteString(", ")
@@ -718,6 +723,19 @@ func renderFunction(b *strings.Builder, fn *loweredFunction) {
 func renderMethod(b *strings.Builder, fn *loweredFunction) {
 	writeIndent(b, 1)
 	b.WriteString("public ")
+	if fn.prototypeDeclaration {
+		b.WriteString("declare ")
+		b.WriteString(fn.name)
+		b.WriteString(": (")
+		for idx, param := range fn.params {
+			if idx != 0 {
+				b.WriteString(", ")
+			}
+			b.WriteString(param.name + ": " + param.typ)
+		}
+		b.WriteString(") => " + fn.result + "\n")
+		return
+	}
 	if fn.async {
 		b.WriteString("async ")
 	}
