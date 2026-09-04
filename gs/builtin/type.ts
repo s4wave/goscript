@@ -152,6 +152,13 @@ export type TypeInfo =
   | FunctionTypeInfo
   | ChannelTypeInfo
 
+/** Construct a fresh basic descriptor without repeating its shape in generated code. */
+export function basicType(name: string, typeName?: string): BasicTypeInfo {
+  const info: BasicTypeInfo = { kind: TypeKind.Basic, name }
+  if (typeName !== undefined) info.typeName = typeName
+  return info
+}
+
 // isStructTypeInfo Type guard functions for TypeInfo variants.
 export function isStructTypeInfo(info: TypeInfo): info is StructTypeInfo {
   return info.kind === TypeKind.Struct
@@ -234,25 +241,37 @@ function registerTypeInfo(name: string, typeInfo: TypeInfo): void {
  *
  * @param name The name of the type.
  * @param zeroValue The zero value for the type.
- * @param methods Array of method signatures for the struct.
+ * @param methods Method signatures, or a factory evaluated once on first inspection.
  * @param ctor Constructor for the struct.
- * @param fields Record of field names and their types.
+ * @param fields Field descriptors, or a factory evaluated once on first inspection.
  * @returns The struct type information object.
  */
 export const registerStructType = (
   name: string,
   zeroValue: any,
-  methods: MethodSignature[],
+  methods: MethodSignature[] | (() => MethodSignature[]),
   ctor: new (...args: any[]) => any,
-  fields: StructFieldInfo[] = [],
+  fields: StructFieldInfo[] | (() => StructFieldInfo[]) = [],
 ): StructTypeInfo => {
   const typeInfo: StructTypeInfo = {
     name,
     kind: TypeKind.Struct,
     zeroValue,
-    methods,
+    get methods() {
+      if (typeof methods === 'function') methods = methods()
+      return methods
+    },
+    set methods(value) {
+      methods = value
+    },
     ctor,
-    fields,
+    get fields() {
+      if (typeof fields === 'function') fields = fields()
+      return fields
+    },
+    set fields(value) {
+      fields = value
+    },
   }
   registerTypeInfo(name, typeInfo)
   return typeInfo

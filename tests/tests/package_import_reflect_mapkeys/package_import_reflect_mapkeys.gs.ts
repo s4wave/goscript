@@ -7,7 +7,7 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/reflect/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let keys: $.Slice<reflect.Value> = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.makeMap<string, number>([["alpha", 1], ["beta", 2]]), "map[string]int", { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } })))).MapKeys()
+	let keys: $.Slice<reflect.Value> = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.makeMap<string, number>([["alpha", 1], ["beta", 2]]), "map[string]int", { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: /* @__PURE__ */ $.basicType("int") })))).MapKeys()
 
 	let seen: globalThis.Map<string, boolean> | null = $.makeMap<string, boolean>([])
 	for (let __goscriptRangeTarget0 = keys, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {

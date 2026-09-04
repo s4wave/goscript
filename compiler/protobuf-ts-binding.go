@@ -617,70 +617,25 @@ func rewriteProtobufTypeScriptBindingStruct(structType *loweredStruct, bindingSo
 	if structType == nil {
 		return
 	}
+	var names []string
 	for idx := range structType.methods {
 		method := &structType.methods[idx]
-		if method.sourcePath != bindingSourcePath {
+		if method.sourcePath != bindingSourcePath || !protobufTypeScriptBindingReplacesMethodName(method.name) {
 			continue
 		}
 		if structType.protobufPreserveJSON && protobufTypeScriptBindingJSONMethodName(method.name) {
 			continue
 		}
-		body := protobufTypeScriptBindingMethodBody(structType, method)
-		if body == "" {
-			continue
-		}
 		method.async = false
+		method.prototypeDeclaration = true
 		method.paramBindings = nil
 		method.namedResults = nil
 		method.deferState = nil
-		method.body = []loweredStmt{{text: body}}
+		method.body = nil
+		names = append(names, strconvQuote(method.name))
 	}
-}
-
-func protobufTypeScriptBindingMethodBody(structType *loweredStruct, method *loweredFunction) string {
-	if structType == nil || method == nil {
-		return ""
-	}
-	ctor := structType.name
-	if !protobufTypeScriptBindingReplacesMethodName(method.name) {
-		return ""
-	}
-	switch method.name {
-	case "CloneMessageVT":
-		return "return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(protobuf_go_lite.CloneBoundMessage(" +
-			ctor + ", this) as any, " + strconvQuote("*"+structType.typeName) + ")"
-	case "CloneVT":
-		return "return protobuf_go_lite.CloneBoundMessage(" + ctor + ", this) as any"
-	case "EqualVT":
-		return "return protobuf_go_lite.EqualBoundMessage(" + ctor + ", this, " + protobufBindingParam(method, 0, "null") + ")"
-	case "MarshalJSON":
-		return "return protobuf_go_lite.MarshalBoundMessageJSON(" + ctor + ", this)"
-	case "MarshalProtoJSON":
-		return "protobuf_go_lite.MarshalBoundMessageProtoJSON(" + ctor + ", this, " + protobufBindingParam(method, 0, "null") + ")"
-	case "MarshalProtoText", "String":
-		// Keep the transpiled Go body: String() must stay synchronous and
-		// produce proto TEXT format to match native Go output. The async
-		// JSON-based helper broke the sync contract (returned a Promise)
-		// and emitted JSON instead of proto text.
-		return ""
-	case "MarshalToSizedBufferVT":
-		return "return protobuf_go_lite.MarshalBoundMessageToSizedBufferVT(" + ctor + ", this, " + protobufBindingParam(method, 0, "null") + ")"
-	case "MarshalVT":
-		return "return protobuf_go_lite.MarshalBoundMessageVT(" + ctor + ", this)"
-	case "ProtoMessage":
-		return "return"
-	case "Reset":
-		return "$.assignStruct($.pointerValue<" + ctor + ">(this), $.markAsStructValue(new " + ctor + "()))"
-	case "SizeVT":
-		return "return protobuf_go_lite.SizeBoundMessageVT(" + ctor + ", this)"
-	case "UnmarshalJSON":
-		return "return protobuf_go_lite.UnmarshalBoundMessageJSON(" + ctor + ", this, " + protobufBindingParam(method, 0, "null") + ")"
-	case "UnmarshalProtoJSON":
-		return "protobuf_go_lite.UnmarshalBoundMessageProtoJSON(" + ctor + ", this, " + protobufBindingParam(method, 0, "null") + ")"
-	case "UnmarshalVT":
-		return "return protobuf_go_lite.UnmarshalBoundMessageVT(" + ctor + ", this, " + protobufBindingParam(method, 0, "null") + ")"
-	default:
-		return ""
+	if len(names) != 0 {
+		structType.prototypeSetup = "protobuf_go_lite.BindMessageMethods(this, " + strconvQuote("*"+structType.typeName) + ", [" + strings.Join(names, ", ") + "])"
 	}
 }
 
@@ -696,7 +651,6 @@ func protobufTypeScriptBindingJSONMethodName(name string) bool {
 func protobufTypeScriptBindingReplacesMethodName(name string) bool {
 	switch name {
 	case "CloneMessageVT",
-		"CloneOneofVT",
 		"CloneVT",
 		"EqualVT",
 		"MarshalJSON",
@@ -713,13 +667,6 @@ func protobufTypeScriptBindingReplacesMethodName(name string) bool {
 	default:
 		return false
 	}
-}
-
-func protobufBindingParam(method *loweredFunction, idx int, fallback string) string {
-	if method == nil || idx < 0 || idx >= len(method.params) || strings.TrimSpace(method.params[idx].name) == "" {
-		return fallback
-	}
-	return method.params[idx].name
 }
 
 func protobufTypeScriptBindingStructSetupDecl(structType *loweredStruct, importAlias, messageName, pkgName string, file *loweredFile, binding protobufTypeScriptBinding, siblings *protobufTypeScriptBindingSiblingImports, oneofCases []protobufTypeScriptBindingOneofCase) (loweredDecl, []Diagnostic) {

@@ -10,7 +10,7 @@ export type hidden = {
 $.registerInterfaceType(
 	"dep.hidden",
 	null,
-	[{ name: "Ping", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+	[{ name: "Ping", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
 );
 
 export class impl {
@@ -36,9 +36,9 @@ export class impl {
 	static __typeInfo = $.registerStructType(
 		"dep.impl",
 		() => new impl(),
-		[{ name: "Ping", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Ping", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		impl,
-		[]
+		() => []
 	)
 }
 
@@ -71,9 +71,9 @@ export class Holder {
 	static __typeInfo = $.registerStructType(
 		"dep.Holder",
 		() => new Holder(),
-		[],
+		() => [],
 		Holder,
-		[{ name: "Hidden", key: "Hidden", type: "dep.hidden" }]
+		() => [{ name: "Hidden", key: "Hidden", type: "dep.hidden" }]
 	)
 }
 

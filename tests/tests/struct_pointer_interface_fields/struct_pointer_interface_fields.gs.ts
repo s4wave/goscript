@@ -52,9 +52,9 @@ export class MyStruct {
 	static __typeInfo = $.registerStructType(
 		"main.MyStruct",
 		() => new MyStruct(),
-		[],
+		() => [],
 		MyStruct,
-		[{ name: "PointerField", key: "PointerField", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "int" } } }, { name: "interfaceField", key: "interfaceField", type: "main.MyInterface" }]
+		() => [{ name: "PointerField", key: "PointerField", type: { kind: $.TypeKind.Pointer, elemType: /* @__PURE__ */ $.basicType("int") } }, { name: "interfaceField", key: "interfaceField", type: "main.MyInterface" }]
 	)
 }
 

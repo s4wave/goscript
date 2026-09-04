@@ -172,14 +172,9 @@ export const Foo = {} as any
 
 	binding := readTestFile(t, filepath.Join(out, "@goscript", "example.test", "protobufbindingmethods", "foo.pb.ts"))
 	wantSnippets := []string{
-		`$.interfaceValue<protobuf_go_lite.CloneMessage | null>(protobuf_go_lite.CloneBoundMessage(Foo, this) as any, "*protobufbindingmethods.Foo")`,
-		`return protobuf_go_lite.CloneBoundMessage(Foo, this) as any`,
-		`protobuf_go_lite.EqualBoundMessage(Foo, this, other)`,
-		`protobuf_go_lite.MarshalBoundMessageVT(Foo, this)`,
-		`protobuf_go_lite.MarshalBoundMessageToSizedBufferVT(Foo, this, data)`,
-		`protobuf_go_lite.SizeBoundMessageVT(Foo, this)`,
-		`protobuf_go_lite.UnmarshalBoundMessageVT(Foo, this, data)`,
-		`$.assignStruct($.pointerValue<Foo>(this), $.markAsStructValue(new Foo()))`,
+		`public declare CloneMessageVT: () => protobuf_go_lite.CloneMessage | null`,
+		`public declare MarshalVT: () => [$.Slice<number>, $.GoError]`,
+		`protobuf_go_lite.BindMessageMethods(this, "*protobufbindingmethods.Foo", ["CloneMessageVT", "CloneVT", "EqualVT", "MarshalToSizedBufferVT", "MarshalVT", "Reset", "SizeVT", "UnmarshalVT"])`,
 	}
 	for _, snippet := range wantSnippets {
 		if !strings.Contains(binding, snippet) {
@@ -299,9 +294,10 @@ export const Wrapper = {} as any
 		t.Fatalf("oneof-preserved protobuf file should still expose TypeScript metadata, got:\n%s", binding)
 	}
 	wantSnippets := []string{
-		`protobuf_go_lite.CloneBoundMessage(Wrapper, this)`,
-		`protobuf_go_lite.EqualBoundMessage(Wrapper, this, other)`,
-		`protobuf_go_lite.SizeBoundMessageVT(Wrapper, this)`,
+		`public declare CloneVT:`,
+		`public declare EqualVT:`,
+		`public declare SizeVT:`,
+		`protobuf_go_lite.BindMessageMethods(this, "*oneofpb.Wrapper",`,
 	}
 	for _, snippet := range wantSnippets {
 		if !strings.Contains(binding, snippet) {

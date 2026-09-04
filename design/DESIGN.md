@@ -40,6 +40,12 @@ This means generated TypeScript text should not re-query package loader state, r
 *   The `main` package is translated like any other package. The `main` function is exported as `export async function main(): Promise<void>` to serve as the entry point, and generated `package main` modules include a main-script guard that calls `main()` when the module is executed directly.
 *   Imports are translated to TypeScript `import` statements. The GoScript runtime is imported as `@goscript/builtin/index.ts` in generated source.
 
+#### Explicit deferred functions
+
+`DeferredFunctions` (CLI `--deferred-function`, TypeScript `deferredFunctions`) names exported, non-generic package functions by full import path and function name. Calls from outside the selected packages use `import()` and participate in ordinary async propagation. Taking a function value creates an async callable without importing the module. ES module evaluation owns initialization: concurrent first calls share evaluation, and an evaluation failure rejects subsequent calls without rerunning `init()`.
+
+This option deliberately delays package initialization until first use. Unconfigured builds retain eager imports. Selected packages may statically import each other to form a feature closure. Other callers may reference selected functions and erased interface types; references to package variables, constants, concrete types, unselected functions, or blank/dot imports produce a diagnostic. Shared declarations belong in a separate eager package. The compiler emits the dynamic boundary; the bundler determines the resulting chunks, including dependencies shared with the eager graph. Deferred selections are part of compiler cache identity.
+
 ### Types
 
 *   **Basic Types:** Go basic types (`int`, `string`, `bool`, `float64`, etc.) are mapped to corresponding TypeScript types.
@@ -172,7 +178,9 @@ The runtime provides:
     *   Function/generic operations: `$.namedFunction`, `$.genericZero`, `$.callGenericMethod`
     *   Control flow: `$.panic`, `$.recover`, `$.println`, `$.isMainScript`
     *   Math: `$.int`, `$.byte`
-*   Runtime type information utilities (`$.registerStructType`, `$.registerInterfaceType`, `$.getTypeByName`, `$.TypeKind`).
+*   Runtime type information utilities (`$.registerStructType`, `$.registerInterfaceType`, `$.getTypeByName`, `$.TypeKind`). Basic descriptors use `$.basicType(name, typeName?)` to keep emitted metadata compact. Each call returns a fresh descriptor; named identity and reflection contents remain unchanged. Struct registration accepts field and method factories, evaluated independently on the first synchronous read and then retained. Registration still publishes the constructor and type name immediately; reflection observes the complete mutable arrays.
+
+Generated protobuf adapters declare their Go method types and install binary, JSON, clone, equality, and reset forwarding methods through the shared protobuf bridge. Installation occurs in the class static block, captures the declaring constructor for nil receiver calls, and preserves non-enumerable prototype methods. Handwritten methods and native proto-text bodies remain on their declaring classes.
 
 ## Known Divergences
 

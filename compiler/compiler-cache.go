@@ -27,7 +27,7 @@ const compilerCacheSchema = "goscript-package-artifact-v1"
 // compilerSemanticsVersion versions emitted-output semantics. Bump this value
 // with every behavior-changing compiler commit so artifacts cached by an
 // older binary miss and rebuild instead of replaying stale bytes.
-const compilerSemanticsVersion = "2"
+const compilerSemanticsVersion = "5"
 
 type compilerCacheEntryKind string
 
@@ -446,6 +446,9 @@ func writeRequestIdentity(b *strings.Builder, req *CompileRequest) {
 	}
 	for _, dir := range req.OverrideDirs {
 		writeKeyField(b, "override-dir", cleanAbs(dir))
+	}
+	for _, function := range req.DeferredFunctions {
+		writeKeyField(b, "deferred-function", function)
 	}
 	for _, path := range req.PackageBlocklist {
 		writeKeyField(b, "blocklist", path)

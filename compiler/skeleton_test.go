@@ -708,7 +708,7 @@ func TestCompilePackagesPreservesNamedUint64InterfaceTypeInfo(t *testing.T) {
 	if !strings.Contains(text, want) {
 		t.Fatalf("missing named interface box %q in generated output:\n%s", want, text)
 	}
-	want = `elemType: { kind: $.TypeKind.Basic, name: "uint64", typeName: "main.Pol" }`
+	want = `elemType: /* @__PURE__ */ $.basicType("uint64", "main.Pol")`
 	if !strings.Contains(text, want) {
 		t.Fatalf("named uint64 pointer interface box lost type metadata:\n%s", text)
 	}
@@ -1926,8 +1926,8 @@ func TestCompilePackagesEmitsStructMethodsAndPointerAssertions(t *testing.T) {
 		"Counter.prototype.Set.call(pointer, 2)",
 		"Counter.prototype.Set.call(NewCounter(), 5)",
 		"let [, ok] = $.typeAssertTuple<Counter | $.VarRef<Counter> | null>(iface, { kind: $.TypeKind.Pointer, elemType: \"main.Counter\" })",
-		"{ name: \"Value\", key: \"Value\", type: { kind: $.TypeKind.Basic, name: \"int\" }, tag: \"json:\\\"value\\\"\" }",
-		"{ name: \"ID\", key: \"ID\", type: { kind: $.TypeKind.Basic, name: \"int32\", typeName: \"main.ObjectID\" } }",
+		"{ name: \"Value\", key: \"Value\", type: /* @__PURE__ */ $.basicType(\"int\"), tag: \"json:\\\"value\\\"\" }",
+		"{ name: \"ID\", key: \"ID\", type: /* @__PURE__ */ $.basicType(\"int32\", \"main.ObjectID\") }",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -1977,16 +1977,16 @@ func TestCompilePackagesTypeInfoTrimFollowsReflectReachability(t *testing.T) {
 		text := string(content)
 		for _, want := range []string{
 			`args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }]`,
-			`returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }]`,
-			`{ name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" }, tag: "json:\"name\"" }`,
+			`returns: [{ type: /* @__PURE__ */ $.basicType("string") }]`,
+			`{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string"), tag: "json:\"name\"" }`,
 		} {
 			if !strings.Contains(text, want) {
 				t.Fatalf("missing trimmed type-info payload %q:\n%s", want, text)
 			}
 		}
 		for _, dropped := range []string{
-			`args: [{ name: "v", type: { kind: $.TypeKind.Basic, name: "int" } }]`,
-			`returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }]`,
+			`args: [{ name: "v", type: /* @__PURE__ */ $.basicType("int") }]`,
+			`returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }]`,
 			`index: [0]`,
 			`offset: 0`,
 			`exported: true`,
@@ -2017,9 +2017,9 @@ func TestCompilePackagesTypeInfoTrimFollowsReflectReachability(t *testing.T) {
 		}
 		text := string(content)
 		for _, want := range []string{
-			`args: [{ name: "v", type: { kind: $.TypeKind.Basic, name: "int" } }]`,
-			`returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }]`,
-			`{ name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" }, tag: "json:\"name\"", index: [0], offset: 0, exported: true }`,
+			`args: [{ name: "v", type: /* @__PURE__ */ $.basicType("int") }]`,
+			`returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }]`,
+			`{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string"), tag: "json:\"name\"", index: [0], offset: 0, exported: true }`,
 		} {
 			if !strings.Contains(text, want) {
 				t.Fatalf("missing full type-info payload %q:\n%s", want, text)
@@ -2969,13 +2969,13 @@ func TestCompilePackagesEmitsInterfacesMethodValuesTypeSwitchesAndFunctionAssert
 		"Read(): string",
 		"Close(): string",
 		"$.registerInterfaceType(\n\t\"main.ReadCloser\"",
-		"{ name: \"Close\", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: \"string\" } }] }",
+		"{ name: \"Close\", args: [], returns: [{ type: /* @__PURE__ */ $.basicType(\"string\") }] }",
 		"((__receiver) => () => __receiver.Inc())($.pointerValue<Counter>(counter))",
 		"$.namedFunction(greet, \"main.Greeter\", ({ kind: $.TypeKind.Function, name: \"main.Greeter\"",
-		"params: [{ kind: $.TypeKind.Basic, name: \"string\" }]",
-		"results: [{ kind: $.TypeKind.Basic, name: \"string\" }]",
+		"params: [/* @__PURE__ */ $.basicType(\"string\")]",
+		"results: [/* @__PURE__ */ $.basicType(\"string\")]",
 		"$.interfaceValue(null, \"*struct{Name string}\",",
-		"elemType: { kind: $.TypeKind.Struct, methods: [], fields: [{ name: \"Name\", key: \"Name\", type: { kind: $.TypeKind.Basic, name: \"string\" }",
+		"elemType: { kind: $.TypeKind.Struct, methods: [], fields: [{ name: \"Name\", key: \"Name\", type: /* @__PURE__ */ $.basicType(\"string\")",
 		"let fn = __goscriptTuple",
 		"switch (true)",
 		"case $.typeAssert<ReadCloser | null>(__goscriptTypeSwitchValue, \"main.ReadCloser\").ok",
@@ -3239,9 +3239,9 @@ func TestCompilePackagesEmitsGenericMethodsAliasesAndDictionaries(t *testing.T) 
 		"$.mapSet(seen, 1, {})",
 		"$.genericZero(__typeArgs, \"T\", null)",
 		"return $.callGenericMethod(__typeArgs, \"T\", \"String\", v)",
-		"ZeroValue({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: \"int\", typeName: \"main.MyInt\" }, zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: \"String\", args: [], returns: [{ name: \"_r0\", type: { kind: $.TypeKind.Basic, name: \"string\" } }] }] }})",
-		"await CallString({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: \"int\", typeName: \"main.MyInt\" }, zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: \"String\", args: [], returns: [{ name: \"_r0\", type: { kind: $.TypeKind.Basic, name: \"string\" } }] }] }}, zero)",
-		"Sum({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: \"int\", typeName: \"main.MyInt\" }, zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: \"String\", args: [], returns: [{ name: \"_r0\", type: { kind: $.TypeKind.Basic, name: \"string\" } }] }] }}, null)",
+		"ZeroValue({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: \"String\", args: [], returns: [{ name: \"_r0\", type: /* @__PURE__ */ $.basicType(\"string\") }] }] }})",
+		"await CallString({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: \"String\", args: [], returns: [{ name: \"_r0\", type: /* @__PURE__ */ $.basicType(\"string\") }] }] }}, zero)",
+		"Sum({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: \"String\", args: [], returns: [{ name: \"_r0\", type: /* @__PURE__ */ $.basicType(\"string\") }] }] }}, null)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -3358,8 +3358,8 @@ func TestCompilePackagesAttachesFunctionLiteralTypeInfo(t *testing.T) {
 		"let cb: Callback | null = (null as Callback | null)",
 		"$.functionValue((value: number): string => {",
 		"kind: $.TypeKind.Function",
-		"params: [{ kind: $.TypeKind.Basic, name: \"int\" }]",
-		"results: [{ kind: $.TypeKind.Basic, name: \"string\" }]",
+		"params: [/* @__PURE__ */ $.basicType(\"int\")]",
+		"results: [/* @__PURE__ */ $.basicType(\"string\")]",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -3915,7 +3915,7 @@ func TestCompilePackagesLowersFunctionIteratorControlFlow(t *testing.T) {
 		"switch (v)",
 		"const __goscriptTypeSwitchValue",
 		"switch (true)",
-		"case $.typeAssert<number>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: \"int\" }).ok",
+		"case $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType(\"int\")).ok",
 		"break",
 	} {
 		if !strings.Contains(text, want) {
@@ -4085,7 +4085,7 @@ func TestCompilePackagesPropagatesAsyncGenericInterfaceMethods(t *testing.T) {
 	for _, want := range []string{
 		"Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): any | globalThis.Promise<any>",
 		"public async Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): globalThis.Promise<any>",
-		"return (await $.callInterfaceMethod($.pointerValue<Exclude<Watchable, null>>(w), \"Wait\", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: \"int\" }, zero: () => 0 }}, ctx, old) as number)",
+		"return (await $.callInterfaceMethod($.pointerValue<Exclude<Watchable, null>>(w), \"Wait\", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\"), zero: () => 0 }}, ctx, old) as number)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -4793,7 +4793,7 @@ func TestCompilePackagesPropagatesImportedAsyncGenericInterfaceMethods(t *testin
 		t.Fatal(err.Error())
 	}
 	mainText := string(mainContent)
-	if want := "return (await $.callInterfaceMethod($.pointerValue<Exclude<dep.Watchable, null>>(w), \"Wait\", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: \"int\" }, zero: () => 0 }}, ctx, old) as number)"; !strings.Contains(mainText, want) {
+	if want := "return (await $.callInterfaceMethod($.pointerValue<Exclude<dep.Watchable, null>>(w), \"Wait\", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\"), zero: () => 0 }}, ctx, old) as number)"; !strings.Contains(mainText, want) {
 		t.Fatalf("missing %q in generated main output:\n%s", want, mainText)
 	}
 }

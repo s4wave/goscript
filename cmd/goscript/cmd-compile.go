@@ -21,6 +21,7 @@ func newCompileCommand() *cli.Command {
 	var overrideDirs cli.StringSlice
 	var packageBlocklist cli.StringSlice
 	var bindingRoots cli.StringSlice
+	var deferredFunctions cli.StringSlice
 
 	return &cli.Command{
 		Name:     "compile",
@@ -31,9 +32,15 @@ func newCompileCommand() *cli.Command {
 			config.OverrideDirs = slices.Clone(overrideDirs.Value())
 			config.PackageBlocklist = slices.Clone(packageBlocklist.Value())
 			config.AdditionalBindingRoots = slices.Clone(bindingRoots.Value())
+			config.DeferredFunctions = slices.Clone(deferredFunctions.Value())
 			return compilePackage(c.Context, &config, packages.Value())
 		},
 		Flags: []cli.Flag{
+			&cli.StringSliceFlag{
+				Name:        "deferred-function",
+				Usage:       "exported package function to import on first invocation (package/path.Function); delays package init",
+				Destination: &deferredFunctions,
+			},
 			&cli.StringSliceFlag{
 				Name:        "package",
 				Usage:       "the package(s) to compile",

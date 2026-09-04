@@ -246,6 +246,7 @@ Common options:
 - `--package-blocklist <paths>`: comma-separated Go import paths to reject from the compiled package graph.
 - `--compiler-cache-root <dir>`: explicit compiler package artifact cache root.
 - `--protobuf-ts-binding`: bind `.pb.go` files to sibling `.pb.ts` files instead of emitting `.pb.gs.ts`.
+- `--deferred-function`: repeat for each exported, non-generic `package/path.Function` to load on first call. This opts into late package initialization and requires eager callers to move shared concrete types and values into a separate package. Calls become asynchronous; function values remain lazy until invoked. Configure the equivalent `deferredFunctions` array through the TypeScript API.
 - `--disable-emit-builtin`: skip copying handwritten `gs/` runtime packages.
 
 Run Go package tests through GoScript:

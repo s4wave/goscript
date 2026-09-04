@@ -41,9 +41,9 @@ export class asyncReader {
 	static __typeInfo = $.registerStructType(
 		"main.asyncReader",
 		() => new asyncReader(),
-		[{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }, { type: "error" }] }],
+		() => [{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
 		asyncReader,
-		[{ name: "ch", key: "ch", type: { kind: $.TypeKind.Channel, direction: "both", elemType: { kind: $.TypeKind.Basic, name: "int" } } }]
+		() => [{ name: "ch", key: "ch", type: { kind: $.TypeKind.Channel, direction: "both", elemType: /* @__PURE__ */ $.basicType("int") } }]
 	)
 }
 

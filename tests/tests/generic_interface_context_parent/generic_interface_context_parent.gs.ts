@@ -33,7 +33,7 @@ export type ValueReader = {
 $.registerInterfaceType(
 	"main.ValueReader",
 	null,
-	[{ name: "Get", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }]
+	[{ name: "Get", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }]
 );
 
 export class handler {
@@ -58,9 +58,9 @@ export class handler {
 	static __typeInfo = $.registerStructType(
 		"main.handler",
 		() => new handler(),
-		[{ name: "Mark", args: [], returns: [] }],
+		() => [{ name: "Mark", args: [], returns: [] }],
 		handler,
-		[]
+		() => []
 	)
 }
 
@@ -91,9 +91,9 @@ export class genericResolver {
 	static __typeInfo = $.registerStructType(
 		"main.genericResolver",
 		() => new genericResolver(),
-		[{ name: "Resolve", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
+		() => [{ name: "Resolve", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
 		genericResolver,
-		[]
+		() => []
 	)
 }
 
@@ -131,14 +131,14 @@ export class genericValue {
 	static __typeInfo = $.registerStructType(
 		"main.genericValue",
 		() => new genericValue(),
-		[{ name: "Get", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }],
+		() => [{ name: "Get", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		genericValue,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
 export async function main(): globalThis.Promise<void> {
-	let resolver: Resolver | null = $.namedValueInterfaceValue<Resolver | null>(new genericResolver(), "*main.genericResolver", {Resolve: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Resolve({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "main.genericResolver" }, [{ name: "Resolve", args: [{ name: "ctx", type: "context.Context" }, { name: "handler", type: "main.Handler" }], returns: [{ name: "_r0", type: "error" }] }])
+	let resolver: Resolver | null = $.namedValueInterfaceValue<Resolver | null>(new genericResolver(), "*main.genericResolver", {Resolve: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Resolve({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "main.genericResolver" }, [{ name: "Resolve", args: [{ name: "ctx", type: "context.Context" }, { name: "handler", type: "main.Handler" }], returns: [{ name: "_r0", type: "error" }] }])
 	{
 		let err = await $.pointerValue<Exclude<Resolver, null>>(resolver).Resolve(context.Background(), $.interfaceValue<Handler | null>($.markAsStructValue(new handler()), "main.handler", "main.handler"))
 		if (err != null) {
@@ -148,7 +148,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("resolve ok")
 	let g = $.markAsStructValue(new genericValue({value: 7}))
-	let reader: ValueReader | null = $.namedValueInterfaceValue<ValueReader | null>($.markAsStructValue($.cloneStructValue(g)), "main.genericValue", {Get: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Get({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, "main.genericValue", [{ name: "Get", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }])
+	let reader: ValueReader | null = $.namedValueInterfaceValue<ValueReader | null>($.markAsStructValue($.cloneStructValue(g)), "main.genericValue", {Get: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Get({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, "main.genericValue", [{ name: "Get", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("int") }] }])
 	g.value = 9
 	if (await $.pointerValue<Exclude<ValueReader, null>>(reader).Get() != 7) {
 		await $.println("value copy failed")

@@ -25,6 +25,8 @@ export interface CompileConfig {
   allDependencies?: boolean
   /** Go import paths to reject from the compiled package graph. */
   packageBlocklist?: string[] | string
+  /** Exported package functions imported on first invocation, delaying package init. */
+  deferredFunctions?: string[]
   /** The path to the goscript executable. Defaults to `go run ./cmd/goscript`. */
   goscriptPath?: string
 }
@@ -57,6 +59,10 @@ export async function compile(config: CompileConfig): Promise<void> {
   const packageBlocklist = normalizePackageBlocklist(config.packageBlocklist)
   if (packageBlocklist) {
     args.push('--package-blocklist', packageBlocklist)
+  }
+
+  for (const fn of config.deferredFunctions ?? []) {
+    args.push('--deferred-function', fn)
   }
 
   if (config.goscriptPath) {

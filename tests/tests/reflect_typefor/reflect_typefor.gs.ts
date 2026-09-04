@@ -61,9 +61,9 @@ export class MyStruct {
 	static __typeInfo = $.registerStructType(
 		"main.MyStruct",
 		() => new MyStruct(),
-		[],
+		() => [],
 		MyStruct,
-		[{ name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" }, index: [0], offset: 0, exported: true }, { name: "Age", key: "Age", type: { kind: $.TypeKind.Basic, name: "int" }, index: [1], offset: 16, exported: true }]
+		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string"), index: [0], offset: 0, exported: true }, { name: "Age", key: "Age", type: /* @__PURE__ */ $.basicType("int"), index: [1], offset: 16, exported: true }]
 	)
 }
 
@@ -78,7 +78,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("TypeFor struct kind:", await $.pointerValue<Exclude<reflect.Type, null>>(t2).Kind() == reflect.Struct)
 
 	// Test TypeFor with int type
-	let t3 = reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }})
+	let t3 = reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
 	await $.println("TypeFor int:", await $.pointerValue<Exclude<reflect.Type, null>>(t3).String())
 	await $.println("TypeFor int kind:", await $.pointerValue<Exclude<reflect.Type, null>>(t3).Kind() == reflect.Int)
 

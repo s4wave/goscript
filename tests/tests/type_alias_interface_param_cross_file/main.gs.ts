@@ -43,9 +43,9 @@ export class sink {
 	static __typeInfo = $.registerStructType(
 		"main.sink",
 		() => new sink(),
-		[{ name: "Put", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "Put", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
 		sink,
-		[{ name: "size", key: "size", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "size", key: "size", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

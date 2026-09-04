@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  basicType,
+  registerStructType,
+  type MethodSignature,
+  type StructFieldInfo,
   is,
   type MapTypeInfo,
   type SliceTypeInfo,
@@ -70,5 +74,58 @@ describe('a Go slice is never a map (structural type matching)', () => {
     expect(is([], mapStringAny)).toBe(false)
     expect(is([], sliceAny)).toBe(true)
     expect(is(new Uint8Array(0), mapStringAny)).toBe(false)
+  })
+})
+
+describe('compact basic descriptors', () => {
+  it('preserves named type identity without sharing mutable descriptors', () => {
+    const first = basicType('uint64', 'main.Counter')
+    const second = basicType('uint64', 'main.Counter')
+    expect(first).toEqual({
+      kind: TypeKind.Basic,
+      name: 'uint64',
+      typeName: 'main.Counter',
+    })
+    first.name = 'changed'
+    expect(second.name).toBe('uint64')
+    expect(basicType('string')).toEqual({
+      kind: TypeKind.Basic,
+      name: 'string',
+    })
+  })
+})
+
+describe('deferred struct metadata', () => {
+  it('initializes fields and methods independently once when inspected', () => {
+    let methodReads = 0
+    let fieldReads = 0
+    class Sample {}
+    const methods: MethodSignature[] = [{ name: 'Read', args: [], returns: [] }]
+    const fields: StructFieldInfo[] = [
+      { name: 'Value', type: basicType('int') },
+    ]
+    const info = registerStructType(
+      'test.DeferredSample',
+      () => new Sample(),
+      () => {
+        methodReads++
+        return methods
+      },
+      Sample,
+      () => {
+        fieldReads++
+        return fields
+      },
+    )
+    expect([methodReads, fieldReads]).toEqual([0, 0])
+    expect(info.methods).toBe(methods)
+    expect(info.methods).toBe(methods)
+    expect([methodReads, fieldReads]).toEqual([1, 0])
+    expect(info.fields).toBe(fields)
+    expect(info.fields).toBe(fields)
+    expect([methodReads, fieldReads]).toEqual([1, 1])
+    info.fields = []
+    expect(info.fields).toEqual([])
+    expect(fieldReads).toBe(1)
   })
 })

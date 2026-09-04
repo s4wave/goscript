@@ -64,6 +64,7 @@ type loweredStruct struct {
 	exported             bool
 	indexExported        bool
 	protobufPreserveJSON bool
+	prototypeSetup       string
 	name                 string
 	typeName             string
 	cloneMethod          string
@@ -91,6 +92,7 @@ type loweredStructField struct {
 type loweredFunction struct {
 	exported                bool
 	indexExported           bool
+	prototypeDeclaration    bool
 	init                    bool
 	async                   bool
 	sourcePath              string

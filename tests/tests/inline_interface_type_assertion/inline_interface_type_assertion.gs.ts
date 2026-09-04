@@ -10,7 +10,7 @@ export type Stringer = {
 $.registerInterfaceType(
 	"main.Stringer",
 	null,
-	[{ name: "String", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+	[{ name: "String", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
 );
 
 export class Greeter {
@@ -37,9 +37,9 @@ export class Greeter {
 	static __typeInfo = $.registerStructType(
 		"main.Greeter",
 		() => new Greeter(),
-		[{ name: "Greet", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Greet", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		Greeter,
-		[]
+		() => []
 	)
 }
 
@@ -67,9 +67,9 @@ export class MyStringer {
 	static __typeInfo = $.registerStructType(
 		"main.MyStringer",
 		() => new MyStringer(),
-		[{ name: "String", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "String", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		MyStringer,
-		[]
+		() => []
 	)
 }
 
@@ -78,7 +78,7 @@ export async function main(): globalThis.Promise<void> {
 	i = $.interfaceValue($.markAsStructValue(new Greeter()), "main.Greeter", "main.Greeter")
 
 	// Successful type assertion to an inline interface
-	let [g, ok] = $.typeAssertTuple<any>(i, { kind: $.TypeKind.Interface, methods: [{ name: "Greet", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] })
+	let [g, ok] = $.typeAssertTuple<any>(i, { kind: $.TypeKind.Interface, methods: [{ name: "Greet", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }] }] })
 	if (ok) {
 		await $.println("Greet assertion successful:", await $.pointerValue<any>(g).Greet())
 	} else {
@@ -86,7 +86,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Failing type assertion to a different inline interface
-	let [s, ok2] = $.typeAssertTuple<any>(i, { kind: $.TypeKind.Interface, methods: [{ name: "NonExistentMethod", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }] })
+	let [s, ok2] = $.typeAssertTuple<any>(i, { kind: $.TypeKind.Interface, methods: [{ name: "NonExistentMethod", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("int") }] }] })
 	if (ok2) {
 		await $.println("NonExistentMethod assertion successful (unexpected):", await $.pointerValue<any>(s).NonExistentMethod())
 	} else {
@@ -98,7 +98,7 @@ export async function main(): globalThis.Promise<void> {
 	j = $.interfaceValue($.markAsStructValue(new MyStringer()), "main.MyStringer", "main.MyStringer")
 
 	// Assert 'j' (which holds MyStringer) to an inline interface that MyStringer satisfies.
-	let [inlineMs, ok4] = $.typeAssertTuple<any>(j, { kind: $.TypeKind.Interface, methods: [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] })
+	let [inlineMs, ok4] = $.typeAssertTuple<any>(j, { kind: $.TypeKind.Interface, methods: [{ name: "String", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }] }] })
 	if (ok4) {
 		await $.println("Inline String assertion successful:", await $.pointerValue<any>(inlineMs).String())
 	} else {
@@ -109,7 +109,7 @@ export async function main(): globalThis.Promise<void> {
 	let k: Stringer | null = null! as Stringer | null
 	k = $.interfaceValue<Stringer | null>($.markAsStructValue(new MyStringer()), "main.MyStringer", "main.MyStringer")
 
-	let [inlineK, ok5] = $.typeAssertTuple<any>(k, { kind: $.TypeKind.Interface, methods: [{ name: "String", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }] })
+	let [inlineK, ok5] = $.typeAssertTuple<any>(k, { kind: $.TypeKind.Interface, methods: [{ name: "String", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }] }] })
 	if (ok5) {
 		await $.println("k.(interface{ String() string }) successful:", await $.pointerValue<any>(inlineK).String())
 	} else {
@@ -117,9 +117,9 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Test case: nil value of an inline interface type assigned to interface{}
-	let l: any = $.interfaceValue(null, "*struct{Name string}", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Struct, methods: [], fields: [{ name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" }, index: [0], offset: 0, exported: true }] } })
+	let l: any = $.interfaceValue(null, "*struct{Name string}", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Struct, methods: [], fields: [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string"), index: [0], offset: 0, exported: true }] } })
 
-	let [ptr, ok6] = $.typeAssertTuple<$.VarRef<{"Name": string}> | null>(l, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Struct, methods: [], fields: [{ name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" }, index: [0], offset: 0, exported: true }] } })
+	let [ptr, ok6] = $.typeAssertTuple<$.VarRef<{"Name": string}> | null>(l, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Struct, methods: [], fields: [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string"), index: [0], offset: 0, exported: true }] } })
 	if (ok6) {
 		if (ptr == null) {
 			await $.println("l.(*struct{ Name string }) successful, ptr is nil as expected")

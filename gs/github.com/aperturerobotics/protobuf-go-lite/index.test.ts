@@ -4,6 +4,7 @@ import * as $ from '../../../builtin/index.js'
 import { Builder } from '../../../strings/index.js'
 import {
   AppendVarint,
+  BindMessageMethods,
   DecodeBytes,
   DecodeBytesAppend,
   DecodeFloat32,
@@ -1123,5 +1124,39 @@ describe('protobuf-go-lite text helpers', () => {
     const mb = new Builder()
     TextWriteTextMarshaler(mb, { MarshalProtoText: () => 'inner {}' })
     expect(mb.String()).toBe('inner {}')
+  })
+})
+
+describe('generated method installation', () => {
+  it('uses the declaring constructor for nil and borrowed receivers and preserves custom methods', () => {
+    class Installed {
+      static __protobufTypeScriptMessage = {
+        typeName: 'test.Installed',
+        fields: { list: () => [] },
+        fromBinary: () => ({}),
+        toBinary: () => new Uint8Array([7]),
+      }
+      declare MarshalVT: () => [$.Slice<number>, $.GoError]
+      MarshalJSON() {
+        return 'custom'
+      }
+    }
+    BindMessageMethods(Installed, '*test.Installed', ['MarshalVT'])
+    for (const receiver of [null, {}, new Installed()]) {
+      const [data, err] = Installed.prototype.MarshalVT.call(
+        receiver as Installed,
+      )
+      expect(err).toBeNull()
+      expect(Array.from(data ?? [])).toEqual([7])
+    }
+    expect(new Installed().MarshalJSON()).toBe('custom')
+    expect(Object.keys(new Installed())).not.toContain('MarshalVT')
+    expect(
+      Object.getOwnPropertyDescriptor(Installed.prototype, 'MarshalVT'),
+    ).toMatchObject({
+      enumerable: false,
+      configurable: true,
+      writable: true,
+    })
   })
 })

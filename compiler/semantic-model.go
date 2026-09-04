@@ -28,7 +28,7 @@ func NewSemanticModelOwner(overrideOwners ...*OverrideRegistryOwner) *SemanticMo
 }
 
 // Build constructs semantic facts for a package graph.
-func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph) (*SemanticModel, []Diagnostic) {
+func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, deferredFunctions ...string) (*SemanticModel, []Diagnostic) {
 	if err := ctx.Err(); err != nil {
 		return nil, []Diagnostic{{
 			Severity: DiagnosticSeverityError,
@@ -75,6 +75,11 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph) (*S
 		return model, diagnostics
 	}
 
+	diagnostics = append(diagnostics, model.deferFunctions(deferredFunctions)...)
+	if diagnosticsHaveErrors(diagnostics) {
+		model.freeze()
+		return model, diagnostics
+	}
 	model.functionCallers = semanticFunctionCallers(model)
 	propagatedCallers := make(map[*types.Func]bool)
 	diagnostics = append(diagnostics, o.propagateFunctionAsync(ctx, model, propagatedCallers)...)
