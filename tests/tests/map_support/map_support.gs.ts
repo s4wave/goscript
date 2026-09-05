@@ -48,7 +48,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("After delete, does Charlie exist? Expected: false, Actual:", exists)
 
 	// Create map with literal syntax
-	let colors: globalThis.Map<string, string> | null = new globalThis.Map<string, string>([["red", "#ff0000"], ["green", "#00ff00"], ["blue", "#0000ff"]])
+	let colors: globalThis.Map<string, string> | null = $.makeMap<string, string>([["red", "#ff0000"], ["green", "#00ff00"], ["blue", "#0000ff"]])
 	await $.println("Map literal size: Expected: 3, Actual:", $.len(colors))
 	await $.println("Color code for red: Expected: #ff0000, Actual:", $.mapGet<string, string, string>(colors, "red", "")[0])
 
@@ -56,7 +56,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Iterating over scores map:")
 
 	// Create a new map with string keys and string values for testing iteration
-	let stringMap: globalThis.Map<string, string> | null = new globalThis.Map<string, string>([["Alice", "A+"], ["Bob", "B+"], ["Charlie", "A"]])
+	let stringMap: globalThis.Map<string, string> | null = $.makeMap<string, string>([["Alice", "A+"], ["Bob", "B+"], ["Charlie", "A"]])
 
 	// Note: Map iteration is not ordered in Go, so we will collect the results and sort them for consistent test output.
 	let scoreResults: $.Slice<string> = null! as $.Slice<string>

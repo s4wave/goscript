@@ -61,6 +61,15 @@ function goStringBytes(str: GoStringValue): Uint8Array {
   return sharedTextEncoder.encode(str)
 }
 
+// stringMapKey gives every Go string representation the same native Map key.
+// Ordinary JavaScript strings are already canonical and need no byte conversion.
+export function stringMapKey(value: string | GoBinaryString): string {
+  if (typeof value === 'string' && !value.startsWith(goBinaryStringPrefix)) {
+    return value
+  }
+  return goStringFromBytes(goStringBytes(value))
+}
+
 function goStringComparableBytes(value: GoStringBytes): Uint8Array {
   if (isGoStringValue(value)) {
     return goStringBytes(value)
@@ -2409,6 +2418,13 @@ export function genericBytesOrStringToString(
     return value as string
   }
   return bytesToString(value)
+}
+
+// indexByteString indexes compiler-encoded byte constants without allocating a
+// UTF-8 buffer. Each JavaScript code unit represents exactly one original byte.
+export function indexByteString(value: string, index: number): number {
+  if (index < 0 || index >= value.length) outOfRangeIndex(index, value.length)
+  return value.charCodeAt(index)
 }
 
 /**

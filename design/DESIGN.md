@@ -475,7 +475,7 @@ After reviewing the code and tests, some important implementation considerations
     -   **Sparse Array Literals:** For Go array literals with specific indices (e.g., `[5]int{1: 10, 3: 30}`), unspecified indices are filled with the zero value of the element type in the generated TypeScript. For example, `[5]int{1: 10, 3: 30}` becomes `[0, 10, 0, 30, 0]`.
 
 *Note: The distinction between slices and arrays in Go is important. While both often map to TypeScript arrays, runtime helpers (`makeSlice`, `slice`, `len`, `cap`, `append`) and the `__capacity` property are essential for emulating Go's slice semantics accurately.*
-- **Maps:** Go maps (`map[K]V`) are translated to TypeScript's standard `Map<K, V>` objects. Various Go map operations are mapped as follows:
+- **Maps:** Go maps (`map[K]V`) use a `Map<K, V>` subclass created by `$.makeMap`. It indexes string keys by their Go byte value, so misses and insertions do not scan existing entries. Binary and UTF-8 string representations share a key while iteration retains the original representation. Struct keys still use Go value comparison. Various Go map operations are mapped as follows:
     -   **Creation (`make`):** `make(map[K]V)` is translated using a runtime helper:
         ```go
         m := make(map[string]int)
@@ -485,13 +485,13 @@ After reviewing the code and tests, some important implementation considerations
         import * as $ from "@goscript/builtin"
         let m = $.makeMap<string, number>() // Using generics for type information
         ```
-    -   **Literals:** Map literals are translated to `new Map(...)`:
+    -   **Literals:** Map literals use the same `$.makeMap` owner with initial entries:
         ```go
         m := map[string]int{"one": 1, "two": 2}
         ```
         becomes:
         ```typescript
-        let m = new Map([["one", 1], ["two", 2]])
+        let m = $.makeMap([["one", 1], ["two", 2]])
         ```
     -   **Assignment (`m[k] = v`):** Uses a runtime helper `mapSet`:
         ```go
@@ -501,15 +501,15 @@ After reviewing the code and tests, some important implementation considerations
         ```typescript
         $.mapSet(m, "three", 3)
         ```
-    -   **Access (`m[k]`):** Uses the standard `Map.get()` method combined with the nullish coalescing operator (`??`) to provide the zero value if the key is not found.
+    -   **Access (`m[k]`):** Uses `$.mapGet` to preserve both Go key equality and presence, including a stored undefined value.
         ```go
         val := m["one"] // Assuming m["one"] exists
         zero := m["nonexistent"] // Assuming m["nonexistent"] doesn't exist
         ```
         becomes (simplified conceptual translation):
         ```typescript
-        let val = m.get("one") ?? 0 // Provide zero value (0 for int) if undefined
-        let zero = m.get("nonexistent") ?? 0 // Provide zero value (0 for int) if undefined
+        let val = $.mapGet(m, "one", 0)[0]
+        let zero = $.mapGet(m, "nonexistent", 0)[0]
         ```
     -   **Comma-Ok Idiom (`v, ok := m[k]`):** Translated using `Map.has()` and `Map.get()` with zero-value handling during assignment:
         ```go

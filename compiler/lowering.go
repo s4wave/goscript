@@ -11023,6 +11023,21 @@ func (o *LoweringOwner) lowerIndexExpr(ctx lowerFileContext, expr *ast.IndexExpr
 	targetType := ctx.semPkg.source.TypesInfo.TypeOf(expr.X)
 	switch {
 	case isStringType(targetType):
+		// A constant string lookup needs one byte, not a fresh UTF-8 buffer.
+		// Encode each Go byte as a JS code unit, including invalid UTF-8 bytes.
+		value := ctx.semPkg.source.TypesInfo.Types[unwrapParenExpr(expr.X)].Value
+		if value != nil && value.Kind() == constant.String {
+			encoded := hex.EncodeToString([]byte(constant.StringVal(value)))
+			var literal strings.Builder
+			literal.WriteByte('"')
+			for i := 0; i < len(encoded); i += 2 {
+				literal.WriteString(`\x`)
+				literal.WriteString(encoded[i : i+2])
+			}
+			literal.WriteByte('"')
+			return o.runtimeOwner.QualifiedHelper(RuntimeHelperIndexByteString) + "(" + literal.String() + ", " + o.lowerNumberIndexValue(ctx, expr.Index, index) + ")", diagnostics
+		}
+
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperIndexStringOrBytes) + "(" + target + ", " + o.lowerNumberIndexValue(ctx, expr.Index, index) + ")", diagnostics
 	case isMapType(targetType):
 		return o.lowerMapGetValue(ctx, expr, target, index), diagnostics
@@ -11506,7 +11521,7 @@ func (o *LoweringOwner) lowerMapCompositeLit(
 		value = o.lowerValueForTarget(ctx, keyed.Value, mapType.Elem(), value)
 		entries = append(entries, "["+key+", "+value+"]")
 	}
-	return "new " + tsNativeMapType(o.tsTypeFor(ctx, mapType.Key()), o.tsTypeFor(ctx, mapType.Elem())) + "([" + strings.Join(entries, ", ") + "])", diagnostics
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperMakeMap) + "<" + o.tsTypeFor(ctx, mapType.Key()) + ", " + o.tsTypeFor(ctx, mapType.Elem()) + ">([" + strings.Join(entries, ", ") + "])", diagnostics
 }
 
 func tsNativeMapType(keyType, elemType string) string {
