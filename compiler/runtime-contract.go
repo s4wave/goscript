@@ -115,6 +115,7 @@ const (
 	RuntimeHelperStringHeaderRef              RuntimeHelper = "slice.stringHeaderRef"
 	RuntimeHelperSliceHeaderRef               RuntimeHelper = "slice.sliceHeaderRef"
 	RuntimeHelperGenericBytesOrStringToString RuntimeHelper = "slice.genericBytesOrStringToString"
+	RuntimeHelperIndexByteString              RuntimeHelper = "slice.indexByteString"
 	RuntimeHelperIndexStringOrBytes           RuntimeHelper = "slice.indexStringOrBytes"
 	RuntimeHelperArrayIndex                   RuntimeHelper = "slice.arrayIndex"
 	RuntimeHelperSliceStringOrBytes           RuntimeHelper = "slice.sliceStringOrBytes"
@@ -364,6 +365,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperStringHeaderRef, "stringHeaderRef", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperSliceHeaderRef, "sliceHeaderRef", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperGenericBytesOrStringToString, "genericBytesOrStringToString", RuntimeHelperCategorySlice),
+		runtimeHelper(RuntimeHelperIndexByteString, "indexByteString", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperIndexStringOrBytes, "indexStringOrBytes", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperArrayIndex, "arrayIndex", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperSliceStringOrBytes, "sliceStringOrBytes", RuntimeHelperCategorySlice),

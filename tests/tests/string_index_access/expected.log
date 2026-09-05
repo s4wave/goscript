@@ -5,3 +5,11 @@ Byte from myStr2[0]: 228
 Byte from myStr2[1]: 189
 Byte from myStr2[2]: 160
 Byte from myStr2[3]: 229
+constant byte 0
+constant byte 255
+constant byte 7
+constant byte 228
+constant byte 189
+constant byte 160
+out of bounds true
+out of bounds true

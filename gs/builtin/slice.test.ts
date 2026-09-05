@@ -12,6 +12,7 @@ import {
   copy,
   goSlice,
   indexString,
+  indexByteString,
   len,
   makeSlice,
   runeToString,
@@ -24,6 +25,14 @@ import {
 import { markAsStructValue } from './type.js'
 
 describe('compiler byte constants', () => {
+  it('indexes encoded constants by byte with Go bounds checks', () => {
+    expect(indexByteString('\x00\xff\x07\xe4\xbd\xa0', 1)).toBe(255)
+    expect(indexByteString('\x00\xff\x07\xe4\xbd\xa0', 2)).toBe(7)
+    expect(indexByteString('\x00\xff\x07\xe4\xbd\xa0', 4)).toBe(189)
+    expect(() => indexByteString('a', -1)).toThrow()
+    expect(() => indexByteString('a', 1)).toThrow()
+  })
+
   it('decodes compact hexadecimal byte arrays', () => {
     expect(bytesFromHex('00ff8041')).toEqual(new Uint8Array([0, 255, 128, 65]))
   })
