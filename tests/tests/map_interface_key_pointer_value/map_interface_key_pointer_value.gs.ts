@@ -55,7 +55,7 @@ export class Table {
 
 export async function main(): globalThis.Promise<void> {
 	let node: Node | null = $.interfaceValue<Node | null>(new Table({name: "users"}), "*main.Table", { kind: $.TypeKind.Pointer, elemType: "main.Table" })
-	let seen: globalThis.Map<Node | null, boolean> | null = new globalThis.Map<Node | null, boolean>([[node, true]])
+	let seen: globalThis.Map<Node | null, boolean> | null = $.makeMap<Node | null, boolean>([[node, true]])
 	{
 		let __goscriptTuple0: any = $.typeAssertTuple<Table | $.VarRef<Table> | null>(node, { kind: $.TypeKind.Pointer, elemType: "main.Table" })
 		let table: Table | $.VarRef<Table> | null = __goscriptTuple0[0]

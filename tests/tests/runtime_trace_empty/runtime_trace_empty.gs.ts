@@ -58,8 +58,8 @@ export function toHex(b: $.Slice<number>): string {
 	let out: $.Slice<number> = $.makeSlice<number>($.len(b) * 2, undefined, "byte")
 	for (let __goscriptRangeTarget0 = b, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
 		let c = __goscriptRangeTarget0![i]
-		out![i * 2] = $.uint($.indexStringOrBytes("0123456789abcdef", $.uintShr(c, 4, 8)), 8)
-		out![(i * 2) + 1] = $.uint($.indexStringOrBytes("0123456789abcdef", c & 0x0f), 8)
+		out![i * 2] = $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", $.uintShr(c, 4, 8)), 8)
+		out![(i * 2) + 1] = $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", c & 0x0f), 8)
 	}
 	return $.bytesToString(out)
 }

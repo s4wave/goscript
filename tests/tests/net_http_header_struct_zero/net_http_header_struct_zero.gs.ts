@@ -47,7 +47,7 @@ export class responseWriter {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let writer: responseWriter | $.VarRef<responseWriter> | null = new responseWriter({header: new globalThis.Map<string, $.Slice<string>>([])})
+	let writer: responseWriter | $.VarRef<responseWriter> | null = new responseWriter({header: $.makeMap<string, $.Slice<string>>([])})
 	http.Header_Set(responseWriter.prototype.Header.call(writer), "X-Test", "ok")
 	await $.println(await http.Header_Get(responseWriter.prototype.Header.call(writer), "x-test"))
 }

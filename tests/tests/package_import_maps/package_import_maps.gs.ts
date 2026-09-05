@@ -27,7 +27,7 @@ export function simpleIterator(m: globalThis.Map<string, number> | null): ((_p0:
 
 export async function main(): globalThis.Promise<void> {
 	// Create a map to test with
-	let m: globalThis.Map<string, number> | null = new globalThis.Map<string, number>([["a", 1], ["b", 2], ["c", 3]])
+	let m: globalThis.Map<string, number> | null = $.makeMap<string, number>([["a", 1], ["b", 2], ["c", 3]])
 
 	// Collect results in a slice to ensure deterministic output
 	let results: $.Slice<string> = null! as $.Slice<string>
@@ -70,8 +70,8 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("Result:", result)
 	}
 
-	let dst: globalThis.Map<string, number> | null = new globalThis.Map<string, number>([["base", 1]])
-	let src: globalThis.Map<string, number> | null = new globalThis.Map<string, number>([["copied", 2]])
+	let dst: globalThis.Map<string, number> | null = $.makeMap<string, number>([["base", 1]])
+	let src: globalThis.Map<string, number> | null = $.makeMap<string, number>([["copied", 2]])
 	maps.Copy(dst, src)
 	let nilSrc: globalThis.Map<string, number> | null = null! as globalThis.Map<string, number> | null
 	maps.Copy(dst, nilSrc)

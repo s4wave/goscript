@@ -14,7 +14,7 @@ export async function mapped(): globalThis.Promise<globalThis.Map<number, number
 	let ready: $.Channel<boolean> | null = $.makeChannel<boolean>(1, false, "both")
 	await $.chanSend(ready, true)
 	await $.chanRecv(ready)
-	return new globalThis.Map<number, number>([[2, 5]])
+	return $.makeMap<number, number>([[2, 5]])
 }
 
 export async function main(): globalThis.Promise<void> {

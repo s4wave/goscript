@@ -167,7 +167,7 @@ export async function main(): globalThis.Promise<void> {
 	let runner: packetHandlerMap | $.VarRef<packetHandlerMap> | null = $.unsafePointerCast<packetHandlerMap | $.VarRef<packetHandlerMap> | null>(t, packetHandlerMap)
 	transport.prototype.SourceOnly.call(t, 3)
 	let runnerAgainDest: packetHandlerMap | $.VarRef<packetHandlerMap> | null = $.unsafePointerCast<packetHandlerMap | $.VarRef<packetHandlerMap> | null>(t, packetHandlerMap)
-	let runners: connRunners = new globalThis.Map<connRunner | null, connRunnerCallbacks>([[$.interfaceValue<connRunner | null>(runner, "*main.packetHandlerMap", { kind: $.TypeKind.Pointer, elemType: "main.packetHandlerMap" }), $.markAsStructValue($.cloneStructValue(newConnRunnerCallbacks($.interfaceValue<connRunner | null>(runner, "*main.packetHandlerMap", { kind: $.TypeKind.Pointer, elemType: "main.packetHandlerMap" }))))]])
+	let runners: connRunners = $.makeMap<connRunner | null, connRunnerCallbacks>([[$.interfaceValue<connRunner | null>(runner, "*main.packetHandlerMap", { kind: $.TypeKind.Pointer, elemType: "main.packetHandlerMap" }), $.markAsStructValue($.cloneStructValue(newConnRunnerCallbacks($.interfaceValue<connRunner | null>(runner, "*main.packetHandlerMap", { kind: $.TypeKind.Pointer, elemType: "main.packetHandlerMap" }))))]])
 	let sourceInterface: sourceRunner | null = $.interfaceValue<sourceRunner | null>(t, "*main.transport", { kind: $.TypeKind.Pointer, elemType: "main.transport" })
 	let destinationInterface: connRunner | null = $.interfaceValue<connRunner | null>(runner, "*main.packetHandlerMap", { kind: $.TypeKind.Pointer, elemType: "main.packetHandlerMap" })
 	await connRunners_AddConnectionID(runners, 7)
@@ -179,7 +179,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("boxed same pointer:", $.pointerEqual(t, runnerAgain))
 	await $.pointerValue<Exclude<sourceRunner, null>>(sourceInterface).SourceOnly(4)
 	await $.pointerValue<Exclude<connRunner, null>>(destinationInterface).Add(8)
-	let pointerValues: globalThis.Map<transport | $.VarRef<transport> | null, number> | null = new globalThis.Map<transport | $.VarRef<transport> | null, number>([[t, 42]])
+	let pointerValues: globalThis.Map<transport | $.VarRef<transport> | null, number> | null = $.makeMap<transport | $.VarRef<transport> | null, number>([[t, 42]])
 	await $.println("map lookup:", $.mapGet<transport | $.VarRef<transport> | null, number, number>(pointerValues, runnerAgain, 0)[0])
 	await testVarRefConversion()
 }

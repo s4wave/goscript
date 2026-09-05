@@ -39,7 +39,7 @@ export class holder {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let k = $.markAsStructValue(new holder({values: new globalThis.Map<string, number>([["a", 1], ["b", 2]])}))
+	let k = $.markAsStructValue(new holder({values: $.makeMap<string, number>([["a", 1], ["b", 2]])}))
 	let sum = 0
 	for (const [__goscriptRangeShadow0, v] of k.values?.entries() ?? []) {
 		sum = sum + ($.len(__goscriptRangeShadow0) + v)

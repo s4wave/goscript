@@ -39,7 +39,7 @@ export class Map {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let m = $.markAsStructValue(new Map({values: new globalThis.Map<string, number>([["one", 1]])}))
+	let m = $.markAsStructValue(new Map({values: $.makeMap<string, number>([["one", 1]])}))
 	let [got, ok] = $.mapGet<string, number, number>(m.values, "one", 0)
 	await $.println(got, ok)
 }

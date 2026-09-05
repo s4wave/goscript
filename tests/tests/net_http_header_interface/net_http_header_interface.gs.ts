@@ -10,7 +10,7 @@ import "@goscript/fmt/index.js"
 import "@goscript/net/http/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let header: http.Header = new globalThis.Map<string, $.Slice<string>>([["X-Test", $.arrayToSlice<string>(["ok"])]])
+	let header: http.Header = $.makeMap<string, $.Slice<string>>([["X-Test", $.arrayToSlice<string>(["ok"])]])
 	if (!$.stringEqual(await http.Header_Get(header, "x-test"), "ok")) {
 		$.panic("missing header")
 	}

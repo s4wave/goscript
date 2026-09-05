@@ -117,7 +117,7 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo))) as $.Slice<number>)
 	await $.println("delete func:", $.arrayIndex(filtered!, 0), $.arrayIndex(filtered!, 1), $.arrayIndex(filtered!, 2), $.len(filtered))
 
-	let sortedKeys: $.Slice<string> = (slices.Sorted(maps.Keys(new globalThis.Map<string, number>([["c", 3], ["a", 1], ["b", 2]]))) as $.Slice<string>)
+	let sortedKeys: $.Slice<string> = (slices.Sorted(maps.Keys($.makeMap<string, number>([["c", 3], ["a", 1], ["b", 2]]))) as $.Slice<string>)
 	await $.println("sorted:", $.arrayIndex(sortedKeys!, 0), $.arrayIndex(sortedKeys!, 1), $.arrayIndex(sortedKeys!, 2))
 
 	await $.println("test finished")
