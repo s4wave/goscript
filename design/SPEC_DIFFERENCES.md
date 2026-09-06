@@ -1132,8 +1132,8 @@ Go has two forms of type declarations: alias declarations and type definitions.
         -   Instantiation in Go is often implicit. In TypeScript, generic functions are called with type arguments inferred or explicitly provided. This maps well.
     -   **External Functions:**
         -   Go: `func flushICache(begin, end uintptr)`
-        -   TS: `declare function flushICache(begin: number, end: number): void;` (using an ambient declaration).
-        -   **Divergence (Minor):** GoScript would need a mechanism to identify these (e.g., no function body in AST) and generate `declare function` or link to provided external implementations.
+        -   Bodyless declarations do not supply an implementation. The compiler currently emits an empty body unless a runtime package override replaces the package.
+        -   `gs/internal/chacha8rand` supplies the portable ChaCha8 algorithm and state API for the assembly-backed standard-library package. The `math_rand_v2_chacha8` compliance fixture compares generated output with native Go, including refills, serialization, and seeding. Other external implementations still require an explicit runtime implementation.
     -   **Overall:** Function declarations map well to TypeScript functions.
 
 ### Method declarations
@@ -2001,7 +2001,6 @@ Go has two forms of type declarations: alias declarations and type definitions.
         -   This behavior is somewhat analogous.
     -   **Iterative Process:** TS type inference is also iterative, resolving types and constraints until a stable state or an error.
     -   **Divergence:** The precise rules for Go's "loose" unification based on underlying types and the specific steps for constraint unification (especially involving tilde `~` types) are unique to Go. TS has its own sophisticated rules. While often leading to similar outcomes for common generic patterns, edge cases related to Go's specific definition of type identity and underlying types might be handled differently. GoScript would rely on TS's mechanisms, which means Go programs relying on very subtle aspects of Go's unification might behave differently or require more explicit typing when transpiled.
-
 
 
 
