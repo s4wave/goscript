@@ -8485,6 +8485,12 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 				call := o.runtimeOwner.QualifiedHelper(RuntimeHelperCallGenericMethod) + "(" + strings.Join(methodArgs, ", ") + ")"
 				return o.awaitCallIfNeeded(ctx, fun, call), diagnostics
 			}
+			// A generic method on a plain receiver takes its own type dictionary.
+			if signature := genericFunctionSignature(ctx, fun); signature != nil &&
+				len(genericReceiverTypeParams(selection.Recv())) == 0 &&
+				!o.callUsesOverridePackage(ctx, fun) {
+				args = append([]string{o.inferredGenericTypeArgsExpr(ctx, signature, expr.Args)}, args...)
+			}
 			if genericArgs := o.genericReceiverTypeArgsExpr(ctx, selection); genericArgs != "" &&
 				!o.callUsesOverridePackage(ctx, fun) {
 				if isInterfaceType(selection.Recv()) {

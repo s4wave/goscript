@@ -139,6 +139,12 @@ Go's explicit error return values are maintained. Functions returning an error t
 *   `byte()`: Mapped to `$.byte()` for byte conversion.
 *   `int()`: Mapped to `$.int()` which uses `Math.trunc()` for integer truncation.
 
+### Generic Method Calls
+
+Generated generic functions and methods receive a leading `__typeArgs` dictionary containing runtime descriptors. Inferred calls to methods with their own type parameters on a non-generic receiver use the same inference helper as generic function calls. Receiver type arguments continue to use the existing receiver dictionary path.
+
+Methods with both receiver and method type parameters remain unsupported: the declaration currently emits two parameters named `__typeArgs`. Supporting that shape requires one combined dictionary at declarations and calls.
+
 ### Variable References and Pointers
 
 See `design/VAR_REFS.md`. Go pointers are represented using a `$.VarRef<T>` wrapper type provided by the runtime. This allows emulating pointer semantics (shared reference, ability to modify the original value indirectly) in TypeScript.
