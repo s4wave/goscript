@@ -1,4 +1,7 @@
+import { describe, expect, test } from 'vitest'
+
 import * as $ from '@goscript/builtin/index.js'
+
 import {
   Copy,
   CopyBuffer,
@@ -18,7 +21,6 @@ import {
   TeeReader,
   WriteString,
 } from './index.js'
-import { describe, expect, test } from 'vitest'
 
 class sliceReader {
   public requestedSizes: number[] = []
@@ -51,7 +53,7 @@ class syncReaderAt {
 
   ReadAt(p: $.Bytes, off: bigint): [number, $.GoError] {
     const n = $.copy(p, this.data.subarray(Number(off)))
-    return [n, n < $.len(p) ? (new Error('EOF') as $.GoError) : null]
+    return [n, n < $.len(p) ? EOF : null]
   }
 }
 
@@ -154,8 +156,8 @@ describe('io override', () => {
   test('SectionReader preserves sync reads for sync ReaderAt', () => {
     const reader = NewSectionReader(
       new syncReaderAt($.stringToBytes('abcdef')),
-      1,
-      3,
+      1n,
+      3n,
     )
     const buf = new Uint8Array(4)
 
@@ -175,11 +177,11 @@ describe('io override', () => {
           await Promise.resolve()
           const data = $.stringToBytes('abcdef')
           const n = $.copy(p, data.subarray(Number(off)))
-          return [n, n < $.len(p) ? (new Error('EOF') as $.GoError) : null]
+          return [n, n < $.len(p) ? EOF : null]
         },
       } as any,
-      1,
-      3,
+      1n,
+      3n,
     )
     const buf = new Uint8Array(4)
 
@@ -264,9 +266,9 @@ describe('io override', () => {
     const [remainingBytes, remainingErr] = exactSource.Read(remaining)
     expect(remainingErr).toBeNull()
     expect(remainingBytes).toBe(2)
-    expect(Buffer.from(remaining.subarray(0, remainingBytes)).toString('utf8')).toBe(
-      'ef',
-    )
+    expect(
+      Buffer.from(remaining.subarray(0, remainingBytes)).toString('utf8'),
+    ).toBe('ef')
 
     const shortWriter = new captureWriter()
     const [shortWritten, shortErr] = await CopyN(
@@ -295,7 +297,10 @@ describe('io override', () => {
 
   test('ReadFull fills the buffer and reports unexpected EOF on short input', async () => {
     const full = new Uint8Array(4)
-    const [n, err] = await ReadFull(new sliceReader($.stringToBytes('abcd')), full)
+    const [n, err] = await ReadFull(
+      new sliceReader($.stringToBytes('abcd')),
+      full,
+    )
 
     expect(err).toBeNull()
     expect(n).toBe(4)
@@ -332,8 +337,28 @@ describe('io override', () => {
     expect(written).toBe(10n)
   })
 
+  test('ReadAll consumes large async inputs with bounded bulk reads', async () => {
+    const input = Uint8Array.from(
+      { length: 1024 * 1024 + 17 },
+      (_, i) => i % 251,
+    )
+    const reader = new sliceReader(input)
+
+    const [out, err] = await ReadAll({
+      async Read(p: $.Bytes): Promise<[number, $.GoError]> {
+        return reader.Read(p)
+      },
+    })
+
+    expect(err).toBeNull()
+    expect(out).toEqual(input)
+    expect(reader.requestedSizes.length).toBeLessThanOrEqual(64)
+    expect(reader.requestedSizes[0]).toBeLessThanOrEqual(1024)
+    expect(Math.max(...reader.requestedSizes)).toBeLessThanOrEqual(32 * 1024)
+  })
+
   test('ReadAll returns the bytes already read with a non-EOF error', async () => {
-    const boom = new Error('boom') as $.GoError
+    const boom = $.newError('boom')
     let called = false
     const reader = {
       Read(p: $.Bytes): [number, $.GoError] {

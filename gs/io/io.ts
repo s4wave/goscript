@@ -5,7 +5,7 @@
 
 import * as $ from '@goscript/builtin/index.js'
 
-// Simple error implementation for io package
+// IOError carries an io sentinel message.
 class IOError {
   constructor(private message: string) {}
 
@@ -22,7 +22,7 @@ function newError(message: string): $.GoError {
   return new IOError(message)
 }
 
-// EOF Error variables.
+// EOF marks normal completion of a reader.
 export const EOF = newError('EOF')
 export const ErrClosedPipe = newError('io: read/write on closed pipe')
 export const ErrNoProgress = newError(
@@ -32,18 +32,17 @@ export const ErrShortBuffer = newError('short buffer')
 export const ErrShortWrite = newError('short write')
 export const ErrUnexpectedEOF = newError('unexpected EOF')
 
-// SeekStart Seek whence values.
+// SeekStart measures offsets from the beginning.
 export const SeekStart = 0 // seek relative to the origin of the file
 export const SeekCurrent = 1 // seek relative to the current offset
 export const SeekEnd = 2 // seek relative to the end
-
-// Core interfaces
 
 // Reader is the interface that wraps the basic Read method.
 export interface Reader {
   Read(p: $.Bytes): [number, $.GoError]
 }
 
+// AsyncReader completes each read asynchronously.
 export interface AsyncReader {
   Read(p: $.Bytes): Promise<[number, $.GoError]>
 }
@@ -66,7 +65,7 @@ export interface Seeker {
   Seek(offset: bigint, whence: number): [bigint, $.GoError]
 }
 
-// ReadWriter Combined interfaces.
+// ReadWriter combines sequential reads and writes.
 export interface ReadWriter extends Reader, Writer {}
 export interface ReadCloser extends Reader, Closer {}
 export interface WriteCloser extends Writer, Closer {}
@@ -274,26 +273,25 @@ export interface ReaderFrom {
   ReadFrom(r: Reader): [bigint, $.GoError]
 }
 
-// Discard is a Writer on which all Write calls succeed without doing anything
+// DiscardWriter accepts every byte without retaining it.
 class DiscardWriter implements Writer {
   Write(p: $.Bytes): [number, $.GoError] {
     return [$.len(p), null]
   }
 }
 
+// Discard accepts every byte without retaining it.
 export const Discard: Writer | null = new DiscardWriter()
 
-// WriteString writes the contents of the string s to w, which accepts a slice of bytes
+// WriteString writes s through StringWriter when available, or as UTF-8 bytes.
 export async function WriteString(
   w: Writer,
   s: string,
 ): Promise<[number, $.GoError]> {
-  // Check if w implements StringWriter interface
   if ('WriteString' in w && typeof (w as any).WriteString === 'function') {
     return await ((w as StringWriter).WriteString(s) as any)
   }
 
-  // Convert string to bytes and write
   const bytes = new TextEncoder().encode(s)
   return await (w.Write(bytes) as any)
 }
@@ -362,7 +360,7 @@ export class SectionReader implements Reader, Seeker, ReaderAt {
       return [0, EOF]
     }
 
-    let max = this.limit - this.off
+    const max = this.limit - this.off
     if ($.len(p) > max) {
       p = $.goSlice(p, 0, max)
     }
@@ -501,7 +499,7 @@ export function NewOffsetWriter(w: WriterAt, off: bigint): OffsetWriter {
   return new OffsetWriter(w, off)
 }
 
-// Copy copies from src to dst until either EOF is reached on src or an error occurs
+// Copy copies from src to dst until EOF or an error.
 export async function Copy(
   dst: WriterLike,
   src: ReaderLike,
@@ -509,7 +507,8 @@ export async function Copy(
   return await CopyBuffer(dst, src, null)
 }
 
-// CopyBuffer is identical to Copy except that it stages through the provided buffer
+// CopyBuffer stages copying through buf unless a reader or writer owns the copy.
+// A nil buffer allocates a bounded 32 KiB buffer.
 export async function CopyBuffer(
   dst: WriterLike,
   src: ReaderLike,
@@ -521,18 +520,17 @@ export async function CopyBuffer(
     return [0n, newError('io: copy with nil reader or writer')]
   }
 
-  // If src implements WriterTo, use it
+  // Source and destination copy methods take precedence over buffering.
   if ('WriteTo' in src && typeof (src as any).WriteTo === 'function') {
     return await ((src as WriterTo).WriteTo(dst) as any)
   }
 
-  // If dst implements ReaderFrom, use it
   if ('ReadFrom' in dst && typeof (dst as any).ReadFrom === 'function') {
     return await ((dst as ReaderFrom).ReadFrom(src) as any)
   }
 
   if (buf === null) {
-    buf = $.makeSlice<number>(32 * 1024, undefined, 'byte') // 32KB default buffer
+    buf = $.makeSlice<number>(32 * 1024, undefined, 'byte')
   }
 
   let written = 0n
@@ -584,7 +582,7 @@ function unwrapWriter(dst: WriterLike): Writer | null {
   return (dst as { Writer: Writer | null }).Writer
 }
 
-// CopyN copies n bytes (or until an error) from src to dst
+// CopyN copies n bytes from src to dst, or returns the error that stops it.
 export async function CopyN(
   dst: Writer,
   src: Reader,
@@ -595,13 +593,13 @@ export async function CopyN(
     return [written, null]
   }
   if (written < n && err === null) {
-    // src stopped early; must have been EOF
+    // Copy translates EOF to nil; a short CopyN restores that terminal error.
     return [written, EOF]
   }
   return [written, err]
 }
 
-// ReadAtLeast reads from r into buf until it has read at least min bytes
+// ReadAtLeast fills at least min bytes or reports the terminal error.
 export async function ReadAtLeast(
   r: Reader,
   buf: $.Bytes,
@@ -631,7 +629,7 @@ export async function ReadAtLeast(
   return [n, null]
 }
 
-// ReadFull reads exactly len(buf) bytes from r into buf
+// ReadFull fills buf or reports EOF or ErrUnexpectedEOF for a short read.
 export async function ReadFull(
   r: Reader,
   buf: $.Bytes,
@@ -639,13 +637,14 @@ export async function ReadFull(
   return await ReadAtLeast(r, buf, $.len(buf))
 }
 
-// ReadAll reads from r until an error or EOF and returns the data it read
+// ReadAll reads until EOF or an error, preserving bytes returned with an error.
+// EOF is reported as a nil error; other errors accompany the partial result.
 export async function ReadAll(
   r: Reader | AsyncReader,
 ): Promise<[$.Bytes, $.GoError]> {
   const chunks: $.Bytes[] = []
   let totalLength = 0
-  const buf = $.makeSlice<number>(512, undefined, 'byte')
+  let buf = $.makeSlice<number>(512, undefined, 'byte')
   let readErr: $.GoError = null
 
   while (true) {
@@ -657,16 +656,19 @@ export async function ReadAll(
       totalLength += n
     }
     if (err !== null) {
-      // EOF is the normal terminator and is reported as a nil error. Any other
-      // error is returned together with the bytes already read, matching Go.
       if (err !== EOF) {
         readErr = err
       }
       break
     }
+
+    // Keep small inputs cheap and amortize calls once the reader fills the buffer.
+    if (n === $.len(buf) && $.len(buf) < 32 * 1024) {
+      buf = $.makeSlice<number>($.len(buf) * 2, undefined, 'byte')
+    }
   }
 
-  // Combine all chunks.
+  // Return independently owned bytes after the scratch buffer is no longer needed.
   const result = $.makeSlice<number>(totalLength, undefined, 'byte')
   let offset = 0
   for (const chunk of chunks) {
@@ -709,7 +711,7 @@ class multiReader implements Reader {
   Read(p: $.Bytes): [number, $.GoError] {
     while (this.readers.length > 0) {
       if (this.readers.length === 1) {
-        // Optimization for single reader
+        // The final reader owns terminal EOF.
         const r = this.readers[0]
         const [n, err] = r.Read(p)
         if (err === EOF) {
@@ -720,12 +722,12 @@ class multiReader implements Reader {
 
       const [n, err] = this.readers[0].Read(p)
       if (err === EOF) {
-        this.readers.shift() // Remove first reader
+        this.readers.shift()
         continue
       }
       if (n > 0 || err !== EOF) {
         if (err === EOF && this.readers.length > 1) {
-          // Don't return EOF if there are more readers
+          // Intermediate EOF does not terminate the combined reader.
           return [n, null]
         }
         return [n, err]
