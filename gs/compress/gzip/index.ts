@@ -22,14 +22,17 @@ export const HuffmanOnly = -2
 export let ErrChecksum = errors.New('gzip: invalid checksum')
 export let ErrHeader = errors.New('gzip: invalid header')
 
+// __goscript_set_ErrChecksum updates the assignable Go package error.
 export function __goscript_set_ErrChecksum(value: $.GoError): void {
   ErrChecksum = value
 }
 
+// __goscript_set_ErrHeader updates the assignable Go package error.
 export function __goscript_set_ErrHeader(value: $.GoError): void {
   ErrHeader = value
 }
 
+// Header holds gzip member metadata.
 export class Header {
   Comment = ''
   Extra: $.Bytes = null
@@ -38,6 +41,7 @@ export class Header {
   OS = 255
 }
 
+// Reader collects and decompresses its source before serving uncompressed bytes.
 export class Reader {
   private data: Uint8Array = new Uint8Array(0)
   private offset = 0
@@ -50,6 +54,7 @@ export class Reader {
     }
   }
 
+  // Read waits for pending decompression and copies bytes into the caller's buffer.
   async Read(p: $.Bytes): Promise<[number, $.GoError]> {
     const pending = this.pending
     if (pending != null) {
@@ -61,6 +66,7 @@ export class Reader {
       this.data = result.data ?? new Uint8Array(0)
       this.offset = 0
     }
+
     if (this.offset >= this.data.length) {
       return [0, io.EOF]
     }
@@ -71,10 +77,12 @@ export class Reader {
     return [n, null]
   }
 
+  // Close leaves the caller-owned input reader open.
   Close(): $.GoError {
     return null
   }
 
+  // Reset replaces the source; asynchronous failures are reported by Read.
   Reset(r: io.Reader | null): $.GoError {
     if (r == null) {
       return errors.New('gzip: nil reader')
@@ -95,6 +103,7 @@ export class Reader {
   }
 }
 
+// Writer retains its own input bytes until Close compresses and writes them.
 export class Writer {
   private chunks: Uint8Array[] = []
   private closed = false
@@ -104,6 +113,7 @@ export class Writer {
     private level = DefaultCompression,
   ) {}
 
+  // Write copies accepted input so the caller can immediately reuse its buffer.
   Write(p: $.Bytes): [number, $.GoError] {
     if (this.closed) {
       return [0, errors.New('gzip: writer closed')]
@@ -113,6 +123,7 @@ export class Writer {
     return [data.length, null]
   }
 
+  // Close compresses buffered input once and waits for the destination write.
   async Close(): Promise<$.GoError> {
     if (this.closed) {
       return null
@@ -127,10 +138,12 @@ export class Writer {
     return err
   }
 
+  // Flush leaves buffered input for the complete-stream compressor at Close.
   Flush(): $.GoError {
     return null
   }
 
+  // Reset discards buffered input and reuses the compression level.
   Reset(w: io.Writer | null): void {
     this.w = w
     this.chunks = []
@@ -138,6 +151,7 @@ export class Writer {
   }
 }
 
+// NewReader starts decompression, reporting deferred errors through Read.
 export function NewReader(
   r: io.Reader | null,
 ): [io.ReadCloser | null, $.GoError] {
@@ -149,10 +163,12 @@ export function NewReader(
   return [reader as any, null]
 }
 
+// NewWriter buffers gzip output with the default compression level.
 export function NewWriter(w: io.Writer | null): Writer {
   return new Writer(w)
 }
 
+// NewWriterLevel validates the level before creating a buffered writer.
 export function NewWriterLevel(
   w: io.Writer | null,
   level: number,
@@ -163,6 +179,7 @@ export function NewWriterLevel(
   return [new Writer(w, level), null]
 }
 
+// gzipBytes compresses owned bytes through the available native runtime.
 async function gzipBytes(data: Uint8Array, level: number): Promise<Uint8Array> {
   const runtime = nodeCompressionRuntime()
   if (runtime?.gzipSync != null) {
@@ -176,6 +193,7 @@ async function gzipBytes(data: Uint8Array, level: number): Promise<Uint8Array> {
   return streamTransform(data, new CompressionStreamCtor('gzip'))
 }
 
+// gunzipBytes decompresses owned bytes through the available native runtime.
 function gunzipBytes(data: Uint8Array): Uint8Array | Promise<Uint8Array> {
   const runtime = nodeCompressionRuntime()
   if (runtime?.gunzipSync != null) {
@@ -189,18 +207,23 @@ function gunzipBytes(data: Uint8Array): Uint8Array | Promise<Uint8Array> {
   return streamTransform(data, new DecompressionStreamCtor('gzip'))
 }
 
+// streamTransform consumes owned input without an intermediate Blob or copy.
 async function streamTransform(
   data: Uint8Array,
   stream: ReadableWritablePair<Uint8Array, Uint8Array>,
 ): Promise<Uint8Array> {
-  const body = new ArrayBuffer(data.length)
-  new Uint8Array(body).set(data)
-  const response = new Response(
-    new Blob([body]).stream().pipeThrough(stream as any),
-  )
+  // The caller owns the collected bytes for the lifetime of this transform.
+  const source = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(data)
+      controller.close()
+    },
+  })
+  const response = new Response(source.pipeThrough(stream))
   return new Uint8Array(await response.arrayBuffer())
 }
 
+// readGunzipped collects synchronous input in bounded chunks until EOF.
 function readGunzipped(
   r: io.Reader,
 ):
@@ -224,6 +247,7 @@ function readGunzipped(
   }
 }
 
+// readGunzippedAsync continues collection after a source returns a Promise.
 async function readGunzippedAsync(
   read: Promise<[number, $.GoError]>,
   r: io.Reader,
@@ -243,12 +267,14 @@ async function readGunzippedAsync(
   }
 }
 
+// recordChunk preserves bytes before the reusable read buffer is overwritten.
 function recordChunk(chunks: Uint8Array[], buf: $.Bytes, n: number): void {
   if (n > 0) {
     chunks.push($.bytesToUint8Array($.goSlice(buf, 0, n)).slice())
   }
 }
 
+// inflateRecorded converts native decompression failures into the Go error.
 function inflateRecorded(chunks: Uint8Array[]):
   | { data: Uint8Array | null; err: $.GoError }
   | Promise<{
@@ -268,6 +294,7 @@ function inflateRecorded(chunks: Uint8Array[]):
   }
 }
 
+// concat creates one owned buffer from the collected chunks.
 function concat(chunks: Uint8Array[]): Uint8Array {
   let length = 0
   for (const chunk of chunks) {
@@ -282,6 +309,7 @@ function concat(chunks: Uint8Array[]): Uint8Array {
   return out
 }
 
+// nodeCompressionRuntime returns native Node compression when available.
 function nodeCompressionRuntime(): compressionRuntime | null {
   const processObj = (globalThis as any).process
   if (processObj && typeof processObj.getBuiltinModule === 'function') {
