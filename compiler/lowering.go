@@ -11756,6 +11756,10 @@ func (o *LoweringOwner) lowerValueForTargetTypes(
 	if isStructValueType(targetType) && cloneStructValue {
 		return o.lowerStructClone(value)
 	}
+	// Arrays retain value semantics at assignment, argument, and return boundaries.
+	if isArrayType(targetType) && isArrayType(sourceType) && cloneStructValue {
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperCloneArrayValue) + "(" + value + ", " + o.runtimeTypeInfoExpr(sourceType) + ")"
+	}
 	if isIntegerType(targetType) && isIntegerType(sourceType) {
 		if isBigIntBackedType(targetType) {
 			if isBigIntBackedType(sourceType) {

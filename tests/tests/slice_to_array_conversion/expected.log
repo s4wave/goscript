@@ -1,2 +1,6 @@
 2 3
 2 9
+byte write: 1 7 8
+byte alias: 6
+word write: 1 20 30 4
+word alias: 40

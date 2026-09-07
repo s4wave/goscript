@@ -316,26 +316,37 @@ export function sliceToArray<T>(
   return asArray(slice as Slice<T>).slice(0, length)
 }
 
+/**
+ * sliceToArrayPointer keeps element and whole-array writes in the slice backing.
+ */
 export function sliceToArrayPointer<T>(
   slice: Slice<T> | Uint8Array,
   length: number,
-  typeHint?: string,
+  typeHint: 'byte',
+): VarRef<Uint8Array>
+export function sliceToArrayPointer<T>(
+  slice: Slice<T> | Uint8Array,
+  length: number,
+): VarRef<T[]>
+export function sliceToArrayPointer<T>(
+  slice: Slice<T> | Uint8Array,
+  length: number,
+  _typeHint?: string,
 ): VarRef<T[] | Uint8Array> {
   if (len(slice) < length) {
     runtimePanic(
       `runtime error: cannot convert slice with length ${len(slice)} to array or pointer to array with length ${length}`,
     )
   }
-  if (typeHint === 'byte') {
-    if (slice instanceof Uint8Array) {
-      return varRef(goSlice(slice, 0, length) as Uint8Array)
-    }
-    return varRef(goSlice(slice as Slice<T>, 0, length) as Uint8Array)
-  }
-  if (slice instanceof Uint8Array) {
-    return varRef(goSlice(slice, 0, length) as T[])
-  }
-  return varRef(goSlice(slice, 0, length) as T[])
+  const view = goSlice(slice as Slice<T>, 0, length) as T[] | Uint8Array
+  const ref = varRef(view)
+  Object.defineProperty(ref, 'value', {
+    get: () => view,
+    set: (value: T[] | Uint8Array) => {
+      copy(view as Slice<T>, value as Slice<T>)
+    },
+  })
+  return ref
 }
 
 /**

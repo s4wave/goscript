@@ -310,7 +310,11 @@ describe('builtin runtime contract helpers', () => {
       [1, 2],
       [3, 4],
     ]
-    const clonedWords = cloneArrayValue(fixedWords)
+    const clonedWords = cloneArrayValue(fixedWords, {
+      kind: TypeKind.Array,
+      length: 2,
+      elemType: { kind: TypeKind.Array, length: 2, elemType: 'int' },
+    })
     expect(clonedWords).toEqual(fixedWords)
     expect(clonedWords).not.toBe(fixedWords)
     expect(clonedWords[0]).not.toBe(fixedWords[0])

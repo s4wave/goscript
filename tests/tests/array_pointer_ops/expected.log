@@ -1,3 +1,8 @@
+slice sharing: 7
+struct copy: 1 7
+pointer sharing: 7 true
+array fields: 8 1 8
+row copy: 1 2 9 2
 len: 3
 index: 5 7
 range: 0 5
