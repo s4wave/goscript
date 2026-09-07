@@ -1,6 +1,6 @@
 import * as $ from '@goscript/builtin/index.js'
 
-// uintptr Type definitions.
+// uintptr represents a Go program counter; JavaScript cannot resolve its location.
 export type uintptr = number
 export type Frame = uintptr
 export type StackTrace = $.Slice<Frame>
@@ -39,56 +39,7 @@ export function StackTrace_Format(
   _state: any,
   _verb: number,
 ): void {
-  // Stack frame formatting is informational in the JavaScript target.
-}
-
-class stack {
-  constructor(private _value: uintptr[]) {}
-
-  valueOf(): uintptr[] {
-    return this._value
-  }
-
-  toString(): string {
-    return String(this._value)
-  }
-
-  static from(value: uintptr[]): stack {
-    return new stack(value)
-  }
-
-  public StackTrace(): StackTrace {
-    const s = this._value
-    if (!s || s.length === 0) {
-      return null
-    }
-
-    const frames: Frame[] = []
-    for (let i = 0; i < s.length; i++) {
-      frames.push(s[i])
-    }
-    return $.arrayToSlice(frames)
-  }
-}
-
-// callers returns a simplified stack trace using JavaScript's native stack.
-export function callers(): $.VarRef<stack> | null {
-  try {
-    // Get JavaScript stack trace
-    throw new Error()
-  } catch (e: any) {
-    // Parse the stack trace to get some basic frame information
-    const stackLines = e.stack ? e.stack.split('\n') : []
-
-    // Create simplified frame data - just use line numbers as uintptr values
-    const pcs: uintptr[] = []
-    for (let i = 0; i < Math.min(stackLines.length, 8); i++) {
-      pcs.push(i + 1) // Simple frame counter
-    }
-
-    const st = new stack(pcs)
-    return $.varRef(st)
-  }
+  // JavaScript has no Go program-counter frames to format.
 }
 
 // funcname extracts the function name from a full function path.
