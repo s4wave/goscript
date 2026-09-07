@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { uint, uint64, uint64Add, uint64Shr } from './builtin.js'
+import type { StringHeaderData } from './slice.js'
 
 // Go represents uint/uintptr as a TypeScript number until full-width values no
 // longer round-trip through JS number. uint() returns bigint in that overflow
@@ -37,5 +38,46 @@ describe('uint full 64-bit width (Go uint semantics)', () => {
     // uint64 always yields bigint regardless of magnitude.
     expect(uint64(7)).toBe(7n)
     expect(typeof uint64(7)).toBe('bigint')
+  })
+})
+
+describe('uint conversion widths', () => {
+  it.each([8, 16, 32])('wraps finite numbers at %i bits', (bits) => {
+    for (const value of [
+      0,
+      -0,
+      1.75,
+      -1.75,
+      255,
+      256,
+      65535,
+      65536,
+      2 ** 31,
+      2 ** 32,
+      -(2 ** 32),
+      Number.MAX_SAFE_INTEGER,
+      2 ** 80,
+    ]) {
+      const expected = Number(BigInt.asUintN(bits, BigInt(Math.trunc(value))))
+      expect(uint(value, bits)).toBe(expected)
+    }
+  })
+
+  it('preserves uncommon widths, encoded integers, and non-finite values', () => {
+    expect(uint(-1, 7)).toBe(127)
+    expect(uint(-1n, 16)).toBe(65535)
+    expect(uint('4294967296', 32)).toBe(0)
+    expect(uint('18446744073709551615')).toBe(18446744073709551615n)
+    expect(() => uint('invalid', 8)).toThrow(SyntaxError)
+    for (const bits of [8, 16, 32, 64]) {
+      expect(uint(NaN, bits)).toBeNaN()
+      expect(uint(Infinity, bits)).toBe(Infinity)
+      expect(uint(-Infinity, bits)).toBe(-Infinity)
+    }
+  })
+
+  it('preserves string-header identity', () => {
+    const header: StringHeaderData = { kind: 'string', value: 'abc' }
+    expect(uint(header, 32)).toBe(header)
   })
 })

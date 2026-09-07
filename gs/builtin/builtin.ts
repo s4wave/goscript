@@ -11,19 +11,14 @@ import { isSliceProxy, runeToString } from './slice.js'
 import { isVarRef, type VarRef } from './varRef.js'
 
 /**
- * Implementation of Go's built-in print function. An operand rendered through
- * an async transpiled Error/String/GoString method resolves on the microtask
- * queue, so the write lands one microtask after the call in that case.
- * @param args Arguments to print
+ * print writes formatted operands, awaiting asynchronous string methods.
  */
 export async function print(...args: any[]): Promise<void> {
   writeHostStdoutText(args.length === 0 ? '' : await formatPrintedArgs(args))
 }
 
 /**
- * Implementation of Go's built-in println function. Operand rendering follows
- * the same MaybePromise convention as print.
- * @param args Arguments to print
+ * println writes formatted operands followed by a newline.
  */
 export async function println(...args: any[]): Promise<void> {
   const message =
@@ -32,10 +27,7 @@ export async function println(...args: any[]): Promise<void> {
 }
 
 /**
- * clear Implementation of Go's built-in clear function.
- * For slices, it sets all elements to their zero value.
- * For maps, it deletes all entries.
- * @param v The slice or map to clear
+ * clear zeroes slice elements or removes every map entry.
  */
 export function clear<T>(v: Slice<T> | Map<unknown, unknown> | null): void {
   if (v === null || v === undefined) {
@@ -108,7 +100,6 @@ export function assignStruct<T>(target: T, source: T): void {
     Object.assign(target as object, copied as object)
     return
   }
-  // Copy each field's value from source to target
   for (const key of Object.keys(sourceFields)) {
     const sourceField = sourceFields[key]
     const targetField = targetFields[key]
@@ -389,8 +380,7 @@ function unwrapGoValue<T>(value: T): T {
   return value
 }
 
-// Bytes represents all valid []byte representations in TypeScript
-// This includes Uint8Array (the preferred representation) and $.Slice<number> (which includes null).
+// Bytes represents Go byte slices, including nil and array-backed slices.
 export type Bytes = Uint8Array | Slice<number>
 type ByteData = Uint8Array | number[] | SliceProxy<number>
 
@@ -401,8 +391,7 @@ const maxUint64BigInt = 0xffffffffffffffffn
 // full 64-bit width (e.g. ^uint(0)) survives; see uint().
 const maxSafeUintBigInt = BigInt(Number.MAX_SAFE_INTEGER)
 
-// int converts a value to a Go int type, handling proper signed integer conversion
-// This ensures that values like 2147483648 (2^31) are properly handled according to Go semantics.
+// int truncates a numeric value, wrapping signed values at an explicit width.
 export function int(value: number | bigint | string, bits = 0): number {
   if (typeof value === 'string') {
     value = BigInt(value)
@@ -429,15 +418,6 @@ export function int(value: number | bigint | string, bits = 0): number {
     }
     return truncated
   }
-  // In Go, int is typically 64-bit on 64-bit systems, but for compatibility with JavaScript
-  // we need to handle the conversion properly. The issue is that JavaScript's number type
-  // can represent values larger than 32-bit signed integers, but when cast in certain contexts
-  // they get interpreted as signed 32-bit integers.
-  //
-  // For Go's int type on 64-bit systems, we should preserve the full value
-  // since JavaScript numbers can safely represent integers up to Number.MAX_SAFE_INTEGER
-  //
-  // For this we use Math.trunc.
   return Math.trunc(value)
 }
 
@@ -454,6 +434,25 @@ export function uint(
 export function uint(
   value: number | bigint | string | StringHeaderData,
   bits = 64,
+): number | bigint | StringHeaderData {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    if (bits === 8) {
+      return value & 0xff
+    }
+    if (bits === 16) {
+      return value & 0xffff
+    }
+    if (bits === 32) {
+      return value >>> 0
+    }
+  }
+  return uintGeneral(value, bits)
+}
+
+// uintGeneral normalizes values outside the common finite-number widths.
+function uintGeneral(
+  value: number | bigint | string | StringHeaderData,
+  bits: number,
 ): number | bigint | StringHeaderData {
   if (typeof value === 'object') {
     return value
@@ -473,15 +472,6 @@ export function uint(
   }
   if (!Number.isFinite(value)) {
     return value
-  }
-  if (bits === 8) {
-    return value & 0xff
-  }
-  if (bits === 16) {
-    return value & 0xffff
-  }
-  if (bits === 32) {
-    return value >>> 0
   }
   if (bits >= 64) {
     const truncated = Math.trunc(value)
@@ -759,17 +749,8 @@ function uint64Result(value: bigint): bigint {
 }
 
 /**
- * normalizeBytes Normalizes various byte representations into a `Uint8Array` for protobuf compatibility.
- *
- * @param {Uint8Array | number[] | null | undefined | { data: number[] } | { valueOf(): number[] }} bytes
- *   The input to normalize. Accepted types:
- *   - `Uint8Array`: Returned as-is.
- *   - `number[]`: Converted to a `Uint8Array`.
- *   - `null` or `undefined`: Returns an empty `Uint8Array`.
- *   - `{ data: number[] }`: An object with a `data` property (e.g., `$.Slice<number>`), where `data` is a `number[]`.
- *   - `{ valueOf(): number[] }`: An object with a `valueOf` method that returns a `number[]`.
- * @returns {Uint8Array} A normalized `Uint8Array` representation of the input.
- * @throws {Error} If the input type is unsupported or cannot be normalized.
+ * normalizeBytes preserves byte arrays and converts number arrays or data fields.
+ * Null inputs produce an empty byte array; unsupported inputs throw.
  */
 export function normalizeBytes(
   bytes: Uint8Array | number[] | null | undefined | { data: number[] },
@@ -782,7 +763,6 @@ export function normalizeBytes(
     return bytes
   }
 
-  // Handle $.Slice<number> (which has a .data property that's a number[])
   if (
     bytes &&
     typeof bytes === 'object' &&
@@ -792,7 +772,6 @@ export function normalizeBytes(
     return new Uint8Array(bytes.data)
   }
 
-  // Handle plain number arrays
   if (Array.isArray(bytes)) {
     return new Uint8Array(bytes)
   }
@@ -801,15 +780,13 @@ export function normalizeBytes(
 }
 
 /**
- * sortSlice sorts a slice in ascending order.
- * Handles all slice types including null, arrays, Uint8Array, and SliceProxy.
- * @param s The slice to sort in place
+ * sortSlice sorts the current backing window in ascending order.
  */
 export function sortSlice<T extends string | number | bigint>(
   s: Slice<T>,
 ): void {
   if (s === null || s === undefined) {
-    return // Nothing to sort for nil slice
+    return
   }
 
   // SliceProxy targets are arrays too, so handle metadata-backed slices before
@@ -854,8 +831,7 @@ function ascendingOrdered<T extends string | number | bigint>(
 }
 
 /**
- * bytesEqual efficiently compares two byte slices for equality.
- * Optimized for different byte representations.
+ * bytesEqual compares byte values across slice representations.
  */
 export function bytesEqual(a: Bytes | null, b: Bytes | null): boolean {
   if (a === b) return true
@@ -1063,8 +1039,7 @@ export function bytesCount(bytes: Bytes | null, sep: Bytes | null): number {
   const needle = bytesToArray(sep)
 
   if (needle.length === 0) {
-    // Special case: empty separator counts code points + 1
-    // For now, just return length + 1 (ASCII assumption)
+    // Empty separators count byte positions, including both ends.
     return haystack.length + 1
   }
 
@@ -1114,13 +1089,7 @@ export function max<T extends number | bigint>(a: T, b: T): T {
 }
 
 /**
- * runeOrStringToString Converts a rune (number) or string to a string.
- * This is used to replace String.fromCharCode() in Go string(rune) conversions.
- * Since sometimes single-char rune literals are compiled to strings, this function
- * needs to handle both numbers (runes) and strings.
- *
- * @param runeOrString A rune (Unicode code point as number) or a string
- * @returns The resulting string
+ * runeOrStringToString preserves strings and encodes numeric Unicode scalars.
  */
 export function runeOrStringToString(runeOrString: number | string): string {
   if (typeof runeOrString === 'string') {
