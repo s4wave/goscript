@@ -243,6 +243,93 @@ export async function main(): globalThis.Promise<void> {
 	} else {
 		await $.println("TEST9: Channel reports as not closed")
 	}
+
+	// Empty cases communicate; an empty default leaves the channel alone.
+	let empty: $.Channel<number> | null = $.makeChannel<number>(1, 0, "both")
+	const [__goscriptSelect8HasReturn, __goscriptSelect8Value] = await $.selectStatement<any, void>([
+		{
+			id: 0,
+			isSend: true,
+			channel: empty,
+			value: 17,
+		},
+		{
+			id: -1,
+			isSend: false,
+			channel: null,
+			onSelected: async (__goscriptSelect8Result) => {
+				$.panic("empty send case did not send")
+			}
+		}
+	], true)
+	if (__goscriptSelect8HasReturn) {
+		return __goscriptSelect8Value
+	}
+	const [__goscriptSelect9HasReturn, __goscriptSelect9Value] = await $.selectStatement<any, void>([
+		{
+			id: 0,
+			isSend: false,
+			channel: empty,
+		},
+		{
+			id: -1,
+			isSend: false,
+			channel: null,
+			onSelected: async (__goscriptSelect9Result) => {
+				$.panic("empty receive case did not receive")
+			}
+		}
+	], true)
+	if (__goscriptSelect9HasReturn) {
+		return __goscriptSelect9Value
+	}
+	const [__goscriptSelect10HasReturn, __goscriptSelect10Value] = await $.selectStatement<any, void>([
+		{
+			id: 0,
+			isSend: false,
+			channel: empty,
+			onSelected: async (__goscriptSelect10Result) => {
+				$.panic("empty default case received unexpectedly")
+			}
+		},
+		{
+			id: -1,
+			isSend: false,
+			channel: null,
+		}
+	], true)
+	if (__goscriptSelect10HasReturn) {
+		return __goscriptSelect10Value
+	}
+
+	// An empty body retains its receive assignment and closed-channel readiness.
+	let value = 0
+	await $.chanSend(empty, 23)
+	const [__goscriptSelect11HasReturn, __goscriptSelect11Value] = await $.selectStatement<any, void>([
+		{
+			id: 0,
+			isSend: false,
+			channel: empty,
+			onSelected: async (__goscriptSelect11Result) => {
+				value = __goscriptSelect11Result.value
+			}
+		}
+	], false)
+	if (__goscriptSelect11HasReturn) {
+		return __goscriptSelect11Value
+	}
+	empty!.close()
+	const [__goscriptSelect12HasReturn, __goscriptSelect12Value] = await $.selectStatement<any, void>([
+		{
+			id: 0,
+			isSend: false,
+			channel: empty,
+		}
+	], false)
+	if (__goscriptSelect12HasReturn) {
+		return __goscriptSelect12Value
+	}
+	await $.println("TEST10: Empty cases completed:", value, $.len(empty))
 }
 
 if ($.isMainScript(import.meta)) {
