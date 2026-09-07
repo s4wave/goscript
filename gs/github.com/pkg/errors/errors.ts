@@ -1,15 +1,10 @@
 import * as $ from '@goscript/builtin/index.js'
-import { callers } from './stack.js'
+
 import type { StackTrace } from './stack.js'
 
-// stack Type definitions.
-export type stack = any // Simplified stack type
-export type uintptr = number
-
-// Simplified fmt functions for basic string formatting
+// fmt formats the verbs supported by this package override.
 const fmt = {
   Sprintf: (format: string, ...args: any[]): string => {
-    // Basic sprintf implementation for the errors package
     let result = format
     let argIndex = 0
     result = result.replace(/%[sdqv%]/g, (match) => {
@@ -34,18 +29,17 @@ const fmt = {
 }
 
 // New returns an error with the supplied message.
-// New also records the stack trace at the point it was called.
+// JavaScript errors do not expose Go program-counter stacks.
 export function New(message: string): $.GoError {
-  return new fundamental({ msg: message, stack: callers() })
+  return new fundamental({ msg: message })
 }
 
 // Errorf formats according to a format specifier and returns the string
 // as a value that satisfies error.
-// Errorf also records the stack trace at the point it was called.
+// JavaScript errors do not expose Go program-counter stacks.
 export function Errorf(format: string, ...args: any[]): $.GoError {
   return new fundamental({
     msg: fmt.Sprintf(format, ...args),
-    stack: callers(),
   })
 }
 
@@ -57,24 +51,13 @@ class fundamental {
     this._fields.msg.value = value
   }
 
-  public get stack(): $.VarRef<stack> | null {
-    return this._fields.stack.value
-  }
-  public set stack(value: $.VarRef<stack> | null) {
-    this._fields.stack.value = value
-  }
-
   public _fields: {
     msg: $.VarRef<string>
-    stack: $.VarRef<$.VarRef<stack> | null>
   }
 
-  constructor(
-    init?: Partial<{ msg?: string; stack?: $.VarRef<stack> | null }>,
-  ) {
+  constructor(init?: Partial<{ msg?: string }>) {
     this._fields = {
       msg: $.varRef(init?.msg ?? ''),
-      stack: $.varRef(init?.stack ?? null),
     }
   }
 
@@ -82,21 +65,19 @@ class fundamental {
     const cloned = new fundamental()
     cloned._fields = {
       msg: $.varRef(this._fields.msg.value),
-      stack: $.varRef(this._fields.stack.value),
     }
     return cloned
   }
 
   public Error(): string {
-    const f = this
-    return f!.msg
+    return this.msg
   }
 
+  // StackTrace returns nil because Go program counters are unavailable.
   public StackTrace(): StackTrace {
-    return null // Simplified - no stack trace for now
+    return null
   }
 
-  // Register this type with the runtime type system
   static __typeInfo = $.registerStructType(
     'fundamental',
     new fundamental(),
@@ -114,22 +95,18 @@ class fundamental {
         key: 'msg',
         type: { kind: $.TypeKind.Basic, name: 'string' },
       },
-      {
-        name: 'stack',
-        key: 'stack',
-        type: { kind: $.TypeKind.Pointer, elemType: 'stack' },
-      },
     ],
   )
 }
 
-// WithStack annotates err with a stack trace at the point WithStack was called.
+// WithStack wraps err while retaining its cause and message.
+// Go program-counter stacks are unavailable in the JavaScript target.
 // If err is nil, WithStack returns nil.
 export function WithStack(err: $.GoError): $.GoError {
   if (err == null) {
     return null
   }
-  return new withStack({ error: err, stack: callers() })
+  return new withStack({ error: err })
 }
 
 class withStack {
@@ -140,24 +117,13 @@ class withStack {
     this._fields.error.value = value
   }
 
-  public get stack(): $.VarRef<stack> | null {
-    return this._fields.stack.value
-  }
-  public set stack(value: $.VarRef<stack> | null) {
-    this._fields.stack.value = value
-  }
-
   public _fields: {
     error: $.VarRef<$.GoError>
-    stack: $.VarRef<$.VarRef<stack> | null>
   }
 
-  constructor(
-    init?: Partial<{ error?: $.GoError; stack?: $.VarRef<stack> | null }>,
-  ) {
+  constructor(init?: Partial<{ error?: $.GoError }>) {
     this._fields = {
       error: $.varRef(init?.error ?? null),
-      stack: $.varRef(init?.stack ?? null),
     }
   }
 
@@ -165,20 +131,17 @@ class withStack {
     const cloned = new withStack()
     cloned._fields = {
       error: $.varRef(this._fields.error.value),
-      stack: $.varRef(this._fields.stack.value),
     }
     return cloned
   }
 
   public Cause(): $.GoError {
-    const w = this
-    return w!.error
+    return this.error
   }
 
-  // Unwrap provides compatibility for Go 1.13 error chains.
+  // Unwrap returns the next error in the chain.
   public Unwrap(): $.GoError {
-    const w = this
-    return w!.error
+    return this.error
   }
 
   public Error(): string | PromiseLike<string> {
@@ -194,11 +157,11 @@ class withStack {
     return Promise.resolve(inner)
   }
 
+  // StackTrace returns nil because Go program counters are unavailable.
   public StackTrace(): StackTrace {
-    return null // Simplified - no stack trace for now
+    return null
   }
 
-  // Register this type with the runtime type system
   static __typeInfo = $.registerStructType(
     'withStack',
     new withStack(),
@@ -263,28 +226,21 @@ class withStack {
           ],
         },
       },
-      {
-        name: 'stack',
-        key: 'stack',
-        type: { kind: $.TypeKind.Pointer, elemType: 'stack' },
-      },
     ],
   )
 }
 
-// Wrap returns an error annotating err with a stack trace
-// at the point Wrap is called, and the supplied message.
+// Wrap annotates err with the supplied message and retains its cause.
 // If err is nil, Wrap returns nil.
 export function Wrap(err: $.GoError, message: string): $.GoError {
   if (err == null) {
     return null
   }
   const wrappedErr = new withMessage({ cause: err, msg: message })
-  return new withStack({ error: wrappedErr, stack: callers() })
+  return new withStack({ error: wrappedErr })
 }
 
-// Wrapf returns an error annotating err with a stack trace
-// at the point Wrapf is called, and the format specifier.
+// Wrapf annotates err with a formatted message and retains its cause.
 // If err is nil, Wrapf returns nil.
 export function Wrapf(
   err: $.GoError,
@@ -298,7 +254,7 @@ export function Wrapf(
     cause: err,
     msg: fmt.Sprintf(format, ...args),
   })
-  return new withStack({ error: wrappedErr, stack: callers() })
+  return new withStack({ error: wrappedErr })
 }
 
 // WithMessage annotates err with a new message.
@@ -359,29 +315,24 @@ class withMessage {
     return cloned
   }
 
-  // cause.Error() may be async, so the message resolves it lazily instead of
-  // interpolating a possible Promise into the text.
+  // Error preserves synchronous messages and awaits asynchronous causes.
   public Error(): string | PromiseLike<string> {
-    const w = this
-    const inner = w!.cause!.Error()
+    const inner = this.cause!.Error()
     if (typeof inner === 'string') {
-      return w!.msg + ': ' + inner
+      return this.msg + ': ' + inner
     }
-    return Promise.resolve(inner).then((text) => w!.msg + ': ' + text)
+    return Promise.resolve(inner).then((text) => this.msg + ': ' + text)
   }
 
   public Cause(): $.GoError {
-    const w = this
-    return w!.cause
+    return this.cause
   }
 
-  // Unwrap provides compatibility for Go 1.13 error chains.
+  // Unwrap returns the next error in the chain.
   public Unwrap(): $.GoError {
-    const w = this
-    return w!.cause
+    return this.cause
   }
 
-  // Register this type with the runtime type system
   static __typeInfo = $.registerStructType(
     'withMessage',
     new withMessage(),
@@ -460,17 +411,7 @@ class withMessage {
   )
 }
 
-// Cause returns the underlying cause of the error, if possible.
-// An error value has a cause if it implements the following
-// interface:
-//
-//     type causer interface {
-//            Cause() error
-//     }
-//
-// If the error does not implement Cause, the original error will
-// be returned. If the error is nil, nil will be returned without further
-// investigation.
+// Cause follows Cause methods to the underlying error, or returns nil for nil.
 export function Cause(err: $.GoError): $.GoError {
   type causer = null | {
     Cause(): $.GoError
@@ -505,7 +446,7 @@ export function Cause(err: $.GoError): $.GoError {
   )
 
   for (; err != null; ) {
-    let { value: cause, ok: ok } = $.typeAssert<causer>(err, 'causer')
+    const { value: cause, ok } = $.typeAssert<causer>(err, 'causer')
     if (!ok) {
       break
     }

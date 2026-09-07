@@ -1,18 +1,19 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import * as $ from '@goscript/builtin/index.js'
-import { New, WithStack } from './errors.js'
 
-// asyncError returns an error whose Error() transpiles from a Go method that
-// awaits, so calling it yields a Promise.
+import { Cause, Errorf, New, WithStack, Wrap, Wrapf } from './errors.js'
+import { Is, Unwrap } from './go113.js'
+
+// asyncError models a Go Error method that awaits before returning its text.
 function asyncError(message: string): $.GoError {
   return {
     Error: async () => message,
-  } as unknown as $.GoError
+  }
 }
 
 describe('WithStack Error text', () => {
-  it('WithStack of a synchronous cause keeps Error plain and exact', () => {
+  it('keeps synchronous error text synchronous', () => {
     const err = WithStack(New('sync cause'))
 
     const text = err!.Error()
@@ -20,9 +21,42 @@ describe('WithStack Error text', () => {
     expect(text).toBe('sync cause')
   })
 
-  it('WithStack of an async cause resolves the exact awaited text', async () => {
+  it('resolves the exact asynchronous error text', async () => {
     const err = WithStack(asyncError('async cause'))
 
     await expect(err!.Error()).resolves.toBe('async cause')
+  })
+})
+
+describe('error construction', () => {
+  it('preserves messages and causes without capturing unused JavaScript stacks', () => {
+    const capture = vi.spyOn(globalThis, 'Error')
+    let base: $.GoError
+    let wrapped: $.GoError
+    let formatted: $.GoError
+    let annotated: $.GoError
+    let formattedBase: $.GoError
+    let captures: number
+    try {
+      base = New('disk unavailable')
+      wrapped = Wrap(base, 'read')
+      formatted = Wrapf(base, 'read %s', 'guide')
+      annotated = WithStack(base)
+      formattedBase = Errorf('read %d', 3)
+      captures = capture.mock.calls.length
+    } finally {
+      capture.mockRestore()
+    }
+
+    expect(captures).toBe(0)
+    expect(base!.Error()).toBe('disk unavailable')
+    expect(wrapped!.Error()).toBe('read: disk unavailable')
+    expect(formatted!.Error()).toBe('read guide: disk unavailable')
+    expect(annotated!.Error()).toBe('disk unavailable')
+    expect(formattedBase!.Error()).toBe('read 3')
+    expect(Cause(wrapped)).toBe(base)
+    expect(Cause(formatted)).toBe(base)
+    expect(Unwrap(annotated)).toBe(base)
+    expect(Is(wrapped, base)).toBe(true)
   })
 })
