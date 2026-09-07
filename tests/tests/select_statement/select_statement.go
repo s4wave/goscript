@@ -1,5 +1,6 @@
 package main
 
+// main exercises ready, default, closed, and empty select cases.
 func main() {
 	// Test 1: Simple deterministic select with default
 	// Create a buffered channel so sends don't block
@@ -106,4 +107,34 @@ func main() {
 	} else {
 		println("TEST9: Channel reports as not closed")
 	}
+
+	// Empty cases communicate; an empty default leaves the channel alone.
+	empty := make(chan int, 1)
+	select {
+	case empty <- 17:
+	default:
+		panic("empty send case did not send")
+	}
+	select {
+	case <-empty:
+	default:
+		panic("empty receive case did not receive")
+	}
+	select {
+	case <-empty:
+		panic("empty default case received unexpectedly")
+	default:
+	}
+
+	// An empty body retains its receive assignment and closed-channel readiness.
+	value := 0
+	empty <- 23
+	select {
+	case value = <-empty:
+	}
+	close(empty)
+	select {
+	case <-empty:
+	}
+	println("TEST10: Empty cases completed:", value, len(empty))
 }

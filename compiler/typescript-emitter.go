@@ -117,6 +117,7 @@ func (o *TypeScriptEmitOwner) WriteFiles(
 	return compiled, diagnostics
 }
 
+// writeFileString replaces a file and reports write, truncation, or close failures.
 func writeFileString(path string, contents string, perm os.FileMode) error {
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
 	if err != nil {
@@ -161,6 +162,7 @@ func (o *TypeScriptEmitOwner) EmitToMemory(
 	return files, nil
 }
 
+// renderLoweredFile orders imports, declarations, and the optional main invocation.
 func (o *TypeScriptEmitOwner) renderLoweredFile(pkg *loweredPackage, file *loweredFile, trimTypeInfo bool) string {
 	var b strings.Builder
 	b.Grow(estimateLoweredFileSize(file))
@@ -255,6 +257,7 @@ func (o *TypeScriptEmitOwner) renderLoweredFile(pkg *loweredPackage, file *lower
 	return strings.TrimRight(b.String(), "\n") + "\n"
 }
 
+// estimateLoweredFileSize reserves approximate builder capacity without rendering.
 func estimateLoweredFileSize(file *loweredFile) int {
 	if file == nil {
 		return 0
@@ -275,6 +278,7 @@ func estimateLoweredFileSize(file *loweredFile) int {
 	return size
 }
 
+// estimateLoweredStructSize includes field accessors, metadata, and methods.
 func estimateLoweredStructSize(structType *loweredStruct) int {
 	if structType == nil {
 		return 0
@@ -290,6 +294,7 @@ func estimateLoweredStructSize(structType *loweredStruct) int {
 	return size
 }
 
+// estimateLoweredFunctionSize includes the signature, bindings, and lowered body.
 func estimateLoweredFunctionSize(fn *loweredFunction) int {
 	if fn == nil {
 		return 0
@@ -309,6 +314,7 @@ func estimateLoweredFunctionSize(fn *loweredFunction) int {
 	return size
 }
 
+// estimateLoweredStmtsSize accounts for nested control flow and source comments.
 func estimateLoweredStmtsSize(stmts []loweredStmt) int {
 	size := len(stmts) * 24
 	for _, stmt := range stmts {
@@ -353,6 +359,7 @@ func estimateLoweredStmtsSize(stmts []loweredStmt) int {
 	return size
 }
 
+// sortedStructDecls emits zero-value dependencies before their containing structs.
 func sortedStructDecls(decls []loweredDecl) []loweredDecl {
 	structs := make([]loweredDecl, 0)
 	names := make(map[string]bool)
@@ -395,6 +402,7 @@ func sortedStructDecls(decls []loweredDecl) []loweredDecl {
 	return sorted
 }
 
+// structZeroValueDeps finds local struct constructors referenced by field defaults.
 func structZeroValueDeps(structType *loweredStruct, names map[string]bool) []string {
 	var deps []string
 	for _, field := range structType.fields {
@@ -413,6 +421,7 @@ func structZeroValueDeps(structType *loweredStruct, names map[string]bool) []str
 	return deps
 }
 
+// renderStruct emits field storage, value-copy operations, methods, and metadata.
 func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *RuntimeContractOwner, trimTypeInfo bool) {
 	varRef := runtimeOwner.QualifiedHelper(RuntimeHelperVarRef)
 	markStructValue := runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue)
@@ -592,6 +601,7 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	b.WriteString("}\n")
 }
 
+// runtimeMethodSignatureExpr selects the requested metadata representation.
 func runtimeMethodSignatureExpr(method loweredFunction, trimTypeInfo bool) string {
 	if trimTypeInfo && method.runtimeTrimmedSignature != "" {
 		return method.runtimeTrimmedSignature
@@ -606,6 +616,7 @@ func runtimeMethodSignatureExpr(method loweredFunction, trimTypeInfo bool) strin
 	return "{ name: " + strconvQuote(methodName) + ", args: [], returns: [] }"
 }
 
+// trimmedRuntimeStructFieldInfoExpr retains field lookup and value-shape metadata.
 func trimmedRuntimeStructFieldInfoExpr(
 	runtimeType string,
 	storageKey string,
@@ -631,6 +642,7 @@ func trimmedRuntimeStructFieldInfoExpr(
 	return "{ " + strings.Join(fields, ", ") + " }"
 }
 
+// writeLineComment preserves multiline comment text at the requested indentation.
 func writeLineComment(b *strings.Builder, indent string, comment string) {
 	comment = strings.TrimSpace(comment)
 	if comment == "" {
@@ -650,6 +662,7 @@ func writeLineComment(b *strings.Builder, indent string, comment string) {
 	}
 }
 
+// renderFunction emits a declaration with receiver bindings and deferred cleanup.
 func renderFunction(b *strings.Builder, fn *loweredFunction) {
 	if fn.exported {
 		b.WriteString("export ")
@@ -697,6 +710,7 @@ func renderFunction(b *strings.Builder, fn *loweredFunction) {
 	b.WriteString("}\n")
 }
 
+// renderMethod emits a class method with its lowered receiver and return contract.
 func renderMethod(b *strings.Builder, fn *loweredFunction) {
 	writeIndent(b, 1)
 	b.WriteString("public ")
@@ -743,6 +757,7 @@ func renderMethod(b *strings.Builder, fn *loweredFunction) {
 	b.WriteString("}\n")
 }
 
+// renderUnreachableReturn closes non-void paths that lowering marks unreachable.
 func renderUnreachableReturn(b *strings.Builder, fn *loweredFunction, indent int) {
 	if fn.result == "void" || fn.result == "globalThis.Promise<void>" {
 		return
@@ -754,6 +769,7 @@ func renderUnreachableReturn(b *strings.Builder, fn *loweredFunction, indent int
 	b.WriteString("throw new globalThis.Error(\"goscript: unreachable return\")\n")
 }
 
+// loweredStmtsEndWithTerminal recognizes a final textual return or throw.
 func loweredStmtsEndWithTerminal(stmts []loweredStmt) bool {
 	if len(stmts) == 0 {
 		return false
@@ -763,6 +779,7 @@ func loweredStmtsEndWithTerminal(stmts []loweredStmt) bool {
 	return strings.HasPrefix(text, "return") || strings.HasPrefix(text, "throw ")
 }
 
+// renderFunctionTypeParams omits the generic parameter list when it is empty.
 func renderFunctionTypeParams(b *strings.Builder, fn *loweredFunction) {
 	if len(fn.typeParams) == 0 {
 		return
@@ -777,6 +794,7 @@ func renderFunctionTypeParams(b *strings.Builder, fn *loweredFunction) {
 	b.WriteString(">")
 }
 
+// receiverValue selects an explicit lowered receiver or the class instance.
 func receiverValue(fn *loweredFunction) string {
 	if fn.receiverValue != "" {
 		return fn.receiverValue
@@ -784,6 +802,7 @@ func receiverValue(fn *loweredFunction) string {
 	return "this"
 }
 
+// renderNamedResults initializes named return variables before the function body.
 func renderNamedResults(b *strings.Builder, results []loweredNamedResult, indent int) {
 	for _, result := range results {
 		writeIndent(b, indent)
@@ -797,6 +816,7 @@ func renderNamedResults(b *strings.Builder, results []loweredNamedResult, indent
 	}
 }
 
+// renderDeferStack selects disposal semantics from the lowered defer contract.
 func renderDeferStack(b *strings.Builder, state *loweredDeferState, indent int) {
 	if state == nil || !state.used {
 		return
@@ -861,6 +881,7 @@ func renderBodyWithDefer(b *strings.Builder, fn *loweredFunction, indent int) {
 	}
 }
 
+// renderStmts preserves control-flow nesting and automatic-semicolon boundaries.
 func renderStmts(b *strings.Builder, stmts []loweredStmt, indent int) {
 	for idx, stmt := range stmts {
 		renderLeadingLines(b, stmt.leading, indent)
@@ -911,6 +932,7 @@ func renderStmts(b *strings.Builder, stmts []loweredStmt, indent int) {
 	}
 }
 
+// needsASIBarrier prevents adjacent statements from becoming one JS expression.
 func needsASIBarrier(current loweredStmt, next loweredStmt) bool {
 	if current.text == "" ||
 		current.hasBlock ||
@@ -928,6 +950,7 @@ func needsASIBarrier(current loweredStmt, next loweredStmt) bool {
 	return strings.HasPrefix(nextText, "(") || strings.HasPrefix(nextText, "[")
 }
 
+// renderLeadingLines preserves source comments and blank lines before a statement.
 func renderLeadingLines(b *strings.Builder, lines []string, indent int) {
 	for _, line := range lines {
 		if strings.TrimSpace(line) == "" {
@@ -940,6 +963,7 @@ func renderLeadingLines(b *strings.Builder, lines []string, indent int) {
 	}
 }
 
+// writeIndentedText indents continuation lines of already-lowered statement text.
 func writeIndentedText(b *strings.Builder, text string, indent int) {
 	lines := strings.Split(text, "\n")
 	for idx, line := range lines {
@@ -953,6 +977,7 @@ func writeIndentedText(b *strings.Builder, text string, indent int) {
 	}
 }
 
+// renderSwitch emits grouped case labels and their lowered bodies.
 func renderSwitch(b *strings.Builder, stmt *loweredSwitch, indent int) {
 	writeIndent(b, indent)
 	b.WriteString("switch (")
@@ -976,6 +1001,7 @@ func renderSwitch(b *strings.Builder, stmt *loweredSwitch, indent int) {
 	b.WriteString("}\n")
 }
 
+// renderSwitchBody isolates declarations and preserves explicit fallthrough.
 func renderSwitchBody(b *strings.Builder, body []loweredStmt, fallsThrough bool, indent int) {
 	writeIndent(b, indent)
 	b.WriteString("{\n")
@@ -988,6 +1014,7 @@ func renderSwitchBody(b *strings.Builder, body []loweredStmt, fallsThrough bool,
 	b.WriteString("}\n")
 }
 
+// renderRangeFunc carries early returns through iterator callback boundaries.
 func renderRangeFunc(b *strings.Builder, stmt *loweredRangeFunc, indent int) {
 	if stmt.returnBranch != nil {
 		writeIndent(b, indent)
@@ -1071,6 +1098,7 @@ func renderRangeFunc(b *strings.Builder, stmt *loweredRangeFunc, indent int) {
 	b.WriteString("}\n")
 }
 
+// renderNamedStructConversion evaluates the input once before converting fields.
 func renderNamedStructConversion(expr *loweredNamedStructConversionExpr) string {
 	if expr == nil {
 		return "undefined"
@@ -1090,6 +1118,7 @@ func renderNamedStructConversion(expr *loweredNamedStructConversionExpr) string 
 	return "(() => { " + body + " })()"
 }
 
+// renderSelect delegates channel choice and propagates case returns or loop jumps.
 func renderSelect(b *strings.Builder, stmt *loweredSelect, indent int) {
 	writeIndent(b, indent)
 	b.WriteString("const [")
@@ -1138,6 +1167,7 @@ func renderSelect(b *strings.Builder, stmt *loweredSelect, indent int) {
 	}
 }
 
+// renderSelectExternalBodies keeps loop jumps in the selecting function's scope.
 func renderSelectExternalBodies(b *strings.Builder, stmt *loweredSelect, indent int) {
 	writeIndent(b, indent)
 	b.WriteString("switch (")
@@ -1171,7 +1201,9 @@ func renderSelectExternalBodies(b *strings.Builder, stmt *loweredSelect, indent 
 	}
 }
 
+// renderSelectCase emits the communication and any work performed after selection.
 func renderSelectCase(b *strings.Builder, switchCase loweredSelectCase, external bool, resultName string, indent int) {
+	// Evaluate the channel and send value before the runtime chooses a case.
 	writeIndent(b, indent)
 	b.WriteString("{\n")
 	writeIndent(b, indent+1)
@@ -1196,6 +1228,16 @@ func renderSelectCase(b *strings.Builder, switchCase loweredSelectCase, external
 		b.WriteString(switchCase.value)
 		b.WriteString(",\n")
 	}
+
+	// The runtime completes empty cases without an asynchronous callback.
+	// External bodies still need the selected result to dispatch their case.
+	if !external && len(switchCase.prelude) == 0 && len(switchCase.body) == 0 {
+		writeIndent(b, indent)
+		b.WriteString("}")
+		return
+	}
+
+	// Return the selection for external bodies, or execute the case in its callback.
 	writeIndent(b, indent+1)
 	b.WriteString("onSelected: async (")
 	b.WriteString(resultName)
@@ -1211,6 +1253,8 @@ func renderSelectCase(b *strings.Builder, switchCase loweredSelectCase, external
 		b.WriteString("}")
 		return
 	}
+
+	// Receive assignments precede the body, including an otherwise empty case.
 	renderStmts(b, switchCase.prelude, indent+2)
 	renderSelectCaseStmts(b, switchCase.body, indent+2)
 	writeIndent(b, indent+1)
@@ -1219,6 +1263,7 @@ func renderSelectCase(b *strings.Builder, switchCase loweredSelectCase, external
 	b.WriteString("}")
 }
 
+// renderSelectCaseStmts distinguishes a void function return from case completion.
 func renderSelectCaseStmts(b *strings.Builder, stmts []loweredStmt, indent int) {
 	for idx, stmt := range stmts {
 		renderLeadingLines(b, stmt.leading, indent)
@@ -1273,6 +1318,7 @@ func renderSelectCaseStmts(b *strings.Builder, stmts []loweredStmt, indent int) 
 	}
 }
 
+// renderTypeSwitch evaluates its operand once before testing runtime types.
 func renderTypeSwitch(b *strings.Builder, stmt *loweredTypeSwitch, indent int) {
 	writeIndent(b, indent)
 	b.WriteString("{\n")
@@ -1298,6 +1344,7 @@ func renderTypeSwitch(b *strings.Builder, stmt *loweredTypeSwitch, indent int) {
 	b.WriteString("}\n")
 }
 
+// renderTypeSwitchCase binds the narrowed value for a matching type alternative.
 func renderTypeSwitchCase(b *strings.Builder, varName string, varRef bool, switchCase loweredTypeSwitchCase, indent int) {
 	if len(switchCase.types) == 0 {
 		return
@@ -1331,6 +1378,7 @@ func renderTypeSwitchCase(b *strings.Builder, varName string, varRef bool, switc
 	b.WriteString("break\n")
 }
 
+// typeSwitchAssertType selects the emitted assertion type for one alternative.
 func typeSwitchAssertType(switchCase loweredTypeSwitchCase, idx int) string {
 	if idx < len(switchCase.tsTypes) && switchCase.tsTypes[idx] != "" {
 		return switchCase.tsTypes[idx]
@@ -1338,6 +1386,7 @@ func typeSwitchAssertType(switchCase loweredTypeSwitchCase, idx int) string {
 	return "any"
 }
 
+// typeSwitchCaseVariableType narrows only cases containing one runtime type.
 func typeSwitchCaseVariableType(switchCase loweredTypeSwitchCase) string {
 	if len(switchCase.types) == 1 {
 		return typeSwitchAssertType(switchCase, 0)
@@ -1345,6 +1394,7 @@ func typeSwitchCaseVariableType(switchCase loweredTypeSwitchCase) string {
 	return ""
 }
 
+// renderTypeSwitchInlineBody scopes the case variable and its lowered statements.
 func renderTypeSwitchInlineBody(
 	b *strings.Builder,
 	varName string,
@@ -1393,6 +1443,7 @@ func renderTypeSwitchInlineBody(
 	b.WriteString("}\n")
 }
 
+// renderIndex emits sorted value, type, and initialization imports for a package.
 func renderIndex(pkg *loweredPackage) string {
 	var lines []string
 	for _, file := range pkg.files {
@@ -1420,16 +1471,19 @@ func renderIndex(pkg *loweredPackage) string {
 	return strings.Join(lines, "\n") + "\n"
 }
 
+// writeIndent emits one tab per nesting level.
 func writeIndent(b *strings.Builder, indent int) {
 	for range indent {
 		b.WriteString("\t")
 	}
 }
 
+// strconvQuote escapes a string literal for emitted TypeScript.
 func strconvQuote(value string) string {
 	return strconv.Quote(value)
 }
 
+// emitError reports an output failure with the affected subject.
 func emitError(action string, subject string, err error) Diagnostic {
 	return Diagnostic{
 		Severity: DiagnosticSeverityError,
