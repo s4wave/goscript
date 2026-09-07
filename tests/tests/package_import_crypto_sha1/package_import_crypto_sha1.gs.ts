@@ -13,7 +13,7 @@ import "@goscript/hash/index.js"
 import "@goscript/io/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let sum = await sha1.Sum(new Uint8Array([97, 98, 99]))
+	let sum = $.cloneArrayValue(await sha1.Sum(new Uint8Array([97, 98, 99])), { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 20 })
 	await $.println("sum len", $.len(sum))
 	await $.println("sum first", $.uint($.arrayIndex(sum, 0), 8))
 	await $.println("sum last", $.uint($.arrayIndex(sum, 19), 8))

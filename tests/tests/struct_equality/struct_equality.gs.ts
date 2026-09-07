@@ -27,7 +27,7 @@ export class ObjectID {
 
 	constructor(init?: Partial<{hash?: Uint8Array, format?: number}>) {
 		this._fields = {
-			hash: $.varRef(init?.hash !== undefined ? $.cloneArrayValue(init.hash) : new Uint8Array(4)),
+			hash: $.varRef(init?.hash !== undefined ? $.cloneArrayValue(init.hash, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 4 }) : new Uint8Array(4)),
 			format: $.varRef(init?.format ?? (0 as number))
 		}
 	}
@@ -35,7 +35,7 @@ export class ObjectID {
 	public clone(): ObjectID {
 		const cloned = new ObjectID()
 		cloned._fields = {
-			hash: $.varRef($.cloneArrayValue(this._fields.hash.value)),
+			hash: $.varRef($.cloneArrayValue(this._fields.hash.value, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 4 })),
 			format: $.varRef(this._fields.format.value)
 		}
 		return $.markAsStructValue(cloned)

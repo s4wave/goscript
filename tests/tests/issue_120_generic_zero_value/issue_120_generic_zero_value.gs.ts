@@ -75,7 +75,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("zeroStr == \"\":", $.stringEqual(zeroStr, ""))
 
 	// Test 6: T{} returns the instantiated array zero value.
-	let zeroPair = (ZeroArrayLiteral({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Pair", zero: () => Array.from({ length: 2 }, () => 0) }}) as Pair)
+	let zeroPair = ($.cloneArrayValue(ZeroArrayLiteral({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Pair", zero: () => Array.from({ length: 2 }, () => 0) }}), "main.Pair") as Pair)
 	await $.println("ZeroArrayLiteral[Pair] len:", $.len(zeroPair))
 	await $.println("ZeroArrayLiteral[Pair] zero:", ($.arrayIndex(zeroPair, 0) == 0) && ($.arrayIndex(zeroPair, 1) == 0))
 }

@@ -11,7 +11,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget0 = seed, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
 		seed[i] = $.uint($.uint(i + 1, 8), 8)
 	}
-	let r: rand.ChaCha8 | $.VarRef<rand.ChaCha8> | null = rand.NewChaCha8(seed)
+	let r: rand.ChaCha8 | $.VarRef<rand.ChaCha8> | null = rand.NewChaCha8($.cloneArrayValue(seed, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 32 }))
 	for (let i = 0; i < 8; i++) {
 		await $.println(rand.ChaCha8.prototype.Uint64.call(r))
 	}
@@ -32,7 +32,7 @@ export async function main(): globalThis.Promise<void> {
 		let v = __goscriptRangeTarget1![__rangeIndex]
 		await $.println($.uint(v, 8))
 	}
-	let r2: rand.ChaCha8 | $.VarRef<rand.ChaCha8> | null = rand.NewChaCha8(seed)
+	let r2: rand.ChaCha8 | $.VarRef<rand.ChaCha8> | null = rand.NewChaCha8($.cloneArrayValue(seed, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 32 }))
 	{
 		let __goscriptShadow0 = rand.ChaCha8.prototype.UnmarshalBinary.call(r2, b)
 		if (__goscriptShadow0 != null) {
@@ -42,9 +42,9 @@ export async function main(): globalThis.Promise<void> {
 	for (let i = 0; i < 8; i++) {
 		await $.println(rand.ChaCha8.prototype.Uint64.call(r2))
 	}
-	let seed2 = seed
+	let seed2 = $.cloneArrayValue(seed, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 32 })
 	seed2[0] = $.uint(0xff, 8)
-	rand.ChaCha8.prototype.Seed.call(r, seed2)
+	rand.ChaCha8.prototype.Seed.call(r, $.cloneArrayValue(seed2, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 32 }))
 	await $.println(rand.ChaCha8.prototype.Uint64.call(r))
 }
 
