@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
 import { makeMap, mapGet, mapSet } from './map.js'
 import {
   append,
@@ -10,6 +11,7 @@ import {
   bytesFromHex,
   bytesToString,
   copy,
+  GoBinaryString,
   goSlice,
   indexString,
   indexByteString,
@@ -20,6 +22,7 @@ import {
   sliceString,
   stringCompare,
   stringEqual,
+  stringLen,
   stringToBytes,
 } from './slice.js'
 import { markAsStructValue } from './type.js'
@@ -43,7 +46,6 @@ describe('rune to string encoding (Go string(rune) semantics)', () => {
     // U+1F600 grinning face; fromCharCode would have truncated to a broken unit.
     expect(runeToString(0x1f600)).toBe('😀')
     expect(runeToString(0x1f600).codePointAt(0)).toBe(0x1f600)
-    // CJU+597D '好'
     expect(runeToString(0x597d)).toBe('好')
   })
 
@@ -54,8 +56,8 @@ describe('rune to string encoding (Go string(rune) semantics)', () => {
   })
 
   it('encodes a rune slice with astral planes intact', () => {
-    expect(runesToString([0x48, 0x69, 0x1f600] as never)).toBe('Hi😀')
-    expect(runesToString([] as never)).toBe('')
+    expect(runesToString([0x48, 0x69, 0x1f600])).toBe('Hi😀')
+    expect(runesToString([])).toBe('')
   })
 })
 
@@ -117,7 +119,7 @@ describe('destination-independent byte specialization', () => {
 })
 
 describe('append spare capacity', () => {
-  class item {
+  class Item {
     value = 0
   }
 
@@ -130,21 +132,21 @@ describe('append spare capacity', () => {
   })
 
   it('zero-initializes struct elements exposed by reslicing', () => {
-    const zeroHint = appendZero(() => markAsStructValue(new item()))
-    let values = append<item>(null, markAsStructValue(new item()), zeroHint)
-    values = append(values, markAsStructValue(new item()), zeroHint)
-    values = append(values, markAsStructValue(new item()), zeroHint)
+    const zeroHint = appendZero(() => markAsStructValue(new Item()))
+    let values = append<Item>(null, markAsStructValue(new Item()), zeroHint)
+    values = append(values, markAsStructValue(new Item()), zeroHint)
+    values = append(values, markAsStructValue(new Item()), zeroHint)
 
     const zero = goSlice(values, undefined, 4)[3]
-    expect(zero).toBeInstanceOf(item)
+    expect(zero).toBeInstanceOf(Item)
     expect(zero.value).toBe(0)
   })
 
   it('creates independent struct zeros for every spare slot', () => {
-    const zeroHint = appendZero(() => markAsStructValue(new item()))
-    let values = append<item>(null, markAsStructValue(new item()), zeroHint)
+    const zeroHint = appendZero(() => markAsStructValue(new Item()))
+    let values = append<Item>(null, markAsStructValue(new Item()), zeroHint)
     for (let i = 0; i < 4; i++) {
-      values = append(values, markAsStructValue(new item()), zeroHint)
+      values = append(values, markAsStructValue(new Item()), zeroHint)
     }
 
     const expanded = goSlice(values, undefined, 8)
@@ -154,9 +156,9 @@ describe('append spare capacity', () => {
   })
 
   it('zero-initializes appendSlice spare capacity from a static hint', () => {
-    const dynamic = markAsStructValue(new item())
-    const source: (item | null)[] = [dynamic]
-    let values = appendSlice<item | null>(null, source, appendZeros.nil)
+    const dynamic = markAsStructValue(new Item())
+    const source: (Item | null)[] = [dynamic]
+    let values = appendSlice<Item | null>(null, source, appendZeros.nil)
     values = appendSlice(values, source, appendZeros.nil)
     values = appendSlice(values, source, appendZeros.nil)
 
@@ -164,8 +166,8 @@ describe('append spare capacity', () => {
   })
 
   it('uses the static interface zero instead of the dynamic element type', () => {
-    const dynamic = markAsStructValue(new item())
-    let values = append<item | null>(null, dynamic, appendZeros.nil)
+    const dynamic = markAsStructValue(new Item())
+    let values = append<Item | null>(null, dynamic, appendZeros.nil)
     values = append(values, dynamic, appendZeros.nil)
     values = append(values, dynamic, appendZeros.nil)
 
@@ -174,6 +176,61 @@ describe('append spare capacity', () => {
 })
 
 describe('builtin string byte representation', () => {
+  it('reads ASCII lengths and bytes without encoding temporary arrays', () => {
+    const value = String.fromCharCode(
+      ...Array.from({ length: 128 }, (_, i) => i),
+    )
+    const encode = vi.spyOn(TextEncoder.prototype, 'encode')
+    try {
+      expect(stringLen('')).toBe(0)
+      expect(len(value)).toBe(128)
+      for (let i = 0; i < value.length; i++) {
+        expect(indexString(value, i)).toBe(i)
+      }
+      expect(encode).not.toHaveBeenCalled()
+    } finally {
+      encode.mockRestore()
+    }
+  })
+
+  it.each(['aé🙂z', '你好', '\ud800', '\udc00', 'a\u2028', 'a\u2029'])(
+    'keeps UTF-8 byte reads for %j',
+    (value) => {
+      const bytes = new TextEncoder().encode(value)
+      expect(stringLen(value)).toBe(bytes.length)
+      for (let i = 0; i < bytes.length; i++) {
+        expect(indexString(value, i)).toBe(bytes[i])
+      }
+    },
+  )
+
+  it('keeps binary string bytes and independent conversion buffers', () => {
+    const bytes = new Uint8Array([0, 255, 128, 65])
+    for (const value of [bytesToString(bytes), new GoBinaryString(bytes)]) {
+      expect(stringLen(value)).toBe(bytes.length)
+      for (let i = 0; i < bytes.length; i++) {
+        expect(indexString(value, i)).toBe(bytes[i])
+      }
+      stringToBytes(value).fill(0)
+      expect(stringToBytes(value)).toEqual(bytes)
+    }
+    const ascii = 'abc'
+    stringToBytes(ascii).fill(0)
+    expect(indexString(ascii, 0)).toBe(97)
+  })
+
+  it('preserves byte-index bounds and non-integer access behavior', () => {
+    for (const value of ['', 'abc', 'é']) {
+      expect(() => indexString(value, -1)).toThrow('index out of range [-1]')
+      const length = stringLen(value)
+      expect(() => indexString(value, length)).toThrow(
+        `index out of range [${length}] with length ${length}`,
+      )
+      expect(indexString(value, NaN)).toBeUndefined()
+    }
+    expect(indexString('abc', 0.5)).toBeUndefined()
+  })
+
   it('appends large byte slices without JavaScript argument spreading', () => {
     const dst = new Uint8Array(0)
     const src = new Uint8Array(200_000)

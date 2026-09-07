@@ -165,7 +165,7 @@ The runtime provides:
     *   Slice operations: `$.makeSlice`, `$.goSlice`, `$.append`, `$.copy`, `$.len`, `$.cap`, `$.clear`
     *   Map operations: `$.makeMap`, `$.mapGet`, `$.mapSet`, `$.deleteMapEntry`
     *   Channel operations: `$.makeChannel`, `$.chanSend`, `$.chanRecv`, `$.chanRecvWithOk`, `$.selectStatement`
-    *   String operations: `$.stringToRunes`, `$.stringToBytes`, `$.bytesToString`, `$.runeOrStringToString`
+    *   String operations include `$.indexString`, `$.stringLen`, `$.stringToRunes`, `$.stringToBytes`, and `$.bytesToString`. Length and byte indexing read ASCII strings directly without allocating an encoded byte array. Other strings retain UTF-8 byte access and the binary-string representation for invalid UTF-8; explicit string-to-byte conversion still creates independent storage.
     *   Pointer/value operations: `$.varRef`, `$.unref`, `$.isVarRef`, `$.pointerValue`, `$.markAsStructValue`, `$.assignStruct`
     *   Type operations: `$.typeAssert`, `$.mustTypeAssert`, `$.typeSwitch`, `$.is`, `$.typedNil`
     *   Function/generic operations: `$.namedFunction`, `$.genericZero`, `$.callGenericMethod`
