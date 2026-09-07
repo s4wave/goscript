@@ -138,6 +138,7 @@ Go's explicit error return values are maintained. Functions returning an error t
 *   `clear()`: Mapped to `$.clear()` which empties maps or zeroes slice elements.
 *   `byte()`: Mapped to `$.byte()` for byte conversion.
 *   `int()`: Mapped to `$.int()` which uses `Math.trunc()` for integer truncation.
+*   `uint` normalization uses `$.uint()`. Finite numbers at 8-, 16-, and 32-bit widths take a small bitwise fast path; other widths, encoded integers, non-finite inputs, and string-header values retain the general conversion. Full-width unsigned values beyond the exact JavaScript number range remain `bigint` at runtime.
 
 ### Generic Method Calls
 
