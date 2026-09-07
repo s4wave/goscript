@@ -749,15 +749,11 @@ export function newRoutedRpcStreamClient(ctx: context.Context | null, componentI
 						isSend: true,
 						channel: results,
 						value: (await (async () => { const __goscriptLiteralField1 = await $.pointerValue<Exclude<$.GoError, null>>(err).Error(); return $.markAsStructValue(new rpcStreamServerResult({err: __goscriptLiteralField1})) })()),
-						onSelected: async (__goscriptSelect5Result) => {
-						}
 					},
 					{
 						id: -1,
 						isSend: false,
 						channel: null,
-						onSelected: async (__goscriptSelect5Result) => {
-						}
 					}
 				], true)
 				if (__goscriptSelect5HasReturn) {
@@ -843,8 +839,6 @@ export async function exerciseRpcStreamClientPressure(ctx: context.Context | nul
 			id: -1,
 			isSend: false,
 			channel: null,
-			onSelected: async (__goscriptSelect7Result) => {
-			}
 		}
 	], true)
 	if (__goscriptSelect7HasReturn) {

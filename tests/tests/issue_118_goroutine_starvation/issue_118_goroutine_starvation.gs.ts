@@ -68,8 +68,6 @@ export async function main(): globalThis.Promise<void> {
 				id: 2,
 				isSend: false,
 				channel: done,
-				onSelected: async (__goscriptSelect0Result) => {
-				}
 			}
 		], false)
 		if (__goscriptSelect0HasReturn) {
