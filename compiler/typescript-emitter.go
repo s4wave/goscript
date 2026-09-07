@@ -494,6 +494,8 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 			b.WriteString(cloneArrayValue)
 			b.WriteString("(init.")
 			b.WriteString(field.name)
+			b.WriteString(", ")
+			b.WriteString(field.runtimeType)
 			b.WriteString(") : ")
 			b.WriteString(field.zero)
 		} else {
@@ -541,7 +543,9 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 			b.WriteString(cloneArrayValue)
 			b.WriteString("(this._fields.")
 			b.WriteString(field.name)
-			b.WriteString(".value)")
+			b.WriteString(".value, ")
+			b.WriteString(field.runtimeType)
+			b.WriteString(")")
 		} else {
 			b.WriteString("this._fields.")
 			b.WriteString(field.name)

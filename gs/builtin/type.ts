@@ -1161,16 +1161,30 @@ export function unsafePointerCast<T>(
   return destinationPointerView(source, target) as T
 }
 
-export function cloneArrayValue<T>(value: T): T {
+/**
+ * cloneArrayValue copies array storage and its value-typed elements.
+ * Scalar arrays can omit typeInfo; composite arrays require their descriptor.
+ */
+export function cloneArrayValue<T>(value: T, typeInfo?: string | TypeInfo): T {
   if (value instanceof Uint8Array) {
-    const out = new Uint8Array(value.length)
-    out.set(value)
-    return out as T
+    return value.slice() as T
   }
-  if (Array.isArray(value)) {
-    return value.map((item) => cloneArrayValue(item)) as T
+  if (!Array.isArray(value)) {
+    return value
   }
-  return value
+
+  const info = typeInfo === undefined ? undefined : normalizeTypeInfo(typeInfo)
+  const element =
+    info?.kind === TypeKind.Array && info.elemType !== undefined
+      ? normalizeTypeInfo(info.elemType)
+      : undefined
+  if (element?.kind === TypeKind.Array) {
+    return value.map((item) => cloneArrayValue(item, element)) as T
+  }
+  if (element?.kind === TypeKind.Struct) {
+    return value.map((item) => markAsStructValue(cloneStructValue(item))) as T
+  }
+  return value.slice() as T
 }
 
 // isMarkedAsStructValue reports whether value uses Go struct-value semantics.
