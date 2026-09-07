@@ -3,7 +3,6 @@ import {
   isTypedNilValue,
   markAsStructValue,
 } from './type.js'
-
 import { runtimePanic } from './panic.js'
 import {
   isOwnedPointerHandle,
@@ -38,16 +37,15 @@ type GoStringValue = string | GoBinaryString
 type GoStringBytes = GoStringValue | Slice<number> | Uint8Array
 const goBinaryStringPrefix = '\uFDD0goscript-bytes:'
 
+// asciiString matches strings whose UTF-16 code units are their Go bytes.
+// eslint-disable-next-line no-control-regex
+const asciiString = /^[\x00-\x7f]*$/
+
 function isGoStringValue(value: unknown): value is GoStringValue {
   return typeof value === 'string' || value instanceof GoBinaryString
 }
 
-// Shared codec instances: goStringBytes/goStringFromBytes run on the hot
-// path for every Go string byte-conversion (==, len(), slicing), so
-// constructing a fresh TextEncoder/TextDecoder per call is measurably
-// wasteful. Encoders/decoders are stateless per call (no streaming state
-// carried across encode/decode calls here), so a single shared instance is
-// safe to reuse.
+// Non-streaming codecs retain no per-call state and can be shared.
 const sharedTextEncoder = new TextEncoder()
 const sharedTextDecoder = new TextDecoder('utf-8', { fatal: true })
 
@@ -92,13 +90,13 @@ function goStringFromBytes(bytes: Uint8Array): string {
 }
 
 /**
- * GoSliceObject contains metadata for complex slice views
+ * GoSliceObject describes a slice window and its shared backing array.
  */
 interface GoSliceObject<T> {
-  backing: T[] // The backing array
-  offset: number // Offset into the backing array
-  length: number // Length of the slice
-  capacity: number // Capacity of the slice
+  backing: T[]
+  offset: number
+  length: number
+  capacity: number
   target?: T[] // Materialized proxy target for JS array operations
 }
 
@@ -115,7 +113,7 @@ interface ByteAddressSource {
 }
 
 /**
- * SliceProxy is a proxy object for complex slices.
+ * SliceProxy exposes a shared backing window through array operations.
  */
 export type SliceProxy<T> = T[] & {
   __meta__: GoSliceObject<T>
@@ -145,10 +143,7 @@ function sliceIndexProperty(prop: string | symbol): number {
 }
 
 /**
- * Slice<T> is a union type that is either a plain array or a proxy
- * null represents the nil state.
- *
- * Slice<number> can be represented as Uint8Array.
+ * Slice represents an array-backed or byte-backed Go slice; null is nil.
  */
 export type Slice<T> =
   | T[]
@@ -169,8 +164,7 @@ function outOfRangeIndex(index: number, length: number): never {
 }
 
 /**
- * wrapSliceProxy wraps a SliceProxy in a Proxy to intercept index access
- * and route it through the backing array.
+ * wrapSliceProxy routes indexed reads and writes through the backing window.
  */
 function wrapSliceProxy<T>(proxy: SliceProxy<T>): SliceProxy<T> {
   const meta = proxy.__meta__
@@ -248,7 +242,7 @@ function sliceProxyBackingMethod<T>(
   return method
 }
 
-// SliceProxy sort mutates only the backing window because sparse proxy targets
+// sliceProxySortMethod mutates only the backing window because sparse proxy targets
 // have no numeric own properties for Array.prototype.sort to enumerate.
 function sliceProxySortMethod<T>(
   meta: GoSliceObject<T>,
@@ -345,7 +339,7 @@ export function sliceToArrayPointer<T>(
 }
 
 /**
- * isComplexSlice checks if a slice is a complex slice (has __meta__ property)
+ * isComplexSlice identifies slices with explicit backing-window metadata.
  */
 function isComplexSlice<T>(slice: unknown): slice is SliceProxy<T> {
   return (
@@ -387,18 +381,14 @@ function byteSliceView(
 }
 
 /**
- * isSliceProxy checks if a slice is a SliceProxy (has __meta__ property)
- * This is an alias for isComplexSlice for better type hinting.
+ * isSliceProxy narrows slices with explicit backing-window metadata.
  */
 export function isSliceProxy<T>(slice: Slice<T>): slice is SliceProxy<T> {
   return isComplexSlice(slice)
 }
 
 /**
- * makeSlice Creates a new slice with the specified length and capacity.
- * @param length The length of the slice.
- * @param capacity The capacity of the slice (optional).
- * @returns A new slice.
+ * makeSlice allocates a zero-initialized backing array with the requested length and capacity.
  */
 export const makeSlice = <T>(
   length: number,
@@ -416,7 +406,6 @@ export const makeSlice = <T>(
       )
     }
 
-    // If capacity equals length, use Uint8Array directly for efficiency
     if (actualCapacity === length) {
       return new Uint8Array(length) as Slice<T>
     }
@@ -461,13 +450,10 @@ export const makeSlice = <T>(
     backingArr[i] = zeroValue()
   }
 
-  // OPTIMIZATION: If length equals capacity, return backing array directly
   if (length === actualCapacity) {
     return backingArr as Slice<T>
   }
 
-  // The proxyTargetArray serves as the shell for the proxy.
-  // Its elements up to 'length' should reflect the initialized part of the slice.
   const proxyTargetArray = new Array<T>(length)
   for (let i = 0; i < length; i++) {
     proxyTargetArray[i] = backingArr[i]
@@ -477,11 +463,10 @@ export const makeSlice = <T>(
   proxy.__meta__ = {
     backing: backingArr,
     offset: 0,
-    length: length,
+    length,
     capacity: actualCapacity,
   }
 
-  // Create a proper Proxy with the handler for SliceProxy behavior
   const handler = {
     get(target: any, prop: string | symbol): any {
       const index = sliceIndexProperty(prop)
@@ -510,7 +495,7 @@ export const makeSlice = <T>(
       if (index >= 0) {
         if (index < target.__meta__.length) {
           target.__meta__.backing[target.__meta__.offset + index] = value
-          target[index] = value // Also update the proxy target for consistency
+          target[index] = value
           return true
         }
         runtimePanic(
@@ -530,29 +515,21 @@ export const makeSlice = <T>(
 }
 
 /**
- * goSlice creates a slice from s[low:high:max]
- * Arguments mirror Go semantics; omitted indices are undefined.
- *
- * @param s The original slice
- * @param low Starting index (defaults to 0)
- * @param high Ending index (defaults to s.length)
- * @param max Capacity limit (defaults to original capacity)
+ * goSlice returns a shared view for s[low:high:max]. Omitted bounds use zero, length, and capacity.
  */
-// goSlice Overload for Uint8Array - returns Slice<number> (which includes Uint8Array).
 export function goSlice(
   s: Uint8Array,
   low?: number,
   high?: number,
   max?: number,
 ): Slice<number>
-// goSlice Generic overload for other slice types.
 export function goSlice<T>(
   s: Slice<T>,
   low?: number,
   high?: number,
   max?: number,
 ): Slice<T>
-export function goSlice<T>( // T can be number for Uint8Array case
+export function goSlice<T>(
   s: Slice<T> | Uint8Array,
   low?: number,
   high?: number,
@@ -655,13 +632,12 @@ export function goSlice<T>( // T can be number for Uint8Array case
 
     if (max !== undefined) {
       if (max < actualHigh || max > baseCapacity) {
-        // max is relative to the original s.length (capacity)
         runtimePanic(
           `runtime error: slice bounds out of range [:${actualHigh}:${max}] with capacity ${baseCapacity}`,
         )
       }
 
-      const newCap = max - actualLow // Capacity of the new slice view
+      const newCap = max - actualLow
       return byteSliceView(
         backing,
         baseOffset + actualLow,
@@ -730,7 +706,6 @@ export function goSlice<T>( // T can be number for Uint8Array case
   let oldOffset = 0
   let oldCap = scap
 
-  // Get the backing array and offset
   if (isComplexSlice(s)) {
     backing = s.__meta__.backing
     oldOffset = s.__meta__.offset
@@ -752,7 +727,6 @@ export function goSlice<T>( // T can be number for Uint8Array case
     }
     newCap = max - low
   } else {
-    // For slices of slices, capacity should be the capacity of the original slice minus the low index
     if (isComplexSlice(s)) {
       newCap = oldCap - low
     } else {
@@ -763,35 +737,25 @@ export function goSlice<T>( // T can be number for Uint8Array case
   const newLength = high - low
   const newOffset = oldOffset + low
 
-  // OPTIMIZATION: If the result would have offset=0 and length=capacity, return backing directly
   if (newOffset === 0 && newLength === newCap && backing.length === newLength) {
     return backing as Slice<T>
   }
 
-  // Create an array-like target with the correct length
   const proxyTargetArray = new Array<T>(newLength)
-  // Note: We don't need to initialize the values here since the proxy handler
-  // will fetch them from the backing array when accessed
 
   const proxy = proxyTargetArray as SliceProxy<T>
   proxy.__meta__ = {
-    backing: backing,
+    backing,
     offset: newOffset,
     length: newLength,
     capacity: newCap,
   }
 
-  // const handler = { ... } // Handler is now defined at the top
-
   return new Proxy(proxy, handler) as SliceProxy<T>
 }
 
 /**
- * arrayToSlice Converts a JavaScript array to a Go slice.
- * For multi-dimensional arrays, recursively converts nested arrays to slices.
- * @param arr The JavaScript array to convert
- * @param depth How many levels of nesting to convert (default: 1, use Infinity for all levels)
- * @returns A Go slice containing the same elements
+ * arrayToSlice converts nested arrays to shared slice views up to depth; depth one preserves the array.
  */
 export const arrayToSlice = <T>(
   arr: T[] | null | undefined,
@@ -801,8 +765,6 @@ export const arrayToSlice = <T>(
 
   if (arr.length === 0) return arr
 
-  // OPTIMIZATION: For arrays where offset=0 and length=capacity, return the array directly
-  // if we're not doing deep conversion
   if (depth === 1) {
     return arr
   }
@@ -882,7 +844,6 @@ export const arrayToSlice = <T>(
     },
   }
 
-  // Recursively convert nested arrays if depth > 1
   if (depth > 1 && arr.length > 0) {
     for (let i = 0; i < arr.length; i++) {
       const item = arr[i]
@@ -896,9 +857,7 @@ export const arrayToSlice = <T>(
 }
 
 /**
- * len Returns the length of a collection (string, array, slice, map, or set).
- * @param obj The collection to get the length of.
- * @returns The length of the collection.
+ * len returns the Go length of a collection, counting string bytes.
  */
 export const len = <T = unknown, V = unknown>(
   obj:
@@ -953,9 +912,7 @@ export const len = <T = unknown, V = unknown>(
 }
 
 /**
- * cap Returns the capacity of a slice.
- * @param obj The slice.
- * @returns The capacity of the slice.
+ * cap returns the available capacity of a slice.
  */
 export const cap = <T>(
   obj: Slice<T> | Uint8Array | { cap(): number } | null | undefined,
@@ -1084,12 +1041,7 @@ function appendZeroValue(sample: unknown): unknown {
 }
 
 /**
- * append Appends elements to a slice.
- * Note: In Go, append can return a new slice if the underlying array is reallocated.
- * This helper emulates that by returning the modified or new slice.
- * @param slice The slice to append to.
- * @param elements The elements to append.
- * @returns The modified or new slice.
+ * append returns an extended slice, sharing its backing array when capacity permits.
  */
 export function append(slice: Uint8Array, ...elements: unknown[]): Uint8Array
 // append Null destinations carry no runtime element type, so compiler-only hint
@@ -1153,14 +1105,12 @@ export function append<T>(
     originalTarget = meta.target
     originalOffset = meta.offset
   } else {
-    // Simple T[] array
     originalElements = (slice as T[]).slice()
     oldLength = originalElements.length
     oldCapacity = oldLength
   }
   const newLength = oldLength + numAdded
 
-  // Case 1: Modify in-place if original was SliceProxy and has enough capacity.
   if (isOriginalComplex && newLength <= oldCapacity && originalBacking) {
     for (let i = 0; i < numAdded; i++) {
       originalBacking[originalOffset + oldLength + i] = elements[i] as T
@@ -1180,7 +1130,6 @@ export function append<T>(
     ) as any
   }
 
-  // Case 2: Reallocation is needed.
   const newCapacity = nextAppendCapacity(oldLength, oldCapacity, newLength)
 
   const newBacking = new Array<T>(newCapacity)
@@ -1373,10 +1322,7 @@ function writeByteElements(
 }
 
 /**
- * copy Copies elements from src to dst.
- * @param dst The destination slice.
- * @param src The source slice or string.
- * @returns The number of elements copied.
+ * copy copies the shared length of src and dst, preserving overlapping source values.
  */
 export function copy(dst: Uint8Array, src: Uint8Array | string): number
 export function copy(dst: Uint8Array, src: Slice<number>): number
@@ -1390,7 +1336,6 @@ export function copy<T>(
     return 0
   }
 
-  // Handle string source first
   if (isGoStringValue(src)) {
     return copyFromString(dst, src)
   }
@@ -1399,7 +1344,6 @@ export function copy<T>(
     return 0
   }
 
-  // Now we know src is Slice<T> | Uint8Array
   const dstLen = dst instanceof Uint8Array ? dst.length : len(dst)
   const srcLen = src instanceof Uint8Array ? src.length : len(src)
   const count = Math.min(dstLen, srcLen)
@@ -1408,30 +1352,22 @@ export function copy<T>(
     return 0
   }
 
-  // Handle all combinations of dst and src types
   if (dst instanceof Uint8Array && src instanceof Uint8Array) {
-    // Uint8Array to Uint8Array
     dst.set(src.subarray(0, count))
     return count
   }
 
   if (dst instanceof Uint8Array) {
-    // Uint8Array destination, Slice<number> source
     return copyToUint8Array(dst, src as Slice<number>, count)
   }
 
   if (src instanceof Uint8Array) {
-    // Slice<T> destination, Uint8Array source
     return copyFromUint8Array(dst as Slice<T>, src, count)
   }
 
-  // Both are Slice<T>
   return copyBetweenSlices(dst as Slice<T>, src as Slice<T>, count)
 }
 
-/**
- * Helper: Copy from string to any destination type
- */
 function copyFromString<T>(
   dst: Slice<T> | Uint8Array,
   src: GoStringValue,
@@ -1464,9 +1400,6 @@ function copyFromString<T>(
   return count
 }
 
-/**
- * Helper: Copy from Slice<number> to Uint8Array
- */
 function copyToUint8Array(
   dst: Uint8Array,
   src: Slice<number>,
@@ -1479,9 +1412,6 @@ function copyToUint8Array(
   return count
 }
 
-/**
- * Helper: Copy from Uint8Array to Slice<T>
- */
 function copyFromUint8Array<T>(
   dst: Slice<T>,
   src: Uint8Array,
@@ -1502,9 +1432,6 @@ function copyFromUint8Array<T>(
   return count
 }
 
-/**
- * Helper: Copy between two Slice<T> instances
- */
 function copyBetweenSlices<T>(
   dst: Slice<T>,
   src: Slice<T>,
@@ -1525,7 +1452,7 @@ function copyBetweenSlices<T>(
   return count
 }
 
-// copy snapshots the source before writing so overlapping slices follow Go's
+// copySliceValues snapshots the source before writing so overlapping slices follow Go's
 // memmove-style copy semantics.
 function copySliceValues<T>(src: Slice<T>, count: number): T[] {
   const values = new Array<T>(count)
@@ -1543,15 +1470,7 @@ function copySliceValues<T>(src: Slice<T>, count: number): T[] {
 }
 
 /**
- * index Accesses an element at a specific index for various Go-like types (string, slice, array).
- * Mimics Go's indexing behavior: `myCollection[index]`
- * For strings, it returns the byte value at the specified byte index.
- * For slices/arrays, it returns the element at the specified index.
- * This is used when dealing with types like "string | []byte".
- * @param collection The string, Slice, or Array to access.
- * @param index The index.
- * @returns The element or byte value at the specified index.
- * @throws Error if index is out of bounds or type is unsupported.
+ * index reads a collection element or string byte with Go bounds checks.
  */
 export function index<T>(
   collection: GoStringValue | Slice<T> | T[],
@@ -1561,14 +1480,7 @@ export function index<T>(
     runtimePanic('runtime error: index on nil or undefined collection')
   }
 
-  // Slice/array checks run before the string check: they are mutually
-  // exclusive with GoStringValue (a SliceProxy or plain array can never
-  // also be a string or GoBinaryString), so this reorder cannot change
-  // which branch handles any given value — only how fast the common
-  // "index into a slice" case gets there. isGoStringValue's `instanceof
-  // GoBinaryString` check forces a full [[GetPrototypeOf]] walk when
-  // `collection` is a Proxy-wrapped SliceProxy (always false for those),
-  // which is wasted work on every slice-typed call when checked first.
+  // Slice checks avoid a GoBinaryString prototype walk through slice proxies.
   if (collection instanceof Uint8Array) {
     if (index < 0 || index >= collection.length) {
       outOfRangeIndex(index, collection.length)
@@ -1585,7 +1497,7 @@ export function index<T>(
     }
     return collection[index]
   } else if (isGoStringValue(collection)) {
-    return indexString(collection, index) // Use the existing indexString for byte access
+    return indexString(collection, index)
   }
   runtimePanic('runtime error: index on unsupported type')
 }
@@ -1599,10 +1511,7 @@ type ArrayIndexValue<C> =
   : any
 
 /**
- * arrayIndex reads collection[index] with Go bounds-check semantics, panicking
- * with the Go runtime message when index is out of range. Strings and maps are
- * lowered through their own helpers, so this covers Go arrays and slices.
- * TypeScript-friendly generic.
+ * arrayIndex reads an array or slice element with Go bounds checks.
  */
 export function arrayIndex<
   C extends
@@ -1996,18 +1905,14 @@ function byteArrayFromAddress(
 }
 
 /**
- * stringToRunes Converts a string to an array of Unicode code points (runes).
- * @param str The input string.
- * @returns An array of numbers representing the Unicode code points.
+ * stringToRunes returns the Unicode code points of a JavaScript string.
  */
 export const stringToRunes = (str: string): number[] => {
   return Array.from(str).map((c) => c.codePointAt(0) || 0)
 }
 
 /**
- * rangeString Returns Go range pairs for a string: UTF-8 byte offset and rune value.
- * @param str The input string.
- * @returns Index/rune pairs matching Go's `for i, r := range str`.
+ * rangeString returns UTF-8 byte offsets and rune values for string iteration.
  */
 export const rangeString = (str: string): Array<[number, number]> => {
   const pairs: Array<[number, number]> = []
@@ -2020,10 +1925,7 @@ export const rangeString = (str: string): Array<[number, number]> => {
 }
 
 /**
- * stringToRune Converts a single-character string to its Unicode code point (rune).
- * Used for readable rune constants like $.stringToRune('/') instead of 47.
- * @param str A single-character string.
- * @returns The Unicode code point as a number.
+ * stringToRune returns the first Unicode code point, or zero for an empty string.
  */
 export const stringToRune = (str: string): number => {
   if (str.length === 0) {
@@ -2033,9 +1935,7 @@ export const stringToRune = (str: string): number => {
 }
 
 /**
- * runesToString Converts an array of Unicode code points (runes) to a string.
- * @param runes The input array of numbers representing Unicode code points.
- * @returns The resulting string.
+ * runesToString encodes Unicode scalar values, replacing invalid runes with U+FFFD.
  */
 export const runesToString = (runes: Slice<number>): string => {
   if (!runes?.length) {
@@ -2061,36 +1961,37 @@ export function runeToString(r: number): string {
 }
 
 /**
- * byte Converts a number to a byte (uint8) by truncating to the range 0-255.
- * Equivalent to Go's byte() conversion.
- * @param n The number to convert to a byte.
- * @returns The byte value (0-255).
+ * byte truncates a number to its low eight bits.
  */
 export const byte = (n: number): number => {
-  return n & 0xff // Bitwise AND with 255 ensures we get a value in the range 0-255
+  return n & 0xff
 }
 
 /**
- * indexString Accesses the byte value at a specific index of a UTF-8 encoded string.
- * Mimics Go's string indexing behavior: `myString[index]`.
- * @param str The string to access.
- * @param index The byte index.
- * @returns The byte value (0-255) at the specified index.
- * @throws Error if index is out of bounds.
+ * indexString reads a Go string byte with bounds checks; ASCII reads allocate no byte buffer.
  */
 export const indexString = (
   str: GoStringValue | import('./builtin.js').Bytes,
   index: number,
 ): number => {
+  if (
+    typeof str === 'string' &&
+    Number.isInteger(index) &&
+    asciiString.test(str)
+  ) {
+    if (index < 0 || index >= str.length) {
+      outOfRangeIndex(index, str.length)
+    }
+    return str.charCodeAt(index)
+  }
+
   if (!isGoStringValue(str)) {
-    // Bytes - access directly
     if (str instanceof Uint8Array) {
       if (index < 0 || index >= str.length) {
         outOfRangeIndex(index, str.length)
       }
       return str[index]
     }
-    // Array or null
     if (str === null || str === undefined) {
       outOfRangeIndex(index, 0)
     }
@@ -2107,23 +2008,17 @@ export const indexString = (
 }
 
 /**
- * stringLen Returns the byte length of a string.
- * Mimics Go's `len(string)` behavior.
- * @param str The string.
- * @returns The number of bytes in the UTF-8 representation of the string.
+ * stringLen returns the Go byte length; ASCII reads allocate no byte buffer.
  */
 export const stringLen = (str: GoStringValue): number => {
+  if (typeof str === 'string' && asciiString.test(str)) {
+    return str.length
+  }
   return goStringBytes(str).length
 }
 
 /**
- * sliceString Slices a string based on byte indices.
- * Mimics Go's string slicing behavior: `myString[low:high]` for valid UTF-8 slices only.
- * @param str The string to slice.
- * @param low The starting byte index (inclusive). Defaults to 0.
- * @param high The ending byte index (exclusive). Defaults to string byte length.
- * @returns The sliced string.
- * @throws Error if the slice would create invalid UTF-8.
+ * sliceString slices Go bytes, preserving invalid UTF-8 in the binary-string representation.
  */
 export const sliceString = (
   str: GoStringValue,
@@ -2135,11 +2030,6 @@ export const sliceString = (
   const actualHigh = high === undefined ? bytes.length : high
 
   if (actualLow < 0 || actualHigh < actualLow || actualHigh > bytes.length) {
-    // Go's behavior for out-of-bounds slice on string is a panic.
-    // For simple slices like s[len(s):len(s)], it should produce an empty string.
-    // For s[len(s)+1:], it panics.
-    // Let's ensure high <= bytes.length and low <= high.
-    // If low == high, it's an empty string.
     if (
       actualLow === actualHigh &&
       actualLow >= 0 &&
@@ -2165,27 +2055,21 @@ export function bytesFromHex(hex: string): Uint8Array {
 }
 
 /**
- * bytesToString Converts a Slice<number> (byte array) to a string using TextDecoder.
- * @param bytes The Slice<number> to convert.
- * @returns The resulting string.
+ * bytesToString encodes byte values as a Go string without losing invalid UTF-8.
  */
 export const bytesToString = (
   bytes: Slice<number> | Uint8Array | string,
 ): string => {
   if (bytes === null) return ''
-  // If it's already a string, just return it
   if (typeof bytes === 'string') return bytes
   if (bytes instanceof Uint8Array) return goStringFromBytes(bytes)
-  // Ensure we get a plain number[] for Uint8Array.from
   let byteArray: number[]
   if (isComplexSlice(bytes)) {
-    // For complex slices, extract the relevant part of the backing array
     byteArray = bytes.__meta__.backing.slice(
       bytes.__meta__.offset,
       bytes.__meta__.offset + bytes.__meta__.length,
     )
   } else {
-    // For simple T[] slices
     byteArray = bytes
   }
   return goStringFromBytes(Uint8Array.from(byteArray))
@@ -2316,9 +2200,7 @@ function binaryStringToBytes(value: string): Uint8Array {
 }
 
 /**
- * stringToBytes Converts a string to a Uint8Array (byte slice).
- * @param s The input string.
- * @returns A Uint8Array representing the UTF-8 bytes of the string.
+ * stringToBytes copies Go string bytes and preserves existing byte-array inputs.
  */
 export function stringToBytes(
   s: GoStringValue | import('./builtin.js').Bytes,
@@ -2326,14 +2208,12 @@ export function stringToBytes(
   if (isGoStringValue(s)) {
     return goStringBytes(s)
   }
-  // Already bytes - normalize to Uint8Array
   if (s instanceof Uint8Array) {
     return s
   }
   if (s === null || s === undefined) {
     return new Uint8Array(0)
   }
-  // Handle array or slice types
   return new Uint8Array(Array.isArray(s) ? s : [])
 }
 
@@ -2403,10 +2283,7 @@ export function sliceHeaderRef(b: VarRef<Slice<number>>): VarRef<{
 }
 
 /**
- * genericBytesOrStringToString Handles string() conversion for values that could be either string or []byte.
- * Used for generic type parameters with constraint []byte|string.
- * @param value Value that is either a string or Uint8Array
- * @returns The string representation
+ * genericBytesOrStringToString converts values with a string or byte-slice constraint.
  */
 export function genericBytesOrStringToString(
   value: string | import('./builtin.js').Bytes | null | undefined,
@@ -2428,12 +2305,7 @@ export function indexByteString(value: string, index: number): number {
 }
 
 /**
- * indexStringOrBytes Indexes into a value that could be either a string or bytes.
- * Used for generic type parameters with constraint string | []byte.
- * Both cases return a byte value (number).
- * @param value Value that is either a string or bytes (Uint8Array or Slice<number>)
- * @param index The index to access
- * @returns The byte value at the specified index
+ * indexStringOrBytes reads one string or slice byte with Go bounds checks.
  */
 export function indexStringOrBytes(
   value: GoStringValue | import('./builtin.js').Bytes,
@@ -2442,7 +2314,6 @@ export function indexStringOrBytes(
   if (isGoStringValue(value)) {
     return indexString(value, index)
   } else if (value instanceof Uint8Array) {
-    // For Uint8Array, direct access returns the byte value
     if (index < 0 || index >= value.length) {
       outOfRangeIndex(index, value.length)
     }
@@ -2450,7 +2321,6 @@ export function indexStringOrBytes(
   } else if (value === null) {
     outOfRangeIndex(index, 0)
   } else {
-    // For Slice<number> (including SliceProxy)
     const length = len(value)
     if (index < 0 || index >= length) {
       outOfRangeIndex(index, length)
@@ -2460,22 +2330,14 @@ export function indexStringOrBytes(
 }
 
 /**
- * sliceStringOrBytes Slices a value that could be either a string or bytes.
- * Used for generic type parameters with constraint string | []byte.
- * @param value Value that is either a string or bytes (Uint8Array or Slice<number>)
- * @param low Starting index (inclusive). Defaults to 0.
- * @param high Ending index (exclusive). Defaults to length.
- * @param max Capacity limit (only used for bytes, ignored for strings)
- * @returns The sliced value of the same type as input
+ * sliceStringOrBytes slices strings by byte and slices by element; max applies only to slices.
  */
 export function sliceStringOrBytes<
   T extends GoStringValue | import('./builtin.js').Bytes,
 >(value: T, low?: number, high?: number, max?: number): T {
   if (isGoStringValue(value)) {
-    // For strings, use sliceString and ignore max parameter
     return sliceString(value, low, high) as T
   } else {
-    // For bytes (Uint8Array or Slice<number>), use goSlice
     return goSlice(value as Slice<number>, low, high, max) as T
   }
 }
