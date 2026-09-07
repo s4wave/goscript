@@ -6015,7 +6015,7 @@ func TestCompilePackagesUnwrapsImportedArrayPackageVarReads(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"$.arrayIndex($.pointerValue<number[]>(dep.Table), 1)",
-		"dep.Sum($.pointerValue<number[]>(dep.Table))",
+		"dep.Sum($.cloneArrayValue($.pointerValue<number[]>(dep.Table),",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing imported array package var read %q:\n%s", want, text)
@@ -6103,7 +6103,7 @@ func TestCompilePackagesUnwrapsAliasedArrayPackageVarReads(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"$.arrayIndex($.pointerValue<number[]>(__goscript_table.Table), 1)",
-		"Sum($.pointerValue<number[]>(__goscript_table.Table))",
+		"Sum($.cloneArrayValue($.pointerValue<number[]>(__goscript_table.Table),",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing aliased array package var read %q:\n%s", want, text)
