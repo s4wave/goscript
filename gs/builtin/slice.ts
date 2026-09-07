@@ -362,6 +362,19 @@ function byteSliceMeta(slice: Uint8Array): ByteSliceMeta | undefined {
   return (slice as ByteSlice).__meta__
 }
 
+/** checkByteSliceBounds validates two-index slice bounds against capacity. */
+function checkByteSliceBounds(
+  low: number,
+  high: number,
+  capacity: number,
+): void {
+  if (low < 0 || high < low || low > capacity || high > capacity) {
+    runtimePanic(
+      `runtime error: slice bounds out of range [${low}:${high}] with capacity ${capacity}`,
+    )
+  }
+}
+
 function byteSliceView(
   backing: Uint8Array,
   offset: number,
@@ -617,16 +630,7 @@ export function goSlice<T>(
     const actualLow = low ?? 0
     const actualHigh = high ?? s.length
 
-    if (
-      actualLow < 0 ||
-      actualHigh < actualLow ||
-      actualLow > baseCapacity ||
-      actualHigh > baseCapacity
-    ) {
-      runtimePanic(
-        `runtime error: slice bounds out of range [${actualLow}:${actualHigh}] with capacity ${baseCapacity}`,
-      )
-    }
+    checkByteSliceBounds(actualLow, actualHigh, baseCapacity)
 
     const newLength = actualHigh - actualLow
 
@@ -1366,6 +1370,48 @@ export function copy<T>(
   }
 
   return copyBetweenSlices(dst as Slice<T>, src as Slice<T>, count)
+}
+
+/**
+ * copyByteRanges copies two sliced byte ranges after validating destination
+ * and source bounds in order. Callers evaluate only inert operands before entry.
+ * Omitted high bounds use length; explicit high bounds may reach capacity.
+ */
+export function copyByteRanges(
+  dst: Slice<number>,
+  dstLow: number | undefined,
+  dstHigh: number | undefined,
+  src: Slice<number>,
+  srcLow: number | undefined,
+  srcHigh: number | undefined,
+): number {
+  if (!(dst instanceof Uint8Array) || !(src instanceof Uint8Array)) {
+    return copy(goSlice(dst, dstLow, dstHigh), goSlice(src, srcLow, srcHigh))
+  }
+
+  const dstMeta = byteSliceMeta(dst)
+  const dstBacking = dstMeta?.backing ?? dst
+  const dstStart = normalizeSliceIndex(dstLow) ?? 0
+  const dstEnd = normalizeSliceIndex(dstHigh) ?? dst.length
+  checkByteSliceBounds(dstStart, dstEnd, dstMeta?.capacity ?? dst.length)
+
+  const srcMeta = byteSliceMeta(src)
+  const srcBacking = srcMeta?.backing ?? src
+  const srcStart = normalizeSliceIndex(srcLow) ?? 0
+  const srcEnd = normalizeSliceIndex(srcHigh) ?? src.length
+  checkByteSliceBounds(srcStart, srcEnd, srcMeta?.capacity ?? src.length)
+
+  const count = Math.min(dstEnd - dstStart, srcEnd - srcStart)
+  if (count === 0) return 0
+
+  const dstOffset = (dstMeta?.offset ?? 0) + dstStart
+  const srcOffset = (srcMeta?.offset ?? 0) + srcStart
+  if (dstBacking === srcBacking) {
+    dstBacking.copyWithin(dstOffset, srcOffset, srcOffset + count)
+  } else {
+    dstBacking.set(srcBacking.subarray(srcOffset, srcOffset + count), dstOffset)
+  }
+  return count
 }
 
 function copyFromString<T>(
