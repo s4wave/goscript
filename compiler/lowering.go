@@ -8332,6 +8332,10 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 			return o.lowerMakeExpr(ctx, expr)
 		case "new":
 			return o.lowerNewExpr(ctx, expr)
+		case "copy":
+			if call, diagnostics, ok := o.lowerByteCopyRanges(ctx, expr); ok {
+				return call, diagnostics
+			}
 		}
 	}
 	if targetType := typeFromExpr(ctx, expr.Fun); targetType != nil {

@@ -128,7 +128,7 @@ Go's explicit error return values are maintained. Functions returning an error t
 *   `append()`: Mapped to `$.append()` runtime helper.
 *   `make()`: Mapped to runtime helper functions (`$.makeSlice()`, `$.makeMap()`, `$.makeChannel()`).
 *   `new()`: Mapped to `new T()`, returning a new instance of the zero value.
-*   `copy()`: Mapped to `$.copy()` runtime helper.
+*   `copy()`: Mapped to `$.copy()` runtime helper. When both operands are two-index byte-slice expressions with inert local values and bounds, the compiler emits `$.copyByteRanges()` to avoid temporary slice views. The runtime checks destination and source bounds before copying, preserves capacity and overlap behavior, and supports both typed and Array-backed byte slices. Calls, package-variable reads, and other potentially effectful operands retain ordinary slice evaluation.
 *   `delete()`: Mapped to `$.deleteMapEntry()` runtime helper.
 *   `close()`: Mapped to `channel.close()` method call.
 *   `panic()`: Mapped to `$.panic()` which throws an Error.
@@ -163,7 +163,7 @@ The runtime provides:
 
 *   Helper types (`$.GoError`, `$.Slice`, `$.Bytes`, `$.Channel`, `$.VarRef`, `$.DisposableStack`, `$.AsyncDisposableStack`, etc.).
 *   Helper functions:
-    *   Slice operations: `$.makeSlice`, `$.goSlice`, `$.append`, `$.copy`, `$.len`, `$.cap`, `$.clear`
+    *   Slice operations: `$.makeSlice`, `$.goSlice`, `$.append`, `$.copy`, `$.copyByteRanges`, `$.len`, `$.cap`, `$.clear`
     *   Map operations: `$.makeMap`, `$.mapGet`, `$.mapSet`, `$.deleteMapEntry`
     *   Channel operations: `$.makeChannel`, `$.chanSend`, `$.chanRecv`, `$.chanRecvWithOk`, `$.selectStatement`
     *   String operations include `$.indexString`, `$.stringLen`, `$.stringToRunes`, `$.stringToBytes`, and `$.bytesToString`. Length and byte indexing read ASCII strings directly without allocating an encoded byte array. Other strings retain UTF-8 byte access and the binary-string representation for invalid UTF-8; explicit string-to-byte conversion still creates independent storage.

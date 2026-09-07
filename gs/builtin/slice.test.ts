@@ -11,6 +11,7 @@ import {
   bytesFromHex,
   bytesToString,
   copy,
+  copyByteRanges,
   GoBinaryString,
   goSlice,
   indexString,
@@ -26,6 +27,49 @@ import {
   stringToBytes,
 } from './slice.js'
 import { markAsStructValue } from './type.js'
+
+describe('byte range copies', () => {
+  it('copies overlapping views of the same buffer with memmove semantics', () => {
+    const bytes = new Uint8Array([1, 2, 3, 4, 5])
+    const src = bytes.subarray(0, 4)
+    const dst = bytes.subarray(1)
+
+    expect(copyByteRanges(dst, 0, undefined, src, 0, undefined)).toBe(4)
+    expect(Array.from(bytes)).toEqual([1, 1, 2, 3, 4])
+    expect(copyByteRanges(bytes, 0, 4, bytes, 1, 5)).toBe(4)
+    expect(Array.from(bytes)).toEqual([1, 2, 3, 4, 4])
+  })
+
+  it('uses metadata capacity while preserving omitted high bounds', () => {
+    const bytes = new Uint8Array([1, 2, 3, 4, 5, 6])
+    const dst = goSlice(bytes, 1, 2, 5)
+    const src = new Uint8Array([7, 8, 9])
+
+    expect(copyByteRanges(dst, 1, 4, src, 0, undefined)).toBe(3)
+    expect(Array.from(bytes)).toEqual([1, 2, 7, 8, 9, 6])
+    expect(copyByteRanges(dst, undefined, undefined, src, 0, 3)).toBe(1)
+    expect(Array.from(bytes)).toEqual([1, 7, 7, 8, 9, 6])
+  })
+
+  it('validates both ranges before writing, including nil destinations', () => {
+    const dst = new Uint8Array([1, 2])
+    const src = new Uint8Array([3])
+
+    expect(() => copyByteRanges(dst, 0, 2, src, 0, 2)).toThrow()
+    expect(Array.from(dst)).toEqual([1, 2])
+    expect(() => copyByteRanges(null, 0, 0, src, 0, 2)).toThrow()
+    expect(copyByteRanges(null, 0, 0, src, 0, 1)).toBe(0)
+  })
+
+  it('preserves Array-backed byte slice aliases', () => {
+    const backing = [1, 2, 3, 4, 5]
+    const dst = goSlice(backing, 1, 4)
+    const src = goSlice(backing, 0, 3)
+
+    expect(copyByteRanges(dst, 0, 3, src, 0, 3)).toBe(3)
+    expect(backing).toEqual([1, 1, 2, 3, 5])
+  })
+})
 
 describe('compiler byte constants', () => {
   it('indexes encoded constants by byte with Go bounds checks', () => {
