@@ -1137,18 +1137,67 @@ describe('generated method installation', () => {
         toBinary: () => new Uint8Array([7]),
       }
       declare MarshalVT: () => [$.Slice<number>, $.GoError]
+      declare MarshalToVT: (data: $.Slice<number>) => [number, $.GoError]
+      declare EqualMessageVT: (other: any) => boolean
+      declare String: () => string
+
+      EqualVT(other: Installed | null) {
+        return this === other
+      }
+
+      SizeVT() {
+        return 2
+      }
+
+      MarshalToSizedBufferVT(data: $.Slice<number>): [number, $.GoError] {
+        expect($.len(data)).toBe(2)
+        data![0] = 7
+        data![1] = 8
+        return [2, null]
+      }
+
+      MarshalProtoText() {
+        return 'custom text'
+      }
+
       MarshalJSON() {
         return 'custom'
       }
     }
-    BindMessageMethods(Installed, '*test.Installed', ['MarshalVT'])
+    BindMessageMethods(Installed, '*test.Installed', [
+      'EqualMessageVT',
+      'MarshalToVT',
+      'MarshalVT',
+      'String',
+    ])
     for (const receiver of [null, {}, new Installed()]) {
       const [data, err] = Installed.prototype.MarshalVT.call(
         receiver as Installed,
       )
       expect(err).toBeNull()
       expect(Array.from(data ?? [])).toEqual([7])
+
+      const buffer = new Uint8Array([0, 0, 99, 99])
+      expect(
+        Installed.prototype.MarshalToVT.call(receiver as Installed, buffer),
+      ).toEqual([2, null])
+      expect(Array.from(buffer)).toEqual([7, 8, 99, 99])
+      expect(Installed.prototype.String.call(receiver as Installed)).toBe(
+        'custom text',
+      )
     }
+    const instance = new Installed()
+    const boxed = $.interfaceValue(instance, '*test.Installed')
+    expect(instance.EqualMessageVT(boxed)).toBe(true)
+    expect(new Installed().EqualMessageVT(boxed)).toBe(false)
+    expect(instance.EqualMessageVT({})).toBe(false)
+    expect(instance.EqualMessageVT(null)).toBe(false)
+    expect(
+      Installed.prototype.EqualMessageVT.call(
+        null as any,
+        $.interfaceValue(null, '*test.Installed'),
+      ),
+    ).toBe(true)
     expect(new Installed().MarshalJSON()).toBe('custom')
     expect(Object.keys(new Installed())).not.toContain('MarshalVT')
     expect(
