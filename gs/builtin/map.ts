@@ -1,11 +1,15 @@
 import { comparableEqual } from './builtin.js'
 import { GoBinaryString, stringEqual, stringMapKey } from './slice.js'
+import { isVarRef } from './varRef.js'
 
-// GoMap indexes Go string representations by their canonical byte value.
+// GoMap indexes Go string representations by their canonical byte value and
+// structs whose fields are all strings by their canonical field values.
 // Iteration retains the original key; object and struct equality stays in the
-// shared comparison path below. Non-string maps allocate no secondary index.
+// shared comparison path below. Keys without an indexed representation
+// allocate no secondary index and fall back to the shared comparison scan.
 class GoMap<K, V> extends Map<K, V> {
   private stringKeys?: Map<string, K>
+  private structKeys?: Map<string, K[]>
 
   override set(key: K, value: V): this {
     if (isGoStringKey(key)) {
@@ -13,6 +17,13 @@ class GoMap<K, V> extends Map<K, V> {
       this.stringKeys ??= new Map<string, K>()
       key = this.stringKeys.get(canonical) ?? key
       this.stringKeys.set(canonical, key)
+    } else {
+      const stored = this.structEntry(key)
+      if (stored !== undefined) {
+        key = stored
+      } else {
+        this.addStructKey(key)
+      }
     }
     return super.set(key, value)
   }
@@ -28,22 +39,65 @@ class GoMap<K, V> extends Map<K, V> {
   override delete(key: K): boolean {
     const stored = this.storedKey(key)
     if (isGoStringKey(key)) this.stringKeys?.delete(stringMapKey(key))
+    else this.removeStructKey(stored)
     return super.delete(stored)
   }
 
   override clear(): void {
     this.stringKeys?.clear()
+    this.structKeys?.clear()
     super.clear()
   }
 
+  // structEntry returns the stored key equal to key under Go struct
+  // equality, or undefined when the index holds no matching candidate. The
+  // bucket only narrows candidates; comparableEqual stays the equality
+  // authority, so same-field structs of different types stay distinct.
+  private structEntry(key: K): K | undefined {
+    const canonical = structMapKey(key)
+    if (canonical === undefined) return undefined
+    const bucket = this.structKeys?.get(canonical)
+    if (bucket === undefined) return undefined
+    for (const member of bucket) {
+      if (comparableEqual(member, key)) return member
+    }
+    return undefined
+  }
+
   private storedKey(key: K): K {
-    return isGoStringKey(key) ?
-        (this.stringKeys?.get(stringMapKey(key)) ?? key)
-      : key
+    if (isGoStringKey(key)) {
+      return this.stringKeys?.get(stringMapKey(key)) ?? key
+    }
+    return this.structEntry(key) ?? key
+  }
+
+  private addStructKey(key: K): void {
+    const canonical = structMapKey(key)
+    if (canonical === undefined) return
+    this.structKeys ??= new Map<string, K[]>()
+    const bucket = this.structKeys.get(canonical)
+    if (bucket === undefined) {
+      this.structKeys.set(canonical, [key])
+    } else {
+      bucket.push(key)
+    }
+  }
+
+  private removeStructKey(stored: K): void {
+    const canonical = structMapKey(stored)
+    if (canonical === undefined) return
+    const bucket = this.structKeys?.get(canonical)
+    if (bucket === undefined) return
+    const remaining = bucket.filter((member) => member !== stored)
+    if (remaining.length === 0) {
+      this.structKeys!.delete(canonical)
+    } else {
+      this.structKeys!.set(canonical, remaining)
+    }
   }
 }
 
-// makeMap creates a Go map with indexed string-value equality.
+// makeMap creates a Go map with indexed string and flat string-struct keys.
 export function makeMap<K, V>(entries?: Iterable<readonly [K, V]>): Map<K, V> {
   const map = new GoMap<K, V>()
   if (entries) for (const [key, value] of entries) mapSet(map, key, value)
@@ -111,6 +165,9 @@ function findMapEntry<K, V>(
   if (key === null || (typeof key !== 'object' && typeof key !== 'function')) {
     return { found: false }
   }
+  if (map instanceof GoMap && structMapKey(key) !== undefined) {
+    return { found: false }
+  }
   for (const [candidate, value] of map.entries()) {
     if (candidate !== key && comparableEqual(candidate, key)) {
       return { found: true, key: candidate, value }
@@ -121,4 +178,28 @@ function findMapEntry<K, V>(
 
 function isGoStringKey(value: unknown): value is string | GoBinaryString {
   return typeof value === 'string' || value instanceof GoBinaryString
+}
+
+// structMapKey returns the canonical index key for a struct whose fields are
+// all strings, or undefined for any other value. Fields are VarRef cells; the
+// canonical form narrows candidates by field names and Go string bytes.
+// comparableEqual still decides identity, type, and field equality within a
+// bucket. Non-string fields remain on the comparison scan.
+function structMapKey(key: unknown): string | undefined {
+  if (typeof key !== 'object' || key === null) return undefined
+  const fields = (key as { _fields?: unknown })._fields
+  if (typeof fields !== 'object' || fields === null || Array.isArray(fields)) {
+    return undefined
+  }
+  const names = Object.keys(fields)
+  const parts: string[] = []
+  for (const name of names.sort()) {
+    const field = (fields as Record<string, unknown>)[name]
+    if (!isVarRef(field)) return undefined
+    const value = field.value
+    if (!isGoStringKey(value)) return undefined
+    const bytes = stringMapKey(value)
+    parts.push(`${name.length}:${name}${bytes.length}:${bytes}`)
+  }
+  return parts.join('')
 }

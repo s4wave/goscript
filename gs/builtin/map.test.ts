@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
+
 import { deleteMapEntry, makeMap, mapGet, mapHas, mapSet } from './map.js'
 import { bytesToString, GoBinaryString } from './slice.js'
+import { varRef } from './varRef.js'
 
 describe('Go map string keys', () => {
   it('does not scan existing entries for string misses or insertion', () => {
@@ -39,5 +41,50 @@ describe('Go map string keys', () => {
       map.clear()
       expect(mapHas(map, wrapped)).toBe(false)
     }
+  })
+})
+
+describe('Go map string-struct keys', () => {
+  const edge = (subject: string, object: string, type = 'edge') => ({
+    __goType: type,
+    _fields: { subject: varRef(subject), object: varRef(object) },
+  })
+
+  it('indexes value copies without scanning unrelated entries', () => {
+    const first = edge('first', 'target')
+    const map = makeMap([[first, 0]])
+    const entries = vi.spyOn(map, 'entries')
+    for (let i = 0; i < 4096; i++) mapSet(map, edge(`key-${i}`, 'target'), i)
+    expect(mapGet(map, edge('key-2048', 'target'), -1)).toEqual([2048, true])
+    expect(mapHas(map, edge('absent', 'target'))).toBe(false)
+    mapSet(map, edge('first', 'target'), 7)
+    expect(mapGet(map, first, -1)).toEqual([7, true])
+    expect(map.keys().next().value).toBe(first)
+    deleteMapEntry(map, edge('first', 'target'))
+    expect(mapHas(map, first)).toBe(false)
+    expect(entries).not.toHaveBeenCalled()
+    map.clear()
+    expect(mapHas(map, edge('key-2048', 'target'))).toBe(false)
+    mapSet(map, first, 8)
+    expect(map.size).toBe(1)
+  })
+
+  it('preserves type and binary-field equality inside candidate buckets', () => {
+    const binary = new GoBinaryString(new TextEncoder().encode('value'))
+    const value = (field: string | GoBinaryString, type: string) => ({
+      __goType: type,
+      _fields: { field: varRef(field) },
+    })
+    const map = makeMap<ReturnType<typeof value>, number>()
+    mapSet(map, value('value', 'first'), 1)
+    mapSet(map, value('value', 'second'), 2)
+    mapSet(map, value(binary, 'first'), 3)
+    expect(map.size).toBe(3)
+    expect(mapGet(map, value('value', 'first'), 0)).toEqual([1, true])
+    expect(mapGet(map, value('value', 'second'), 0)).toEqual([2, true])
+    expect(mapGet(map, value(binary, 'first'), 0)).toEqual([3, true])
+    deleteMapEntry(map, value('value', 'first'))
+    expect(mapGet(map, value(binary, 'first'), 0)).toEqual([3, true])
+    expect(mapGet(map, value('value', 'second'), 0)).toEqual([2, true])
   })
 })
