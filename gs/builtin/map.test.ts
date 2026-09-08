@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { deleteMapEntry, makeMap, mapGet, mapHas, mapSet } from './map.js'
 import { bytesToString, GoBinaryString } from './slice.js'
-import { varRef } from './varRef.js'
 
 describe('Go map string keys', () => {
   it('does not scan existing entries for string misses or insertion', () => {
@@ -47,7 +46,7 @@ describe('Go map string keys', () => {
 describe('Go map string-struct keys', () => {
   const edge = (subject: string, object: string, type = 'edge') => ({
     __goType: type,
-    _fields: { subject: varRef(subject), object: varRef(object) },
+    _fields: { subject: subject, object: object },
   })
 
   it('indexes value copies without scanning unrelated entries', () => {
@@ -73,7 +72,7 @@ describe('Go map string-struct keys', () => {
     const binary = new GoBinaryString(new TextEncoder().encode('value'))
     const value = (field: string | GoBinaryString, type: string) => ({
       __goType: type,
-      _fields: { field: varRef(field) },
+      _fields: { field: field },
     })
     const map = makeMap<ReturnType<typeof value>, number>()
     mapSet(map, value('value', 'first'), 1)

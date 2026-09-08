@@ -88,34 +88,33 @@ function zeroReflectValue(typ: Type): ReflectValue {
 
 function newStructValue(typ: Type): ReflectValue {
   type StructValueInstance = {
-    _fields: Record<string, $.VarRef<ReflectValue>>
+    _fields: Record<string, ReflectValue>
   }
 
   const initFields = (value: StructValueInstance): void => {
     for (let i = 0; i < typ.NumField(); i++) {
       const field = typ.Field(i)
       const key = structFieldStorageKey(typ, i)
-      const ref = $.varRef<ReflectValue>(zeroReflectValue(field.Type))
-      value._fields[key] = ref
+      value._fields[key] = zeroReflectValue(field.Type)
       Object.defineProperty(value, key, {
         enumerable: true,
         configurable: true,
-        get: () => ref.value,
+        get: () => value._fields[key],
         set: (next: unknown) => {
-          ref.value = next as ReflectValue
+          value._fields[key] = next as ReflectValue
         },
       })
     }
   }
 
   const StructValue = class {
-    public _fields: Record<string, $.VarRef<ReflectValue>> = {}
+    public _fields: Record<string, ReflectValue> = {}
 
     public clone(): unknown {
       const cloned = new StructValue()
       initFields(cloned)
       for (const key of Object.keys(this._fields)) {
-        cloned._fields[key].value = this._fields[key].value
+        cloned._fields[key] = this._fields[key]
       }
       return cloned
     }

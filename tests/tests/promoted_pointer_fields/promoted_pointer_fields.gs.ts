@@ -4,34 +4,29 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class counter {
-	public get value(): number {
-		return this._fields.value.value
-	}
-	public set value(value: number) {
-		this._fields.value.value = value
-	}
+	public declare value: number
 
 	public _fields: {
-		value: $.VarRef<number>
+		value: number
 	}
 
 	constructor(init?: Partial<{value?: number}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? (0 as number))
+			value: init?.value ?? (0 as number)
 		}
 	}
 
 	public clone(): counter {
-		const cloned = new counter()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new counter(this))
 	}
 
 	public Load(): number {
 		const c: counter | $.VarRef<counter> | null = this
 		return $.pointerValue<counter>(c).value
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -44,39 +39,28 @@ export class counter {
 }
 
 export class inner {
-	public get name(): string {
-		return this._fields.name.value
-	}
-	public set name(value: string) {
-		this._fields.name.value = value
-	}
+	public declare name: string
 
-	public get count(): counter {
-		return this._fields.count.value
-	}
-	public set count(value: counter) {
-		this._fields.count.value = value
-	}
+	public declare count: counter
 
 	public _fields: {
-		name: $.VarRef<string>
-		count: $.VarRef<counter>
+		name: string
+		count: counter
 	}
 
 	constructor(init?: Partial<{name?: string, count?: counter}>) {
 		this._fields = {
-			name: $.varRef(init?.name ?? ("" as string)),
-			count: $.varRef(init?.count ? $.markAsStructValue($.cloneStructValue(init.count)) : $.markAsStructValue(new counter()))
+			name: init?.name ?? ("" as string),
+			count: init?.count ? $.markAsStructValue($.cloneStructValue(init.count)) : $.markAsStructValue(new counter())
 		}
 	}
 
 	public clone(): inner {
-		const cloned = new inner()
-		cloned._fields = {
-			name: $.varRef(this._fields.name.value),
-			count: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.count.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new inner(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["name", "count"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -89,29 +73,24 @@ export class inner {
 }
 
 export class outer {
-	public get inner(): inner | $.VarRef<inner> | null {
-		return this._fields.inner.value
-	}
-	public set inner(value: inner | $.VarRef<inner> | null) {
-		this._fields.inner.value = value
-	}
+	public declare inner: inner | $.VarRef<inner> | null
 
 	public _fields: {
-		inner: $.VarRef<inner | $.VarRef<inner> | null>
+		inner: inner | $.VarRef<inner> | null
 	}
 
 	constructor(init?: Partial<{inner?: inner | $.VarRef<inner> | null}>) {
 		this._fields = {
-			inner: $.varRef(init?.inner ?? (null! as inner | $.VarRef<inner> | null))
+			inner: init?.inner ?? (null! as inner | $.VarRef<inner> | null)
 		}
 	}
 
 	public clone(): outer {
-		const cloned = new outer()
-		cloned._fields = {
-			inner: $.varRef(this._fields.inner.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new outer(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["inner"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -119,7 +98,7 @@ export class outer {
 		() => new outer(),
 		() => [],
 		outer,
-		() => [{ name: "inner", key: "inner", type: { kind: $.TypeKind.Pointer, elemType: "main.inner" }, anonymous: true }]
+		() => [{ name: "inner", key: "inner", type: /* @__PURE__ */ $.pointerType("main.inner"), anonymous: true }]
 	)
 }
 

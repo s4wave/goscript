@@ -62,36 +62,36 @@ export const PathError = fs.PathError;
 
 export class SyscallError {
 	public get Syscall(): string {
-		return this._fields.Syscall.value
+		return this._fields.Syscall
 	}
 	public set Syscall(value: string) {
-		this._fields.Syscall.value = value
+		this._fields.Syscall = value
 	}
 
 	public get Err(): $.GoError {
-		return this._fields.Err.value
+		return this._fields.Err
 	}
 	public set Err(value: $.GoError) {
-		this._fields.Err.value = value
+		this._fields.Err = value
 	}
 
 	public _fields: {
-		Syscall: $.VarRef<string>;
-		Err: $.VarRef<$.GoError>;
+		Syscall: string;
+		Err: $.GoError;
 	}
 
 	constructor(init?: Partial<{Err?: $.GoError, Syscall?: string}>) {
 		this._fields = {
-			Syscall: $.varRef(init?.Syscall ?? ""),
-			Err: $.varRef(init?.Err ?? null)
+			Syscall: init?.Syscall ?? "",
+			Err: init?.Err ?? null
 		}
 	}
 
 	public clone(): SyscallError {
 		const cloned = new SyscallError()
 		cloned._fields = {
-			Syscall: $.varRef(this._fields.Syscall.value),
-			Err: $.varRef(this._fields.Err.value)
+			Syscall: this._fields.Syscall,
+			Err: this._fields.Err
 		}
 		return cloned
 	}

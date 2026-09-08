@@ -107,26 +107,26 @@ export async function ReadDir(
 
 class dirInfo {
   public get fileInfo(): FileInfo {
-    return this._fields.fileInfo.value
+    return this._fields.fileInfo
   }
   public set fileInfo(value: FileInfo) {
-    this._fields.fileInfo.value = value
+    this._fields.fileInfo = value
   }
 
   public _fields: {
-    fileInfo: $.VarRef<FileInfo>
+    fileInfo: FileInfo
   }
 
   constructor(init?: Partial<{ fileInfo?: FileInfo }>) {
     this._fields = {
-      fileInfo: $.varRef(init?.fileInfo ?? null),
+      fileInfo: init?.fileInfo ?? null,
     }
   }
 
   public clone(): dirInfo {
     const cloned = new dirInfo()
     cloned._fields = {
-      fileInfo: $.varRef(this._fields.fileInfo.value),
+      fileInfo: this._fields.fileInfo,
     }
     return cloned
   }

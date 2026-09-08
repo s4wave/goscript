@@ -9,48 +9,48 @@ import * as utf8 from "@goscript/unicode/utf8/index.js"
 
 export class Reader {
 	public get s(): $.Bytes {
-		return this._fields.s.value
+		return this._fields.s
 	}
 	public set s(value: $.Bytes) {
-		this._fields.s.value = value
+		this._fields.s = value
 	}
 
 	// current reading index
 	public get i(): number {
-		return this._fields.i.value
+		return this._fields.i
 	}
 	public set i(value: number) {
-		this._fields.i.value = value
+		this._fields.i = value
 	}
 
 	// index of previous rune; or < 0
 	public get prevRune(): number {
-		return this._fields.prevRune.value
+		return this._fields.prevRune
 	}
 	public set prevRune(value: number) {
-		this._fields.prevRune.value = value
+		this._fields.prevRune = value
 	}
 
 	public _fields: {
-		s: $.VarRef<$.Bytes>;
-		i: $.VarRef<number>;
-		prevRune: $.VarRef<number>;
+		s: $.Bytes;
+		i: number;
+		prevRune: number;
 	}
 
 	constructor(init?: Partial<{i?: number, prevRune?: number, s?: $.Bytes}>) {
 		this._fields = {
-			s: $.varRef(init?.s ?? new Uint8Array(0)),
-			i: $.varRef(init?.i ?? 0),
-			prevRune: $.varRef(init?.prevRune ?? 0)
+			s: init?.s ?? new Uint8Array(0),
+			i: init?.i ?? 0,
+			prevRune: init?.prevRune ?? 0
 		}
 	}
 
 	public clone(): Reader {
 		const cloned = new Reader()
 		cloned._fields = {
-			s: $.varRef(this._fields.s.value),
-			i: $.varRef(this._fields.i.value),
-			prevRune: $.varRef(this._fields.prevRune.value)
+			s: this._fields.s,
+			i: this._fields.i,
+			prevRune: this._fields.prevRune
 		}
 		return cloned
 	}

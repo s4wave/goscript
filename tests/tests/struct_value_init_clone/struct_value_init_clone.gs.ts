@@ -9,14 +9,14 @@ export class Point {
 	public declare Y: number
 
 	public _fields: {
-		X: $.VarRef<number>
-		Y: $.VarRef<number>
+		X: number
+		Y: number
 	}
 
 	constructor(init?: Partial<{X?: number, Y?: number}>) {
 		this._fields = {
-			X: $.varRef(init?.X ?? (0 as number)),
-			Y: $.varRef(init?.Y ?? (0 as number))
+			X: init?.X ?? (0 as number),
+			Y: init?.Y ?? (0 as number)
 		}
 	}
 

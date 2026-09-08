@@ -8,66 +8,66 @@ import * as time from "@goscript/time/index.js"
 
 class fileStat {
 	public get name(): string {
-		return this._fields.name.value
+		return this._fields.name
 	}
 	public set name(value: string) {
-		this._fields.name.value = value
+		this._fields.name = value
 	}
 
 	public get size(): number {
-		return this._fields.size.value
+		return this._fields.size
 	}
 	public set size(value: number) {
-		this._fields.size.value = value
+		this._fields.size = value
 	}
 
 	public get mode(): fs.FileMode {
-		return this._fields.mode.value
+		return this._fields.mode
 	}
 	public set mode(value: fs.FileMode) {
-		this._fields.mode.value = value
+		this._fields.mode = value
 	}
 
 	public get modTime(): time.Time {
-		return this._fields.modTime.value
+		return this._fields.modTime
 	}
 	public set modTime(value: time.Time) {
-		this._fields.modTime.value = value
+		this._fields.modTime = value
 	}
 
 	public get sys(): syscall.Stat_t {
-		return this._fields.sys.value
+		return this._fields.sys
 	}
 	public set sys(value: syscall.Stat_t) {
-		this._fields.sys.value = value
+		this._fields.sys = value
 	}
 
 	public _fields: {
-		name: $.VarRef<string>;
-		size: $.VarRef<number>;
-		mode: $.VarRef<fs.FileMode>;
-		modTime: $.VarRef<time.Time>;
-		sys: $.VarRef<syscall.Stat_t>;
+		name: string;
+		size: number;
+		mode: fs.FileMode;
+		modTime: time.Time;
+		sys: syscall.Stat_t;
 	}
 
 	constructor(init?: Partial<{modTime?: time.Time, mode?: fs.FileMode, name?: string, size?: number, sys?: syscall.Stat_t}>) {
 		this._fields = {
-			name: $.varRef(init?.name ?? ""),
-			size: $.varRef(init?.size ?? 0),
-			mode: $.varRef(init?.mode ?? 0),
-			modTime: $.varRef(init?.modTime?.clone() ?? time.Now()),
-			sys: $.varRef(init?.sys?.clone() ?? new syscall.Stat_t())
+			name: init?.name ?? "",
+			size: init?.size ?? 0,
+			mode: init?.mode ?? 0,
+			modTime: init?.modTime?.clone() ?? time.Now(),
+			sys: init?.sys?.clone() ?? new syscall.Stat_t()
 		}
 	}
 
 	public clone(): fileStat {
 		const cloned = new fileStat()
 		cloned._fields = {
-			name: $.varRef(this._fields.name.value),
-			size: $.varRef(this._fields.size.value),
-			mode: $.varRef(this._fields.mode.value),
-			modTime: $.varRef(this._fields.modTime.value?.clone() ?? null),
-			sys: $.varRef(this._fields.sys.value?.clone() ?? null)
+			name: this._fields.name,
+			size: this._fields.size,
+			mode: this._fields.mode,
+			modTime: this._fields.modTime?.clone() ?? null,
+			sys: this._fields.sys?.clone() ?? null
 		}
 		return cloned
 	}

@@ -11,7 +11,7 @@ async function nextMicrotask(): Promise<void> {
 describe('context override', () => {
   it('matches generated struct keys by Go comparable value', () => {
     class Key {
-      public _fields: Record<string, $.VarRef<unknown>>
+      public _fields: Record<string, unknown>
 
       constructor() {
         this._fields = {}

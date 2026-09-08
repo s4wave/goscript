@@ -6,48 +6,48 @@ export let ErrSyntax: $.GoError = $.newError("invalid syntax");
 export class NumError {
 	// the failing function (ParseBool, ParseInt, ParseUint, ParseFloat, ParseComplex)
 	public get Func(): string {
-		return this._fields.Func.value;
+		return this._fields.Func;
 	}
 	public set Func(value: string) {
-		this._fields.Func.value = value;
+		this._fields.Func = value;
 	}
 
 	// the input
 	public get Num(): string {
-		return this._fields.Num.value;
+		return this._fields.Num;
 	}
 	public set Num(value: string) {
-		this._fields.Num.value = value;
+		this._fields.Num = value;
 	}
 
 	// the reason the conversion failed (e.g. ErrRange, ErrSyntax, etc.)
 	public get Err(): $.GoError {
-		return this._fields.Err.value;
+		return this._fields.Err;
 	}
 	public set Err(value: $.GoError) {
-		this._fields.Err.value = value;
+		this._fields.Err = value;
 	}
 
 	public _fields: {
-		Func: $.VarRef<string>;
-		Num: $.VarRef<string>;
-		Err: $.VarRef<$.GoError>;
+		Func: string;
+		Num: string;
+		Err: $.GoError;
 	}
 
 	constructor(init?: Partial<{Err?: $.GoError, Func?: string, Num?: string}>) {
 		this._fields = {
-			Func: $.varRef(init?.Func ?? ""),
-			Num: $.varRef(init?.Num ?? ""),
-			Err: $.varRef(init?.Err ?? null)
+			Func: init?.Func ?? "",
+			Num: init?.Num ?? "",
+			Err: init?.Err ?? null
 		};
 	}
 
 	public clone(): NumError {
 		const cloned = new NumError();
 		cloned._fields = {
-			Func: $.varRef(this._fields.Func.value),
-			Num: $.varRef(this._fields.Num.value),
-			Err: $.varRef(this._fields.Err.value)
+			Func: this._fields.Func,
+			Num: this._fields.Num,
+			Err: this._fields.Err
 		};
 		return cloned;
 	}

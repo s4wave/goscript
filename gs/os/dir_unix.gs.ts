@@ -22,59 +22,59 @@ type uintptr = syscall.uintptr
 
 class dirInfo {
 	public get mu(): sync.Mutex {
-		return this._fields.mu.value
+		return this._fields.mu
 	}
 	public set mu(value: sync.Mutex) {
-		this._fields.mu.value = value
+		this._fields.mu = value
 	}
 
 	// buffer for directory I/O
 	public get buf(): $.VarRef<$.Bytes> | null {
-		return this._fields.buf.value
+		return this._fields.buf
 	}
 	public set buf(value: $.VarRef<$.Bytes> | null) {
-		this._fields.buf.value = value
+		this._fields.buf = value
 	}
 
 	// length of buf; return value from Getdirentries
 	public get nbuf(): number {
-		return this._fields.nbuf.value
+		return this._fields.nbuf
 	}
 	public set nbuf(value: number) {
-		this._fields.nbuf.value = value
+		this._fields.nbuf = value
 	}
 
 	// location of next record in buf.
 	public get bufp(): number {
-		return this._fields.bufp.value
+		return this._fields.bufp
 	}
 	public set bufp(value: number) {
-		this._fields.bufp.value = value
+		this._fields.bufp = value
 	}
 
 	public _fields: {
-		mu: $.VarRef<sync.Mutex>;
-		buf: $.VarRef<$.VarRef<$.Bytes> | null>;
-		nbuf: $.VarRef<number>;
-		bufp: $.VarRef<number>;
+		mu: sync.Mutex;
+		buf: $.VarRef<$.Bytes> | null;
+		nbuf: number;
+		bufp: number;
 	}
 
 	constructor(init?: Partial<{buf?: $.VarRef<$.Bytes> | null, bufp?: number, mu?: sync.Mutex, nbuf?: number}>) {
 		this._fields = {
-			mu: $.varRef(init?.mu?.clone() ?? new sync.Mutex()),
-			buf: $.varRef(init?.buf ?? null),
-			nbuf: $.varRef(init?.nbuf ?? 0),
-			bufp: $.varRef(init?.bufp ?? 0)
+			mu: init?.mu?.clone() ?? new sync.Mutex(),
+			buf: init?.buf ?? null,
+			nbuf: init?.nbuf ?? 0,
+			bufp: init?.bufp ?? 0
 		}
 	}
 
 	public clone(): dirInfo {
 		const cloned = new dirInfo()
 		cloned._fields = {
-			mu: $.varRef(this._fields.mu.value?.clone() ?? null),
-			buf: $.varRef(this._fields.buf.value),
-			nbuf: $.varRef(this._fields.nbuf.value),
-			bufp: $.varRef(this._fields.bufp.value)
+			mu: this._fields.mu?.clone() ?? null,
+			buf: this._fields.buf,
+			nbuf: this._fields.nbuf,
+			bufp: this._fields.bufp
 		}
 		return cloned
 	}

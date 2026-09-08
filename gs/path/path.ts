@@ -16,46 +16,46 @@ function normalizeJoinElements(elem: JoinElement[]): string[] {
 
 class lazybuf {
   public get s(): string {
-    return this._fields.s.value
+    return this._fields.s
   }
   public set s(value: string) {
-    this._fields.s.value = value
+    this._fields.s = value
   }
 
   public get buf(): Uint8Array | null {
-    return this._fields.buf.value
+    return this._fields.buf
   }
   public set buf(value: Uint8Array | null) {
-    this._fields.buf.value = value
+    this._fields.buf = value
   }
 
   public get w(): number {
-    return this._fields.w.value
+    return this._fields.w
   }
   public set w(value: number) {
-    this._fields.w.value = value
+    this._fields.w = value
   }
 
   public _fields: {
-    s: $.VarRef<string>
-    buf: $.VarRef<Uint8Array | null>
-    w: $.VarRef<number>
+    s: string
+    buf: Uint8Array | null
+    w: number
   }
 
   constructor(init?: Partial<{ buf?: Uint8Array; s?: string; w?: number }>) {
     this._fields = {
-      s: $.varRef(init?.s ?? ''),
-      buf: $.varRef(init?.buf ?? null),
-      w: $.varRef(init?.w ?? 0),
+      s: init?.s ?? '',
+      buf: init?.buf ?? null,
+      w: init?.w ?? 0,
     }
   }
 
   public clone(): lazybuf {
     const cloned = new lazybuf()
     cloned._fields = {
-      s: $.varRef(this._fields.s.value),
-      buf: $.varRef(this._fields.buf.value),
-      w: $.varRef(this._fields.w.value),
+      s: this._fields.s,
+      buf: this._fields.buf,
+      w: this._fields.w,
     }
     return cloned
   }

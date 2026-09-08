@@ -388,14 +388,14 @@ describe('builtin runtime contract helpers', () => {
   it('matches struct map keys by Go comparable value', () => {
     class Key {
       public _fields: {
-        name: ReturnType<typeof varRef<string>>
-        id: ReturnType<typeof varRef<number>>
+        name: string
+        id: number
       }
 
       constructor(name: string, id: number) {
         this._fields = {
-          name: varRef(name),
-          id: varRef(id),
+          name: name,
+          id: id,
         }
       }
     }

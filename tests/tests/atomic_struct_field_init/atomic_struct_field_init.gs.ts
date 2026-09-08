@@ -7,49 +7,32 @@ import * as atomic from "@goscript/sync/atomic/index.js"
 import "@goscript/sync/atomic/index.js"
 
 export class MyStruct {
-	public get closed(): atomic.Bool {
-		return this._fields.closed.value
-	}
-	public set closed(value: atomic.Bool) {
-		this._fields.closed.value = value
-	}
+	public declare closed: atomic.Bool
 
-	public get count(): atomic.Int32 {
-		return this._fields.count.value
-	}
-	public set count(value: atomic.Int32) {
-		this._fields.count.value = value
-	}
+	public declare count: atomic.Int32
 
-	public get flag(): atomic.Uint32 {
-		return this._fields.flag.value
-	}
-	public set flag(value: atomic.Uint32) {
-		this._fields.flag.value = value
-	}
+	public declare flag: atomic.Uint32
 
 	public _fields: {
-		closed: $.VarRef<atomic.Bool>
-		count: $.VarRef<atomic.Int32>
-		flag: $.VarRef<atomic.Uint32>
+		closed: atomic.Bool
+		count: atomic.Int32
+		flag: atomic.Uint32
 	}
 
 	constructor(init?: Partial<{closed?: atomic.Bool, count?: atomic.Int32, flag?: atomic.Uint32}>) {
 		this._fields = {
-			closed: $.varRef(init?.closed ? $.markAsStructValue($.cloneStructValue(init.closed)) : $.markAsStructValue(new atomic.Bool())),
-			count: $.varRef(init?.count ? $.markAsStructValue($.cloneStructValue(init.count)) : $.markAsStructValue(new atomic.Int32())),
-			flag: $.varRef(init?.flag ? $.markAsStructValue($.cloneStructValue(init.flag)) : $.markAsStructValue(new atomic.Uint32()))
+			closed: init?.closed ? $.markAsStructValue($.cloneStructValue(init.closed)) : $.markAsStructValue(new atomic.Bool()),
+			count: init?.count ? $.markAsStructValue($.cloneStructValue(init.count)) : $.markAsStructValue(new atomic.Int32()),
+			flag: init?.flag ? $.markAsStructValue($.cloneStructValue(init.flag)) : $.markAsStructValue(new atomic.Uint32())
 		}
 	}
 
 	public clone(): MyStruct {
-		const cloned = new MyStruct()
-		cloned._fields = {
-			closed: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.closed.value))),
-			count: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.count.value))),
-			flag: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.flag.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyStruct(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["closed", "count", "flag"])
 	}
 
 	static __typeInfo = $.registerStructType(

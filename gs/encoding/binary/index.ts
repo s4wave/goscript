@@ -342,7 +342,9 @@ export function Uvarint(buf: $.Slice<number>): [bigint, number] {
   const meta = $.isSliceProxy(buf) ? buf.__meta__ : null
   const length = meta === null ? $.len(buf) : meta.length
   const byte = (i: number): number =>
-    meta === null ? byteAt(buf, i) : Number(meta.backing[meta.offset + i]) & 0xff
+    meta === null ?
+      byteAt(buf, i)
+    : Number(meta.backing[meta.offset + i]) & 0xff
 
   let x = 0
   let s = 0
@@ -378,7 +380,10 @@ export function Uvarint(buf: $.Slice<number>): [bigint, number] {
   return [uint64Result(0n), 0]
 }
 
-export function AppendVarint(buf: $.Slice<number>, x: number | bigint): $.Slice<number> {
+export function AppendVarint(
+  buf: $.Slice<number>,
+  x: number | bigint,
+): $.Slice<number> {
   return AppendUvarint(buf, encodeSignedVarint(x))
 }
 
@@ -954,9 +959,7 @@ function shapeSize(shape: binShape): number {
 }
 
 function structFieldValue(instance: unknown, key: string): unknown {
-  const ref = (instance as { _fields: Record<string, $.VarRef<unknown>> })
-    ._fields[key]
-  return ref.value
+  return (instance as { _fields: Record<string, unknown> })._fields[key]
 }
 
 function shapeEncode(
@@ -1054,17 +1057,15 @@ function shapeDecodeInto(
   shape: { tag: 'struct'; fields: { key: string; shape: binShape }[] },
   instance: unknown,
 ): void {
-  const fields = (instance as { _fields: Record<string, $.VarRef<unknown>> })
-    ._fields
+  const fields = (instance as { _fields: Record<string, unknown> })._fields
   let offset = 0
   for (const field of shape.fields) {
     const width = shapeSize(field.shape)
     const slice = $.goSlice(buf, offset, offset + width)
-    const ref = fields[field.key]
     if (field.shape.tag === 'struct') {
-      shapeDecodeInto(slice, order, field.shape, ref.value)
+      shapeDecodeInto(slice, order, field.shape, fields[field.key])
     } else {
-      ref.value = shapeDecodeValue(slice, order, field.shape)
+      fields[field.key] = shapeDecodeValue(slice, order, field.shape)
     }
     offset += width
   }

@@ -1,6 +1,5 @@
 import { comparableEqual } from './builtin.js'
 import { GoBinaryString, stringEqual, stringMapKey } from './slice.js'
-import { isVarRef } from './varRef.js'
 
 // GoMap indexes Go string representations by their canonical byte value and
 // structs whose fields are all strings by their canonical field values.
@@ -181,7 +180,7 @@ function isGoStringKey(value: unknown): value is string | GoBinaryString {
 }
 
 // structMapKey returns the canonical index key for a struct whose fields are
-// all strings, or undefined for any other value. Fields are VarRef cells; the
+// all strings, or undefined for any other value. The
 // canonical form narrows candidates by field names and Go string bytes.
 // comparableEqual still decides identity, type, and field equality within a
 // bucket. Non-string fields remain on the comparison scan.
@@ -194,9 +193,7 @@ function structMapKey(key: unknown): string | undefined {
   const names = Object.keys(fields)
   const parts: string[] = []
   for (const name of names.sort()) {
-    const field = (fields as Record<string, unknown>)[name]
-    if (!isVarRef(field)) return undefined
-    const value = field.value
+    const value = (fields as Record<string, unknown>)[name]
     if (!isGoStringKey(value)) return undefined
     const bytes = stringMapKey(value)
     parts.push(`${name.length}:${name}${bytes.length}:${bytes}`)

@@ -46,46 +46,46 @@ const reseed = 4
 // crash or cause out-of-bounds memory accesses.
 export class State {
   public get buf(): bigint[] {
-    return this._fields.buf.value
+    return this._fields.buf
   }
   public set buf(value: bigint[]) {
-    this._fields.buf.value = value
+    this._fields.buf = value
   }
 
   public get seed(): bigint[] {
-    return this._fields.seed.value
+    return this._fields.seed
   }
   public set seed(value: bigint[]) {
-    this._fields.seed.value = value
+    this._fields.seed = value
   }
 
   public get i(): number {
-    return this._fields.i.value
+    return this._fields.i
   }
   public set i(value: number) {
-    this._fields.i.value = value
+    this._fields.i = value
   }
 
   public get n(): number {
-    return this._fields.n.value
+    return this._fields.n
   }
   public set n(value: number) {
-    this._fields.n.value = value
+    this._fields.n = value
   }
 
   public get c(): number {
-    return this._fields.c.value
+    return this._fields.c
   }
   public set c(value: number) {
-    this._fields.c.value = value
+    this._fields.c = value
   }
 
   public _fields: {
-    buf: $.VarRef<bigint[]>
-    seed: $.VarRef<bigint[]>
-    i: $.VarRef<number>
-    n: $.VarRef<number>
-    c: $.VarRef<number>
+    buf: bigint[]
+    seed: bigint[]
+    i: number
+    n: number
+    c: number
   }
 
   constructor(
@@ -98,30 +98,28 @@ export class State {
     }>,
   ) {
     this._fields = {
-      buf: $.varRef(
+      buf:
         init?.buf !== undefined ?
           $.cloneArrayValue(init.buf)
         : Array.from({ length: 32 }, () => 0n),
-      ),
-      seed: $.varRef(
+      seed:
         init?.seed !== undefined ?
           $.cloneArrayValue(init.seed)
         : Array.from({ length: 4 }, () => 0n),
-      ),
-      i: $.varRef(init?.i ?? (0 as number)),
-      n: $.varRef(init?.n ?? (0 as number)),
-      c: $.varRef(init?.c ?? (0 as number)),
+      i: init?.i ?? (0 as number),
+      n: init?.n ?? (0 as number),
+      c: init?.c ?? (0 as number),
     }
   }
 
   public clone(): State {
     const cloned = new State()
     cloned._fields = {
-      buf: $.varRef($.cloneArrayValue(this._fields.buf.value)),
-      seed: $.varRef($.cloneArrayValue(this._fields.seed.value)),
-      i: $.varRef(this._fields.i.value),
-      n: $.varRef(this._fields.n.value),
-      c: $.varRef(this._fields.c.value),
+      buf: $.cloneArrayValue(this._fields.buf),
+      seed: $.cloneArrayValue(this._fields.seed),
+      i: this._fields.i,
+      n: this._fields.n,
+      c: this._fields.c,
     }
     return $.markAsStructValue(cloned)
   }

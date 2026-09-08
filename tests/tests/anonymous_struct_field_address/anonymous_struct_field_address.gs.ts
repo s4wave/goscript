@@ -4,34 +4,29 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class entry {
-	public get value(): number {
-		return this._fields.value.value
-	}
-	public set value(value: number) {
-		this._fields.value.value = value
-	}
+	public declare value: number
 
 	public _fields: {
-		value: $.VarRef<number>
+		value: number
 	}
 
 	constructor(init?: Partial<{value?: number}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? (0 as number))
+			value: init?.value ?? (0 as number)
 		}
 	}
 
 	public clone(): entry {
-		const cloned = new entry()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new entry(this))
 	}
 
 	public add(value: number): void {
 		let e: entry | $.VarRef<entry> | null = this
 		$.pointerValue<entry>(e).value = $.pointerValue<entry>(e).value + (value)
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(

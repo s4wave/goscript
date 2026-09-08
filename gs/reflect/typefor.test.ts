@@ -701,10 +701,10 @@ describe('TypeFor', () => {
   it('allocates registered struct zero values through the named constructor', () => {
     class RegisteredZero {
       public get Name(): string {
-        return this._fields.Name.value
+        return this._fields.Name
       }
       public set Name(value: string) {
-        this._fields.Name.value = value
+        this._fields.Name = value
       }
 
       public _fields: {
@@ -713,7 +713,7 @@ describe('TypeFor', () => {
 
       constructor(init?: Partial<{ Name?: string }>) {
         this._fields = {
-          Name: varRef(init?.Name ?? ''),
+          Name: init?.Name ?? '',
         }
       }
 

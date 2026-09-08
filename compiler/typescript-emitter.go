@@ -423,7 +423,6 @@ func structZeroValueDeps(structType *loweredStruct, names map[string]bool) []str
 
 // renderStruct emits field storage, value-copy operations, methods, and metadata.
 func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *RuntimeContractOwner, trimTypeInfo bool) {
-	varRef := runtimeOwner.QualifiedHelper(RuntimeHelperVarRef)
 	markStructValue := runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue)
 	cloneStructValue := runtimeOwner.QualifiedHelper(RuntimeHelperCloneStructValue)
 	cloneArrayValue := runtimeOwner.QualifiedHelper(RuntimeHelperCloneArrayValue)
@@ -446,9 +445,9 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	for _, field := range structType.fields {
 		b.WriteString("\t\t")
 		b.WriteString(field.name)
-		b.WriteString(": $.VarRef<")
+		b.WriteString(": ")
 		b.WriteString(field.typ)
-		b.WriteString(">\n")
+		b.WriteString("\n")
 	}
 	b.WriteString("\t}\n\n")
 	b.WriteString("\tconstructor(init?: Partial<{")
@@ -465,8 +464,6 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 		b.WriteString("\t\t\t")
 		b.WriteString(field.name)
 		b.WriteString(": ")
-		b.WriteString(varRef)
-		b.WriteString("(")
 		if field.structValue {
 			b.WriteString("init?.")
 			b.WriteString(field.name)
@@ -503,7 +500,6 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 			b.WriteString(field.typ)
 			b.WriteString(")")
 		}
-		b.WriteString(")")
 		if idx != len(structType.fields)-1 {
 			b.WriteString(",")
 		}

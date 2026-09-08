@@ -239,28 +239,28 @@ class BinaryInputBoundMessage {
 
 class TimestampBoundMessage {
   public get Seconds(): number {
-    return this._fields.Seconds.value
+    return this._fields.Seconds
   }
   public set Seconds(value: number) {
-    this._fields.Seconds.value = value
+    this._fields.Seconds = value
   }
 
   public get Nanos(): number {
-    return this._fields.Nanos.value
+    return this._fields.Nanos
   }
   public set Nanos(value: number) {
-    this._fields.Nanos.value = value
+    this._fields.Nanos = value
   }
 
   public _fields: {
-    Seconds: $.VarRef<number>
-    Nanos: $.VarRef<number>
+    Seconds: number
+    Nanos: number
   }
 
   constructor(init?: Partial<{ Seconds?: number; Nanos?: number }>) {
     this._fields = {
-      Seconds: $.varRef(init?.Seconds ?? 0),
-      Nanos: $.varRef(init?.Nanos ?? 0),
+      Seconds: init?.Seconds ?? 0,
+      Nanos: init?.Nanos ?? 0,
     }
   }
 }
@@ -277,19 +277,19 @@ const timestampMessageType = {
 
 class TimestampParentBoundMessage {
   public get Timestamp(): TimestampBoundMessage | null {
-    return this._fields.Timestamp.value
+    return this._fields.Timestamp
   }
   public set Timestamp(value: TimestampBoundMessage | null) {
-    this._fields.Timestamp.value = value
+    this._fields.Timestamp = value
   }
 
   public _fields: {
-    Timestamp: $.VarRef<TimestampBoundMessage | null>
+    Timestamp: TimestampBoundMessage | null
   }
 
   constructor(init?: Partial<{ Timestamp?: TimestampBoundMessage | null }>) {
     this._fields = {
-      Timestamp: $.varRef(init?.Timestamp ?? null),
+      Timestamp: init?.Timestamp ?? null,
     }
   }
 }
@@ -323,19 +323,19 @@ const oneofLeafMessageType = {
 
 class OneofLeafBoundMessage {
   public get Label(): string {
-    return this._fields.Label.value
+    return this._fields.Label
   }
   public set Label(value: string) {
-    this._fields.Label.value = value
+    this._fields.Label = value
   }
 
   public _fields: {
-    Label: $.VarRef<string>
+    Label: string
   }
 
   constructor(init?: Partial<{ Label?: string }>) {
     this._fields = {
-      Label: $.varRef(init?.Label ?? ''),
+      Label: init?.Label ?? '',
     }
   }
 }
@@ -346,38 +346,38 @@ class OneofLeafBoundMessage {
 
 class OneofBoundMessage_TabSet {
   public get TabSet(): OneofLeafBoundMessage | null {
-    return this._fields.TabSet.value
+    return this._fields.TabSet
   }
   public set TabSet(value: OneofLeafBoundMessage | null) {
-    this._fields.TabSet.value = value
+    this._fields.TabSet = value
   }
 
   public _fields: {
-    TabSet: $.VarRef<OneofLeafBoundMessage | null>
+    TabSet: OneofLeafBoundMessage | null
   }
 
   constructor(init?: Partial<{ TabSet?: OneofLeafBoundMessage | null }>) {
     this._fields = {
-      TabSet: $.varRef(init?.TabSet ?? null),
+      TabSet: init?.TabSet ?? null,
     }
   }
 }
 
 class OneofBoundMessage {
   public get Node(): OneofBoundMessage_TabSet | null {
-    return this._fields.Node.value
+    return this._fields.Node
   }
   public set Node(value: OneofBoundMessage_TabSet | null) {
-    this._fields.Node.value = value
+    this._fields.Node = value
   }
 
   public _fields: {
-    Node: $.VarRef<OneofBoundMessage_TabSet | null>
+    Node: OneofBoundMessage_TabSet | null
   }
 
   constructor(init?: Partial<{ Node?: OneofBoundMessage_TabSet | null }>) {
     this._fields = {
-      Node: $.varRef(init?.Node ?? null),
+      Node: init?.Node ?? null,
     }
   }
 }
@@ -628,18 +628,18 @@ describe('protobuf-go-lite TypeScript binding helpers', () => {
 
 class ViewLeafBoundMessage {
   public _fields: {
-    Data: $.VarRef<Uint8Array | null>
+    Data: Uint8Array | null
   }
 
   constructor(init?: Partial<{ Data?: Uint8Array | null }>) {
-    this._fields = { Data: $.varRef(init?.Data ?? null) }
+    this._fields = { Data: init?.Data ?? null }
   }
 
   public get Data(): Uint8Array | null {
-    return this._fields.Data.value
+    return this._fields.Data
   }
   public set Data(value: Uint8Array | null) {
-    this._fields.Data.value = value
+    this._fields.Data = value
   }
 }
 
@@ -655,9 +655,9 @@ const viewLeafType = {
 // byte aliases the caller-owned wire buffer until copied.
 class ViewHolderBoundMessage {
   public _fields: {
-    Leaf: $.VarRef<ViewLeafBoundMessage | null>
-    Leaves: $.VarRef<$.Slice<ViewLeafBoundMessage | null> | null>
-    Entries: $.VarRef<Map<string, ViewLeafBoundMessage | null> | null>
+    Leaf: ViewLeafBoundMessage | null
+    Leaves: $.Slice<ViewLeafBoundMessage | null> | null
+    Entries: Map<string, ViewLeafBoundMessage | null> | null
   }
 
   constructor(init?: {
@@ -666,31 +666,31 @@ class ViewHolderBoundMessage {
     Entries?: Map<string, ViewLeafBoundMessage | null> | null
   }) {
     this._fields = {
-      Leaf: $.varRef(init?.Leaf ?? null),
-      Leaves: $.varRef(init?.Leaves ?? null),
-      Entries: $.varRef(init?.Entries ?? null),
+      Leaf: init?.Leaf ?? null,
+      Leaves: init?.Leaves ?? null,
+      Entries: init?.Entries ?? null,
     }
   }
 
   public get Leaf(): ViewLeafBoundMessage | null {
-    return this._fields.Leaf.value
+    return this._fields.Leaf
   }
   public set Leaf(value: ViewLeafBoundMessage | null) {
-    this._fields.Leaf.value = value
+    this._fields.Leaf = value
   }
 
   public get Leaves(): $.Slice<ViewLeafBoundMessage | null> | null {
-    return this._fields.Leaves.value
+    return this._fields.Leaves
   }
   public set Leaves(value: $.Slice<ViewLeafBoundMessage | null> | null) {
-    this._fields.Leaves.value = value
+    this._fields.Leaves = value
   }
 
   public get Entries(): Map<string, ViewLeafBoundMessage | null> | null {
-    return this._fields.Entries.value
+    return this._fields.Entries
   }
   public set Entries(value: Map<string, ViewLeafBoundMessage | null> | null) {
-    this._fields.Entries.value = value
+    this._fields.Entries = value
   }
 }
 

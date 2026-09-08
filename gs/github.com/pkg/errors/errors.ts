@@ -45,26 +45,26 @@ export function Errorf(format: string, ...args: any[]): $.GoError {
 
 class fundamental {
   public get msg(): string {
-    return this._fields.msg.value
+    return this._fields.msg
   }
   public set msg(value: string) {
-    this._fields.msg.value = value
+    this._fields.msg = value
   }
 
   public _fields: {
-    msg: $.VarRef<string>
+    msg: string
   }
 
   constructor(init?: Partial<{ msg?: string }>) {
     this._fields = {
-      msg: $.varRef(init?.msg ?? ''),
+      msg: init?.msg ?? '',
     }
   }
 
   public clone(): fundamental {
     const cloned = new fundamental()
     cloned._fields = {
-      msg: $.varRef(this._fields.msg.value),
+      msg: this._fields.msg,
     }
     return cloned
   }
@@ -111,26 +111,26 @@ export function WithStack(err: $.GoError): $.GoError {
 
 class withStack {
   public get error(): $.GoError {
-    return this._fields.error.value
+    return this._fields.error
   }
   public set error(value: $.GoError) {
-    this._fields.error.value = value
+    this._fields.error = value
   }
 
   public _fields: {
-    error: $.VarRef<$.GoError>
+    error: $.GoError
   }
 
   constructor(init?: Partial<{ error?: $.GoError }>) {
     this._fields = {
-      error: $.varRef(init?.error ?? null),
+      error: init?.error ?? null,
     }
   }
 
   public clone(): withStack {
     const cloned = new withStack()
     cloned._fields = {
-      error: $.varRef(this._fields.error.value),
+      error: this._fields.error,
     }
     return cloned
   }
@@ -281,36 +281,36 @@ export function WithMessagef(
 
 class withMessage {
   public get cause(): $.GoError {
-    return this._fields.cause.value
+    return this._fields.cause
   }
   public set cause(value: $.GoError) {
-    this._fields.cause.value = value
+    this._fields.cause = value
   }
 
   public get msg(): string {
-    return this._fields.msg.value
+    return this._fields.msg
   }
   public set msg(value: string) {
-    this._fields.msg.value = value
+    this._fields.msg = value
   }
 
   public _fields: {
-    cause: $.VarRef<$.GoError>
-    msg: $.VarRef<string>
+    cause: $.GoError
+    msg: string
   }
 
   constructor(init?: Partial<{ cause?: $.GoError; msg?: string }>) {
     this._fields = {
-      cause: $.varRef(init?.cause ?? null),
-      msg: $.varRef(init?.msg ?? ''),
+      cause: init?.cause ?? null,
+      msg: init?.msg ?? '',
     }
   }
 
   public clone(): withMessage {
     const cloned = new withMessage()
     cloned._fields = {
-      cause: $.varRef(this._fields.cause.value),
-      msg: $.varRef(this._fields.msg.value),
+      cause: this._fields.cause,
+      msg: this._fields.msg,
     }
     return cloned
   }

@@ -116,7 +116,10 @@ function formatValue(
       return formatArray(
         Array.from(value.entries()).map(([k, v]) =>
           joinMaybeText(
-            [formatValue(k, depth + 1, true, seen), formatValue(v, depth + 1, true, seen)],
+            [
+              formatValue(k, depth + 1, true, seen),
+              formatValue(v, depth + 1, true, seen),
+            ],
             ' => ',
           ),
         ),
@@ -201,13 +204,7 @@ function formatObject(
 function getObjectEntries(value: Record<string, any>): [string, any][] {
   const fields = value._fields
   if (fields && typeof fields === 'object' && !Array.isArray(fields)) {
-    return Object.keys(fields).map((key) => {
-      const field = fields[key]
-      if (field && typeof field === 'object' && 'value' in field) {
-        return [key, field.value]
-      }
-      return [key, field]
-    })
+    return Object.entries(fields)
   }
 
   return Object.entries(value).filter(

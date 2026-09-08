@@ -11,26 +11,26 @@ const firstStoreInProgress = Symbol('firstStoreInProgress');
 
 export class Value {
 	public get v(): null | any {
-		return this._fields.v.value
+		return this._fields.v
 	}
 	public set v(value: null | any) {
-		this._fields.v.value = value
+		this._fields.v = value
 	}
 
 	public _fields: {
-		v: $.VarRef<null | any>;
+		v: null | any;
 	}
 
 	constructor(init?: Partial<{v?: null | any}>) {
 		this._fields = {
-			v: $.varRef(init?.v ?? null)
+			v: init?.v ?? null
 		}
 	}
 
 	public clone(): Value {
 		const cloned = new Value()
 		cloned._fields = {
-			v: $.varRef(this._fields.v.value)
+			v: this._fields.v
 		}
 		return cloned
 	}
@@ -41,7 +41,7 @@ export class Value {
 		const v = this
 		// For JavaScript, we can simplify this since we're single-threaded
 		// Just return the stored value directly
-		return v._fields.v.value
+		return v._fields.v
 	}
 
 	// Store sets the value of the [Value] v to val.
@@ -53,7 +53,7 @@ export class Value {
 			$.panic("sync/atomic: store of nil value into Value")
 		}
 		// For JavaScript, store the value directly
-		v._fields.v.value = val
+		v._fields.v = val
 	}
 
 	// Swap stores new into Value and returns the previous value. It returns nil if
@@ -67,8 +67,8 @@ export class Value {
 			$.panic("sync/atomic: swap of nil value into Value")
 		}
 		// For JavaScript, swap the values directly
-		const old = v._fields.v.value
-		v._fields.v.value = _new
+		const old = v._fields.v
+		v._fields.v = _new
 		return old
 	}
 
@@ -83,8 +83,8 @@ export class Value {
 			$.panic("sync/atomic: compare and swap of nil value into Value")
 		}
 		// For JavaScript, compare and swap directly
-		if (v._fields.v.value === old) {
-			v._fields.v.value = _new
+		if (v._fields.v === old) {
+			v._fields.v = _new
 			return true
 		}
 		return false
@@ -103,36 +103,36 @@ export class Value {
 
 class efaceWords {
 	public get typ(): Pointer {
-		return this._fields.typ.value
+		return this._fields.typ
 	}
 	public set typ(value: Pointer) {
-		this._fields.typ.value = value
+		this._fields.typ = value
 	}
 
 	public get data(): Pointer {
-		return this._fields.data.value
+		return this._fields.data
 	}
 	public set data(value: Pointer) {
-		this._fields.data.value = value
+		this._fields.data = value
 	}
 
 	public _fields: {
-		typ: $.VarRef<Pointer>;
-		data: $.VarRef<Pointer>;
+		typ: Pointer;
+		data: Pointer;
 	}
 
 	constructor(init?: Partial<{data?: Pointer, typ?: Pointer}>) {
 		this._fields = {
-			typ: $.varRef(init?.typ ?? null),
-			data: $.varRef(init?.data ?? null)
+			typ: init?.typ ?? null,
+			data: init?.data ?? null
 		}
 	}
 
 	public clone(): efaceWords {
 		const cloned = new efaceWords()
 		cloned._fields = {
-			typ: $.varRef(this._fields.typ.value),
-			data: $.varRef(this._fields.data.value)
+			typ: this._fields.typ,
+			data: this._fields.data
 		}
 		return cloned
 	}
