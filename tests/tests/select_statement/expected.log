@@ -8,3 +8,4 @@ TEST7: Selected ch4 correctly: from ch4
 TEST8: Selected ch5 correctly: from ch5
 TEST9: Channel is closed, ok is false, val: false
 TEST10: Empty cases completed: 23 0
+TEST11: Concurrent select values preserved

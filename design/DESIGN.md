@@ -1025,6 +1025,8 @@ The `selectStatement` helper takes an array of case objects, each containing:
 
 For receive operations, the callback receives a `result` object with `value` and `ok` properties, similar to Go's comma-ok syntax. The second parameter to `selectStatement` indicates whether the `select` has a default case.
 
+Blocked cases claim selection synchronously when the channel transfers a value, before Promise continuations run. Claiming cancels the other registered cases, so a losing receive cannot consume a value and a losing send cannot remain available to another receiver. Send and receive cases in the same select never rendezvous with each other.
+
 ## Control Flow: `if` Statements
 
 Go's `if` statements are translated into standard TypeScript `if` statements.

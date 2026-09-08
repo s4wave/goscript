@@ -330,6 +330,75 @@ export async function main(): globalThis.Promise<void> {
 		return __goscriptSelect12Value
 	}
 	await $.println("TEST10: Empty cases completed:", value, $.len(empty))
+
+	// Each blocked select consumes exactly one of two concurrent sends.
+	for (let __rangeIndex = 0; __rangeIndex < 16; __rangeIndex++) {
+		let first: $.Channel<number> | null = $.makeChannel<number>(1, 0, "both")
+		let second: $.Channel<number> | null = $.makeChannel<number>(1, 0, "both")
+		let sent: $.Channel<{}> | null = $.makeChannel<{}>(2, {}, "both")
+		queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
+			await $.chanSend(first, 7)
+			await $.chanSend(sent, {})
+		})() })
+		queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
+			await $.chanSend(second, 9)
+			await $.chanSend(sent, {})
+		})() })
+		let total = 0
+		const [__goscriptSelect13HasReturn, __goscriptSelect13Value] = await $.selectStatement<any, void>([
+			{
+				id: 0,
+				isSend: false,
+				channel: first,
+				onSelected: async (__goscriptSelect13Result) => {
+					total = __goscriptSelect13Result.value
+				}
+			},
+			{
+				id: 1,
+				isSend: false,
+				channel: second,
+				onSelected: async (__goscriptSelect13Result) => {
+					total = __goscriptSelect13Result.value
+				}
+			}
+		], false)
+		if (__goscriptSelect13HasReturn) {
+			return __goscriptSelect13Value
+		}
+		await $.chanRecv(sent)
+		await $.chanRecv(sent)
+		if (($.len(first) + $.len(second)) != 1) {
+			$.panic("select consumed an unselected value")
+		}
+		const [__goscriptSelect14HasReturn, __goscriptSelect14Value] = await $.selectStatement<any, void>([
+			{
+				id: 0,
+				isSend: false,
+				channel: first,
+				onSelected: async (__goscriptSelect14Result) => {
+					let remaining = __goscriptSelect14Result.value
+					total = total + (remaining)
+				}
+			},
+			{
+				id: 1,
+				isSend: false,
+				channel: second,
+				onSelected: async (__goscriptSelect14Result) => {
+					let remaining = __goscriptSelect14Result.value
+					total = total + (remaining)
+				}
+			}
+		], false)
+		if (__goscriptSelect14HasReturn) {
+			return __goscriptSelect14Value
+		}
+		if (total != 16) {
+			$.panic("select lost a value")
+		}
+	}
+	await $.println("TEST11: Concurrent select values preserved")
 }
 
 if ($.isMainScript(import.meta)) {

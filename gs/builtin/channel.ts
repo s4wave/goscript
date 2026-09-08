@@ -31,10 +31,8 @@ function completeUnbufferedReceive<T>(
   value: T,
 ): Promise<void> {
   return new Promise<void>((resolve) => {
-    queueMicrotask(() => {
-      resolveReceive(value)
-      queueMicrotask(resolve)
-    })
+    resolveReceive(value)
+    queueMicrotask(resolve)
   })
 }
 
@@ -43,10 +41,8 @@ function completeUnbufferedReceiveWithOk<T>(
   result: ChannelReceiveResult<T>,
 ): Promise<void> {
   return new Promise<void>((resolve) => {
-    queueMicrotask(() => {
-      resolveReceive(result)
-      queueMicrotask(resolve)
-    })
+    resolveReceive(result)
+    queueMicrotask(resolve)
   })
 }
 
@@ -88,13 +84,19 @@ export interface Channel<T> {
 
   /**
    * Used in select statements to create a receive operation promise.
+   * Calls onCommit synchronously at selection to withdraw the other cases.
    * @param id An identifier for this case in the select statement
    * @returns Promise that resolves when this case is selected
    */
-  selectReceive(id: number, signal?: AbortSignal): Promise<SelectResult<T>>
+  selectReceive(
+    id: number,
+    signal?: AbortSignal,
+    onCommit?: () => void,
+  ): Promise<SelectResult<T>>
 
   /**
    * Used in select statements to create a send operation promise.
+   * Calls onCommit synchronously at selection to withdraw the other cases.
    * @param value The value to send
    * @param id An identifier for this case in the select statement
    * @returns Promise that resolves when this case is selected
@@ -103,6 +105,7 @@ export interface Channel<T> {
     value: T,
     id: number,
     signal?: AbortSignal,
+    onCommit?: () => void,
   ): Promise<SelectResult<boolean>>
 
   /**
@@ -268,7 +271,7 @@ export async function selectStatement<T, V = void>(
   }
 
   // 3. If no operations are ready and no default case, block until one is ready
-  // Use Promise.race on the blocking promises
+  // Claim at the channel operation before another branch can consume a value.
   const abort = new AbortController()
   const blockingPromises = cases
     .filter((c) => c.id !== -1) // Exclude default case
@@ -280,9 +283,12 @@ export async function selectStatement<T, V = void>(
           caseObj.value,
           caseObj.id,
           abort.signal,
+          () => abort.abort(),
         )
       } else {
-        return caseObj.channel!.selectReceive(caseObj.id, abort.signal)
+        return caseObj.channel!.selectReceive(caseObj.id, abort.signal, () =>
+          abort.abort(),
+        )
       }
     })
 
@@ -405,6 +411,7 @@ class BufferedChannel<T> implements Channel<T> {
     value: T
     resolveSend: () => void
     rejectSend: (e: Error) => void
+    signal?: AbortSignal
   }> = []
 
   // Receivers queue for receive(): stores { resolve for receive, reject for receive }
@@ -416,6 +423,7 @@ class BufferedChannel<T> implements Channel<T> {
   // Receivers queue for receiveWithOk(): stores { resolve for receiveWithOk }
   private receiversWithOk: Array<{
     resolveReceive: (result: ChannelReceiveResult<T>) => void
+    signal?: AbortSignal
   }> = []
 
   constructor(capacity: number, zeroValue: T) {
@@ -464,7 +472,7 @@ class BufferedChannel<T> implements Channel<T> {
       if (this.senders.length > 0) {
         const senderTask = this.senders.shift()!
         this.buffer.push(senderTask.value) // Sender's value now goes into buffer
-        queueMicrotask(() => senderTask.resolveSend()) // Unblock sender
+        senderTask.resolveSend() // Unblock sender
       }
       return value
     }
@@ -479,7 +487,7 @@ class BufferedChannel<T> implements Channel<T> {
     // Attempt to rendezvous with a waiting sender.
     if (this.senders.length > 0) {
       const senderTask = this.senders.shift()!
-      queueMicrotask(() => senderTask.resolveSend()) // Unblock the sender
+      senderTask.resolveSend() // Unblock the sender
       return senderTask.value // Return the value from sender
     }
 
@@ -496,7 +504,7 @@ class BufferedChannel<T> implements Channel<T> {
       if (this.senders.length > 0) {
         const senderTask = this.senders.shift()!
         this.buffer.push(senderTask.value)
-        queueMicrotask(() => senderTask.resolveSend())
+        senderTask.resolveSend()
       }
       return { value, ok: true }
     }
@@ -505,7 +513,7 @@ class BufferedChannel<T> implements Channel<T> {
     // Attempt to rendezvous with a waiting sender.
     if (this.senders.length > 0) {
       const senderTask = this.senders.shift()!
-      queueMicrotask(() => senderTask.resolveSend())
+      senderTask.resolveSend()
       return { value: senderTask.value, ok: true }
     }
 
@@ -527,14 +535,14 @@ class BufferedChannel<T> implements Channel<T> {
       if (this.senders.length > 0) {
         const senderTask = this.senders.shift()!
         this.buffer.push(senderTask.value)
-        queueMicrotask(() => senderTask.resolveSend())
+        senderTask.resolveSend()
       }
       return { value, ok: true, id }
     }
 
     if (this.senders.length > 0) {
       const senderTask = this.senders.shift()!
-      queueMicrotask(() => senderTask.resolveSend())
+      senderTask.resolveSend()
       return { value: senderTask.value, ok: true, id }
     }
 
@@ -547,24 +555,32 @@ class BufferedChannel<T> implements Channel<T> {
   async selectReceive(
     id: number,
     signal?: AbortSignal,
+    onCommit?: () => void,
   ): Promise<SelectResult<T>> {
+    if (signal?.aborted) return new Promise(() => {})
     if (this.buffer.length > 0) {
+      onCommit?.()
       const value = this.buffer.shift()!
       if (this.senders.length > 0) {
         const senderTask = this.senders.shift()!
         this.buffer.push(senderTask.value)
-        queueMicrotask(() => senderTask.resolveSend())
+        senderTask.resolveSend()
       }
       return { value, ok: true, id }
     }
 
-    if (this.senders.length > 0) {
-      const senderTask = this.senders.shift()!
-      queueMicrotask(() => senderTask.resolveSend())
+    const senderIndex = this.senders.findIndex(
+      (sender) => !signal || sender.signal !== signal,
+    )
+    if (senderIndex >= 0) {
+      const senderTask = this.senders.splice(senderIndex, 1)[0]
+      onCommit?.()
+      senderTask.resolveSend()
       return { value: senderTask.value, ok: true, id }
     }
 
     if (this.closed) {
+      onCommit?.()
       return { value: this.zeroValue, ok: false, id }
     }
 
@@ -572,10 +588,12 @@ class BufferedChannel<T> implements Channel<T> {
       const state = { done: false }
       const receiversWithOk = this.receiversWithOk
       const task = {
+        signal,
         resolveReceive: (result: ChannelReceiveResult<T>) => {
           if (!state.done) {
             state.done = true
             cleanup()
+            onCommit?.()
             resolve({ ...result, id })
           }
         },
@@ -631,8 +649,11 @@ class BufferedChannel<T> implements Channel<T> {
     value: T,
     id: number,
     signal?: AbortSignal,
+    onCommit?: () => void,
   ): Promise<SelectResult<boolean>> {
+    if (signal?.aborted) return new Promise(() => {})
     if (this.closed) {
+      onCommit?.()
       // A select case sending on a closed channel panics in Go.
       // This will cause Promise.race in selectStatement to reject.
       throw new Error('send on closed channel')
@@ -640,11 +661,16 @@ class BufferedChannel<T> implements Channel<T> {
 
     if (this.receivers.length > 0) {
       const receiverTask = this.receivers.shift()!
+      onCommit?.()
       await completeUnbufferedReceive(receiverTask.resolveReceive, value)
       return { value: true, ok: true, id }
     }
-    if (this.receiversWithOk.length > 0) {
-      const receiverTask = this.receiversWithOk.shift()!
+    const receiverIndex = this.receiversWithOk.findIndex(
+      (receiver) => !signal || receiver.signal !== signal,
+    )
+    if (receiverIndex >= 0) {
+      const receiverTask = this.receiversWithOk.splice(receiverIndex, 1)[0]
+      onCommit?.()
       await completeUnbufferedReceiveWithOk(receiverTask.resolveReceive, {
         value,
         ok: true,
@@ -653,6 +679,7 @@ class BufferedChannel<T> implements Channel<T> {
     }
 
     if (this.buffer.length < this.capacity) {
+      onCommit?.()
       this.buffer.push(value)
       return { value: true, ok: true, id }
     }
@@ -661,11 +688,13 @@ class BufferedChannel<T> implements Channel<T> {
       const state = { done: false }
       const senders = this.senders
       const task = {
+        signal,
         value,
         resolveSend: () => {
           if (!state.done) {
             state.done = true
             cleanup()
+            onCommit?.()
             resolve({ value: true, ok: true, id })
           }
         },
@@ -673,6 +702,7 @@ class BufferedChannel<T> implements Channel<T> {
           if (!state.done) {
             state.done = true
             cleanup()
+            onCommit?.()
             reject(e)
           }
         },
@@ -778,8 +808,13 @@ export interface ChannelRef<T> {
     value: T,
     id: number,
     signal?: AbortSignal,
+    onCommit?: () => void,
   ): Promise<SelectResult<boolean>>
-  selectReceive(id: number, signal?: AbortSignal): Promise<SelectResult<T>>
+  selectReceive(
+    id: number,
+    signal?: AbortSignal,
+    onCommit?: () => void,
+  ): Promise<SelectResult<T>>
   trySelectReceive(id: number): SelectResult<T> | undefined
   trySelectSend(value: T, id: number): SelectResult<boolean> | undefined
   len(): number
@@ -823,12 +858,17 @@ export class BidirectionalChannelRef<T> implements ChannelRef<T> {
     value: T,
     id: number,
     signal?: AbortSignal,
+    onCommit?: () => void,
   ): Promise<SelectResult<boolean>> {
-    return this.channel.selectSend(value, id, signal)
+    return this.channel.selectSend(value, id, signal, onCommit)
   }
 
-  selectReceive(id: number, signal?: AbortSignal): Promise<SelectResult<T>> {
-    return this.channel.selectReceive(id, signal)
+  selectReceive(
+    id: number,
+    signal?: AbortSignal,
+    onCommit?: () => void,
+  ): Promise<SelectResult<T>> {
+    return this.channel.selectReceive(id, signal, onCommit)
   }
 
   trySelectReceive(id: number): SelectResult<T> | undefined {
@@ -874,8 +914,9 @@ export class SendOnlyChannelRef<T> implements ChannelRef<T> {
     value: T,
     id: number,
     signal?: AbortSignal,
+    onCommit?: () => void,
   ): Promise<SelectResult<boolean>> {
-    return this.channel.selectSend(value, id, signal)
+    return this.channel.selectSend(value, id, signal, onCommit)
   }
 
   trySelectReceive(_id: number): SelectResult<T> | undefined {
@@ -899,7 +940,11 @@ export class SendOnlyChannelRef<T> implements ChannelRef<T> {
     return false
   }
 
-  selectReceive(_id: number, _signal?: AbortSignal): Promise<SelectResult<T>> {
+  selectReceive(
+    _id: number,
+    _signal?: AbortSignal,
+    _onCommit?: () => void,
+  ): Promise<SelectResult<T>> {
     throw new Error('Cannot receive from send-only channel')
   }
 
@@ -933,8 +978,12 @@ export class ReceiveOnlyChannelRef<T> implements ChannelRef<T> {
     return this.channel.canReceiveNonBlocking()
   }
 
-  selectReceive(id: number, signal?: AbortSignal): Promise<SelectResult<T>> {
-    return this.channel.selectReceive(id, signal)
+  selectReceive(
+    id: number,
+    signal?: AbortSignal,
+    onCommit?: () => void,
+  ): Promise<SelectResult<T>> {
+    return this.channel.selectReceive(id, signal, onCommit)
   }
 
   trySelectReceive(id: number): SelectResult<T> | undefined {

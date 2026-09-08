@@ -1209,6 +1209,61 @@ describe('builtin runtime contract helpers', () => {
     expect(events).toEqual(['queued', 'receiver'])
   })
 
+  it('preserves values offered to losing select branches in the same turn', async () => {
+    const first = makeChannel(1, 0)
+    const second = makeChannel(1, 0)
+    const selected = selectStatement<number, number>([
+      {
+        id: 0,
+        isSend: false,
+        channel: first,
+        onSelected: (result) => result.value,
+      },
+      {
+        id: 1,
+        isSend: false,
+        channel: second,
+        onSelected: (result) => result.value,
+      },
+    ])
+
+    const firstSend = first.send(7)
+    const secondSend = second.send(9)
+    expect(await selected).toEqual([true, 7])
+    await Promise.all([firstSend, secondSend])
+    expect(second.len()).toBe(1)
+    expect(await second.receive()).toBe(9)
+  })
+
+  it('withdraws losing sends before another receiver can consume them', async () => {
+    const first = makeChannel(0, 0)
+    const second = makeChannel(0, 0)
+    const selected = selectStatement<number, number>([
+      { id: 0, isSend: true, channel: first, value: 7, onSelected: () => 0 },
+      { id: 1, isSend: true, channel: second, value: 9, onSelected: () => 1 },
+    ])
+
+    const received = first.receive()
+    expect(second.canReceiveNonBlocking()).toBe(false)
+    expect(await received).toBe(7)
+    expect(await selected).toEqual([true, 0])
+  })
+
+  it('never pairs send and receive branches of the same select', async () => {
+    const channel = makeChannel(0, 0)
+    const selected = selectStatement<number, number>([
+      { id: 0, isSend: false, channel, onSelected: (result) => result.value },
+      { id: 1, isSend: true, channel, value: 7, onSelected: () => -1 },
+    ])
+    const externalSend = channel.send(9)
+    try {
+      expect(await selected).toEqual([true, 9])
+    } finally {
+      channel.close()
+      await externalSend.catch(() => {})
+    }
+  })
+
   it('cancels losing select receive cases', async () => {
     const signal = makeChannel<string>(1, '', 'both')
     const timeout = makeChannel<string>(0, '', 'both')
