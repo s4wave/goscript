@@ -86,6 +86,7 @@ const (
 	RuntimeHelperPointerEqual          RuntimeHelper = "value.pointerEqual"
 
 	RuntimeHelperVarRef                RuntimeHelper = "varref.varRef"
+	RuntimeHelperBindStructFields      RuntimeHelper = "varref.bindStructFields"
 	RuntimeHelperFieldRef              RuntimeHelper = "varref.fieldRef"
 	RuntimeHelperUnref                 RuntimeHelper = "varref.unref"
 	RuntimeHelperIsVarRef              RuntimeHelper = "varref.isVarRef"
@@ -346,6 +347,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperComparableEqual, "comparableEqual", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperPointerEqual, "pointerEqual", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperVarRef, "varRef", RuntimeHelperCategoryVarRef),
+		runtimeHelper(RuntimeHelperBindStructFields, "bindStructFields", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperFieldRef, "fieldRef", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperUnref, "unref", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperIsVarRef, "isVarRef", RuntimeHelperCategoryVarRef),
