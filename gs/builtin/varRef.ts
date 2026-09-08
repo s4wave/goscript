@@ -89,6 +89,24 @@ export function varRef<T>(v: T): VarRef<T> {
   return new VariableRef(v)
 }
 
+/** Install struct properties over their existing mutable field cells. */
+export function bindStructFields(
+  prototype: object,
+  names: readonly string[],
+): void {
+  for (const name of names) {
+    Object.defineProperty(prototype, name, {
+      get(this: { _fields: Record<string, VarRef<unknown>> }) {
+        return this._fields[name].value
+      },
+      set(this: { _fields: Record<string, VarRef<unknown>> }, value: unknown) {
+        this._fields[name].value = value
+      },
+      configurable: true,
+    })
+  }
+}
+
 /** fieldRef Create a variable reference to an object field. */
 export function fieldRef<T extends object, K extends keyof T>(
   target: T,
@@ -109,7 +127,7 @@ export function fieldRef<T extends object, K extends keyof T>(
   return ref
 }
 
-/** isVarRef Check if a value is a VarRef (pointer) .*/
+/** isVarRef reports whether a value carries the variable-reference marker. */
 export function isVarRef(v: unknown): v is VarRef<unknown> {
   return v !== null && typeof v === 'object' && (v as any).__isVarRef === true
 }

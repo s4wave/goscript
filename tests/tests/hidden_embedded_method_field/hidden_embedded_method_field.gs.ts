@@ -33,19 +33,9 @@ export class embedded {
 }
 
 export class holder {
-	public get Database(): string {
-		return this._fields.Database.value
-	}
-	public set Database(value: string) {
-		this._fields.Database.value = value
-	}
+	public declare Database: string
 
-	public get embedded(): embedded {
-		return this._fields.embedded.value
-	}
-	public set embedded(value: embedded) {
-		this._fields.embedded.value = value
-	}
+	public declare embedded: embedded
 
 	public _fields: {
 		Database: $.VarRef<string>
@@ -66,6 +56,10 @@ export class holder {
 			embedded: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.embedded.value)))
 		}
 		return $.markAsStructValue(cloned)
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Database", "embedded"])
 	}
 
 	static __typeInfo = $.registerStructType(

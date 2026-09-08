@@ -436,20 +436,11 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	b.WriteString(" {\n")
 	for _, field := range structType.fields {
 		writeLineComment(b, "\t", field.doc)
-		b.WriteString("\tpublic get ")
+		b.WriteString("\tpublic declare ")
 		b.WriteString(field.name)
-		b.WriteString("(): ")
+		b.WriteString(": ")
 		b.WriteString(field.typ)
-		b.WriteString(" {\n\t\treturn this._fields.")
-		b.WriteString(field.name)
-		b.WriteString(".value\n\t}\n")
-		b.WriteString("\tpublic set ")
-		b.WriteString(field.name)
-		b.WriteString("(value: ")
-		b.WriteString(field.typ)
-		b.WriteString(") {\n\t\tthis._fields.")
-		b.WriteString(field.name)
-		b.WriteString(".value = value\n\t}\n\n")
+		b.WriteString("\n\n")
 	}
 	b.WriteString("\tpublic _fields: {\n")
 	for _, field := range structType.fields {
@@ -564,10 +555,26 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 		b.WriteString("\n")
 		renderMethod(b, &method)
 	}
-	if structType.prototypeSetup != "" {
-		b.WriteString("\n\tstatic { ")
-		b.WriteString(structType.prototypeSetup)
-		b.WriteString(" }\n")
+	if len(structType.fields) != 0 || structType.prototypeSetup != "" {
+		b.WriteString("\n\tstatic {\n")
+		if len(structType.fields) != 0 {
+			b.WriteString("\t\t")
+			b.WriteString(runtimeOwner.QualifiedHelper(RuntimeHelperBindStructFields))
+			b.WriteString("(this.prototype, [")
+			for idx, field := range structType.fields {
+				if idx != 0 {
+					b.WriteString(", ")
+				}
+				b.WriteString(strconv.Quote(field.name))
+			}
+			b.WriteString("])\n")
+		}
+		if structType.prototypeSetup != "" {
+			b.WriteString("\t\t")
+			b.WriteString(structType.prototypeSetup)
+			b.WriteString("\n")
+		}
+		b.WriteString("\t}\n")
 	}
 	b.WriteString("\n\tstatic __typeInfo = ")
 	b.WriteString(registerStructType)

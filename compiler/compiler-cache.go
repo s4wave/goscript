@@ -27,7 +27,7 @@ const compilerCacheSchema = "goscript-package-artifact-v1"
 // compilerSemanticsVersion versions emitted-output semantics. Bump this value
 // with every behavior-changing compiler commit so artifacts cached by an
 // older binary miss and rebuild instead of replaying stale bytes.
-const compilerSemanticsVersion = "9"
+const compilerSemanticsVersion = "10"
 
 type compilerCacheEntryKind string
 
