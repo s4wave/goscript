@@ -186,6 +186,8 @@ Generated classes declare their field types and install non-enumerable prototype
 
 Standalone variable references retain distinct mutable cells. Variable and field references share their accessors through class prototypes. Pointer handles and their address/ref closures are allocated on the first pointer access and retained on that reference; ordinary field reads and writes do not allocate pointer machinery.
 
+The `io.Copy` and `io.CopyN` fallback starts with a 32 KiB buffer and grows it after full reads to a 256 KiB ceiling. This bounds memory while reducing asynchronous reader/writer transitions for bulk transfers. `CopyBuffer` preserves a caller-supplied buffer, and `WriterTo` or `ReaderFrom` still owns copying when available.
+
 Generated protobuf adapters declare their Go method types and install binary, JSON, clone, equality, and reset forwarding methods through the shared protobuf bridge. Installation occurs in the class static block, captures the declaring constructor for nil receiver calls, and preserves non-enumerable prototype methods. Handwritten methods and native proto-text bodies remain on their declaring classes.
 
 ## Known Divergences

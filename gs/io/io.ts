@@ -508,7 +508,7 @@ export async function Copy(
 }
 
 // CopyBuffer stages copying through buf unless a reader or writer owns the copy.
-// A nil buffer allocates a bounded 32 KiB buffer.
+// A nil buffer grows from 32 KiB to 256 KiB when full reads sustain bulk copying.
 export async function CopyBuffer(
   dst: WriterLike,
   src: ReaderLike,
@@ -529,6 +529,7 @@ export async function CopyBuffer(
     return await ((dst as ReaderFrom).ReadFrom(src) as any)
   }
 
+  const growBuffer = buf === null
   if (buf === null) {
     buf = $.makeSlice<number>(32 * 1024, undefined, 'byte')
   }
@@ -557,6 +558,9 @@ export async function CopyBuffer(
         break
       }
       return [written, er]
+    }
+    if (growBuffer && nr === $.len(buf) && $.len(buf) < 256 * 1024) {
+      buf = $.makeSlice<number>($.len(buf) * 2, undefined, 'byte')
     }
   }
   return [written, null]

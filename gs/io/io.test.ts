@@ -207,17 +207,35 @@ describe('io override', () => {
     expect(Buffer.from(buf).toString('utf8')).toBe('later')
   })
 
-  test('Copy copies bytes until EOF and reports nil error', async () => {
-    const writer = new captureWriter()
+  test('Copy transfers large async inputs with bounded bulk reads', async () => {
+    const input = Uint8Array.from(
+      { length: 1024 * 1024 + 17 },
+      (_, i) => i % 251,
+    )
+    const output = new Uint8Array(input.length)
+    const reader = new sliceReader(input)
+    let offset = 0
 
     const [written, err] = await Copy(
-      writer,
-      new sliceReader($.stringToBytes('hello world')),
+      {
+        async Write(data: $.Bytes): Promise<[number, $.GoError]> {
+          output.set(data!, offset)
+          offset += $.len(data)
+          return [$.len(data), null]
+        },
+      },
+      {
+        async Read(data: $.Bytes): Promise<[number, $.GoError]> {
+          return reader.Read(data)
+        },
+      },
     )
 
     expect(err).toBeNull()
-    expect(written).toBe(11n)
-    expect(Buffer.from(writer.chunks).toString('utf8')).toBe('hello world')
+    expect(written).toBe(BigInt(input.length))
+    expect(output).toEqual(input)
+    expect(reader.requestedSizes.length).toBeLessThanOrEqual(10)
+    expect(Math.max(...reader.requestedSizes)).toBeLessThanOrEqual(256 * 1024)
   })
 
   test('CopyBuffer stages reads through the provided buffer', async () => {
