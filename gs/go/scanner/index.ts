@@ -4,30 +4,30 @@ import type * as io from '@goscript/io/index.js'
 
 export class Error {
   public get Pos(): token.Position {
-    return this._fields.Pos.value
+    return this._fields.Pos
   }
 
   public set Pos(value: token.Position) {
-    this._fields.Pos.value = value
+    this._fields.Pos = value
   }
 
   public get Msg(): string {
-    return this._fields.Msg.value
+    return this._fields.Msg
   }
 
   public set Msg(value: string) {
-    this._fields.Msg.value = value
+    this._fields.Msg = value
   }
 
   public _fields: {
-    Pos: $.VarRef<token.Position>
-    Msg: $.VarRef<string>
+    Pos: token.Position
+    Msg: string
   }
 
   constructor(init?: Partial<{ Pos: token.Position; Msg: string }>) {
     this._fields = {
-      Pos: $.varRef(init?.Pos ?? new token.Position()),
-      Msg: $.varRef(init?.Msg ?? ''),
+      Pos: init?.Pos ?? new token.Position(),
+      Msg: init?.Msg ?? '',
     }
   }
 

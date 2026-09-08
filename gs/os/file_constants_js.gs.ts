@@ -30,46 +30,46 @@ export const SEEK_END = 2
 // LinkError carries details for link-related path errors.
 export class LinkError {
 	public get Op(): string {
-		return this._fields.Op.value
+		return this._fields.Op
 	}
 	public set Op(value: string) {
-		this._fields.Op.value = value
+		this._fields.Op = value
 	}
 
 	public get Old(): string {
-		return this._fields.Old.value
+		return this._fields.Old
 	}
 	public set Old(value: string) {
-		this._fields.Old.value = value
+		this._fields.Old = value
 	}
 
 	public get New(): string {
-		return this._fields.New.value
+		return this._fields.New
 	}
 	public set New(value: string) {
-		this._fields.New.value = value
+		this._fields.New = value
 	}
 
 	public get Err(): $.GoError {
-		return this._fields.Err.value
+		return this._fields.Err
 	}
 	public set Err(value: $.GoError) {
-		this._fields.Err.value = value
+		this._fields.Err = value
 	}
 
 	public _fields: {
-		Op: $.VarRef<string>;
-		Old: $.VarRef<string>;
-		New: $.VarRef<string>;
-		Err: $.VarRef<$.GoError>;
+		Op: string;
+		Old: string;
+		New: string;
+		Err: $.GoError;
 	}
 
 	constructor(init?: Partial<{Op?: string, Old?: string, New?: string, Err?: $.GoError}>) {
 		this._fields = {
-			Op: $.varRef(init?.Op ?? ""),
-			Old: $.varRef(init?.Old ?? ""),
-			New: $.varRef(init?.New ?? ""),
-			Err: $.varRef(init?.Err ?? null)
+			Op: init?.Op ?? "",
+			Old: init?.Old ?? "",
+			New: init?.New ?? "",
+			Err: init?.Err ?? null
 		}
 	}
 

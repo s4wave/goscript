@@ -507,46 +507,46 @@ export function fileModeType(mode: FileMode): FileMode {
 
 export class PathError {
   public get Op(): string {
-    return this._fields.Op.value
+    return this._fields.Op
   }
   public set Op(value: string) {
-    this._fields.Op.value = value
+    this._fields.Op = value
   }
 
   public get Path(): string {
-    return this._fields.Path.value
+    return this._fields.Path
   }
   public set Path(value: string) {
-    this._fields.Path.value = value
+    this._fields.Path = value
   }
 
   public get Err(): $.GoError {
-    return this._fields.Err.value
+    return this._fields.Err
   }
   public set Err(value: $.GoError) {
-    this._fields.Err.value = value
+    this._fields.Err = value
   }
 
   public _fields: {
-    Op: $.VarRef<string>
-    Path: $.VarRef<string>
-    Err: $.VarRef<$.GoError>
+    Op: string
+    Path: string
+    Err: $.GoError
   }
 
   constructor(init?: Partial<{ Err?: $.GoError; Op?: string; Path?: string }>) {
     this._fields = {
-      Op: $.varRef(init?.Op ?? ''),
-      Path: $.varRef(init?.Path ?? ''),
-      Err: $.varRef(init?.Err ?? null),
+      Op: init?.Op ?? '',
+      Path: init?.Path ?? '',
+      Err: init?.Err ?? null,
     }
   }
 
   public clone(): PathError {
     const cloned = new PathError()
     cloned._fields = {
-      Op: $.varRef(this._fields.Op.value),
-      Path: $.varRef(this._fields.Path.value),
-      Err: $.varRef(this._fields.Err.value),
+      Op: this._fields.Op,
+      Path: this._fields.Path,
+      Err: this._fields.Err,
     }
     return cloned
   }
@@ -555,7 +555,7 @@ export class PathError {
   // interpolating a possible Promise into the text.
   public Error(): string | PromiseLike<string> {
     const e = this
-    const inner = e!._fields.Err.value!.Error()
+    const inner = e!._fields.Err!.Error()
     if (typeof inner === 'string') {
       return e!.Op + ' ' + e!.Path + ': ' + inner
     }

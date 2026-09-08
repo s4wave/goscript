@@ -12,26 +12,26 @@ export let Kill: Signal = null // syscall.SIGKILL not available in JavaScript
 // ProcessState Simplified ProcessState for JavaScript environment.
 export class ProcessState {
 	public get pid(): number {
-		return this._fields.pid.value
+		return this._fields.pid
 	}
 	public set pid(value: number) {
-		this._fields.pid.value = value
+		this._fields.pid = value
 	}
 
 	public _fields: {
-		pid: $.VarRef<number>;
+		pid: number;
 	}
 
 	constructor(init?: Partial<{pid?: number}>) {
 		this._fields = {
-			pid: $.varRef(init?.pid ?? -1)
+			pid: init?.pid ?? -1
 		}
 	}
 
 	public clone(): ProcessState {
 		const cloned = new ProcessState()
 		cloned._fields = {
-			pid: $.varRef(this._fields.pid.value)
+			pid: this._fields.pid
 		}
 		return cloned
 	}

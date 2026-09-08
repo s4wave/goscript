@@ -10,26 +10,26 @@ export let ErrNoHandle: $.GoError = errors.New("os: process handle unavailable")
 // Process Simplified Process class for JavaScript environment.
 export class Process {
 	public get Pid(): number {
-		return this._fields.Pid.value
+		return this._fields.Pid
 	}
 	public set Pid(value: number) {
-		this._fields.Pid.value = value
+		this._fields.Pid = value
 	}
 
 	public _fields: {
-		Pid: $.VarRef<number>;
+		Pid: number;
 	}
 
 	constructor(init?: Partial<{Pid?: number}>) {
 		this._fields = {
-			Pid: $.varRef(init?.Pid ?? -1)
+			Pid: init?.Pid ?? -1
 		}
 	}
 
 	public clone(): Process {
 		const cloned = new Process()
 		cloned._fields = {
-			Pid: $.varRef(this._fields.Pid.value)
+			Pid: this._fields.Pid
 		}
 		return cloned
 	}
@@ -69,56 +69,56 @@ export class Process {
 // ProcAttr Simplified ProcAttr class for JavaScript environment.
 export class ProcAttr {
 	public get Dir(): string {
-		return this._fields.Dir.value
+		return this._fields.Dir
 	}
 	public set Dir(value: string) {
-		this._fields.Dir.value = value
+		this._fields.Dir = value
 	}
 
 	public get Env(): $.Slice<string> {
-		return this._fields.Env.value
+		return this._fields.Env
 	}
 	public set Env(value: $.Slice<string>) {
-		this._fields.Env.value = value
+		this._fields.Env = value
 	}
 
 	public get Files(): $.Slice<any> {
-		return this._fields.Files.value
+		return this._fields.Files
 	}
 	public set Files(value: $.Slice<any>) {
-		this._fields.Files.value = value
+		this._fields.Files = value
 	}
 
 	public get Sys(): any {
-		return this._fields.Sys.value
+		return this._fields.Sys
 	}
 	public set Sys(value: any) {
-		this._fields.Sys.value = value
+		this._fields.Sys = value
 	}
 
 	public _fields: {
-		Dir: $.VarRef<string>;
-		Env: $.VarRef<$.Slice<string>>;
-		Files: $.VarRef<$.Slice<any>>;
-		Sys: $.VarRef<any>;
+		Dir: string;
+		Env: $.Slice<string>;
+		Files: $.Slice<any>;
+		Sys: any;
 	}
 
 	constructor(init?: Partial<{Dir?: string, Env?: $.Slice<string>, Files?: $.Slice<any>, Sys?: any}>) {
 		this._fields = {
-			Dir: $.varRef(init?.Dir ?? ""),
-			Env: $.varRef(init?.Env ?? null),
-			Files: $.varRef(init?.Files ?? null),
-			Sys: $.varRef(init?.Sys ?? null)
+			Dir: init?.Dir ?? "",
+			Env: init?.Env ?? null,
+			Files: init?.Files ?? null,
+			Sys: init?.Sys ?? null
 		}
 	}
 
 	public clone(): ProcAttr {
 		const cloned = new ProcAttr()
 		cloned._fields = {
-			Dir: $.varRef(this._fields.Dir.value),
-			Env: $.varRef(this._fields.Env.value),
-			Files: $.varRef(this._fields.Files.value),
-			Sys: $.varRef(this._fields.Sys.value)
+			Dir: this._fields.Dir,
+			Env: this._fields.Env,
+			Files: this._fields.Files,
+			Sys: this._fields.Sys
 		}
 		return cloned
 	}

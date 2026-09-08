@@ -30,15 +30,15 @@ describe('DeepEqual', () => {
     expect(DeepEqual({ a: 1, b: 2 }, { a: 1 })).toBe(false)
   })
 
-  it('compares generated structs by field values, not VarRef mechanics', () => {
+  it('compares generated structs by their stored field values', () => {
     const left = {
-      _fields: { FullBytes: { value: null, address: () => 1 } },
+      _fields: { FullBytes: null },
     }
     const equal = {
-      _fields: { FullBytes: { value: null, address: () => 2 } },
+      _fields: { FullBytes: null },
     }
     const different = {
-      _fields: { FullBytes: { value: new Uint8Array([0]), address: () => 3 } },
+      _fields: { FullBytes: new Uint8Array([0]) },
     }
 
     expect(DeepEqual(left, equal)).toBe(true)

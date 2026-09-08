@@ -326,7 +326,7 @@ describe('encoding/binary override', () => {
   it('fails unsupported reflect-shaped cases closed', () => {
     class StructLike {
       public _fields = {
-        Value: $.varRef(1),
+        Value: 1,
       }
     }
 
@@ -414,9 +414,9 @@ describe('encoding/binary override', () => {
 
     const instance = {
       _fields: {
-        A: $.varRef(0x01020304),
-        B: $.varRef(0x0506),
-        C: $.varRef([0xaa, 0xbb]),
+        A: 0x01020304,
+        B: 0x0506,
+        C: [0xaa, 0xbb],
       },
     }
     const value = $.namedValueInterfaceValue<unknown>(
@@ -435,9 +435,9 @@ describe('encoding/binary override', () => {
 
     const decodedInstance = {
       _fields: {
-        A: $.varRef(0),
-        B: $.varRef(0),
-        C: $.varRef([0, 0]),
+        A: 0,
+        B: 0,
+        C: [0, 0],
       },
     }
     const target = $.namedValueInterfaceValue<unknown>(
@@ -447,8 +447,8 @@ describe('encoding/binary override', () => {
       { kind: $.TypeKind.Pointer, elemType: structInfo },
     )
     expect(Decode(encoded, BigEndian, target)).toEqual([8, null])
-    expect(decodedInstance._fields.A.value).toBe(0x01020304)
-    expect(decodedInstance._fields.B.value).toBe(0x0506)
-    expect(decodedInstance._fields.C.value).toEqual([0xaa, 0xbb])
+    expect(decodedInstance._fields.A).toBe(0x01020304)
+    expect(decodedInstance._fields.B).toBe(0x0506)
+    expect(decodedInstance._fields.C).toEqual([0xaa, 0xbb])
   })
 })

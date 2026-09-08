@@ -35,8 +35,8 @@ describe('builtin println formatting', () => {
       formatPrintedArgs([
         {
           _fields: {
-            Name: { value: 'hello' },
-            Count: { value: 3 },
+            Name: 'hello',
+            Count: 3,
           },
         },
       ]),

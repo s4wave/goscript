@@ -15,14 +15,14 @@ export async function main(): globalThis.Promise<void> {
 	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	let signed: number = $.int(2, 32)
 	{
-		let err = await binary.Write($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.BigEndian))), "binary.bigEndian", "binary.bigEndian"), $.basicInterfaceValue(signed, "int32"))
+		let err = await binary.Write($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.BigEndian))), "binary.bigEndian", "binary.bigEndian"), $.basicInterfaceValue(signed, "int32"))
 		if (err != null) {
 			await $.println("write signed error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return
 		}
 	}
 	{
-		let err = await binary.Write($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.BigEndian))), "binary.bigEndian", "binary.bigEndian"), $.basicInterfaceValue($.uint(3, 32), "uint32"))
+		let err = await binary.Write($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.BigEndian))), "binary.bigEndian", "binary.bigEndian"), $.basicInterfaceValue($.uint(3, 32), "uint32"))
 		if (err != null) {
 			await $.println("write unsigned error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return

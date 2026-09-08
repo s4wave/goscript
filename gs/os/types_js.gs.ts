@@ -316,10 +316,10 @@ export function Getpagesize(): number {
 // File adapts host file descriptors and file handles to Go's os.File surface.
 export class File {
 	public get file(): file | null {
-		return this._fields.file.value
+		return this._fields.file
 	}
 	public set file(value: file | null) {
-		this._fields.file.value = value
+		this._fields.file = value
 	}
 
 	public name: string
@@ -331,7 +331,7 @@ export class File {
 	public cachedDirInfos: fs.FileInfo[] | null
 
 	public _fields: {
-		file: $.VarRef<file | null>;
+		file: file | null;
 	}
 
 	constructor(init?: Partial<{closed?: boolean, fd?: number, file?: file | null, name?: string}>) {
@@ -343,7 +343,7 @@ export class File {
 		this.cachedDirEntries = null
 		this.cachedDirInfos = null
 		this._fields = {
-			file: $.varRef(init?.file ?? null)
+			file: init?.file ?? null
 		}
 	}
 

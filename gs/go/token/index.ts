@@ -196,42 +196,42 @@ type lineInfo = {
 
 export class Position {
   public get Filename(): string {
-    return this._fields.Filename.value
+    return this._fields.Filename
   }
 
   public set Filename(value: string) {
-    this._fields.Filename.value = value
+    this._fields.Filename = value
   }
 
   public get Offset(): number {
-    return this._fields.Offset.value
+    return this._fields.Offset
   }
 
   public set Offset(value: number) {
-    this._fields.Offset.value = value
+    this._fields.Offset = value
   }
 
   public get Line(): number {
-    return this._fields.Line.value
+    return this._fields.Line
   }
 
   public set Line(value: number) {
-    this._fields.Line.value = value
+    this._fields.Line = value
   }
 
   public get Column(): number {
-    return this._fields.Column.value
+    return this._fields.Column
   }
 
   public set Column(value: number) {
-    this._fields.Column.value = value
+    this._fields.Column = value
   }
 
   public _fields: {
-    Filename: $.VarRef<string>
-    Offset: $.VarRef<number>
-    Line: $.VarRef<number>
-    Column: $.VarRef<number>
+    Filename: string
+    Offset: number
+    Line: number
+    Column: number
   }
 
   constructor(
@@ -243,10 +243,10 @@ export class Position {
     }>,
   ) {
     this._fields = {
-      Filename: $.varRef(init?.Filename ?? ''),
-      Offset: $.varRef(init?.Offset ?? 0),
-      Line: $.varRef(init?.Line ?? 0),
-      Column: $.varRef(init?.Column ?? 0),
+      Filename: init?.Filename ?? '',
+      Offset: init?.Offset ?? 0,
+      Line: init?.Line ?? 0,
+      Column: init?.Column ?? 0,
     }
   }
 

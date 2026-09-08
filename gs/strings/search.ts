@@ -9,10 +9,10 @@ function max(a: number, b: number): number {
 export class stringFinder {
   // pattern is the string that we are searching for in the text.
   public get pattern(): string {
-    return this._fields.pattern.value
+    return this._fields.pattern
   }
   public set pattern(value: string) {
-    this._fields.pattern.value = value
+    this._fields.pattern = value
   }
 
   // badCharSkip[b] contains the distance between the last byte of pattern
@@ -23,10 +23,10 @@ export class stringFinder {
   // shift the matching frame at least badCharSkip[b] until the next time
   // the matching char could be in alignment.
   public get badCharSkip(): number[] {
-    return this._fields.badCharSkip.value
+    return this._fields.badCharSkip
   }
   public set badCharSkip(value: number[]) {
-    this._fields.badCharSkip.value = value
+    this._fields.badCharSkip = value
   }
 
   // goodSuffixSkip[i] defines how far we can shift the matching frame given
@@ -50,16 +50,16 @@ export class stringFinder {
   // rightmost "abc" (at position 6) is a prefix of the whole pattern, so
   // goodSuffixSkip[3] == shift+len(suffix) == 6+5 == 11.
   public get goodSuffixSkip(): $.Slice<number> {
-    return this._fields.goodSuffixSkip.value
+    return this._fields.goodSuffixSkip
   }
   public set goodSuffixSkip(value: $.Slice<number>) {
-    this._fields.goodSuffixSkip.value = value
+    this._fields.goodSuffixSkip = value
   }
 
   public _fields: {
-    pattern: $.VarRef<string>
-    badCharSkip: $.VarRef<number[]>
-    goodSuffixSkip: $.VarRef<$.Slice<number>>
+    pattern: string
+    badCharSkip: number[]
+    goodSuffixSkip: $.Slice<number>
   }
 
   constructor(
@@ -70,18 +70,18 @@ export class stringFinder {
     }>,
   ) {
     this._fields = {
-      pattern: $.varRef(init?.pattern ?? ''),
-      badCharSkip: $.varRef(init?.badCharSkip ?? new Array(256).fill(0)),
-      goodSuffixSkip: $.varRef(init?.goodSuffixSkip ?? null),
+      pattern: init?.pattern ?? '',
+      badCharSkip: init?.badCharSkip ?? new Array(256).fill(0),
+      goodSuffixSkip: init?.goodSuffixSkip ?? null,
     }
   }
 
   public clone(): stringFinder {
     const cloned = new stringFinder()
     cloned._fields = {
-      pattern: $.varRef(this._fields.pattern.value),
-      badCharSkip: $.varRef(this._fields.badCharSkip.value),
-      goodSuffixSkip: $.varRef(this._fields.goodSuffixSkip.value),
+      pattern: this._fields.pattern,
+      badCharSkip: this._fields.badCharSkip,
+      goodSuffixSkip: this._fields.goodSuffixSkip,
     }
     return cloned
   }

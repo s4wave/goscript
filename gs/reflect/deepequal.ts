@@ -53,7 +53,7 @@ import { ReflectValue } from './types.js'
 
 function hasGeneratedStructFields(
   value: object,
-): value is { _fields: Record<string, { value: ReflectValue }> } {
+): value is { _fields: Record<string, ReflectValue> } {
   if (!('_fields' in value)) {
     return false
   }
@@ -61,11 +61,7 @@ function hasGeneratedStructFields(
   return (
     typeof fields === 'object' &&
     fields !== null &&
-    !globalThis.Array.isArray(fields) &&
-    Object.values(fields).every(
-      (field) =>
-        typeof field === 'object' && field !== null && 'value' in field,
-    )
+    !globalThis.Array.isArray(fields)
   )
 }
 
@@ -177,8 +173,7 @@ export function DeepEqual(
         keysX.length === keysY.length &&
         keysX.every(
           (key) =>
-            key in y._fields &&
-            DeepEqual(x._fields[key].value, y._fields[key].value),
+            key in y._fields && DeepEqual(x._fields[key], y._fields[key]),
         )
       )
     }

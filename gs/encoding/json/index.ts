@@ -885,10 +885,7 @@ function marshalValue(v: unknown): unknown {
   // the runtime as { __goType, __goValue, ... } so it can carry methods)
   // before serializing; otherwise the wrapper object itself leaks into the
   // output instead of the underlying primitive/map/slice it holds.
-  if (
-    $.isNamedValueBox(v) &&
-    !isStructValue(v)
-  ) {
+  if ($.isNamedValueBox(v) && !isStructValue(v)) {
     return marshalValue((v as { __goValue: unknown }).__goValue)
   }
   if (v === null || v === undefined) {
@@ -922,18 +919,18 @@ function marshalValue(v: unknown): unknown {
 
   const out: Record<string, unknown> = {}
   for (const field of structFields(v)) {
-    const ref = v._fields[field.key]
-    if (ref === undefined) {
+    const value = v._fields[field.key]
+    if (value === undefined) {
       continue
     }
     const jsonName = jsonFieldName(field.name, field.tag)
     if (jsonName === '') {
       continue
     }
-    if (jsonOmitEmpty(field.tag) && isEmptyValue(ref.value, field.type)) {
+    if (jsonOmitEmpty(field.tag) && isEmptyValue(value, field.type)) {
       continue
     }
-    out[jsonName] = marshalFieldValue(ref.value, field.type)
+    out[jsonName] = marshalFieldValue(value, field.type)
   }
   return out
 }
@@ -1144,7 +1141,7 @@ function assignDecodedValue(
 }
 
 function assignStructFields(
-  target: { _fields: Record<string, $.VarRef<unknown>> },
+  target: { _fields: Record<string, unknown> },
   decoded: Record<string, unknown>,
   opts: decodeOptions,
 ): void {
@@ -1164,8 +1161,7 @@ function assignStructFields(
     }
   }
   for (const field of fields) {
-    const ref = target._fields[field.key]
-    if (ref === undefined) {
+    if (!(field.key in target._fields)) {
       continue
     }
     const jsonName = jsonFieldName(field.name, field.tag)
@@ -1173,7 +1169,12 @@ function assignStructFields(
       jsonName !== '' &&
       Object.prototype.hasOwnProperty.call(decoded, jsonName)
     ) {
-      assignDecodedFieldValue(ref, decoded[jsonName], opts, field.type)
+      assignDecodedFieldValue(
+        $.fieldRef(target._fields, field.key),
+        decoded[jsonName],
+        opts,
+        field.type,
+      )
     }
   }
 }
@@ -1672,7 +1673,7 @@ function matchingBracketIndex(s: string, open: number): number {
 
 function isStructValue(
   value: unknown,
-): value is { _fields: Record<string, $.VarRef<unknown>> } {
+): value is { _fields: Record<string, unknown> } {
   if (value === null || typeof value !== 'object') {
     return false
   }
@@ -1696,7 +1697,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 }
 
 function structFields(value: {
-  _fields: Record<string, $.VarRef<unknown>>
+  _fields: Record<string, unknown>
 }): fieldMetadata[] {
   const fields = structFieldMetadata(value)
   if (fields.length !== 0) {

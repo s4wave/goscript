@@ -7,12 +7,12 @@ export class MyStruct {
 	public declare MyInt: number
 
 	public _fields: {
-		MyInt: $.VarRef<number>
+		MyInt: number
 	}
 
 	constructor(init?: Partial<{MyInt?: number}>) {
 		this._fields = {
-			MyInt: $.varRef(init?.MyInt ?? (0 as number))
+			MyInt: init?.MyInt ?? (0 as number)
 		}
 	}
 

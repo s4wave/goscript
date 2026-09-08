@@ -26,9 +26,9 @@ export type VarRef<T> = {
 
 const pointerAddressStride = 0x100000000
 const pointerAddresses = new WeakMap<object, number>()
-const fieldPointerAddresses = new WeakMap<
+const fieldReferences = new WeakMap<
   object,
-  globalThis.Map<PropertyKey, number>
+  globalThis.Map<PropertyKey, VarRef<unknown>>
 >()
 let nextPointerAddress = 1
 
@@ -38,21 +38,6 @@ function pointerAddress(value: object): number {
     address = nextPointerAddress * pointerAddressStride
     nextPointerAddress++
     pointerAddresses.set(value, address)
-  }
-  return address
-}
-
-function fieldPointerAddress(target: object, key: PropertyKey): number {
-  let addresses = fieldPointerAddresses.get(target)
-  if (addresses === undefined) {
-    addresses = new globalThis.Map<PropertyKey, number>()
-    fieldPointerAddresses.set(target, addresses)
-  }
-  let address = addresses.get(key)
-  if (address === undefined) {
-    address = nextPointerAddress * pointerAddressStride
-    nextPointerAddress++
-    addresses.set(key, address)
   }
   return address
 }
@@ -89,30 +74,37 @@ export function varRef<T>(v: T): VarRef<T> {
   return new VariableRef(v)
 }
 
-/** Install struct properties over their existing mutable field cells. */
+/** bindStructFields installs properties over a struct's mutable field record. */
 export function bindStructFields(
   prototype: object,
   names: readonly string[],
 ): void {
   for (const name of names) {
     Object.defineProperty(prototype, name, {
-      get(this: { _fields: Record<string, VarRef<unknown>> }) {
-        return this._fields[name].value
+      get(this: { _fields: Record<string, unknown> }) {
+        return this._fields[name]
       },
-      set(this: { _fields: Record<string, VarRef<unknown>> }, value: unknown) {
-        this._fields[name].value = value
+      set(this: { _fields: Record<string, unknown> }, value: unknown) {
+        this._fields[name] = value
       },
       configurable: true,
     })
   }
 }
 
-/** fieldRef Create a variable reference to an object field. */
+/** fieldRef returns the stable reference to a mutable object field. */
 export function fieldRef<T extends object, K extends keyof T>(
   target: T,
   key: K,
 ): VarRef<T[K]> {
-  const address = () => fieldPointerAddress(target, key)
+  let references = fieldReferences.get(target)
+  if (references === undefined) {
+    references = new globalThis.Map<PropertyKey, VarRef<unknown>>()
+    fieldReferences.set(target, references)
+  }
+  const existing = references.get(key)
+  if (existing !== undefined) return existing as VarRef<T[K]>
+  const address = () => pointerAddress(ref)
   const ref: VarRef<T[K]> = {
     get value(): T[K] {
       return target[key]
@@ -124,6 +116,7 @@ export function fieldRef<T extends object, K extends keyof T>(
     __goAddress: address,
   }
   ref.__goPointer = refPointer(ref, address)
+  references.set(key, ref)
   return ref
 }
 

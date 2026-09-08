@@ -9962,7 +9962,7 @@ func (o *LoweringOwner) lowerFieldSelectionExpr(
 		if structType == nil || fieldIndex < 0 || fieldIndex >= structType.NumFields() {
 			fieldName := tsStructFieldName(expr.Sel.Name, 0)
 			if address {
-				return receiver + "._fields." + fieldName, diagnostics
+				return o.runtimeOwner.QualifiedHelper(RuntimeHelperFieldRef) + "(" + receiver + "._fields, " + strconv.Quote(fieldName) + ")", diagnostics
 			}
 			return receiver + "." + fieldName, diagnostics
 		}
@@ -9992,7 +9992,7 @@ func (o *LoweringOwner) lowerFieldSelectionExpr(
 
 func (o *LoweringOwner) lowerFieldAddressExpr(ctx lowerFileContext, receiver string, typ types.Type, fieldName string) string {
 	if namedStructType(derefPointerType(typ)) != nil {
-		return receiver + "._fields." + fieldName
+		receiver += "._fields"
 	}
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperFieldRef) + "(" + receiver + ", " + strconv.Quote(fieldName) + ")"
 }
@@ -10353,7 +10353,7 @@ func (o *LoweringOwner) lowerAddressExpr(ctx lowerFileContext, expr ast.Expr) (s
 			return o.lowerFieldSelectionExpr(ctx, typed, selection, true)
 		}
 		receiver, diagnostics := o.lowerFieldReceiverExpr(ctx, typed.X)
-		return receiver + "._fields." + typed.Sel.Name, diagnostics
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperFieldRef) + "(" + receiver + "._fields, " + strconv.Quote(typed.Sel.Name) + ")", diagnostics
 	case *ast.IndexExpr:
 		return o.lowerIndexAddressExpr(ctx, typed)
 	case *ast.StarExpr:

@@ -101,11 +101,7 @@ export function assignStruct<T>(target: T, source: T): void {
     return
   }
   for (const key of Object.keys(sourceFields)) {
-    const sourceField = sourceFields[key]
-    const targetField = targetFields[key]
-    if (sourceField && targetField && sourceField.value !== undefined) {
-      targetField.value = sourceField.value
-    }
+    targetFields[key] = sourceFields[key]
   }
 }
 
@@ -287,23 +283,18 @@ function hasGoMethodSurface(value: unknown): boolean {
 }
 
 function isStructValue(value: unknown): value is {
-  _fields: Record<string, VarRef<unknown>>
+  _fields: Record<string, unknown>
 } {
   const fields =
     typeof value === 'object' && value !== null ?
       (value as { _fields?: unknown })._fields
     : undefined
-  return (
-    typeof fields === 'object' &&
-    fields !== null &&
-    !Array.isArray(fields) &&
-    Object.values(fields).every(isVarRef)
-  )
+  return typeof fields === 'object' && fields !== null && !Array.isArray(fields)
 }
 
 function fieldsEqual(
-  a: Record<string, VarRef<unknown>>,
-  b: Record<string, VarRef<unknown>>,
+  a: Record<string, unknown>,
+  b: Record<string, unknown>,
 ): boolean {
   const aKeys = Object.keys(a)
   const bKeys = Object.keys(b)
@@ -311,7 +302,7 @@ function fieldsEqual(
     return false
   }
   for (const key of aKeys) {
-    if (!(key in b) || !comparableEqual(a[key].value, b[key].value)) {
+    if (!(key in b) || !comparableEqual(a[key], b[key])) {
       return false
     }
   }

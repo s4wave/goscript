@@ -14,48 +14,48 @@ let smallBufferSize: number = 64
 export class Buffer {
 	// contents are the bytes buf[off : len(buf)]
 	public get buf(): $.Bytes {
-		return this._fields.buf.value
+		return this._fields.buf
 	}
 	public set buf(value: $.Bytes) {
-		this._fields.buf.value = value
+		this._fields.buf = value
 	}
 
 	// read at &buf[off], write at &buf[len(buf)]
 	public get off(): number {
-		return this._fields.off.value
+		return this._fields.off
 	}
 	public set off(value: number) {
-		this._fields.off.value = value
+		this._fields.off = value
 	}
 
 	// last read operation, so that Unread* can work correctly.
 	public get lastRead(): readOp {
-		return this._fields.lastRead.value
+		return this._fields.lastRead
 	}
 	public set lastRead(value: readOp) {
-		this._fields.lastRead.value = value
+		this._fields.lastRead = value
 	}
 
 	public _fields: {
-		buf: $.VarRef<$.Bytes>;
-		off: $.VarRef<number>;
-		lastRead: $.VarRef<readOp>;
+		buf: $.Bytes;
+		off: number;
+		lastRead: readOp;
 	}
 
 	constructor(init?: Partial<{buf?: $.Bytes, lastRead?: readOp, off?: number}>) {
 		this._fields = {
-			buf: $.varRef(init?.buf ?? null),
-			off: $.varRef(init?.off ?? 0),
-			lastRead: $.varRef(init?.lastRead ?? 0)
+			buf: init?.buf ?? null,
+			off: init?.off ?? 0,
+			lastRead: init?.lastRead ?? 0
 		}
 	}
 
 	public clone(): Buffer {
 		const cloned = new Buffer()
 		cloned._fields = {
-			buf: $.varRef(this._fields.buf.value),
-			off: $.varRef(this._fields.off.value),
-			lastRead: $.varRef(this._fields.lastRead.value)
+			buf: this._fields.buf,
+			off: this._fields.off,
+			lastRead: this._fields.lastRead
 		}
 		return cloned
 	}
