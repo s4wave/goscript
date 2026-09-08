@@ -137,4 +137,38 @@ func main() {
 	case <-empty:
 	}
 	println("TEST10: Empty cases completed:", value, len(empty))
+
+	// Each blocked select consumes exactly one of two concurrent sends.
+	for range 16 {
+		first, second := make(chan int, 1), make(chan int, 1)
+		sent := make(chan struct{}, 2)
+		go func() {
+			first <- 7
+			sent <- struct{}{}
+		}()
+		go func() {
+			second <- 9
+			sent <- struct{}{}
+		}()
+		total := 0
+		select {
+		case total = <-first:
+		case total = <-second:
+		}
+		<-sent
+		<-sent
+		if len(first)+len(second) != 1 {
+			panic("select consumed an unselected value")
+		}
+		select {
+		case remaining := <-first:
+			total += remaining
+		case remaining := <-second:
+			total += remaining
+		}
+		if total != 16 {
+			panic("select lost a value")
+		}
+	}
+	println("TEST11: Concurrent select values preserved")
 }
