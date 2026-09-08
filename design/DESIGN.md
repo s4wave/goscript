@@ -184,7 +184,7 @@ Generated clone methods pass the source instance to the declaring constructor, w
 
 Generated classes declare their field types and install non-enumerable prototype accessors with `$.bindStructFields`. These accessors read and write values stored directly in `_fields`. Taking a field address uses `$.fieldRef` on that record and key. The runtime retains one stable reference per addressed field; ordinary construction allocates no field-reference cells. Struct assignment updates the existing target record, preserving held field pointers, and unsafe pointer views share the same record. Runtime overrides, reflection, codecs, equality, and printing use this representation together. The compiler semantic version invalidates previously generated output; no mixed representation is supported.
 
-Standalone variable references retain distinct mutable cells. Pointer handles and their address/ref closures are allocated on the first pointer access and retained on that cell; ordinary field reads and writes do not allocate pointer machinery.
+Standalone variable references retain distinct mutable cells. Variable and field references share their accessors through class prototypes. Pointer handles and their address/ref closures are allocated on the first pointer access and retained on that reference; ordinary field reads and writes do not allocate pointer machinery.
 
 Generated protobuf adapters declare their Go method types and install binary, JSON, clone, equality, and reset forwarding methods through the shared protobuf bridge. Installation occurs in the class static block, captures the declaring constructor for nil receiver calls, and preserves non-enumerable prototype methods. Handwritten methods and native proto-text bodies remain on their declaring classes.
 
