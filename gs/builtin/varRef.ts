@@ -68,15 +68,25 @@ function refPointer<T>(
   }
 }
 
-/** varRef Wrap a non-null T in a variable reference. */
+/** VariableRef allocates pointer machinery only when its address is requested. */
+class VariableRef<T> implements VarRef<T> {
+  readonly __isVarRef = true
+  private pointer?: OwnedPointerHandle<T>
+
+  constructor(public value: T) {}
+
+  get __goPointer(): OwnedPointerHandle<T> {
+    return (this.pointer ??= refPointer(this, () => pointerAddress(this)))
+  }
+
+  get __goAddress(): () => number {
+    return this.__goPointer.__goAddress
+  }
+}
+
+/** varRef wraps a variable with distinct pointer identity. */
 export function varRef<T>(v: T): VarRef<T> {
-  // We create a new object wrapper for every varRef call to ensure
-  // distinct pointer identity, crucial for pointer comparisons (p1 == p2).
-  // The __isVarRef marker allows the reflect system to identify this as a pointer type.
-  const ref: VarRef<T> = { value: v, __isVarRef: true }
-  ref.__goAddress = () => pointerAddress(ref)
-  ref.__goPointer = refPointer(ref, ref.__goAddress)
-  return ref
+  return new VariableRef(v)
 }
 
 /** fieldRef Create a variable reference to an object field. */
