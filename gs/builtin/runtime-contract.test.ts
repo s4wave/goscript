@@ -361,6 +361,10 @@ describe('builtin runtime contract helpers', () => {
     const localPointer = ownedPointerFromRef(local)
     expect(localPointer).toBeDefined()
     expect(ownedPointerRef(localPointer!)).toBe(local)
+    expect(ownedPointerFromRef(local)).toBe(localPointer)
+    expect(ownedPointerAddress(ownedPointerFromRef(varRef(1))!)).not.toBe(
+      ownedPointerAddress(localPointer!),
+    )
     expect(ownedPointerAddress(localPointer!)).toBe(local.__goAddress!())
     ownedPointerRef(localPointer!).value = 3
     expect(local.value).toBe(3)
