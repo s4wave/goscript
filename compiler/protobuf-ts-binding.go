@@ -2,6 +2,7 @@ package compiler
 
 import (
 	"go/ast"
+	"go/types"
 	"os"
 	"path/filepath"
 	"slices"
@@ -799,29 +800,29 @@ func protobufTypeScriptBindingProtoCamel(name string) string {
 	return out.String()
 }
 
-// protobufTypeScriptBindingFieldMessageRef extracts the referenced named
-// struct type from a lowered runtime type expression. Message-kind fields
-// appear either as a bare quoted canonical name for value structs
-// (`"pkg.Name"`) or as the innermost `elemType: "pkg.Name"` of a pointer,
-// slice-of-pointer, or similar wrapper. Non-message fields (basic kinds,
-// interfaces, maps of scalars) carry no quoted dotted name and return false.
-func protobufTypeScriptBindingFieldMessageRef(runtimeType string) (pkgName, typeName string, ok bool) {
-	trimmed := strings.TrimSpace(runtimeType)
-	if strings.HasPrefix(trimmed, "\"") && strings.HasSuffix(trimmed, "\"") && strings.Count(trimmed, "\"") == 2 {
-		pkgName, typeName, ok = protobufTypeScriptBindingSplitDotted(trimmed[1 : len(trimmed)-1])
-		return pkgName, typeName, ok
+// protobufTypeScriptBindingMessageType resolves message identity from Go types,
+// independently of the emitted reflection descriptor representation.
+func protobufTypeScriptBindingMessageType(typ types.Type) string {
+	seen := make(map[types.Type]bool)
+	for typ != nil && !seen[typ] {
+		seen[typ] = true
+		if named := namedStructType(typ); named != nil {
+			return runtimeNamedTypeName(named)
+		}
+		switch typed := types.Unalias(typ).Underlying().(type) {
+		case *types.Pointer:
+			typ = typed.Elem()
+		case *types.Slice:
+			typ = typed.Elem()
+		case *types.Array:
+			typ = typed.Elem()
+		case *types.Map:
+			typ = typed.Elem()
+		default:
+			return ""
+		}
 	}
-	const marker = "elemType: \""
-	idx := strings.LastIndex(runtimeType, marker)
-	if idx < 0 {
-		return "", "", false
-	}
-	rest := runtimeType[idx+len(marker):]
-	before, _, found := strings.Cut(rest, "\"")
-	if !found {
-		return "", "", false
-	}
-	return protobufTypeScriptBindingSplitDotted(before)
+	return ""
 }
 
 func protobufTypeScriptBindingSplitDotted(ref string) (pkgName, typeName string, ok bool) {
@@ -833,8 +834,8 @@ func protobufTypeScriptBindingSplitDotted(ref string) (pkgName, typeName string,
 }
 
 // protobufTypeScriptBindingFieldCtor resolves the TypeScript class identifier
-// for a message-kind struct field. The lowered runtime type expression remains
-// the authority for message kind and the referenced type name; the emitted
+// for a message-kind struct field. The canonical Go message type identifies
+// the referenced class independently of emitted reflection metadata. The emitted
 // constructor comes from the declared field type so the qualifier is the
 // actual lowered import alias, which may differ from the dependency directory
 // basename and Go package clause. Same-package references resolve through the
@@ -846,7 +847,7 @@ func protobufTypeScriptBindingSplitDotted(ref string) (pkgName, typeName string,
 // can report a compile-time diagnostic rather than silently omitting binding
 // metadata.
 func protobufTypeScriptBindingFieldCtor(field loweredStructField, pkgName string, file *loweredFile, binding protobufTypeScriptBinding, siblings *protobufTypeScriptBindingSiblingImports) (ctor string, isMessage bool) {
-	refPkg, refType, ok := protobufTypeScriptBindingFieldMessageRef(field.runtimeType)
+	refPkg, refType, ok := protobufTypeScriptBindingSplitDotted(field.messageType)
 	if !ok {
 		return "", false
 	}

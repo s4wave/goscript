@@ -78,6 +78,7 @@ type loweredStructField struct {
 	typ         string
 	zero        string
 	runtimeType string
+	messageType string // Canonical named message reached through field containers.
 	doc         string
 	tag         string
 	pkgPath     string

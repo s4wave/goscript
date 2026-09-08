@@ -135,6 +135,11 @@ const (
 	RuntimeHelperToGoError RuntimeHelper = "error.toGoError"
 
 	RuntimeHelperBasicType                RuntimeHelper = "type.basicType"
+	RuntimeHelperChannelType              RuntimeHelper = "type.channelType"
+	RuntimeHelperMapType                  RuntimeHelper = "type.mapType"
+	RuntimeHelperArrayType                RuntimeHelper = "type.arrayType"
+	RuntimeHelperSliceType                RuntimeHelper = "type.sliceType"
+	RuntimeHelperPointerType              RuntimeHelper = "type.pointerType"
 	RuntimeHelperMethodSignature          RuntimeHelper = "type.methodSignature"
 	RuntimeHelperTypeKind                 RuntimeHelper = "type.TypeKind"
 	RuntimeHelperRegisterStructType       RuntimeHelper = "type.registerStructType"
@@ -385,6 +390,11 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperNewError, "newError", RuntimeHelperCategoryError),
 		runtimeHelper(RuntimeHelperToGoError, "toGoError", RuntimeHelperCategoryError),
 		runtimeHelper(RuntimeHelperBasicType, "basicType", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperChannelType, "channelType", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperMapType, "mapType", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperArrayType, "arrayType", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperSliceType, "sliceType", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperPointerType, "pointerType", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperMethodSignature, "methodSignature", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperTypeKind, "TypeKind", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperRegisterStructType, "registerStructType", RuntimeHelperCategoryType),
