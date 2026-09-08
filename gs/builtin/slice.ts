@@ -60,12 +60,12 @@ function goStringBytes(str: GoStringValue): Uint8Array {
 }
 
 // stringMapKey gives every Go string representation the same native Map key.
-// Ordinary JavaScript strings are already canonical and need no byte conversion.
+// Primitive strings, including tagged binary strings, are already canonical.
 export function stringMapKey(value: string | GoBinaryString): string {
-  if (typeof value === 'string' && !value.startsWith(goBinaryStringPrefix)) {
+  if (typeof value === 'string') {
     return value
   }
-  return goStringFromBytes(goStringBytes(value))
+  return goStringFromBytes(value.bytes)
 }
 
 function goStringComparableBytes(value: GoStringBytes): Uint8Array {
