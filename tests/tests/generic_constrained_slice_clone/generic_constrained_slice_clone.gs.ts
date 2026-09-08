@@ -14,12 +14,7 @@ $.registerInterfaceType(
 );
 
 export class item {
-	public get value(): string {
-		return this._fields.value.value
-	}
-	public set value(value: string) {
-		this._fields.value.value = value
-	}
+	public declare value: string
 
 	public _fields: {
 		value: $.VarRef<string>
@@ -32,11 +27,7 @@ export class item {
 	}
 
 	public clone(): item {
-		const cloned = new item()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new item(this))
 	}
 
 	public CloneVT(): item | $.VarRef<item> | null {
@@ -47,10 +38,14 @@ export class item {
 		return new item({value: $.pointerValue<item>(i).value})
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["value"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.item",
 		() => new item(),
-		() => [{ name: "CloneVT", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.item" } }] }],
+		() => [{ name: "CloneVT", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.item") }] }],
 		item,
 		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("string") }]
 	)
@@ -67,7 +62,7 @@ export async function cloneSlice<T>(__typeArgs: $.GenericTypeArgs | undefined, i
 
 export async function main(): globalThis.Promise<void> {
 	let items: $.Slice<item | $.VarRef<item> | null> = $.arrayToSlice<item | $.VarRef<item> | null>([new item({value: "first"}), new item({value: "second"})])
-	let cloned: $.Slice<item | $.VarRef<item> | null> = (await cloneSlice({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Pointer, elemType: "main.item" }, zero: () => null, methods: {CloneVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloneVT(...$.stripGenericTypeArgs(args))} }}, items) as $.Slice<item | $.VarRef<item> | null>)
+	let cloned: $.Slice<item | $.VarRef<item> | null> = (await cloneSlice({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.item"), zero: () => null, methods: {CloneVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloneVT(...$.stripGenericTypeArgs(args))} }}, items) as $.Slice<item | $.VarRef<item> | null>)
 	await $.println($.len(cloned), $.pointerValue<item>($.arrayIndex(cloned!, 0)).value, $.pointerValue<item>($.arrayIndex(cloned!, 1)).value, $.pointerEqual($.arrayIndex(cloned!, 0), $.arrayIndex(items!, 0)))
 }
 

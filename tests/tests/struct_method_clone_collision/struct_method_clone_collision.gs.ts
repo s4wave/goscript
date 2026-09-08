@@ -4,12 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Box {
-	public get Value(): number {
-		return this._fields.Value.value
-	}
-	public set Value(value: number) {
-		this._fields.Value.value = value
-	}
+	public declare Value: number
 
 	public _fields: {
 		Value: $.VarRef<number>
@@ -22,11 +17,7 @@ export class Box {
 	}
 
 	public __goscriptClone(): Box {
-		const cloned = new Box()
-		cloned._fields = {
-			Value: $.varRef(this._fields.Value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Box(this))
 	}
 
 	public clone(): Box | $.VarRef<Box> | null {
@@ -34,10 +25,14 @@ export class Box {
 		return new Box({Value: $.pointerValue<Box>(b).Value + 1})
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["Value"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Box",
 		() => new Box(),
-		() => [{ name: "clone", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.Box" } }] }],
+		() => [{ name: "clone", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.Box") }] }],
 		Box,
 		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("int") }]
 	)

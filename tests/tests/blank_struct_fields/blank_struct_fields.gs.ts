@@ -25,13 +25,7 @@ export class padded {
 	}
 
 	public clone(): padded {
-		const cloned = new padded()
-		cloned._fields = {
-			_blank0: $.varRef($.cloneArrayValue(this._fields._blank0.value, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2))),
-			Value: $.varRef(this._fields.Value.value),
-			_blank2: $.varRef($.cloneArrayValue(this._fields._blank2.value, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 3)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new padded(this))
 	}
 
 	static {

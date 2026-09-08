@@ -180,6 +180,8 @@ The runtime provides:
     *   Math: `$.int`, `$.byte`
 *   Runtime type information utilities (`$.registerStructType`, `$.registerInterfaceType`, `$.getTypeByName`, `$.TypeKind`). Basic descriptors use `$.basicType(name, typeName?)`; pointer, slice, array, map, and channel descriptors use corresponding runtime constructors. Each call returns a fresh descriptor; named identity and reflection contents remain unchanged. Method signatures use `$.methodSignature(name, args?, returns?)`, with each parameter encoded as a type or a `[name, type]` pair. Full field descriptors use `$.structField(name, type, index, offset, exported, options?)`, preserving storage keys, tags, visibility, and embedding metadata. Struct registration accepts field and method factories, evaluated independently on the first synchronous read and then retained. Registration still publishes the constructor and type name immediately; reflection observes the complete mutable arrays.
 
+Generated clone methods pass the source instance to the declaring constructor, which owns field-copy rules. Cloning creates fresh field cells without a discarded zero-initialization pass or a duplicate field-copy loop.
+
 Generated classes declare their field types and install non-enumerable prototype accessors with `$.bindStructFields`. These accessors read and write the existing `_fields` cells; taking a field address and assigning through that address use the same cell.
 
 Variable references retain distinct mutable cells. Pointer handles and their address/ref closures are allocated on the first pointer access and retained on that cell; ordinary field reads and writes do not allocate pointer machinery.

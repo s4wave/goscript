@@ -514,43 +514,11 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	b.WriteString(structType.cloneMethod)
 	b.WriteString("(): ")
 	b.WriteString(structType.name)
-	b.WriteString(" {\n\t\tconst cloned = new ")
-	b.WriteString(structType.name)
-	b.WriteString("()\n\t\tcloned._fields = {\n")
-	for idx, field := range structType.fields {
-		b.WriteString("\t\t\t")
-		b.WriteString(field.name)
-		b.WriteString(": ")
-		b.WriteString(varRef)
-		b.WriteString("(")
-		if field.structValue {
-			b.WriteString(markStructValue)
-			b.WriteString("(")
-			b.WriteString(cloneStructValue)
-			b.WriteString("(this._fields.")
-			b.WriteString(field.name)
-			b.WriteString(".value))")
-		} else if field.arrayValue {
-			b.WriteString(cloneArrayValue)
-			b.WriteString("(this._fields.")
-			b.WriteString(field.name)
-			b.WriteString(".value, ")
-			b.WriteString(field.runtimeType)
-			b.WriteString(")")
-		} else {
-			b.WriteString("this._fields.")
-			b.WriteString(field.name)
-			b.WriteString(".value")
-		}
-		b.WriteString(")")
-		if idx != len(structType.fields)-1 {
-			b.WriteString(",")
-		}
-		b.WriteString("\n")
-	}
-	b.WriteString("\t\t}\n\t\treturn ")
+	b.WriteString(" {\n\t\treturn ")
 	b.WriteString(markStructValue)
-	b.WriteString("(cloned)\n\t}\n")
+	b.WriteString("(new ")
+	b.WriteString(structType.name)
+	b.WriteString("(this))\n\t}\n")
 	for _, method := range structType.methods {
 		b.WriteString("\n")
 		renderMethod(b, &method)
