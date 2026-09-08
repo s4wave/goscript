@@ -19,7 +19,7 @@ export type MyInterface = {
 $.registerInterfaceType(
 	"main.MyInterface",
 	null,
-	[{ name: "SomeMethod", args: [], returns: [] }]
+	[$.methodSignature("SomeMethod")]
 );
 
 export class MyStruct {

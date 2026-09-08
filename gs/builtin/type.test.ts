@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   basicType,
+  methodSignature,
   registerStructType,
   type MethodSignature,
   type StructFieldInfo,
@@ -100,7 +101,14 @@ describe('deferred struct metadata', () => {
     let methodReads = 0
     let fieldReads = 0
     class Sample {}
-    const methods: MethodSignature[] = [{ name: 'Read', args: [], returns: [] }]
+    const methods: MethodSignature[] = [
+      methodSignature(
+        'Read',
+        [basicType('int'), ['offset', 'main.Offset']],
+        ['error', ['n', basicType('int')]],
+      ),
+      methodSignature('Close'),
+    ]
     const fields: StructFieldInfo[] = [
       { name: 'Value', type: basicType('int') },
     ]
@@ -120,6 +128,20 @@ describe('deferred struct metadata', () => {
     expect([methodReads, fieldReads]).toEqual([0, 0])
     expect(info.methods).toBe(methods)
     expect(info.methods).toBe(methods)
+    expect(info.methods).toEqual([
+      {
+        name: 'Read',
+        args: [
+          { name: '_p0', type: basicType('int') },
+          { name: 'offset', type: 'main.Offset' },
+        ],
+        returns: [
+          { name: '_r0', type: 'error' },
+          { name: 'n', type: basicType('int') },
+        ],
+      },
+      { name: 'Close', args: [], returns: [] },
+    ])
     expect([methodReads, fieldReads]).toEqual([1, 0])
     expect(info.fields).toBe(fields)
     expect(info.fields).toBe(fields)
