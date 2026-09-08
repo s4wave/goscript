@@ -69,6 +69,35 @@ class VariableRef<T> implements VarRef<T> {
   }
 }
 
+/** FieldReference keeps field access separate from lazily requested pointers. */
+class FieldReference<T extends object, K extends keyof T> implements VarRef<
+  T[K]
+> {
+  readonly __isVarRef = true
+  private pointer?: OwnedPointerHandle<T[K]>
+
+  constructor(
+    private readonly target: T,
+    private readonly key: K,
+  ) {}
+
+  get value(): T[K] {
+    return this.target[this.key]
+  }
+
+  set value(value: T[K]) {
+    this.target[this.key] = value
+  }
+
+  get __goPointer(): OwnedPointerHandle<T[K]> {
+    return (this.pointer ??= refPointer(this, () => pointerAddress(this)))
+  }
+
+  get __goAddress(): () => number {
+    return this.__goPointer.__goAddress
+  }
+}
+
 /** varRef wraps a variable with distinct pointer identity. */
 export function varRef<T>(v: T): VarRef<T> {
   return new VariableRef(v)
@@ -104,18 +133,7 @@ export function fieldRef<T extends object, K extends keyof T>(
   }
   const existing = references.get(key)
   if (existing !== undefined) return existing as VarRef<T[K]>
-  const address = () => pointerAddress(ref)
-  const ref: VarRef<T[K]> = {
-    get value(): T[K] {
-      return target[key]
-    },
-    set value(value: T[K]) {
-      target[key] = value
-    },
-    __isVarRef: true,
-    __goAddress: address,
-  }
-  ref.__goPointer = refPointer(ref, address)
+  const ref = new FieldReference(target, key)
   references.set(key, ref)
   return ref
 }
