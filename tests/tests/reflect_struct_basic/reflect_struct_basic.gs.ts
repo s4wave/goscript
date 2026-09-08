@@ -50,7 +50,7 @@ export class Person {
 		() => new Person(),
 		() => [],
 		Person,
-		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string"), index: [0], offset: 0, exported: true }, { name: "Age", key: "Age", type: /* @__PURE__ */ $.basicType("int"), index: [1], offset: 16, exported: true }]
+		() => [/* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [0], 0, true), /* @__PURE__ */ $.structField("Age", /* @__PURE__ */ $.basicType("int"), [1], 16, true)]
 	)
 }
 

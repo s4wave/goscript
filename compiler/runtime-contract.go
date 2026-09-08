@@ -141,6 +141,7 @@ const (
 	RuntimeHelperSliceType                RuntimeHelper = "type.sliceType"
 	RuntimeHelperPointerType              RuntimeHelper = "type.pointerType"
 	RuntimeHelperMethodSignature          RuntimeHelper = "type.methodSignature"
+	RuntimeHelperStructField              RuntimeHelper = "type.structField"
 	RuntimeHelperTypeKind                 RuntimeHelper = "type.TypeKind"
 	RuntimeHelperRegisterStructType       RuntimeHelper = "type.registerStructType"
 	RuntimeHelperRegisterInterfaceType    RuntimeHelper = "type.registerInterfaceType"
@@ -396,6 +397,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperSliceType, "sliceType", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperPointerType, "pointerType", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperMethodSignature, "methodSignature", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperStructField, "structField", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperTypeKind, "TypeKind", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperRegisterStructType, "registerStructType", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperRegisterInterfaceType, "registerInterfaceType", RuntimeHelperCategoryType),

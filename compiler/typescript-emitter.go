@@ -594,6 +594,7 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 			b.WriteString(trimmedRuntimeStructFieldInfoExpr(field.runtimeType, field.name, field.runtimeName, field.tag, field.anonymous))
 		} else {
 			b.WriteString(runtimeStructFieldInfoExpr(
+				runtimeOwner.QualifiedHelper(RuntimeHelperStructField),
 				field.runtimeType,
 				field.name,
 				field.runtimeName,
