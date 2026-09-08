@@ -3321,6 +3321,7 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 			typ:         o.tsStructFieldTypeFor(ctx, field.typ),
 			zero:        o.lowerZeroValueExprFor(ctx, field.typ),
 			runtimeType: o.runtimeTypeInfoExpr(field.typ),
+			messageType: protobufTypeScriptBindingMessageType(field.typ),
 			doc:         field.doc,
 			tag:         field.tag,
 			pkgPath:     field.pkgPath,
@@ -12065,9 +12066,7 @@ func (o *LoweringOwner) runtimeTypeAssertInfoExprWithSeen(ctx lowerFileContext, 
 			return runtimeBasicTypeInfoExpr(o.runtimeOwner.QualifiedHelper(RuntimeHelperBasicType), basic, runtimeNamedTypeName(named))
 		}
 		if slice, ok := types.Unalias(named.Underlying()).(*types.Slice); ok {
-			return "{ kind: " + typeKind + ".Slice, typeName: " +
-				strconv.Quote(runtimeNamedTypeName(named)) + ", elemType: " +
-				o.runtimeTypeAssertInfoExprWithSeen(ctx, slice.Elem(), seen) + " }"
+			return o.runtimeDescriptorExpr(RuntimeHelperSliceType, o.runtimeTypeAssertInfoExprWithSeen(ctx, slice.Elem(), seen), strconv.Quote(runtimeNamedTypeName(named)))
 		}
 		return strconv.Quote(runtimeNamedTypeName(named))
 	}
@@ -12075,17 +12074,17 @@ func (o *LoweringOwner) runtimeTypeAssertInfoExprWithSeen(ctx lowerFileContext, 
 	case *types.Basic:
 		return runtimeBasicTypeInfoExpr(o.runtimeOwner.QualifiedHelper(RuntimeHelperBasicType), typed, "")
 	case *types.Pointer:
-		return "{ kind: " + typeKind + ".Pointer, elemType: " + o.runtimeTypeAssertInfoExprWithSeen(ctx, typed.Elem(), seen) + " }"
+		return o.runtimeDescriptorExpr(RuntimeHelperPointerType, o.runtimeTypeAssertInfoExprWithSeen(ctx, typed.Elem(), seen))
 	case *types.Struct:
 		return "{ kind: " + typeKind + ".Struct, methods: [], fields: " + o.runtimeStructAssertFieldsExpr(ctx, typed, seen) + " }"
 	case *types.Slice:
-		return "{ kind: " + typeKind + ".Slice, elemType: " + o.runtimeTypeAssertInfoExprWithSeen(ctx, typed.Elem(), seen) + " }"
+		return o.runtimeDescriptorExpr(RuntimeHelperSliceType, o.runtimeTypeAssertInfoExprWithSeen(ctx, typed.Elem(), seen))
 	case *types.Array:
-		return "{ kind: " + typeKind + ".Array, elemType: " + o.runtimeTypeAssertInfoExprWithSeen(ctx, typed.Elem(), seen) + ", length: " + strconv.FormatInt(typed.Len(), 10) + " }"
+		return o.runtimeDescriptorExpr(RuntimeHelperArrayType, o.runtimeTypeAssertInfoExprWithSeen(ctx, typed.Elem(), seen), strconv.FormatInt(typed.Len(), 10))
 	case *types.Map:
-		return "{ kind: " + typeKind + ".Map, keyType: " + o.runtimeTypeAssertInfoExprWithSeen(ctx, typed.Key(), seen) + ", elemType: " + o.runtimeTypeAssertInfoExprWithSeen(ctx, typed.Elem(), seen) + " }"
+		return o.runtimeDescriptorExpr(RuntimeHelperMapType, o.runtimeTypeAssertInfoExprWithSeen(ctx, typed.Key(), seen), o.runtimeTypeAssertInfoExprWithSeen(ctx, typed.Elem(), seen))
 	case *types.Chan:
-		return "{ kind: " + typeKind + ".Channel, direction: " + strconv.Quote(channelDirectionString(typed.Dir())) + ", elemType: " + o.runtimeTypeAssertInfoExprWithSeen(ctx, typed.Elem(), seen) + " }"
+		return o.runtimeDescriptorExpr(RuntimeHelperChannelType, o.runtimeTypeAssertInfoExprWithSeen(ctx, typed.Elem(), seen), strconv.Quote(channelDirectionString(typed.Dir())))
 	case *types.Interface:
 		typed.Complete()
 		return "{ kind: " + typeKind + ".Interface, methods: " + o.runtimeMethodAssertSignaturesWithSeen(ctx, typed, seen) + " }"
@@ -12122,9 +12121,7 @@ func (o *LoweringOwner) runtimeTypeInfoExprWithSeen(typ types.Type, seen map[typ
 			return runtimeBasicTypeInfoExpr(o.runtimeOwner.QualifiedHelper(RuntimeHelperBasicType), basic, runtimeNamedTypeName(named))
 		}
 		if slice, ok := types.Unalias(named.Underlying()).(*types.Slice); ok {
-			return "{ kind: " + typeKind + ".Slice, typeName: " +
-				strconv.Quote(runtimeNamedTypeName(named)) + ", elemType: " +
-				o.runtimeTypeInfoExprWithSeen(slice.Elem(), seen) + " }"
+			return o.runtimeDescriptorExpr(RuntimeHelperSliceType, o.runtimeTypeInfoExprWithSeen(slice.Elem(), seen), strconv.Quote(runtimeNamedTypeName(named)))
 		}
 		return strconv.Quote(runtimeNamedTypeName(named))
 	}
@@ -12132,17 +12129,17 @@ func (o *LoweringOwner) runtimeTypeInfoExprWithSeen(typ types.Type, seen map[typ
 	case *types.Basic:
 		return runtimeBasicTypeInfoExpr(o.runtimeOwner.QualifiedHelper(RuntimeHelperBasicType), typed, "")
 	case *types.Pointer:
-		return "{ kind: " + typeKind + ".Pointer, elemType: " + o.runtimeTypeInfoExprWithSeen(typed.Elem(), seen) + " }"
+		return o.runtimeDescriptorExpr(RuntimeHelperPointerType, o.runtimeTypeInfoExprWithSeen(typed.Elem(), seen))
 	case *types.Struct:
 		return "{ kind: " + typeKind + ".Struct, methods: [], fields: " + o.runtimeStructFieldsExpr(typed, seen) + " }"
 	case *types.Slice:
-		return "{ kind: " + typeKind + ".Slice, elemType: " + o.runtimeTypeInfoExprWithSeen(typed.Elem(), seen) + " }"
+		return o.runtimeDescriptorExpr(RuntimeHelperSliceType, o.runtimeTypeInfoExprWithSeen(typed.Elem(), seen))
 	case *types.Array:
-		return "{ kind: " + typeKind + ".Array, elemType: " + o.runtimeTypeInfoExprWithSeen(typed.Elem(), seen) + ", length: " + strconv.FormatInt(typed.Len(), 10) + " }"
+		return o.runtimeDescriptorExpr(RuntimeHelperArrayType, o.runtimeTypeInfoExprWithSeen(typed.Elem(), seen), strconv.FormatInt(typed.Len(), 10))
 	case *types.Map:
-		return "{ kind: " + typeKind + ".Map, keyType: " + o.runtimeTypeInfoExprWithSeen(typed.Key(), seen) + ", elemType: " + o.runtimeTypeInfoExprWithSeen(typed.Elem(), seen) + " }"
+		return o.runtimeDescriptorExpr(RuntimeHelperMapType, o.runtimeTypeInfoExprWithSeen(typed.Key(), seen), o.runtimeTypeInfoExprWithSeen(typed.Elem(), seen))
 	case *types.Chan:
-		return "{ kind: " + typeKind + ".Channel, direction: " + strconv.Quote(channelDirectionString(typed.Dir())) + ", elemType: " + o.runtimeTypeInfoExprWithSeen(typed.Elem(), seen) + " }"
+		return o.runtimeDescriptorExpr(RuntimeHelperChannelType, o.runtimeTypeInfoExprWithSeen(typed.Elem(), seen), strconv.Quote(channelDirectionString(typed.Dir())))
 	case *types.Interface:
 		typed.Complete()
 		return "{ kind: " + typeKind + ".Interface, methods: " + o.runtimeMethodSignaturesWithSeen(typed, seen) + " }"
@@ -12151,6 +12148,11 @@ func (o *LoweringOwner) runtimeTypeInfoExprWithSeen(typ types.Type, seen map[typ
 	default:
 		return "{ kind: " + typeKind + ".Basic, name: \"unknown\" }"
 	}
+}
+
+// runtimeDescriptorExpr keeps pure descriptor construction removable by bundlers.
+func (o *LoweringOwner) runtimeDescriptorExpr(helper RuntimeHelper, args ...string) string {
+	return "/* @__PURE__ */ " + o.runtimeOwner.QualifiedHelper(helper) + "(" + strings.Join(args, ", ") + ")"
 }
 
 func runtimeBasicTypeInfoExpr(helper string, basic *types.Basic, typeName string) string {

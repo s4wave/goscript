@@ -189,6 +189,45 @@ export function basicType(name: string, typeName?: string): BasicTypeInfo {
   return info
 }
 
+/** Construct a fresh pointer descriptor for generated reflection metadata. */
+export function pointerType(elemType: TypeInfo | string): PointerTypeInfo {
+  return { kind: TypeKind.Pointer, elemType }
+}
+
+/** Construct a fresh slice descriptor, preserving an optional named type. */
+export function sliceType(
+  elemType: TypeInfo | string,
+  typeName?: string,
+): SliceTypeInfo {
+  const info: SliceTypeInfo = { kind: TypeKind.Slice, elemType }
+  if (typeName !== undefined) info.typeName = typeName
+  return info
+}
+
+/** Construct a fresh array descriptor with its fixed length. */
+export function arrayType(
+  elemType: TypeInfo | string,
+  length: number,
+): ArrayTypeInfo {
+  return { kind: TypeKind.Array, elemType, length }
+}
+
+/** Construct a fresh map descriptor with its key and element types. */
+export function mapType(
+  keyType: TypeInfo | string,
+  elemType: TypeInfo | string,
+): MapTypeInfo {
+  return { kind: TypeKind.Map, keyType, elemType }
+}
+
+/** Construct a fresh channel descriptor with its declared direction. */
+export function channelType(
+  elemType: TypeInfo | string,
+  direction: ChannelTypeInfo['direction'],
+): ChannelTypeInfo {
+  return { kind: TypeKind.Channel, direction, elemType }
+}
+
 // isStructTypeInfo Type guard functions for TypeInfo variants.
 export function isStructTypeInfo(info: TypeInfo): info is StructTypeInfo {
   return info.kind === TypeKind.Struct
