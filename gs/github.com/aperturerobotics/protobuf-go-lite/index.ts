@@ -418,6 +418,7 @@ type BoundFieldInfo = {
 
 type BoundMessageCtor<T = any> = {
   new (init?: any): T
+  readonly prototype: T
   __protobufTypeScriptFields?: Record<string, BoundMessageCtor>
   __protobufTypeScriptOneofFields?: Record<
     string,
@@ -714,6 +715,13 @@ function boundMessageMethods(ctor: BoundMessageCtor, typeName: string) {
     CloneVT(this: any) {
       return CloneBoundMessage(ctor, this)
     },
+    EqualMessageVT(this: any, other: any) {
+      const [value, ok] = $.typeAssertTuple(other, {
+        kind: $.TypeKind.Pointer,
+        elemType: typeName.slice(1),
+      })
+      return ok && ctor.prototype.EqualVT.call(this, value)
+    },
     EqualVT(this: any, other: any) {
       return EqualBoundMessage(ctor, this, other)
     },
@@ -722,6 +730,13 @@ function boundMessageMethods(ctor: BoundMessageCtor, typeName: string) {
     },
     MarshalToSizedBufferVT(this: any, data: $.Slice<number>) {
       return MarshalBoundMessageToSizedBufferVT(ctor, this, data)
+    },
+    MarshalToVT(this: any, data: $.Slice<number>) {
+      const size = ctor.prototype.SizeVT.call(this)
+      return ctor.prototype.MarshalToSizedBufferVT.call(
+        this,
+        $.goSlice(data, undefined, size),
+      )
     },
     SizeVT(this: any) {
       return SizeBoundMessageVT(ctor, this)
@@ -750,6 +765,9 @@ function boundMessageMethods(ctor: BoundMessageCtor, typeName: string) {
     ProtoMessage() {},
     Reset(this: any) {
       $.assignStruct($.pointerValue(this), $.markAsStructValue(new ctor()))
+    },
+    String(this: any) {
+      return ctor.prototype.MarshalProtoText.call(this)
     },
   }
 }

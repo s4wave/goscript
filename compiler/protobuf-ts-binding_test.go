@@ -125,6 +125,12 @@ func (x *Foo) EqualVT(other *Foo) bool {
 	return other != nil && x.Name == other.Name
 }
 
+func (x *Foo) EqualMessageVT(other any) bool {
+	println("inline EqualMessageVT marker")
+	value, ok := other.(*Foo)
+	return ok && x.EqualVT(value)
+}
+
 func (x *Foo) MarshalVT() ([]byte, error) {
 	println("inline MarshalVT marker")
 	return []byte(x.Name), nil
@@ -133,6 +139,20 @@ func (x *Foo) MarshalVT() ([]byte, error) {
 func (x *Foo) MarshalToSizedBufferVT(data []byte) (int, error) {
 	println("inline MarshalToSizedBufferVT marker")
 	return copy(data, x.Name), nil
+}
+
+func (x *Foo) MarshalToVT(data []byte) (int, error) {
+	println("inline MarshalToVT marker")
+	return x.MarshalToSizedBufferVT(data[:x.SizeVT()])
+}
+
+func (x *Foo) MarshalProtoText() string {
+	return "custom text"
+}
+
+func (x *Foo) String() string {
+	println("inline String marker")
+	return x.MarshalProtoText()
 }
 
 func (x *Foo) SizeVT() int {
@@ -174,7 +194,7 @@ export const Foo = {} as any
 	wantSnippets := []string{
 		`public declare CloneMessageVT: () => protobuf_go_lite.CloneMessage | null`,
 		`public declare MarshalVT: () => [$.Slice<number>, $.GoError]`,
-		`protobuf_go_lite.BindMessageMethods(this, "*protobufbindingmethods.Foo", ["CloneMessageVT", "CloneVT", "EqualVT", "MarshalToSizedBufferVT", "MarshalVT", "Reset", "SizeVT", "UnmarshalVT"])`,
+		`protobuf_go_lite.BindMessageMethods(this, "*protobufbindingmethods.Foo", ["CloneMessageVT", "CloneVT", "EqualMessageVT", "EqualVT", "MarshalToSizedBufferVT", "MarshalToVT", "MarshalVT", "Reset", "SizeVT", "String", "UnmarshalVT"])`,
 	}
 	for _, snippet := range wantSnippets {
 		if !strings.Contains(binding, snippet) {

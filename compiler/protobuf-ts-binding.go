@@ -652,14 +652,17 @@ func protobufTypeScriptBindingReplacesMethodName(name string) bool {
 	switch name {
 	case "CloneMessageVT",
 		"CloneVT",
+		"EqualMessageVT",
 		"EqualVT",
 		"MarshalJSON",
 		"MarshalProtoJSON",
 		"MarshalToSizedBufferVT",
+		"MarshalToVT",
 		"MarshalVT",
 		"ProtoMessage",
 		"Reset",
 		"SizeVT",
+		"String",
 		"UnmarshalJSON",
 		"UnmarshalProtoJSON",
 		"UnmarshalVT":
