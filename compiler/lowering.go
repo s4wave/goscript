@@ -12215,6 +12215,7 @@ func (o *LoweringOwner) runtimeStructFieldsExpr(structType *types.Struct, seen m
 			pkgPath = field.Pkg().Path()
 		}
 		fieldInfo := runtimeStructFieldInfoExpr(
+			o.runtimeOwner.QualifiedHelper(RuntimeHelperStructField),
 			o.runtimeTypeInfoExprWithSeen(field.Type(), seen),
 			fieldName,
 			runtimeName,
@@ -12249,6 +12250,7 @@ func (o *LoweringOwner) runtimeStructAssertFieldsExpr(ctx lowerFileContext, stru
 			pkgPath = field.Pkg().Path()
 		}
 		fieldInfo := runtimeStructFieldInfoExpr(
+			o.runtimeOwner.QualifiedHelper(RuntimeHelperStructField),
 			o.runtimeTypeAssertInfoExprWithSeen(ctx, field.Type(), seen),
 			fieldName,
 			runtimeName,
@@ -12265,6 +12267,7 @@ func (o *LoweringOwner) runtimeStructAssertFieldsExpr(ctx lowerFileContext, stru
 }
 
 func runtimeStructFieldInfoExpr(
+	helper string,
 	runtimeType string,
 	storageKey string,
 	runtimeName string,
@@ -12279,26 +12282,30 @@ func runtimeStructFieldInfoExpr(
 	if name == "" {
 		name = storageKey
 	}
-	fields := []string{
-		"name: " + strconv.Quote(name),
-		"key: " + strconv.Quote(storageKey),
-		"type: " + runtimeType,
+	args := []string{
+		strconv.Quote(name),
+		runtimeType,
+		runtimeStructFieldIndexExpr(index),
+		strconv.FormatInt(offset, 10),
+		strconv.FormatBool(exported),
 	}
-	if runtimeName != "" {
-		fields = append(fields, "pkgPath: "+strconv.Quote(pkgPath))
-	} else if pkgPath != "" {
-		fields = append(fields, "pkgPath: "+strconv.Quote(pkgPath))
+	var options []string
+	if name != storageKey {
+		options = append(options, "key: "+strconv.Quote(storageKey))
+	}
+	if runtimeName != "" || pkgPath != "" {
+		options = append(options, "pkgPath: "+strconv.Quote(pkgPath))
 	}
 	if tag != "" {
-		fields = append(fields, "tag: "+strconv.Quote(tag))
+		options = append(options, "tag: "+strconv.Quote(tag))
 	}
 	if anonymous {
-		fields = append(fields, "anonymous: true")
+		options = append(options, "anonymous: true")
 	}
-	fields = append(fields, "index: "+runtimeStructFieldIndexExpr(index))
-	fields = append(fields, "offset: "+strconv.FormatInt(offset, 10))
-	fields = append(fields, "exported: "+strconv.FormatBool(exported))
-	return "{ " + strings.Join(fields, ", ") + " }"
+	if len(options) != 0 {
+		args = append(args, "{ "+strings.Join(options, ", ")+" }")
+	}
+	return "/* @__PURE__ */ " + helper + "(" + strings.Join(args, ", ") + ")"
 }
 
 func runtimeStructFieldIndexExpr(index []int) string {

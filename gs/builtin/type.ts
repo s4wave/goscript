@@ -88,6 +88,18 @@ export interface StructFieldInfo {
   exported?: boolean
 }
 
+/** Construct complete field metadata without repeating its common properties. */
+export function structField(
+  name: string,
+  type: TypeInfo | string,
+  index: number[],
+  offset: number,
+  exported: boolean,
+  options?: Pick<StructFieldInfo, 'key' | 'tag' | 'pkgPath' | 'anonymous'>,
+): StructFieldInfo {
+  return { name, key: name, type, index, offset, exported, ...options }
+}
+
 /**
  * StructTypeInfo Type information for struct types.
  */
