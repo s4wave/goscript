@@ -1279,10 +1279,12 @@ function appendByteSlice(slice: Uint8Array, elements: any[]): Uint8Array {
     writeByteElements(view, oldLength, elements)
     return view
   }
-  const next = new Uint8Array(newLength)
+  // Keep spare backing capacity so repeated appends copy only on growth.
+  const newCapacity = nextAppendCapacity(oldLength, oldCapacity, newLength)
+  const next = new Uint8Array(newCapacity)
   next.set(slice)
   writeByteElements(next, oldLength, elements)
-  return next
+  return byteSliceView(next, 0, newLength, newCapacity)
 }
 
 function byteElementLength(item: any): number {

@@ -475,21 +475,22 @@ After reviewing the code and tests, some important implementation considerations
     -   **Append (`append(s, ...)`):** Translated using the `$.append` runtime helper. Crucially, the result of `$.append` *must* be assigned back to the slice variable, as `append` may return a new slice instance if reallocation occurs.
         ```go
         s = append(s, elem1, elem2)
-        s = append(s, anotherSlice...) // Spread operator
+        s = append(s, anotherSlice...)
         ```
         becomes:
         ```typescript
         s = $.append(s, elem1, elem2)
-        s = $.append(s, ...anotherSlice) // Spread operator
+        s = $.appendSlice(s, anotherSlice)
         ```
         -   **Behavior:**
-            -   If appending fits within the existing capacity (`len(s) + num_elements <= cap(s)`), elements are added to the underlying array, and the original slice header's length is updated (potentially modifying the same object `s` refers to). The underlying array is modified.
+            -   If appending fits within the existing capacity (`len(s) + num_elements <= cap(s)`), elements are added to the shared underlying array. The returned slice has the new length; existing slice headers retain their lengths.
             -   If appending exceeds the capacity, a *new*, larger underlying array is allocated, the existing elements plus the new elements are copied to it, and `append` returns a *new* slice header referencing this new array. The original underlying array is *not* modified beyond its bounds.
             -   Appending to a nil slice allocates a new underlying array.
+            -   Byte slices use `Uint8Array` views with backing-window metadata. Both byte and generic slices use the same capacity-growth policy, avoiding a full copy on every append. Spare capacity is zero-initialized and can be exposed by reslicing.
 - **Arrays:** Go arrays (e.g., `[5]int`) have a fixed size known at compile time. They are also mapped to TypeScript arrays (`T[]`), but their fixed-size nature is enforced during compilation (e.g., preventing `append`). Slicing an array (`arr[:]`, `arr[low:high]`, etc.) uses the `$.goSlice` helper, resulting in a Go-style slice backed by the original array data.
     -   **Sparse Array Literals:** For Go array literals with specific indices (e.g., `[5]int{1: 10, 3: 30}`), unspecified indices are filled with the zero value of the element type in the generated TypeScript. For example, `[5]int{1: 10, 3: 30}` becomes `[0, 10, 0, 30, 0]`.
 
-*Note: The distinction between slices and arrays in Go is important. While both often map to TypeScript arrays, runtime helpers (`makeSlice`, `slice`, `len`, `cap`, `append`) and the `__capacity` property are essential for emulating Go's slice semantics accurately.*
+*Slice helpers (`makeSlice`, `goSlice`, `len`, `cap`, `append`, and `appendSlice`) preserve backing-window metadata when length differs from capacity.*
 - **Maps:** Go maps (`map[K]V`) use a `Map<K, V>` subclass created by `$.makeMap`. It indexes string keys by their Go byte value, so misses and insertions do not scan existing entries. Binary and UTF-8 string representations share a key while iteration retains the original representation. Struct keys still use Go value comparison. Various Go map operations are mapped as follows:
     -   **Creation (`make`):** `make(map[K]V)` is translated using a runtime helper:
         ```go
