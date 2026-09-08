@@ -43,6 +43,36 @@ export interface MethodSignature {
   returns: MethodArg[]
 }
 
+/** MethodParameter encodes a type and an optional declared parameter name. */
+export type MethodParameter =
+  | TypeInfo
+  | string
+  | [name: string, type: TypeInfo | string]
+
+/** methodSignature expands generated parameter tables for runtime reflection. */
+export function methodSignature(
+  name: string,
+  args: readonly MethodParameter[] = [],
+  returns: readonly MethodParameter[] = [],
+): MethodSignature {
+  return {
+    name,
+    args: methodParameters(args, '_p'),
+    returns: methodParameters(returns, '_r'),
+  }
+}
+
+function methodParameters(
+  parameters: readonly MethodParameter[],
+  prefix: string,
+): MethodArg[] {
+  return parameters.map((parameter, index) =>
+    Array.isArray(parameter) ?
+      { name: parameter[0], type: parameter[1] }
+    : { name: prefix + index, type: parameter },
+  )
+}
+
 /**
  * StructFieldInfo Information about a struct field including type and optional tag.
  */

@@ -13,7 +13,7 @@ export type Stringer = {
 $.registerInterfaceType(
 	"main.Stringer",
 	null,
-	[{ name: "String", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }] }]
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 export class MyType {
@@ -40,7 +40,7 @@ export class MyType {
 	static __typeInfo = $.registerStructType(
 		"main.MyType",
 		() => new MyType(),
-		() => [{ name: "String", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])],
 		MyType,
 		() => []
 	)

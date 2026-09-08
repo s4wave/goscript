@@ -3184,13 +3184,18 @@ func (o *LoweringOwner) runtimeMethodAssertSignaturesWithSeen(ctx lowerFileConte
 }
 
 func (o *LoweringOwner) runtimeMethodSignature(method *types.Func, seen map[types.Type]bool) string {
+	helper := o.runtimeOwner.QualifiedHelper(RuntimeHelperMethodSignature)
+	args := []string{strconv.Quote(method.Name())}
 	signature, _ := method.Type().(*types.Signature)
-	if signature == nil {
-		return "{ name: " + strconv.Quote(method.Name()) + ", args: [], returns: [] }"
+	if signature != nil {
+		if signature.Params().Len() != 0 || signature.Results().Len() != 0 {
+			args = append(args, o.runtimeMethodParameters(signature.Params(), seen))
+		}
+		if signature.Results().Len() != 0 {
+			args = append(args, o.runtimeMethodParameters(signature.Results(), seen))
+		}
 	}
-	return "{ name: " + strconv.Quote(method.Name()) +
-		", args: " + o.runtimeMethodArgs(signature.Params(), seen) +
-		", returns: " + o.runtimeMethodReturns(signature.Results(), seen) + " }"
+	return helper + "(" + strings.Join(args, ", ") + ")"
 }
 
 func (o *LoweringOwner) runtimeTrimmedMethodSignature(method *types.Func, seen map[types.Type]bool) string {
@@ -3213,18 +3218,17 @@ func (o *LoweringOwner) runtimeMethodAssertSignature(ctx lowerFileContext, metho
 		", returns: " + o.runtimeMethodAssertReturns(ctx, signature.Results(), seen) + " }"
 }
 
-func (o *LoweringOwner) runtimeMethodArgs(tuple *types.Tuple, seen map[types.Type]bool) string {
+func (o *LoweringOwner) runtimeMethodParameters(tuple *types.Tuple, seen map[types.Type]bool) string {
 	if tuple == nil || tuple.Len() == 0 {
 		return "[]"
 	}
 	args := make([]string, 0, tuple.Len())
-	for idx := range tuple.Len() {
-		param := tuple.At(idx)
-		name := param.Name()
-		if name == "" {
-			name = "_p" + strconv.Itoa(idx)
+	for param := range tuple.Variables() {
+		value := o.runtimeTypeInfoExprWithSeen(param.Type(), seen)
+		if name := param.Name(); name != "" {
+			value = "[" + strconv.Quote(name) + ", " + value + "]"
 		}
-		args = append(args, "{ name: "+strconv.Quote(name)+", type: "+o.runtimeTypeInfoExprWithSeen(param.Type(), seen)+" }")
+		args = append(args, value)
 	}
 	return "[" + strings.Join(args, ", ") + "]"
 }
@@ -3256,22 +3260,6 @@ func (o *LoweringOwner) runtimeMethodAssertArgs(ctx lowerFileContext, tuple *typ
 		args = append(args, "{ name: "+strconv.Quote(name)+", type: "+o.runtimeTypeAssertInfoExprWithSeen(ctx, param.Type(), seen)+" }")
 	}
 	return "[" + strings.Join(args, ", ") + "]"
-}
-
-func (o *LoweringOwner) runtimeMethodReturns(tuple *types.Tuple, seen map[types.Type]bool) string {
-	if tuple == nil || tuple.Len() == 0 {
-		return "[]"
-	}
-	results := make([]string, 0, tuple.Len())
-	for idx := range tuple.Len() {
-		result := tuple.At(idx)
-		name := result.Name()
-		if name == "" {
-			name = "_r" + strconv.Itoa(idx)
-		}
-		results = append(results, "{ name: "+strconv.Quote(name)+", type: "+o.runtimeTypeInfoExprWithSeen(result.Type(), seen)+" }")
-	}
-	return "[" + strings.Join(results, ", ") + "]"
 }
 
 func (o *LoweringOwner) runtimeTrimmedMethodReturns(tuple *types.Tuple, seen map[types.Type]bool) string {

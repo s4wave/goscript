@@ -135,6 +135,7 @@ const (
 	RuntimeHelperToGoError RuntimeHelper = "error.toGoError"
 
 	RuntimeHelperBasicType                RuntimeHelper = "type.basicType"
+	RuntimeHelperMethodSignature          RuntimeHelper = "type.methodSignature"
 	RuntimeHelperTypeKind                 RuntimeHelper = "type.TypeKind"
 	RuntimeHelperRegisterStructType       RuntimeHelper = "type.registerStructType"
 	RuntimeHelperRegisterInterfaceType    RuntimeHelper = "type.registerInterfaceType"
@@ -384,6 +385,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperNewError, "newError", RuntimeHelperCategoryError),
 		runtimeHelper(RuntimeHelperToGoError, "toGoError", RuntimeHelperCategoryError),
 		runtimeHelper(RuntimeHelperBasicType, "basicType", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperMethodSignature, "methodSignature", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperTypeKind, "TypeKind", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperRegisterStructType, "registerStructType", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperRegisterInterfaceType, "registerInterfaceType", RuntimeHelperCategoryType),
