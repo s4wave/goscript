@@ -79,9 +79,9 @@ export class handler {
 	static __typeInfo = $.registerStructType(
 		"main.handler",
 		() => new handler(),
-		[{ name: "GetMethodIDs", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }] }, { name: "GetServiceID", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "InvokeMethod", args: [{ name: "serviceID", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "methodID", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "strm", type: "srpc.Stream" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "_r1", type: "error" }] }],
+		() => [{ name: "GetMethodIDs", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("string") } }] }, { name: "GetServiceID", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }] }, { name: "InvokeMethod", args: [{ name: "serviceID", type: /* @__PURE__ */ $.basicType("string") }, { name: "methodID", type: /* @__PURE__ */ $.basicType("string") }, { name: "strm", type: "srpc.Stream" }], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("bool") }, { name: "_r1", type: "error" }] }],
 		handler,
-		[]
+		() => []
 	)
 }
 
@@ -134,9 +134,9 @@ export class embeddedStream {
 	static __typeInfo = $.registerStructType(
 		"main.embeddedStream",
 		() => new embeddedStream(),
-		[{ name: "Close", args: [], returns: [{ name: "_r0", type: "error" }] }, { name: "CloseSend", args: [], returns: [{ name: "_r0", type: "error" }] }, { name: "Context", args: [], returns: [{ name: "_r0", type: "context.Context" }] }, { name: "MsgRecv", args: [{ name: "msg", type: "protobuf_go_lite.Message" }], returns: [{ name: "_r0", type: "error" }] }, { name: "MsgSend", args: [{ name: "msg", type: "protobuf_go_lite.Message" }], returns: [{ name: "_r0", type: "error" }] }],
+		() => [{ name: "Close", args: [], returns: [{ name: "_r0", type: "error" }] }, { name: "CloseSend", args: [], returns: [{ name: "_r0", type: "error" }] }, { name: "Context", args: [], returns: [{ name: "_r0", type: "context.Context" }] }, { name: "MsgRecv", args: [{ name: "msg", type: "protobuf_go_lite.Message" }], returns: [{ name: "_r0", type: "error" }] }, { name: "MsgSend", args: [{ name: "msg", type: "protobuf_go_lite.Message" }], returns: [{ name: "_r0", type: "error" }] }],
 		embeddedStream,
-		[{ name: "Stream", key: "Stream", type: "srpc.Stream", anonymous: true, index: [0], offset: 0, exported: true }]
+		() => [{ name: "Stream", key: "Stream", type: "srpc.Stream", anonymous: true, index: [0], offset: 0, exported: true }]
 	)
 }
 
@@ -179,9 +179,9 @@ export class streamOpenResult {
 	static __typeInfo = $.registerStructType(
 		"main.streamOpenResult",
 		() => new streamOpenResult(),
-		[],
+		() => [],
 		streamOpenResult,
-		[{ name: "stream", key: "stream", type: "srpc.Stream", pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [0], offset: 0, exported: false }, { name: "err", key: "err", type: "error", pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [1], offset: 16, exported: false }]
+		() => [{ name: "stream", key: "stream", type: "srpc.Stream", pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [0], offset: 0, exported: false }, { name: "err", key: "err", type: "error", pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [1], offset: 16, exported: false }]
 	)
 }
 
@@ -224,9 +224,9 @@ export class streamProbeResult {
 	static __typeInfo = $.registerStructType(
 		"main.streamProbeResult",
 		() => new streamProbeResult(),
-		[],
+		() => [],
 		streamProbeResult,
-		[{ name: "total", key: "total", type: { kind: $.TypeKind.Basic, name: "int" }, pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [0], offset: 0, exported: false }, { name: "err", key: "err", type: { kind: $.TypeKind.Basic, name: "string" }, pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [1], offset: 8, exported: false }]
+		() => [{ name: "total", key: "total", type: /* @__PURE__ */ $.basicType("int"), pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [0], offset: 0, exported: false }, { name: "err", key: "err", type: /* @__PURE__ */ $.basicType("string"), pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [1], offset: 8, exported: false }]
 	)
 }
 
@@ -259,9 +259,9 @@ export class rpcStreamServerResult {
 	static __typeInfo = $.registerStructType(
 		"main.rpcStreamServerResult",
 		() => new rpcStreamServerResult(),
-		[],
+		() => [],
 		rpcStreamServerResult,
-		[{ name: "err", key: "err", type: { kind: $.TypeKind.Basic, name: "string" }, pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [0], offset: 0, exported: false }]
+		() => [{ name: "err", key: "err", type: /* @__PURE__ */ $.basicType("string"), pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [0], offset: 0, exported: false }]
 	)
 }
 
@@ -455,9 +455,9 @@ export class memoryRpcStream {
 	static __typeInfo = $.registerStructType(
 		"main.memoryRpcStream",
 		() => new memoryRpcStream(),
-		[{ name: "Close", args: [], returns: [{ name: "_r0", type: "error" }] }, { name: "CloseSend", args: [], returns: [{ name: "_r0", type: "error" }] }, { name: "Context", args: [], returns: [{ name: "_r0", type: "context.Context" }] }, { name: "MsgRecv", args: [{ name: "msg", type: "protobuf_go_lite.Message" }], returns: [{ name: "_r0", type: "error" }] }, { name: "MsgSend", args: [{ name: "msg", type: "protobuf_go_lite.Message" }], returns: [{ name: "_r0", type: "error" }] }, { name: "Recv", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket" } }, { name: "_r1", type: "error" }] }, { name: "Send", args: [{ name: "pkt", type: { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket" } }], returns: [{ name: "_r0", type: "error" }] }],
+		() => [{ name: "Close", args: [], returns: [{ name: "_r0", type: "error" }] }, { name: "CloseSend", args: [], returns: [{ name: "_r0", type: "error" }] }, { name: "Context", args: [], returns: [{ name: "_r0", type: "context.Context" }] }, { name: "MsgRecv", args: [{ name: "msg", type: "protobuf_go_lite.Message" }], returns: [{ name: "_r0", type: "error" }] }, { name: "MsgSend", args: [{ name: "msg", type: "protobuf_go_lite.Message" }], returns: [{ name: "_r0", type: "error" }] }, { name: "Recv", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket" } }, { name: "_r1", type: "error" }] }, { name: "Send", args: [{ name: "pkt", type: { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket" } }], returns: [{ name: "_r0", type: "error" }] }],
 		memoryRpcStream,
-		[{ name: "ctx", key: "ctx", type: "context.Context", pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [0], offset: 0, exported: false }, { name: "cancel", key: "cancel", type: ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [1], offset: 16, exported: false }, { name: "recv", key: "recv", type: { kind: $.TypeKind.Channel, direction: "receive", elemType: { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket" } }, pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [2], offset: 24, exported: false }, { name: "send", key: "send", type: { kind: $.TypeKind.Channel, direction: "send", elemType: { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket" } }, pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [3], offset: 32, exported: false }, { name: "closeSend", key: "closeSend", type: "sync.Once", pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [4], offset: 40, exported: false }, { name: "cancelLocal", key: "cancelLocal", type: "sync.Once", pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [5], offset: 52, exported: false }]
+		() => [{ name: "ctx", key: "ctx", type: "context.Context", pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [0], offset: 0, exported: false }, { name: "cancel", key: "cancel", type: ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [1], offset: 16, exported: false }, { name: "recv", key: "recv", type: { kind: $.TypeKind.Channel, direction: "receive", elemType: { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket" } }, pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [2], offset: 24, exported: false }, { name: "send", key: "send", type: { kind: $.TypeKind.Channel, direction: "send", elemType: { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamPacket" } }, pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [3], offset: 32, exported: false }, { name: "closeSend", key: "closeSend", type: "sync.Once", pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [4], offset: 40, exported: false }, { name: "cancelLocal", key: "cancelLocal", type: "sync.Once", pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [5], offset: 52, exported: false }]
 	)
 }
 
@@ -542,9 +542,9 @@ export class memoryRpcContext {
 	static __typeInfo = $.registerStructType(
 		"main.memoryRpcContext",
 		() => new memoryRpcContext(),
-		[{ name: "Deadline", args: [], returns: [{ name: "_r0", type: "time.Time" }, { name: "_r1", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Done", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Channel, direction: "receive", elemType: { kind: $.TypeKind.Struct, methods: [], fields: [] } } }] }, { name: "Err", args: [], returns: [{ name: "_r0", type: "error" }] }, { name: "Value", args: [{ name: "key", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }],
+		() => [{ name: "Deadline", args: [], returns: [{ name: "_r0", type: "time.Time" }, { name: "_r1", type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Done", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Channel, direction: "receive", elemType: { kind: $.TypeKind.Struct, methods: [], fields: [] } } }] }, { name: "Err", args: [], returns: [{ name: "_r0", type: "error" }] }, { name: "Value", args: [{ name: "key", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }],
 		memoryRpcContext,
-		[{ name: "done", key: "done", type: { kind: $.TypeKind.Channel, direction: "both", elemType: { kind: $.TypeKind.Struct, methods: [], fields: [] } }, pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [0], offset: 0, exported: false }, { name: "once", key: "once", type: "sync.Once", pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [1], offset: 8, exported: false }]
+		() => [{ name: "done", key: "done", type: { kind: $.TypeKind.Channel, direction: "both", elemType: { kind: $.TypeKind.Struct, methods: [], fields: [] } }, pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [0], offset: 0, exported: false }, { name: "once", key: "once", type: "sync.Once", pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_starpc_srpc", index: [1], offset: 8, exported: false }]
 	)
 }
 
@@ -806,7 +806,7 @@ export async function exerciseRpcStreamClientPressure(ctx: context.Context | nul
 			return [null, (null as (() => void) | null), null]
 		}
 		return [(mux as srpc.Invoker | null), (null as (() => void) | null), null]
-	}, ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)], results: ["srpc.Invoker", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "error"] } as $.FunctionTypeInfo))
+	}, ({ kind: $.TypeKind.Function, params: ["context.Context", /* @__PURE__ */ $.basicType("string"), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)], results: ["srpc.Invoker", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "error"] } as $.FunctionTypeInfo))
 
 	let rootClient = newRoutedRpcStreamClient(ctx, "component-root", getter, true, results)
 	let __goscriptTuple5: any = await openHeldStreams(ctx, rootClient, 64)
@@ -866,8 +866,8 @@ export async function exerciseRpcStreamHandle(): globalThis.Promise<boolean> {
 			return [$.namedValueInterfaceValue<srpc.Invoker | null>($.namedFunction($.functionValue(async (serviceID: string, methodID: string, strm: srpc.Stream | null): globalThis.Promise<[boolean, $.GoError]> => {
 				await $.chanSend(invoked, ($.stringEqual(serviceID, "svc")) && ($.stringEqual(methodID, "method")))
 				return [true, null]
-			}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "srpc.Stream"], results: [{ kind: $.TypeKind.Basic, name: "bool" }, "error"] } as $.FunctionTypeInfo)), "srpc.InvokerFunc", ({ kind: $.TypeKind.Function, name: "srpc.InvokerFunc", params: [{ kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "srpc.Stream"], results: [{ kind: $.TypeKind.Basic, name: "bool" }, "error"] } as $.FunctionTypeInfo)), "srpc.InvokerFunc", {InvokeMethod: (receiver: any, ...args: any[]) => (srpc.InvokerFunc_InvokeMethod as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, ({ kind: $.TypeKind.Function, name: "srpc.InvokerFunc", params: [{ kind: $.TypeKind.Basic, name: "string" }, { kind: $.TypeKind.Basic, name: "string" }, "srpc.Stream"], results: [{ kind: $.TypeKind.Basic, name: "bool" }, "error"] } as $.FunctionTypeInfo), [{ name: "InvokeMethod", args: [{ name: "serviceID", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "methodID", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "strm", type: "srpc.Stream" }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "_r1", type: "error" }] }]), (null as (() => void) | null), null]
-		}, ({ kind: $.TypeKind.Function, params: ["context.Context", { kind: $.TypeKind.Basic, name: "string" }, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)], results: ["srpc.Invoker", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "error"] } as $.FunctionTypeInfo))))
+			}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string"), "srpc.Stream"], results: [/* @__PURE__ */ $.basicType("bool"), "error"] } as $.FunctionTypeInfo)), "srpc.InvokerFunc", ({ kind: $.TypeKind.Function, name: "srpc.InvokerFunc", params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string"), "srpc.Stream"], results: [/* @__PURE__ */ $.basicType("bool"), "error"] } as $.FunctionTypeInfo)), "srpc.InvokerFunc", {InvokeMethod: (receiver: any, ...args: any[]) => (srpc.InvokerFunc_InvokeMethod as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, ({ kind: $.TypeKind.Function, name: "srpc.InvokerFunc", params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string"), "srpc.Stream"], results: [/* @__PURE__ */ $.basicType("bool"), "error"] } as $.FunctionTypeInfo), [{ name: "InvokeMethod", args: [{ name: "serviceID", type: /* @__PURE__ */ $.basicType("string") }, { name: "methodID", type: /* @__PURE__ */ $.basicType("string") }, { name: "strm", type: "srpc.Stream" }], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("bool") }, { name: "_r1", type: "error" }] }]), (null as (() => void) | null), null]
+		}, ({ kind: $.TypeKind.Function, params: ["context.Context", /* @__PURE__ */ $.basicType("string"), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)], results: ["srpc.Invoker", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "error"] } as $.FunctionTypeInfo))))
 	})() })
 
 	{
@@ -995,7 +995,7 @@ export async function exercisePushablePacketWriter(): globalThis.Promise<boolean
 	}, ({ kind: $.TypeKind.Function, params: ["js.Value", { kind: $.TypeKind.Slice, elemType: "js.Value" }], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))))
 	__defer.defer(() => { $.markAsStructValue($.cloneStructValue(endFn)).Release() })
 
-	let writer: srpc.PushablePacketWriter | $.VarRef<srpc.PushablePacketWriter> | null = srpc.NewPushablePacketWriter($.markAsStructValue($.cloneStructValue(js.ValueOf($.interfaceValue($.makeMap<string, any>([["push", $.interfaceValue($.markAsStructValue($.cloneStructValue(pushFn)), "js.Func", "js.Func")], ["end", $.interfaceValue($.markAsStructValue($.cloneStructValue(endFn)), "js.Func", "js.Func")]]), "map[string]any", { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Interface, methods: [] } })))))
+	let writer: srpc.PushablePacketWriter | $.VarRef<srpc.PushablePacketWriter> | null = srpc.NewPushablePacketWriter($.markAsStructValue($.cloneStructValue(js.ValueOf($.interfaceValue($.makeMap<string, any>([["push", $.interfaceValue($.markAsStructValue($.cloneStructValue(pushFn)), "js.Func", "js.Func")], ["end", $.interfaceValue($.markAsStructValue($.cloneStructValue(endFn)), "js.Func", "js.Func")]]), "map[string]any", { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: { kind: $.TypeKind.Interface, methods: [] } })))))
 	{
 		let err = srpc.PushablePacketWriter.prototype.WritePacket.call(writer, srpc.NewCallStartPacket("svc", "push", new Uint8Array([7, 8, 9]) as $.Slice<number>, false))
 		if (err != null) {

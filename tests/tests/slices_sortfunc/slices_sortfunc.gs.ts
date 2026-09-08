@@ -45,9 +45,9 @@ export class Person {
 	static __typeInfo = $.registerStructType(
 		"main.Person",
 		() => new Person(),
-		[],
+		() => [],
 		Person,
-		[{ name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "Age", key: "Age", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }, { name: "Age", key: "Age", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -62,7 +62,7 @@ export async function main(): globalThis.Promise<void> {
 			return 1
 		}
 		return 0
-	}, ({ kind: $.TypeKind.Function, params: ["main.Person", "main.Person"], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo)))
+	}, ({ kind: $.TypeKind.Function, params: ["main.Person", "main.Person"], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))
 
 	for (let __goscriptRangeTarget0 = people, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let p = __goscriptRangeTarget0![__rangeIndex]

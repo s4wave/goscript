@@ -32,9 +32,9 @@ export class inner {
 	static __typeInfo = $.registerStructType(
 		"main.inner",
 		() => new inner(),
-		[],
+		() => [],
 		inner,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -67,9 +67,9 @@ export class outer {
 	static __typeInfo = $.registerStructType(
 		"main.outer",
 		() => new outer(),
-		[],
+		() => [],
 		outer,
-		[{ name: "inner", key: "inner", type: "main.inner" }]
+		() => [{ name: "inner", key: "inner", type: "main.inner" }]
 	)
 }
 

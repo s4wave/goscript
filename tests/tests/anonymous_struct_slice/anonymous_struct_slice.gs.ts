@@ -42,9 +42,9 @@ export class namedItem {
 	static __typeInfo = $.registerStructType(
 		"main.namedItem",
 		() => new namedItem(),
-		[],
+		() => [],
 		namedItem,
-		[{ name: "key", key: "key", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }]
+		() => [{ name: "key", key: "key", type: /* @__PURE__ */ $.basicType("string") }, { name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }]
 	)
 }
 

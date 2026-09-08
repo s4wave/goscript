@@ -35,9 +35,9 @@ export class item {
 	static __typeInfo = $.registerStructType(
 		"main.item",
 		() => new item(),
-		[],
+		() => [],
 		item,
-		[{ name: "Text", key: "Text", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "Text", key: "Text", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
@@ -81,9 +81,9 @@ export class arena {
 	static __typeInfo = $.registerStructType(
 		"main.arena",
 		() => new arena(),
-		[{ name: "New", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } } }] }],
+		() => [{ name: "New", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } } }] }],
 		arena,
-		[{ name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Interface, methods: [] } } }]
+		() => [{ name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Interface, methods: [] } } }]
 	)
 }
 

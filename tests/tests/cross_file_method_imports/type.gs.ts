@@ -47,9 +47,9 @@ export class label {
 	static __typeInfo = $.registerStructType(
 		"main.label",
 		() => new label(),
-		[{ name: "Format", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Format", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		label,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 

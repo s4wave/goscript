@@ -42,9 +42,9 @@ export class file {
 	static __typeInfo = $.registerStructType(
 		"main.file",
 		() => new file(),
-		[],
+		() => [],
 		file,
-		[{ name: "name", key: "name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }]
+		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }, { name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }]
 	)
 }
 
@@ -87,9 +87,9 @@ export class storage {
 	static __typeInfo = $.registerStructType(
 		"main.storage",
 		() => new storage(),
-		[],
+		() => [],
 		storage,
-		[{ name: "files", key: "files", type: { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Pointer, elemType: "main.file" } } }, { name: "children", key: "children", type: { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Pointer, elemType: "main.file" } } } }]
+		() => [{ name: "files", key: "files", type: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: { kind: $.TypeKind.Pointer, elemType: "main.file" } } }, { name: "children", key: "children", type: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: { kind: $.TypeKind.Pointer, elemType: "main.file" } } } }]
 	)
 }
 

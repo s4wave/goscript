@@ -32,9 +32,9 @@ export class item {
 	static __typeInfo = $.registerStructType(
 		"main.item",
 		() => new item(),
-		[],
+		() => [],
 		item,
-		[{ name: "Value", key: "Value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -46,7 +46,7 @@ export async function main(): globalThis.Promise<void> {
 	let values: $.Slice<item> = null! as $.Slice<item>
 	await fill($.functionValue((value: number): void => {
 		values = $.append(values, $.markAsStructValue(new item({Value: value})))
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: [] } as $.FunctionTypeInfo)))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo)))
 	if ($.len(values) != 0) {
 		await $.println("first:", $.arrayIndex(values!, 0).Value)
 	}

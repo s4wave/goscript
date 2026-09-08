@@ -15,7 +15,7 @@ export type FileInfo = {
 $.registerInterfaceType(
 	"main.FileInfo",
 	null,
-	[{ name: "IsDir", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Size", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int64" } }] }]
+	[{ name: "IsDir", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Size", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int64") }] }]
 );
 
 export type WalkFunc = ((path: string, info: FileInfo | null, err: $.GoError) => $.GoError | globalThis.Promise<$.GoError>) | null
@@ -98,9 +98,9 @@ export class MockFileInfo {
 	static __typeInfo = $.registerStructType(
 		"main.MockFileInfo",
 		() => new MockFileInfo(),
-		[{ name: "IsDir", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Size", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int64" } }] }],
+		() => [{ name: "IsDir", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Size", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int64") }] }],
 		MockFileInfo,
-		[{ name: "name", key: "name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "size", key: "size", type: { kind: $.TypeKind.Basic, name: "int64" } }, { name: "isDir", key: "isDir", type: { kind: $.TypeKind.Basic, name: "bool" } }]
+		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }, { name: "size", key: "size", type: /* @__PURE__ */ $.basicType("int64") }, { name: "isDir", key: "isDir", type: /* @__PURE__ */ $.basicType("bool") }]
 	)
 }
 
@@ -128,9 +128,9 @@ export class MockFilesystem {
 	static __typeInfo = $.registerStructType(
 		"main.MockFilesystem",
 		() => new MockFilesystem(),
-		[{ name: "ReadDir", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: "main.FileInfo" } }, { type: "error" }] }],
+		() => [{ name: "ReadDir", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: "main.FileInfo" } }, { type: "error" }] }],
 		MockFilesystem,
-		[]
+		() => []
 	)
 }
 
@@ -185,7 +185,7 @@ export async function main(): globalThis.Promise<void> {
 			await $.println("Error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		}
 		return null
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }, "main.FileInfo", "error"], results: ["error"] } as $.FunctionTypeInfo))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), "main.FileInfo", "error"], results: ["error"] } as $.FunctionTypeInfo))
 
 	let err = await walk($.interfaceValue<Filesystem | null>(fs, "*main.MockFilesystem", { kind: $.TypeKind.Pointer, elemType: "main.MockFilesystem" }), "/test", $.interfaceValue<FileInfo | null>(fileInfo, "*main.MockFileInfo", { kind: $.TypeKind.Pointer, elemType: "main.MockFileInfo" }), walkFunc)
 	if (err != null) {
@@ -195,7 +195,7 @@ export async function main(): globalThis.Promise<void> {
 	// Test the process function with a callback
 	let processFunc: ((data: string) => [string, $.GoError] | globalThis.Promise<[string, $.GoError]>) | null = $.functionValue((data: string): [string, $.GoError] => {
 		return ["processed: " + data, null]
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }, "error"] } as $.FunctionTypeInfo))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string"), "error"] } as $.FunctionTypeInfo))
 
 	let [result, err2] = await processWithCallback("hello", processFunc)
 	if (err2 != null) {

@@ -32,9 +32,9 @@ export class Promise {
 	static __typeInfo = $.registerStructType(
 		"main.Promise",
 		() => new Promise(),
-		[],
+		() => [],
 		Promise,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 

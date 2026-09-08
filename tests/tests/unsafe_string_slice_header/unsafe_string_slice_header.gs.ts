@@ -48,9 +48,9 @@ export class localSliceHeader {
 	static __typeInfo = $.registerStructType(
 		"main.localSliceHeader",
 		() => new localSliceHeader(),
-		[],
+		() => [],
 		localSliceHeader,
-		[{ name: "s", key: "s", type: { kind: $.TypeKind.Basic, name: "string" }, pkgPath: "github.com/s4wave/goscript/tests/tests/unsafe_string_slice_header", index: [0], offset: 0, exported: false }, { name: "cap", key: "cap", type: { kind: $.TypeKind.Basic, name: "int" }, pkgPath: "github.com/s4wave/goscript/tests/tests/unsafe_string_slice_header", index: [1], offset: 16, exported: false }]
+		() => [{ name: "s", key: "s", type: /* @__PURE__ */ $.basicType("string"), pkgPath: "github.com/s4wave/goscript/tests/tests/unsafe_string_slice_header", index: [0], offset: 0, exported: false }, { name: "cap", key: "cap", type: /* @__PURE__ */ $.basicType("int"), pkgPath: "github.com/s4wave/goscript/tests/tests/unsafe_string_slice_header", index: [1], offset: 16, exported: false }]
 	)
 }
 

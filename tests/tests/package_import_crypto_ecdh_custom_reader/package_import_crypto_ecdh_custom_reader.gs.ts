@@ -75,9 +75,9 @@ export class segmentedReader {
 	static __typeInfo = $.registerStructType(
 		"main.segmentedReader",
 		() => new segmentedReader(),
-		[{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }, { type: "error" }] }],
+		() => [{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
 		segmentedReader,
-		[{ name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "offset", key: "offset", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "step", key: "step", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }, { name: "offset", key: "offset", type: /* @__PURE__ */ $.basicType("int") }, { name: "step", key: "step", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -105,9 +105,9 @@ export class failingReader {
 	static __typeInfo = $.registerStructType(
 		"main.failingReader",
 		() => new failingReader(),
-		[{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }, { type: "error" }] }],
+		() => [{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
 		failingReader,
-		[]
+		() => []
 	)
 }
 

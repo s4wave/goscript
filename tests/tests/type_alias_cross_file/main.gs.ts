@@ -35,9 +35,9 @@ export class source {
 	static __typeInfo = $.registerStructType(
 		"main.source",
 		() => new source(),
-		[{ name: "Val", args: [], returns: [{ type: { kind: $.TypeKind.Slice, typeName: "subpkg.Value", elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }],
+		() => [{ name: "Val", args: [], returns: [{ type: { kind: $.TypeKind.Slice, typeName: "subpkg.Value", elemType: /* @__PURE__ */ $.basicType("uint8") } }] }],
 		source,
-		[]
+		() => []
 	)
 }
 

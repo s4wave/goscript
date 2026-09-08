@@ -56,9 +56,9 @@ export class wrapper {
 	static __typeInfo = $.registerStructType(
 		"main.wrapper",
 		() => new wrapper(),
-		[{ name: "Other", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }],
+		() => [{ name: "Other", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }],
 		wrapper,
-		[{ name: "Impl", key: "Impl", type: { kind: $.TypeKind.Pointer, elemType: "dep.Impl" }, anonymous: true }]
+		() => [{ name: "Impl", key: "Impl", type: { kind: $.TypeKind.Pointer, elemType: "dep.Impl" }, anonymous: true }]
 	)
 }
 
@@ -71,14 +71,14 @@ export function setGeneric(__typeArgs: $.GenericTypeArgs | undefined, w: dep.Wra
 }
 
 export function setConcrete(w: dep.Wrapper | $.VarRef<dep.Wrapper> | null): string {
-	return (dep.Keyed.prototype.SetValues.call($.pointerValue<dep.Wrapper>(w).Keyed, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }, U: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, 7) as string)
+	return (dep.Keyed.prototype.SetValues.call($.pointerValue<dep.Wrapper>(w).Keyed, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }, U: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, 7) as string)
 }
 
 export async function main(): globalThis.Promise<void> {
 	let impl: wrapper | $.VarRef<wrapper> | null = new wrapper({Impl: new dep.Impl({Item: 7})})
-	await $.println("interface:", await read({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }, E: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, $.namedValueInterfaceValue<Derived | null>(impl, "*main.wrapper", {Other: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Other({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }, E: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, ...$.stripGenericTypeArgs(args)), Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "main.wrapper" }, [{ name: "Other", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Value", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }])))
+	await $.println("interface:", await read({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }, E: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, $.namedValueInterfaceValue<Derived | null>(impl, "*main.wrapper", {Other: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Other({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }, E: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, ...$.stripGenericTypeArgs(args)), Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "main.wrapper" }, [{ name: "Other", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Value", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("int") }] }])))
 	let keyed: dep.Wrapper | $.VarRef<dep.Wrapper> | null = new dep.Wrapper({Keyed: new dep.Keyed()})
-	await $.println("generic empty:", $.stringEqual(setGeneric({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }, U: { type: { kind: $.TypeKind.Basic, name: "string" }, zero: () => "" }}, keyed, 7), ""))
+	await $.println("generic empty:", $.stringEqual(setGeneric({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }, U: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, keyed, 7), ""))
 	await $.println("concrete empty:", $.stringEqual(setConcrete(keyed), ""))
 }
 

@@ -27,7 +27,7 @@ export class ObjectID {
 
 	constructor(init?: Partial<{hash?: Uint8Array, format?: number}>) {
 		this._fields = {
-			hash: $.varRef(init?.hash !== undefined ? $.cloneArrayValue(init.hash, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 4 }) : new Uint8Array(4)),
+			hash: $.varRef(init?.hash !== undefined ? $.cloneArrayValue(init.hash, { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("uint8"), length: 4 }) : new Uint8Array(4)),
 			format: $.varRef(init?.format ?? (0 as number))
 		}
 	}
@@ -35,7 +35,7 @@ export class ObjectID {
 	public clone(): ObjectID {
 		const cloned = new ObjectID()
 		cloned._fields = {
-			hash: $.varRef($.cloneArrayValue(this._fields.hash.value, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 4 })),
+			hash: $.varRef($.cloneArrayValue(this._fields.hash.value, { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("uint8"), length: 4 })),
 			format: $.varRef(this._fields.format.value)
 		}
 		return $.markAsStructValue(cloned)
@@ -54,9 +54,9 @@ export class ObjectID {
 	static __typeInfo = $.registerStructType(
 		"main.ObjectID",
 		() => new ObjectID(),
-		[{ name: "IsZero", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Valid", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }],
+		() => [{ name: "IsZero", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Valid", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }],
 		ObjectID,
-		[{ name: "hash", key: "hash", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 4 } }, { name: "format", key: "format", type: { kind: $.TypeKind.Basic, name: "uint8" } }]
+		() => [{ name: "hash", key: "hash", type: { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("uint8"), length: 4 } }, { name: "format", key: "format", type: /* @__PURE__ */ $.basicType("uint8") }]
 	)
 }
 

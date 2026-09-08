@@ -35,9 +35,9 @@ export class parser {
 	static __typeInfo = $.registerStructType(
 		"main.parser",
 		() => new parser(),
-		[],
+		() => [],
 		parser,
-		[{ name: "errors", key: "errors", type: { kind: $.TypeKind.Slice, typeName: "errlist.ErrorList", elemType: { kind: $.TypeKind.Basic, name: "string" } } }]
+		() => [{ name: "errors", key: "errors", type: { kind: $.TypeKind.Slice, typeName: "errlist.ErrorList", elemType: /* @__PURE__ */ $.basicType("string") } }]
 	)
 }
 

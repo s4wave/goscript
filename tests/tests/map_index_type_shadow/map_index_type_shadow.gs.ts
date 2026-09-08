@@ -32,9 +32,9 @@ export class item {
 	static __typeInfo = $.registerStructType(
 		"main.item",
 		() => new item(),
-		[],
+		() => [],
 		item,
-		[{ name: "values", key: "values", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } } }]
+		() => [{ name: "values", key: "values", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") } }]
 	)
 }
 

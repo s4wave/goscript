@@ -44,9 +44,9 @@ export async function main(): globalThis.Promise<void> {
 			static __typeInfo = $.registerStructType(
 				"main.item",
 				() => new item(),
-				[],
+				() => [],
 				item,
-				[{ name: "name", key: "name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "count", key: "count", type: { kind: $.TypeKind.Basic, name: "int" } }]
+				() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }, { name: "count", key: "count", type: /* @__PURE__ */ $.basicType("int") }]
 			)
 		}
 

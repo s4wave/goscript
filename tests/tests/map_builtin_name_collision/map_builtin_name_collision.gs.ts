@@ -32,9 +32,9 @@ export class Map {
 	static __typeInfo = $.registerStructType(
 		"main.Map",
 		() => new Map(),
-		[],
+		() => [],
 		Map,
-		[{ name: "values", key: "values", type: { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Basic, name: "int" } } }]
+		() => [{ name: "values", key: "values", type: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: /* @__PURE__ */ $.basicType("int") } }]
 	)
 }
 

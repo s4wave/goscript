@@ -42,9 +42,9 @@ export class node {
 	static __typeInfo = $.registerStructType(
 		"main.node",
 		() => new node(),
-		[],
+		() => [],
 		node,
-		[{ name: "sub", key: "sub", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.node" } } }, { name: "sub0", key: "sub0", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Pointer, elemType: "main.node" }, length: 1 } }]
+		() => [{ name: "sub", key: "sub", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.node" } } }, { name: "sub0", key: "sub0", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Pointer, elemType: "main.node" }, length: 1 } }]
 	)
 }
 

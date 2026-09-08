@@ -47,9 +47,9 @@ export class MyStruct {
 	static __typeInfo = $.registerStructType(
 		"main.MyStruct",
 		() => new MyStruct(),
-		[{ name: "GetMyString", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "GetMyString", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		MyStruct,
-		[{ name: "MyInt", key: "MyInt", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "MyString", key: "MyString", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "MyInt", key: "MyInt", type: /* @__PURE__ */ $.basicType("int") }, { name: "MyString", key: "MyString", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
@@ -92,9 +92,9 @@ export class setterStruct {
 	static __typeInfo = $.registerStructType(
 		"main.setterStruct",
 		() => new setterStruct(),
-		[{ name: "get", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "set", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "get", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "set", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
 		setterStruct,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -132,9 +132,9 @@ export class digest {
 	static __typeInfo = $.registerStructType(
 		"main.digest",
 		() => new digest(),
-		[{ name: "Write", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "Write", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
 		digest,
-		[{ name: "writes", key: "writes", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "writes", key: "writes", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

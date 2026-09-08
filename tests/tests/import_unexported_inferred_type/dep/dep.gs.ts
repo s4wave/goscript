@@ -26,9 +26,9 @@ export class hiddenError {
 	static __typeInfo = $.registerStructType(
 		"dep.hiddenError",
 		() => new hiddenError(),
-		[{ name: "Error", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Error", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		hiddenError,
-		[]
+		() => []
 	)
 }
 

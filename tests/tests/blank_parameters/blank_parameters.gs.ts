@@ -10,7 +10,7 @@ export type blankInterface = {
 $.registerInterfaceType(
 	"main.blankInterface",
 	null,
-	[{ name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }]
+	[{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }]
 );
 
 export class blankImpl {
@@ -47,9 +47,9 @@ export class blankImpl {
 	static __typeInfo = $.registerStructType(
 		"main.blankImpl",
 		() => new blankImpl(),
-		[{ name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }],
+		() => [{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		blankImpl,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -76,9 +76,9 @@ export class Packer {
 	static __typeInfo = $.registerStructType(
 		"main.Packer",
 		() => new Packer(),
-		[{ name: "pack", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }] }],
+		() => [{ name: "pack", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }] }],
 		Packer,
-		[]
+		() => []
 	)
 }
 
@@ -101,7 +101,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let f: ((_p0: number, _p1: number) => number | globalThis.Promise<number>) | null = $.functionValue((_p0: number, _p1: number): number => {
 		return 9
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	await $.println(await f!(1, 2))
 
 	let [left, right] = unicodeNames(3, 4)

@@ -55,9 +55,9 @@ export class LocalTime {
 	static __typeInfo = $.registerStructType(
 		"main.LocalTime",
 		() => new LocalTime(),
-		[],
+		() => [],
 		LocalTime,
-		[{ name: "wall", key: "wall", type: { kind: $.TypeKind.Basic, name: "uint64" } }, { name: "ext", key: "ext", type: { kind: $.TypeKind.Basic, name: "int64" } }, { name: "loc", key: "loc", type: { kind: $.TypeKind.Pointer, elemType: "time.Location" } }]
+		() => [{ name: "wall", key: "wall", type: /* @__PURE__ */ $.basicType("uint64") }, { name: "ext", key: "ext", type: /* @__PURE__ */ $.basicType("int64") }, { name: "loc", key: "loc", type: { kind: $.TypeKind.Pointer, elemType: "time.Location" } }]
 	)
 }
 

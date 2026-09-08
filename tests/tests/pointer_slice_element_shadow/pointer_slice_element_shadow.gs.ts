@@ -32,9 +32,9 @@ export class entry {
 	static __typeInfo = $.registerStructType(
 		"main.entry",
 		() => new entry(),
-		[],
+		() => [],
 		entry,
-		[{ name: "key", key: "key", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "key", key: "key", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
@@ -77,9 +77,9 @@ export class _object {
 	static __typeInfo = $.registerStructType(
 		"main.object",
 		() => new _object(),
-		[{ name: "next", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.entry" } }] }],
+		() => [{ name: "next", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.entry" } }] }],
 		_object,
-		[{ name: "entries", key: "entries", type: { kind: $.TypeKind.Slice, elemType: "main.entry" } }]
+		() => [{ name: "entries", key: "entries", type: { kind: $.TypeKind.Slice, elemType: "main.entry" } }]
 	)
 }
 

@@ -10,7 +10,7 @@ export type Stringer = {
 $.registerInterfaceType(
 	"main.Stringer",
 	null,
-	[{ name: "String", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+	[{ name: "String", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
 );
 
 export class Base {
@@ -36,9 +36,9 @@ export class Base {
 	static __typeInfo = $.registerStructType(
 		"main.Base",
 		() => new Base(),
-		[{ name: "String", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "String", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		Base,
-		[]
+		() => []
 	)
 }
 
@@ -65,9 +65,9 @@ export class Derived {
 	static __typeInfo = $.registerStructType(
 		"main.Derived",
 		() => new Derived(),
-		[{ name: "Own", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Own", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		Derived,
-		[]
+		() => []
 	)
 }
 

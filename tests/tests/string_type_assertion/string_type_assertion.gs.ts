@@ -5,7 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let w: any = "test"
-	await $.println("value is", $.mustTypeAssert<string>(w, { kind: $.TypeKind.Basic, name: "string" }))
+	await $.println("value is", $.mustTypeAssert<string>(w, /* @__PURE__ */ $.basicType("string")))
 }
 
 if ($.isMainScript(import.meta)) {

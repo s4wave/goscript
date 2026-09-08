@@ -32,9 +32,9 @@ export class node {
 	static __typeInfo = $.registerStructType(
 		"main.node",
 		() => new node(),
-		[],
+		() => [],
 		node,
-		[{ name: "next", key: "next", type: { kind: $.TypeKind.Pointer, elemType: "main.node" } }]
+		() => [{ name: "next", key: "next", type: { kind: $.TypeKind.Pointer, elemType: "main.node" } }]
 	)
 }
 

@@ -44,9 +44,9 @@ export class Thing {
 	static __typeInfo = $.registerStructType(
 		"subpkg.Thing",
 		() => new Thing(),
-		[],
+		() => [],
 		Thing,
-		[{ name: "Value", key: "Value", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "Label", key: "Label", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("int") }, { name: "Label", key: "Label", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 

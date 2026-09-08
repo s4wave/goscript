@@ -32,9 +32,9 @@ export class box {
 	static __typeInfo = $.registerStructType(
 		"main.box",
 		() => new box(),
-		[],
+		() => [],
 		box,
-		[{ name: "Value", key: "Value", type: { kind: $.TypeKind.Interface, methods: [] } }]
+		() => [{ name: "Value", key: "Value", type: { kind: $.TypeKind.Interface, methods: [] } }]
 	)
 }
 
@@ -67,9 +67,9 @@ export class point {
 	static __typeInfo = $.registerStructType(
 		"main.point",
 		() => new point(),
-		[],
+		() => [],
 		point,
-		[{ name: "X", key: "X", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "X", key: "X", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

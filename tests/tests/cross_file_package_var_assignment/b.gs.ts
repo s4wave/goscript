@@ -9,7 +9,7 @@ import "./a.gs.ts"
 function __goscriptInit0(): void {
 	__goscript_a.__goscript_set_hook($.functionValue((): number => {
 		return 2
-	}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo)))
+	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))
 }
 
 export async function main(): globalThis.Promise<void> {

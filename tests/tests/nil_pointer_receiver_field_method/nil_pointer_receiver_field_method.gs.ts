@@ -40,9 +40,9 @@ export class child {
 	static __typeInfo = $.registerStructType(
 		"main.child",
 		() => new child(),
-		[{ name: "Clone", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.child" } }] }],
+		() => [{ name: "Clone", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.child" } }] }],
 		child,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
@@ -75,9 +75,9 @@ export class parent {
 	static __typeInfo = $.registerStructType(
 		"main.parent",
 		() => new parent(),
-		[],
+		() => [],
 		parent,
-		[{ name: "child", key: "child", type: { kind: $.TypeKind.Pointer, elemType: "main.child" } }]
+		() => [{ name: "child", key: "child", type: { kind: $.TypeKind.Pointer, elemType: "main.child" } }]
 	)
 }
 

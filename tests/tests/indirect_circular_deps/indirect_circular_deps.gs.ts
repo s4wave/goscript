@@ -32,9 +32,9 @@ export class A {
 	static __typeInfo = $.registerStructType(
 		"main.A",
 		() => new A(),
-		[],
+		() => [],
 		A,
-		[{ name: "BB", key: "BB", type: { kind: $.TypeKind.Slice, elemType: "main.B" } }]
+		() => [{ name: "BB", key: "BB", type: { kind: $.TypeKind.Slice, elemType: "main.B" } }]
 	)
 }
 
@@ -67,9 +67,9 @@ export class B {
 	static __typeInfo = $.registerStructType(
 		"main.B",
 		() => new B(),
-		[],
+		() => [],
 		B,
-		[{ name: "AA", key: "AA", type: { kind: $.TypeKind.Slice, elemType: "main.A" } }]
+		() => [{ name: "AA", key: "AA", type: { kind: $.TypeKind.Slice, elemType: "main.A" } }]
 	)
 }
 

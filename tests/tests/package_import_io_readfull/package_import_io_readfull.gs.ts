@@ -61,9 +61,9 @@ export class fixedReader {
 	static __typeInfo = $.registerStructType(
 		"main.fixedReader",
 		() => new fixedReader(),
-		[{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }, { type: "error" }] }],
+		() => [{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
 		fixedReader,
-		[{ name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "size", key: "size", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }, { name: "size", key: "size", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

@@ -37,9 +37,9 @@ export class Box {
 	static __typeInfo = $.registerStructType(
 		"main.Box",
 		() => new Box(),
-		[{ name: "clone", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.Box" } }] }],
+		() => [{ name: "clone", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.Box" } }] }],
 		Box,
-		[{ name: "Value", key: "Value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

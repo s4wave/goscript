@@ -10,7 +10,7 @@ export type Factory = {
 $.registerInterfaceType(
 	"dep.Factory",
 	null,
-	[{ name: "GetConfigID", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+	[{ name: "GetConfigID", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
 );
 
 export class Bus {
@@ -32,9 +32,9 @@ export class Bus {
 	static __typeInfo = $.registerStructType(
 		"dep.Bus",
 		() => new Bus(),
-		[],
+		() => [],
 		Bus,
-		[]
+		() => []
 	)
 }
 
@@ -62,9 +62,9 @@ export class factory {
 	static __typeInfo = $.registerStructType(
 		"dep.factory",
 		() => new factory(),
-		[{ name: "GetConfigID", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "GetConfigID", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		factory,
-		[]
+		() => []
 	)
 }
 
@@ -72,5 +72,5 @@ export async function NewFactory(b: Bus): globalThis.Promise<Factory | null> {
 	let ch: $.Channel<{}> | null = $.makeChannel<{}>(1, {}, "both")
 	await $.chanSend(ch, {})
 	await $.chanRecv(ch)
-	return $.namedValueInterfaceValue<Factory | null>(new factory(), "*dep.factory", {GetConfigID: (receiver: any, ...args: any[]) => $.pointerValue(receiver).GetConfigID({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "dep.Bus", zero: () => $.markAsStructValue(new Bus()) }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "dep.factory" }, [{ name: "GetConfigID", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])
+	return $.namedValueInterfaceValue<Factory | null>(new factory(), "*dep.factory", {GetConfigID: (receiver: any, ...args: any[]) => $.pointerValue(receiver).GetConfigID({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "dep.Bus", zero: () => $.markAsStructValue(new Bus()) }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "dep.factory" }, [{ name: "GetConfigID", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }] }])
 }

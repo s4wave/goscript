@@ -37,9 +37,9 @@ export class counter {
 	static __typeInfo = $.registerStructType(
 		"main.counter",
 		() => new counter(),
-		[{ name: "Load", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }],
+		() => [{ name: "Load", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		counter,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -82,9 +82,9 @@ export class inner {
 	static __typeInfo = $.registerStructType(
 		"main.inner",
 		() => new inner(),
-		[],
+		() => [],
 		inner,
-		[{ name: "name", key: "name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "count", key: "count", type: "main.counter" }]
+		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }, { name: "count", key: "count", type: "main.counter" }]
 	)
 }
 
@@ -117,9 +117,9 @@ export class outer {
 	static __typeInfo = $.registerStructType(
 		"main.outer",
 		() => new outer(),
-		[],
+		() => [],
 		outer,
-		[{ name: "inner", key: "inner", type: { kind: $.TypeKind.Pointer, elemType: "main.inner" }, anonymous: true }]
+		() => [{ name: "inner", key: "inner", type: { kind: $.TypeKind.Pointer, elemType: "main.inner" }, anonymous: true }]
 	)
 }
 

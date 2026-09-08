@@ -13,13 +13,13 @@ export type runner = {
 $.registerInterfaceType(
 	"main.runner",
 	null,
-	[{ name: "Run", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+	[{ name: "Run", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
 );
 
 export type mode = number
 
 export function asRunner(m: mode): runner | null {
-	return $.namedValueInterfaceValue<runner | null>(m, "main.mode", {Run: (receiver: any, ...args: any[]) => (__goscript_method.mode_Run as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Basic, name: "int", typeName: "main.mode" }, [{ name: "Run", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])
+	return $.namedValueInterfaceValue<runner | null>(m, "main.mode", {Run: (receiver: any, ...args: any[]) => (__goscript_method.mode_Run as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("int", "main.mode"), [{ name: "Run", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }] }])
 }
 
 export async function main(): globalThis.Promise<void> {

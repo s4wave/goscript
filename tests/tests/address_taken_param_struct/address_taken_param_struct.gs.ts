@@ -42,9 +42,9 @@ export class Format {
 	static __typeInfo = $.registerStructType(
 		"main.Format",
 		() => new Format(),
-		[],
+		() => [],
 		Format,
-		[{ name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "Ext", key: "Ext", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "string" } } }]
+		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }, { name: "Ext", key: "Ext", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("string") } }]
 	)
 }
 

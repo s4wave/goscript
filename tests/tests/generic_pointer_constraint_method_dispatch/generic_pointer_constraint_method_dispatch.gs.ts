@@ -11,7 +11,7 @@ export type localPairingMessage = {
 $.registerInterfaceType(
 	"main.localPairingMessage",
 	null,
-	[{ name: "MarshalVT", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }, { name: "UnmarshalVT", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }]
+	[{ name: "MarshalVT", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }, { type: "error" }] }, { name: "UnmarshalVT", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }]
 );
 
 export class pairingOffer {
@@ -54,9 +54,9 @@ export class pairingOffer {
 	static __typeInfo = $.registerStructType(
 		"main.pairingOffer",
 		() => new pairingOffer(),
-		[{ name: "MarshalVT", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { type: "error" }] }, { name: "UnmarshalVT", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
+		() => [{ name: "MarshalVT", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }, { type: "error" }] }, { name: "UnmarshalVT", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
 		pairingOffer,
-		[{ name: "Note", key: "Note", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "Note", key: "Note", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 

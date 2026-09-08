@@ -32,9 +32,9 @@ export class Match {
 	static __typeInfo = $.registerStructType(
 		"main.Match",
 		() => new Match(),
-		[],
+		() => [],
 		Match,
-		[{ name: "Size", key: "Size", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "Size", key: "Size", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -82,9 +82,9 @@ export class Matcher {
 	static __typeInfo = $.registerStructType(
 		"main.Matcher",
 		() => new Matcher(),
-		[{ name: "Blocks", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: "main.Match" } }] }, { name: "Total", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }],
+		() => [{ name: "Blocks", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: "main.Match" } }] }, { name: "Total", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		Matcher,
-		[{ name: "matches", key: "matches", type: { kind: $.TypeKind.Slice, elemType: "main.Match" } }]
+		() => [{ name: "matches", key: "matches", type: { kind: $.TypeKind.Slice, elemType: "main.Match" } }]
 	)
 }
 

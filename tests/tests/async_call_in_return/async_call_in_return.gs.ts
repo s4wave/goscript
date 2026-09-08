@@ -26,12 +26,12 @@ export async function main(): globalThis.Promise<void> {
 
 	let [val1, ok1] = await getFromCache("test")
 	if (ok1) {
-		await $.println("getFromCache found:", $.mustTypeAssert<number>(val1, { kind: $.TypeKind.Basic, name: "int" }))
+		await $.println("getFromCache found:", $.mustTypeAssert<number>(val1, /* @__PURE__ */ $.basicType("int")))
 	}
 
 	let [val2, ok2] = await getFromCacheInline("test")
 	if (ok2) {
-		await $.println("getFromCacheInline found:", $.mustTypeAssert<number>(val2, { kind: $.TypeKind.Basic, name: "int" }))
+		await $.println("getFromCacheInline found:", $.mustTypeAssert<number>(val2, /* @__PURE__ */ $.basicType("int")))
 	}
 
 	let [, ok3] = await getFromCache("missing")

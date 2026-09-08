@@ -42,9 +42,9 @@ export class MyStruct {
 	static __typeInfo = $.registerStructType(
 		"main.MyStruct",
 		() => new MyStruct(),
-		[],
+		() => [],
 		MyStruct,
-		[{ name: "MyInt", key: "MyInt", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "MyString", key: "MyString", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "MyInt", key: "MyInt", type: /* @__PURE__ */ $.basicType("int") }, { name: "MyString", key: "MyString", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
@@ -87,9 +87,9 @@ export class NestedStruct {
 	static __typeInfo = $.registerStructType(
 		"main.NestedStruct",
 		() => new NestedStruct(),
-		[],
+		() => [],
 		NestedStruct,
-		[{ name: "Value", key: "Value", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "InnerStruct", key: "InnerStruct", type: "main.MyStruct" }]
+		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("int") }, { name: "InnerStruct", key: "InnerStruct", type: "main.MyStruct" }]
 	)
 }
 

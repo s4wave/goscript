@@ -52,9 +52,9 @@ export class FileTracker {
 	static __typeInfo = $.registerStructType(
 		"main.FileTracker",
 		() => new FileTracker(),
-		[{ name: "AddLine", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "AddLine", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
 		FileTracker,
-		[{ name: "mutex", key: "mutex", type: "sync.Mutex" }, { name: "lines", key: "lines", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } } }]
+		() => [{ name: "mutex", key: "mutex", type: "sync.Mutex" }, { name: "lines", key: "lines", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") } }]
 	)
 }
 
@@ -92,9 +92,9 @@ export class Scanner {
 	static __typeInfo = $.registerStructType(
 		"main.Scanner",
 		() => new Scanner(),
-		[{ name: "next", args: [], returns: [] }],
+		() => [{ name: "next", args: [], returns: [] }],
 		Scanner,
-		[{ name: "file", key: "file", type: { kind: $.TypeKind.Pointer, elemType: "main.FileTracker" } }]
+		() => [{ name: "file", key: "file", type: { kind: $.TypeKind.Pointer, elemType: "main.FileTracker" } }]
 	)
 }
 

@@ -10,7 +10,7 @@ export type dumper = {
 $.registerInterfaceType(
 	"main.dumper",
 	null,
-	[{ name: "Dump", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+	[{ name: "Dump", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
 );
 
 export class item {
@@ -36,9 +36,9 @@ export class item {
 	static __typeInfo = $.registerStructType(
 		"main.item",
 		() => new item(),
-		[{ name: "Dump", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Dump", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		item,
-		[]
+		() => []
 	)
 }
 

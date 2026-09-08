@@ -62,9 +62,9 @@ export class multiplyCase {
 	static __typeInfo = $.registerStructType(
 		"main.multiplyCase",
 		() => new multiplyCase(),
-		[],
+		() => [],
 		multiplyCase,
-		[{ name: "x", key: "x", type: { kind: $.TypeKind.Basic, name: "uint32" } }, { name: "y", key: "y", type: { kind: $.TypeKind.Basic, name: "uint32" } }, { name: "unsigned", key: "unsigned", type: { kind: $.TypeKind.Basic, name: "uint32" } }, { name: "signed", key: "signed", type: { kind: $.TypeKind.Basic, name: "int32" } }]
+		() => [{ name: "x", key: "x", type: /* @__PURE__ */ $.basicType("uint32") }, { name: "y", key: "y", type: /* @__PURE__ */ $.basicType("uint32") }, { name: "unsigned", key: "unsigned", type: /* @__PURE__ */ $.basicType("uint32") }, { name: "signed", key: "signed", type: /* @__PURE__ */ $.basicType("int32") }]
 	)
 }
 

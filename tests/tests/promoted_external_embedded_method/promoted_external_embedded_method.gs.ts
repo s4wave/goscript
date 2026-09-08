@@ -13,7 +13,7 @@ export type runner = {
 $.registerInterfaceType(
 	"main.runner",
 	null,
-	[{ name: "Run", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+	[{ name: "Run", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
 );
 
 export class raw {
@@ -57,9 +57,9 @@ export class raw {
 	static __typeInfo = $.registerStructType(
 		"main.raw",
 		() => new raw(),
-		[{ name: "Lock", args: [], returns: [] }, { name: "TryLock", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Unlock", args: [], returns: [] }],
+		() => [{ name: "Lock", args: [], returns: [] }, { name: "TryLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Unlock", args: [], returns: [] }],
 		raw,
-		[{ name: "Mutex", key: "Mutex", type: "sync.Mutex", anonymous: true }]
+		() => [{ name: "Mutex", key: "Mutex", type: "sync.Mutex", anonymous: true }]
 	)
 }
 
@@ -104,9 +104,9 @@ export class outer {
 	static __typeInfo = $.registerStructType(
 		"main.outer",
 		() => new outer(),
-		[{ name: "Lock", args: [], returns: [] }, { name: "TryLock", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Unlock", args: [], returns: [] }],
+		() => [{ name: "Lock", args: [], returns: [] }, { name: "TryLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Unlock", args: [], returns: [] }],
 		outer,
-		[{ name: "raw", key: "raw", type: "main.raw", anonymous: true }]
+		() => [{ name: "raw", key: "raw", type: "main.raw", anonymous: true }]
 	)
 }
 
@@ -167,9 +167,9 @@ export class rawRW {
 	static __typeInfo = $.registerStructType(
 		"main.rawRW",
 		() => new rawRW(),
-		[{ name: "Lock", args: [], returns: [] }, { name: "RLock", args: [], returns: [] }, { name: "RLocker", args: [], returns: [{ type: "sync.Locker" }] }, { name: "RUnlock", args: [], returns: [] }, { name: "TryLock", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "TryRLock", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Unlock", args: [], returns: [] }],
+		() => [{ name: "Lock", args: [], returns: [] }, { name: "RLock", args: [], returns: [] }, { name: "RLocker", args: [], returns: [{ type: "sync.Locker" }] }, { name: "RUnlock", args: [], returns: [] }, { name: "TryLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "TryRLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Unlock", args: [], returns: [] }],
 		rawRW,
-		[{ name: "RWMutex", key: "RWMutex", type: "sync.RWMutex", anonymous: true }]
+		() => [{ name: "RWMutex", key: "RWMutex", type: "sync.RWMutex", anonymous: true }]
 	)
 }
 
@@ -230,9 +230,9 @@ export class outerRW {
 	static __typeInfo = $.registerStructType(
 		"main.outerRW",
 		() => new outerRW(),
-		[{ name: "Lock", args: [], returns: [] }, { name: "RLock", args: [], returns: [] }, { name: "RLocker", args: [], returns: [{ type: "sync.Locker" }] }, { name: "RUnlock", args: [], returns: [] }, { name: "TryLock", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "TryRLock", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Unlock", args: [], returns: [] }],
+		() => [{ name: "Lock", args: [], returns: [] }, { name: "RLock", args: [], returns: [] }, { name: "RLocker", args: [], returns: [{ type: "sync.Locker" }] }, { name: "RUnlock", args: [], returns: [] }, { name: "TryLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "TryRLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Unlock", args: [], returns: [] }],
 		outerRW,
-		[{ name: "rawRW", key: "rawRW", type: "main.rawRW", anonymous: true }]
+		() => [{ name: "rawRW", key: "rawRW", type: "main.rawRW", anonymous: true }]
 	)
 }
 
@@ -269,9 +269,9 @@ export class rawRunner {
 	static __typeInfo = $.registerStructType(
 		"main.rawRunner",
 		() => new rawRunner(),
-		[{ name: "Run", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Run", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		rawRunner,
-		[{ name: "runner", key: "runner", type: "main.runner", anonymous: true }]
+		() => [{ name: "runner", key: "runner", type: "main.runner", anonymous: true }]
 	)
 }
 
@@ -308,9 +308,9 @@ export class outerRunner {
 	static __typeInfo = $.registerStructType(
 		"main.outerRunner",
 		() => new outerRunner(),
-		[{ name: "Run", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Run", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		outerRunner,
-		[{ name: "rawRunner", key: "rawRunner", type: "main.rawRunner", anonymous: true }]
+		() => [{ name: "rawRunner", key: "rawRunner", type: "main.rawRunner", anonymous: true }]
 	)
 }
 
@@ -337,9 +337,9 @@ export class runnable {
 	static __typeInfo = $.registerStructType(
 		"main.runnable",
 		() => new runnable(),
-		[{ name: "Run", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Run", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		runnable,
-		[]
+		() => []
 	)
 }
 

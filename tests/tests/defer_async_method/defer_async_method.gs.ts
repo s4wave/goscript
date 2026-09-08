@@ -42,9 +42,9 @@ export class AsyncResource {
 	static __typeInfo = $.registerStructType(
 		"main.AsyncResource",
 		() => new AsyncResource(),
-		[{ name: "Release", args: [], returns: [] }],
+		() => [{ name: "Release", args: [], returns: [] }],
 		AsyncResource,
-		[{ name: "name", key: "name", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 

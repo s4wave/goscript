@@ -32,9 +32,9 @@ export class MyStruct {
 	static __typeInfo = $.registerStructType(
 		"main.MyStruct",
 		() => new MyStruct(),
-		[],
+		() => [],
 		MyStruct,
-		[{ name: "myPrivate", key: "myPrivate", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "myPrivate", key: "myPrivate", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

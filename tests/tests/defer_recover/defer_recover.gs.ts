@@ -42,7 +42,7 @@ export async function mustPanic(): globalThis.Promise<void> {
 			{
 				let r = $.recover()
 				if (r != null) {
-					await $.println("recovered:", $.mustTypeAssert<string>(r, { kind: $.TypeKind.Basic, name: "string" }))
+					await $.println("recovered:", $.mustTypeAssert<string>(r, /* @__PURE__ */ $.basicType("string")))
 				}
 			}
 		})() })

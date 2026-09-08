@@ -33,9 +33,9 @@ export async function main(): globalThis.Promise<void> {
 		static __typeInfo = $.registerStructType(
 			"main.result",
 			() => new result(),
-			[],
+			() => [],
 			result,
-			[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+			() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 		)
 	}
 

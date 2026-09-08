@@ -34,9 +34,9 @@ export class Pair {
 	static __typeInfo = $.registerStructType(
 		"main.Pair",
 		() => new Pair(),
-		[],
+		() => [],
 		Pair,
-		[{ name: "Value", key: "Value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

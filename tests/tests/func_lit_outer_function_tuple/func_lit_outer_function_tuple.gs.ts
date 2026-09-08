@@ -16,7 +16,7 @@ export function wrap(open: opener | null): wrapper | null {
 			return ["", err]
 		}
 		return ["wrapped:" + value, null]
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "string" }, "error"] } as $.FunctionTypeInfo))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string"), "error"] } as $.FunctionTypeInfo))
 }
 
 export function open(path: string): [string, $.GoError] {

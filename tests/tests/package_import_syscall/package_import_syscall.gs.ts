@@ -71,12 +71,12 @@ export async function main(): globalThis.Promise<void> {
 		iovecs
 	}
 	let sa4: syscall.SockaddrInet4 = $.markAsStructValue(new syscall.SockaddrInet4())
-	let addr4 = $.markAsStructValue($.cloneStructValue(netip.AddrFrom4($.cloneArrayValue(sa4.Addr, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 4 }))))
-	sa4.Addr = $.cloneArrayValue($.markAsStructValue($.cloneStructValue(addr4)).As4(), { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 4 })
+	let addr4 = $.markAsStructValue($.cloneStructValue(netip.AddrFrom4($.cloneArrayValue(sa4.Addr, { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("uint8"), length: 4 }))))
+	sa4.Addr = $.cloneArrayValue($.markAsStructValue($.cloneStructValue(addr4)).As4(), { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("uint8"), length: 4 })
 
 	let sa6: syscall.SockaddrInet6 = $.markAsStructValue(new syscall.SockaddrInet6())
-	let addr6 = $.markAsStructValue($.cloneStructValue(netip.AddrFrom16($.cloneArrayValue(sa6.Addr, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 16 }))))
-	sa6.Addr = $.cloneArrayValue($.markAsStructValue($.cloneStructValue(addr6)).As16(), { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 16 })
+	let addr6 = $.markAsStructValue($.cloneStructValue(netip.AddrFrom16($.cloneArrayValue(sa6.Addr, { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("uint8"), length: 16 }))))
+	sa6.Addr = $.cloneArrayValue($.markAsStructValue($.cloneStructValue(addr6)).As16(), { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("uint8"), length: 16 })
 
 	await fmt.Println("set nonblock ok")
 }

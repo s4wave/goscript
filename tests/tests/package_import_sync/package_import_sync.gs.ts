@@ -57,9 +57,9 @@ export class embeddedMutex {
 	static __typeInfo = $.registerStructType(
 		"main.embeddedMutex",
 		() => new embeddedMutex(),
-		[{ name: "Lock", args: [], returns: [] }, { name: "TryLock", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Unlock", args: [], returns: [] }],
+		() => [{ name: "Lock", args: [], returns: [] }, { name: "TryLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Unlock", args: [], returns: [] }],
 		embeddedMutex,
-		[{ name: "Mutex", key: "Mutex", type: "sync.Mutex", anonymous: true }, { name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "Mutex", key: "Mutex", type: "sync.Mutex", anonymous: true }, { name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -130,9 +130,9 @@ export class embeddedRWMutex {
 	static __typeInfo = $.registerStructType(
 		"main.embeddedRWMutex",
 		() => new embeddedRWMutex(),
-		[{ name: "Lock", args: [], returns: [] }, { name: "RLock", args: [], returns: [] }, { name: "RLocker", args: [], returns: [{ type: "sync.Locker" }] }, { name: "RUnlock", args: [], returns: [] }, { name: "TryLock", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "TryRLock", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Unlock", args: [], returns: [] }],
+		() => [{ name: "Lock", args: [], returns: [] }, { name: "RLock", args: [], returns: [] }, { name: "RLocker", args: [], returns: [{ type: "sync.Locker" }] }, { name: "RUnlock", args: [], returns: [] }, { name: "TryLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "TryRLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Unlock", args: [], returns: [] }],
 		embeddedRWMutex,
-		[{ name: "RWMutex", key: "RWMutex", type: "sync.RWMutex", anonymous: true }, { name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "RWMutex", key: "RWMutex", type: "sync.RWMutex", anonymous: true }, { name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -200,7 +200,7 @@ export async function main(): globalThis.Promise<void> {
 	let onceValue: (() => number | globalThis.Promise<number>) | null = (sync.OnceValue($.functionValue(async (): globalThis.Promise<number> => {
 		await $.println("OnceValue function executed")
 		return 42
-	}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))) as (() => number | globalThis.Promise<number>) | null)
+	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))) as (() => number | globalThis.Promise<number>) | null)
 	let val1 = await onceValue!()
 	let val2 = await onceValue!()
 	await $.println("OnceValue results:", val1, val2)
@@ -252,7 +252,7 @@ export async function main(): globalThis.Promise<void> {
 	await m.value.Range($.functionValue(async (key: any, value: any): globalThis.Promise<boolean> => {
 		await $.println("Range:", key, "->", value)
 		return true
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }, { kind: $.TypeKind.Interface, methods: [] }], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo)))
+	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }, { kind: $.TypeKind.Interface, methods: [] }], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 
 	await m.value.Delete("key1")
 	{

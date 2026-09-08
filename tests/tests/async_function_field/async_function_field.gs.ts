@@ -40,9 +40,9 @@ export class loader {
 	static __typeInfo = $.registerStructType(
 		"main.loader",
 		() => new loader(),
-		[{ name: "getLoad", args: [], returns: [{ type: ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Interface, methods: [] }, { kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo) }] }],
+		() => [{ name: "getLoad", args: [], returns: [{ type: ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [{ kind: $.TypeKind.Interface, methods: [] }, /* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo) }] }],
 		loader,
-		[{ name: "load", key: "load", type: ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Interface, methods: [] }, { kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo) }]
+		() => [{ name: "load", key: "load", type: ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [{ kind: $.TypeKind.Interface, methods: [] }, /* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo) }]
 	)
 }
 
@@ -54,7 +54,7 @@ export function __goscript_set_cache(__goscriptValue: sync.Map): void {
 
 export let defaultLoader: loader | $.VarRef<loader> | null = new loader({load: $.functionValue(async (key: string): globalThis.Promise<[any, boolean]> => {
 	return await cache.value.Load(key)
-}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Interface, methods: [] }, { kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo))})
+}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [{ kind: $.TypeKind.Interface, methods: [] }, /* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))})
 
 export function __goscript_set_defaultLoader(__goscriptValue: loader | $.VarRef<loader> | null): void {
 	defaultLoader = __goscriptValue
@@ -72,11 +72,11 @@ export async function main(): globalThis.Promise<void> {
 	await cache.value.Store("answer", $.basicInterfaceValue(42, "int"))
 	let [value, ok] = await lookup("answer")
 	if (ok) {
-		await $.println("value:", $.mustTypeAssert<number>(value, { kind: $.TypeKind.Basic, name: "int" }))
+		await $.println("value:", $.mustTypeAssert<number>(value, /* @__PURE__ */ $.basicType("int")))
 	}
 	let [getterValue, getterOk] = await lookupViaGetter("answer")
 	if (getterOk) {
-		await $.println("getter value:", $.mustTypeAssert<number>(getterValue, { kind: $.TypeKind.Basic, name: "int" }))
+		await $.println("getter value:", $.mustTypeAssert<number>(getterValue, /* @__PURE__ */ $.basicType("int")))
 	}
 }
 

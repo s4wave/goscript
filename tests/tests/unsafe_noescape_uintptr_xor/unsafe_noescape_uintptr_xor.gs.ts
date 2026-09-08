@@ -45,9 +45,9 @@ export class sourceStruct {
 	static __typeInfo = $.registerStructType(
 		"main.sourceStruct",
 		() => new sourceStruct(),
-		[],
+		() => [],
 		sourceStruct,
-		[{ name: "flag", key: "flag", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint" } } }]
+		() => [{ name: "flag", key: "flag", type: /* @__PURE__ */ $.basicType("bool") }, { name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint") } }]
 	)
 }
 
@@ -90,9 +90,9 @@ export class viewStruct {
 	static __typeInfo = $.registerStructType(
 		"main.viewStruct",
 		() => new viewStruct(),
-		[],
+		() => [],
 		viewStruct,
-		[{ name: "flag", key: "flag", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint" } } }]
+		() => [{ name: "flag", key: "flag", type: /* @__PURE__ */ $.basicType("bool") }, { name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint") } }]
 	)
 }
 

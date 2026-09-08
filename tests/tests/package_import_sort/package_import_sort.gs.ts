@@ -58,15 +58,15 @@ export class descending {
 	static __typeInfo = $.registerStructType(
 		"main.descending",
 		() => new descending(),
-		[{ name: "Len", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "Less", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Swap", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "Len", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Less", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Swap", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
 		descending,
-		[{ name: "values", key: "values", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } } }]
+		() => [{ name: "values", key: "values", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") } }]
 	)
 }
 
 export async function byFreq_sort(s: $.VarRef<byFreq> | null, a: $.Slice<number>): globalThis.Promise<void> {
 	s!.value = ((a as byFreq) as byFreq)
-	await sort2.Sort($.pointerValueOrNil($.namedValueInterfaceValue<sort2.Interface | null>(s, "*main.byFreq", {Len: (receiver: any, ...args: any[]) => (byFreq_Len as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Less: (receiver: any, ...args: any[]) => (byFreq_Less as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byFreq_Swap as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), sort: (receiver: any, ...args: any[]) => (byFreq_sort as any)(receiver, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, typeName: "main.byFreq", elemType: { kind: $.TypeKind.Basic, name: "int" } } }, [{ name: "Len", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "Less", args: [{ name: "i", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "j", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Swap", args: [{ name: "i", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "j", type: { kind: $.TypeKind.Basic, name: "int" } }], returns: [] }, { name: "sort", args: [{ name: "a", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } } }], returns: [] }]))!)
+	await sort2.Sort($.pointerValueOrNil($.namedValueInterfaceValue<sort2.Interface | null>(s, "*main.byFreq", {Len: (receiver: any, ...args: any[]) => (byFreq_Len as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Less: (receiver: any, ...args: any[]) => (byFreq_Less as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byFreq_Swap as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), sort: (receiver: any, ...args: any[]) => (byFreq_sort as any)(receiver, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, typeName: "main.byFreq", elemType: /* @__PURE__ */ $.basicType("int") } }, [{ name: "Len", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Less", args: [{ name: "i", type: /* @__PURE__ */ $.basicType("int") }, { name: "j", type: /* @__PURE__ */ $.basicType("int") }], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Swap", args: [{ name: "i", type: /* @__PURE__ */ $.basicType("int") }, { name: "j", type: /* @__PURE__ */ $.basicType("int") }], returns: [] }, { name: "sort", args: [{ name: "a", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") } }], returns: [] }]))!)
 }
 
 export function byFreq_Len(s: byFreq): number {
@@ -128,7 +128,7 @@ export async function main(): globalThis.Promise<void> {
 	// Test generic Search function
 	let searchResult = await sort2.Search($.len(ints), $.functionValue((i: number): boolean => {
 		return $.arrayIndex(ints!, i) >= 5
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo)))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 	await $.println("First index where value >= 5:", searchResult)
 
 	// Test Slice function with custom comparator
@@ -139,16 +139,16 @@ export async function main(): globalThis.Promise<void> {
 	let asyncSlice: $.Slice<number> = $.arrayToSlice<number>([2, 1])
 	let ready: $.Channel<boolean> | null = $.makeChannel<boolean>(1, false, "both")
 	await $.chanSend(ready, true)
-	await sort2.Slice($.interfaceValue(asyncSlice, "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }), $.functionValue(async (i: number, j: number): globalThis.Promise<boolean> => {
+	await sort2.Slice($.interfaceValue(asyncSlice, "[]int", { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") }), $.functionValue(async (i: number, j: number): globalThis.Promise<boolean> => {
 		await $.chanRecv(ready)
 		return $.arrayIndex(asyncSlice!, i) < $.arrayIndex(asyncSlice!, j)
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo)))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 	await $.println("Async sorted slice:", $.arrayIndex(asyncSlice!, 0), $.arrayIndex(asyncSlice!, 1))
 
 	// Test SliceIsSorted
-	let isSliceSorted = await sort2.SliceIsSorted($.interfaceValue(testSlice, "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }), $.functionValue((i: number, j: number): boolean => {
+	let isSliceSorted = await sort2.SliceIsSorted($.interfaceValue(testSlice, "[]int", { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") }), $.functionValue((i: number, j: number): boolean => {
 		return $.arrayIndex(testSlice!, i) < $.arrayIndex(testSlice!, j)
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }, { kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo)))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 	await $.println("Custom slice is sorted:", isSliceSorted)
 
 	// Test custom sort.Interface values.

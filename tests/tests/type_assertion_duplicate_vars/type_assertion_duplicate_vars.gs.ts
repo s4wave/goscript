@@ -10,7 +10,7 @@ export type Interface = {
 $.registerInterfaceType(
 	"main.Interface",
 	null,
-	[{ name: "Method", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+	[{ name: "Method", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
 );
 
 export class ConcreteA {
@@ -37,9 +37,9 @@ export class ConcreteA {
 	static __typeInfo = $.registerStructType(
 		"main.ConcreteA",
 		() => new ConcreteA(),
-		[{ name: "Method", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Method", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		ConcreteA,
-		[]
+		() => []
 	)
 }
 
@@ -67,9 +67,9 @@ export class ConcreteB {
 	static __typeInfo = $.registerStructType(
 		"main.ConcreteB",
 		() => new ConcreteB(),
-		[{ name: "Method", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Method", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		ConcreteB,
-		[]
+		() => []
 	)
 }
 
@@ -112,9 +112,9 @@ export class Container {
 	static __typeInfo = $.registerStructType(
 		"main.Container",
 		() => new Container(),
-		[],
+		() => [],
 		Container,
-		[{ name: "hasA", key: "hasA", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "hasB", key: "hasB", type: { kind: $.TypeKind.Basic, name: "bool" } }]
+		() => [{ name: "hasA", key: "hasA", type: /* @__PURE__ */ $.basicType("bool") }, { name: "hasB", key: "hasB", type: /* @__PURE__ */ $.basicType("bool") }]
 	)
 }
 

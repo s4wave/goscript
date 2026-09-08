@@ -26,9 +26,9 @@ export class embedded {
 	static __typeInfo = $.registerStructType(
 		"main.embedded",
 		() => new embedded(),
-		[{ name: "Database", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Database", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		embedded,
-		[]
+		() => []
 	)
 }
 
@@ -71,9 +71,9 @@ export class holder {
 	static __typeInfo = $.registerStructType(
 		"main.holder",
 		() => new holder(),
-		[],
+		() => [],
 		holder,
-		[{ name: "Database", key: "Database", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "embedded", key: "embedded", type: "main.embedded", anonymous: true }]
+		() => [{ name: "Database", key: "Database", type: /* @__PURE__ */ $.basicType("string") }, { name: "embedded", key: "embedded", type: "main.embedded", anonymous: true }]
 	)
 }
 

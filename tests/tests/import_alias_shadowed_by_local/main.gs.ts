@@ -35,9 +35,9 @@ export class local {
 	static __typeInfo = $.registerStructType(
 		"main.local",
 		() => new local(),
-		[],
+		() => [],
 		local,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

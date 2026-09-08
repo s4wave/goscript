@@ -35,9 +35,9 @@ export class pointerNode {
 	static __typeInfo = $.registerStructType(
 		"main.pointerNode",
 		() => new pointerNode(),
-		[],
+		() => [],
 		pointerNode,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
@@ -143,7 +143,7 @@ export async function main(): globalThis.Promise<void> {
 		let loaded_val = val.value.Load()
 		if (loaded_val != null) {
 			{
-				let [str, ok] = $.typeAssertTuple<string>(loaded_val, { kind: $.TypeKind.Basic, name: "string" })
+				let [str, ok] = $.typeAssertTuple<string>(loaded_val, /* @__PURE__ */ $.basicType("string"))
 				if (ok) {
 					await $.println("Value loaded:", str)
 				}
@@ -154,7 +154,7 @@ export async function main(): globalThis.Promise<void> {
 	let old_val = val.value.Swap("new atomic value")
 	if (old_val != null) {
 		{
-			let [str, ok] = $.typeAssertTuple<string>(old_val, { kind: $.TypeKind.Basic, name: "string" })
+			let [str, ok] = $.typeAssertTuple<string>(old_val, /* @__PURE__ */ $.basicType("string"))
 			if (ok) {
 				await $.println("Value swapped, old:", str)
 			}
@@ -164,7 +164,7 @@ export async function main(): globalThis.Promise<void> {
 		let loaded_val = val.value.Load()
 		if (loaded_val != null) {
 			{
-				let [str, ok] = $.typeAssertTuple<string>(loaded_val, { kind: $.TypeKind.Basic, name: "string" })
+				let [str, ok] = $.typeAssertTuple<string>(loaded_val, /* @__PURE__ */ $.basicType("string"))
 				if (ok) {
 					await $.println("Value new:", str)
 				}

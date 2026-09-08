@@ -42,9 +42,9 @@ export class customErr {
 	static __typeInfo = $.registerStructType(
 		"main.customErr",
 		() => new customErr(),
-		[{ name: "Error", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Error", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		customErr,
-		[{ name: "msg", key: "msg", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "msg", key: "msg", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
@@ -87,9 +87,9 @@ export class wrappedErr {
 	static __typeInfo = $.registerStructType(
 		"main.wrappedErr",
 		() => new wrappedErr(),
-		[{ name: "Error", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Unwrap", args: [], returns: [{ type: "error" }] }],
+		() => [{ name: "Error", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Unwrap", args: [], returns: [{ type: "error" }] }],
 		wrappedErr,
-		[{ name: "err", key: "err", type: "error" }]
+		() => [{ name: "err", key: "err", type: "error" }]
 	)
 }
 
@@ -126,8 +126,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("AsType missing:", ok)
 
 	let scalarTarget: $.VarRef<scalarErr> = $.varRef(0)
-	await $.println("As scalar missing:", errors.As($.pointerValueOrNil(err1)!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", {Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" } }, [{ name: "Error", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])), $.uint(scalarTarget.value, 8))
-	await $.println("As scalar matched:", errors.As($.namedValueInterfaceValue<$.GoError>(42, "main.scalarErr", {"Error": scalarErr_Error}, { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" }), $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", {Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "uint8", typeName: "main.scalarErr" } }, [{ name: "Error", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Basic, name: "string" } }] }])), $.uint(scalarTarget.value, 8))
+	await $.println("As scalar missing:", errors.As($.pointerValueOrNil(err1)!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", {Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: /* @__PURE__ */ $.basicType("uint8", "main.scalarErr") }, [{ name: "Error", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }] }])), $.uint(scalarTarget.value, 8))
+	await $.println("As scalar matched:", errors.As($.namedValueInterfaceValue<$.GoError>(42, "main.scalarErr", {"Error": scalarErr_Error}, /* @__PURE__ */ $.basicType("uint8", "main.scalarErr")), $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", {Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: /* @__PURE__ */ $.basicType("uint8", "main.scalarErr") }, [{ name: "Error", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }] }])), $.uint(scalarTarget.value, 8))
 
 	await $.println("test finished")
 }

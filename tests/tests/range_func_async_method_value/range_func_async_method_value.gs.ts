@@ -47,9 +47,9 @@ export class listProvider {
 	static __typeInfo = $.registerStructType(
 		"main.listProvider",
 		() => new listProvider(),
-		[{ name: "Items", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.Group" } } }] }],
+		() => [{ name: "Items", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.Group" } } }] }],
 		listProvider,
-		[{ name: "items", key: "items", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.Group" } } }]
+		() => [{ name: "items", key: "items", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.Group" } } }]
 	)
 }
 
@@ -93,7 +93,7 @@ export class Group {
 		const g: Group | $.VarRef<Group> | null = this
 		let __goscriptRangeReturn0 = false
 		;await (async () => {
-			await $.functionValue(((__receiver) => (_yield: ((_p0: Group | $.VarRef<Group> | null) => boolean | globalThis.Promise<boolean>) | null) => __receiver.Each(_yield))($.pointerValue<Group>(g)), ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "main.Group" }], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo))!(async (child) => {
+			await $.functionValue(((__receiver) => (_yield: ((_p0: Group | $.VarRef<Group> | null) => boolean | globalThis.Promise<boolean>) | null) => __receiver.Each(_yield))($.pointerValue<Group>(g)), ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "main.Group" }], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo))!(async (child) => {
 				$.pointerValue<Group>(child).seen = true
 				return true
 			})
@@ -116,9 +116,9 @@ export class Group {
 	static __typeInfo = $.registerStructType(
 		"main.Group",
 		() => new Group(),
-		[{ name: "Build", args: [], returns: [] }, { name: "Each", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "Build", args: [], returns: [] }, { name: "Each", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
 		Group,
-		[{ name: "provider", key: "provider", type: "main.provider" }, { name: "seen", key: "seen", type: { kind: $.TypeKind.Basic, name: "bool" } }]
+		() => [{ name: "provider", key: "provider", type: "main.provider" }, { name: "seen", key: "seen", type: /* @__PURE__ */ $.basicType("bool") }]
 	)
 }
 

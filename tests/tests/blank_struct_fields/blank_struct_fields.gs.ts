@@ -33,18 +33,18 @@ export class padded {
 
 	constructor(init?: Partial<{_blank0?: Uint8Array, Value?: number, _blank2?: Uint8Array}>) {
 		this._fields = {
-			_blank0: $.varRef(init?._blank0 !== undefined ? $.cloneArrayValue(init._blank0, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 2 }) : new Uint8Array(2)),
+			_blank0: $.varRef(init?._blank0 !== undefined ? $.cloneArrayValue(init._blank0, { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("uint8"), length: 2 }) : new Uint8Array(2)),
 			Value: $.varRef(init?.Value ?? (0 as number)),
-			_blank2: $.varRef(init?._blank2 !== undefined ? $.cloneArrayValue(init._blank2, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 3 }) : new Uint8Array(3))
+			_blank2: $.varRef(init?._blank2 !== undefined ? $.cloneArrayValue(init._blank2, { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("uint8"), length: 3 }) : new Uint8Array(3))
 		}
 	}
 
 	public clone(): padded {
 		const cloned = new padded()
 		cloned._fields = {
-			_blank0: $.varRef($.cloneArrayValue(this._fields._blank0.value, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 2 })),
+			_blank0: $.varRef($.cloneArrayValue(this._fields._blank0.value, { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("uint8"), length: 2 })),
 			Value: $.varRef(this._fields.Value.value),
-			_blank2: $.varRef($.cloneArrayValue(this._fields._blank2.value, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 3 }))
+			_blank2: $.varRef($.cloneArrayValue(this._fields._blank2.value, { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("uint8"), length: 3 }))
 		}
 		return $.markAsStructValue(cloned)
 	}
@@ -52,9 +52,9 @@ export class padded {
 	static __typeInfo = $.registerStructType(
 		"main.padded",
 		() => new padded(),
-		[],
+		() => [],
 		padded,
-		[{ name: "_", key: "_blank0", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 2 } }, { name: "Value", key: "Value", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "_", key: "_blank2", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 3 } }]
+		() => [{ name: "_", key: "_blank0", type: { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("uint8"), length: 2 } }, { name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("int") }, { name: "_", key: "_blank2", type: { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("uint8"), length: 3 } }]
 	)
 }
 

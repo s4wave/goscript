@@ -25,9 +25,9 @@ export class thing {
 	static __typeInfo = $.registerStructType(
 		"main.thing",
 		() => new thing(),
-		[],
+		() => [],
 		thing,
-		[]
+		() => []
 	)
 }
 

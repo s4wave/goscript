@@ -43,9 +43,9 @@ export class openOnlyFS {
 	static __typeInfo = $.registerStructType(
 		"main.openOnlyFS",
 		() => new openOnlyFS(),
-		[{ name: "Open", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "fs.File" }, { type: "error" }] }],
+		() => [{ name: "Open", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "fs.File" }, { type: "error" }] }],
 		openOnlyFS,
-		[{ name: "fsys", key: "fsys", type: "fstest.MapFS" }]
+		() => [{ name: "fsys", key: "fsys", type: "fstest.MapFS" }]
 	)
 }
 

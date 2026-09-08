@@ -34,7 +34,7 @@ export async function recoverMsg(label: string, fn: (() => void) | null): global
 export async function main(): globalThis.Promise<void> {
 	await recoverMsg("array:", $.functionValue(async (): globalThis.Promise<void> => {
 		let values: $.Slice<number> = new Uint8Array([1, 2]) as $.Slice<number>
-		let arr = $.cloneArrayValue(($.sliceToArray<number>(values, 4, "byte") as Uint8Array), { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "uint8" }, length: 4 })
+		let arr = $.cloneArrayValue(($.sliceToArray<number>(values, 4, "byte") as Uint8Array), { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("uint8"), length: 4 })
 		await $.println($.uint($.arrayIndex(arr, 0), 8))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await recoverMsg("pointer:", $.functionValue(async (): globalThis.Promise<void> => {

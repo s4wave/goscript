@@ -31,7 +31,7 @@ export async function main(): globalThis.Promise<void> {
 	// Decoder reads one value per call and buffers the rest of the stream.
 	let dec: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("1 2 3"), "*strings.Reader", { kind: $.TypeKind.Pointer, elemType: "strings.Reader" }))!)
 	let n: $.VarRef<number> = $.varRef(0)
-	while (json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.interfaceValue(n, "*int", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "int" } })) == null) {
+	while (json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.interfaceValue(n, "*int", { kind: $.TypeKind.Pointer, elemType: /* @__PURE__ */ $.basicType("int") })) == null) {
 		await fmt.Println("decoded", $.basicInterfaceValue(n.value, "int"))
 	}
 
@@ -39,7 +39,7 @@ export async function main(): globalThis.Promise<void> {
 	let und: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"big\":9007199254740993}"), "*strings.Reader", { kind: $.TypeKind.Pointer, elemType: "strings.Reader" }))!)
 	json.Decoder.prototype.UseNumber.call($.pointerValue<json.Decoder>(und))
 	let m: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null! as globalThis.Map<string, any> | null)
-	json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(und), $.interfaceValue(m, "*map[string]any", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Interface, methods: [] } } }))
+	json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(und), $.interfaceValue(m, "*map[string]any", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: { kind: $.TypeKind.Interface, methods: [] } } }))
 	await fmt.Println("big", $.mapGet<string, any, any>(m.value, "big", null)[0])
 
 	// A malformed document yields a *json.SyntaxError with the Go byte offset.

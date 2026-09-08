@@ -32,8 +32,8 @@ export class Tx {
 	static __typeInfo = $.registerStructType(
 		"tx.Tx",
 		() => new Tx(),
-		[],
+		() => [],
 		Tx,
-		[{ name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }

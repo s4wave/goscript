@@ -38,13 +38,13 @@ export async function typeSwitchCaseRedeclare(value: any): globalThis.Promise<vo
 	{
 		const __goscriptTypeSwitchValue = value
 		switch (true) {
-			case $.typeAssert<number>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "int" }).ok:
+			case $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int")).ok:
 				{
 					let hashed = "int"
 					await $.println("type hashed:", hashed)
 				}
 				break
-			case $.typeAssert<string>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Basic, name: "string" }).ok:
+			case $.typeAssert<string>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string")).ok:
 				{
 					let hashed = "string"
 					await $.println("type hashed:", hashed)
@@ -83,7 +83,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptTuple2: any = await shadowCallbackInput($.functionValue((k: number): number => {
 			return k + 1
-		}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo)))
+		}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))
 		let k = __goscriptTuple2[0]
 		let ok = __goscriptTuple2[1]
 		await $.println("callback shadow:", k, ok)

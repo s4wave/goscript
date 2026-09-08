@@ -32,9 +32,9 @@ export class Result {
 	static __typeInfo = $.registerStructType(
 		"main.Result",
 		() => new Result(),
-		[],
+		() => [],
 		Result,
-		[{ name: "ok", key: "ok", type: { kind: $.TypeKind.Basic, name: "bool" } }]
+		() => [{ name: "ok", key: "ok", type: /* @__PURE__ */ $.basicType("bool") }]
 	)
 }
 
@@ -44,7 +44,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// This should trigger the error: ok expression is not an identifier: *ast.SelectorExpr
 	// The 'ok' variable is result.ok (a selector expression) instead of a simple identifier
-	let __goscriptTuple0: any = $.typeAssertTuple<number>(x, { kind: $.TypeKind.Basic, name: "int" })
+	let __goscriptTuple0: any = $.typeAssertTuple<number>(x, /* @__PURE__ */ $.basicType("int"))
 	result.ok = __goscriptTuple0[1]
 
 	await $.println("Type assertion successful:", result.ok)

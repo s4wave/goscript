@@ -36,9 +36,9 @@ export class Holder {
 	static __typeInfo = $.registerStructType(
 		"main.Holder",
 		() => new Holder(),
-		[{ name: "Run", args: [], returns: [] }],
+		() => [{ name: "Run", args: [], returns: [] }],
 		Holder,
-		[]
+		() => []
 	)
 }
 

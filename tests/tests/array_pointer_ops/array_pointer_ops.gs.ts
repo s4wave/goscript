@@ -32,9 +32,9 @@ export class item {
 	static __typeInfo = $.registerStructType(
 		"main.item",
 		() => new item(),
-		[],
+		() => [],
 		item,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -60,7 +60,7 @@ export class arrays {
 
 	constructor(init?: Partial<{slices?: $.Slice<number>[], items?: item[]}>) {
 		this._fields = {
-			slices: $.varRef(init?.slices !== undefined ? $.cloneArrayValue(init.slices, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }, length: 1 }) : Array.from({ length: 1 }, () => null)),
+			slices: $.varRef(init?.slices !== undefined ? $.cloneArrayValue(init.slices, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") }, length: 1 }) : Array.from({ length: 1 }, () => null)),
 			items: $.varRef(init?.items !== undefined ? $.cloneArrayValue(init.items, { kind: $.TypeKind.Array, elemType: "main.item", length: 1 }) : Array.from({ length: 1 }, () => $.markAsStructValue(new item())))
 		}
 	}
@@ -68,7 +68,7 @@ export class arrays {
 	public clone(): arrays {
 		const cloned = new arrays()
 		cloned._fields = {
-			slices: $.varRef($.cloneArrayValue(this._fields.slices.value, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }, length: 1 })),
+			slices: $.varRef($.cloneArrayValue(this._fields.slices.value, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") }, length: 1 })),
 			items: $.varRef($.cloneArrayValue(this._fields.items.value, { kind: $.TypeKind.Array, elemType: "main.item", length: 1 }))
 		}
 		return $.markAsStructValue(cloned)
@@ -77,9 +77,9 @@ export class arrays {
 	static __typeInfo = $.registerStructType(
 		"main.arrays",
 		() => new arrays(),
-		[],
+		() => [],
 		arrays,
-		[{ name: "slices", key: "slices", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }, length: 1 } }, { name: "items", key: "items", type: { kind: $.TypeKind.Array, elemType: "main.item", length: 1 } }]
+		() => [{ name: "slices", key: "slices", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") }, length: 1 } }, { name: "items", key: "items", type: { kind: $.TypeKind.Array, elemType: "main.item", length: 1 } }]
 	)
 }
 
@@ -110,7 +110,7 @@ export function closureArrayAddress(): number {
 
 export async function main(): globalThis.Promise<void> {
 	let slices = [$.arrayToSlice<number>([1])]
-	let slicesCopy = $.cloneArrayValue(slices, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }, length: 1 })
+	let slicesCopy = $.cloneArrayValue(slices, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") }, length: 1 })
 	$.arrayIndex(slicesCopy, 0)![0] = 7
 	await $.println("slice sharing:", $.arrayIndex($.arrayIndex(slices, 0)!, 0))
 
@@ -124,7 +124,7 @@ export async function main(): globalThis.Promise<void> {
 	$.pointerValue<item>($.arrayIndex(pointersCopy, 0)).value = 7
 	await $.println("pointer sharing:", $.pointerValue<item>($.arrayIndex(pointers, 0)).value, $.pointerEqual($.arrayIndex(pointers, 0), $.arrayIndex(pointersCopy, 0)))
 
-	let original = $.markAsStructValue(new arrays({slices: $.cloneArrayValue(slices, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }, length: 1 }), items: $.cloneArrayValue(structs, { kind: $.TypeKind.Array, elemType: "main.item", length: 1 })}))
+	let original = $.markAsStructValue(new arrays({slices: $.cloneArrayValue(slices, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") }, length: 1 }), items: $.cloneArrayValue(structs, { kind: $.TypeKind.Array, elemType: "main.item", length: 1 })}))
 	let copied = $.markAsStructValue($.cloneStructValue(original))
 	$.arrayIndex(copied.slices, 0)![0] = 8
 	$.arrayIndex(copied.items, 0).value = 8
@@ -132,7 +132,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Assigning an array element copies its value instead of aliasing the row.
 	let rows = [[$.int(1, 32), $.int(2, 32)], [$.int(3, 32), $.int(4, 32)]]
-	rows[1] = $.cloneArrayValue($.arrayIndex(rows, 0), { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Basic, name: "int32" }, length: 2 })
+	rows[1] = $.cloneArrayValue($.arrayIndex(rows, 0), { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("int32"), length: 2 })
 	$.arrayIndex(rows, 1)[0] = $.int(9, 32)
 	await $.println("row copy:", $.int($.arrayIndex($.arrayIndex(rows, 0), 0), 32), $.int($.arrayIndex($.arrayIndex(rows, 0), 1), 32), $.int($.arrayIndex($.arrayIndex(rows, 1), 0), 32), $.int($.arrayIndex($.arrayIndex(rows, 1), 1), 32))
 

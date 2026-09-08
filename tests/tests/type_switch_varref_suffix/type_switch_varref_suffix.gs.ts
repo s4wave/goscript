@@ -10,7 +10,7 @@ export type node = {
 $.registerInterfaceType(
 	"main.node",
 	null,
-	[{ name: "value", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }]
+	[{ name: "value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }]
 );
 
 export class branch {
@@ -47,9 +47,9 @@ export class branch {
 	static __typeInfo = $.registerStructType(
 		"main.branch",
 		() => new branch(),
-		[{ name: "value", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }],
+		() => [{ name: "value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		branch,
-		[{ name: "n", key: "n", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "n", key: "n", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

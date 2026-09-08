@@ -42,9 +42,9 @@ export class Col {
 	static __typeInfo = $.registerStructType(
 		"main.Col",
 		() => new Col(),
-		[],
+		() => [],
 		Col,
-		[{ name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "Default", key: "Default", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Basic, name: "int" } } }]
+		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }, { name: "Default", key: "Default", type: { kind: $.TypeKind.Pointer, elemType: /* @__PURE__ */ $.basicType("int") } }]
 	)
 }
 

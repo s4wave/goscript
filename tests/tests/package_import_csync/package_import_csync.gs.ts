@@ -46,7 +46,7 @@ export async function main(): globalThis.Promise<void> {
 		let current = counter
 		await time.Sleep(100000000n)
 		counter = current + 1
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: [] } as $.FunctionTypeInfo))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo))
 
 	// Start worker goroutines
 	for (let i = 0; i < numWorkers; i++) {

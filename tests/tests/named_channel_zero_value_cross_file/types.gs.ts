@@ -34,8 +34,8 @@ export class Job {
 	static __typeInfo = $.registerStructType(
 		"main.Job",
 		() => new Job(),
-		[],
+		() => [],
 		Job,
-		[{ name: "Value", key: "Value", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }

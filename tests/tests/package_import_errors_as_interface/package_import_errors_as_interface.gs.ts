@@ -14,7 +14,7 @@ export type healthError = {
 $.registerInterfaceType(
 	"main.healthError",
 	null,
-	[{ name: "Error", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Health", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+	[{ name: "Error", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Health", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
 );
 
 export class wrappedHealthError {
@@ -61,9 +61,9 @@ export class wrappedHealthError {
 	static __typeInfo = $.registerStructType(
 		"main.wrappedHealthError",
 		() => new wrappedHealthError(),
-		[{ name: "Error", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Health", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Unwrap", args: [], returns: [{ type: "error" }] }],
+		() => [{ name: "Error", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Health", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Unwrap", args: [], returns: [{ type: "error" }] }],
 		wrappedHealthError,
-		[{ name: "err", key: "err", type: "error" }]
+		() => [{ name: "err", key: "err", type: "error" }]
 	)
 }
 

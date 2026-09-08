@@ -35,9 +35,9 @@ export class Holder {
 	static __typeInfo = $.registerStructType(
 		"main.Holder",
 		() => new Holder(),
-		[],
+		() => [],
 		Holder,
-		[{ name: "Box", key: "Box", type: { kind: $.TypeKind.Pointer, elemType: "unique.Box" } }]
+		() => [{ name: "Box", key: "Box", type: { kind: $.TypeKind.Pointer, elemType: "unique.Box" } }]
 	)
 }
 

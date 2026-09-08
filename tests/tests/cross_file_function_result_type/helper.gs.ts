@@ -32,9 +32,9 @@ export class token {
 	static __typeInfo = $.registerStructType(
 		"main.token",
 		() => new token(),
-		[],
+		() => [],
 		token,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

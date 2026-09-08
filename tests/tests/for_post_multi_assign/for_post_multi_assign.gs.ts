@@ -32,9 +32,9 @@ export class frame {
 	static __typeInfo = $.registerStructType(
 		"main.frame",
 		() => new frame(),
-		[],
+		() => [],
 		frame,
-		[{ name: "name", key: "name", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
@@ -90,9 +90,9 @@ export class iterator {
 	static __typeInfo = $.registerStructType(
 		"main.iterator",
 		() => new iterator(),
-		[{ name: "Next", args: [], returns: [{ type: "main.frame" }, { type: { kind: $.TypeKind.Basic, name: "bool" } }] }],
+		() => [{ name: "Next", args: [], returns: [{ type: "main.frame" }, { type: /* @__PURE__ */ $.basicType("bool") }] }],
 		iterator,
-		[{ name: "idx", key: "idx", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "idx", key: "idx", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

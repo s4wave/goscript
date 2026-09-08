@@ -32,9 +32,9 @@ export class node {
 	static __typeInfo = $.registerStructType(
 		"main.node",
 		() => new node(),
-		[],
+		() => [],
 		node,
-		[{ name: "next", key: "next", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "next", key: "next", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -67,9 +67,9 @@ export class queue {
 	static __typeInfo = $.registerStructType(
 		"main.queue",
 		() => new queue(),
-		[],
+		() => [],
 		queue,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

@@ -10,7 +10,7 @@ export type named = {
 $.registerInterfaceType(
 	"main.named",
 	null,
-	[{ name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+	[{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
 );
 
 export class lateType {
@@ -36,9 +36,9 @@ export class lateType {
 	static __typeInfo = $.registerStructType(
 		"main.lateType",
 		() => new lateType(),
-		[{ name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		lateType,
-		[]
+		() => []
 	)
 }
 

@@ -35,9 +35,9 @@ export class bValue {
 	static __typeInfo = $.registerStructType(
 		"main.bValue",
 		() => new bValue(),
-		[],
+		() => [],
 		bValue,
-		[{ name: "inner", key: "inner", type: "main.aValue" }]
+		() => [{ name: "inner", key: "inner", type: "main.aValue" }]
 	)
 }
 

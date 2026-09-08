@@ -44,9 +44,9 @@ export class TestStruct {
 	static __typeInfo = $.registerStructType(
 		"main.TestStruct",
 		() => new TestStruct(),
-		[],
+		() => [],
 		TestStruct,
-		[{ name: "IntField", key: "IntField", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "StringField", key: "StringField", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "IntField", key: "IntField", type: /* @__PURE__ */ $.basicType("int") }, { name: "StringField", key: "StringField", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 

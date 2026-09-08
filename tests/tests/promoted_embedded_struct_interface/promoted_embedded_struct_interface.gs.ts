@@ -10,7 +10,7 @@ export type closer = {
 $.registerInterfaceType(
 	"main.closer",
 	null,
-	[{ name: "Close", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }]
+	[{ name: "Close", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
 );
 
 export class stream {
@@ -47,9 +47,9 @@ export class stream {
 	static __typeInfo = $.registerStructType(
 		"main.stream",
 		() => new stream(),
-		[{ name: "Close", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Close", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		stream,
-		[{ name: "name", key: "name", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
@@ -86,9 +86,9 @@ export class stopStream {
 	static __typeInfo = $.registerStructType(
 		"main.stopStream",
 		() => new stopStream(),
-		[{ name: "Close", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Close", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		stopStream,
-		[{ name: "stream", key: "stream", type: "main.stream", anonymous: true }]
+		() => [{ name: "stream", key: "stream", type: "main.stream", anonymous: true }]
 	)
 }
 
@@ -125,9 +125,9 @@ export class pointerStopStream {
 	static __typeInfo = $.registerStructType(
 		"main.pointerStopStream",
 		() => new pointerStopStream(),
-		[{ name: "Close", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Close", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		pointerStopStream,
-		[{ name: "stream", key: "stream", type: { kind: $.TypeKind.Pointer, elemType: "main.stream" }, anonymous: true }]
+		() => [{ name: "stream", key: "stream", type: { kind: $.TypeKind.Pointer, elemType: "main.stream" }, anonymous: true }]
 	)
 }
 

@@ -32,9 +32,9 @@ export class queue {
 	static __typeInfo = $.registerStructType(
 		"main.queue",
 		() => new queue(),
-		[],
+		() => [],
 		queue,
-		[{ name: "buf", key: "buf", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Interface, methods: [] } } }]
+		() => [{ name: "buf", key: "buf", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Interface, methods: [] } } }]
 	)
 }
 
@@ -43,7 +43,7 @@ export function newQueue(__typeArgs: $.GenericTypeArgs | undefined, capacity: nu
 }
 
 export async function main(): globalThis.Promise<void> {
-	let q: queue | $.VarRef<queue> | null = (newQueue({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 2) as queue | $.VarRef<queue> | null)
+	let q: queue | $.VarRef<queue> | null = (newQueue({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, 2) as queue | $.VarRef<queue> | null)
 	$.pointerValue<queue>(q).buf![0] = 7
 	await $.println($.len($.pointerValue<queue>(q).buf), $.arrayIndex($.pointerValue<queue>(q).buf!, 0))
 }

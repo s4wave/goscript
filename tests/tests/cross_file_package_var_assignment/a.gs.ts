@@ -9,7 +9,7 @@ export function __goscript_init_hook(): void {
 	if (((hook) as any) === undefined) {
 		hook = $.functionValue((): number => {
 	return 1
-}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo))
+}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	}
 }
 

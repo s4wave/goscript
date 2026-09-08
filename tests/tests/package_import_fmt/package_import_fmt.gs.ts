@@ -47,9 +47,9 @@ export class byteFormatter {
 	static __typeInfo = $.registerStructType(
 		"main.byteFormatter",
 		() => new byteFormatter(),
-		[{ name: "Format", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "Format", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
 		byteFormatter,
-		[{ name: "prefix", key: "prefix", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }]
+		() => [{ name: "prefix", key: "prefix", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }]
 	)
 }
 
@@ -96,7 +96,7 @@ export async function main(): globalThis.Promise<void> {
 	await fmt.Printf("Float: %f\n", $.basicInterfaceValue(3.14159, "float64"))
 	await fmt.Printf("String: %s\n", "hello")
 	await fmt.Printf("Type: %T\n", $.basicInterfaceValue(42, "int"))
-	await fmt.Printf("Value: %v\n", $.interfaceValue($.arrayToSlice<number>([1, 2, 3]), "[]int", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } }))
+	await fmt.Printf("Value: %v\n", $.interfaceValue($.arrayToSlice<number>([1, 2, 3]), "[]int", { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") }))
 
 	// Test width and precision
 	await fmt.Printf("Width: '%5s'\n", "hi")

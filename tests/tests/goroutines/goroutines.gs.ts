@@ -42,9 +42,9 @@ export class Message {
 	static __typeInfo = $.registerStructType(
 		"main.Message",
 		() => new Message(),
-		[],
+		() => [],
 		Message,
-		[{ name: "priority", key: "priority", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "text", key: "text", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "priority", key: "priority", type: /* @__PURE__ */ $.basicType("int") }, { name: "text", key: "text", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 

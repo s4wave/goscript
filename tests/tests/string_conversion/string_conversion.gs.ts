@@ -73,7 +73,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test with interface{} type assertion
 	let v: any = "interface test"
-	let interfaceString = $.mustTypeAssert<string>(v, { kind: $.TypeKind.Basic, name: "string" })
+	let interfaceString = $.mustTypeAssert<string>(v, /* @__PURE__ */ $.basicType("string"))
 	await $.println(interfaceString)
 
 	// Test with type conversion through variable

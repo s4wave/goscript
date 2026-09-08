@@ -59,9 +59,9 @@ export class transport {
 	static __typeInfo = $.registerStructType(
 		"main.transport",
 		() => new transport(),
-		[{ name: "SourceOnly", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "SourceOnly", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
 		transport,
-		[{ name: "values", key: "values", type: { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "int" }, elemType: { kind: $.TypeKind.Basic, name: "int" } } }]
+		() => [{ name: "values", key: "values", type: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("int"), elemType: /* @__PURE__ */ $.basicType("int") } }]
 	)
 }
 
@@ -99,9 +99,9 @@ export class packetHandlerMap {
 	static __typeInfo = $.registerStructType(
 		"main.packetHandlerMap",
 		() => new packetHandlerMap(),
-		[{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
 		packetHandlerMap,
-		[{ name: "values", key: "values", type: { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "int" }, elemType: { kind: $.TypeKind.Basic, name: "int" } } }]
+		() => [{ name: "values", key: "values", type: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("int"), elemType: /* @__PURE__ */ $.basicType("int") } }]
 	)
 }
 
@@ -134,9 +134,9 @@ export class connRunnerCallbacks {
 	static __typeInfo = $.registerStructType(
 		"main.connRunnerCallbacks",
 		() => new connRunnerCallbacks(),
-		[],
+		() => [],
 		connRunnerCallbacks,
-		[{ name: "AddConnectionID", key: "AddConnectionID", type: ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: [] } as $.FunctionTypeInfo) }]
+		() => [{ name: "AddConnectionID", key: "AddConnectionID", type: ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo) }]
 	)
 }
 
@@ -149,7 +149,7 @@ export async function connRunners_AddConnectionID(cr: connRunners, id: number): 
 export function newConnRunnerCallbacks(runner: connRunner | null): connRunnerCallbacks {
 	return $.markAsStructValue(new connRunnerCallbacks({AddConnectionID: $.functionValue(async (id: number): globalThis.Promise<void> => {
 		await $.pointerValue<Exclude<connRunner, null>>(runner).Add(id)
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "int" }], results: [] } as $.FunctionTypeInfo))}))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo))}))
 }
 
 export async function testVarRefConversion(): globalThis.Promise<void> {

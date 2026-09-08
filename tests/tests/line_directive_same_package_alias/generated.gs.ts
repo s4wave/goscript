@@ -32,9 +32,9 @@ export class yySymType {
 	static __typeInfo = $.registerStructType(
 		"main.yySymType",
 		() => new yySymType(),
-		[],
+		() => [],
 		yySymType,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -57,9 +57,9 @@ export class yyParserImpl {
 	static __typeInfo = $.registerStructType(
 		"main.yyParserImpl",
 		() => new yyParserImpl(),
-		[],
+		() => [],
 		yyParserImpl,
-		[]
+		() => []
 	)
 }
 

@@ -54,9 +54,9 @@ export class BaseStore {
 	static __typeInfo = $.registerStructType(
 		"dep.BaseStore",
 		() => new BaseStore(),
-		[{ name: "NewTransaction", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "tx.Tx" } }] }],
+		() => [{ name: "NewTransaction", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "tx.Tx" } }] }],
 		BaseStore,
-		[{ name: "CoreStore", key: "CoreStore", type: { kind: $.TypeKind.Pointer, elemType: "inner.CoreStore" }, anonymous: true }]
+		() => [{ name: "CoreStore", key: "CoreStore", type: { kind: $.TypeKind.Pointer, elemType: "inner.CoreStore" }, anonymous: true }]
 	)
 }
 

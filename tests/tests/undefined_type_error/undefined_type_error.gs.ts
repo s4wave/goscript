@@ -132,9 +132,9 @@ export class formatter {
 	static __typeInfo = $.registerStructType(
 		"main.formatter",
 		() => new formatter(),
-		[],
+		() => [],
 		formatter,
-		[{ name: "wid", key: "wid", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "prec", key: "prec", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "widPresent", key: "widPresent", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "precPresent", key: "precPresent", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "minus", key: "minus", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "plus", key: "plus", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "sharp", key: "sharp", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "space", key: "space", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "zero", key: "zero", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "plusV", key: "plusV", type: { kind: $.TypeKind.Basic, name: "bool" } }, { name: "sharpV", key: "sharpV", type: { kind: $.TypeKind.Basic, name: "bool" } }]
+		() => [{ name: "wid", key: "wid", type: /* @__PURE__ */ $.basicType("int") }, { name: "prec", key: "prec", type: /* @__PURE__ */ $.basicType("int") }, { name: "widPresent", key: "widPresent", type: /* @__PURE__ */ $.basicType("bool") }, { name: "precPresent", key: "precPresent", type: /* @__PURE__ */ $.basicType("bool") }, { name: "minus", key: "minus", type: /* @__PURE__ */ $.basicType("bool") }, { name: "plus", key: "plus", type: /* @__PURE__ */ $.basicType("bool") }, { name: "sharp", key: "sharp", type: /* @__PURE__ */ $.basicType("bool") }, { name: "space", key: "space", type: /* @__PURE__ */ $.basicType("bool") }, { name: "zero", key: "zero", type: /* @__PURE__ */ $.basicType("bool") }, { name: "plusV", key: "plusV", type: /* @__PURE__ */ $.basicType("bool") }, { name: "sharpV", key: "sharpV", type: /* @__PURE__ */ $.basicType("bool") }]
 	)
 }
 
@@ -205,9 +205,9 @@ export class printer {
 	static __typeInfo = $.registerStructType(
 		"main.printer",
 		() => new printer(),
-		[{ name: "format", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "init", args: [], returns: [] }],
+		() => [{ name: "format", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "init", args: [], returns: [] }],
 		printer,
-		[{ name: "buf", key: "buf", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }, { name: "arg", key: "arg", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "fmt", key: "fmt", type: "main.formatter" }]
+		() => [{ name: "buf", key: "buf", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }, { name: "arg", key: "arg", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "fmt", key: "fmt", type: "main.formatter" }]
 	)
 }
 

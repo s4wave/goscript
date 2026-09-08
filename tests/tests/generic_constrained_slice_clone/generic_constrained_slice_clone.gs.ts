@@ -50,9 +50,9 @@ export class item {
 	static __typeInfo = $.registerStructType(
 		"main.item",
 		() => new item(),
-		[{ name: "CloneVT", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.item" } }] }],
+		() => [{ name: "CloneVT", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.item" } }] }],
 		item,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 

@@ -45,9 +45,9 @@ export class cache {
 	static __typeInfo = $.registerStructType(
 		"main.cache",
 		() => new cache(),
-		[{ name: "Get", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } } }, { type: "error" }] }],
+		() => [{ name: "Get", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } } }, { type: "error" }] }],
 		cache,
-		[{ name: "stored", key: "stored", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } } }]
+		() => [{ name: "stored", key: "stored", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } } }]
 	)
 }
 
@@ -80,9 +80,9 @@ export class key {
 	static __typeInfo = $.registerStructType(
 		"main.key",
 		() => new key(),
-		[],
+		() => [],
 		key,
-		[{ name: "N", key: "N", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "N", key: "N", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -115,9 +115,9 @@ export class privateKey {
 	static __typeInfo = $.registerStructType(
 		"main.privateKey",
 		() => new privateKey(),
-		[],
+		() => [],
 		privateKey,
-		[{ name: "D", key: "D", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "D", key: "D", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -132,7 +132,7 @@ export async function privateKeyToCache(k: key | $.VarRef<key> | null): globalTh
 		return [new privateKey({D: $.pointerValue<key>(k).N}), null]
 	}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Pointer, elemType: "main.privateKey" }, "error"] } as $.FunctionTypeInfo)), $.functionValue((v: privateKey | $.VarRef<privateKey> | null): boolean => {
 		return $.pointerValue<privateKey>(v).D == $.pointerValue<key>(k).N
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "main.privateKey" }], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo)))
+	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "main.privateKey" }], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 	return [(__goscriptReturn0[0] as privateKey | $.VarRef<privateKey> | null), __goscriptReturn0[1]]
 	throw new globalThis.Error("goscript: unreachable return")
 }

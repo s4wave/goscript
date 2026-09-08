@@ -32,9 +32,9 @@ export class buffer {
 	static __typeInfo = $.registerStructType(
 		"main.buffer",
 		() => new buffer(),
-		[],
+		() => [],
 		buffer,
-		[{ name: "buf", key: "buf", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } } }]
+		() => [{ name: "buf", key: "buf", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }]
 	)
 }
 

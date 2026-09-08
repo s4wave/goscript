@@ -55,9 +55,9 @@ export class Person {
 	static __typeInfo = $.registerStructType(
 		"main.Person",
 		() => new Person(),
-		[],
+		() => [],
 		Person,
-		[{ name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" }, tag: "json:\"name\"" }, { name: "Age", key: "Age", type: { kind: $.TypeKind.Basic, name: "int" }, tag: "json:\"age\"" }, { name: "Active", key: "Active", type: { kind: $.TypeKind.Basic, name: "bool" }, tag: "json:\"active\"" }]
+		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string"), tag: "json:\"name\"" }, { name: "Age", key: "Age", type: /* @__PURE__ */ $.basicType("int"), tag: "json:\"age\"" }, { name: "Active", key: "Active", type: /* @__PURE__ */ $.basicType("bool"), tag: "json:\"active\"" }]
 	)
 }
 

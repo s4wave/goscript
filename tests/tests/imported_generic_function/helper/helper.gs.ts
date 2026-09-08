@@ -10,7 +10,7 @@ export type Value = {
 $.registerInterfaceType(
 	"helper.Value",
 	null,
-	[{ name: "GetValue", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }]
+	[{ name: "GetValue", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }]
 );
 
 export class Box {
@@ -42,9 +42,9 @@ export class Box {
 	static __typeInfo = $.registerStructType(
 		"helper.Box",
 		() => new Box(),
-		[],
+		() => [],
 		Box,
-		[{ name: "Value", key: "Value", type: { kind: $.TypeKind.Interface, methods: [] } }]
+		() => [{ name: "Value", key: "Value", type: { kind: $.TypeKind.Interface, methods: [] } }]
 	)
 }
 
@@ -82,9 +82,9 @@ export class IntValue {
 	static __typeInfo = $.registerStructType(
 		"helper.IntValue",
 		() => new IntValue(),
-		[{ name: "GetValue", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }],
+		() => [{ name: "GetValue", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		IntValue,
-		[{ name: "N", key: "N", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "N", key: "N", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

@@ -32,8 +32,8 @@ export class Thing {
 	static __typeInfo = $.registerStructType(
 		"dep.Thing",
 		() => new Thing(),
-		[],
+		() => [],
 		Thing,
-		[{ name: "Value", key: "Value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }

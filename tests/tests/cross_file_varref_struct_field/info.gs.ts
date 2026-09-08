@@ -42,9 +42,9 @@ export class floatInfo {
 	static __typeInfo = $.registerStructType(
 		"main.floatInfo",
 		() => new floatInfo(),
-		[],
+		() => [],
 		floatInfo,
-		[{ name: "mantbits", key: "mantbits", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "expbits", key: "expbits", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "mantbits", key: "mantbits", type: /* @__PURE__ */ $.basicType("int") }, { name: "expbits", key: "expbits", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

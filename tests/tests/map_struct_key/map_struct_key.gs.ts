@@ -52,9 +52,9 @@ export class requestKey {
 	static __typeInfo = $.registerStructType(
 		"main.requestKey",
 		() => new requestKey(),
-		[],
+		() => [],
 		requestKey,
-		[{ name: "soID", key: "soID", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "inviteID", key: "inviteID", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "peerID", key: "peerID", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "soID", key: "soID", type: /* @__PURE__ */ $.basicType("string") }, { name: "inviteID", key: "inviteID", type: /* @__PURE__ */ $.basicType("string") }, { name: "peerID", key: "peerID", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 

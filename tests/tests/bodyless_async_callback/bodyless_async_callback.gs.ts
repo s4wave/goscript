@@ -44,9 +44,9 @@ export class Setting {
 	static __typeInfo = $.registerStructType(
 		"main.Setting",
 		() => new Setting(),
-		[{ name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		Setting,
-		[{ name: "once", key: "once", type: "sync.Once" }]
+		() => [{ name: "once", key: "once", type: "sync.Once" }]
 	)
 }
 

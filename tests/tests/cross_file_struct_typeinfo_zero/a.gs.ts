@@ -35,9 +35,9 @@ export class aValue {
 	static __typeInfo = $.registerStructType(
 		"main.aValue",
 		() => new aValue(),
-		[],
+		() => [],
 		aValue,
-		[{ name: "next", key: "next", type: { kind: $.TypeKind.Pointer, elemType: "main.bValue" } }]
+		() => [{ name: "next", key: "next", type: { kind: $.TypeKind.Pointer, elemType: "main.bValue" } }]
 	)
 }
 

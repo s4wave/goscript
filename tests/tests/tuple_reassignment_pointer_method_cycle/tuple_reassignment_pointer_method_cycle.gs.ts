@@ -32,9 +32,9 @@ export class box {
 	static __typeInfo = $.registerStructType(
 		"main.box",
 		() => new box(),
-		[],
+		() => [],
 		box,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -61,9 +61,9 @@ export class cursor {
 	static __typeInfo = $.registerStructType(
 		"main.cursor",
 		() => new cursor(),
-		[{ name: "rotate", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.box" } }, { type: { kind: $.TypeKind.Pointer, elemType: "main.box" } }, { type: { kind: $.TypeKind.Pointer, elemType: "main.box" } }] }],
+		() => [{ name: "rotate", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.box" } }, { type: { kind: $.TypeKind.Pointer, elemType: "main.box" } }, { type: { kind: $.TypeKind.Pointer, elemType: "main.box" } }] }],
 		cursor,
-		[]
+		() => []
 	)
 }
 

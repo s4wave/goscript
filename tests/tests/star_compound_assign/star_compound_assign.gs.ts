@@ -32,9 +32,9 @@ export class holder {
 	static __typeInfo = $.registerStructType(
 		"main.holder",
 		() => new holder(),
-		[],
+		() => [],
 		holder,
-		[{ name: "values", key: "values", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "int" } } } }]
+		() => [{ name: "values", key: "values", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") } } }]
 	)
 }
 

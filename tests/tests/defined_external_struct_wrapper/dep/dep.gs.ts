@@ -32,9 +32,9 @@ export class hidden {
 	static __typeInfo = $.registerStructType(
 		"dep.hidden",
 		() => new hidden(),
-		[],
+		() => [],
 		hidden,
-		[{ name: "label", key: "label", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "label", key: "label", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
@@ -82,8 +82,8 @@ export class Public {
 	static __typeInfo = $.registerStructType(
 		"dep.Public",
 		() => new Public(),
-		[{ name: "Label", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }],
+		() => [{ name: "Label", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		Public,
-		[{ name: "Value", key: "Value", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "Hidden", key: "Hidden", type: "dep.hidden" }]
+		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("string") }, { name: "Hidden", key: "Hidden", type: "dep.hidden" }]
 	)
 }

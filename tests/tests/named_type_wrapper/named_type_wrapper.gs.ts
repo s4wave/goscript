@@ -44,9 +44,9 @@ export class FileStatus {
 	static __typeInfo = $.registerStructType(
 		"main.FileStatus",
 		() => new FileStatus(),
-		[],
+		() => [],
 		FileStatus,
-		[{ name: "mode", key: "mode", type: { kind: $.TypeKind.Basic, name: "int", typeName: "main.MyFileMode" } }, { name: "size", key: "size", type: { kind: $.TypeKind.Basic, name: "int64" } }]
+		() => [{ name: "mode", key: "mode", type: /* @__PURE__ */ $.basicType("int", "main.MyFileMode") }, { name: "size", key: "size", type: /* @__PURE__ */ $.basicType("int64") }]
 	)
 }
 

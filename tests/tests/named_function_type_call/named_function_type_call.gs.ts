@@ -15,7 +15,7 @@ export type FileInfo = {
 $.registerInterfaceType(
 	"main.FileInfo",
 	null,
-	[{ name: "IsDir", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Size", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int64" } }] }]
+	[{ name: "IsDir", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Size", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int64") }] }]
 );
 
 export type Filesystem = {
@@ -37,7 +37,7 @@ export type Shape = {
 $.registerInterfaceType(
 	"main.Shape",
 	null,
-	[{ name: "Stats", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }]
+	[{ name: "Stats", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }]
 );
 
 export type Morphism = ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null
@@ -106,9 +106,9 @@ export class MockFileInfo {
 	static __typeInfo = $.registerStructType(
 		"main.MockFileInfo",
 		() => new MockFileInfo(),
-		[{ name: "IsDir", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "bool" } }] }, { name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Size", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int64" } }] }],
+		() => [{ name: "IsDir", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Size", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int64") }] }],
 		MockFileInfo,
-		[{ name: "name", key: "name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "size", key: "size", type: { kind: $.TypeKind.Basic, name: "int64" } }, { name: "isDir", key: "isDir", type: { kind: $.TypeKind.Basic, name: "bool" } }]
+		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }, { name: "size", key: "size", type: /* @__PURE__ */ $.basicType("int64") }, { name: "isDir", key: "isDir", type: /* @__PURE__ */ $.basicType("bool") }]
 	)
 }
 
@@ -136,9 +136,9 @@ export class MockFilesystem {
 	static __typeInfo = $.registerStructType(
 		"main.MockFilesystem",
 		() => new MockFilesystem(),
-		[{ name: "ReadDir", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: "main.FileInfo" } }, { type: "error" }] }],
+		() => [{ name: "ReadDir", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: "main.FileInfo" } }, { type: "error" }] }],
 		MockFilesystem,
-		[]
+		() => []
 	)
 }
 
@@ -176,9 +176,9 @@ export class shapeNode {
 	static __typeInfo = $.registerStructType(
 		"main.shapeNode",
 		() => new shapeNode(),
-		[{ name: "Stats", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }],
+		() => [{ name: "Stats", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		shapeNode,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -221,9 +221,9 @@ export class MorphismHolder {
 	static __typeInfo = $.registerStructType(
 		"main.MorphismHolder",
 		() => new MorphismHolder(),
-		[{ name: "apply", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "cloneApply", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }],
+		() => [{ name: "apply", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "cloneApply", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		MorphismHolder,
-		[{ name: "morphism", key: "morphism", type: ({ kind: $.TypeKind.Function, name: "main.Morphism", params: ["main.Shape"], results: ["main.Shape"] } as $.FunctionTypeInfo) }]
+		() => [{ name: "morphism", key: "morphism", type: ({ kind: $.TypeKind.Function, name: "main.Morphism", params: ["main.Shape"], results: ["main.Shape"] } as $.FunctionTypeInfo) }]
 	)
 }
 
@@ -263,9 +263,9 @@ export class morphismWorker {
 	static __typeInfo = $.registerStructType(
 		"main.morphismWorker",
 		() => new morphismWorker(),
-		[{ name: "lookup", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "main.Shape" }] }],
+		() => [{ name: "lookup", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "main.Shape" }] }],
 		morphismWorker,
-		[{ name: "ready", key: "ready", type: { kind: $.TypeKind.Channel, direction: "both", elemType: { kind: $.TypeKind.Basic, name: "bool" } } }]
+		() => [{ name: "ready", key: "ready", type: { kind: $.TypeKind.Channel, direction: "both", elemType: /* @__PURE__ */ $.basicType("bool") } }]
 	)
 }
 
@@ -279,7 +279,7 @@ export async function walk(fs: Filesystem | null, path: string, info: FileInfo |
 	return walkWithCustomFunc(fs, path, info, $.functionValue((p: string, i: FileInfo | null, e: $.GoError): $.GoError => {
 		// This simulates the issue by calling filepath.WalkFunc indirectly
 		return null
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }, "main.FileInfo", "error"], results: ["error"] } as $.FunctionTypeInfo)))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), "main.FileInfo", "error"], results: ["error"] } as $.FunctionTypeInfo)))
 }
 
 export async function walkWithCustomFunc(fs: Filesystem | null, path: string, info: FileInfo | null, walkFn: ((path: string, info: FileInfo | null, err: $.GoError) => $.GoError | globalThis.Promise<$.GoError>) | null): globalThis.Promise<$.GoError> {
@@ -359,7 +359,7 @@ export async function main(): globalThis.Promise<void> {
 			await $.println("Error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		}
 		return null
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }, "main.FileInfo", "error"], results: ["error"] } as $.FunctionTypeInfo))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), "main.FileInfo", "error"], results: ["error"] } as $.FunctionTypeInfo))
 
 	let err = await walkWithCustomFunc($.interfaceValue<Filesystem | null>(fs, "*main.MockFilesystem", { kind: $.TypeKind.Pointer, elemType: "main.MockFilesystem" }), "/test", $.interfaceValue<FileInfo | null>(fileInfo, "*main.MockFileInfo", { kind: $.TypeKind.Pointer, elemType: "main.MockFileInfo" }), walkFunc)
 	if (err != null) {
@@ -370,7 +370,7 @@ export async function main(): globalThis.Promise<void> {
 	let processFunc: ((pattern: string) => $.GoError | globalThis.Promise<$.GoError>) | null = $.functionValue(async (pattern: string): globalThis.Promise<$.GoError> => {
 		await $.println("Processing pattern:", pattern)
 		return null
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }], results: ["error"] } as $.FunctionTypeInfo))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: ["error"] } as $.FunctionTypeInfo))
 
 	let err2 = await processFiles("*.go", processFunc)
 	if (err2 != null) {
@@ -386,7 +386,7 @@ export async function main(): globalThis.Promise<void> {
 	await indexedCallback($.arrayToSlice<((_p0: string) => boolean | globalThis.Promise<boolean>) | null>([$.functionValue(async (value: string): globalThis.Promise<boolean> => {
 		await $.println("Indexed callback:", value)
 		return true
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Basic, name: "string" }], results: [{ kind: $.TypeKind.Basic, name: "bool" }] } as $.FunctionTypeInfo))]), "slice")
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))]), "slice")
 
 	let worker: morphismWorker | $.VarRef<morphismWorker> | null = new morphismWorker({ready: $.makeChannel<boolean>(1, false, "both")})
 	let shape: shapeNode | $.VarRef<shapeNode> | null = new shapeNode({value: 7})

@@ -42,9 +42,9 @@ export class locked {
 	static __typeInfo = $.registerStructType(
 		"main.locked",
 		() => new locked(),
-		[{ name: "Inc", args: [], returns: [] }, { name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }],
+		() => [{ name: "Inc", args: [], returns: [] }, { name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		locked,
-		[{ name: "value", key: "value", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

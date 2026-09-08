@@ -55,9 +55,9 @@ export class Hooked {
 	static __typeInfo = $.registerStructType(
 		"main.Hooked",
 		() => new Hooked(),
-		[{ name: "UnmarshalJSON", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
+		() => [{ name: "UnmarshalJSON", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
 		Hooked,
-		[{ name: "Calls", key: "Calls", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "Seen", key: "Seen", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "Calls", key: "Calls", type: /* @__PURE__ */ $.basicType("int") }, { name: "Seen", key: "Seen", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
@@ -90,9 +90,9 @@ export class Box {
 	static __typeInfo = $.registerStructType(
 		"main.Box",
 		() => new Box(),
-		[],
+		() => [],
 		Box,
-		[{ name: "Value", key: "Value", type: { kind: $.TypeKind.Pointer, elemType: "main.Hooked" }, tag: "json:\"value\"" }]
+		() => [{ name: "Value", key: "Value", type: { kind: $.TypeKind.Pointer, elemType: "main.Hooked" }, tag: "json:\"value\"" }]
 	)
 }
 

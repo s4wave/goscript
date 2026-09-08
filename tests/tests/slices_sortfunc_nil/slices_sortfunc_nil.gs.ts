@@ -35,9 +35,9 @@ export class field {
 	static __typeInfo = $.registerStructType(
 		"main.field",
 		() => new field(),
-		[],
+		() => [],
 		field,
-		[{ name: "name", key: "name", type: { kind: $.TypeKind.Basic, name: "string" } }]
+		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
@@ -53,7 +53,7 @@ export async function main(): globalThis.Promise<void> {
 			return 1
 		}
 		return 0
-	}, ({ kind: $.TypeKind.Function, params: ["main.field", "main.field"], results: [{ kind: $.TypeKind.Basic, name: "int" }] } as $.FunctionTypeInfo)))
+	}, ({ kind: $.TypeKind.Function, params: ["main.field", "main.field"], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))
 
 	await $.println("fields after:", fields)
 }

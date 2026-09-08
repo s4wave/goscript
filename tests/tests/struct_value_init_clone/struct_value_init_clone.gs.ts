@@ -42,9 +42,9 @@ export class Point {
 	static __typeInfo = $.registerStructType(
 		"main.Point",
 		() => new Point(),
-		[],
+		() => [],
 		Point,
-		[{ name: "X", key: "X", type: { kind: $.TypeKind.Basic, name: "int" } }, { name: "Y", key: "Y", type: { kind: $.TypeKind.Basic, name: "int" } }]
+		() => [{ name: "X", key: "X", type: /* @__PURE__ */ $.basicType("int") }, { name: "Y", key: "Y", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 

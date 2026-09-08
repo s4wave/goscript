@@ -64,9 +64,9 @@ export class Person {
 	static __typeInfo = $.registerStructType(
 		"main.Person",
 		() => new Person(),
-		[],
+		() => [],
 		Person,
-		[{ name: "Name", key: "Name", type: { kind: $.TypeKind.Basic, name: "string" }, tag: "json:\"name\"" }, { name: "Age", key: "Age", type: { kind: $.TypeKind.Basic, name: "int" }, tag: "json:\"age\"" }, { name: "Active", key: "Active", type: { kind: $.TypeKind.Basic, name: "bool" }, tag: "json:\"active\"" }]
+		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string"), tag: "json:\"name\"" }, { name: "Age", key: "Age", type: /* @__PURE__ */ $.basicType("int"), tag: "json:\"age\"" }, { name: "Active", key: "Active", type: /* @__PURE__ */ $.basicType("bool"), tag: "json:\"active\"" }]
 	)
 }
 
@@ -106,13 +106,13 @@ export async function main(): globalThis.Promise<void> {
 	// Unmarshal into a map[string]any
 	let m: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null! as globalThis.Map<string, any> | null)
 	{
-		let __goscriptShadow1 = json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 67, 97, 114, 111, 108, 34, 44, 34, 97, 103, 101, 34, 58, 50, 50, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 116, 114, 117, 101, 125]), $.interfaceValue(m, "*map[string]any", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Basic, name: "string" }, elemType: { kind: $.TypeKind.Interface, methods: [] } } }))
+		let __goscriptShadow1 = json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 67, 97, 114, 111, 108, 34, 44, 34, 97, 103, 101, 34, 58, 50, 50, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 116, 114, 117, 101, 125]), $.interfaceValue(m, "*map[string]any", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: { kind: $.TypeKind.Interface, methods: [] } } }))
 		if (__goscriptShadow1 != null) {
 			results = $.append(results, "Unmarshal map error: " + await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow1).Error())
 		} else {
-			let name = $.mustTypeAssert<string>($.mapGet<string, any, any>(m.value, "name", null)[0], { kind: $.TypeKind.Basic, name: "string" })
-			let age = $.int($.mustTypeAssert<number>($.mapGet<string, any, any>(m.value, "age", null)[0], { kind: $.TypeKind.Basic, name: "float64" }))
-			let active = $.mustTypeAssert<boolean>($.mapGet<string, any, any>(m.value, "active", null)[0], { kind: $.TypeKind.Basic, name: "bool" })
+			let name = $.mustTypeAssert<string>($.mapGet<string, any, any>(m.value, "name", null)[0], /* @__PURE__ */ $.basicType("string"))
+			let age = $.int($.mustTypeAssert<number>($.mapGet<string, any, any>(m.value, "age", null)[0], /* @__PURE__ */ $.basicType("float64")))
+			let active = $.mustTypeAssert<boolean>($.mapGet<string, any, any>(m.value, "active", null)[0], /* @__PURE__ */ $.basicType("bool"))
 			results = $.append(results, (((("Unmarshal map: name=" + name) + ", age=") + strconv.Itoa(age)) + ", active=") + strconv.FormatBool(active))
 		}
 	}

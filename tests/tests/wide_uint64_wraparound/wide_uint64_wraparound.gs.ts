@@ -22,9 +22,9 @@ export class BigInt {
 	static __typeInfo = $.registerStructType(
 		"main.BigInt",
 		() => new BigInt(),
-		[],
+		() => [],
 		BigInt,
-		[]
+		() => []
 	)
 }
 

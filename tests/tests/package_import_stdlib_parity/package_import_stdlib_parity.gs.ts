@@ -78,9 +78,9 @@ export class xof {
 	static __typeInfo = $.registerStructType(
 		"main.xof",
 		() => new xof(),
-		[{ name: "BlockSize", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }] }, { name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }, { type: "error" }] }, { name: "Reset", args: [], returns: [] }, { name: "Write", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "int" } }, { type: "error" }] }],
+		() => [{ name: "BlockSize", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }, { name: "Reset", args: [], returns: [] }, { name: "Write", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
 		xof,
-		[]
+		() => []
 	)
 }
 

@@ -50,9 +50,9 @@ export class Worker {
 	static __typeInfo = $.registerStructType(
 		"main.Worker",
 		() => new Worker(),
-		[{ name: "Spawn", args: [], returns: [{ type: "error" }] }],
+		() => [{ name: "Spawn", args: [], returns: [{ type: "error" }] }],
 		Worker,
-		[{ name: "ch", key: "ch", type: { kind: $.TypeKind.Channel, direction: "both", elemType: { kind: $.TypeKind.Basic, name: "int" } } }]
+		() => [{ name: "ch", key: "ch", type: { kind: $.TypeKind.Channel, direction: "both", elemType: /* @__PURE__ */ $.basicType("int") } }]
 	)
 }
 

@@ -35,9 +35,9 @@ export class Simple {
 	static __typeInfo = $.registerStructType(
 		"main.Simple",
 		() => new Simple(),
-		[],
+		() => [],
 		Simple,
-		[{ name: "X", key: "X", type: { kind: $.TypeKind.Basic, name: "int" }, tag: "json:\"x\"" }]
+		() => [{ name: "X", key: "X", type: /* @__PURE__ */ $.basicType("int"), tag: "json:\"x\"" }]
 	)
 }
 

@@ -38,9 +38,9 @@ export class Foo {
 	static __typeInfo = $.registerStructType(
 		"main.Foo",
 		() => new Foo(),
-		[{ name: "Bar", args: [], returns: [] }],
+		() => [{ name: "Bar", args: [], returns: [] }],
 		Foo,
-		[{ name: "done", key: "done", type: { kind: $.TypeKind.Channel, direction: "both", elemType: { kind: $.TypeKind.Basic, name: "bool" } } }]
+		() => [{ name: "done", key: "done", type: { kind: $.TypeKind.Channel, direction: "both", elemType: /* @__PURE__ */ $.basicType("bool") } }]
 	)
 }
 

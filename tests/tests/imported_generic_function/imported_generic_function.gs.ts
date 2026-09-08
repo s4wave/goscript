@@ -23,7 +23,7 @@ export function collectAssigned(value: helper.Value | null): [$.Slice<helper.Val
 }
 
 export async function main(): globalThis.Promise<void> {
-	let box = ($.markAsStructValue($.cloneStructValue(helper.Wrap({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Basic, name: "int" }, zero: () => 0 }}, 21))) as helper.Box)
+	let box = ($.markAsStructValue($.cloneStructValue(helper.Wrap({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, 21))) as helper.Box)
 	await $.println("wrapped:", box.Value)
 	let __goscriptTuple1: any = collectValues($.interfaceValue<helper.Value | null>($.markAsStructValue(new helper.IntValue({N: 34})), "helper.IntValue", "helper.IntValue"))
 	let values: $.Slice<helper.Value | null> = __goscriptTuple1[0]

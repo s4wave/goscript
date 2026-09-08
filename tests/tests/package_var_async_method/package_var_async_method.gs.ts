@@ -21,7 +21,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let [val, ok] = await getValueFromCache("hello")
 	if (ok) {
-		await $.println("Found:", $.mustTypeAssert<string>(val, { kind: $.TypeKind.Basic, name: "string" }))
+		await $.println("Found:", $.mustTypeAssert<string>(val, /* @__PURE__ */ $.basicType("string")))
 	}
 }
 
