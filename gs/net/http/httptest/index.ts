@@ -5,6 +5,7 @@ import * as errors from '@goscript/errors/index.js'
 import * as http from '@goscript/net/http/index.js'
 import * as io from '@goscript/io/index.js'
 import * as strings from '@goscript/strings/index.js'
+import * as testing from '@goscript/testing/index.js'
 
 export const DefaultRemoteAddr = '1.2.3.4'
 
@@ -216,6 +217,30 @@ function serverRequest(request: http.Request): http.Request {
 
 export function NewServer(handler: http.Handler | null): Server {
   return new Server({ Handler: handler })
+}
+
+export function NewTestServer(
+  t: testing.TB,
+  handler: http.Handler | null,
+): Server {
+  const server = NewServer({
+    async ServeHTTP(w, r) {
+      try {
+        if (handler == null) {
+          w?.WriteHeader(http.StatusInternalServerError)
+          return
+        }
+        await handler.ServeHTTP(w, r)
+      } catch (err) {
+        if (err !== http.ErrAbortHandler) {
+          t.Errorf('httptest: panic in server handler: %v', err)
+        }
+        throw http.ErrAbortHandler
+      }
+    },
+  })
+  t.Cleanup(() => server.Close())
+  return server
 }
 
 export function NewTLSServer(handler: http.Handler | null): Server {

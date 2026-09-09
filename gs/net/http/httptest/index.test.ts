@@ -4,11 +4,13 @@ import * as $ from '@goscript/builtin/index.js'
 import * as bytes from '@goscript/bytes/index.js'
 import * as context from '@goscript/context/index.js'
 import * as io from '@goscript/io/index.js'
+import { T } from '@goscript/testing/index.js'
 
 import {
   Handler,
   Header_Get,
   Header_Set,
+  Get,
   MethodGet,
   MethodPost,
   NoBody,
@@ -21,6 +23,7 @@ import {
   NewRecorder,
   NewRequestWithContext,
   NewServer,
+  NewTestServer,
   NewTLSServer,
   NewUnstartedServer,
   Server_Start,
@@ -44,6 +47,19 @@ describe('net/http/httptest override', () => {
     )
     srv.Close()
     tlsSrv.Close()
+  })
+
+  it('binds test server cleanup and nil-handler failures to the test', async () => {
+    const t = new T('NewTestServer')
+    const srv = NewTestServer(t, null)
+
+    const [resp, err] = await srv.Client().Get(srv.URL)
+
+    expect(err).toBeNull()
+    expect(resp?.StatusCode).toBe(500)
+    await t.runCleanups()
+    const [, closedErr] = await Get(srv.URL)
+    expect(closedErr).not.toBeNull()
   })
 
   it('exports request defaults and recorder compatibility helpers', () => {
