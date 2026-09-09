@@ -1915,7 +1915,8 @@ func TestCompilePackagesEmitsStructMethodsAndPointerAssertions(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"export class Counter",
-		"// Value counts reads.\n\tpublic get Value(): number",
+		"// Value counts reads.\n\tpublic declare Value: number",
+		"$.bindStructFields(this.prototype, [\"Value\", \"ID\"])",
 		"public clone(): Counter",
 		"public Read(): number",
 		"public Set(v: number): void",
@@ -1925,7 +1926,7 @@ func TestCompilePackagesEmitsStructMethodsAndPointerAssertions(t *testing.T) {
 		"let pointer: Counter | $.VarRef<Counter> | null = original",
 		"Counter.prototype.Set.call(pointer, 2)",
 		"Counter.prototype.Set.call(NewCounter(), 5)",
-		"let [, ok] = $.typeAssertTuple<Counter | $.VarRef<Counter> | null>(iface, { kind: $.TypeKind.Pointer, elemType: \"main.Counter\" })",
+		"let [, ok] = $.typeAssertTuple<Counter | $.VarRef<Counter> | null>(iface, /* @__PURE__ */ $.pointerType(\"main.Counter\"))",
 		"{ name: \"Value\", key: \"Value\", type: /* @__PURE__ */ $.basicType(\"int\"), tag: \"json:\\\"value\\\"\" }",
 		"{ name: \"ID\", key: \"ID\", type: /* @__PURE__ */ $.basicType(\"int32\", \"main.ObjectID\") }",
 	} {
@@ -2328,8 +2329,8 @@ func TestCompilePackagesClonesNestedStructFieldsWithCloneMethodCollision(t *test
 	text := string(content)
 	for _, want := range []string{
 		"public __goscriptClone(): Box",
-		"Box: $.varRef(init?.Box ? $.markAsStructValue($.cloneStructValue(init.Box)) : $.markAsStructValue(new Box()))",
-		"Box: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.Box.value)))",
+		"Box: init?.Box ? $.markAsStructValue($.cloneStructValue(init.Box)) : $.markAsStructValue(new Box())",
+		"return $.markAsStructValue(new Holder(this))",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)

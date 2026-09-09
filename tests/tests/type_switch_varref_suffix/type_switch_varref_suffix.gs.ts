@@ -14,34 +14,29 @@ $.registerInterfaceType(
 );
 
 export class branch {
-	public get n(): number {
-		return this._fields.n.value
-	}
-	public set n(value: number) {
-		this._fields.n.value = value
-	}
+	public declare n: number
 
 	public _fields: {
-		n: $.VarRef<number>
+		n: number
 	}
 
 	constructor(init?: Partial<{n?: number}>) {
 		this._fields = {
-			n: $.varRef(init?.n ?? (0 as number))
+			n: init?.n ?? (0 as number)
 		}
 	}
 
 	public clone(): branch {
-		const cloned = new branch()
-		cloned._fields = {
-			n: $.varRef(this._fields.n.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new branch(this))
 	}
 
 	public value(): number {
 		const b: branch | $.VarRef<branch> | null = this
 		return $.pointerValue<branch>(b).n
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["n"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -58,13 +53,13 @@ export function accept(b: branch | $.VarRef<branch> | null): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let v: node | null = $.interfaceValue<node | null>(new branch({n: 3}), "*main.branch", { kind: $.TypeKind.Pointer, elemType: "main.branch" })
+	let v: node | null = $.interfaceValue<node | null>(new branch({n: 3}), "*main.branch", /* @__PURE__ */ $.pointerType("main.branch"))
 	{
 		const __goscriptTypeSwitchValue = v
 		switch (true) {
-			case $.typeAssert<branch | $.VarRef<branch> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "main.branch" }).ok:
+			case $.typeAssert<branch | $.VarRef<branch> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.branch")).ok:
 				{
-					let e: branch | $.VarRef<branch> | null = $.typeAssert<branch | $.VarRef<branch> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "main.branch" }).value
+					let e: branch | $.VarRef<branch> | null = $.typeAssert<branch | $.VarRef<branch> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.branch")).value
 					let imprecise = $.varRef(0)
 					let ptr = imprecise
 					ptr!.value = 4

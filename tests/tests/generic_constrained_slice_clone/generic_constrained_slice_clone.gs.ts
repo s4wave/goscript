@@ -17,12 +17,12 @@ export class item {
 	public declare value: string
 
 	public _fields: {
-		value: $.VarRef<string>
+		value: string
 	}
 
 	constructor(init?: Partial<{value?: string}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? ("" as string))
+			value: init?.value ?? ("" as string)
 		}
 	}
 

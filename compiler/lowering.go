@@ -1559,8 +1559,11 @@ func (o *LoweringOwner) lowerGenDecl(ctx lowerFileContext, decl *ast.GenDecl) ([
 						}
 					}
 					setterValue := "__goscriptValue"
-					setterCode := "export function " + setterName + "(" + setterValue + ": " + setterType + "): void {\n\t" +
-						setterTarget + " = " + setterValue + "\n}"
+					assignment := setterTarget + " = " + setterValue
+					if isStructValueType(obj.Type()) {
+						assignment = o.lowerStructAssignment(setterTarget, setterValue)
+					}
+					setterCode := "export function " + setterName + "(" + setterValue + ": " + setterType + "): void {\n\t" + assignment + "\n}"
 					setterIndexExport := ""
 					if ast.IsExported(name.Name) {
 						setterIndexExport = setterName
@@ -5228,10 +5231,8 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 		left, leftDiagnostics := o.lowerAssignmentTarget(ctx, lhs, isShortDecl)
 		diagnostics = append(diagnostics, leftDiagnostics...)
 		star, starTarget := unwrapParenExpr(lhs).(*ast.StarExpr)
-		if starTarget && stmt.Tok == token.ASSIGN && isStructValueType(targetType) {
-			pointer, pointerDiagnostics := o.lowerPointerValueExpr(ctx, star.X)
-			diagnostics = append(diagnostics, pointerDiagnostics...)
-			stmts = append(stmts, loweredStmt{text: o.runtimeOwner.QualifiedHelper(RuntimeHelperAssignStruct) + "(" + pointer + ", " + right + ")"})
+		if !isShortDecl && isStructValueType(targetType) {
+			stmts = append(stmts, loweredStmt{text: o.lowerStructAssignment(left, right)})
 			continue
 		}
 		if starTarget && stmt.Tok == token.ASSIGN {
@@ -5467,21 +5468,8 @@ func (o *LoweringOwner) lowerChannelReceiveAssignStmt(
 			return []loweredStmt{{text: "await " + o.runtimeOwner.QualifiedHelper(RuntimeHelperChanRecv) + "(" + channel + ")"}}, diagnostics
 		}
 		value := "await " + o.runtimeOwner.QualifiedHelper(RuntimeHelperChanRecv) + "(" + channel + ")"
-		if stmt.Tok != token.DEFINE {
-			if targetStmt, targetDiagnostics, ok := o.lowerStarTargetAssignmentStmt(ctx, stmt.Lhs[0], value); ok {
-				diagnostics = append(diagnostics, targetDiagnostics...)
-				return []loweredStmt{targetStmt}, diagnostics
-			}
-		}
-		left, leftDiagnostics := o.lowerAssignmentTarget(ctx, stmt.Lhs[0], stmt.Tok == token.DEFINE)
-		diagnostics = append(diagnostics, leftDiagnostics...)
-		prefix := ""
-		if stmt.Tok == token.DEFINE {
-			prefix = declarationKeyword(ctx)
-			left += o.shortDeclTypeAnnotation(ctx, stmt.Lhs[0], nil)
-			value = o.lowerDeclaredValue(ctx, stmt.Lhs[0], value)
-		}
-		return []loweredStmt{{text: prefix + left + " = " + value}}, diagnostics
+		targetStmt, targetDiagnostics := o.lowerTupleTargetAssignmentStmt(ctx, stmt.Lhs[0], value, stmt.Tok == token.DEFINE)
+		return []loweredStmt{targetStmt}, append(diagnostics, targetDiagnostics...)
 	}
 	tempName := ctx.tempName("Recv")
 	stmts := []loweredStmt{{text: "let " + tempName + " = await " + o.runtimeOwner.QualifiedHelper(RuntimeHelperChanRecvWithOk) + "(" + channel + ")"}}
@@ -5581,6 +5569,9 @@ func (o *LoweringOwner) lowerTupleTargetAssignmentStmt(
 		}
 	}
 	left, diagnostics := o.lowerAssignmentTarget(ctx, lhs, declare)
+	if !declare && isStructValueType(assignmentTargetType(ctx, lhs)) {
+		return loweredStmt{text: o.lowerStructAssignment(left, value)}, diagnostics
+	}
 	prefix := ""
 	if declare {
 		prefix = declarationKeyword(ctx)
@@ -5599,13 +5590,17 @@ func (o *LoweringOwner) lowerStarTargetAssignmentStmt(
 	if !ok {
 		return loweredStmt{}, nil, false
 	}
-	targetType := ctx.semPkg.source.TypesInfo.TypeOf(lhs)
-	if isStructValueType(targetType) {
+	if isStructValueType(ctx.semPkg.source.TypesInfo.TypeOf(lhs)) {
 		pointer, diagnostics := o.lowerPointerValueExpr(ctx, star.X)
-		return loweredStmt{text: o.runtimeOwner.QualifiedHelper(RuntimeHelperAssignStruct) + "(" + pointer + ", " + right + ")"}, diagnostics, true
+		return loweredStmt{text: o.lowerStructAssignment(pointer, right)}, diagnostics, true
 	}
 	pointer, diagnostics := o.lowerPointerStorageExpr(ctx, star.X)
 	return loweredStmt{text: pointer + " = " + right}, diagnostics, true
+}
+
+// lowerStructAssignment preserves the addresses of an existing struct's fields.
+func (o *LoweringOwner) lowerStructAssignment(target, value string) string {
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperAssignStruct) + "(" + target + ", " + value + ")"
 }
 
 func (o *LoweringOwner) lowerTupleReassignmentStmt(

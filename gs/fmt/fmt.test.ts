@@ -126,9 +126,16 @@ describe('fmt basic value formatting', () => {
     expect(await fmt.Sprintf('%q', 0x110000)).toBe(JSON.stringify('�'))
   })
 
-  it('%p pointer-ish formatting fallback', async () => {
-    expect(await fmt.Sprintf('%p', {})).toBe('0x0')
-    expect(await fmt.Sprintf('%p', { __address: 255 })).toBe('0xff')
+  it('uses the same address for %p and scalar pointers nested in structs', async () => {
+    const storage = { count: 7 }
+    const pointer = $.fieldRef(storage, 'count')
+    const address = '0x' + pointer.__goAddress!().toString(16)
+    expect(await fmt.Sprintf('%p', pointer)).toBe(address)
+    expect(await fmt.Sprintf('%v', pointer)).toBe(address)
+    expect(await fmt.Sprintf('%+v', { Count: pointer })).toBe(
+      '{Count:' + address + '}',
+    )
+    expect(await fmt.Sprintf('%p', $.fieldRef(storage, 'count'))).toBe(address)
   })
 
   it('%v default formats for arrays/maps/sets', async () => {
@@ -338,7 +345,9 @@ describe('fmt spacing rules', () => {
 
 describe('fmt parseFormat basic cases', () => {
   it('Printf with %d, %s, %f, width and precision', async () => {
-    expect(await fmt.Sprintf('n=%d s=%s f=%f', 42, 'ok', 3.5)).toBe('n=42 s=ok f=3.5')
+    expect(await fmt.Sprintf('n=%d s=%s f=%f', 42, 'ok', 3.5)).toBe(
+      'n=42 s=ok f=3.5',
+    )
     expect(await fmt.Sprintf("'%5s'", 'hi')).toBe("'   hi'")
     expect(await fmt.Sprintf("'%-.3f'", 3.14159)).toBe("'3.142'") // JS rounds
     expect(await fmt.Sprintf("'%6.2f'", 3.14159)).toBe("'  3.14'")
@@ -352,7 +361,9 @@ describe('fmt parseFormat basic cases', () => {
   })
 
   it('Printf hex/octal/bin', async () => {
-    expect(await fmt.Sprintf('%x %X %o %b', 255, 255, 8, 5)).toBe('ff FF 10 101')
+    expect(await fmt.Sprintf('%x %X %o %b', 255, 255, 8, 5)).toBe(
+      'ff FF 10 101',
+    )
   })
 
   it('Printf %c for code points', async () => {

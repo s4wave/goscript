@@ -154,7 +154,7 @@ Methods with both receiver and method type parameters remain unsupported: the de
 
 ### Variable References and Pointers
 
-See `design/VAR_REFS.md`. Go pointers are represented using a `$.VarRef<T>` wrapper type provided by the runtime. This allows emulating pointer semantics (shared reference, ability to modify the original value indirectly) in TypeScript.
+See `design/VAR_REFS.md` for the original storage-identity requirement and [VAR_REFS_CURRENT.md](VAR_REFS_CURRENT.md) for the current representation and checks. Go pointers use variable references or direct named-struct instances, with `pointerValue` handling both struct-pointer representations.
 
 *   Taking the address (`&x`): Often implicit when assigning to a variable expecting a `$.VarRef<T>`, or explicitly `$.varRef(x)`.
 *   Dereferencing (`*p`): Accessing the `p.value` property.
@@ -181,6 +181,8 @@ The runtime provides:
 *   Runtime type information utilities (`$.registerStructType`, `$.registerInterfaceType`, `$.getTypeByName`, `$.TypeKind`). Basic descriptors use `$.basicType(name, typeName?)`; pointer, slice, array, map, and channel descriptors use corresponding runtime constructors. Each call returns a fresh descriptor; named identity and reflection contents remain unchanged. Method signatures use `$.methodSignature(name, args?, returns?)`, with each parameter encoded as a type or a `[name, type]` pair. Full field descriptors use `$.structField(name, type, index, offset, exported, options?)`, preserving storage keys, tags, visibility, and embedding metadata. Struct registration accepts field and method factories, evaluated independently on the first synchronous read and then retained. Registration still publishes the constructor and type name immediately; reflection observes the complete mutable arrays.
 
 Generated clone methods pass the source instance to the declaring constructor, which owns field-copy rules. Cloning creates a fresh field record without a discarded zero-initialization pass or a duplicate field-copy loop.
+
+Assignments to existing named structs use `assignStruct` to preserve their storage, including nested struct and array fields. Reflection uses the same operation and the same canonical field references as generated address expressions. `fmt` renders Go fields and pointer addresses rather than enumerating JavaScript storage properties.
 
 Generated classes declare their field types and install non-enumerable prototype accessors with `$.bindStructFields`. These accessors read and write values stored directly in `_fields`. Taking a field address uses `$.fieldRef` on that record and key. The runtime retains one stable reference per addressed field; ordinary construction allocates no field-reference cells. Struct assignment updates the existing target record, preserving held field pointers, and unsafe pointer views share the same record. Runtime overrides, reflection, codecs, equality, and printing use this representation together. The compiler semantic version invalidates previously generated output; no mixed representation is supported.
 
@@ -616,8 +618,8 @@ After reviewing the code and tests, some important implementation considerations
 
 Go's value semantics (where assigning a struct copies it) are emulated in TypeScript by:
 1.  Adding a `clone()` method to generated classes representing structs. This method performs a deep copy.
-    -   The `clone()` method creates a new instance of the struct and then copies the values from the original struct's `_fields` to the new instance's `_fields`. For each field, the value is retrieved from the source variable reference (e.g., `this._fields.MyInt.value`) and then re-wrapped in a new variable reference in the destination (e.g., `cloned._fields.MyInt = $.varRef(...)`).
-    -   For nested struct fields, the `clone()` method of the nested struct is called recursively (e.g., `cloned._fields.InnerStruct = $.varRef(this._fields.InnerStruct.value?.clone() ?? new MyStruct())`).
+    -   The `clone()` method creates a new instance through the declaring constructor, passing `this` as its initializer. Fields are values in `_fields`, and constructor reads use the shared prototype accessors.
+    -   The constructor copies nested struct fields through `cloneStructValue` and array fields through `cloneArrayValue`. Pointer and other reference-valued fields retain their references.
     ```typescript
     // Example: MyStruct.clone()
     public clone(): MyStruct {

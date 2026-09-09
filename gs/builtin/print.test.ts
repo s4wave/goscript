@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { formatPrintedArgs } from './print.js'
+import { fieldRef, varRef } from './varRef.js'
 
 describe('builtin println formatting', () => {
   it('formats Uint8Array values with a stable inspect-style representation', () => {
@@ -44,5 +45,17 @@ describe('builtin println formatting', () => {
   Name: "hello",
   Count: 3,
 }`)
+  })
+
+  it('formats variable and field pointers without exposing pointer machinery', () => {
+    const storage = { Count: 3 }
+    const local = varRef(4)
+    const field = fieldRef(storage, 'Count')
+    const value = { _fields: { Local: local, Field: field } }
+    const expected = '{\n  Local: 4,\n  Field: 3,\n}'
+    expect(formatPrintedArgs([value])).toBe(expected)
+    void local.__goPointer
+    void field.__goPointer
+    expect(formatPrintedArgs([value])).toBe(expected)
   })
 })
