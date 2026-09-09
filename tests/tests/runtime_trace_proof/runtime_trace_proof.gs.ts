@@ -15,29 +15,20 @@ import "@goscript/fmt/index.js"
 import "@goscript/runtime/trace/index.js"
 
 export class byteSink {
-	public get data(): $.Slice<number> {
-		return this._fields.data.value
-	}
-	public set data(value: $.Slice<number>) {
-		this._fields.data.value = value
-	}
+	public declare data: $.Slice<number>
 
 	public _fields: {
-		data: $.VarRef<$.Slice<number>>
+		data: $.Slice<number>
 	}
 
 	constructor(init?: Partial<{data?: $.Slice<number>}>) {
 		this._fields = {
-			data: $.varRef(init?.data ?? (null! as $.Slice<number>))
+			data: init?.data ?? (null! as $.Slice<number>)
 		}
 	}
 
 	public clone(): byteSink {
-		const cloned = new byteSink()
-		cloned._fields = {
-			data: $.varRef(this._fields.data.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new byteSink(this))
 	}
 
 	public Write(p: $.Slice<number>): [number, $.GoError] {
@@ -46,12 +37,16 @@ export class byteSink {
 		return [$.len(p), null]
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["data"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.byteSink",
 		() => new byteSink(),
 		() => [{ name: "Write", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
 		byteSink,
-		() => [{ name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }]
+		() => [{ name: "data", key: "data", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }]
 	)
 }
 
@@ -70,7 +65,7 @@ export function toHex(b: $.Slice<number>): string {
 export async function main(): globalThis.Promise<void> {
 	let sink: byteSink | $.VarRef<byteSink> | null = new byteSink()
 	{
-		let err = trace.Start($.pointerValueOrNil($.interfaceValue<io.Writer | null>(sink, "*main.byteSink", { kind: $.TypeKind.Pointer, elemType: "main.byteSink" }))!)
+		let err = trace.Start($.pointerValueOrNil($.interfaceValue<io.Writer | null>(sink, "*main.byteSink", /* @__PURE__ */ $.pointerType("main.byteSink")))!)
 		if (err != null) {
 			await fmt.Println("ERROR:" + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return

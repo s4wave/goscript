@@ -458,9 +458,6 @@ func RunTypeScriptRunner(t *testing.T, workspaceDir, tempDir, tsRunner string) s
 
 	workspace := tsworkspace.NewOwner(tempDir, workspaceDir)
 	phase := workspace.RunTool(ctx, tsworkspace.PhaseRuntime, tempDir, "bun", "--smol", "run", tsRunner)
-	if phase.Output != "" {
-		fmt.Print(phase.Output)
-	}
 	if phase.Failed() {
 		if ctx.Err() != nil {
 			t.Fatalf("bun run exceeded %s: %v\noutput: %s", complianceToolTimeout, phase.Error, phase.Output)
