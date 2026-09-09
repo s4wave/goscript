@@ -233,7 +233,7 @@ describe('io override', () => {
 
     expect(err).toBeNull()
     expect(written).toBe(BigInt(input.length))
-    expect(output).toEqual(input)
+    expect(Buffer.from(output).equals(Buffer.from(input))).toBe(true)
     expect(reader.requestedSizes.length).toBeLessThanOrEqual(10)
     expect(Math.max(...reader.requestedSizes)).toBeLessThanOrEqual(256 * 1024)
   })
