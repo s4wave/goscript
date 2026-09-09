@@ -7,12 +7,12 @@ export class Box {
 	public declare Value: number
 
 	public _fields: {
-		Value: $.VarRef<number>
+		Value: number
 	}
 
 	constructor(init?: Partial<{Value?: number}>) {
 		this._fields = {
-			Value: $.varRef(init?.Value ?? (0 as number))
+			Value: init?.Value ?? (0 as number)
 		}
 	}
 

@@ -53,7 +53,7 @@ function refPointer<T>(
   }
 }
 
-/** VariableRef allocates pointer machinery only when its address is requested. */
+/** VariableRef allocates pointer machinery only when its pointer or address is requested. */
 class VariableRef<T> implements VarRef<T> {
   readonly __isVarRef = true
   private pointer?: OwnedPointerHandle<T>
@@ -117,6 +117,7 @@ export function bindStructFields(
         this._fields[name] = value
       },
       configurable: true,
+      enumerable: false,
     })
   }
 }

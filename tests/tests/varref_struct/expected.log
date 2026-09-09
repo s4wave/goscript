@@ -1,2 +1,12 @@
 ptrToVal.MyInt: 10
 myIntVal: 10
+field after assignment: 30 true
+write through field: 40 40
+keyword field: 6 true
+nested: 50 60 true 1
+nested identity: true true true
+tuple: 70 80
+parallel: 80 70
+global: 90
+reflect: 100 true
+reflect address: true

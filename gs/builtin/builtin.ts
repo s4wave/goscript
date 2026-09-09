@@ -1,7 +1,10 @@
 import type { Slice, SliceProxy, StringHeaderData } from './slice.js'
 import {
+  getTypeByName,
   isTypeInfoComparable,
   pointerIdentityEqual,
+  structFieldRuntimeKey,
+  TypeKind,
   type TypeInfo,
 } from './type.js'
 import { writeHostStdoutText } from './hostio.js'
@@ -72,11 +75,15 @@ function clearZeroValue<T>(v: T[]): T {
 }
 
 /**
- * assignStruct copies all field values from source struct to target struct.
- * Used for pointer dereference assignment: *p = value
- * Copies the _fields contents from source to target.
+ * assignStruct copies a prepared struct value into existing storage. Nested
+ * structs and arrays retain their addresses; pointer and slice fields receive
+ * the source references. The compiler snapshots the right-hand side first.
  */
-export function assignStruct<T>(target: T, source: T): void {
+export function assignStruct<T>(
+  target: T,
+  source: T,
+  typeInfo?: TypeInfo | string,
+): void {
   if (
     target === null ||
     target === undefined ||
@@ -87,6 +94,21 @@ export function assignStruct<T>(target: T, source: T): void {
   }
   const targetFields = (target as any)._fields
   const sourceFields = (source as any)._fields
+  const info = typeInfo ?? (source as any).constructor?.__typeInfo
+  const resolved = typeof info === 'string' ? getTypeByName(info) : info
+  if (resolved?.kind === TypeKind.Struct) {
+    const destination = targetFields ?? target
+    const values = sourceFields ?? source
+    for (const field of resolved.fields) {
+      const key = structFieldRuntimeKey(field)
+      destination[key] = assignFieldValue(
+        destination[key],
+        values[key],
+        field.type,
+      )
+    }
+    return
+  }
   if (!targetFields || !sourceFields) {
     // Structs without a _fields map (e.g. bound protobuf messages) carry their
     // data as plain enumerable properties. Copy a clone when the value defines
@@ -103,6 +125,26 @@ export function assignStruct<T>(target: T, source: T): void {
   for (const key of Object.keys(sourceFields)) {
     targetFields[key] = sourceFields[key]
   }
+}
+
+/** assignFieldValue preserves aggregate storage while replacing reference values. */
+function assignFieldValue(
+  target: any,
+  source: any,
+  typeInfo?: TypeInfo | string,
+): any {
+  const info = typeof typeInfo === 'string' ? getTypeByName(typeInfo) : typeInfo
+  if (info?.kind === TypeKind.Struct) {
+    assignStruct(target, source, info)
+    return target
+  }
+  if (info?.kind === TypeKind.Array) {
+    for (let i = 0; i < info.length; i++) {
+      target[i] = assignFieldValue(target[i], source[i], info.elemType)
+    }
+    return target
+  }
+  return source
 }
 
 /**

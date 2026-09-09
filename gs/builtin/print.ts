@@ -1,4 +1,5 @@
 import { asArray, isSliceProxy, type Slice } from './slice.js'
+import { isVarRef } from './varRef.js'
 
 // A transpiled Go Error(), String(), or GoString() method may be async, so
 // printed operands render through the MaybePromise convention: text when the
@@ -112,6 +113,10 @@ function formatValue(
   seen.add(value)
 
   try {
+    if (isVarRef(value)) {
+      return formatValue(value.value, depth, nested, seen)
+    }
+
     if (value instanceof Map) {
       return formatArray(
         Array.from(value.entries()).map(([k, v]) =>

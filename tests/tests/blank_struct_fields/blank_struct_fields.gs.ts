@@ -11,16 +11,16 @@ export class padded {
 	public declare _blank2: Uint8Array
 
 	public _fields: {
-		_blank0: $.VarRef<Uint8Array>
-		Value: $.VarRef<number>
-		_blank2: $.VarRef<Uint8Array>
+		_blank0: Uint8Array
+		Value: number
+		_blank2: Uint8Array
 	}
 
 	constructor(init?: Partial<{_blank0?: Uint8Array, Value?: number, _blank2?: Uint8Array}>) {
 		this._fields = {
-			_blank0: $.varRef(init?._blank0 !== undefined ? $.cloneArrayValue(init._blank0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)) : new Uint8Array(2)),
-			Value: $.varRef(init?.Value ?? (0 as number)),
-			_blank2: $.varRef(init?._blank2 !== undefined ? $.cloneArrayValue(init._blank2, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 3)) : new Uint8Array(3))
+			_blank0: init?._blank0 !== undefined ? $.cloneArrayValue(init._blank0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)) : new Uint8Array(2),
+			Value: init?.Value ?? (0 as number),
+			_blank2: init?._blank2 !== undefined ? $.cloneArrayValue(init._blank2, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 3)) : new Uint8Array(3)
 		}
 	}
 

@@ -14,39 +14,28 @@ $.registerInterfaceType(
 );
 
 export class MyStruct {
-	public get PointerField(): $.VarRef<number> | null {
-		return this._fields.PointerField.value
-	}
-	public set PointerField(value: $.VarRef<number> | null) {
-		this._fields.PointerField.value = value
-	}
+	public declare PointerField: $.VarRef<number> | null
 
-	public get interfaceField(): MyInterface | null {
-		return this._fields.interfaceField.value
-	}
-	public set interfaceField(value: MyInterface | null) {
-		this._fields.interfaceField.value = value
-	}
+	public declare interfaceField: MyInterface | null
 
 	public _fields: {
-		PointerField: $.VarRef<$.VarRef<number> | null>
-		interfaceField: $.VarRef<MyInterface | null>
+		PointerField: $.VarRef<number> | null
+		interfaceField: MyInterface | null
 	}
 
 	constructor(init?: Partial<{PointerField?: $.VarRef<number> | null, interfaceField?: MyInterface | null}>) {
 		this._fields = {
-			PointerField: $.varRef(init?.PointerField ?? (null! as $.VarRef<number> | null)),
-			interfaceField: $.varRef(init?.interfaceField ?? (null! as MyInterface | null))
+			PointerField: init?.PointerField ?? (null! as $.VarRef<number> | null),
+			interfaceField: init?.interfaceField ?? (null! as MyInterface | null)
 		}
 	}
 
 	public clone(): MyStruct {
-		const cloned = new MyStruct()
-		cloned._fields = {
-			PointerField: $.varRef(this._fields.PointerField.value),
-			interfaceField: $.varRef(this._fields.interfaceField.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyStruct(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["PointerField", "interfaceField"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -54,7 +43,7 @@ export class MyStruct {
 		() => new MyStruct(),
 		() => [],
 		MyStruct,
-		() => [{ name: "PointerField", key: "PointerField", type: { kind: $.TypeKind.Pointer, elemType: /* @__PURE__ */ $.basicType("int") } }, { name: "interfaceField", key: "interfaceField", type: "main.MyInterface" }]
+		() => [{ name: "PointerField", key: "PointerField", type: /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")) }, { name: "interfaceField", key: "interfaceField", type: "main.MyInterface" }]
 	)
 }
 

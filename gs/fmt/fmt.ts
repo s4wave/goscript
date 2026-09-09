@@ -3,6 +3,14 @@
 
 import * as $ from '@goscript/builtin/index.js'
 import { writeHostStdoutText } from '@goscript/builtin/hostio.js'
+import {
+  Array as ArrayKind,
+  PointerTo,
+  Slice as SliceKind,
+  Struct,
+  TypeOf,
+  Value,
+} from '@goscript/reflect/type.js'
 
 // Stringer Basic interfaces.
 export interface Stringer {
@@ -120,10 +128,7 @@ function formatValue(value: any, verb: string, flags = ''): string {
       }
       return JSON.stringify(String(value))
     case 'p': {
-      // pointer (address)
-      const addr = (value as any)?.__address
-      if (typeof addr === 'number') return '0x' + addr.toString(16)
-      return '0x0'
+      return formatPointer(value)
     }
     default:
       return String(value)
@@ -179,43 +184,152 @@ function joinMaybe(
   return `${prefix}${(parts as string[]).join(separator)}${suffix}`
 }
 
-function defaultFormatMaybe(value: any): MaybeString {
+/** formatPointer renders a stable runtime address without inspecting the pointee. */
+function formatPointer(value: any): string {
+  const pointer = new Value(value, PointerTo(TypeOf(value)))
+  return '0x' + pointer.Pointer().toString(16)
+}
+
+/** defaultFormatMaybe renders Go values without exposing their runtime storage. */
+function defaultFormatMaybe(
+  value: any,
+  flags = '',
+  depth = 0,
+  typeInfo?: $.TypeInfo | string,
+  allowMethods = true,
+): MaybeString {
   if (value === null || value === undefined) return '<nil>'
+  if ($.isTypedNilValue(value)) return '<nil>'
   if (typeof value === 'boolean') return value ? 'true' : 'false'
+  if (typeof value === 'string')
+    return flags.includes('#') ? JSON.stringify(value) : value
   if (typeof value === 'number' || typeof value === 'bigint') {
     return value.toString()
   }
   if (Array.isArray(value))
-    return joinMaybe(value.map(defaultFormatMaybe), ' ', '[', ']')
+    return joinMaybe(
+      value.map((item) => defaultFormatMaybe(item, flags, depth + 1)),
+      ' ',
+      '[',
+      ']',
+    )
   if (typeof value === 'object') {
-    // GoStringer is intentionally not consulted here: Go calls GoString only
-    // for the %#v verb, which formatValue handles before reaching this default
-    // path. %v, %s, Sprint, and Print use Error then Stringer.
-    // Prefer error interface if present
-    if ((value as any).Error && typeof (value as any).Error === 'function') {
+    // Go consults methods on exported fields, with GoString reserved for %#v.
+    const methodValue = $.isVarRef(value) ? value.value : value
+    if (allowMethods && flags.includes('#') && hasGoString(methodValue)) {
+      return toMaybeString(methodValue.GoString())
+    }
+    if (
+      allowMethods &&
+      !flags.includes('#') &&
+      typeof methodValue?.Error === 'function'
+    ) {
       try {
-        return toMaybeString((value as any).Error())
+        return toMaybeString(methodValue.Error())
       } catch {
         // Ignore error by continuing to next case.
       }
     }
-    // Check for Stringer interface
-    if ((value as any).String && typeof (value as any).String === 'function') {
+    if (
+      allowMethods &&
+      !flags.includes('#') &&
+      typeof methodValue?.String === 'function'
+    ) {
       try {
-        return toMaybeString((value as any).String())
+        return toMaybeString(methodValue.String())
       } catch {
         // Ignore error by continuing to next case.
       }
+    }
+    const declared =
+      typeof typeInfo === 'string' ? $.getTypeByName(typeInfo) : typeInfo
+    const descriptor =
+      (declared?.kind === $.TypeKind.Interface ? undefined : declared) ??
+      value.__goTypeInfo ??
+      value.constructor?.__typeInfo
+    const info =
+      typeof descriptor === 'string' ? $.getTypeByName(descriptor) : descriptor
+    if ($.isVarRef(value) || info?.kind === $.TypeKind.Pointer) {
+      const pointee =
+        $.isVarRef(value) ? value.value : (value.__goValue ?? value)
+      const elementDescriptor =
+        info?.kind === $.TypeKind.Pointer ? info.elemType : undefined
+      const element =
+        typeof elementDescriptor === 'string' ?
+          $.getTypeByName(elementDescriptor)
+        : elementDescriptor
+      if (
+        depth === 0 &&
+        pointee !== null &&
+        typeof pointee === 'object' &&
+        (element?.kind === $.TypeKind.Struct ||
+          element?.kind === $.TypeKind.Array ||
+          element?.kind === $.TypeKind.Slice ||
+          (element === undefined &&
+            [Struct, ArrayKind, SliceKind].includes(TypeOf(pointee).Kind())))
+      ) {
+        return joinMaybe(
+          [
+            defaultFormatMaybe(
+              pointee,
+              flags,
+              depth + 1,
+              element ?? pointee.constructor?.__typeInfo,
+              allowMethods,
+            ),
+          ],
+          '',
+          '&',
+        )
+      }
+      return formatPointer(value)
     }
     if ('__goValue' in value) {
-      return defaultFormatMaybe((value as { __goValue: unknown }).__goValue)
+      return defaultFormatMaybe(
+        value.__goValue,
+        flags,
+        depth,
+        typeInfo,
+        allowMethods,
+      )
+    }
+    if (
+      info?.kind === $.TypeKind.Struct ||
+      (value._fields &&
+        typeof value._fields === 'object' &&
+        !Array.isArray(value._fields)) ||
+      value.constructor === Object
+    ) {
+      const fields: $.StructFieldInfo[] =
+        info?.kind === $.TypeKind.Struct ?
+          info.fields
+        : Object.keys(value._fields ?? value).map((name) => ({
+            name,
+            key: name,
+            type: $.basicType('unknown'),
+          }))
+      const storage = value._fields ?? value
+      const parts = fields.map((field) => {
+        const formatted = defaultFormatMaybe(
+          storage[$.structFieldRuntimeKey(field)],
+          flags,
+          depth + 1,
+          field.type,
+          allowMethods && (field.exported ?? /^\p{Lu}/u.test(field.name)),
+        )
+        const prefix =
+          flags.includes('+') || flags.includes('#') ? field.name + ':' : ''
+        return joinMaybe([formatted], '', prefix)
+      })
+      const name = flags.includes('#') ? (info?.name ?? '') : ''
+      return joinMaybe(parts, flags.includes('#') ? ', ' : ' ', name + '{', '}')
     }
     // Basic Map/Set rendering
     if (value instanceof Map) {
       const parts: MaybeString[] = []
       for (const [k, v] of (value as Map<any, any>).entries()) {
-        const key = defaultFormatMaybe(k)
-        const elem = defaultFormatMaybe(v)
+        const key = defaultFormatMaybe(k, flags, depth + 1)
+        const elem = defaultFormatMaybe(v, flags, depth + 1)
         if (isPromiseLike(key) || isPromiseLike(elem)) {
           parts.push(
             Promise.all([Promise.resolve(key), Promise.resolve(elem)]).then(
@@ -231,7 +345,7 @@ function defaultFormatMaybe(value: any): MaybeString {
     if (value instanceof Set) {
       const parts: MaybeString[] = []
       for (const v of (value as Set<any>).values()) {
-        parts.push(defaultFormatMaybe(v))
+        parts.push(defaultFormatMaybe(v, flags, depth + 1))
       }
       return joinMaybe(parts, ' ', '[', ']')
     }
@@ -242,7 +356,7 @@ function defaultFormatMaybe(value: any): MaybeString {
     ) {
       const parts = Object.entries(value as Record<string, any>).map(
         ([k, v]) => {
-          const formatted = defaultFormatMaybe(v)
+          const formatted = defaultFormatMaybe(v, flags, depth + 1)
           if (isPromiseLike(formatted)) {
             return formatted.then((resolved) => `${k}:${resolved}`)
           }
@@ -266,7 +380,7 @@ function formatValueMaybe(value: any, verb: string, flags = ''): MaybeString {
       if (flags.includes('#') && hasGoString(value)) {
         return toMaybeString(value.GoString())
       }
-      return defaultFormatMaybe(value)
+      return defaultFormatMaybe(value, flags)
     case 'w':
       return defaultFormatMaybe(value)
     case 's':

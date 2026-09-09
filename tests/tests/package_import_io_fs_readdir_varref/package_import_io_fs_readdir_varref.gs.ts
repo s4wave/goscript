@@ -10,34 +10,29 @@ import "@goscript/io/fs/index.js"
 import "@goscript/testing/fstest/index.js"
 
 export class openOnlyFS {
-	public get fsys(): fstest.MapFS {
-		return this._fields.fsys.value
-	}
-	public set fsys(value: fstest.MapFS) {
-		this._fields.fsys.value = value
-	}
+	public declare fsys: fstest.MapFS
 
 	public _fields: {
-		fsys: $.VarRef<fstest.MapFS>
+		fsys: fstest.MapFS
 	}
 
 	constructor(init?: Partial<{fsys?: fstest.MapFS}>) {
 		this._fields = {
-			fsys: $.varRef(init?.fsys ?? (null! as fstest.MapFS))
+			fsys: init?.fsys ?? (null! as fstest.MapFS)
 		}
 	}
 
 	public clone(): openOnlyFS {
-		const cloned = new openOnlyFS()
-		cloned._fields = {
-			fsys: $.varRef(this._fields.fsys.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new openOnlyFS(this))
 	}
 
 	public async Open(name: string): globalThis.Promise<[fs.File | null, $.GoError]> {
 		const o = this
 		return fstest.MapFS_Open(o.fsys, name)
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["fsys"])
 	}
 
 	static __typeInfo = $.registerStructType(

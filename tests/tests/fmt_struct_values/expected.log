@@ -1,0 +1,13 @@
+{3 hello {true}}
+{Count:3 name:hello Inner:{Ready:true}}
+&{3 hello {true}}
+&{Count:3 name:hello Inner:{Ready:true}}
+&{3 hello {true}}
+main.Record{Count:3, name:"hello", Inner:main.Inner{Ready:true}}
+&main.Record{Count:3, name:"hello", Inner:main.Inner{Ready:true}}
+{4}
+{Count:4}
+&{4}
+&{Count:4}
+&{Value:<scalar> Next:<self> Dynamic:<self>}
+level=warning msg="waiting for controller Execute to return" controller="&{3 hello {true}}"

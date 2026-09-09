@@ -180,10 +180,6 @@ export const UnsafePointer: Kind = 26
 
 const pointerAddressStride = 0x100000000
 const pointerAddresses = new WeakMap<object, number>()
-const fieldPointerAddresses = new WeakMap<
-  object,
-  globalThis.Map<string, number>
->()
 let nextPointerAddress = 1
 const canonicalTypes = new globalThis.Map<string, Type>()
 const constructingRegisteredTypes = new globalThis.Map<string, Type>()
@@ -194,21 +190,6 @@ function pointerAddress(value: object): number {
     address = nextPointerAddress * pointerAddressStride
     nextPointerAddress++
     pointerAddresses.set(value, address)
-  }
-  return address
-}
-
-function fieldPointerAddress(target: object, key: string): number {
-  let addresses = fieldPointerAddresses.get(target)
-  if (addresses === undefined) {
-    addresses = new globalThis.Map<string, number>()
-    fieldPointerAddresses.set(target, addresses)
-  }
-  let address = addresses.get(key)
-  if (address === undefined) {
-    address = nextPointerAddress * pointerAddressStride
-    nextPointerAddress++
-    addresses.set(key, address)
   }
   return address
 }
@@ -583,6 +564,12 @@ export class Value {
   }
 
   private storeValue(value: ReflectValue): void {
+    if (this.Kind() === Struct) {
+      const target = this.currentValue()
+      $.assignStruct(target, value, typeInfoFromReflectType(this._type))
+      this._value = target
+      return
+    }
     this._value = value
     if (this._parentVarRef) {
       this._parentVarRef.value = value
@@ -864,7 +851,8 @@ export class Value {
       throw new Error('reflect: struct field index out of range')
     }
 
-    const parentObj = this._value as Record<string, any>
+    const structValue = this.currentValue() as Record<string, any>
+    const parentObj = structValue._fields ?? structValue
     let fieldVal = parentObj[fieldKey]
     if (fieldVal === undefined) {
       fieldVal = null
@@ -947,11 +935,7 @@ export class Value {
         target,
         key as keyof typeof target,
       ) as $.VarRef<ReflectValue>
-      return {
-        __goOwnedPointer: true,
-        __goAddress: () => fieldPointerAddress(target, key),
-        __goRef: () => ref,
-      }
+      return $.ownedPointerFromRef(ref)!
     }
     if (this._parentVarRef?.__goPointer) {
       return this._parentVarRef
