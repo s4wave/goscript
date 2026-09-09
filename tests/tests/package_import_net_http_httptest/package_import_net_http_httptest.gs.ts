@@ -21,7 +21,7 @@ export async function main(): globalThis.Promise<void> {
 	http.Header_Set(httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(w)), "X-Test", "ok")
 	await $.println(await http.Header_Get(httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(w)), "X-Test"))
 
-	await setAttachment($.interfaceValue<http.ResponseWriter | null>(w, "*httptest.ResponseRecorder", { kind: $.TypeKind.Pointer, elemType: "httptest.ResponseRecorder" }), "hello.txt")
+	await setAttachment($.interfaceValue<http.ResponseWriter | null>(w, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")), "hello.txt")
 	await $.println(await http.Header_Get(httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(w)), "Content-Disposition"))
 }
 

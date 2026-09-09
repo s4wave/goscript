@@ -1208,6 +1208,10 @@ func parityFixtureJSON(t *testing.T, symbols map[string]overrideParityEntry) str
 			b.WriteString(",\"reason\":")
 			b.WriteString(strconv.Quote(entry.Reason))
 		}
+		if entry.Since != "" {
+			b.WriteString(",\"since\":")
+			b.WriteString(strconv.Quote(entry.Since))
+		}
 		b.WriteString("}")
 	}
 	b.WriteString("}}\n")

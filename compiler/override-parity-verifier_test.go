@@ -101,7 +101,7 @@ func requireDiagnosticSeverity(t *testing.T, diagnostics []Diagnostic, code stri
 	t.Fatalf("missing diagnostic %q with severity %q in %#v", code, severity, diagnostics)
 }
 
-func TestOverrideParityVerifierBlockedToolchainSuperset(t *testing.T) {
+func TestOverrideParityVerifierToolchainSuperset(t *testing.T) {
 	pkg := types.NewPackage("example.test/future", "future")
 	ledger := overrideParityLedger{
 		SchemaVersion: 1,
@@ -109,11 +109,15 @@ func TestOverrideParityVerifierBlockedToolchainSuperset(t *testing.T) {
 		Symbols: map[string]overrideParityEntry{
 			"FutureBlocked": {Status: overrideParityStatusBlocked, Reason: "newer stdlib surface"},
 			"FutureReal":    {Status: overrideParityStatusReal},
+			"FutureVersioned": {
+				Status: overrideParityStatusReal,
+				Since:  "go1.27",
+			},
 		},
 	}
 
 	t.Run("blocked absent from go and typescript passes", func(t *testing.T) {
-		diagnostics := verifyOverrideParityPackage(pkg.Path(), pkg, ledger, nil, nil)
+		diagnostics := verifyOverrideParityPackage("go1.26.5", pkg.Path(), pkg, ledger, nil, nil)
 		for _, diagnostic := range diagnostics {
 			if diagnostic.Code == "goscript/overrides:parity-unknown-symbol" &&
 				diagnostic.Detail == pkg.Path()+".FutureBlocked" {
@@ -123,13 +127,35 @@ func TestOverrideParityVerifierBlockedToolchainSuperset(t *testing.T) {
 	})
 
 	t.Run("real absent from go rejects", func(t *testing.T) {
-		diagnostics := verifyOverrideParityPackage(pkg.Path(), pkg, ledger, nil, nil)
+		diagnostics := verifyOverrideParityPackage("go1.26.5", pkg.Path(), pkg, ledger, nil, nil)
+		requireDiagnosticCode(t, diagnostics, "goscript/overrides:parity-unknown-symbol")
+	})
+
+	t.Run("versioned real export before introduction passes", func(t *testing.T) {
+		tsExports := map[string]typeScriptExport{"FutureVersioned": {value: true}}
+		diagnostics := verifyOverrideParityPackage("go1.26.5", pkg.Path(), pkg, ledger, tsExports, nil)
+		for _, diagnostic := range diagnostics {
+			if diagnostic.Code == "goscript/overrides:parity-unknown-symbol" &&
+				diagnostic.Detail == pkg.Path()+".FutureVersioned" {
+				t.Fatalf("versioned superset entry was rejected: %#v", diagnostic)
+			}
+		}
+	})
+
+	t.Run("versioned real export after introduction rejects", func(t *testing.T) {
+		tsExports := map[string]typeScriptExport{"FutureVersioned": {value: true}}
+		diagnostics := verifyOverrideParityPackage("go1.27", pkg.Path(), pkg, ledger, tsExports, nil)
+		requireDiagnosticCode(t, diagnostics, "goscript/overrides:parity-unknown-symbol")
+	})
+
+	t.Run("versioned real without export rejects", func(t *testing.T) {
+		diagnostics := verifyOverrideParityPackage("go1.26.5", pkg.Path(), pkg, ledger, nil, nil)
 		requireDiagnosticCode(t, diagnostics, "goscript/overrides:parity-unknown-symbol")
 	})
 
 	t.Run("blocked absent from go but exported by typescript rejects", func(t *testing.T) {
 		tsExports := map[string]typeScriptExport{"FutureBlocked": {value: true}}
-		diagnostics := verifyOverrideParityPackage(pkg.Path(), pkg, ledger, tsExports, nil)
+		diagnostics := verifyOverrideParityPackage("go1.26.5", pkg.Path(), pkg, ledger, tsExports, nil)
 		requireDiagnosticCode(t, diagnostics, "goscript/overrides:parity-unexpected-export")
 		requireDiagnosticSeverity(t, diagnostics, "goscript/overrides:parity-unexpected-export", DiagnosticSeverityError)
 	})
@@ -146,7 +172,7 @@ func TestOverrideParityVerifierBlockedToolchainSuperset(t *testing.T) {
 				"BlockedNow": {Status: overrideParityStatusBlocked, Reason: "unsupported surface"},
 			},
 		}
-		diagnostics := verifyOverrideParityPackage(present.Path(), present, blockedLedger, tsExports, nil)
+		diagnostics := verifyOverrideParityPackage("go1.26.5", present.Path(), present, blockedLedger, tsExports, nil)
 		requireDiagnosticCode(t, diagnostics, "goscript/overrides:parity-unexpected-export")
 	})
 }

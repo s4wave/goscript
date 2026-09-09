@@ -1,6 +1,7 @@
 package compiler
 
 import (
+	goversion "go/version"
 	"io"
 	"io/fs"
 	"maps"
@@ -28,6 +29,7 @@ type overrideParityLedger struct {
 type overrideParityEntry struct {
 	Status overrideParityStatus
 	Reason string
+	Since  string
 }
 
 func newOverrideParityLedger() overrideParityLedger {
@@ -61,6 +63,8 @@ func loadOverrideParityLedger(root overridePackageRoot) (overrideParityLedger, e
 						entry.Status = overrideParityStatus(iter.ReadString())
 					case "reason":
 						entry.Reason = iter.ReadString()
+					case "since":
+						entry.Since = iter.ReadString()
 					default:
 						iter.Skip()
 					}
@@ -89,6 +93,12 @@ func loadOverrideParityLedger(root overridePackageRoot) (overrideParityLedger, e
 		}
 		if entry.Status == overrideParityStatusBlocked && strings.TrimSpace(entry.Reason) == "" {
 			return overrideParityLedger{}, errors.New("parity.json blocked symbols must include a reason")
+		}
+		if entry.Since != "" && entry.Status != overrideParityStatusReal {
+			return overrideParityLedger{}, errors.New("parity.json since requires real status")
+		}
+		if entry.Since != "" && !goversion.IsValid(entry.Since) {
+			return overrideParityLedger{}, errors.New("parity.json since must be a valid Go version")
 		}
 	}
 	return ledger, nil

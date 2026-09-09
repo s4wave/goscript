@@ -42,11 +42,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("request:", $.pointerValue<http.Request>(req).Method, $.pointerValue<any>($.pointerValue<http.Request>(req).URL).Path, http.Request.prototype.ProtoAtLeast.call($.pointerValue<http.Request>(req), 1, 1), $.len(http.Request.prototype.Cookies.call($.pointerValue<http.Request>(req))))
 
 	let rec: httptest.ResponseRecorder | $.VarRef<httptest.ResponseRecorder> | null = httptest.NewRecorder()
-	http.Error($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", { kind: $.TypeKind.Pointer, elemType: "httptest.ResponseRecorder" }))!, http.ProtocolError.prototype.Error.call($.pointerValue<http.ProtocolError>(http.ErrNotSupported)), http.StatusForbidden)
+	http.Error($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, http.ProtocolError.prototype.Error.call($.pointerValue<http.ProtocolError>(http.ErrNotSupported)), http.StatusForbidden)
 	await $.println("recorder:", $.pointerValue<httptest.ResponseRecorder>(rec).Code, bytes.Buffer.prototype.String.call($.pointerValue<bytes.Buffer>($.pointerValue<httptest.ResponseRecorder>(rec).Body)))
 
 	rec = httptest.NewRecorder()
-	await http.ServeContent($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", { kind: $.TypeKind.Pointer, elemType: "httptest.ResponseRecorder" }))!, req, "content.txt", $.markAsStructValue(new time.Time()), $.pointerValueOrNil($.interfaceValue<io.ReadSeeker | null>(strings.NewReader("served"), "*strings.Reader", { kind: $.TypeKind.Pointer, elemType: "strings.Reader" }))!)
+	await http.ServeContent($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, req, "content.txt", $.markAsStructValue(new time.Time()), $.pointerValueOrNil($.interfaceValue<io.ReadSeeker | null>(strings.NewReader("served"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	await $.println("servecontent:", $.pointerValue<httptest.ResponseRecorder>(rec).Code, bytes.Buffer.prototype.String.call($.pointerValue<bytes.Buffer>($.pointerValue<httptest.ResponseRecorder>(rec).Body)))
 
 	let __goscriptTuple1: any = http.NewRequest(http.MethodHead, "https://example.invalid/content.txt", $.interfaceValue<io.Reader | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(http.NoBody))), "http.noBody", "http.noBody"))
@@ -57,7 +57,7 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 	rec = httptest.NewRecorder()
-	await http.ServeContent($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", { kind: $.TypeKind.Pointer, elemType: "httptest.ResponseRecorder" }))!, headReq, "content.txt", $.markAsStructValue(new time.Time()), $.pointerValueOrNil($.interfaceValue<io.ReadSeeker | null>(strings.NewReader("hidden"), "*strings.Reader", { kind: $.TypeKind.Pointer, elemType: "strings.Reader" }))!)
+	await http.ServeContent($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, headReq, "content.txt", $.markAsStructValue(new time.Time()), $.pointerValueOrNil($.interfaceValue<io.ReadSeeker | null>(strings.NewReader("hidden"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	await $.println("servecontent head:", $.pointerValue<httptest.ResponseRecorder>(rec).Code, bytes.Buffer.prototype.Len.call($.pointerValue<bytes.Buffer>($.pointerValue<httptest.ResponseRecorder>(rec).Body)))
 
 	let srv: httptest.Server | $.VarRef<httptest.Server> | null = httptest.NewTLSServer($.pointerValueOrNil(http.NotFoundHandler())!)

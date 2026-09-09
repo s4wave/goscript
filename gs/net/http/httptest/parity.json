@@ -7,7 +7,7 @@
     "NewRequest": { "status": "real" },
     "NewRequestWithContext": { "status": "real" },
     "NewServer": { "status": "real" },
-    "NewTestServer": { "status": "real" },
+    "NewTestServer": { "status": "real", "since": "go1.27" },
     "NewTLSServer": { "status": "real" },
     "NewUnstartedServer": { "status": "real" },
     "ResponseRecorder": { "status": "real" },

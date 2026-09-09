@@ -50,7 +50,7 @@ export async function main(): globalThis.Promise<void> {
 				return
 			}
 		}
-	}, ({ kind: $.TypeKind.Function, params: ["http.ResponseWriter", { kind: $.TypeKind.Pointer, elemType: "http.Request" }], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", ({ kind: $.TypeKind.Function, name: "http.HandlerFunc", params: ["http.ResponseWriter", { kind: $.TypeKind.Pointer, elemType: "http.Request" }], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", {ServeHTTP: (receiver: any, ...args: any[]) => (http.HandlerFunc_ServeHTTP as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, ({ kind: $.TypeKind.Function, name: "http.HandlerFunc", params: ["http.ResponseWriter", { kind: $.TypeKind.Pointer, elemType: "http.Request" }], results: [] } as $.FunctionTypeInfo), [{ name: "ServeHTTP", args: [{ name: "w", type: "http.ResponseWriter" }, { name: "r", type: { kind: $.TypeKind.Pointer, elemType: "http.Request" } }], returns: [] }]))!)
+	}, ({ kind: $.TypeKind.Function, params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", ({ kind: $.TypeKind.Function, name: "http.HandlerFunc", params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", {ServeHTTP: (receiver: any, ...args: any[]) => (http.HandlerFunc_ServeHTTP as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, ({ kind: $.TypeKind.Function, name: "http.HandlerFunc", params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo), [$.methodSignature("ServeHTTP", [["w", "http.ResponseWriter"], ["r", /* @__PURE__ */ $.pointerType("http.Request")]])]))!)
 	__defer.defer(() => { httptest.Server.prototype.Close.call($.pointerValue<httptest.Server>(server)) })
 
 	let __goscriptTuple1: any = await http.Get($.pointerValue<httptest.Server>(server).URL)
@@ -102,7 +102,7 @@ export async function main(): globalThis.Promise<void> {
 	__defer.defer(async () => { await $.pointerValue<Exclude<io.ReadCloser, null>>($.pointerValue<http.Response>(headResp).Body).Close() })
 	await $.println("head status:", $.pointerValue<http.Response>(headResp).StatusCode)
 
-	let __goscriptTuple6: any = await http.Client.prototype.Post.call($.pointerValue<http.Client>(httptest.Server.prototype.Client.call($.pointerValue<httptest.Server>(server))), $.pointerValue<httptest.Server>(server).URL, "text/plain", $.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("payload"), "*strings.Reader", { kind: $.TypeKind.Pointer, elemType: "strings.Reader" }))!)
+	let __goscriptTuple6: any = await http.Client.prototype.Post.call($.pointerValue<http.Client>(httptest.Server.prototype.Client.call($.pointerValue<httptest.Server>(server))), $.pointerValue<httptest.Server>(server).URL, "text/plain", $.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("payload"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	let postResp: http.Response | $.VarRef<http.Response> | null = __goscriptTuple6[0]
 	err = __goscriptTuple6[1]
 	if (err != null) {

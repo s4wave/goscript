@@ -4,8 +4,10 @@ import (
 	"context"
 	"go/ast"
 	"go/types"
+	goversion "go/version"
 	"path"
 	"regexp"
+	"runtime"
 	"slices"
 	"strings"
 
@@ -91,6 +93,7 @@ func (v *OverrideParityVerifier) Verify(
 			continue
 		}
 		diagnostics = append(diagnostics, verifyOverrideParityPackage(
+			runtime.Version(),
 			node.PkgPath,
 			pkg.Types,
 			ledger,
@@ -156,6 +159,7 @@ func (v *OverrideParityVerifier) VerifyNoDeferred(facts *OverrideFacts, pkgPaths
 }
 
 func verifyOverrideParityPackage(
+	goVersion string,
 	pkgPath string,
 	goPkg *types.Package,
 	ledger overrideParityLedger,
@@ -210,12 +214,17 @@ func verifyOverrideParityPackage(
 		if goExportSet[symbol] {
 			continue
 		}
-		// Cross-toolchain superset rule: a blocked entry may outlive the
-		// toolchain that exported its symbol. When this toolchain lacks the
-		// export and TypeScript does not provide one either, there is nothing
-		// to verify. A TypeScript export standing in for a blocked symbol
-		// stays an error, and every other status still rejects the row.
+		// Cross-toolchain superset rules keep one ledger valid across supported
+		// Go releases. A real TypeScript export may precede its declared Go
+		// introduction, while a blocked row may outlive a removed Go export.
 		entry := ledger.Symbols[symbol]
+		if entry.Status == overrideParityStatusReal &&
+			entry.Since != "" &&
+			goversion.IsValid(goVersion) &&
+			goversion.Compare(goVersion, entry.Since) < 0 &&
+			tsExports[symbol].present() {
+			continue
+		}
 		if entry.Status == overrideParityStatusBlocked && !tsExports[symbol].present() {
 			continue
 		}
