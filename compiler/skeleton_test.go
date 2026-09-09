@@ -708,7 +708,7 @@ func TestCompilePackagesPreservesNamedUint64InterfaceTypeInfo(t *testing.T) {
 	if !strings.Contains(text, want) {
 		t.Fatalf("missing named interface box %q in generated output:\n%s", want, text)
 	}
-	want = `elemType: /* @__PURE__ */ $.basicType("uint64", "main.Pol")`
+	want = `$.pointerType(/* @__PURE__ */ $.basicType("uint64", "main.Pol"))`
 	if !strings.Contains(text, want) {
 		t.Fatalf("named uint64 pointer interface box lost type metadata:\n%s", text)
 	}
@@ -2018,9 +2018,8 @@ func TestCompilePackagesTypeInfoTrimFollowsReflectReachability(t *testing.T) {
 		}
 		text := string(content)
 		for _, want := range []string{
-			`args: [{ name: "v", type: /* @__PURE__ */ $.basicType("int") }]`,
-			`returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }]`,
-			`{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string"), tag: "json:\"name\"", index: [0], offset: 0, exported: true }`,
+			`$.methodSignature("Read", [["v", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("string")])`,
+			`$.structField("Name", /* @__PURE__ */ $.basicType("string"), [0], 0, true, { tag: "json:\"name\"" })`,
 		} {
 			if !strings.Contains(text, want) {
 				t.Fatalf("missing full type-info payload %q:\n%s", want, text)
@@ -2176,8 +2175,8 @@ func TestCompilePackagesDoesNotEmitHiddenEmbeddedMethodOverField(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"public get Database(): string",
-		"public set Database(value: string)",
+		"public declare Database: string",
+		"$.bindStructFields(this.prototype, [\"Database\", \"embedded\"])",
 		"return h.Database",
 	} {
 		if !strings.Contains(text, want) {
@@ -2976,7 +2975,7 @@ func TestCompilePackagesEmitsInterfacesMethodValuesTypeSwitchesAndFunctionAssert
 		"params: [/* @__PURE__ */ $.basicType(\"string\")]",
 		"results: [/* @__PURE__ */ $.basicType(\"string\")]",
 		"$.interfaceValue(null, \"*struct{Name string}\",",
-		"elemType: { kind: $.TypeKind.Struct, methods: [], fields: [{ name: \"Name\", key: \"Name\", type: /* @__PURE__ */ $.basicType(\"string\")",
+		"$.pointerType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField(\"Name\", /* @__PURE__ */ $.basicType(\"string\"), [0], 0, true)] })",
 		"let fn = __goscriptTuple",
 		"switch (true)",
 		"case $.typeAssert<ReadCloser | null>(__goscriptTypeSwitchValue, \"main.ReadCloser\").ok",
@@ -3240,9 +3239,9 @@ func TestCompilePackagesEmitsGenericMethodsAliasesAndDictionaries(t *testing.T) 
 		"$.mapSet(seen, 1, {})",
 		"$.genericZero(__typeArgs, \"T\", null)",
 		"return $.callGenericMethod(__typeArgs, \"T\", \"String\", v)",
-		"ZeroValue({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: \"String\", args: [], returns: [{ name: \"_r0\", type: /* @__PURE__ */ $.basicType(\"string\") }] }] }})",
-		"await CallString({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: \"String\", args: [], returns: [{ name: \"_r0\", type: /* @__PURE__ */ $.basicType(\"string\") }] }] }}, zero)",
-		"Sum({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [{ name: \"String\", args: [], returns: [{ name: \"_r0\", type: /* @__PURE__ */ $.basicType(\"string\") }] }] }}, null)",
+		"ZeroValue({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature(\"String\", [], [/* @__PURE__ */ $.basicType(\"string\")])] }})",
+		"await CallString({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature(\"String\", [], [/* @__PURE__ */ $.basicType(\"string\")])] }}, zero)",
+		"Sum({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature(\"String\", [], [/* @__PURE__ */ $.basicType(\"string\")])] }}, null)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -5730,12 +5729,12 @@ func TestCompilePackagesQualifiesImportedTypesInSignaturesAndZeroValues(t *testi
 	}
 	text := string(content)
 	for _, want := range []string{
-		"Box: $.VarRef<lib.Box>",
-		"Boxes: $.VarRef<$.Slice<lib.Box>>",
-		"Header: $.VarRef<lib.Header>",
-		"Fn: $.VarRef<((_p0: lib.Box) => [lib.Box, $.GoError] | globalThis.Promise<[lib.Box, $.GoError]>) | null>",
-		"Ptr: $.VarRef<atomic.Pointer<(() => void) | null>>",
-		"Header: $.varRef(init?.Header ?? (null! as lib.Header))",
+		"Box: lib.Box",
+		"Boxes: $.Slice<lib.Box>",
+		"Header: lib.Header",
+		"Fn: ((_p0: lib.Box) => [lib.Box, $.GoError] | globalThis.Promise<[lib.Box, $.GoError]>) | null",
+		"Ptr: atomic.Pointer<(() => void) | null>",
+		"Header: init?.Header ?? (null! as lib.Header)",
 		"$.markAsStructValue(new lib.Box())",
 		"$.markAsStructValue(new atomic.Pointer<(() => void) | null>())",
 		"export async function Use(fn: ((_p0: lib.Box) => [lib.Box, $.GoError] | globalThis.Promise<[lib.Box, $.GoError]>) | null, box: lib.Box): globalThis.Promise<[lib.Box, $.GoError]>",
