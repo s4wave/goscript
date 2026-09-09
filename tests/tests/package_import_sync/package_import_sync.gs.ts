@@ -7,39 +7,24 @@ import * as sync from "@goscript/sync/index.js"
 import "@goscript/sync/index.js"
 
 export class embeddedMutex {
-	public get Mutex(): sync.Mutex {
-		return this._fields.Mutex.value
-	}
-	public set Mutex(value: sync.Mutex) {
-		this._fields.Mutex.value = value
-	}
+	public declare Mutex: sync.Mutex
 
-	public get value(): number {
-		return this._fields.value.value
-	}
-	public set value(value: number) {
-		this._fields.value.value = value
-	}
+	public declare value: number
 
 	public _fields: {
-		Mutex: $.VarRef<sync.Mutex>
-		value: $.VarRef<number>
+		Mutex: sync.Mutex
+		value: number
 	}
 
 	constructor(init?: Partial<{Mutex?: sync.Mutex, value?: number}>) {
 		this._fields = {
-			Mutex: $.varRef(init?.Mutex ? $.markAsStructValue($.cloneStructValue(init.Mutex)) : $.markAsStructValue(new sync.Mutex())),
-			value: $.varRef(init?.value ?? (0 as number))
+			Mutex: init?.Mutex ? $.markAsStructValue($.cloneStructValue(init.Mutex)) : $.markAsStructValue(new sync.Mutex()),
+			value: init?.value ?? (0 as number)
 		}
 	}
 
 	public clone(): embeddedMutex {
-		const cloned = new embeddedMutex()
-		cloned._fields = {
-			Mutex: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.Mutex.value))),
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new embeddedMutex(this))
 	}
 
 	public Lock(): any {
@@ -54,6 +39,10 @@ export class embeddedMutex {
 		return $.pointerValue<sync.Mutex>(this.Mutex).Unlock()
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["Mutex", "value"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.embeddedMutex",
 		() => new embeddedMutex(),
@@ -64,39 +53,24 @@ export class embeddedMutex {
 }
 
 export class embeddedRWMutex {
-	public get RWMutex(): sync.RWMutex {
-		return this._fields.RWMutex.value
-	}
-	public set RWMutex(value: sync.RWMutex) {
-		this._fields.RWMutex.value = value
-	}
+	public declare RWMutex: sync.RWMutex
 
-	public get value(): number {
-		return this._fields.value.value
-	}
-	public set value(value: number) {
-		this._fields.value.value = value
-	}
+	public declare value: number
 
 	public _fields: {
-		RWMutex: $.VarRef<sync.RWMutex>
-		value: $.VarRef<number>
+		RWMutex: sync.RWMutex
+		value: number
 	}
 
 	constructor(init?: Partial<{RWMutex?: sync.RWMutex, value?: number}>) {
 		this._fields = {
-			RWMutex: $.varRef(init?.RWMutex ? $.markAsStructValue($.cloneStructValue(init.RWMutex)) : $.markAsStructValue(new sync.RWMutex())),
-			value: $.varRef(init?.value ?? (0 as number))
+			RWMutex: init?.RWMutex ? $.markAsStructValue($.cloneStructValue(init.RWMutex)) : $.markAsStructValue(new sync.RWMutex()),
+			value: init?.value ?? (0 as number)
 		}
 	}
 
 	public clone(): embeddedRWMutex {
-		const cloned = new embeddedRWMutex()
-		cloned._fields = {
-			RWMutex: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.RWMutex.value))),
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new embeddedRWMutex(this))
 	}
 
 	public Lock(): any {
@@ -125,6 +99,10 @@ export class embeddedRWMutex {
 
 	public Unlock(): any {
 		return $.pointerValue<sync.RWMutex>(this.RWMutex).Unlock()
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["RWMutex", "value"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -34,10 +34,7 @@ export class pingFrame {
 	}
 
 	public clone(): pingFrame {
-		const cloned = new pingFrame()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new pingFrame(this))
 	}
 
 	public Write(): void {
@@ -53,39 +50,28 @@ export class pingFrame {
 }
 
 export class Frame {
-	public get Frame(): wireFrame | null {
-		return this._fields.Frame.value
-	}
-	public set Frame(value: wireFrame | null) {
-		this._fields.Frame.value = value
-	}
+	public declare Frame: wireFrame | null
 
-	public get Handler(): FrameHandler | null {
-		return this._fields.Handler.value
-	}
-	public set Handler(value: FrameHandler | null) {
-		this._fields.Handler.value = value
-	}
+	public declare Handler: FrameHandler | null
 
 	public _fields: {
-		Frame: $.VarRef<wireFrame | null>
-		Handler: $.VarRef<FrameHandler | null>
+		Frame: wireFrame | null
+		Handler: FrameHandler | null
 	}
 
 	constructor(init?: Partial<{Frame?: wireFrame | null, Handler?: FrameHandler | null}>) {
 		this._fields = {
-			Frame: $.varRef(init?.Frame ?? (null! as wireFrame | null)),
-			Handler: $.varRef(init?.Handler ?? (null! as FrameHandler | null))
+			Frame: init?.Frame ?? (null! as wireFrame | null),
+			Handler: init?.Handler ?? (null! as FrameHandler | null)
 		}
 	}
 
 	public clone(): Frame {
-		const cloned = new Frame()
-		cloned._fields = {
-			Frame: $.varRef(this._fields.Frame.value),
-			Handler: $.varRef(this._fields.Handler.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Frame(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Frame", "Handler"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -98,29 +84,24 @@ export class Frame {
 }
 
 export class packet {
-	public get Frames(): $.Slice<Frame> {
-		return this._fields.Frames.value
-	}
-	public set Frames(value: $.Slice<Frame>) {
-		this._fields.Frames.value = value
-	}
+	public declare Frames: $.Slice<Frame>
 
 	public _fields: {
-		Frames: $.VarRef<$.Slice<Frame>>
+		Frames: $.Slice<Frame>
 	}
 
 	constructor(init?: Partial<{Frames?: $.Slice<Frame>}>) {
 		this._fields = {
-			Frames: $.varRef(init?.Frames ?? (null! as $.Slice<Frame>))
+			Frames: init?.Frames ?? (null! as $.Slice<Frame>)
 		}
 	}
 
 	public clone(): packet {
-		const cloned = new packet()
-		cloned._fields = {
-			Frames: $.varRef(this._fields.Frames.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new packet(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Frames"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -128,49 +109,44 @@ export class packet {
 		() => new packet(),
 		() => [],
 		packet,
-		() => [{ name: "Frames", key: "Frames", type: { kind: $.TypeKind.Slice, elemType: "main.Frame" } }]
+		() => [{ name: "Frames", key: "Frames", type: /* @__PURE__ */ $.sliceType("main.Frame") }]
 	)
 }
 
 export class retransmissionQueue {
-	public get lost(): number {
-		return this._fields.lost.value
-	}
-	public set lost(value: number) {
-		this._fields.lost.value = value
-	}
+	public declare lost: number
 
 	public _fields: {
-		lost: $.VarRef<number>
+		lost: number
 	}
 
 	constructor(init?: Partial<{lost?: number}>) {
 		this._fields = {
-			lost: $.varRef(init?.lost ?? (0 as number))
+			lost: init?.lost ?? (0 as number)
 		}
 	}
 
 	public clone(): retransmissionQueue {
-		const cloned = new retransmissionQueue()
-		cloned._fields = {
-			lost: $.varRef(this._fields.lost.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new retransmissionQueue(this))
 	}
 
 	public AppDataAckHandler(): FrameHandler | null {
 		const q: retransmissionQueue | $.VarRef<retransmissionQueue> | null = this
-		return $.interfaceValue<FrameHandler | null>($.unsafePointerCast<retransmissionQueueAppDataAckHandler | $.VarRef<retransmissionQueueAppDataAckHandler> | null>(q, retransmissionQueueAppDataAckHandler), "*main.retransmissionQueueAppDataAckHandler", { kind: $.TypeKind.Pointer, elemType: "main.retransmissionQueueAppDataAckHandler" })
+		return $.interfaceValue<FrameHandler | null>($.unsafePointerCast<retransmissionQueueAppDataAckHandler | $.VarRef<retransmissionQueueAppDataAckHandler> | null>(q, retransmissionQueueAppDataAckHandler), "*main.retransmissionQueueAppDataAckHandler", /* @__PURE__ */ $.pointerType("main.retransmissionQueueAppDataAckHandler"))
 	}
 
 	public HandshakeAckHandler(): FrameHandler | null {
 		const q: retransmissionQueue | $.VarRef<retransmissionQueue> | null = this
-		return $.interfaceValue<FrameHandler | null>($.unsafePointerCast<retransmissionQueueHandshakeAckHandler | $.VarRef<retransmissionQueueHandshakeAckHandler> | null>(q, retransmissionQueueHandshakeAckHandler), "*main.retransmissionQueueHandshakeAckHandler", { kind: $.TypeKind.Pointer, elemType: "main.retransmissionQueueHandshakeAckHandler" })
+		return $.interfaceValue<FrameHandler | null>($.unsafePointerCast<retransmissionQueueHandshakeAckHandler | $.VarRef<retransmissionQueueHandshakeAckHandler> | null>(q, retransmissionQueueHandshakeAckHandler), "*main.retransmissionQueueHandshakeAckHandler", /* @__PURE__ */ $.pointerType("main.retransmissionQueueHandshakeAckHandler"))
 	}
 
 	public InitialAckHandler(): FrameHandler | null {
 		const q: retransmissionQueue | $.VarRef<retransmissionQueue> | null = this
-		return $.interfaceValue<FrameHandler | null>($.unsafePointerCast<retransmissionQueueInitialAckHandler | $.VarRef<retransmissionQueueInitialAckHandler> | null>(q, retransmissionQueueInitialAckHandler), "*main.retransmissionQueueInitialAckHandler", { kind: $.TypeKind.Pointer, elemType: "main.retransmissionQueueInitialAckHandler" })
+		return $.interfaceValue<FrameHandler | null>($.unsafePointerCast<retransmissionQueueInitialAckHandler | $.VarRef<retransmissionQueueInitialAckHandler> | null>(q, retransmissionQueueInitialAckHandler), "*main.retransmissionQueueInitialAckHandler", /* @__PURE__ */ $.pointerType("main.retransmissionQueueInitialAckHandler"))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["lost"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -183,29 +159,20 @@ export class retransmissionQueue {
 }
 
 export class retransmissionQueueInitialAckHandler {
-	public get lost(): number {
-		return this._fields.lost.value
-	}
-	public set lost(value: number) {
-		this._fields.lost.value = value
-	}
+	public declare lost: number
 
 	public _fields: {
-		lost: $.VarRef<number>
+		lost: number
 	}
 
 	constructor(init?: Partial<{lost?: number}>) {
 		this._fields = {
-			lost: $.varRef(init?.lost ?? (0 as number))
+			lost: init?.lost ?? (0 as number)
 		}
 	}
 
 	public clone(): retransmissionQueueInitialAckHandler {
-		const cloned = new retransmissionQueueInitialAckHandler()
-		cloned._fields = {
-			lost: $.varRef(this._fields.lost.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new retransmissionQueueInitialAckHandler(this))
 	}
 
 	public OnAcked(_p0: wireFrame | null): void {
@@ -218,6 +185,10 @@ export class retransmissionQueueInitialAckHandler {
 		await $.println("initial")
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["lost"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.retransmissionQueueInitialAckHandler",
 		() => new retransmissionQueueInitialAckHandler(),
@@ -228,29 +199,20 @@ export class retransmissionQueueInitialAckHandler {
 }
 
 export class retransmissionQueueHandshakeAckHandler {
-	public get lost(): number {
-		return this._fields.lost.value
-	}
-	public set lost(value: number) {
-		this._fields.lost.value = value
-	}
+	public declare lost: number
 
 	public _fields: {
-		lost: $.VarRef<number>
+		lost: number
 	}
 
 	constructor(init?: Partial<{lost?: number}>) {
 		this._fields = {
-			lost: $.varRef(init?.lost ?? (0 as number))
+			lost: init?.lost ?? (0 as number)
 		}
 	}
 
 	public clone(): retransmissionQueueHandshakeAckHandler {
-		const cloned = new retransmissionQueueHandshakeAckHandler()
-		cloned._fields = {
-			lost: $.varRef(this._fields.lost.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new retransmissionQueueHandshakeAckHandler(this))
 	}
 
 	public OnAcked(_p0: wireFrame | null): void {
@@ -263,6 +225,10 @@ export class retransmissionQueueHandshakeAckHandler {
 		await $.println("handshake")
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["lost"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.retransmissionQueueHandshakeAckHandler",
 		() => new retransmissionQueueHandshakeAckHandler(),
@@ -273,29 +239,20 @@ export class retransmissionQueueHandshakeAckHandler {
 }
 
 export class retransmissionQueueAppDataAckHandler {
-	public get lost(): number {
-		return this._fields.lost.value
-	}
-	public set lost(value: number) {
-		this._fields.lost.value = value
-	}
+	public declare lost: number
 
 	public _fields: {
-		lost: $.VarRef<number>
+		lost: number
 	}
 
 	constructor(init?: Partial<{lost?: number}>) {
 		this._fields = {
-			lost: $.varRef(init?.lost ?? (0 as number))
+			lost: init?.lost ?? (0 as number)
 		}
 	}
 
 	public clone(): retransmissionQueueAppDataAckHandler {
-		const cloned = new retransmissionQueueAppDataAckHandler()
-		cloned._fields = {
-			lost: $.varRef(this._fields.lost.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new retransmissionQueueAppDataAckHandler(this))
 	}
 
 	public OnAcked(_p0: wireFrame | null): void {
@@ -306,6 +263,10 @@ export class retransmissionQueueAppDataAckHandler {
 		let q: retransmissionQueueAppDataAckHandler | $.VarRef<retransmissionQueueAppDataAckHandler> | null = this
 		$.pointerValue<retransmissionQueueAppDataAckHandler>(q).lost++
 		await $.println("app")
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["lost"])
 	}
 
 	static __typeInfo = $.registerStructType(

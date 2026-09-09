@@ -4,29 +4,20 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Worker {
-	public get ch(): $.Channel<number> | null {
-		return this._fields.ch.value
-	}
-	public set ch(value: $.Channel<number> | null) {
-		this._fields.ch.value = value
-	}
+	public declare ch: $.Channel<number> | null
 
 	public _fields: {
-		ch: $.VarRef<$.Channel<number> | null>
+		ch: $.Channel<number> | null
 	}
 
 	constructor(init?: Partial<{ch?: $.Channel<number> | null}>) {
 		this._fields = {
-			ch: $.varRef(init?.ch ?? (null! as $.Channel<number> | null))
+			ch: init?.ch ?? (null! as $.Channel<number> | null)
 		}
 	}
 
 	public clone(): Worker {
-		const cloned = new Worker()
-		cloned._fields = {
-			ch: $.varRef(this._fields.ch.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Worker(this))
 	}
 
 	public async lookup(network: string): globalThis.Promise<number> {
@@ -35,12 +26,16 @@ export class Worker {
 		return await $.chanRecv($.pointerValue<Worker>(w).ch)
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["ch"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Worker",
 		() => new Worker(),
 		() => [{ name: "lookup", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		Worker,
-		() => [{ name: "ch", key: "ch", type: { kind: $.TypeKind.Channel, direction: "both", elemType: /* @__PURE__ */ $.basicType("int") } }]
+		() => [{ name: "ch", key: "ch", type: /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both") }]
 	)
 }
 

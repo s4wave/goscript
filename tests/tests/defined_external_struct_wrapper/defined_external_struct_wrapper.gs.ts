@@ -7,39 +7,24 @@ import * as dep from "@goscript/github.com/s4wave/goscript/tests/tests/defined_e
 import "@goscript/github.com/s4wave/goscript/tests/tests/defined_external_struct_wrapper/dep/index.js"
 
 export class Wrapped {
-	public get Value(): string {
-		return this._fields.Value.value
-	}
-	public set Value(value: string) {
-		this._fields.Value.value = value
-	}
+	public declare Value: string
 
-	public get Hidden(): dep.hidden {
-		return this._fields.Hidden.value
-	}
-	public set Hidden(value: dep.hidden) {
-		this._fields.Hidden.value = value
-	}
+	public declare Hidden: dep.hidden
 
 	public _fields: {
-		Value: $.VarRef<string>
-		Hidden: $.VarRef<dep.hidden>
+		Value: string
+		Hidden: dep.hidden
 	}
 
 	constructor(init?: Partial<{Value?: string, Hidden?: dep.hidden}>) {
 		this._fields = {
-			Value: $.varRef(init?.Value ?? ("" as string)),
-			Hidden: $.varRef(init?.Hidden ? $.markAsStructValue($.cloneStructValue(init.Hidden)) : $.markAsStructValue(new dep.hidden()))
+			Value: init?.Value ?? ("" as string),
+			Hidden: init?.Hidden ? $.markAsStructValue($.cloneStructValue(init.Hidden)) : $.markAsStructValue(new dep.hidden())
 		}
 	}
 
 	public clone(): Wrapped {
-		const cloned = new Wrapped()
-		cloned._fields = {
-			Value: $.varRef(this._fields.Value.value),
-			Hidden: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.Hidden.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Wrapped(this))
 	}
 
 	public ["public"](): dep.Public | $.VarRef<dep.Public> | null {
@@ -47,10 +32,14 @@ export class Wrapped {
 		return $.unsafePointerCast<dep.Public | $.VarRef<dep.Public> | null>(w, dep.Public)
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["Value", "Hidden"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Wrapped",
 		() => new Wrapped(),
-		() => [{ name: "public", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "dep.Public" } }] }],
+		() => [{ name: "public", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("dep.Public") }] }],
 		Wrapped,
 		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("string") }, { name: "Hidden", key: "Hidden", type: "dep.hidden" }]
 	)

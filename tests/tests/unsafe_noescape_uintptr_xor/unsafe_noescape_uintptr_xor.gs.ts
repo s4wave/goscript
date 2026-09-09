@@ -7,39 +7,28 @@ import * as unsafe from "@goscript/unsafe/index.js"
 import "@goscript/unsafe/index.js"
 
 export class sourceStruct {
-	public get flag(): boolean {
-		return this._fields.flag.value
-	}
-	public set flag(value: boolean) {
-		this._fields.flag.value = value
-	}
+	public declare flag: boolean
 
-	public get data(): $.Slice<number> {
-		return this._fields.data.value
-	}
-	public set data(value: $.Slice<number>) {
-		this._fields.data.value = value
-	}
+	public declare data: $.Slice<number>
 
 	public _fields: {
-		flag: $.VarRef<boolean>
-		data: $.VarRef<$.Slice<number>>
+		flag: boolean
+		data: $.Slice<number>
 	}
 
 	constructor(init?: Partial<{flag?: boolean, data?: $.Slice<number>}>) {
 		this._fields = {
-			flag: $.varRef(init?.flag ?? (false as boolean)),
-			data: $.varRef(init?.data ?? (null! as $.Slice<number>))
+			flag: init?.flag ?? (false as boolean),
+			data: init?.data ?? (null! as $.Slice<number>)
 		}
 	}
 
 	public clone(): sourceStruct {
-		const cloned = new sourceStruct()
-		cloned._fields = {
-			flag: $.varRef(this._fields.flag.value),
-			data: $.varRef(this._fields.data.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new sourceStruct(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["flag", "data"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -47,44 +36,33 @@ export class sourceStruct {
 		() => new sourceStruct(),
 		() => [],
 		sourceStruct,
-		() => [{ name: "flag", key: "flag", type: /* @__PURE__ */ $.basicType("bool") }, { name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint") } }]
+		() => [{ name: "flag", key: "flag", type: /* @__PURE__ */ $.basicType("bool") }, { name: "data", key: "data", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint")) }]
 	)
 }
 
 export class viewStruct {
-	public get flag(): boolean {
-		return this._fields.flag.value
-	}
-	public set flag(value: boolean) {
-		this._fields.flag.value = value
-	}
+	public declare flag: boolean
 
-	public get data(): $.Slice<number> {
-		return this._fields.data.value
-	}
-	public set data(value: $.Slice<number>) {
-		this._fields.data.value = value
-	}
+	public declare data: $.Slice<number>
 
 	public _fields: {
-		flag: $.VarRef<boolean>
-		data: $.VarRef<$.Slice<number>>
+		flag: boolean
+		data: $.Slice<number>
 	}
 
 	constructor(init?: Partial<{flag?: boolean, data?: $.Slice<number>}>) {
 		this._fields = {
-			flag: $.varRef(init?.flag ?? (false as boolean)),
-			data: $.varRef(init?.data ?? (null! as $.Slice<number>))
+			flag: init?.flag ?? (false as boolean),
+			data: init?.data ?? (null! as $.Slice<number>)
 		}
 	}
 
 	public clone(): viewStruct {
-		const cloned = new viewStruct()
-		cloned._fields = {
-			flag: $.varRef(this._fields.flag.value),
-			data: $.varRef(this._fields.data.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new viewStruct(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["flag", "data"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -92,7 +70,7 @@ export class viewStruct {
 		() => new viewStruct(),
 		() => [],
 		viewStruct,
-		() => [{ name: "flag", key: "flag", type: /* @__PURE__ */ $.basicType("bool") }, { name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint") } }]
+		() => [{ name: "flag", key: "flag", type: /* @__PURE__ */ $.basicType("bool") }, { name: "data", key: "data", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint")) }]
 	)
 }
 

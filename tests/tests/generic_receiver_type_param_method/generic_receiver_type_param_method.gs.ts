@@ -23,10 +23,7 @@ export class nistCurve {
 	}
 
 	public clone(): nistCurve {
-		const cloned = new nistCurve()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new nistCurve(this))
 	}
 
 	public async Add(__typeArgs: $.GenericTypeArgs | undefined, p1: any, p2: any): globalThis.Promise<any> {
@@ -43,36 +40,27 @@ export class nistCurve {
 	static __typeInfo = $.registerStructType(
 		"main.nistCurve",
 		() => new nistCurve(),
-		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Interface, methods: [{ name: "Add", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }] } }] }, { name: "Zero", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [{ name: "Add", args: [{ name: "_p0", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "_p1", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }] } }] }],
+		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Add", [{ kind: $.TypeKind.Interface, methods: [] }, { kind: $.TypeKind.Interface, methods: [] }], [{ kind: $.TypeKind.Interface, methods: [] }])] } }] }, { name: "Zero", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Add", [{ kind: $.TypeKind.Interface, methods: [] }, { kind: $.TypeKind.Interface, methods: [] }], [{ kind: $.TypeKind.Interface, methods: [] }])] } }] }],
 		nistCurve,
 		() => []
 	)
 }
 
 export class point {
-	public get N(): number {
-		return this._fields.N.value
-	}
-	public set N(value: number) {
-		this._fields.N.value = value
-	}
+	public declare N: number
 
 	public _fields: {
-		N: $.VarRef<number>
+		N: number
 	}
 
 	constructor(init?: Partial<{N?: number}>) {
 		this._fields = {
-			N: $.varRef(init?.N ?? (0 as number))
+			N: init?.N ?? (0 as number)
 		}
 	}
 
 	public clone(): point {
-		const cloned = new point()
-		cloned._fields = {
-			N: $.varRef(this._fields.N.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new point(this))
 	}
 
 	public Add(a: point | $.VarRef<point> | null, b: point | $.VarRef<point> | null): point | $.VarRef<point> | null {
@@ -80,10 +68,14 @@ export class point {
 		return new point({N: $.pointerValue<point>(a).N + $.pointerValue<point>(b).N})
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["N"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.point",
 		() => new point(),
-		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.point" } }] }],
+		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("main.point") }] }],
 		point,
 		() => [{ name: "N", key: "N", type: /* @__PURE__ */ $.basicType("int") }]
 	)
@@ -96,9 +88,9 @@ export function __goscript_set_curve(__goscriptValue: nistCurve | $.VarRef<nistC
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p: point | $.VarRef<point> | null = (await nistCurve.prototype.Add.call(curve, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, Point: { type: { kind: $.TypeKind.Pointer, elemType: "main.point" }, zero: () => null, methods: {Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(...$.stripGenericTypeArgs(args))} }}, new point({N: 2}), new point({N: 3})) as point | $.VarRef<point> | null)
+	let p: point | $.VarRef<point> | null = (await nistCurve.prototype.Add.call(curve, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, Point: { type: /* @__PURE__ */ $.pointerType("main.point"), zero: () => null, methods: {Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(...$.stripGenericTypeArgs(args))} }}, new point({N: 2}), new point({N: 3})) as point | $.VarRef<point> | null)
 	await $.println("sum:", $.pointerValue<point>(p).N)
-	if (nistCurve.prototype.Zero.call(curve, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, Point: { type: { kind: $.TypeKind.Pointer, elemType: "main.point" }, zero: () => null, methods: {Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(...$.stripGenericTypeArgs(args))} }}) == null) {
+	if (nistCurve.prototype.Zero.call(curve, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, Point: { type: /* @__PURE__ */ $.pointerType("main.point"), zero: () => null, methods: {Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(...$.stripGenericTypeArgs(args))} }}) == null) {
 		await $.println("zero")
 	}
 }

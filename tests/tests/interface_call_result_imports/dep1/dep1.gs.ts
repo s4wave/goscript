@@ -16,10 +16,7 @@ export class maker {
 	}
 
 	public clone(): maker {
-		const cloned = new maker()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new maker(this))
 	}
 
 	public Value(): string {

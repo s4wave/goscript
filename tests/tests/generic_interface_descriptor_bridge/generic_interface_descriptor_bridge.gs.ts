@@ -38,10 +38,7 @@ export class genericBox {
 	}
 
 	public clone(): genericBox {
-		const cloned = new genericBox()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new genericBox(this))
 	}
 
 	public async Count(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, values: $.Slice<any>): globalThis.Promise<number> {
@@ -64,29 +61,20 @@ export class genericBox {
 }
 
 export class intBox {
-	public get id(): number {
-		return this._fields.id.value
-	}
-	public set id(value: number) {
-		this._fields.id.value = value
-	}
+	public declare id: number
 
 	public _fields: {
-		id: $.VarRef<number>
+		id: number
 	}
 
 	constructor(init?: Partial<{id?: number}>) {
 		this._fields = {
-			id: $.varRef(init?.id ?? (0 as number))
+			id: init?.id ?? (0 as number)
 		}
 	}
 
 	public clone(): intBox {
-		const cloned = new intBox()
-		cloned._fields = {
-			id: $.varRef(this._fields.id.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new intBox(this))
 	}
 
 	public async Count(ctx: context.Context | null, values: $.Slice<number>): globalThis.Promise<number> {
@@ -97,6 +85,10 @@ export class intBox {
 	public async Wait(ctx: context.Context | null, old: number): globalThis.Promise<number> {
 		await $.chanRecv(await $.pointerValue<Exclude<context.Context, null>>(ctx).Done())
 		return old
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["id"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -112,15 +104,15 @@ export async function main(): globalThis.Promise<void> {
 	let [ctx, cancel] = context.WithCancel($.pointerValueOrNil(context.Background())!)
 	await cancel!()
 
-	let genericGeneric: GenericWaiter | null = $.namedValueInterfaceValue<GenericWaiter | null>(new genericBox(), "*main.genericBox", {Count: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Count({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ...$.stripGenericTypeArgs(args)), Wait: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Wait({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "main.genericBox" }, [{ name: "Count", args: [{ name: "ctx", type: "context.Context" }, { name: "values", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") } }], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Wait", args: [{ name: "ctx", type: "context.Context" }, { name: "old", type: /* @__PURE__ */ $.basicType("int") }], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("int") }] }])
+	let genericGeneric: GenericWaiter | null = $.namedValueInterfaceValue<GenericWaiter | null>(new genericBox(), "*main.genericBox", {Count: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Count({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ...$.stripGenericTypeArgs(args)), Wait: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Wait({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType("main.genericBox"), [$.methodSignature("Count", [["ctx", "context.Context"], ["values", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))]], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Wait", [["ctx", "context.Context"], ["old", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])])
 	await $.println("generic-generic", await $.callInterfaceMethod($.pointerValue<Exclude<GenericWaiter, null>>(genericGeneric), "Wait", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ctx, 7), await $.callInterfaceMethod($.pointerValue<Exclude<GenericWaiter, null>>(genericGeneric), "Count", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ctx, $.arrayToSlice<number>([1, 2])))
 
-	let genericPlain: IntWaiter | null = $.namedValueInterfaceValue<IntWaiter | null>(new genericBox(), "*main.genericBox", {Count: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Count({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ...$.stripGenericTypeArgs(args)), Wait: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Wait({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "main.genericBox" }, [{ name: "Count", args: [{ name: "ctx", type: "context.Context" }, { name: "values", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") } }], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Wait", args: [{ name: "ctx", type: "context.Context" }, { name: "old", type: /* @__PURE__ */ $.basicType("int") }], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("int") }] }])
+	let genericPlain: IntWaiter | null = $.namedValueInterfaceValue<IntWaiter | null>(new genericBox(), "*main.genericBox", {Count: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Count({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ...$.stripGenericTypeArgs(args)), Wait: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Wait({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType("main.genericBox"), [$.methodSignature("Count", [["ctx", "context.Context"], ["values", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))]], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Wait", [["ctx", "context.Context"], ["old", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])])
 	await $.println("generic-plain", await $.pointerValue<Exclude<IntWaiter, null>>(genericPlain).Wait(ctx, 8), await $.pointerValue<Exclude<IntWaiter, null>>(genericPlain).Count(ctx, $.arrayToSlice<number>([1, 2, 3])))
 
-	let plainGeneric: GenericWaiter | null = $.namedValueInterfaceValue<GenericWaiter | null>(new intBox(), "*main.intBox", {Count: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Count(...$.stripGenericTypeArgs(args)), Wait: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Wait(...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "main.intBox" }, [{ name: "Count", args: [{ name: "ctx", type: "context.Context" }, { name: "values", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") } }], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Wait", args: [{ name: "ctx", type: "context.Context" }, { name: "old", type: /* @__PURE__ */ $.basicType("int") }], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("int") }] }])
+	let plainGeneric: GenericWaiter | null = $.namedValueInterfaceValue<GenericWaiter | null>(new intBox(), "*main.intBox", {Count: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Count(...$.stripGenericTypeArgs(args)), Wait: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Wait(...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType("main.intBox"), [$.methodSignature("Count", [["ctx", "context.Context"], ["values", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))]], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Wait", [["ctx", "context.Context"], ["old", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])])
 	await $.println("plain-generic", await $.callInterfaceMethod($.pointerValue<Exclude<GenericWaiter, null>>(plainGeneric), "Wait", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ctx, 9), await $.callInterfaceMethod($.pointerValue<Exclude<GenericWaiter, null>>(plainGeneric), "Count", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ctx, $.arrayToSlice<number>([1, 2, 3, 4])))
-	let plainPlain: IntWaiter | null = $.interfaceValue<IntWaiter | null>(new intBox(), "*main.intBox", { kind: $.TypeKind.Pointer, elemType: "main.intBox" })
+	let plainPlain: IntWaiter | null = $.interfaceValue<IntWaiter | null>(new intBox(), "*main.intBox", /* @__PURE__ */ $.pointerType("main.intBox"))
 	let retypedPlainGeneric: GenericWaiter | null = (plainPlain as GenericWaiter | null)
 	await $.println("retyped-plain-generic", await $.callInterfaceMethod($.pointerValue<Exclude<GenericWaiter, null>>(retypedPlainGeneric), "Wait", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ctx, 12), await $.callInterfaceMethod($.pointerValue<Exclude<GenericWaiter, null>>(retypedPlainGeneric), "Count", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ctx, $.arrayToSlice<number>([1, 2, 3, 4, 5, 6, 7])))
 	let methodValue: ((ctx: context.Context | null, old: number) => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => (ctx: context.Context | null, old: number) => $.callInterfaceMethod(__receiver, "Wait", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ctx, old))($.pointerValue<Exclude<GenericWaiter, null>>(retypedPlainGeneric)), ({ kind: $.TypeKind.Function, params: ["context.Context", /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
@@ -128,13 +120,13 @@ export async function main(): globalThis.Promise<void> {
 	let methodExpression: ((_p0: GenericWaiter | null, ctx: context.Context | null, old: number) => number | globalThis.Promise<number>) | null = $.functionValue(async (_p0: GenericWaiter | null, ctx: context.Context | null, old: number): globalThis.Promise<number> => await $.callInterfaceMethod(_p0, "Wait", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ctx, old), ({ kind: $.TypeKind.Function, params: ["main.GenericWaiter", "context.Context", /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	await $.println("method-expression", await methodExpression!(retypedPlainGeneric, ctx, 15))
 	let samePointer: intBox | $.VarRef<intBox> | null = new intBox()
-	let samePointerA: IntWaiter | null = $.interfaceValue<IntWaiter | null>(samePointer, "*main.intBox", { kind: $.TypeKind.Pointer, elemType: "main.intBox" })
-	let samePointerB: IntWaiter | null = $.interfaceValue<IntWaiter | null>(samePointer, "*main.intBox", { kind: $.TypeKind.Pointer, elemType: "main.intBox" })
-	let differentPointer: IntWaiter | null = $.interfaceValue<IntWaiter | null>(new intBox(), "*main.intBox", { kind: $.TypeKind.Pointer, elemType: "main.intBox" })
+	let samePointerA: IntWaiter | null = $.interfaceValue<IntWaiter | null>(samePointer, "*main.intBox", /* @__PURE__ */ $.pointerType("main.intBox"))
+	let samePointerB: IntWaiter | null = $.interfaceValue<IntWaiter | null>(samePointer, "*main.intBox", /* @__PURE__ */ $.pointerType("main.intBox"))
+	let differentPointer: IntWaiter | null = $.interfaceValue<IntWaiter | null>(new intBox(), "*main.intBox", /* @__PURE__ */ $.pointerType("main.intBox"))
 	await $.println("pointer-equal", $.comparableEqual(samePointerA, samePointerB), $.comparableEqual(samePointerA, differentPointer))
 	let nilPointer: intBox | $.VarRef<intBox> | null = null! as intBox | $.VarRef<intBox> | null
-	let nilInterface: IntWaiter | null = $.interfaceValue<IntWaiter | null>(nilPointer, "*main.intBox", { kind: $.TypeKind.Pointer, elemType: "main.intBox" })
-	let __goscriptTuple0: any = $.typeAssertTuple<intBox | $.VarRef<intBox> | null>(nilInterface, { kind: $.TypeKind.Pointer, elemType: "main.intBox" })
+	let nilInterface: IntWaiter | null = $.interfaceValue<IntWaiter | null>(nilPointer, "*main.intBox", /* @__PURE__ */ $.pointerType("main.intBox"))
+	let __goscriptTuple0: any = $.typeAssertTuple<intBox | $.VarRef<intBox> | null>(nilInterface, /* @__PURE__ */ $.pointerType("main.intBox"))
 	let assertedPointer: intBox | $.VarRef<intBox> | null = __goscriptTuple0[0]
 	let assertedOK = __goscriptTuple0[1]
 	await $.println("typed-nil", nilInterface == null, assertedPointer == null, assertedOK, await $.pointerValue<Exclude<IntWaiter, null>>(nilInterface).Wait(ctx, 13))

@@ -23,10 +23,7 @@ export class Base {
 	}
 
 	public clone(): Base {
-		const cloned = new Base()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Base(this))
 	}
 
 	public String(): string {
@@ -52,10 +49,7 @@ export class Derived {
 	}
 
 	public clone(): Derived {
-		const cloned = new Derived()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Derived(this))
 	}
 
 	public Own(): string {

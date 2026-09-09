@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class buffer {
-	public get buf(): $.Slice<number> {
-		return this._fields.buf.value
-	}
-	public set buf(value: $.Slice<number>) {
-		this._fields.buf.value = value
-	}
+	public declare buf: $.Slice<number>
 
 	public _fields: {
-		buf: $.VarRef<$.Slice<number>>
+		buf: $.Slice<number>
 	}
 
 	constructor(init?: Partial<{buf?: $.Slice<number>}>) {
 		this._fields = {
-			buf: $.varRef(init?.buf ?? (null! as $.Slice<number>))
+			buf: init?.buf ?? (null! as $.Slice<number>)
 		}
 	}
 
 	public clone(): buffer {
-		const cloned = new buffer()
-		cloned._fields = {
-			buf: $.varRef(this._fields.buf.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new buffer(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["buf"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -34,7 +29,7 @@ export class buffer {
 		() => new buffer(),
 		() => [],
 		buffer,
-		() => [{ name: "buf", key: "buf", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }]
+		() => [{ name: "buf", key: "buf", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }]
 	)
 }
 

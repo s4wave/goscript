@@ -7,34 +7,29 @@ import * as sync from "@goscript/sync/index.js"
 import "@goscript/sync/index.js"
 
 export class loader {
-	public get load(): ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null {
-		return this._fields.load.value
-	}
-	public set load(value: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null) {
-		this._fields.load.value = value
-	}
+	public declare load: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null
 
 	public _fields: {
-		load: $.VarRef<((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null>
+		load: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null
 	}
 
 	constructor(init?: Partial<{load?: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null}>) {
 		this._fields = {
-			load: $.varRef(init?.load ?? (null! as ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null))
+			load: init?.load ?? (null! as ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null)
 		}
 	}
 
 	public clone(): loader {
-		const cloned = new loader()
-		cloned._fields = {
-			load: $.varRef(this._fields.load.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new loader(this))
 	}
 
 	public getLoad(): ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null {
 		const l: loader | $.VarRef<loader> | null = this
 		return $.pointerValue<loader>(l).load
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["load"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -49,7 +44,7 @@ export class loader {
 export let cache: $.VarRef<sync.Map> = $.varRef($.markAsStructValue(new sync.Map()))
 
 export function __goscript_set_cache(__goscriptValue: sync.Map): void {
-	cache.value = __goscriptValue
+	$.assignStruct(cache.value, __goscriptValue)
 }
 
 export let defaultLoader: loader | $.VarRef<loader> | null = new loader({load: $.functionValue(async (key: string): globalThis.Promise<[any, boolean]> => {

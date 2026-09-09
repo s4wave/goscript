@@ -5,40 +5,29 @@ import * as $ from "@goscript/builtin/index.js"
 
 export class TestStruct {
 	// IntField is a commented integer field.
-	public get IntField(): number {
-		return this._fields.IntField.value
-	}
-	public set IntField(value: number) {
-		this._fields.IntField.value = value
-	}
+	public declare IntField: number
 
 	// StringField is a commented string field.
-	public get StringField(): string {
-		return this._fields.StringField.value
-	}
-	public set StringField(value: string) {
-		this._fields.StringField.value = value
-	}
+	public declare StringField: string
 
 	public _fields: {
-		IntField: $.VarRef<number>
-		StringField: $.VarRef<string>
+		IntField: number
+		StringField: string
 	}
 
 	constructor(init?: Partial<{IntField?: number, StringField?: string}>) {
 		this._fields = {
-			IntField: $.varRef(init?.IntField ?? (0 as number)),
-			StringField: $.varRef(init?.StringField ?? ("" as string))
+			IntField: init?.IntField ?? (0 as number),
+			StringField: init?.StringField ?? ("" as string)
 		}
 	}
 
 	public clone(): TestStruct {
-		const cloned = new TestStruct()
-		cloned._fields = {
-			IntField: $.varRef(this._fields.IntField.value),
-			StringField: $.varRef(this._fields.StringField.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new TestStruct(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["IntField", "StringField"])
 	}
 
 	static __typeInfo = $.registerStructType(

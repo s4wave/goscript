@@ -4,29 +4,20 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class cache {
-	public get stored(): any {
-		return this._fields.stored.value
-	}
-	public set stored(value: any) {
-		this._fields.stored.value = value
-	}
+	public declare stored: any
 
 	public _fields: {
-		stored: $.VarRef<any>
+		stored: any
 	}
 
 	constructor(init?: Partial<{stored?: any}>) {
 		this._fields = {
-			stored: $.varRef(init?.stored ?? (null! as any))
+			stored: init?.stored ?? (null! as any)
 		}
 	}
 
 	public clone(): cache {
-		const cloned = new cache()
-		cloned._fields = {
-			stored: $.varRef(this._fields.stored.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new cache(this))
 	}
 
 	public async Get(__typeArgs: $.GenericTypeArgs | undefined, k: any, _new: (() => [any, $.GoError] | globalThis.Promise<[any, $.GoError]>) | null, check: ((_p0: any) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<[any, $.GoError]> {
@@ -42,39 +33,38 @@ export class cache {
 		return [v, null]
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["stored"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.cache",
 		() => new cache(),
-		() => [{ name: "Get", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } } }, { type: "error" }] }],
+		() => [{ name: "Get", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] }) }, { type: "error" }] }],
 		cache,
-		() => [{ name: "stored", key: "stored", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } } }]
+		() => [{ name: "stored", key: "stored", type: /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] }) }]
 	)
 }
 
 export class key {
-	public get N(): number {
-		return this._fields.N.value
-	}
-	public set N(value: number) {
-		this._fields.N.value = value
-	}
+	public declare N: number
 
 	public _fields: {
-		N: $.VarRef<number>
+		N: number
 	}
 
 	constructor(init?: Partial<{N?: number}>) {
 		this._fields = {
-			N: $.varRef(init?.N ?? (0 as number))
+			N: init?.N ?? (0 as number)
 		}
 	}
 
 	public clone(): key {
-		const cloned = new key()
-		cloned._fields = {
-			N: $.varRef(this._fields.N.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new key(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["N"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -87,29 +77,24 @@ export class key {
 }
 
 export class privateKey {
-	public get D(): number {
-		return this._fields.D.value
-	}
-	public set D(value: number) {
-		this._fields.D.value = value
-	}
+	public declare D: number
 
 	public _fields: {
-		D: $.VarRef<number>
+		D: number
 	}
 
 	constructor(init?: Partial<{D?: number}>) {
 		this._fields = {
-			D: $.varRef(init?.D ?? (0 as number))
+			D: init?.D ?? (0 as number)
 		}
 	}
 
 	public clone(): privateKey {
-		const cloned = new privateKey()
-		cloned._fields = {
-			D: $.varRef(this._fields.D.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new privateKey(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["D"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -124,15 +109,15 @@ export class privateKey {
 export let privateKeyCache: $.VarRef<cache> = $.varRef($.markAsStructValue(new cache()))
 
 export function __goscript_set_privateKeyCache(__goscriptValue: cache): void {
-	privateKeyCache.value = __goscriptValue
+	$.assignStruct(privateKeyCache.value, __goscriptValue)
 }
 
 export async function privateKeyToCache(k: key | $.VarRef<key> | null): globalThis.Promise<[privateKey | $.VarRef<privateKey> | null, $.GoError]> {
 	const __goscriptReturn0 = await privateKeyCache.value.Get({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: "main.key", zero: () => $.markAsStructValue(new key()) }, V: { type: "main.privateKey", zero: () => $.markAsStructValue(new privateKey()) }}, k, $.functionValue((): [privateKey | $.VarRef<privateKey> | null, $.GoError] => {
 		return [new privateKey({D: $.pointerValue<key>(k).N}), null]
-	}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Pointer, elemType: "main.privateKey" }, "error"] } as $.FunctionTypeInfo)), $.functionValue((v: privateKey | $.VarRef<privateKey> | null): boolean => {
+	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.privateKey"), "error"] } as $.FunctionTypeInfo)), $.functionValue((v: privateKey | $.VarRef<privateKey> | null): boolean => {
 		return $.pointerValue<privateKey>(v).D == $.pointerValue<key>(k).N
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "main.privateKey" }], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.privateKey")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 	return [(__goscriptReturn0[0] as privateKey | $.VarRef<privateKey> | null), __goscriptReturn0[1]]
 	throw new globalThis.Error("goscript: unreachable return")
 }

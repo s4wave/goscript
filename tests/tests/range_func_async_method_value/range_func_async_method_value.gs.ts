@@ -10,33 +10,24 @@ export type provider = {
 $.registerInterfaceType(
 	"main.provider",
 	null,
-	[{ name: "Items", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.Group" } } }] }]
+	[{ name: "Items", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.Group")) }] }]
 );
 
 export class listProvider {
-	public get items(): $.Slice<Group | $.VarRef<Group> | null> {
-		return this._fields.items.value
-	}
-	public set items(value: $.Slice<Group | $.VarRef<Group> | null>) {
-		this._fields.items.value = value
-	}
+	public declare items: $.Slice<Group | $.VarRef<Group> | null>
 
 	public _fields: {
-		items: $.VarRef<$.Slice<Group | $.VarRef<Group> | null>>
+		items: $.Slice<Group | $.VarRef<Group> | null>
 	}
 
 	constructor(init?: Partial<{items?: $.Slice<Group | $.VarRef<Group> | null>}>) {
 		this._fields = {
-			items: $.varRef(init?.items ?? (null! as $.Slice<Group | $.VarRef<Group> | null>))
+			items: init?.items ?? (null! as $.Slice<Group | $.VarRef<Group> | null>)
 		}
 	}
 
 	public clone(): listProvider {
-		const cloned = new listProvider()
-		cloned._fields = {
-			items: $.varRef(this._fields.items.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new listProvider(this))
 	}
 
 	public Items(): $.Slice<Group | $.VarRef<Group> | null> {
@@ -44,56 +35,45 @@ export class listProvider {
 		return $.pointerValue<listProvider>(p).items
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["items"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.listProvider",
 		() => new listProvider(),
-		() => [{ name: "Items", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.Group" } } }] }],
+		() => [{ name: "Items", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.Group")) }] }],
 		listProvider,
-		() => [{ name: "items", key: "items", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.Group" } } }]
+		() => [{ name: "items", key: "items", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.Group")) }]
 	)
 }
 
 export class Group {
-	public get provider(): provider | null {
-		return this._fields.provider.value
-	}
-	public set provider(value: provider | null) {
-		this._fields.provider.value = value
-	}
+	public declare provider: provider | null
 
-	public get seen(): boolean {
-		return this._fields.seen.value
-	}
-	public set seen(value: boolean) {
-		this._fields.seen.value = value
-	}
+	public declare seen: boolean
 
 	public _fields: {
-		provider: $.VarRef<provider | null>
-		seen: $.VarRef<boolean>
+		provider: provider | null
+		seen: boolean
 	}
 
 	constructor(init?: Partial<{provider?: provider | null, seen?: boolean}>) {
 		this._fields = {
-			provider: $.varRef(init?.provider ?? (null! as provider | null)),
-			seen: $.varRef(init?.seen ?? (false as boolean))
+			provider: init?.provider ?? (null! as provider | null),
+			seen: init?.seen ?? (false as boolean)
 		}
 	}
 
 	public clone(): Group {
-		const cloned = new Group()
-		cloned._fields = {
-			provider: $.varRef(this._fields.provider.value),
-			seen: $.varRef(this._fields.seen.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Group(this))
 	}
 
 	public async Build(): globalThis.Promise<void> {
 		const g: Group | $.VarRef<Group> | null = this
 		let __goscriptRangeReturn0 = false
 		;await (async () => {
-			await $.functionValue(((__receiver) => (_yield: ((_p0: Group | $.VarRef<Group> | null) => boolean | globalThis.Promise<boolean>) | null) => __receiver.Each(_yield))($.pointerValue<Group>(g)), ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "main.Group" }], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo))!(async (child) => {
+			await $.functionValue(((__receiver) => (_yield: ((_p0: Group | $.VarRef<Group> | null) => boolean | globalThis.Promise<boolean>) | null) => __receiver.Each(_yield))($.pointerValue<Group>(g)), ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Group")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo))!(async (child) => {
 				$.pointerValue<Group>(child).seen = true
 				return true
 			})
@@ -113,6 +93,10 @@ export class Group {
 		}
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["provider", "seen"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Group",
 		() => new Group(),
@@ -124,7 +108,7 @@ export class Group {
 
 export async function main(): globalThis.Promise<void> {
 	let child: Group | $.VarRef<Group> | null = new Group()
-	let root: Group | $.VarRef<Group> | null = new Group({provider: $.interfaceValue<provider | null>(new listProvider({items: $.arrayToSlice<Group | $.VarRef<Group> | null>([child])}), "*main.listProvider", { kind: $.TypeKind.Pointer, elemType: "main.listProvider" })})
+	let root: Group | $.VarRef<Group> | null = new Group({provider: $.interfaceValue<provider | null>(new listProvider({items: $.arrayToSlice<Group | $.VarRef<Group> | null>([child])}), "*main.listProvider", /* @__PURE__ */ $.pointerType("main.listProvider"))})
 	await Group.prototype.Build.call(root)
 	await $.println($.pointerValue<Group>(child).seen)
 }

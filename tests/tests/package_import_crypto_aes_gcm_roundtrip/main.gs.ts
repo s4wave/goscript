@@ -19,33 +19,24 @@ export type packetSealer = {
 $.registerInterfaceType(
 	"main.packetSealer",
 	null,
-	[{ name: "Seal", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }] }]
+	[{ name: "Seal", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }]
 );
 
 export class wrappedAEAD {
-	public get inner(): cipher.AEAD | null {
-		return this._fields.inner.value
-	}
-	public set inner(value: cipher.AEAD | null) {
-		this._fields.inner.value = value
-	}
+	public declare inner: cipher.AEAD | null
 
 	public _fields: {
-		inner: $.VarRef<cipher.AEAD | null>
+		inner: cipher.AEAD | null
 	}
 
 	constructor(init?: Partial<{inner?: cipher.AEAD | null}>) {
 		this._fields = {
-			inner: $.varRef(init?.inner ?? (null! as cipher.AEAD | null))
+			inner: init?.inner ?? (null! as cipher.AEAD | null)
 		}
 	}
 
 	public clone(): wrappedAEAD {
-		const cloned = new wrappedAEAD()
-		cloned._fields = {
-			inner: $.varRef(this._fields.inner.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new wrappedAEAD(this))
 	}
 
 	public async NonceSize(): globalThis.Promise<number> {
@@ -68,59 +59,42 @@ export class wrappedAEAD {
 		return $.pointerValue<Exclude<cipher.AEAD, null>>($.pointerValue<wrappedAEAD>(w).inner).Seal(dst, nonce, plaintext, additionalData)
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["inner"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.wrappedAEAD",
 		() => new wrappedAEAD(),
-		() => [{ name: "NonceSize", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Open", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }, { type: "error" }] }, { name: "Overhead", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Seal", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }] }],
+		() => [{ name: "NonceSize", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Open", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "Overhead", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Seal", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }],
 		wrappedAEAD,
 		() => [{ name: "inner", key: "inner", type: "cipher.AEAD" }]
 	)
 }
 
 export class nestedSealer {
-	public get aead(): cipher.AEAD | null {
-		return this._fields.aead.value
-	}
-	public set aead(value: cipher.AEAD | null) {
-		this._fields.aead.value = value
-	}
+	public declare aead: cipher.AEAD | null
 
-	public get nonce(): $.Slice<number> {
-		return this._fields.nonce.value
-	}
-	public set nonce(value: $.Slice<number>) {
-		this._fields.nonce.value = value
-	}
+	public declare nonce: $.Slice<number>
 
-	public get aad(): $.Slice<number> {
-		return this._fields.aad.value
-	}
-	public set aad(value: $.Slice<number>) {
-		this._fields.aad.value = value
-	}
+	public declare aad: $.Slice<number>
 
 	public _fields: {
-		aead: $.VarRef<cipher.AEAD | null>
-		nonce: $.VarRef<$.Slice<number>>
-		aad: $.VarRef<$.Slice<number>>
+		aead: cipher.AEAD | null
+		nonce: $.Slice<number>
+		aad: $.Slice<number>
 	}
 
 	constructor(init?: Partial<{aead?: cipher.AEAD | null, nonce?: $.Slice<number>, aad?: $.Slice<number>}>) {
 		this._fields = {
-			aead: $.varRef(init?.aead ?? (null! as cipher.AEAD | null)),
-			nonce: $.varRef(init?.nonce ?? (null! as $.Slice<number>)),
-			aad: $.varRef(init?.aad ?? (null! as $.Slice<number>))
+			aead: init?.aead ?? (null! as cipher.AEAD | null),
+			nonce: init?.nonce ?? (null! as $.Slice<number>),
+			aad: init?.aad ?? (null! as $.Slice<number>)
 		}
 	}
 
 	public clone(): nestedSealer {
-		const cloned = new nestedSealer()
-		cloned._fields = {
-			aead: $.varRef(this._fields.aead.value),
-			nonce: $.varRef(this._fields.nonce.value),
-			aad: $.varRef(this._fields.aad.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new nestedSealer(this))
 	}
 
 	public async Seal(dst: $.Slice<number>, plaintext: $.Slice<number>): globalThis.Promise<$.Slice<number>> {
@@ -128,12 +102,16 @@ export class nestedSealer {
 		return $.pointerValue<Exclude<cipher.AEAD, null>>($.pointerValue<nestedSealer>(s).aead).Seal(dst, $.pointerValue<nestedSealer>(s).nonce, plaintext, $.pointerValue<nestedSealer>(s).aad)
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["aead", "nonce", "aad"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.nestedSealer",
 		() => new nestedSealer(),
-		() => [{ name: "Seal", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }] }],
+		() => [{ name: "Seal", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }],
 		nestedSealer,
-		() => [{ name: "aead", key: "aead", type: "cipher.AEAD" }, { name: "nonce", key: "nonce", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }, { name: "aad", key: "aad", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }]
+		() => [{ name: "aead", key: "aead", type: "cipher.AEAD" }, { name: "nonce", key: "nonce", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { name: "aad", key: "aad", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }]
 	)
 }
 
@@ -191,7 +169,7 @@ export async function main(): globalThis.Promise<void> {
 	await roundTrip($.makeSlice<number>(0, 64, "byte"))
 	let [block, ] = aes.NewCipher(new Uint8Array([48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97, 98, 99, 100, 101, 102]))
 	let [inner, ] = cipher.NewGCM($.pointerValueOrNil(block)!)
-	let aead = $.interfaceValue<cipher.AEAD | null>(new wrappedAEAD({inner: inner}), "*main.wrappedAEAD", { kind: $.TypeKind.Pointer, elemType: "main.wrappedAEAD" })
+	let aead = $.interfaceValue<cipher.AEAD | null>(new wrappedAEAD({inner: inner}), "*main.wrappedAEAD", /* @__PURE__ */ $.pointerType("main.wrappedAEAD"))
 	let plaintext: $.Slice<number> = $.makeSlice<number>(695, undefined, "byte")
 	for (let __goscriptRangeTarget1 = plaintext, i = 0; i < $.len(__goscriptRangeTarget1); i++) {
 		plaintext![i] = $.uint($.uint(i, 8), 8)
@@ -201,7 +179,7 @@ export async function main(): globalThis.Promise<void> {
 	let aad: $.Slice<number> = new Uint8Array([113, 117, 105, 99, 32, 112, 114, 111, 116, 101, 99, 116, 101, 100, 32, 104, 101, 97, 100, 101, 114])
 	let expected: $.Slice<number> = await $.pointerValue<Exclude<cipher.AEAD, null>>(aead).Seal(null, nonce, plaintext, aad)
 	$.copy($.goSlice(packet, 15, undefined), plaintext)
-	let sealer = $.interfaceValue<packetSealer | null>(new nestedSealer({aead: aead, nonce: nonce, aad: aad}), "*main.nestedSealer", { kind: $.TypeKind.Pointer, elemType: "main.nestedSealer" })
+	let sealer = $.interfaceValue<packetSealer | null>(new nestedSealer({aead: aead, nonce: nonce, aad: aad}), "*main.nestedSealer", /* @__PURE__ */ $.pointerType("main.nestedSealer"))
 	await $.pointerValue<Exclude<packetSealer, null>>(sealer).Seal($.goSlice(packet, 15, 15), $.goSlice(packet, 15, 15 + $.len(plaintext)))
 	packet = $.goSlice(packet, undefined, $.len(packet) + await $.pointerValue<Exclude<cipher.AEAD, null>>(aead).Overhead())
 	await $.println("wrapped shared backing:", bytes.Equal($.goSlice(packet, 15, 15 + $.len(expected)), expected))

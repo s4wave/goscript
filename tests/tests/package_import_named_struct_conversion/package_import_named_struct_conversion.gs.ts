@@ -7,49 +7,32 @@ import * as time from "@goscript/time/index.js"
 import "@goscript/time/index.js"
 
 export class LocalTime {
-	public get wall(): bigint {
-		return this._fields.wall.value
-	}
-	public set wall(value: bigint) {
-		this._fields.wall.value = value
-	}
+	public declare wall: bigint
 
-	public get ext(): bigint {
-		return this._fields.ext.value
-	}
-	public set ext(value: bigint) {
-		this._fields.ext.value = value
-	}
+	public declare ext: bigint
 
-	public get loc(): time.Location | $.VarRef<time.Location> | null {
-		return this._fields.loc.value
-	}
-	public set loc(value: time.Location | $.VarRef<time.Location> | null) {
-		this._fields.loc.value = value
-	}
+	public declare loc: time.Location | $.VarRef<time.Location> | null
 
 	public _fields: {
-		wall: $.VarRef<bigint>
-		ext: $.VarRef<bigint>
-		loc: $.VarRef<time.Location | $.VarRef<time.Location> | null>
+		wall: bigint
+		ext: bigint
+		loc: time.Location | $.VarRef<time.Location> | null
 	}
 
 	constructor(init?: Partial<{wall?: bigint, ext?: bigint, loc?: time.Location | $.VarRef<time.Location> | null}>) {
 		this._fields = {
-			wall: $.varRef(init?.wall ?? (0n as bigint)),
-			ext: $.varRef(init?.ext ?? (0n as bigint)),
-			loc: $.varRef(init?.loc ?? (null! as time.Location | $.VarRef<time.Location> | null))
+			wall: init?.wall ?? (0n as bigint),
+			ext: init?.ext ?? (0n as bigint),
+			loc: init?.loc ?? (null! as time.Location | $.VarRef<time.Location> | null)
 		}
 	}
 
 	public clone(): LocalTime {
-		const cloned = new LocalTime()
-		cloned._fields = {
-			wall: $.varRef(this._fields.wall.value),
-			ext: $.varRef(this._fields.ext.value),
-			loc: $.varRef(this._fields.loc.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new LocalTime(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["wall", "ext", "loc"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -57,7 +40,7 @@ export class LocalTime {
 		() => new LocalTime(),
 		() => [],
 		LocalTime,
-		() => [{ name: "wall", key: "wall", type: /* @__PURE__ */ $.basicType("uint64") }, { name: "ext", key: "ext", type: /* @__PURE__ */ $.basicType("int64") }, { name: "loc", key: "loc", type: { kind: $.TypeKind.Pointer, elemType: "time.Location" } }]
+		() => [{ name: "wall", key: "wall", type: /* @__PURE__ */ $.basicType("uint64") }, { name: "ext", key: "ext", type: /* @__PURE__ */ $.basicType("int64") }, { name: "loc", key: "loc", type: /* @__PURE__ */ $.pointerType("time.Location") }]
 	)
 }
 

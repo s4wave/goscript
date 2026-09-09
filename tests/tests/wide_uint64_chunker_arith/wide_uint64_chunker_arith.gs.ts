@@ -7,34 +7,29 @@ import * as io from "@goscript/io/index.js"
 import "@goscript/io/index.js"
 
 export class chunker {
-	public get pos(): bigint {
-		return this._fields.pos.value
-	}
-	public set pos(value: bigint) {
-		this._fields.pos.value = value
-	}
+	public declare pos: bigint
 
 	public _fields: {
-		pos: $.VarRef<bigint>
+		pos: bigint
 	}
 
 	constructor(init?: Partial<{pos?: bigint}>) {
 		this._fields = {
-			pos: $.varRef(init?.pos ?? (0n as bigint))
+			pos: init?.pos ?? (0n as bigint)
 		}
 	}
 
 	public clone(): chunker {
-		const cloned = new chunker()
-		cloned._fields = {
-			pos: $.varRef(this._fields.pos.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new chunker(this))
 	}
 
 	public advance(chunkSize: number): void {
 		let c: chunker | $.VarRef<chunker> | null = this
 		$.pointerValue<chunker>(c).pos = $.uint64Add($.pointerValue<chunker>(c).pos, $.uint64(chunkSize))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["pos"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -47,29 +42,20 @@ export class chunker {
 }
 
 export class repeatReader {
-	public get remaining(): number {
-		return this._fields.remaining.value
-	}
-	public set remaining(value: number) {
-		this._fields.remaining.value = value
-	}
+	public declare remaining: number
 
 	public _fields: {
-		remaining: $.VarRef<number>
+		remaining: number
 	}
 
 	constructor(init?: Partial<{remaining?: number}>) {
 		this._fields = {
-			remaining: $.varRef(init?.remaining ?? (0 as number))
+			remaining: init?.remaining ?? (0 as number)
 		}
 	}
 
 	public clone(): repeatReader {
-		const cloned = new repeatReader()
-		cloned._fields = {
-			remaining: $.varRef(this._fields.remaining.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new repeatReader(this))
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
@@ -83,6 +69,10 @@ export class repeatReader {
 		}
 		$.pointerValue<repeatReader>(r).remaining = $.pointerValue<repeatReader>(r).remaining - (n)
 		return [n, null]
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["remaining"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -125,7 +115,7 @@ export async function main(): globalThis.Promise<void> {
 	let totalSize: bigint = 0n
 	let chkStart: bigint = 0n
 
-	let src = io.LimitReader($.pointerValueOrNil($.interfaceValue<io.Reader | null>(newRepeatReader(40), "*main.repeatReader", { kind: $.TypeKind.Pointer, elemType: "main.repeatReader" }))!, 25n)
+	let src = io.LimitReader($.pointerValueOrNil($.interfaceValue<io.Reader | null>(newRepeatReader(40), "*main.repeatReader", /* @__PURE__ */ $.pointerType("main.repeatReader")))!, 25n)
 	let buf: $.Slice<number> = $.makeSlice<number>(8, undefined, "byte")
 	while (true) {
 		let [nr, err] = await $.pointerValue<Exclude<io.Reader, null>>(src).Read(buf)

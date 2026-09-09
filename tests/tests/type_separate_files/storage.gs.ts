@@ -7,39 +7,28 @@ import * as __goscript_memory from "./memory.gs.ts"
 import "./memory.gs.ts"
 
 export class storage {
-	public get files(): globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null {
-		return this._fields.files.value
-	}
-	public set files(value: globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null) {
-		this._fields.files.value = value
-	}
+	public declare files: globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null
 
-	public get children(): globalThis.Map<string, globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null> | null {
-		return this._fields.children.value
-	}
-	public set children(value: globalThis.Map<string, globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null> | null) {
-		this._fields.children.value = value
-	}
+	public declare children: globalThis.Map<string, globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null> | null
 
 	public _fields: {
-		files: $.VarRef<globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null>
-		children: $.VarRef<globalThis.Map<string, globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null> | null>
+		files: globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null
+		children: globalThis.Map<string, globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null> | null
 	}
 
 	constructor(init?: Partial<{files?: globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null, children?: globalThis.Map<string, globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null> | null}>) {
 		this._fields = {
-			files: $.varRef(init?.files ?? (null! as globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null)),
-			children: $.varRef(init?.children ?? (null! as globalThis.Map<string, globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null> | null))
+			files: init?.files ?? (null! as globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null),
+			children: init?.children ?? (null! as globalThis.Map<string, globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null> | null)
 		}
 	}
 
 	public clone(): storage {
-		const cloned = new storage()
-		cloned._fields = {
-			files: $.varRef(this._fields.files.value),
-			children: $.varRef(this._fields.children.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new storage(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["files", "children"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -47,6 +36,6 @@ export class storage {
 		() => new storage(),
 		() => [],
 		storage,
-		() => [{ name: "files", key: "files", type: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: { kind: $.TypeKind.Pointer, elemType: "main.file" } } }, { name: "children", key: "children", type: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: { kind: $.TypeKind.Pointer, elemType: "main.file" } } } }]
+		() => [{ name: "files", key: "files", type: /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.pointerType("main.file")) }, { name: "children", key: "children", type: /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.pointerType("main.file"))) }]
 	)
 }

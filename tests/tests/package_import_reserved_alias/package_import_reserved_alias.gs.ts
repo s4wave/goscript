@@ -7,29 +7,24 @@ import * as _unique from "@goscript/github.com/s4wave/goscript/tests/tests/packa
 import "@goscript/github.com/s4wave/goscript/tests/tests/package_import_reserved_alias/unique/index.js"
 
 export class Holder {
-	public get Box(): _unique.Box | $.VarRef<_unique.Box> | null {
-		return this._fields.Box.value
-	}
-	public set Box(value: _unique.Box | $.VarRef<_unique.Box> | null) {
-		this._fields.Box.value = value
-	}
+	public declare Box: _unique.Box | $.VarRef<_unique.Box> | null
 
 	public _fields: {
-		Box: $.VarRef<_unique.Box | $.VarRef<_unique.Box> | null>
+		Box: _unique.Box | $.VarRef<_unique.Box> | null
 	}
 
 	constructor(init?: Partial<{Box?: _unique.Box | $.VarRef<_unique.Box> | null}>) {
 		this._fields = {
-			Box: $.varRef(init?.Box ?? (null! as _unique.Box | $.VarRef<_unique.Box> | null))
+			Box: init?.Box ?? (null! as _unique.Box | $.VarRef<_unique.Box> | null)
 		}
 	}
 
 	public clone(): Holder {
-		const cloned = new Holder()
-		cloned._fields = {
-			Box: $.varRef(this._fields.Box.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Holder(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Box"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -37,7 +32,7 @@ export class Holder {
 		() => new Holder(),
 		() => [],
 		Holder,
-		() => [{ name: "Box", key: "Box", type: { kind: $.TypeKind.Pointer, elemType: "unique.Box" } }]
+		() => [{ name: "Box", key: "Box", type: /* @__PURE__ */ $.pointerType("unique.Box") }]
 	)
 }
 

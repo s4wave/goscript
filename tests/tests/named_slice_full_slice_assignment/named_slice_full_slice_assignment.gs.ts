@@ -11,9 +11,9 @@ export function filters_size(f: filters): number {
 
 export async function main(): globalThis.Promise<void> {
 	let out: filters = null! as filters
-	let value = $.namedValueInterfaceValue<any>($.arrayToSlice<number>([1, 2, 3]), "main.filters", {size: (receiver: any, ...args: any[]) => (filters_size as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "main.filters", elemType: /* @__PURE__ */ $.basicType("int") }, [{ name: "size", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("int") }] }])
+	let value = $.namedValueInterfaceValue<any>($.arrayToSlice<number>([1, 2, 3]), "main.filters", {size: (receiver: any, ...args: any[]) => (filters_size as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "main.filters"), [$.methodSignature("size", [], [/* @__PURE__ */ $.basicType("int")])])
 	{
-		let __goscriptTuple0: any = $.typeAssertTuple<filters>(value, { kind: $.TypeKind.Slice, typeName: "main.filters", elemType: /* @__PURE__ */ $.basicType("int") })
+		let __goscriptTuple0: any = $.typeAssertTuple<filters>(value, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "main.filters"))
 		let c: filters = (__goscriptTuple0[0] as filters)
 		let ok = __goscriptTuple0[1]
 		if (ok) {

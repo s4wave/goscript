@@ -4,59 +4,36 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class multiplyCase {
-	public get x(): number {
-		return this._fields.x.value
-	}
-	public set x(value: number) {
-		this._fields.x.value = value
-	}
+	public declare x: number
 
-	public get y(): number {
-		return this._fields.y.value
-	}
-	public set y(value: number) {
-		this._fields.y.value = value
-	}
+	public declare y: number
 
-	public get unsigned(): number {
-		return this._fields.unsigned.value
-	}
-	public set unsigned(value: number) {
-		this._fields.unsigned.value = value
-	}
+	public declare unsigned: number
 
-	public get signed(): number {
-		return this._fields.signed.value
-	}
-	public set signed(value: number) {
-		this._fields.signed.value = value
-	}
+	public declare signed: number
 
 	public _fields: {
-		x: $.VarRef<number>
-		y: $.VarRef<number>
-		unsigned: $.VarRef<number>
-		signed: $.VarRef<number>
+		x: number
+		y: number
+		unsigned: number
+		signed: number
 	}
 
 	constructor(init?: Partial<{x?: number, y?: number, unsigned?: number, signed?: number}>) {
 		this._fields = {
-			x: $.varRef(init?.x ?? (0 as number)),
-			y: $.varRef(init?.y ?? (0 as number)),
-			unsigned: $.varRef(init?.unsigned ?? (0 as number)),
-			signed: $.varRef(init?.signed ?? (0 as number))
+			x: init?.x ?? (0 as number),
+			y: init?.y ?? (0 as number),
+			unsigned: init?.unsigned ?? (0 as number),
+			signed: init?.signed ?? (0 as number)
 		}
 	}
 
 	public clone(): multiplyCase {
-		const cloned = new multiplyCase()
-		cloned._fields = {
-			x: $.varRef(this._fields.x.value),
-			y: $.varRef(this._fields.y.value),
-			unsigned: $.varRef(this._fields.unsigned.value),
-			signed: $.varRef(this._fields.signed.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new multiplyCase(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["x", "y", "unsigned", "signed"])
 	}
 
 	static __typeInfo = $.registerStructType(

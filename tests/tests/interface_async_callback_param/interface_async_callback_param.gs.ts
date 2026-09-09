@@ -29,10 +29,7 @@ export class listScanner {
 	}
 
 	public clone(): listScanner {
-		const cloned = new listScanner()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new listScanner(this))
 	}
 
 	public async Scan(fn: ((_p0: number) => $.GoError | globalThis.Promise<$.GoError>) | null): globalThis.Promise<$.GoError> {

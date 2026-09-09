@@ -36,39 +36,28 @@ import "@goscript/time/index.js"
 import "@goscript/io/index.js"
 
 export class signedKey {
-	public get PubKey(): $.Slice<number> {
-		return this._fields.PubKey.value
-	}
-	public set PubKey(value: $.Slice<number>) {
-		this._fields.PubKey.value = value
-	}
+	public declare PubKey: $.Slice<number>
 
-	public get Signature(): $.Slice<number> {
-		return this._fields.Signature.value
-	}
-	public set Signature(value: $.Slice<number>) {
-		this._fields.Signature.value = value
-	}
+	public declare Signature: $.Slice<number>
 
 	public _fields: {
-		PubKey: $.VarRef<$.Slice<number>>
-		Signature: $.VarRef<$.Slice<number>>
+		PubKey: $.Slice<number>
+		Signature: $.Slice<number>
 	}
 
 	constructor(init?: Partial<{PubKey?: $.Slice<number>, Signature?: $.Slice<number>}>) {
 		this._fields = {
-			PubKey: $.varRef(init?.PubKey ?? (null! as $.Slice<number>)),
-			Signature: $.varRef(init?.Signature ?? (null! as $.Slice<number>))
+			PubKey: init?.PubKey ?? (null! as $.Slice<number>),
+			Signature: init?.Signature ?? (null! as $.Slice<number>)
 		}
 	}
 
 	public clone(): signedKey {
-		const cloned = new signedKey()
-		cloned._fields = {
-			PubKey: $.varRef(this._fields.PubKey.value),
-			Signature: $.varRef(this._fields.Signature.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new signedKey(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["PubKey", "Signature"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -76,7 +65,7 @@ export class signedKey {
 		() => new signedKey(),
 		() => [],
 		signedKey,
-		() => [{ name: "PubKey", key: "PubKey", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") }, index: [0], offset: 0, exported: true }, { name: "Signature", key: "Signature", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") }, index: [1], offset: 24, exported: true }]
+		() => [/* @__PURE__ */ $.structField("PubKey", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), [0], 0, true), /* @__PURE__ */ $.structField("Signature", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), [1], 24, true)]
 	)
 }
 
@@ -98,7 +87,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("extension marshal err nil", err == null)
 
 	let template: x509.Certificate | $.VarRef<x509.Certificate> | null = (() => { const __goscriptLiteralField0 = big.NewInt(42n); const __goscriptLiteralField1 = $.markAsStructValue($.cloneStructValue(time.Unix(1700000000n, 0n))); const __goscriptLiteralField2 = $.markAsStructValue($.cloneStructValue(time.Unix(4900000000n, 0n))); return new x509.Certificate({SerialNumber: __goscriptLiteralField0, Subject: $.markAsStructValue(new pkix.Name({CommonName: "goscript.test", Organization: $.arrayToSlice<string>(["GoScript"])})), NotBefore: __goscriptLiteralField1, NotAfter: __goscriptLiteralField2, KeyUsage: x509.KeyUsageDigitalSignature, ExtKeyUsage: $.arrayToSlice<x509.ExtKeyUsage>([x509.ExtKeyUsageServerAuth]), BasicConstraintsValid: true, ExtraExtensions: $.arrayToSlice<pkix.Extension>([$.markAsStructValue(new pkix.Extension({Id: (extensionID as asn1.ObjectIdentifier), Critical: true, Value: extensionDER}))])}) })()
-	let __goscriptTuple2: any = await x509.CreateCertificate(rand.Reader, template, template, $.namedValueInterfaceValue<any>(pub, "ed25519.PublicKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: /* @__PURE__ */ $.basicType("uint8") }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PublicKey" }], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("bool") }] }]), $.namedValueInterfaceValue<any>(priv, "ed25519.PrivateKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Public: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Public as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Seed: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Seed as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Sign: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Sign as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "ed25519.PrivateKey", elemType: /* @__PURE__ */ $.basicType("uint8") }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PrivateKey" }], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Public", args: [], returns: [{ name: "_r0", type: "crypto.PublicKey" }] }, { name: "Seed", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }] }, { name: "Sign", args: [{ name: "rand", type: "io.Reader" }, { name: "message", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }, { name: "opts", type: "crypto.SignerOpts" }], returns: [{ name: "signature", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }, { name: "err", type: "error" }] }]))
+	let __goscriptTuple2: any = await x509.CreateCertificate(rand.Reader, template, template, $.namedValueInterfaceValue<any>(pub, "ed25519.PublicKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey"), [$.methodSignature("Equal", [["x", "crypto.PublicKey"]], [/* @__PURE__ */ $.basicType("bool")])]), $.namedValueInterfaceValue<any>(priv, "ed25519.PrivateKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Public: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Public as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Seed: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Seed as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Sign: (receiver: any, ...args: any[]) => (ed25519.PrivateKey_Sign as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PrivateKey"), [$.methodSignature("Equal", [["x", "crypto.PrivateKey"]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Public", [], ["crypto.PublicKey"]), $.methodSignature("Seed", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]), $.methodSignature("Sign", [["rand", "io.Reader"], ["message", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["opts", "crypto.SignerOpts"]], [["signature", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["err", "error"]])]))
 	let der: $.Slice<number> = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	await $.println("create err nil", err == null)
@@ -120,7 +109,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget1 = $.pointerValue<x509.Certificate>(cert).Extensions, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
 		let ext = __goscriptRangeTarget1![__rangeIndex]
 		if (asn1.ObjectIdentifier_Equal(ext.Id, (extensionID as asn1.ObjectIdentifier))) {
-			keyExt = $.markAsStructValue($.cloneStructValue(ext))
+			$.assignStruct(keyExt, $.markAsStructValue($.cloneStructValue(ext)))
 			for (let __goscriptRangeTarget0 = $.pointerValue<x509.Certificate>(cert).UnhandledCriticalExtensions, idx = 0; idx < $.len(__goscriptRangeTarget0); idx++) {
 				let unhandled = __goscriptRangeTarget0![idx]
 				if (asn1.ObjectIdentifier_Equal(unhandled, (extensionID as asn1.ObjectIdentifier))) {
@@ -132,7 +121,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	let decoded: $.VarRef<signedKey> = $.varRef($.markAsStructValue(new signedKey()))
-	let __goscriptTuple4: any = await asn1.Unmarshal(keyExt.Value, $.interfaceValue(decoded, "*main.signedKey", { kind: $.TypeKind.Pointer, elemType: "main.signedKey" }))
+	let __goscriptTuple4: any = await asn1.Unmarshal(keyExt.Value, $.interfaceValue(decoded, "*main.signedKey", /* @__PURE__ */ $.pointerType("main.signedKey")))
 	err = __goscriptTuple4[1]
 	await $.println("extension unmarshal", err == null, $.len(decoded.value.PubKey), $.uint($.arrayIndex(decoded.value.PubKey!, 0), 8), $.uint($.arrayIndex(decoded.value.PubKey!, 5), 8), $.len(decoded.value.Signature))
 	let pool: x509.CertPool | $.VarRef<x509.CertPool> | null = x509.NewCertPool()
@@ -174,7 +163,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("organization", $.arrayIndex($.pointerValue<x509.Certificate>(cert).Subject.Organization!, 0))
 	await $.println("signature algorithm", x509.SignatureAlgorithm_String($.pointerValue<x509.Certificate>(cert).SignatureAlgorithm))
 	await $.println("public key algorithm", x509.PublicKeyAlgorithm_String($.pointerValue<x509.Certificate>(cert).PublicKeyAlgorithm))
-	await $.println("public key equal", ed25519.PublicKey_Equal($.mustTypeAssert<ed25519.PublicKey>($.pointerValue<x509.Certificate>(cert).PublicKey, { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: /* @__PURE__ */ $.basicType("uint8") }), $.namedValueInterfaceValue<crypto.PublicKey | null>(pub, "ed25519.PublicKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "ed25519.PublicKey", elemType: /* @__PURE__ */ $.basicType("uint8") }, [{ name: "Equal", args: [{ name: "x", type: "crypto.PublicKey" }], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("bool") }] }])))
+	await $.println("public key equal", ed25519.PublicKey_Equal($.mustTypeAssert<ed25519.PublicKey>($.pointerValue<x509.Certificate>(cert).PublicKey, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey")), $.namedValueInterfaceValue<crypto.PublicKey | null>(pub, "ed25519.PublicKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey"), [$.methodSignature("Equal", [["x", "crypto.PublicKey"]], [/* @__PURE__ */ $.basicType("bool")])])))
 }
 
 if ($.isMainScript(import.meta)) {

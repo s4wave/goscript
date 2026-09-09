@@ -23,10 +23,7 @@ export class task {
 	}
 
 	public clone(): task {
-		const cloned = new task()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new task(this))
 	}
 
 	public async Run(): globalThis.Promise<void> {

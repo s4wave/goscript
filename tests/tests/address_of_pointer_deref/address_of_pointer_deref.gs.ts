@@ -4,39 +4,28 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Col {
-	public get Name(): string {
-		return this._fields.Name.value
-	}
-	public set Name(value: string) {
-		this._fields.Name.value = value
-	}
+	public declare Name: string
 
-	public get Default(): $.VarRef<number> | null {
-		return this._fields.Default.value
-	}
-	public set Default(value: $.VarRef<number> | null) {
-		this._fields.Default.value = value
-	}
+	public declare Default: $.VarRef<number> | null
 
 	public _fields: {
-		Name: $.VarRef<string>
-		Default: $.VarRef<$.VarRef<number> | null>
+		Name: string
+		Default: $.VarRef<number> | null
 	}
 
 	constructor(init?: Partial<{Name?: string, Default?: $.VarRef<number> | null}>) {
 		this._fields = {
-			Name: $.varRef(init?.Name ?? ("" as string)),
-			Default: $.varRef(init?.Default ?? (null! as $.VarRef<number> | null))
+			Name: init?.Name ?? ("" as string),
+			Default: init?.Default ?? (null! as $.VarRef<number> | null)
 		}
 	}
 
 	public clone(): Col {
-		const cloned = new Col()
-		cloned._fields = {
-			Name: $.varRef(this._fields.Name.value),
-			Default: $.varRef(this._fields.Default.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Col(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Name", "Default"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -44,7 +33,7 @@ export class Col {
 		() => new Col(),
 		() => [],
 		Col,
-		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }, { name: "Default", key: "Default", type: { kind: $.TypeKind.Pointer, elemType: /* @__PURE__ */ $.basicType("int") } }]
+		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }, { name: "Default", key: "Default", type: /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")) }]
 	)
 }
 

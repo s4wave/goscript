@@ -4,129 +4,64 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class formatter {
-	public get wid(): number {
-		return this._fields.wid.value
-	}
-	public set wid(value: number) {
-		this._fields.wid.value = value
-	}
+	public declare wid: number
 
-	public get prec(): number {
-		return this._fields.prec.value
-	}
-	public set prec(value: number) {
-		this._fields.prec.value = value
-	}
+	public declare prec: number
 
-	public get widPresent(): boolean {
-		return this._fields.widPresent.value
-	}
-	public set widPresent(value: boolean) {
-		this._fields.widPresent.value = value
-	}
+	public declare widPresent: boolean
 
-	public get precPresent(): boolean {
-		return this._fields.precPresent.value
-	}
-	public set precPresent(value: boolean) {
-		this._fields.precPresent.value = value
-	}
+	public declare precPresent: boolean
 
-	public get minus(): boolean {
-		return this._fields.minus.value
-	}
-	public set minus(value: boolean) {
-		this._fields.minus.value = value
-	}
+	public declare minus: boolean
 
-	public get plus(): boolean {
-		return this._fields.plus.value
-	}
-	public set plus(value: boolean) {
-		this._fields.plus.value = value
-	}
+	public declare plus: boolean
 
-	public get sharp(): boolean {
-		return this._fields.sharp.value
-	}
-	public set sharp(value: boolean) {
-		this._fields.sharp.value = value
-	}
+	public declare sharp: boolean
 
-	public get space(): boolean {
-		return this._fields.space.value
-	}
-	public set space(value: boolean) {
-		this._fields.space.value = value
-	}
+	public declare space: boolean
 
-	public get zero(): boolean {
-		return this._fields.zero.value
-	}
-	public set zero(value: boolean) {
-		this._fields.zero.value = value
-	}
+	public declare zero: boolean
 
-	public get plusV(): boolean {
-		return this._fields.plusV.value
-	}
-	public set plusV(value: boolean) {
-		this._fields.plusV.value = value
-	}
+	public declare plusV: boolean
 
-	public get sharpV(): boolean {
-		return this._fields.sharpV.value
-	}
-	public set sharpV(value: boolean) {
-		this._fields.sharpV.value = value
-	}
+	public declare sharpV: boolean
 
 	public _fields: {
-		wid: $.VarRef<number>
-		prec: $.VarRef<number>
-		widPresent: $.VarRef<boolean>
-		precPresent: $.VarRef<boolean>
-		minus: $.VarRef<boolean>
-		plus: $.VarRef<boolean>
-		sharp: $.VarRef<boolean>
-		space: $.VarRef<boolean>
-		zero: $.VarRef<boolean>
-		plusV: $.VarRef<boolean>
-		sharpV: $.VarRef<boolean>
+		wid: number
+		prec: number
+		widPresent: boolean
+		precPresent: boolean
+		minus: boolean
+		plus: boolean
+		sharp: boolean
+		space: boolean
+		zero: boolean
+		plusV: boolean
+		sharpV: boolean
 	}
 
 	constructor(init?: Partial<{wid?: number, prec?: number, widPresent?: boolean, precPresent?: boolean, minus?: boolean, plus?: boolean, sharp?: boolean, space?: boolean, zero?: boolean, plusV?: boolean, sharpV?: boolean}>) {
 		this._fields = {
-			wid: $.varRef(init?.wid ?? (0 as number)),
-			prec: $.varRef(init?.prec ?? (0 as number)),
-			widPresent: $.varRef(init?.widPresent ?? (false as boolean)),
-			precPresent: $.varRef(init?.precPresent ?? (false as boolean)),
-			minus: $.varRef(init?.minus ?? (false as boolean)),
-			plus: $.varRef(init?.plus ?? (false as boolean)),
-			sharp: $.varRef(init?.sharp ?? (false as boolean)),
-			space: $.varRef(init?.space ?? (false as boolean)),
-			zero: $.varRef(init?.zero ?? (false as boolean)),
-			plusV: $.varRef(init?.plusV ?? (false as boolean)),
-			sharpV: $.varRef(init?.sharpV ?? (false as boolean))
+			wid: init?.wid ?? (0 as number),
+			prec: init?.prec ?? (0 as number),
+			widPresent: init?.widPresent ?? (false as boolean),
+			precPresent: init?.precPresent ?? (false as boolean),
+			minus: init?.minus ?? (false as boolean),
+			plus: init?.plus ?? (false as boolean),
+			sharp: init?.sharp ?? (false as boolean),
+			space: init?.space ?? (false as boolean),
+			zero: init?.zero ?? (false as boolean),
+			plusV: init?.plusV ?? (false as boolean),
+			sharpV: init?.sharpV ?? (false as boolean)
 		}
 	}
 
 	public clone(): formatter {
-		const cloned = new formatter()
-		cloned._fields = {
-			wid: $.varRef(this._fields.wid.value),
-			prec: $.varRef(this._fields.prec.value),
-			widPresent: $.varRef(this._fields.widPresent.value),
-			precPresent: $.varRef(this._fields.precPresent.value),
-			minus: $.varRef(this._fields.minus.value),
-			plus: $.varRef(this._fields.plus.value),
-			sharp: $.varRef(this._fields.sharp.value),
-			space: $.varRef(this._fields.space.value),
-			zero: $.varRef(this._fields.zero.value),
-			plusV: $.varRef(this._fields.plusV.value),
-			sharpV: $.varRef(this._fields.sharpV.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new formatter(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["wid", "prec", "widPresent", "precPresent", "minus", "plus", "sharp", "space", "zero", "plusV", "sharpV"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -139,51 +74,30 @@ export class formatter {
 }
 
 export class printer {
-	public get buf(): $.Slice<number> {
-		return this._fields.buf.value
-	}
-	public set buf(value: $.Slice<number>) {
-		this._fields.buf.value = value
-	}
+	public declare buf: $.Slice<number>
 
-	public get arg(): any {
-		return this._fields.arg.value
-	}
-	public set arg(value: any) {
-		this._fields.arg.value = value
-	}
+	public declare arg: any
 
 	// This line causes the issue: fmt: $.VarRef<fmt>; where fmt is undefined
 	// Should generate proper type reference
-	public get fmt(): formatter {
-		return this._fields.fmt.value
-	}
-	public set fmt(value: formatter) {
-		this._fields.fmt.value = value
-	}
+	public declare fmt: formatter
 
 	public _fields: {
-		buf: $.VarRef<$.Slice<number>>
-		arg: $.VarRef<any>
-		fmt: $.VarRef<formatter>
+		buf: $.Slice<number>
+		arg: any
+		fmt: formatter
 	}
 
 	constructor(init?: Partial<{buf?: $.Slice<number>, arg?: any, fmt?: formatter}>) {
 		this._fields = {
-			buf: $.varRef(init?.buf ?? (null! as $.Slice<number>)),
-			arg: $.varRef(init?.arg ?? (null! as any)),
-			fmt: $.varRef(init?.fmt ? $.markAsStructValue($.cloneStructValue(init.fmt)) : $.markAsStructValue(new formatter()))
+			buf: init?.buf ?? (null! as $.Slice<number>),
+			arg: init?.arg ?? (null! as any),
+			fmt: init?.fmt ? $.markAsStructValue($.cloneStructValue(init.fmt)) : $.markAsStructValue(new formatter())
 		}
 	}
 
 	public clone(): printer {
-		const cloned = new printer()
-		cloned._fields = {
-			buf: $.varRef(this._fields.buf.value),
-			arg: $.varRef(this._fields.arg.value),
-			fmt: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.fmt.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new printer(this))
 	}
 
 	public async format(verb: number): globalThis.Promise<void> {
@@ -199,7 +113,11 @@ export class printer {
 
 	public init(): void {
 		let p: printer | $.VarRef<printer> | null = this
-		$.pointerValue<printer>(p).fmt = $.markAsStructValue(new formatter())
+		$.assignStruct($.pointerValue<printer>(p).fmt, $.markAsStructValue(new formatter()))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["buf", "arg", "fmt"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -207,7 +125,7 @@ export class printer {
 		() => new printer(),
 		() => [{ name: "format", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "init", args: [], returns: [] }],
 		printer,
-		() => [{ name: "buf", key: "buf", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }, { name: "arg", key: "arg", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "fmt", key: "fmt", type: "main.formatter" }]
+		() => [{ name: "buf", key: "buf", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { name: "arg", key: "arg", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "fmt", key: "fmt", type: "main.formatter" }]
 	)
 }
 

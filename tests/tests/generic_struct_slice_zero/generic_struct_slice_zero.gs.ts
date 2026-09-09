@@ -7,29 +7,24 @@ import * as slices from "@goscript/slices/index.js"
 import "@goscript/slices/index.js"
 
 export class item {
-	public get Text(): string {
-		return this._fields.Text.value
-	}
-	public set Text(value: string) {
-		this._fields.Text.value = value
-	}
+	public declare Text: string
 
 	public _fields: {
-		Text: $.VarRef<string>
+		Text: string
 	}
 
 	constructor(init?: Partial<{Text?: string}>) {
 		this._fields = {
-			Text: $.varRef(init?.Text ?? ("" as string))
+			Text: init?.Text ?? ("" as string)
 		}
 	}
 
 	public clone(): item {
-		const cloned = new item()
-		cloned._fields = {
-			Text: $.varRef(this._fields.Text.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new item(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Text"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -42,29 +37,20 @@ export class item {
 }
 
 export class arena {
-	public get data(): $.Slice<any> {
-		return this._fields.data.value
-	}
-	public set data(value: $.Slice<any>) {
-		this._fields.data.value = value
-	}
+	public declare data: $.Slice<any>
 
 	public _fields: {
-		data: $.VarRef<$.Slice<any>>
+		data: $.Slice<any>
 	}
 
 	constructor(init?: Partial<{data?: $.Slice<any>}>) {
 		this._fields = {
-			data: $.varRef(init?.data ?? (null! as $.Slice<any>))
+			data: init?.data ?? (null! as $.Slice<any>)
 		}
 	}
 
 	public clone(): arena {
-		const cloned = new arena()
-		cloned._fields = {
-			data: $.varRef(this._fields.data.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new arena(this))
 	}
 
 	public New(__typeArgs: $.GenericTypeArgs | undefined): any {
@@ -78,12 +64,16 @@ export class arena {
 		return $.indexRef($.pointerValue<arena>(a).data!, index)
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["data"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.arena",
 		() => new arena(),
-		() => [{ name: "New", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } } }] }],
+		() => [{ name: "New", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] }) }] }],
 		arena,
-		() => [{ name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Interface, methods: [] } } }]
+		() => [{ name: "data", key: "data", type: /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] }) }]
 	)
 }
 

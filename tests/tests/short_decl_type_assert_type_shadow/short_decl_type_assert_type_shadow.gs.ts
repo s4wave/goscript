@@ -23,10 +23,7 @@ export class item {
 	}
 
 	public clone(): item {
-		const cloned = new item()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new item(this))
 	}
 
 	public Dump(): string {

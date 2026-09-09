@@ -14,43 +14,32 @@ $.registerInterfaceType(
 );
 
 export class MyReader {
-	public get Reader(): Reader | null {
-		return this._fields.Reader.value
-	}
-	public set Reader(value: Reader | null) {
-		this._fields.Reader.value = value
-	}
+	public declare Reader: Reader | null
 
-	public get name(): string {
-		return this._fields.name.value
-	}
-	public set name(value: string) {
-		this._fields.name.value = value
-	}
+	public declare name: string
 
 	public _fields: {
-		Reader: $.VarRef<Reader | null>
-		name: $.VarRef<string>
+		Reader: Reader | null
+		name: string
 	}
 
 	constructor(init?: Partial<{Reader?: Reader | null, name?: string}>) {
 		this._fields = {
-			Reader: $.varRef(init?.Reader ?? (null! as Reader | null)),
-			name: $.varRef(init?.name ?? ("" as string))
+			Reader: init?.Reader ?? (null! as Reader | null),
+			name: init?.name ?? ("" as string)
 		}
 	}
 
 	public clone(): MyReader {
-		const cloned = new MyReader()
-		cloned._fields = {
-			Reader: $.varRef(this._fields.Reader.value),
-			name: $.varRef(this._fields.name.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyReader(this))
 	}
 
 	public Read(p: any): any {
 		return $.pointerValue<Exclude<Reader | null, null>>(this.Reader).Read(p)
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Reader", "name"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -63,39 +52,24 @@ export class MyReader {
 }
 
 export class StringReader {
-	public get data(): string {
-		return this._fields.data.value
-	}
-	public set data(value: string) {
-		this._fields.data.value = value
-	}
+	public declare data: string
 
-	public get pos(): number {
-		return this._fields.pos.value
-	}
-	public set pos(value: number) {
-		this._fields.pos.value = value
-	}
+	public declare pos: number
 
 	public _fields: {
-		data: $.VarRef<string>
-		pos: $.VarRef<number>
+		data: string
+		pos: number
 	}
 
 	constructor(init?: Partial<{data?: string, pos?: number}>) {
 		this._fields = {
-			data: $.varRef(init?.data ?? ("" as string)),
-			pos: $.varRef(init?.pos ?? (0 as number))
+			data: init?.data ?? ("" as string),
+			pos: init?.pos ?? (0 as number)
 		}
 	}
 
 	public clone(): StringReader {
-		const cloned = new StringReader()
-		cloned._fields = {
-			data: $.varRef(this._fields.data.value),
-			pos: $.varRef(this._fields.pos.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new StringReader(this))
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
@@ -106,6 +80,10 @@ export class StringReader {
 		let n = $.copy(p, $.stringToBytes($.sliceStringOrBytes($.pointerValue<StringReader>(s).data, $.pointerValue<StringReader>(s).pos, undefined)))
 		$.pointerValue<StringReader>(s).pos = $.pointerValue<StringReader>(s).pos + (n)
 		return [n, null]
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["data", "pos"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -122,7 +100,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.pointerValue<MyReader>(mr1).Reader == null)
 
 	let sr: StringReader | $.VarRef<StringReader> | null = new StringReader({data: "hello", pos: 0})
-	let mr2: MyReader | $.VarRef<MyReader> | null = new MyReader({Reader: $.interfaceValue<Reader | null>(sr, "*main.StringReader", { kind: $.TypeKind.Pointer, elemType: "main.StringReader" }), name: "test2"})
+	let mr2: MyReader | $.VarRef<MyReader> | null = new MyReader({Reader: $.interfaceValue<Reader | null>(sr, "*main.StringReader", /* @__PURE__ */ $.pointerType("main.StringReader")), name: "test2"})
 	await $.println($.pointerValue<MyReader>(mr2).Reader != null)
 
 	let buf: $.Slice<number> = $.makeSlice<number>(5, undefined, "byte")

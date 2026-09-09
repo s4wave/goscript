@@ -7,29 +7,24 @@ import * as io from "@goscript/io/index.js"
 import "@goscript/io/index.js"
 
 export class holder {
-	public get w(): io.Writer | null {
-		return this._fields.w.value
-	}
-	public set w(value: io.Writer | null) {
-		this._fields.w.value = value
-	}
+	public declare w: io.Writer | null
 
 	public _fields: {
-		w: $.VarRef<io.Writer | null>
+		w: io.Writer | null
 	}
 
 	constructor(init?: Partial<{w?: io.Writer | null}>) {
 		this._fields = {
-			w: $.varRef(init?.w ?? (null! as io.Writer | null))
+			w: init?.w ?? (null! as io.Writer | null)
 		}
 	}
 
 	public clone(): holder {
-		const cloned = new holder()
-		cloned._fields = {
-			w: $.varRef(this._fields.w.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new holder(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["w"])
 	}
 
 	static __typeInfo = $.registerStructType(

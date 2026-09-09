@@ -60,39 +60,28 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("is sorted:", slices.IsSorted($.arrayToSlice<number>([1, 2, 3])), slices.IsSorted($.arrayToSlice<number>([1, 3, 2])))
 
 	class item {
-		public get group(): number {
-			return this._fields.group.value
-		}
-		public set group(value: number) {
-			this._fields.group.value = value
-		}
+		public declare group: number
 
-		public get label(): string {
-			return this._fields.label.value
-		}
-		public set label(value: string) {
-			this._fields.label.value = value
-		}
+		public declare label: string
 
 		public _fields: {
-			group: $.VarRef<number>
-			label: $.VarRef<string>
+			group: number
+			label: string
 		}
 
 		constructor(init?: Partial<{group?: number, label?: string}>) {
 			this._fields = {
-				group: $.varRef(init?.group ?? (0 as number)),
-				label: $.varRef(init?.label ?? ("" as string))
+				group: init?.group ?? (0 as number),
+				label: init?.label ?? ("" as string)
 			}
 		}
 
 		public clone(): item {
-			const cloned = new item()
-			cloned._fields = {
-				group: $.varRef(this._fields.group.value),
-				label: $.varRef(this._fields.label.value)
-			}
-			return $.markAsStructValue(cloned)
+			return $.markAsStructValue(new item(this))
+		}
+
+		static {
+			$.bindStructFields(this.prototype, ["group", "label"])
 		}
 
 		static __typeInfo = $.registerStructType(

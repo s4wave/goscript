@@ -14,29 +14,20 @@ $.registerInterfaceType(
 );
 
 export class Dog {
-	public get name(): string {
-		return this._fields.name.value
-	}
-	public set name(value: string) {
-		this._fields.name.value = value
-	}
+	public declare name: string
 
 	public _fields: {
-		name: $.VarRef<string>
+		name: string
 	}
 
 	constructor(init?: Partial<{name?: string}>) {
 		this._fields = {
-			name: $.varRef(init?.name ?? ("" as string))
+			name: init?.name ?? ("" as string)
 		}
 	}
 
 	public clone(): Dog {
-		const cloned = new Dog()
-		cloned._fields = {
-			name: $.varRef(this._fields.name.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Dog(this))
 	}
 
 	public Name(): string {
@@ -45,6 +36,10 @@ export class Dog {
 			return "unknown dog"
 		}
 		return $.pointerValue<Dog>(d).name
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["name"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -57,29 +52,20 @@ export class Dog {
 }
 
 export class Cat {
-	public get name(): string {
-		return this._fields.name.value
-	}
-	public set name(value: string) {
-		this._fields.name.value = value
-	}
+	public declare name: string
 
 	public _fields: {
-		name: $.VarRef<string>
+		name: string
 	}
 
 	constructor(init?: Partial<{name?: string}>) {
 		this._fields = {
-			name: $.varRef(init?.name ?? ("" as string))
+			name: init?.name ?? ("" as string)
 		}
 	}
 
 	public clone(): Cat {
-		const cloned = new Cat()
-		cloned._fields = {
-			name: $.varRef(this._fields.name.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Cat(this))
 	}
 
 	public Name(): string {
@@ -88,6 +74,10 @@ export class Cat {
 			return "unknown cat"
 		}
 		return $.pointerValue<Cat>(c).name
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["name"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -113,14 +103,14 @@ export function FindAnimal(): Animal | null {
 	// When assigned to Animal interface, the interface is NOT nil
 	// because it has type *Dog (even though value is nil)
 	{
-		let dog = $.interfaceValue<Animal | null>(FindDog(), "*main.Dog", { kind: $.TypeKind.Pointer, elemType: "main.Dog" })
+		let dog = $.interfaceValue<Animal | null>(FindDog(), "*main.Dog", /* @__PURE__ */ $.pointerType("main.Dog"))
 		if (dog != null) {
 			// In Go, this branch IS taken because dog != nil
 			// The interface has type=*Dog, value=nil
 			return dog
 		}
 	}
-	return $.interfaceValue<Animal | null>(FindCat(), "*main.Cat", { kind: $.TypeKind.Pointer, elemType: "main.Cat" })
+	return $.interfaceValue<Animal | null>(FindCat(), "*main.Cat", /* @__PURE__ */ $.pointerType("main.Cat"))
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -142,7 +132,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test 3: Type assertions preserve the typed nil pointer
 	{
-		let __goscriptTuple0: any = $.typeAssertTuple<Dog | $.VarRef<Dog> | null>(animal, { kind: $.TypeKind.Pointer, elemType: "main.Dog" })
+		let __goscriptTuple0: any = $.typeAssertTuple<Dog | $.VarRef<Dog> | null>(animal, /* @__PURE__ */ $.pointerType("main.Dog"))
 		let d: Dog | $.VarRef<Dog> | null = __goscriptTuple0[0]
 		let ok = __goscriptTuple0[1]
 		if (ok && (d == null)) {
@@ -152,7 +142,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	{
-		let __goscriptTuple1: any = $.typeAssertTuple<Cat | $.VarRef<Cat> | null>(animal, { kind: $.TypeKind.Pointer, elemType: "main.Cat" })
+		let __goscriptTuple1: any = $.typeAssertTuple<Cat | $.VarRef<Cat> | null>(animal, /* @__PURE__ */ $.pointerType("main.Cat"))
 		let c: Cat | $.VarRef<Cat> | null = __goscriptTuple1[0]
 		let ok = __goscriptTuple1[1]
 		if (ok || (c != null)) {
@@ -164,7 +154,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test 4: Direct nil pointer to interface assignment
 	let dog: Dog | $.VarRef<Dog> | null = null
-	let a: Animal | null = $.interfaceValue<Animal | null>(dog, "*main.Dog", { kind: $.TypeKind.Pointer, elemType: "main.Dog" })
+	let a: Animal | null = $.interfaceValue<Animal | null>(dog, "*main.Dog", /* @__PURE__ */ $.pointerType("main.Dog"))
 
 	if (a == null) {
 		await $.println("a is nil")

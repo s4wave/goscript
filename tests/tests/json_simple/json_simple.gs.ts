@@ -7,29 +7,24 @@ import * as json from "@goscript/encoding/json/index.js"
 import "@goscript/encoding/json/index.js"
 
 export class Simple {
-	public get X(): number {
-		return this._fields.X.value
-	}
-	public set X(value: number) {
-		this._fields.X.value = value
-	}
+	public declare X: number
 
 	public _fields: {
-		X: $.VarRef<number>
+		X: number
 	}
 
 	constructor(init?: Partial<{X?: number}>) {
 		this._fields = {
-			X: $.varRef(init?.X ?? (0 as number))
+			X: init?.X ?? (0 as number)
 		}
 	}
 
 	public clone(): Simple {
-		const cloned = new Simple()
-		cloned._fields = {
-			X: $.varRef(this._fields.X.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Simple(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["X"])
 	}
 
 	static __typeInfo = $.registerStructType(

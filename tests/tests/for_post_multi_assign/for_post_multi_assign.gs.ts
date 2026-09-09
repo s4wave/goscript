@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class frame {
-	public get name(): string {
-		return this._fields.name.value
-	}
-	public set name(value: string) {
-		this._fields.name.value = value
-	}
+	public declare name: string
 
 	public _fields: {
-		name: $.VarRef<string>
+		name: string
 	}
 
 	constructor(init?: Partial<{name?: string}>) {
 		this._fields = {
-			name: $.varRef(init?.name ?? ("" as string))
+			name: init?.name ?? ("" as string)
 		}
 	}
 
 	public clone(): frame {
-		const cloned = new frame()
-		cloned._fields = {
-			name: $.varRef(this._fields.name.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new frame(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["name"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -39,29 +34,20 @@ export class frame {
 }
 
 export class iterator {
-	public get idx(): number {
-		return this._fields.idx.value
-	}
-	public set idx(value: number) {
-		this._fields.idx.value = value
-	}
+	public declare idx: number
 
 	public _fields: {
-		idx: $.VarRef<number>
+		idx: number
 	}
 
 	constructor(init?: Partial<{idx?: number}>) {
 		this._fields = {
-			idx: $.varRef(init?.idx ?? (0 as number))
+			idx: init?.idx ?? (0 as number)
 		}
 	}
 
 	public clone(): iterator {
-		const cloned = new iterator()
-		cloned._fields = {
-			idx: $.varRef(this._fields.idx.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new iterator(this))
 	}
 
 	public Next(): [frame, boolean] {
@@ -85,6 +71,10 @@ export class iterator {
 			}
 		}
 		throw new globalThis.Error("goscript: unreachable return")
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["idx"])
 	}
 
 	static __typeInfo = $.registerStructType(

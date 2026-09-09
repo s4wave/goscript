@@ -16,49 +16,32 @@ import "@goscript/strconv/index.js"
 import "@goscript/strings/index.js"
 
 export class Person {
-	public get Name(): string {
-		return this._fields.Name.value
-	}
-	public set Name(value: string) {
-		this._fields.Name.value = value
-	}
+	public declare Name: string
 
-	public get Age(): number {
-		return this._fields.Age.value
-	}
-	public set Age(value: number) {
-		this._fields.Age.value = value
-	}
+	public declare Age: number
 
-	public get Active(): boolean {
-		return this._fields.Active.value
-	}
-	public set Active(value: boolean) {
-		this._fields.Active.value = value
-	}
+	public declare Active: boolean
 
 	public _fields: {
-		Name: $.VarRef<string>
-		Age: $.VarRef<number>
-		Active: $.VarRef<boolean>
+		Name: string
+		Age: number
+		Active: boolean
 	}
 
 	constructor(init?: Partial<{Name?: string, Age?: number, Active?: boolean}>) {
 		this._fields = {
-			Name: $.varRef(init?.Name ?? ("" as string)),
-			Age: $.varRef(init?.Age ?? (0 as number)),
-			Active: $.varRef(init?.Active ?? (false as boolean))
+			Name: init?.Name ?? ("" as string),
+			Age: init?.Age ?? (0 as number),
+			Active: init?.Active ?? (false as boolean)
 		}
 	}
 
 	public clone(): Person {
-		const cloned = new Person()
-		cloned._fields = {
-			Name: $.varRef(this._fields.Name.value),
-			Age: $.varRef(this._fields.Age.value),
-			Active: $.varRef(this._fields.Active.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Person(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Name", "Age", "Active"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -95,7 +78,7 @@ export async function main(): globalThis.Promise<void> {
 	// Unmarshal into a struct
 	let q: $.VarRef<Person> = $.varRef($.markAsStructValue(new Person()))
 	{
-		let __goscriptShadow0 = json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 66, 111, 98, 34, 44, 34, 97, 103, 101, 34, 58, 50, 53, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 102, 97, 108, 115, 101, 125]), $.interfaceValue(q, "*main.Person", { kind: $.TypeKind.Pointer, elemType: "main.Person" }))
+		let __goscriptShadow0 = json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 66, 111, 98, 34, 44, 34, 97, 103, 101, 34, 58, 50, 53, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 102, 97, 108, 115, 101, 125]), $.interfaceValue(q, "*main.Person", /* @__PURE__ */ $.pointerType("main.Person")))
 		if (__goscriptShadow0 != null) {
 			results = $.append(results, "Unmarshal struct error: " + await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0).Error())
 		} else {
@@ -106,7 +89,7 @@ export async function main(): globalThis.Promise<void> {
 	// Unmarshal into a map[string]any
 	let m: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null! as globalThis.Map<string, any> | null)
 	{
-		let __goscriptShadow1 = json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 67, 97, 114, 111, 108, 34, 44, 34, 97, 103, 101, 34, 58, 50, 50, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 116, 114, 117, 101, 125]), $.interfaceValue(m, "*map[string]any", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: { kind: $.TypeKind.Interface, methods: [] } } }))
+		let __goscriptShadow1 = json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 67, 97, 114, 111, 108, 34, 44, 34, 97, 103, 101, 34, 58, 50, 50, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 116, 114, 117, 101, 125]), $.interfaceValue(m, "*map[string]any", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))
 		if (__goscriptShadow1 != null) {
 			results = $.append(results, "Unmarshal map error: " + await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow1).Error())
 		} else {

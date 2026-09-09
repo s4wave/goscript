@@ -26,10 +26,7 @@ export class PathJoiner {
 	}
 
 	public clone(): PathJoiner {
-		const cloned = new PathJoiner()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new PathJoiner(this))
 	}
 
 	public Join(elem: $.Slice<string>): string {

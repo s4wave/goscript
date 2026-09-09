@@ -13,10 +13,7 @@ export class Parser {
 	}
 
 	public clone(): Parser {
-		const cloned = new Parser()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Parser(this))
 	}
 
 	public Parse(_arguments: $.Slice<string>): number {

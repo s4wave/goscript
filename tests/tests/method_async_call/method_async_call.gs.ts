@@ -7,39 +7,24 @@ import * as sync from "@goscript/sync/index.js"
 import "@goscript/sync/index.js"
 
 export class FileTracker {
-	public get mutex(): sync.Mutex {
-		return this._fields.mutex.value
-	}
-	public set mutex(value: sync.Mutex) {
-		this._fields.mutex.value = value
-	}
+	public declare mutex: sync.Mutex
 
-	public get lines(): $.Slice<number> {
-		return this._fields.lines.value
-	}
-	public set lines(value: $.Slice<number>) {
-		this._fields.lines.value = value
-	}
+	public declare lines: $.Slice<number>
 
 	public _fields: {
-		mutex: $.VarRef<sync.Mutex>
-		lines: $.VarRef<$.Slice<number>>
+		mutex: sync.Mutex
+		lines: $.Slice<number>
 	}
 
 	constructor(init?: Partial<{mutex?: sync.Mutex, lines?: $.Slice<number>}>) {
 		this._fields = {
-			mutex: $.varRef(init?.mutex ? $.markAsStructValue($.cloneStructValue(init.mutex)) : $.markAsStructValue(new sync.Mutex())),
-			lines: $.varRef(init?.lines ?? (null! as $.Slice<number>))
+			mutex: init?.mutex ? $.markAsStructValue($.cloneStructValue(init.mutex)) : $.markAsStructValue(new sync.Mutex()),
+			lines: init?.lines ?? (null! as $.Slice<number>)
 		}
 	}
 
 	public clone(): FileTracker {
-		const cloned = new FileTracker()
-		cloned._fields = {
-			mutex: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.mutex.value))),
-			lines: $.varRef(this._fields.lines.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new FileTracker(this))
 	}
 
 	public async AddLine(offset: number): globalThis.Promise<void> {
@@ -49,39 +34,34 @@ export class FileTracker {
 		$.pointerValue<FileTracker>(f).mutex.Unlock()
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["mutex", "lines"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.FileTracker",
 		() => new FileTracker(),
 		() => [{ name: "AddLine", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
 		FileTracker,
-		() => [{ name: "mutex", key: "mutex", type: "sync.Mutex" }, { name: "lines", key: "lines", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") } }]
+		() => [{ name: "mutex", key: "mutex", type: "sync.Mutex" }, { name: "lines", key: "lines", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")) }]
 	)
 }
 
 export class Scanner {
-	public get file(): FileTracker | $.VarRef<FileTracker> | null {
-		return this._fields.file.value
-	}
-	public set file(value: FileTracker | $.VarRef<FileTracker> | null) {
-		this._fields.file.value = value
-	}
+	public declare file: FileTracker | $.VarRef<FileTracker> | null
 
 	public _fields: {
-		file: $.VarRef<FileTracker | $.VarRef<FileTracker> | null>
+		file: FileTracker | $.VarRef<FileTracker> | null
 	}
 
 	constructor(init?: Partial<{file?: FileTracker | $.VarRef<FileTracker> | null}>) {
 		this._fields = {
-			file: $.varRef(init?.file ?? (null! as FileTracker | $.VarRef<FileTracker> | null))
+			file: init?.file ?? (null! as FileTracker | $.VarRef<FileTracker> | null)
 		}
 	}
 
 	public clone(): Scanner {
-		const cloned = new Scanner()
-		cloned._fields = {
-			file: $.varRef(this._fields.file.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Scanner(this))
 	}
 
 	public async next(): globalThis.Promise<void> {
@@ -89,12 +69,16 @@ export class Scanner {
 		await FileTracker.prototype.AddLine.call($.pointerValue<Scanner>(s).file, 10)
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["file"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Scanner",
 		() => new Scanner(),
 		() => [{ name: "next", args: [], returns: [] }],
 		Scanner,
-		() => [{ name: "file", key: "file", type: { kind: $.TypeKind.Pointer, elemType: "main.FileTracker" } }]
+		() => [{ name: "file", key: "file", type: /* @__PURE__ */ $.pointerType("main.FileTracker") }]
 	)
 }
 

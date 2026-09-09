@@ -4,39 +4,28 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Format {
-	public get Name(): string {
-		return this._fields.Name.value
-	}
-	public set Name(value: string) {
-		this._fields.Name.value = value
-	}
+	public declare Name: string
 
-	public get Ext(): $.Slice<string> {
-		return this._fields.Ext.value
-	}
-	public set Ext(value: $.Slice<string>) {
-		this._fields.Ext.value = value
-	}
+	public declare Ext: $.Slice<string>
 
 	public _fields: {
-		Name: $.VarRef<string>
-		Ext: $.VarRef<$.Slice<string>>
+		Name: string
+		Ext: $.Slice<string>
 	}
 
 	constructor(init?: Partial<{Name?: string, Ext?: $.Slice<string>}>) {
 		this._fields = {
-			Name: $.varRef(init?.Name ?? ("" as string)),
-			Ext: $.varRef(init?.Ext ?? (null! as $.Slice<string>))
+			Name: init?.Name ?? ("" as string),
+			Ext: init?.Ext ?? (null! as $.Slice<string>)
 		}
 	}
 
 	public clone(): Format {
-		const cloned = new Format()
-		cloned._fields = {
-			Name: $.varRef(this._fields.Name.value),
-			Ext: $.varRef(this._fields.Ext.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Format(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Name", "Ext"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -44,7 +33,7 @@ export class Format {
 		() => new Format(),
 		() => [],
 		Format,
-		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }, { name: "Ext", key: "Ext", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("string") } }]
+		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }, { name: "Ext", key: "Ext", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")) }]
 	)
 }
 

@@ -4,34 +4,29 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class worker {
-	public get base(): number {
-		return this._fields.base.value
-	}
-	public set base(value: number) {
-		this._fields.base.value = value
-	}
+	public declare base: number
 
 	public _fields: {
-		base: $.VarRef<number>
+		base: number
 	}
 
 	constructor(init?: Partial<{base?: number}>) {
 		this._fields = {
-			base: $.varRef(init?.base ?? (0 as number))
+			base: init?.base ?? (0 as number)
 		}
 	}
 
 	public clone(): worker {
-		const cloned = new worker()
-		cloned._fields = {
-			base: $.varRef(this._fields.base.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new worker(this))
 	}
 
 	public add(v: number): number {
 		const w: worker | $.VarRef<worker> | null = this
 		return $.pointerValue<worker>(w).base + v
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["base"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -44,7 +39,7 @@ export class worker {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let fn: ((w: worker | $.VarRef<worker> | null, v: number) => number | globalThis.Promise<number>) | null = $.functionValue((w: worker | $.VarRef<worker> | null, v: number): number => $.pointerValue<worker>(w).add(v), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "main.worker" }, /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
+	let fn: ((w: worker | $.VarRef<worker> | null, v: number) => number | globalThis.Promise<number>) | null = $.functionValue((w: worker | $.VarRef<worker> | null, v: number): number => $.pointerValue<worker>(w).add(v), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.worker"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	await $.println("method expr:", await fn!(new worker({base: 5}), 7))
 }
 

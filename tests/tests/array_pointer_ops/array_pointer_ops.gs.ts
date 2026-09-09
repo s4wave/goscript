@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class item {
-	public get value(): number {
-		return this._fields.value.value
-	}
-	public set value(value: number) {
-		this._fields.value.value = value
-	}
+	public declare value: number
 
 	public _fields: {
-		value: $.VarRef<number>
+		value: number
 	}
 
 	constructor(init?: Partial<{value?: number}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? (0 as number))
+			value: init?.value ?? (0 as number)
 		}
 	}
 
 	public clone(): item {
-		const cloned = new item()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new item(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -39,39 +34,28 @@ export class item {
 }
 
 export class arrays {
-	public get slices(): $.Slice<number>[] {
-		return this._fields.slices.value
-	}
-	public set slices(value: $.Slice<number>[]) {
-		this._fields.slices.value = value
-	}
+	public declare slices: $.Slice<number>[]
 
-	public get items(): item[] {
-		return this._fields.items.value
-	}
-	public set items(value: item[]) {
-		this._fields.items.value = value
-	}
+	public declare items: item[]
 
 	public _fields: {
-		slices: $.VarRef<$.Slice<number>[]>
-		items: $.VarRef<item[]>
+		slices: $.Slice<number>[]
+		items: item[]
 	}
 
 	constructor(init?: Partial<{slices?: $.Slice<number>[], items?: item[]}>) {
 		this._fields = {
-			slices: $.varRef(init?.slices !== undefined ? $.cloneArrayValue(init.slices, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") }, length: 1 }) : Array.from({ length: 1 }, () => null)),
-			items: $.varRef(init?.items !== undefined ? $.cloneArrayValue(init.items, { kind: $.TypeKind.Array, elemType: "main.item", length: 1 }) : Array.from({ length: 1 }, () => $.markAsStructValue(new item())))
+			slices: init?.slices !== undefined ? $.cloneArrayValue(init.slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1)) : Array.from({ length: 1 }, () => null),
+			items: init?.items !== undefined ? $.cloneArrayValue(init.items, /* @__PURE__ */ $.arrayType("main.item", 1)) : Array.from({ length: 1 }, () => $.markAsStructValue(new item()))
 		}
 	}
 
 	public clone(): arrays {
-		const cloned = new arrays()
-		cloned._fields = {
-			slices: $.varRef($.cloneArrayValue(this._fields.slices.value, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") }, length: 1 })),
-			items: $.varRef($.cloneArrayValue(this._fields.items.value, { kind: $.TypeKind.Array, elemType: "main.item", length: 1 }))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new arrays(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["slices", "items"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -79,7 +63,7 @@ export class arrays {
 		() => new arrays(),
 		() => [],
 		arrays,
-		() => [{ name: "slices", key: "slices", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") }, length: 1 } }, { name: "items", key: "items", type: { kind: $.TypeKind.Array, elemType: "main.item", length: 1 } }]
+		() => [{ name: "slices", key: "slices", type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1) }, { name: "items", key: "items", type: /* @__PURE__ */ $.arrayType("main.item", 1) }]
 	)
 }
 
@@ -110,21 +94,21 @@ export function closureArrayAddress(): number {
 
 export async function main(): globalThis.Promise<void> {
 	let slices = [$.arrayToSlice<number>([1])]
-	let slicesCopy = $.cloneArrayValue(slices, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") }, length: 1 })
+	let slicesCopy = $.cloneArrayValue(slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1))
 	$.arrayIndex(slicesCopy, 0)![0] = 7
 	await $.println("slice sharing:", $.arrayIndex($.arrayIndex(slices, 0)!, 0))
 
 	let structs = [$.markAsStructValue(new item({value: 1}))]
-	let structsCopy = $.cloneArrayValue(structs, { kind: $.TypeKind.Array, elemType: "main.item", length: 1 })
+	let structsCopy = $.cloneArrayValue(structs, /* @__PURE__ */ $.arrayType("main.item", 1))
 	$.arrayIndex(structsCopy, 0).value = 7
 	await $.println("struct copy:", $.arrayIndex(structs, 0).value, $.arrayIndex(structsCopy, 0).value)
 
 	let pointers = [new item({value: 1})]
-	let pointersCopy = $.cloneArrayValue(pointers, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Pointer, elemType: "main.item" }, length: 1 })
+	let pointersCopy = $.cloneArrayValue(pointers, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.item"), 1))
 	$.pointerValue<item>($.arrayIndex(pointersCopy, 0)).value = 7
 	await $.println("pointer sharing:", $.pointerValue<item>($.arrayIndex(pointers, 0)).value, $.pointerEqual($.arrayIndex(pointers, 0), $.arrayIndex(pointersCopy, 0)))
 
-	let original = $.markAsStructValue(new arrays({slices: $.cloneArrayValue(slices, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") }, length: 1 }), items: $.cloneArrayValue(structs, { kind: $.TypeKind.Array, elemType: "main.item", length: 1 })}))
+	let original = $.markAsStructValue(new arrays({slices: $.cloneArrayValue(slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1)), items: $.cloneArrayValue(structs, /* @__PURE__ */ $.arrayType("main.item", 1))}))
 	let copied = $.markAsStructValue($.cloneStructValue(original))
 	$.arrayIndex(copied.slices, 0)![0] = 8
 	$.arrayIndex(copied.items, 0).value = 8
@@ -132,7 +116,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Assigning an array element copies its value instead of aliasing the row.
 	let rows = [[$.int(1, 32), $.int(2, 32)], [$.int(3, 32), $.int(4, 32)]]
-	rows[1] = $.cloneArrayValue($.arrayIndex(rows, 0), { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("int32"), length: 2 })
+	rows[1] = $.cloneArrayValue($.arrayIndex(rows, 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int32"), 2))
 	$.arrayIndex(rows, 1)[0] = $.int(9, 32)
 	await $.println("row copy:", $.int($.arrayIndex($.arrayIndex(rows, 0), 0), 32), $.int($.arrayIndex($.arrayIndex(rows, 0), 1), 32), $.int($.arrayIndex($.arrayIndex(rows, 1), 0), 32), $.int($.arrayIndex($.arrayIndex(rows, 1), 1), 32))
 

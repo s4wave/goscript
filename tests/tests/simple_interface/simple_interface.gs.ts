@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class MyStruct {
-	public get Value(): number {
-		return this._fields.Value.value
-	}
-	public set Value(value: number) {
-		this._fields.Value.value = value
-	}
+	public declare Value: number
 
 	public _fields: {
-		Value: $.VarRef<number>
+		Value: number
 	}
 
 	constructor(init?: Partial<{Value?: number}>) {
 		this._fields = {
-			Value: $.varRef(init?.Value ?? (0 as number))
+			Value: init?.Value ?? (0 as number)
 		}
 	}
 
 	public clone(): MyStruct {
-		const cloned = new MyStruct()
-		cloned._fields = {
-			Value: $.varRef(this._fields.Value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyStruct(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Value"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -42,9 +37,9 @@ export async function main(): globalThis.Promise<void> {
 	let original = $.varRef($.markAsStructValue(new MyStruct({Value: 30})))
 	let pAlias: MyStruct | $.VarRef<MyStruct> | null = original
 
-	let jAlias: any = $.interfaceValue(pAlias, "*main.MyStruct", { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
+	let jAlias: any = $.interfaceValue(pAlias, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
 
-	let [, ok] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(jAlias, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
+	let [, ok] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(jAlias, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	await $.println("pointer assertion result:", ok)
 }
 

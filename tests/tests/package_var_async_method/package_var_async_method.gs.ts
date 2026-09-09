@@ -9,7 +9,7 @@ import "@goscript/sync/index.js"
 export let cache: $.VarRef<sync.Map> = $.varRef($.markAsStructValue(new sync.Map()))
 
 export function __goscript_set_cache(__goscriptValue: sync.Map): void {
-	cache.value = __goscriptValue
+	$.assignStruct(cache.value, __goscriptValue)
 }
 
 export async function getValueFromCache(key: string): globalThis.Promise<[any, boolean]> {

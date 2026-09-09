@@ -23,10 +23,7 @@ export class impl {
 	}
 
 	public clone(): impl {
-		const cloned = new impl()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new impl(this))
 	}
 
 	public Ping(): string {
@@ -43,29 +40,24 @@ export class impl {
 }
 
 export class Holder {
-	public get Hidden(): hidden | null {
-		return this._fields.Hidden.value
-	}
-	public set Hidden(value: hidden | null) {
-		this._fields.Hidden.value = value
-	}
+	public declare Hidden: hidden | null
 
 	public _fields: {
-		Hidden: $.VarRef<hidden | null>
+		Hidden: hidden | null
 	}
 
 	constructor(init?: Partial<{Hidden?: hidden | null}>) {
 		this._fields = {
-			Hidden: $.varRef(init?.Hidden ?? (null! as hidden | null))
+			Hidden: init?.Hidden ?? (null! as hidden | null)
 		}
 	}
 
 	public clone(): Holder {
-		const cloned = new Holder()
-		cloned._fields = {
-			Hidden: $.varRef(this._fields.Hidden.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Holder(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Hidden"])
 	}
 
 	static __typeInfo = $.registerStructType(

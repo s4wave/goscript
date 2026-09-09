@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class holder {
-	public get data(): $.Slice<number> {
-		return this._fields.data.value
-	}
-	public set data(value: $.Slice<number>) {
-		this._fields.data.value = value
-	}
+	public declare data: $.Slice<number>
 
 	public _fields: {
-		data: $.VarRef<$.Slice<number>>
+		data: $.Slice<number>
 	}
 
 	constructor(init?: Partial<{data?: $.Slice<number>}>) {
 		this._fields = {
-			data: $.varRef(init?.data ?? (null! as $.Slice<number>))
+			data: init?.data ?? (null! as $.Slice<number>)
 		}
 	}
 
 	public clone(): holder {
-		const cloned = new holder()
-		cloned._fields = {
-			data: $.varRef(this._fields.data.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new holder(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["data"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -34,7 +29,7 @@ export class holder {
 		() => new holder(),
 		() => [],
 		holder,
-		() => [{ name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }]
+		() => [{ name: "data", key: "data", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }]
 	)
 }
 

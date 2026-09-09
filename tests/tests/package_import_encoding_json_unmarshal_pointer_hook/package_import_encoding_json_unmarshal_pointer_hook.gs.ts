@@ -10,39 +10,24 @@ import "@goscript/encoding/json/index.js"
 import "@goscript/fmt/index.js"
 
 export class Hooked {
-	public get Calls(): number {
-		return this._fields.Calls.value
-	}
-	public set Calls(value: number) {
-		this._fields.Calls.value = value
-	}
+	public declare Calls: number
 
-	public get Seen(): string {
-		return this._fields.Seen.value
-	}
-	public set Seen(value: string) {
-		this._fields.Seen.value = value
-	}
+	public declare Seen: string
 
 	public _fields: {
-		Calls: $.VarRef<number>
-		Seen: $.VarRef<string>
+		Calls: number
+		Seen: string
 	}
 
 	constructor(init?: Partial<{Calls?: number, Seen?: string}>) {
 		this._fields = {
-			Calls: $.varRef(init?.Calls ?? (0 as number)),
-			Seen: $.varRef(init?.Seen ?? ("" as string))
+			Calls: init?.Calls ?? (0 as number),
+			Seen: init?.Seen ?? ("" as string)
 		}
 	}
 
 	public clone(): Hooked {
-		const cloned = new Hooked()
-		cloned._fields = {
-			Calls: $.varRef(this._fields.Calls.value),
-			Seen: $.varRef(this._fields.Seen.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Hooked(this))
 	}
 
 	public UnmarshalJSON(data: $.Slice<number>): $.GoError {
@@ -50,6 +35,10 @@ export class Hooked {
 		$.pointerValue<Hooked>(h).Calls++
 		$.pointerValue<Hooked>(h).Seen = $.bytesToString(data)
 		return null
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Calls", "Seen"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -62,29 +51,24 @@ export class Hooked {
 }
 
 export class Box {
-	public get Value(): Hooked | $.VarRef<Hooked> | null {
-		return this._fields.Value.value
-	}
-	public set Value(value: Hooked | $.VarRef<Hooked> | null) {
-		this._fields.Value.value = value
-	}
+	public declare Value: Hooked | $.VarRef<Hooked> | null
 
 	public _fields: {
-		Value: $.VarRef<Hooked | $.VarRef<Hooked> | null>
+		Value: Hooked | $.VarRef<Hooked> | null
 	}
 
 	constructor(init?: Partial<{Value?: Hooked | $.VarRef<Hooked> | null}>) {
 		this._fields = {
-			Value: $.varRef(init?.Value ?? (null! as Hooked | $.VarRef<Hooked> | null))
+			Value: init?.Value ?? (null! as Hooked | $.VarRef<Hooked> | null)
 		}
 	}
 
 	public clone(): Box {
-		const cloned = new Box()
-		cloned._fields = {
-			Value: $.varRef(this._fields.Value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Box(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Value"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -92,7 +76,7 @@ export class Box {
 		() => new Box(),
 		() => [],
 		Box,
-		() => [{ name: "Value", key: "Value", type: { kind: $.TypeKind.Pointer, elemType: "main.Hooked" }, tag: "json:\"value\"" }]
+		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.pointerType("main.Hooked"), tag: "json:\"value\"" }]
 	)
 }
 
@@ -101,7 +85,7 @@ export async function main(): globalThis.Promise<void> {
 	// pointer-to-struct population path can inspect fields.
 	let box = $.varRef($.markAsStructValue(new Box({Value: new Hooked({Seen: "before"})})))
 	{
-		let err = json.Unmarshal(new Uint8Array([123, 34, 118, 97, 108, 117, 101, 34, 58, 123, 34, 105, 103, 110, 111, 114, 101, 100, 34, 58, 48, 125, 125]), $.interfaceValue(box, "*main.Box", { kind: $.TypeKind.Pointer, elemType: "main.Box" }))
+		let err = json.Unmarshal(new Uint8Array([123, 34, 118, 97, 108, 117, 101, 34, 58, 123, 34, 105, 103, 110, 111, 114, 101, 100, 34, 58, 48, 125, 125]), $.interfaceValue(box, "*main.Box", /* @__PURE__ */ $.pointerType("main.Box")))
 		if (err != null) {
 			await fmt.Println("unmarshal error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return

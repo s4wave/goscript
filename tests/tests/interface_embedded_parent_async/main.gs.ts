@@ -27,10 +27,7 @@ export class impl {
 	}
 
 	public clone(): impl {
-		const cloned = new impl()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new impl(this))
 	}
 
 	public async Name(): globalThis.Promise<string> {
@@ -63,7 +60,7 @@ export function __goscript_set_ready(__goscriptValue: $.Channel<boolean> | null)
 }
 
 export function NewSpecific(): Specific | null {
-	return $.interfaceValue<Specific | null>(new impl(), "*main.impl", { kind: $.TypeKind.Pointer, elemType: "main.impl" })
+	return $.interfaceValue<Specific | null>(new impl(), "*main.impl", /* @__PURE__ */ $.pointerType("main.impl"))
 }
 
 export async function main(): globalThis.Promise<void> {

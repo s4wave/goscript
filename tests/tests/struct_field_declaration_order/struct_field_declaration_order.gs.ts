@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class inner {
-	public get value(): number {
-		return this._fields.value.value
-	}
-	public set value(value: number) {
-		this._fields.value.value = value
-	}
+	public declare value: number
 
 	public _fields: {
-		value: $.VarRef<number>
+		value: number
 	}
 
 	constructor(init?: Partial<{value?: number}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? (0 as number))
+			value: init?.value ?? (0 as number)
 		}
 	}
 
 	public clone(): inner {
-		const cloned = new inner()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new inner(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -39,29 +34,24 @@ export class inner {
 }
 
 export class outer {
-	public get inner(): inner {
-		return this._fields.inner.value
-	}
-	public set inner(value: inner) {
-		this._fields.inner.value = value
-	}
+	public declare inner: inner
 
 	public _fields: {
-		inner: $.VarRef<inner>
+		inner: inner
 	}
 
 	constructor(init?: Partial<{inner?: inner}>) {
 		this._fields = {
-			inner: $.varRef(init?.inner ? $.markAsStructValue($.cloneStructValue(init.inner)) : $.markAsStructValue(new inner()))
+			inner: init?.inner ? $.markAsStructValue($.cloneStructValue(init.inner)) : $.markAsStructValue(new inner())
 		}
 	}
 
 	public clone(): outer {
-		const cloned = new outer()
-		cloned._fields = {
-			inner: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.inner.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new outer(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["inner"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -76,7 +66,7 @@ export class outer {
 export let defaultOuter: outer = $.markAsStructValue(new outer())
 
 export function __goscript_set_defaultOuter(__goscriptValue: outer): void {
-	defaultOuter = __goscriptValue
+	$.assignStruct(defaultOuter, __goscriptValue)
 }
 
 export async function main(): globalThis.Promise<void> {

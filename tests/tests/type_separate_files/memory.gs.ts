@@ -4,39 +4,28 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class file {
-	public get name(): string {
-		return this._fields.name.value
-	}
-	public set name(value: string) {
-		this._fields.name.value = value
-	}
+	public declare name: string
 
-	public get data(): $.Slice<number> {
-		return this._fields.data.value
-	}
-	public set data(value: $.Slice<number>) {
-		this._fields.data.value = value
-	}
+	public declare data: $.Slice<number>
 
 	public _fields: {
-		name: $.VarRef<string>
-		data: $.VarRef<$.Slice<number>>
+		name: string
+		data: $.Slice<number>
 	}
 
 	constructor(init?: Partial<{name?: string, data?: $.Slice<number>}>) {
 		this._fields = {
-			name: $.varRef(init?.name ?? ("" as string)),
-			data: $.varRef(init?.data ?? (null! as $.Slice<number>))
+			name: init?.name ?? ("" as string),
+			data: init?.data ?? (null! as $.Slice<number>)
 		}
 	}
 
 	public clone(): file {
-		const cloned = new file()
-		cloned._fields = {
-			name: $.varRef(this._fields.name.value),
-			data: $.varRef(this._fields.data.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new file(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["name", "data"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -44,6 +33,6 @@ export class file {
 		() => new file(),
 		() => [],
 		file,
-		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }, { name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }]
+		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }, { name: "data", key: "data", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }]
 	)
 }

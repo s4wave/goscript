@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class OtherStruct {
-	public get Label(): string {
-		return this._fields.Label.value
-	}
-	public set Label(value: string) {
-		this._fields.Label.value = value
-	}
+	public declare Label: string
 
 	public _fields: {
-		Label: $.VarRef<string>
+		Label: string
 	}
 
 	constructor(init?: Partial<{Label?: string}>) {
 		this._fields = {
-			Label: $.varRef(init?.Label ?? ("" as string))
+			Label: init?.Label ?? ("" as string)
 		}
 	}
 
 	public clone(): OtherStruct {
-		const cloned = new OtherStruct()
-		cloned._fields = {
-			Label: $.varRef(this._fields.Label.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new OtherStruct(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Label"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -34,6 +29,6 @@ export class OtherStruct {
 		() => new OtherStruct(),
 		() => [],
 		OtherStruct,
-		() => [{ name: "Label", key: "Label", type: /* @__PURE__ */ $.basicType("string"), index: [0], offset: 0, exported: true }]
+		() => [/* @__PURE__ */ $.structField("Label", /* @__PURE__ */ $.basicType("string"), [0], 0, true)]
 	)
 }

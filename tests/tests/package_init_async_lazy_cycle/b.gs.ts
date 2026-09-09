@@ -12,7 +12,7 @@ import "./a.gs.ts"
 export let lock: $.VarRef<sync.Mutex> = $.varRef($.markAsStructValue(new sync.Mutex()))
 
 export function __goscript_set_lock(__goscriptValue: sync.Mutex): void {
-	lock.value = __goscriptValue
+	$.assignStruct(lock.value, __goscriptValue)
 }
 
 export var first: __goscript_a.holder
@@ -31,7 +31,7 @@ export function __goscript_get_first(): __goscript_a.holder {
 }
 
 export function __goscript_set_first(__goscriptValue: __goscript_a.holder): void {
-	first = __goscriptValue
+	$.assignStruct(first, __goscriptValue)
 }
 
 export async function makeFirst(): globalThis.Promise<__goscript_a.holder> {

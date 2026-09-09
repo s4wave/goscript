@@ -25,39 +25,24 @@ $.registerInterfaceType(
 );
 
 export class MyStruct {
-	public get Value1(): string {
-		return this._fields.Value1.value
-	}
-	public set Value1(value: string) {
-		this._fields.Value1.value = value
-	}
+	public declare Value1: string
 
-	public get Value2(): string {
-		return this._fields.Value2.value
-	}
-	public set Value2(value: string) {
-		this._fields.Value2.value = value
-	}
+	public declare Value2: string
 
 	public _fields: {
-		Value1: $.VarRef<string>
-		Value2: $.VarRef<string>
+		Value1: string
+		Value2: string
 	}
 
 	constructor(init?: Partial<{Value1?: string, Value2?: string}>) {
 		this._fields = {
-			Value1: $.varRef(init?.Value1 ?? ("" as string)),
-			Value2: $.varRef(init?.Value2 ?? ("" as string))
+			Value1: init?.Value1 ?? ("" as string),
+			Value2: init?.Value2 ?? ("" as string)
 		}
 	}
 
 	public clone(): MyStruct {
-		const cloned = new MyStruct()
-		cloned._fields = {
-			Value1: $.varRef(this._fields.Value1.value),
-			Value2: $.varRef(this._fields.Value2.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyStruct(this))
 	}
 
 	public MyString1(): string {
@@ -68,6 +53,10 @@ export class MyStruct {
 	public MyString2(): string {
 		const m = this
 		return m.Value2
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Value1", "Value2"])
 	}
 
 	static __typeInfo = $.registerStructType(

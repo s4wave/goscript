@@ -23,10 +23,7 @@ export class lateType {
 	}
 
 	public clone(): lateType {
-		const cloned = new lateType()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new lateType(this))
 	}
 
 	public Name(): string {
@@ -42,7 +39,7 @@ export class lateType {
 	)
 }
 
-export let defaultNamed: named | null = $.interfaceValue<named | null>(new lateType(), "*main.lateType", { kind: $.TypeKind.Pointer, elemType: "main.lateType" })
+export let defaultNamed: named | null = $.interfaceValue<named | null>(new lateType(), "*main.lateType", /* @__PURE__ */ $.pointerType("main.lateType"))
 
 export function __goscript_set_defaultNamed(__goscriptValue: named | null): void {
 	defaultNamed = __goscriptValue

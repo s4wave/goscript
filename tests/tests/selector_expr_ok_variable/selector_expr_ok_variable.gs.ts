@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Result {
-	public get ok(): boolean {
-		return this._fields.ok.value
-	}
-	public set ok(value: boolean) {
-		this._fields.ok.value = value
-	}
+	public declare ok: boolean
 
 	public _fields: {
-		ok: $.VarRef<boolean>
+		ok: boolean
 	}
 
 	constructor(init?: Partial<{ok?: boolean}>) {
 		this._fields = {
-			ok: $.varRef(init?.ok ?? (false as boolean))
+			ok: init?.ok ?? (false as boolean)
 		}
 	}
 
 	public clone(): Result {
-		const cloned = new Result()
-		cloned._fields = {
-			ok: $.varRef(this._fields.ok.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Result(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["ok"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class item {
-	public get value(): string {
-		return this._fields.value.value
-	}
-	public set value(value: string) {
-		this._fields.value.value = value
-	}
+	public declare value: string
 
 	public _fields: {
-		value: $.VarRef<string>
+		value: string
 	}
 
 	constructor(init?: Partial<{value?: string}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? ("" as string))
+			value: init?.value ?? ("" as string)
 		}
 	}
 
 	public clone(): item {
-		const cloned = new item()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new item(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -39,11 +34,11 @@ export class item {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let boxed: any = $.interfaceValue(null, "[]*main.item", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.item" } })
-	let asserted: $.Slice<item | $.VarRef<item> | null> = $.mustTypeAssert<$.Slice<item | $.VarRef<item> | null>>(boxed, { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.item" } })
+	let boxed: any = $.interfaceValue(null, "[]*main.item", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.item")))
+	let asserted: $.Slice<item | $.VarRef<item> | null> = $.mustTypeAssert<$.Slice<item | $.VarRef<item> | null>>(boxed, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.item")))
 	await $.println(asserted == null)
 
-	let __goscriptTuple0: any = $.typeAssertTuple<$.Slice<item | $.VarRef<item> | null>>(boxed, { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.item" } })
+	let __goscriptTuple0: any = $.typeAssertTuple<$.Slice<item | $.VarRef<item> | null>>(boxed, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.item")))
 	let commaOK: $.Slice<item | $.VarRef<item> | null> = __goscriptTuple0[0]
 	let ok = __goscriptTuple0[1]
 	await $.println(ok, commaOK == null)

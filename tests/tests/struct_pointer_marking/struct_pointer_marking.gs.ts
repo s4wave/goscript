@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class MyStruct {
-	public get Value(): number {
-		return this._fields.Value.value
-	}
-	public set Value(value: number) {
-		this._fields.Value.value = value
-	}
+	public declare Value: number
 
 	public _fields: {
-		Value: $.VarRef<number>
+		Value: number
 	}
 
 	constructor(init?: Partial<{Value?: number}>) {
 		this._fields = {
-			Value: $.varRef(init?.Value ?? (0 as number))
+			Value: init?.Value ?? (0 as number)
 		}
 	}
 
 	public clone(): MyStruct {
-		const cloned = new MyStruct()
-		cloned._fields = {
-			Value: $.varRef(this._fields.Value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyStruct(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Value"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -49,14 +44,14 @@ export async function main(): globalThis.Promise<void> {
 	// Type assertions - struct value
 	let i: any = $.interfaceValue($.markAsStructValue($.cloneStructValue(s)), "main.MyStruct", "main.MyStruct")
 	let [, ok1] = $.typeAssertTuple<MyStruct>(i, "main.MyStruct")
-	let [, ok2] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
+	let [, ok2] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	await $.println("struct value -> MyStruct assertion:", ok1)
 	await $.println("struct value -> *MyStruct assertion:", ok2)
 
 	// Type assertions - struct pointer
-	let j: any = $.interfaceValue(p, "*main.MyStruct", { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
+	let j: any = $.interfaceValue(p, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	let [, ok3] = $.typeAssertTuple<MyStruct>(j, "main.MyStruct")
-	let [, ok4] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(j, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
+	let [, ok4] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(j, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	await $.println("struct pointer -> MyStruct assertion:", ok3)
 	await $.println("struct pointer -> *MyStruct assertion:", ok4)
 
@@ -66,15 +61,15 @@ export async function main(): globalThis.Promise<void> {
 	let pAlias: MyStruct | $.VarRef<MyStruct> | null = original
 
 	let iOriginal: any = $.interfaceValue($.markAsStructValue($.cloneStructValue(original.value)), "main.MyStruct", "main.MyStruct")
-	let jAlias: any = $.interfaceValue(pAlias, "*main.MyStruct", { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
+	let jAlias: any = $.interfaceValue(pAlias, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
 
 	let [, ok5] = $.typeAssertTuple<MyStruct>(iOriginal, "main.MyStruct")
-	let [, ok6] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(iOriginal, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
+	let [, ok6] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(iOriginal, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	await $.println("original value -> MyStruct assertion:", ok5)
 	await $.println("original value -> *MyStruct assertion:", ok6)
 
 	let [, ok7] = $.typeAssertTuple<MyStruct>(jAlias, "main.MyStruct")
-	let [, ok8] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(jAlias, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
+	let [, ok8] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(jAlias, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	await $.println("alias pointer -> MyStruct assertion:", ok7)
 	await $.println("alias pointer -> *MyStruct assertion:", ok8)
 
@@ -84,22 +79,22 @@ export async function main(): globalThis.Promise<void> {
 	let p1: MyStruct | $.VarRef<MyStruct> | null = shared
 	let p2: MyStruct | $.VarRef<MyStruct> | null = shared
 
-	let i1: any = $.interfaceValue(p1, "*main.MyStruct", { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
-	let i2: any = $.interfaceValue(p2, "*main.MyStruct", { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
+	let i1: any = $.interfaceValue(p1, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
+	let i2: any = $.interfaceValue(p2, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
 
-	let [, ok9] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i1, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
-	let [, ok10] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i2, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
+	let [, ok9] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i1, /* @__PURE__ */ $.pointerType("main.MyStruct"))
+	let [, ok10] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i2, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	await $.println("first pointer -> *MyStruct assertion:", ok9)
 	await $.println("second pointer -> *MyStruct assertion:", ok10)
 
 	// Verify they point to the same data
 	{
-		let __goscriptTuple0: any = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i1, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
+		let __goscriptTuple0: any = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i1, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 		let structPtr1: MyStruct | $.VarRef<MyStruct> | null = __goscriptTuple0[0]
 		let ok = __goscriptTuple0[1]
 		if (ok) {
 			{
-				let __goscriptTuple1: any = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i2, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
+				let __goscriptTuple1: any = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i2, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 				let structPtr2: MyStruct | $.VarRef<MyStruct> | null = __goscriptTuple1[0]
 				let __goscriptShadow0 = __goscriptTuple1[1]
 				if (__goscriptShadow0) {
@@ -116,11 +111,11 @@ export async function main(): globalThis.Promise<void> {
 	let pVar: MyStruct | $.VarRef<MyStruct> | null = mixed
 	let pLit: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({Value: 60})
 
-	let iVar: any = $.interfaceValue(pVar, "*main.MyStruct", { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
-	let iLit: any = $.interfaceValue(pLit, "*main.MyStruct", { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
+	let iVar: any = $.interfaceValue(pVar, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
+	let iLit: any = $.interfaceValue(pLit, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
 
-	let [, ok11] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(iVar, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
-	let [, ok12] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(iLit, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
+	let [, ok11] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(iVar, /* @__PURE__ */ $.pointerType("main.MyStruct"))
+	let [, ok12] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(iLit, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	await $.println("variable pointer -> *MyStruct assertion:", ok11)
 	await $.println("literal pointer -> *MyStruct assertion:", ok12)
 
@@ -130,7 +125,7 @@ export async function main(): globalThis.Promise<void> {
 	let nested2 = $.varRef($.markAsStructValue(new MyStruct({Value: 80})))
 
 	// Array of interfaces containing both pointers and values
-	let arr: $.Slice<any> = $.arrayToSlice<any>([$.interfaceValue(nested1, "*main.MyStruct", { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" }), $.interfaceValue($.markAsStructValue($.cloneStructValue(nested2.value)), "main.MyStruct", "main.MyStruct"), $.interfaceValue(nested2, "*main.MyStruct", { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })])
+	let arr: $.Slice<any> = $.arrayToSlice<any>([$.interfaceValue(nested1, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct")), $.interfaceValue($.markAsStructValue($.cloneStructValue(nested2.value)), "main.MyStruct", "main.MyStruct"), $.interfaceValue(nested2, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))])
 
 	for (let __goscriptRangeTarget0 = arr, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
 		let item = __goscriptRangeTarget0![i]
@@ -140,7 +135,7 @@ export async function main(): globalThis.Promise<void> {
 				await $.println("arr[", i, "] is MyStruct with value:", val.Value)
 			} else {
 				{
-					let __goscriptTuple2: any = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(item, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
+					let __goscriptTuple2: any = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(item, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 					let ptr: MyStruct | $.VarRef<MyStruct> | null = __goscriptTuple2[0]
 					let __goscriptShadow1 = __goscriptTuple2[1]
 					if (__goscriptShadow1) {
@@ -155,7 +150,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Scenario 6: Type Switch with Mixed Types
 	await $.println("\n--- Scenario 6: Type Switch ---")
-	let testItems: $.Slice<any> = $.arrayToSlice<any>([$.interfaceValue($.markAsStructValue(new MyStruct({Value: 100})), "main.MyStruct", "main.MyStruct"), $.interfaceValue(new MyStruct({Value: 200}), "*main.MyStruct", { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" }), $.basicInterfaceValue(300, "int"), "string"])
+	let testItems: $.Slice<any> = $.arrayToSlice<any>([$.interfaceValue($.markAsStructValue(new MyStruct({Value: 100})), "main.MyStruct", "main.MyStruct"), $.interfaceValue(new MyStruct({Value: 200}), "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct")), $.basicInterfaceValue(300, "int"), "string"])
 
 	for (let __goscriptRangeTarget1 = testItems, i = 0; i < $.len(__goscriptRangeTarget1); i++) {
 		let item = __goscriptRangeTarget1![i]
@@ -168,9 +163,9 @@ export async function main(): globalThis.Promise<void> {
 						await $.println("testItems[", i, "] is MyStruct value:", v.Value)
 					}
 					break
-				case $.typeAssert<MyStruct | $.VarRef<MyStruct> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" }).ok:
+				case $.typeAssert<MyStruct | $.VarRef<MyStruct> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.MyStruct")).ok:
 					{
-						let v: MyStruct | $.VarRef<MyStruct> | null = $.typeAssert<MyStruct | $.VarRef<MyStruct> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" }).value
+						let v: MyStruct | $.VarRef<MyStruct> | null = $.typeAssert<MyStruct | $.VarRef<MyStruct> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.MyStruct")).value
 						await $.println("testItems[", i, "] is *MyStruct pointer:", $.pointerValue<MyStruct>(v).Value)
 					}
 					break

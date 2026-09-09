@@ -4,49 +4,32 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class requestKey {
-	public get soID(): string {
-		return this._fields.soID.value
-	}
-	public set soID(value: string) {
-		this._fields.soID.value = value
-	}
+	public declare soID: string
 
-	public get inviteID(): string {
-		return this._fields.inviteID.value
-	}
-	public set inviteID(value: string) {
-		this._fields.inviteID.value = value
-	}
+	public declare inviteID: string
 
-	public get peerID(): string {
-		return this._fields.peerID.value
-	}
-	public set peerID(value: string) {
-		this._fields.peerID.value = value
-	}
+	public declare peerID: string
 
 	public _fields: {
-		soID: $.VarRef<string>
-		inviteID: $.VarRef<string>
-		peerID: $.VarRef<string>
+		soID: string
+		inviteID: string
+		peerID: string
 	}
 
 	constructor(init?: Partial<{soID?: string, inviteID?: string, peerID?: string}>) {
 		this._fields = {
-			soID: $.varRef(init?.soID ?? ("" as string)),
-			inviteID: $.varRef(init?.inviteID ?? ("" as string)),
-			peerID: $.varRef(init?.peerID ?? ("" as string))
+			soID: init?.soID ?? ("" as string),
+			inviteID: init?.inviteID ?? ("" as string),
+			peerID: init?.peerID ?? ("" as string)
 		}
 	}
 
 	public clone(): requestKey {
-		const cloned = new requestKey()
-		cloned._fields = {
-			soID: $.varRef(this._fields.soID.value),
-			inviteID: $.varRef(this._fields.inviteID.value),
-			peerID: $.varRef(this._fields.peerID.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new requestKey(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["soID", "inviteID", "peerID"])
 	}
 
 	static __typeInfo = $.registerStructType(

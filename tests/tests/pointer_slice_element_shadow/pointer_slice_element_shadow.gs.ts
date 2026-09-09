@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class entry {
-	public get key(): string {
-		return this._fields.key.value
-	}
-	public set key(value: string) {
-		this._fields.key.value = value
-	}
+	public declare key: string
 
 	public _fields: {
-		key: $.VarRef<string>
+		key: string
 	}
 
 	constructor(init?: Partial<{key?: string}>) {
 		this._fields = {
-			key: $.varRef(init?.key ?? ("" as string))
+			key: init?.key ?? ("" as string)
 		}
 	}
 
 	public clone(): entry {
-		const cloned = new entry()
-		cloned._fields = {
-			key: $.varRef(this._fields.key.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new entry(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["key"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -39,29 +34,20 @@ export class entry {
 }
 
 export class _object {
-	public get entries(): $.Slice<entry> {
-		return this._fields.entries.value
-	}
-	public set entries(value: $.Slice<entry>) {
-		this._fields.entries.value = value
-	}
+	public declare entries: $.Slice<entry>
 
 	public _fields: {
-		entries: $.VarRef<$.Slice<entry>>
+		entries: $.Slice<entry>
 	}
 
 	constructor(init?: Partial<{entries?: $.Slice<entry>}>) {
 		this._fields = {
-			entries: $.varRef(init?.entries ?? (null! as $.Slice<entry>))
+			entries: init?.entries ?? (null! as $.Slice<entry>)
 		}
 	}
 
 	public clone(): _object {
-		const cloned = new _object()
-		cloned._fields = {
-			entries: $.varRef(this._fields.entries.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new _object(this))
 	}
 
 	public next(): entry | $.VarRef<entry> | null {
@@ -74,12 +60,16 @@ export class _object {
 		return $.indexRef($.pointerValue<_object>(o).entries!, $.len($.pointerValue<_object>(o).entries) - 1)
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["entries"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.object",
 		() => new _object(),
-		() => [{ name: "next", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.entry" } }] }],
+		() => [{ name: "next", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.entry") }] }],
 		_object,
-		() => [{ name: "entries", key: "entries", type: { kind: $.TypeKind.Slice, elemType: "main.entry" } }]
+		() => [{ name: "entries", key: "entries", type: /* @__PURE__ */ $.sliceType("main.entry") }]
 	)
 }
 

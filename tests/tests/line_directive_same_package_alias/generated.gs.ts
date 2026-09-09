@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class yySymType {
-	public get value(): number {
-		return this._fields.value.value
-	}
-	public set value(value: number) {
-		this._fields.value.value = value
-	}
+	public declare value: number
 
 	public _fields: {
-		value: $.VarRef<number>
+		value: number
 	}
 
 	constructor(init?: Partial<{value?: number}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? (0 as number))
+			value: init?.value ?? (0 as number)
 		}
 	}
 
 	public clone(): yySymType {
-		const cloned = new yySymType()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new yySymType(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -48,10 +43,7 @@ export class yyParserImpl {
 	}
 
 	public clone(): yyParserImpl {
-		const cloned = new yyParserImpl()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new yyParserImpl(this))
 	}
 
 	static __typeInfo = $.registerStructType(

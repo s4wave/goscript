@@ -10,7 +10,7 @@ export type AddFactoryFunc = ((b: dep.Bus) => $.Slice<dep.Factory | null> | glob
 
 export let Factories: $.Slice<AddFactoryFunc | null> = $.arrayToSlice<AddFactoryFunc | null>([$.functionValue(async (b: dep.Bus): globalThis.Promise<$.Slice<dep.Factory | null>> => {
 	return $.arrayToSlice<dep.Factory | null>([await dep.NewFactory($.markAsStructValue($.cloneStructValue(b)))])
-}, ({ kind: $.TypeKind.Function, params: ["dep.Bus"], results: [{ kind: $.TypeKind.Slice, elemType: "dep.Factory" }] } as $.FunctionTypeInfo))])
+}, ({ kind: $.TypeKind.Function, params: ["dep.Bus"], results: [/* @__PURE__ */ $.sliceType("dep.Factory")] } as $.FunctionTypeInfo))])
 
 export function __goscript_set_Factories(__goscriptValue: $.Slice<AddFactoryFunc | null>): void {
 	Factories = __goscriptValue

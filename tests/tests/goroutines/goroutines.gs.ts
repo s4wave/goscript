@@ -4,39 +4,28 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Message {
-	public get priority(): number {
-		return this._fields.priority.value
-	}
-	public set priority(value: number) {
-		this._fields.priority.value = value
-	}
+	public declare priority: number
 
-	public get text(): string {
-		return this._fields.text.value
-	}
-	public set text(value: string) {
-		this._fields.text.value = value
-	}
+	public declare text: string
 
 	public _fields: {
-		priority: $.VarRef<number>
-		text: $.VarRef<string>
+		priority: number
+		text: string
 	}
 
 	constructor(init?: Partial<{priority?: number, text?: string}>) {
 		this._fields = {
-			priority: $.varRef(init?.priority ?? (0 as number)),
-			text: $.varRef(init?.text ?? ("" as string))
+			priority: init?.priority ?? (0 as number),
+			text: init?.text ?? ("" as string)
 		}
 	}
 
 	public clone(): Message {
-		const cloned = new Message()
-		cloned._fields = {
-			priority: $.varRef(this._fields.priority.value),
-			text: $.varRef(this._fields.text.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Message(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["priority", "text"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -105,8 +94,8 @@ export async function main(): globalThis.Promise<void> {
 			if ($.arrayIndex(allMessages!, i).priority > $.arrayIndex(allMessages!, j).priority) {
 				let __goscriptAssign0_0: Message = $.markAsStructValue($.cloneStructValue($.arrayIndex(allMessages!, j)))
 				let __goscriptAssign0_1: Message = $.markAsStructValue($.cloneStructValue($.arrayIndex(allMessages!, i)))
-				allMessages![i] = __goscriptAssign0_0
-				allMessages![j] = __goscriptAssign0_1
+				$.assignStruct(allMessages![i], __goscriptAssign0_0)
+				$.assignStruct(allMessages![j], __goscriptAssign0_1)
 			}
 		}
 	}

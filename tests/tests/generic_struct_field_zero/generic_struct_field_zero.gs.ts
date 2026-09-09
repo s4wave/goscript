@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class box {
-	public get Value(): any {
-		return this._fields.Value.value
-	}
-	public set Value(value: any) {
-		this._fields.Value.value = value
-	}
+	public declare Value: any
 
 	public _fields: {
-		Value: $.VarRef<any>
+		Value: any
 	}
 
 	constructor(init?: Partial<{Value?: any}>) {
 		this._fields = {
-			Value: $.varRef(init?.Value ?? (null! as any))
+			Value: init?.Value ?? (null! as any)
 		}
 	}
 
 	public clone(): box {
-		const cloned = new box()
-		cloned._fields = {
-			Value: $.varRef(this._fields.Value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new box(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Value"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -39,29 +34,24 @@ export class box {
 }
 
 export class point {
-	public get X(): number {
-		return this._fields.X.value
-	}
-	public set X(value: number) {
-		this._fields.X.value = value
-	}
+	public declare X: number
 
 	public _fields: {
-		X: $.VarRef<number>
+		X: number
 	}
 
 	constructor(init?: Partial<{X?: number}>) {
 		this._fields = {
-			X: $.varRef(init?.X ?? (0 as number))
+			X: init?.X ?? (0 as number)
 		}
 	}
 
 	public clone(): point {
-		const cloned = new point()
-		cloned._fields = {
-			X: $.varRef(this._fields.X.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new point(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["X"])
 	}
 
 	static __typeInfo = $.registerStructType(

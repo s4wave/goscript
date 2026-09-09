@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class MyStruct {
-	public get myPrivate(): $.VarRef<number> | null {
-		return this._fields.myPrivate.value
-	}
-	public set myPrivate(value: $.VarRef<number> | null) {
-		this._fields.myPrivate.value = value
-	}
+	public declare myPrivate: $.VarRef<number> | null
 
 	public _fields: {
-		myPrivate: $.VarRef<$.VarRef<number> | null>
+		myPrivate: $.VarRef<number> | null
 	}
 
 	constructor(init?: Partial<{myPrivate?: $.VarRef<number> | null}>) {
 		this._fields = {
-			myPrivate: $.varRef(init?.myPrivate ?? (null! as $.VarRef<number> | null))
+			myPrivate: init?.myPrivate ?? (null! as $.VarRef<number> | null)
 		}
 	}
 
 	public clone(): MyStruct {
-		const cloned = new MyStruct()
-		cloned._fields = {
-			myPrivate: $.varRef(this._fields.myPrivate.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyStruct(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["myPrivate"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -34,7 +29,7 @@ export class MyStruct {
 		() => new MyStruct(),
 		() => [],
 		MyStruct,
-		() => [{ name: "myPrivate", key: "myPrivate", type: { kind: $.TypeKind.Pointer, elemType: /* @__PURE__ */ $.basicType("int") } }]
+		() => [{ name: "myPrivate", key: "myPrivate", type: /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")) }]
 	)
 }
 

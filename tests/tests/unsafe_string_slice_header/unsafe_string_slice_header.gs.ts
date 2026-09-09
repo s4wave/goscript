@@ -10,39 +10,28 @@ import "@goscript/reflect/index.js"
 import "@goscript/unsafe/index.js"
 
 export class localSliceHeader {
-	public get s(): string {
-		return this._fields.s.value
-	}
-	public set s(value: string) {
-		this._fields.s.value = value
-	}
+	public declare s: string
 
-	public get cap(): number {
-		return this._fields.cap.value
-	}
-	public set cap(value: number) {
-		this._fields.cap.value = value
-	}
+	public declare cap: number
 
 	public _fields: {
-		s: $.VarRef<string>
-		cap: $.VarRef<number>
+		s: string
+		cap: number
 	}
 
 	constructor(init?: Partial<{s?: string, cap?: number}>) {
 		this._fields = {
-			s: $.varRef(init?.s ?? ("" as string)),
-			cap: $.varRef(init?.cap ?? (0 as number))
+			s: init?.s ?? ("" as string),
+			cap: init?.cap ?? (0 as number)
 		}
 	}
 
 	public clone(): localSliceHeader {
-		const cloned = new localSliceHeader()
-		cloned._fields = {
-			s: $.varRef(this._fields.s.value),
-			cap: $.varRef(this._fields.cap.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new localSliceHeader(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["s", "cap"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -50,7 +39,7 @@ export class localSliceHeader {
 		() => new localSliceHeader(),
 		() => [],
 		localSliceHeader,
-		() => [{ name: "s", key: "s", type: /* @__PURE__ */ $.basicType("string"), pkgPath: "github.com/s4wave/goscript/tests/tests/unsafe_string_slice_header", index: [0], offset: 0, exported: false }, { name: "cap", key: "cap", type: /* @__PURE__ */ $.basicType("int"), pkgPath: "github.com/s4wave/goscript/tests/tests/unsafe_string_slice_header", index: [1], offset: 16, exported: false }]
+		() => [/* @__PURE__ */ $.structField("s", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/unsafe_string_slice_header" }), /* @__PURE__ */ $.structField("cap", /* @__PURE__ */ $.basicType("int"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/unsafe_string_slice_header" })]
 	)
 }
 

@@ -7,34 +7,29 @@ import * as http from "@goscript/net/http/index.js"
 import "@goscript/net/http/index.js"
 
 export class responseWriter {
-	public get header(): http.Header {
-		return this._fields.header.value
-	}
-	public set header(value: http.Header) {
-		this._fields.header.value = value
-	}
+	public declare header: http.Header
 
 	public _fields: {
-		header: $.VarRef<http.Header>
+		header: http.Header
 	}
 
 	constructor(init?: Partial<{header?: http.Header}>) {
 		this._fields = {
-			header: $.varRef(init?.header ?? (null! as http.Header))
+			header: init?.header ?? (null! as http.Header)
 		}
 	}
 
 	public clone(): responseWriter {
-		const cloned = new responseWriter()
-		cloned._fields = {
-			header: $.varRef(this._fields.header.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new responseWriter(this))
 	}
 
 	public Header(): http.Header {
 		const w: responseWriter | $.VarRef<responseWriter> | null = this
 		return $.pointerValue<responseWriter>(w).header
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["header"])
 	}
 
 	static __typeInfo = $.registerStructType(

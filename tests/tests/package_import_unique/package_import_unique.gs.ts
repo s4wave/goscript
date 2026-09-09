@@ -7,29 +7,24 @@ import * as _unique from "@goscript/unique/index.js"
 import "@goscript/unique/index.js"
 
 export class zone {
-	public get name(): string {
-		return this._fields.name.value
-	}
-	public set name(value: string) {
-		this._fields.name.value = value
-	}
+	public declare name: string
 
 	public _fields: {
-		name: $.VarRef<string>
+		name: string
 	}
 
 	constructor(init?: Partial<{name?: string}>) {
 		this._fields = {
-			name: $.varRef(init?.name ?? ("" as string))
+			name: init?.name ?? ("" as string)
 		}
 	}
 
 	public clone(): zone {
-		const cloned = new zone()
-		cloned._fields = {
-			name: $.varRef(this._fields.name.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new zone(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["name"])
 	}
 
 	static __typeInfo = $.registerStructType(

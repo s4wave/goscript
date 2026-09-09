@@ -17,29 +17,20 @@ $.registerInterfaceType(
 );
 
 export class raw {
-	public get Mutex(): sync.Mutex {
-		return this._fields.Mutex.value
-	}
-	public set Mutex(value: sync.Mutex) {
-		this._fields.Mutex.value = value
-	}
+	public declare Mutex: sync.Mutex
 
 	public _fields: {
-		Mutex: $.VarRef<sync.Mutex>
+		Mutex: sync.Mutex
 	}
 
 	constructor(init?: Partial<{Mutex?: sync.Mutex}>) {
 		this._fields = {
-			Mutex: $.varRef(init?.Mutex ? $.markAsStructValue($.cloneStructValue(init.Mutex)) : $.markAsStructValue(new sync.Mutex()))
+			Mutex: init?.Mutex ? $.markAsStructValue($.cloneStructValue(init.Mutex)) : $.markAsStructValue(new sync.Mutex())
 		}
 	}
 
 	public clone(): raw {
-		const cloned = new raw()
-		cloned._fields = {
-			Mutex: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.Mutex.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new raw(this))
 	}
 
 	public Lock(): any {
@@ -54,6 +45,10 @@ export class raw {
 		return $.pointerValue<sync.Mutex>(this.Mutex).Unlock()
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["Mutex"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.raw",
 		() => new raw(),
@@ -64,29 +59,20 @@ export class raw {
 }
 
 export class outer {
-	public get raw(): raw {
-		return this._fields.raw.value
-	}
-	public set raw(value: raw) {
-		this._fields.raw.value = value
-	}
+	public declare raw: raw
 
 	public _fields: {
-		raw: $.VarRef<raw>
+		raw: raw
 	}
 
 	constructor(init?: Partial<{raw?: raw}>) {
 		this._fields = {
-			raw: $.varRef(init?.raw ? $.markAsStructValue($.cloneStructValue(init.raw)) : $.markAsStructValue(new raw()))
+			raw: init?.raw ? $.markAsStructValue($.cloneStructValue(init.raw)) : $.markAsStructValue(new raw())
 		}
 	}
 
 	public clone(): outer {
-		const cloned = new outer()
-		cloned._fields = {
-			raw: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.raw.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new outer(this))
 	}
 
 	public Lock(): any {
@@ -101,6 +87,10 @@ export class outer {
 		return $.pointerValue<raw>(this.raw).Mutex.Unlock()
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["raw"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.outer",
 		() => new outer(),
@@ -111,29 +101,20 @@ export class outer {
 }
 
 export class rawRW {
-	public get RWMutex(): sync.RWMutex {
-		return this._fields.RWMutex.value
-	}
-	public set RWMutex(value: sync.RWMutex) {
-		this._fields.RWMutex.value = value
-	}
+	public declare RWMutex: sync.RWMutex
 
 	public _fields: {
-		RWMutex: $.VarRef<sync.RWMutex>
+		RWMutex: sync.RWMutex
 	}
 
 	constructor(init?: Partial<{RWMutex?: sync.RWMutex}>) {
 		this._fields = {
-			RWMutex: $.varRef(init?.RWMutex ? $.markAsStructValue($.cloneStructValue(init.RWMutex)) : $.markAsStructValue(new sync.RWMutex()))
+			RWMutex: init?.RWMutex ? $.markAsStructValue($.cloneStructValue(init.RWMutex)) : $.markAsStructValue(new sync.RWMutex())
 		}
 	}
 
 	public clone(): rawRW {
-		const cloned = new rawRW()
-		cloned._fields = {
-			RWMutex: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.RWMutex.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new rawRW(this))
 	}
 
 	public Lock(): any {
@@ -164,6 +145,10 @@ export class rawRW {
 		return $.pointerValue<sync.RWMutex>(this.RWMutex).Unlock()
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["RWMutex"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.rawRW",
 		() => new rawRW(),
@@ -174,29 +159,20 @@ export class rawRW {
 }
 
 export class outerRW {
-	public get rawRW(): rawRW {
-		return this._fields.rawRW.value
-	}
-	public set rawRW(value: rawRW) {
-		this._fields.rawRW.value = value
-	}
+	public declare rawRW: rawRW
 
 	public _fields: {
-		rawRW: $.VarRef<rawRW>
+		rawRW: rawRW
 	}
 
 	constructor(init?: Partial<{rawRW?: rawRW}>) {
 		this._fields = {
-			rawRW: $.varRef(init?.rawRW ? $.markAsStructValue($.cloneStructValue(init.rawRW)) : $.markAsStructValue(new rawRW()))
+			rawRW: init?.rawRW ? $.markAsStructValue($.cloneStructValue(init.rawRW)) : $.markAsStructValue(new rawRW())
 		}
 	}
 
 	public clone(): outerRW {
-		const cloned = new outerRW()
-		cloned._fields = {
-			rawRW: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.rawRW.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new outerRW(this))
 	}
 
 	public Lock(): any {
@@ -227,6 +203,10 @@ export class outerRW {
 		return $.pointerValue<rawRW>(this.rawRW).RWMutex.Unlock()
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["rawRW"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.outerRW",
 		() => new outerRW(),
@@ -237,33 +217,28 @@ export class outerRW {
 }
 
 export class rawRunner {
-	public get runner(): runner | null {
-		return this._fields.runner.value
-	}
-	public set runner(value: runner | null) {
-		this._fields.runner.value = value
-	}
+	public declare runner: runner | null
 
 	public _fields: {
-		runner: $.VarRef<runner | null>
+		runner: runner | null
 	}
 
 	constructor(init?: Partial<{runner?: runner | null}>) {
 		this._fields = {
-			runner: $.varRef(init?.runner ?? (null! as runner | null))
+			runner: init?.runner ?? (null! as runner | null)
 		}
 	}
 
 	public clone(): rawRunner {
-		const cloned = new rawRunner()
-		cloned._fields = {
-			runner: $.varRef(this._fields.runner.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new rawRunner(this))
 	}
 
 	public Run(): any {
 		return $.pointerValue<Exclude<runner | null, null>>(this.runner).Run()
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["runner"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -276,33 +251,28 @@ export class rawRunner {
 }
 
 export class outerRunner {
-	public get rawRunner(): rawRunner {
-		return this._fields.rawRunner.value
-	}
-	public set rawRunner(value: rawRunner) {
-		this._fields.rawRunner.value = value
-	}
+	public declare rawRunner: rawRunner
 
 	public _fields: {
-		rawRunner: $.VarRef<rawRunner>
+		rawRunner: rawRunner
 	}
 
 	constructor(init?: Partial<{rawRunner?: rawRunner}>) {
 		this._fields = {
-			rawRunner: $.varRef(init?.rawRunner ? $.markAsStructValue($.cloneStructValue(init.rawRunner)) : $.markAsStructValue(new rawRunner()))
+			rawRunner: init?.rawRunner ? $.markAsStructValue($.cloneStructValue(init.rawRunner)) : $.markAsStructValue(new rawRunner())
 		}
 	}
 
 	public clone(): outerRunner {
-		const cloned = new outerRunner()
-		cloned._fields = {
-			rawRunner: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.rawRunner.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new outerRunner(this))
 	}
 
 	public Run(): any {
 		return $.pointerValue<any>($.pointerValue<rawRunner>(this.rawRunner).runner).Run()
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["rawRunner"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -324,10 +294,7 @@ export class runnable {
 	}
 
 	public clone(): runnable {
-		const cloned = new runnable()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new runnable(this))
 	}
 
 	public Run(): string {

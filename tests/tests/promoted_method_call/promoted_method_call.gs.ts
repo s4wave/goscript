@@ -4,34 +4,29 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class base {
-	public get value(): number {
-		return this._fields.value.value
-	}
-	public set value(value: number) {
-		this._fields.value.value = value
-	}
+	public declare value: number
 
 	public _fields: {
-		value: $.VarRef<number>
+		value: number
 	}
 
 	constructor(init?: Partial<{value?: number}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? (0 as number))
+			value: init?.value ?? (0 as number)
 		}
 	}
 
 	public clone(): base {
-		const cloned = new base()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new base(this))
 	}
 
 	public Add(n: number): number {
 		const b: base | $.VarRef<base> | null = this
 		return $.pointerValue<base>(b).value + n
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -44,33 +39,28 @@ export class base {
 }
 
 export class wrapper {
-	public get base(): base {
-		return this._fields.base.value
-	}
-	public set base(value: base) {
-		this._fields.base.value = value
-	}
+	public declare base: base
 
 	public _fields: {
-		base: $.VarRef<base>
+		base: base
 	}
 
 	constructor(init?: Partial<{base?: base}>) {
 		this._fields = {
-			base: $.varRef(init?.base ? $.markAsStructValue($.cloneStructValue(init.base)) : $.markAsStructValue(new base()))
+			base: init?.base ? $.markAsStructValue($.cloneStructValue(init.base)) : $.markAsStructValue(new base())
 		}
 	}
 
 	public clone(): wrapper {
-		const cloned = new wrapper()
-		cloned._fields = {
-			base: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.base.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new wrapper(this))
 	}
 
 	public Add(n: any): any {
 		return $.pointerValue<base>(this.base).Add(n)
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["base"])
 	}
 
 	static __typeInfo = $.registerStructType(

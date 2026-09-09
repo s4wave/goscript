@@ -7,29 +7,24 @@ import * as __goscript_a from "./a.gs.ts"
 import "./a.gs.ts"
 
 export class bValue {
-	public get inner(): __goscript_a.aValue {
-		return this._fields.inner.value
-	}
-	public set inner(value: __goscript_a.aValue) {
-		this._fields.inner.value = value
-	}
+	public declare inner: __goscript_a.aValue
 
 	public _fields: {
-		inner: $.VarRef<__goscript_a.aValue>
+		inner: __goscript_a.aValue
 	}
 
 	constructor(init?: Partial<{inner?: __goscript_a.aValue}>) {
 		this._fields = {
-			inner: $.varRef(init?.inner ? $.markAsStructValue($.cloneStructValue(init.inner)) : $.markAsStructValue(new __goscript_a.aValue()))
+			inner: init?.inner ? $.markAsStructValue($.cloneStructValue(init.inner)) : $.markAsStructValue(new __goscript_a.aValue())
 		}
 	}
 
 	public clone(): bValue {
-		const cloned = new bValue()
-		cloned._fields = {
-			inner: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.inner.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new bValue(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["inner"])
 	}
 
 	static __typeInfo = $.registerStructType(

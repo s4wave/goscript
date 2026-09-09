@@ -4,29 +4,20 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Counter {
-	public get value(): number {
-		return this._fields.value.value
-	}
-	public set value(value: number) {
-		this._fields.value.value = value
-	}
+	public declare value: number
 
 	public _fields: {
-		value: $.VarRef<number>
+		value: number
 	}
 
 	constructor(init?: Partial<{value?: number}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? (0 as number))
+			value: init?.value ?? (0 as number)
 		}
 	}
 
 	public clone(): Counter {
-		const cloned = new Counter()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Counter(this))
 	}
 
 	public PointerAfterIncrement(): Counter | $.VarRef<Counter> | null {
@@ -40,10 +31,14 @@ export class Counter {
 		return $.pointerValue<Counter>(c).value
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["value"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Counter",
 		() => new Counter(),
-		() => [{ name: "PointerAfterIncrement", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.Counter" } }] }, { name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "PointerAfterIncrement", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.Counter") }] }, { name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		Counter,
 		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)

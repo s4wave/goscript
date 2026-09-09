@@ -12,34 +12,25 @@ import "@goscript/strings/index.js"
 export type state = number
 
 export class msg {
-	public get v(): number {
-		return this._fields.v.value
-	}
-	public set v(value: number) {
-		this._fields.v.value = value
-	}
+	public declare v: number
 
 	public _fields: {
-		v: $.VarRef<number>
+		v: number
 	}
 
 	constructor(init?: Partial<{v?: number}>) {
 		this._fields = {
-			v: $.varRef(init?.v ?? (0 as number))
+			v: init?.v ?? (0 as number)
 		}
 	}
 
 	public clone(): msg {
-		const cloned = new msg()
-		cloned._fields = {
-			v: $.varRef(this._fields.v.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new msg(this))
 	}
 
 	public CloneMessageVT(): protobuf_go_lite.CloneMessage | null {
 		const m: msg | $.VarRef<msg> | null = this
-		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(msg.prototype.CloneVT.call(m), "*main.msg", { kind: $.TypeKind.Pointer, elemType: "main.msg" })
+		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(msg.prototype.CloneVT.call(m), "*main.msg", /* @__PURE__ */ $.pointerType("main.msg"))
 	}
 
 	public CloneVT(): msg | $.VarRef<msg> | null {
@@ -79,10 +70,14 @@ export class msg {
 		return null
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["v"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.msg",
 		() => new msg(),
-		() => [{ name: "CloneMessageVT", args: [], returns: [{ type: "protobuf_go_lite.CloneMessage" }] }, { name: "CloneVT", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.msg" } }] }, { name: "EqualVT", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "MarshalToSizedBufferVT", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }, { name: "MarshalVT", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }, { type: "error" }] }, { name: "Reset", args: [], returns: [] }, { name: "SizeVT", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "UnmarshalVT", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
+		() => [{ name: "CloneMessageVT", args: [], returns: [{ type: "protobuf_go_lite.CloneMessage" }] }, { name: "CloneVT", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.msg") }] }, { name: "EqualVT", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "MarshalToSizedBufferVT", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }, { name: "MarshalVT", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "Reset", args: [], returns: [] }, { name: "SizeVT", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "UnmarshalVT", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
 		msg,
 		() => [{ name: "v", key: "v", type: /* @__PURE__ */ $.basicType("int") }]
 	)
@@ -106,18 +101,18 @@ export function state_String(s: state): string {
 
 export async function main(): globalThis.Promise<void> {
 	let original: msg | $.VarRef<msg> | null = new msg({v: 7})
-	let cloned: msg | $.VarRef<msg> | null = (protobuf_go_lite.CloneVTValue({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Pointer, elemType: "main.msg" }, zero: () => null, methods: {CloneMessageVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloneMessageVT(...$.stripGenericTypeArgs(args)), CloneVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloneVT(...$.stripGenericTypeArgs(args)), EqualVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).EqualVT(...$.stripGenericTypeArgs(args)), MarshalToSizedBufferVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalToSizedBufferVT(...$.stripGenericTypeArgs(args)), MarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalVT(...$.stripGenericTypeArgs(args)), Reset: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Reset(...$.stripGenericTypeArgs(args)), SizeVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).SizeVT(...$.stripGenericTypeArgs(args)), UnmarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalVT(...$.stripGenericTypeArgs(args))} }}, original) as msg | $.VarRef<msg> | null)
+	let cloned: msg | $.VarRef<msg> | null = (protobuf_go_lite.CloneVTValue({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.msg"), zero: () => null, methods: {CloneMessageVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloneMessageVT(...$.stripGenericTypeArgs(args)), CloneVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloneVT(...$.stripGenericTypeArgs(args)), EqualVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).EqualVT(...$.stripGenericTypeArgs(args)), MarshalToSizedBufferVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalToSizedBufferVT(...$.stripGenericTypeArgs(args)), MarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalVT(...$.stripGenericTypeArgs(args)), Reset: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Reset(...$.stripGenericTypeArgs(args)), SizeVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).SizeVT(...$.stripGenericTypeArgs(args)), UnmarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalVT(...$.stripGenericTypeArgs(args))} }}, original) as msg | $.VarRef<msg> | null)
 	await $.println("clone:", !$.pointerEqual(cloned, original), msg.prototype.EqualVT.call(cloned, original))
 	await $.println("clone-slice:", !$.pointerEqual($.arrayIndex(protobuf_go_lite.CloneVTSlice($.arrayToSlice<msg | $.VarRef<msg> | null>([original]))!, 0), original))
 	let enumSlice: $.Slice<state> = $.arrayToSlice<state>([$.int(1, 32), $.int(0, 32)])
 	let clonedEnumSlice: $.Slice<state> = (protobuf_go_lite.CloneSlice(enumSlice) as $.Slice<state>)
 	await $.println("clone-enum-slice:", $.int($.arrayIndex(clonedEnumSlice!, 0), 32), $.int($.arrayIndex(clonedEnumSlice!, 1), 32))
-	await $.println("equal:", protobuf_go_lite.IsEqualVT({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Pointer, elemType: "main.msg" }, zero: () => null, methods: {CloneMessageVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloneMessageVT(...$.stripGenericTypeArgs(args)), CloneVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloneVT(...$.stripGenericTypeArgs(args)), EqualVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).EqualVT(...$.stripGenericTypeArgs(args)), MarshalToSizedBufferVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalToSizedBufferVT(...$.stripGenericTypeArgs(args)), MarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalVT(...$.stripGenericTypeArgs(args)), Reset: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Reset(...$.stripGenericTypeArgs(args)), SizeVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).SizeVT(...$.stripGenericTypeArgs(args)), UnmarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalVT(...$.stripGenericTypeArgs(args))} }}, original, new msg({v: 7})))
+	await $.println("equal:", protobuf_go_lite.IsEqualVT({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.msg"), zero: () => null, methods: {CloneMessageVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloneMessageVT(...$.stripGenericTypeArgs(args)), CloneVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloneVT(...$.stripGenericTypeArgs(args)), EqualVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).EqualVT(...$.stripGenericTypeArgs(args)), MarshalToSizedBufferVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalToSizedBufferVT(...$.stripGenericTypeArgs(args)), MarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalVT(...$.stripGenericTypeArgs(args)), Reset: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Reset(...$.stripGenericTypeArgs(args)), SizeVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).SizeVT(...$.stripGenericTypeArgs(args)), UnmarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalVT(...$.stripGenericTypeArgs(args))} }}, original, new msg({v: 7})))
 	await $.println("equal-slice-implicit:", protobuf_go_lite.EqualVTSliceImplicit($.arrayToSlice<msg | $.VarRef<msg> | null>([null, original]), $.arrayToSlice<msg | $.VarRef<msg> | null>([new msg(), new msg({v: 7})]), $.functionValue((): msg | $.VarRef<msg> | null => {
 		return new msg()
-	}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Pointer, elemType: "main.msg" }] } as $.FunctionTypeInfo))))
+	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.msg")] } as $.FunctionTypeInfo))))
 	let sb: $.VarRef<protobuf_go_lite.TextBuilder> = $.varRef($.markAsStructValue(new strings.Builder()))
-	protobuf_go_lite.TextWriteStringer(sb, $.namedValueInterfaceValue<any>(1, "main.state", {String: (receiver: any, ...args: any[]) => (state_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("int32", "main.state"), [{ name: "String", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }] }]))
+	protobuf_go_lite.TextWriteStringer(sb, $.namedValueInterfaceValue<any>(1, "main.state", {String: (receiver: any, ...args: any[]) => (state_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("int32", "main.state"), [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]))
 	await $.println("stringer:", sb.value.String())
 }
 

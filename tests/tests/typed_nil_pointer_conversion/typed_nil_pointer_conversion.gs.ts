@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class node {
-	public get next(): node | $.VarRef<node> | null {
-		return this._fields.next.value
-	}
-	public set next(value: node | $.VarRef<node> | null) {
-		this._fields.next.value = value
-	}
+	public declare next: node | $.VarRef<node> | null
 
 	public _fields: {
-		next: $.VarRef<node | $.VarRef<node> | null>
+		next: node | $.VarRef<node> | null
 	}
 
 	constructor(init?: Partial<{next?: node | $.VarRef<node> | null}>) {
 		this._fields = {
-			next: $.varRef(init?.next ?? (null! as node | $.VarRef<node> | null))
+			next: init?.next ?? (null! as node | $.VarRef<node> | null)
 		}
 	}
 
 	public clone(): node {
-		const cloned = new node()
-		cloned._fields = {
-			next: $.varRef(this._fields.next.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new node(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["next"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -34,7 +29,7 @@ export class node {
 		() => new node(),
 		() => [],
 		node,
-		() => [{ name: "next", key: "next", type: { kind: $.TypeKind.Pointer, elemType: "main.node" } }]
+		() => [{ name: "next", key: "next", type: /* @__PURE__ */ $.pointerType("main.node") }]
 	)
 }
 
@@ -50,8 +45,8 @@ export async function main(): globalThis.Promise<void> {
 	let cloned: node | $.VarRef<node> | null = clone(n)
 	await $.println(cloned == null)
 
-	let boxed: any = $.interfaceValue(null, "*main.node", { kind: $.TypeKind.Pointer, elemType: "main.node" })
-	let [, ok] = $.typeAssertTuple<node | $.VarRef<node> | null>(boxed, { kind: $.TypeKind.Pointer, elemType: "main.node" })
+	let boxed: any = $.interfaceValue(null, "*main.node", /* @__PURE__ */ $.pointerType("main.node"))
+	let [, ok] = $.typeAssertTuple<node | $.VarRef<node> | null>(boxed, /* @__PURE__ */ $.pointerType("main.node"))
 	await $.println(boxed == null, ok)
 }
 

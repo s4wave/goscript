@@ -6,39 +6,28 @@ import * as $ from "@goscript/builtin/index.js"
 export async function main(): globalThis.Promise<void> {
 	let run: (() => void) | null = $.functionValue(async (): globalThis.Promise<void> => {
 		class item {
-			public get name(): string {
-				return this._fields.name.value
-			}
-			public set name(value: string) {
-				this._fields.name.value = value
-			}
+			public declare name: string
 
-			public get count(): number {
-				return this._fields.count.value
-			}
-			public set count(value: number) {
-				this._fields.count.value = value
-			}
+			public declare count: number
 
 			public _fields: {
-				name: $.VarRef<string>
-				count: $.VarRef<number>
+				name: string
+				count: number
 			}
 
 			constructor(init?: Partial<{name?: string, count?: number}>) {
 				this._fields = {
-					name: $.varRef(init?.name ?? ("" as string)),
-					count: $.varRef(init?.count ?? (0 as number))
+					name: init?.name ?? ("" as string),
+					count: init?.count ?? (0 as number)
 				}
 			}
 
 			public clone(): item {
-				const cloned = new item()
-				cloned._fields = {
-					name: $.varRef(this._fields.name.value),
-					count: $.varRef(this._fields.count.value)
-				}
-				return $.markAsStructValue(cloned)
+				return $.markAsStructValue(new item(this))
+			}
+
+			static {
+				$.bindStructFields(this.prototype, ["name", "count"])
 			}
 
 			static __typeInfo = $.registerStructType(

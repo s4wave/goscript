@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class code {
-	public get len(): number {
-		return this._fields.len.value
-	}
-	public set len(value: number) {
-		this._fields.len.value = value
-	}
+	public declare len: number
 
 	public _fields: {
-		len: $.VarRef<number>
+		len: number
 	}
 
 	constructor(init?: Partial<{len?: number}>) {
 		this._fields = {
-			len: $.varRef(init?.len ?? (0 as number))
+			len: init?.len ?? (0 as number)
 		}
 	}
 
 	public clone(): code {
-		const cloned = new code()
-		cloned._fields = {
-			len: $.varRef(this._fields.len.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new code(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["len"])
 	}
 
 	static __typeInfo = $.registerStructType(

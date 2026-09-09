@@ -21,39 +21,24 @@ $.registerInterfaceType(
 );
 
 export class Action {
-	public get Result(): number {
-		return this._fields.Result.value
-	}
-	public set Result(value: number) {
-		this._fields.Result.value = value
-	}
+	public declare Result: number
 
-	public get Filter(): globalThis.Map<number, dep.Ref | null> | null {
-		return this._fields.Filter.value
-	}
-	public set Filter(value: globalThis.Map<number, dep.Ref | null> | null) {
-		this._fields.Filter.value = value
-	}
+	public declare Filter: globalThis.Map<number, dep.Ref | null> | null
 
 	public _fields: {
-		Result: $.VarRef<number>
-		Filter: $.VarRef<globalThis.Map<number, dep.Ref | null> | null>
+		Result: number
+		Filter: globalThis.Map<number, dep.Ref | null> | null
 	}
 
 	constructor(init?: Partial<{Result?: number, Filter?: globalThis.Map<number, dep.Ref | null> | null}>) {
 		this._fields = {
-			Result: $.varRef(init?.Result ?? (0 as number)),
-			Filter: $.varRef(init?.Filter ?? (null! as globalThis.Map<number, dep.Ref | null> | null))
+			Result: init?.Result ?? (0 as number),
+			Filter: init?.Filter ?? (null! as globalThis.Map<number, dep.Ref | null> | null)
 		}
 	}
 
 	public clone(): Action {
-		const cloned = new Action()
-		cloned._fields = {
-			Result: $.varRef(this._fields.Result.value),
-			Filter: $.varRef(this._fields.Filter.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Action(this))
 	}
 
 	public Mark(): boolean {
@@ -69,17 +54,21 @@ export class Action {
 		$.mapSet($.pointerValue<Action>(a).Filter, k, v)
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["Result", "Filter"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Action",
 		() => new Action(),
 		() => [{ name: "Mark", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "SetFilter", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
 		Action,
-		() => [{ name: "Result", key: "Result", type: /* @__PURE__ */ $.basicType("int") }, { name: "Filter", key: "Filter", type: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("int"), elemType: "dep.Ref" } }]
+		() => [{ name: "Result", key: "Result", type: /* @__PURE__ */ $.basicType("int") }, { name: "Filter", key: "Filter", type: /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("int"), "dep.Ref") }]
 	)
 }
 
 export function value_Key(v: value): any {
-	return $.namedValueInterfaceValue<any>(v, "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [{ name: "Key", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }])
+	return $.namedValueInterfaceValue<any>(v, "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])])
 }
 
 export function Fixed_Mark(f: Fixed): boolean {
@@ -87,17 +76,17 @@ export function Fixed_Mark(f: Fixed): boolean {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let shapes: $.Slice<Shape | null> = $.arrayToSlice<Shape | null>([$.namedValueInterfaceValue<Shape | null>($.arrayToSlice<dep.Ref | null>([$.namedValueInterfaceValue<dep.Ref | null>(new Uint8Array([1, 2]), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [{ name: "Key", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }])]), "main.Fixed", {Mark: (receiver: any, ...args: any[]) => (Fixed_Mark as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Slice, typeName: "main.Fixed", elemType: "dep.Ref" }, [{ name: "Mark", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("bool") }] }]), $.interfaceValue<Shape | null>($.markAsStructValue(new Action({Result: 1, Filter: $.makeMap<number, dep.Ref | null>([[1, $.namedValueInterfaceValue<dep.Ref | null>(new Uint8Array([1, 2]), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [{ name: "Key", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }])]])})), "main.Action", "main.Action")])
+	let shapes: $.Slice<Shape | null> = $.arrayToSlice<Shape | null>([$.namedValueInterfaceValue<Shape | null>($.arrayToSlice<dep.Ref | null>([$.namedValueInterfaceValue<dep.Ref | null>(new Uint8Array([1, 2]), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])])]), "main.Fixed", {Mark: (receiver: any, ...args: any[]) => (Fixed_Mark as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType("dep.Ref", "main.Fixed"), [$.methodSignature("Mark", [], [/* @__PURE__ */ $.basicType("bool")])]), $.interfaceValue<Shape | null>($.markAsStructValue(new Action({Result: 1, Filter: $.makeMap<number, dep.Ref | null>([[1, $.namedValueInterfaceValue<dep.Ref | null>(new Uint8Array([1, 2]), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])])]])})), "main.Action", "main.Action")])
 	let fixed: $.Slice<Fixed> = null! as $.Slice<Fixed>
 	for (let __goscriptRangeTarget0 = shapes, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let shape = __goscriptRangeTarget0![__rangeIndex]
 		{
 			const __goscriptTypeSwitchValue = shape
 			switch (true) {
-				case $.typeAssert<Fixed>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Slice, typeName: "main.Fixed", elemType: "dep.Ref" }).ok:
+				case $.typeAssert<Fixed>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType("dep.Ref", "main.Fixed")).ok:
 					{
-						let shape: Fixed = $.typeAssert<Fixed>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Slice, typeName: "main.Fixed", elemType: "dep.Ref" }).value
-						shape = ($.append((shape as Fixed), $.namedValueInterfaceValue<dep.Ref | null>(new Uint8Array([3, 4]), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [{ name: "Key", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Interface, methods: [] } }] }]), $.appendZeros.nil) as Fixed)
+						let shape: Fixed = $.typeAssert<Fixed>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType("dep.Ref", "main.Fixed")).value
+						shape = ($.append((shape as Fixed), $.namedValueInterfaceValue<dep.Ref | null>(new Uint8Array([3, 4]), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])]), $.appendZeros.nil) as Fixed)
 						fixed = $.append(fixed, (shape as Fixed), $.appendZeros.nil)
 					}
 					break

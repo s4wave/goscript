@@ -4,49 +4,32 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class MyStruct {
-	public get MyInt(): number {
-		return this._fields.MyInt.value
-	}
-	public set MyInt(value: number) {
-		this._fields.MyInt.value = value
-	}
+	public declare MyInt: number
 
-	public get MyString(): string {
-		return this._fields.MyString.value
-	}
-	public set MyString(value: string) {
-		this._fields.MyString.value = value
-	}
+	public declare MyString: string
 
-	public get myBool(): boolean {
-		return this._fields.myBool.value
-	}
-	public set myBool(value: boolean) {
-		this._fields.myBool.value = value
-	}
+	public declare myBool: boolean
 
 	public _fields: {
-		MyInt: $.VarRef<number>
-		MyString: $.VarRef<string>
-		myBool: $.VarRef<boolean>
+		MyInt: number
+		MyString: string
+		myBool: boolean
 	}
 
 	constructor(init?: Partial<{MyInt?: number, MyString?: string, myBool?: boolean}>) {
 		this._fields = {
-			MyInt: $.varRef(init?.MyInt ?? (0 as number)),
-			MyString: $.varRef(init?.MyString ?? ("" as string)),
-			myBool: $.varRef(init?.myBool ?? (false as boolean))
+			MyInt: init?.MyInt ?? (0 as number),
+			MyString: init?.MyString ?? ("" as string),
+			myBool: init?.myBool ?? (false as boolean)
 		}
 	}
 
 	public clone(): MyStruct {
-		const cloned = new MyStruct()
-		cloned._fields = {
-			MyInt: $.varRef(this._fields.MyInt.value),
-			MyString: $.varRef(this._fields.MyString.value),
-			myBool: $.varRef(this._fields.myBool.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyStruct(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["MyInt", "MyString", "myBool"])
 	}
 
 	static __typeInfo = $.registerStructType(

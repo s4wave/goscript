@@ -9,7 +9,7 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/import_unexported_infer
 export let closed: dep.hiddenError = $.markAsStructValue($.cloneStructValue($.pointerValue<dep.hiddenError>(dep.ErrClosed)))
 
 export function __goscript_set_closed(__goscriptValue: dep.hiddenError): void {
-	closed = __goscriptValue
+	$.assignStruct(closed, __goscriptValue)
 }
 
 export async function main(): globalThis.Promise<void> {

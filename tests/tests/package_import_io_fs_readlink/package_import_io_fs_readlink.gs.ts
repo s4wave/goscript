@@ -16,10 +16,7 @@ export class emptyFS {
 	}
 
 	public clone(): emptyFS {
-		const cloned = new emptyFS()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new emptyFS(this))
 	}
 
 	public Open(name: string): [fs.File | null, $.GoError] {
@@ -45,10 +42,7 @@ export class linkFS {
 	}
 
 	public clone(): linkFS {
-		const cloned = new linkFS()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new linkFS(this))
 	}
 
 	public Lstat(name: string): [fs.FileInfo | null, $.GoError] {

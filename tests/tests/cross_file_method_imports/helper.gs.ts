@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class helperState {
-	public get text(): string {
-		return this._fields.text.value
-	}
-	public set text(value: string) {
-		this._fields.text.value = value
-	}
+	public declare text: string
 
 	public _fields: {
-		text: $.VarRef<string>
+		text: string
 	}
 
 	constructor(init?: Partial<{text?: string}>) {
 		this._fields = {
-			text: $.varRef(init?.text ?? ("" as string))
+			text: init?.text ?? ("" as string)
 		}
 	}
 
 	public clone(): helperState {
-		const cloned = new helperState()
-		cloned._fields = {
-			text: $.varRef(this._fields.text.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new helperState(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["text"])
 	}
 
 	static __typeInfo = $.registerStructType(

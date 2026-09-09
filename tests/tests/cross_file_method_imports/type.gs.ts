@@ -13,35 +13,30 @@ import "./helper.gs.ts"
 import "./method.gs.ts"
 
 export class label {
-	public get value(): string {
-		return this._fields.value.value
-	}
-	public set value(value: string) {
-		this._fields.value.value = value
-	}
+	public declare value: string
 
 	public _fields: {
-		value: $.VarRef<string>
+		value: string
 	}
 
 	constructor(init?: Partial<{value?: string}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? ("" as string))
+			value: init?.value ?? ("" as string)
 		}
 	}
 
 	public clone(): label {
-		const cloned = new label()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new label(this))
 	}
 
 	public Format(): string {
 		const l = this
 		let state: __goscript_helper.helperState | $.VarRef<__goscript_helper.helperState> | null = __goscript_helper.newHelperState()
 		return strings.ToUpper(l.value) + $.pointerValue<__goscript_helper.helperState>(state).text
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(

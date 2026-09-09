@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Match {
-	public get Size(): number {
-		return this._fields.Size.value
-	}
-	public set Size(value: number) {
-		this._fields.Size.value = value
-	}
+	public declare Size: number
 
 	public _fields: {
-		Size: $.VarRef<number>
+		Size: number
 	}
 
 	constructor(init?: Partial<{Size?: number}>) {
 		this._fields = {
-			Size: $.varRef(init?.Size ?? (0 as number))
+			Size: init?.Size ?? (0 as number)
 		}
 	}
 
 	public clone(): Match {
-		const cloned = new Match()
-		cloned._fields = {
-			Size: $.varRef(this._fields.Size.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Match(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Size"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -39,29 +34,20 @@ export class Match {
 }
 
 export class Matcher {
-	public get matches(): $.Slice<Match> {
-		return this._fields.matches.value
-	}
-	public set matches(value: $.Slice<Match>) {
-		this._fields.matches.value = value
-	}
+	public declare matches: $.Slice<Match>
 
 	public _fields: {
-		matches: $.VarRef<$.Slice<Match>>
+		matches: $.Slice<Match>
 	}
 
 	constructor(init?: Partial<{matches?: $.Slice<Match>}>) {
 		this._fields = {
-			matches: $.varRef(init?.matches ?? (null! as $.Slice<Match>))
+			matches: init?.matches ?? (null! as $.Slice<Match>)
 		}
 	}
 
 	public clone(): Matcher {
-		const cloned = new Matcher()
-		cloned._fields = {
-			matches: $.varRef(this._fields.matches.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Matcher(this))
 	}
 
 	public Blocks(): $.Slice<Match> {
@@ -79,12 +65,16 @@ export class Matcher {
 		return total
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["matches"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Matcher",
 		() => new Matcher(),
-		() => [{ name: "Blocks", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: "main.Match" } }] }, { name: "Total", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "Blocks", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType("main.Match") }] }, { name: "Total", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		Matcher,
-		() => [{ name: "matches", key: "matches", type: { kind: $.TypeKind.Slice, elemType: "main.Match" } }]
+		() => [{ name: "matches", key: "matches", type: /* @__PURE__ */ $.sliceType("main.Match") }]
 	)
 }
 

@@ -22,10 +22,7 @@ export class source {
 	}
 
 	public clone(): source {
-		const cloned = new source()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new source(this))
 	}
 
 	public Val(): __goscript_alias.Value {
@@ -35,7 +32,7 @@ export class source {
 	static __typeInfo = $.registerStructType(
 		"main.source",
 		() => new source(),
-		() => [{ name: "Val", args: [], returns: [{ type: { kind: $.TypeKind.Slice, typeName: "subpkg.Value", elemType: /* @__PURE__ */ $.basicType("uint8") } }] }],
+		() => [{ name: "Val", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "subpkg.Value") }] }],
 		source,
 		() => []
 	)

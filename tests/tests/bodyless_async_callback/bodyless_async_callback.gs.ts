@@ -9,29 +9,20 @@ import "@goscript/unsafe/index.js"
 import "@goscript/sync/index.js"
 
 export class Setting {
-	public get once(): sync.Once {
-		return this._fields.once.value
-	}
-	public set once(value: sync.Once) {
-		this._fields.once.value = value
-	}
+	public declare once: sync.Once
 
 	public _fields: {
-		once: $.VarRef<sync.Once>
+		once: sync.Once
 	}
 
 	constructor(init?: Partial<{once?: sync.Once}>) {
 		this._fields = {
-			once: $.varRef(init?.once ? $.markAsStructValue($.cloneStructValue(init.once)) : $.markAsStructValue(new sync.Once()))
+			once: init?.once ? $.markAsStructValue($.cloneStructValue(init.once)) : $.markAsStructValue(new sync.Once())
 		}
 	}
 
 	public clone(): Setting {
-		const cloned = new Setting()
-		cloned._fields = {
-			once: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.once.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Setting(this))
 	}
 
 	public async Value(): globalThis.Promise<string> {
@@ -39,6 +30,10 @@ export class Setting {
 		await $.pointerValue<Setting>(s).once.Do($.functionValue((): void => {
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 		return ""
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["once"])
 	}
 
 	static __typeInfo = $.registerStructType(

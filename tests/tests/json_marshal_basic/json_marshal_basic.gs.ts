@@ -7,49 +7,32 @@ import * as json from "@goscript/encoding/json/index.js"
 import "@goscript/encoding/json/index.js"
 
 export class Person {
-	public get Name(): string {
-		return this._fields.Name.value
-	}
-	public set Name(value: string) {
-		this._fields.Name.value = value
-	}
+	public declare Name: string
 
-	public get Age(): number {
-		return this._fields.Age.value
-	}
-	public set Age(value: number) {
-		this._fields.Age.value = value
-	}
+	public declare Age: number
 
-	public get Active(): boolean {
-		return this._fields.Active.value
-	}
-	public set Active(value: boolean) {
-		this._fields.Active.value = value
-	}
+	public declare Active: boolean
 
 	public _fields: {
-		Name: $.VarRef<string>
-		Age: $.VarRef<number>
-		Active: $.VarRef<boolean>
+		Name: string
+		Age: number
+		Active: boolean
 	}
 
 	constructor(init?: Partial<{Name?: string, Age?: number, Active?: boolean}>) {
 		this._fields = {
-			Name: $.varRef(init?.Name ?? ("" as string)),
-			Age: $.varRef(init?.Age ?? (0 as number)),
-			Active: $.varRef(init?.Active ?? (false as boolean))
+			Name: init?.Name ?? ("" as string),
+			Age: init?.Age ?? (0 as number),
+			Active: init?.Active ?? (false as boolean)
 		}
 	}
 
 	public clone(): Person {
-		const cloned = new Person()
-		cloned._fields = {
-			Name: $.varRef(this._fields.Name.value),
-			Age: $.varRef(this._fields.Age.value),
-			Active: $.varRef(this._fields.Active.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Person(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Name", "Age", "Active"])
 	}
 
 	static __typeInfo = $.registerStructType(

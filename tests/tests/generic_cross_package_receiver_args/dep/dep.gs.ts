@@ -14,34 +14,29 @@ $.registerInterfaceType(
 );
 
 export class Impl {
-	public get Item(): any {
-		return this._fields.Item.value
-	}
-	public set Item(value: any) {
-		this._fields.Item.value = value
-	}
+	public declare Item: any
 
 	public _fields: {
-		Item: $.VarRef<any>
+		Item: any
 	}
 
 	constructor(init?: Partial<{Item?: any}>) {
 		this._fields = {
-			Item: $.varRef(init?.Item ?? (null! as any))
+			Item: init?.Item ?? (null! as any)
 		}
 	}
 
 	public clone(): Impl {
-		const cloned = new Impl()
-		cloned._fields = {
-			Item: $.varRef(this._fields.Item.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Impl(this))
 	}
 
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const i: Impl | $.VarRef<Impl> | null = this
 		return $.pointerValue<Impl>(i).Item
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Item"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -63,10 +58,7 @@ export class Keyed {
 	}
 
 	public clone(): Keyed {
-		const cloned = new Keyed()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Keyed(this))
 	}
 
 	public SetValues(__typeArgs: $.GenericTypeArgs | undefined, value: any): any {
@@ -85,33 +77,28 @@ export class Keyed {
 }
 
 export class Wrapper {
-	public get Keyed(): Keyed | $.VarRef<Keyed> | null {
-		return this._fields.Keyed.value
-	}
-	public set Keyed(value: Keyed | $.VarRef<Keyed> | null) {
-		this._fields.Keyed.value = value
-	}
+	public declare Keyed: Keyed | $.VarRef<Keyed> | null
 
 	public _fields: {
-		Keyed: $.VarRef<Keyed | $.VarRef<Keyed> | null>
+		Keyed: Keyed | $.VarRef<Keyed> | null
 	}
 
 	constructor(init?: Partial<{Keyed?: Keyed | $.VarRef<Keyed> | null}>) {
 		this._fields = {
-			Keyed: $.varRef(init?.Keyed ?? (null! as Keyed | $.VarRef<Keyed> | null))
+			Keyed: init?.Keyed ?? (null! as Keyed | $.VarRef<Keyed> | null)
 		}
 	}
 
 	public clone(): Wrapper {
-		const cloned = new Wrapper()
-		cloned._fields = {
-			Keyed: $.varRef(this._fields.Keyed.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Wrapper(this))
 	}
 
 	public SetValues(__typeArgs: $.GenericTypeArgs | undefined, value: any): any {
 		return $.pointerValue<Keyed>(this.Keyed).SetValues({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }, U: __typeArgs?.["U"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, value)
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Keyed"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -119,6 +106,6 @@ export class Wrapper {
 		() => new Wrapper(),
 		() => [{ name: "SetValues", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }],
 		Wrapper,
-		() => [{ name: "Keyed", key: "Keyed", type: { kind: $.TypeKind.Pointer, elemType: "dep.Keyed" }, anonymous: true }]
+		() => [{ name: "Keyed", key: "Keyed", type: /* @__PURE__ */ $.pointerType("dep.Keyed"), anonymous: true }]
 	)
 }

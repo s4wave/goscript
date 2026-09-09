@@ -4,39 +4,28 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class node {
-	public get sub(): $.Slice<node | $.VarRef<node> | null> {
-		return this._fields.sub.value
-	}
-	public set sub(value: $.Slice<node | $.VarRef<node> | null>) {
-		this._fields.sub.value = value
-	}
+	public declare sub: $.Slice<node | $.VarRef<node> | null>
 
-	public get sub0(): (node | $.VarRef<node> | null)[] {
-		return this._fields.sub0.value
-	}
-	public set sub0(value: (node | $.VarRef<node> | null)[]) {
-		this._fields.sub0.value = value
-	}
+	public declare sub0: (node | $.VarRef<node> | null)[]
 
 	public _fields: {
-		sub: $.VarRef<$.Slice<node | $.VarRef<node> | null>>
-		sub0: $.VarRef<(node | $.VarRef<node> | null)[]>
+		sub: $.Slice<node | $.VarRef<node> | null>
+		sub0: (node | $.VarRef<node> | null)[]
 	}
 
 	constructor(init?: Partial<{sub?: $.Slice<node | $.VarRef<node> | null>, sub0?: (node | $.VarRef<node> | null)[]}>) {
 		this._fields = {
-			sub: $.varRef(init?.sub ?? (null! as $.Slice<node | $.VarRef<node> | null>)),
-			sub0: $.varRef(init?.sub0 !== undefined ? $.cloneArrayValue(init.sub0, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Pointer, elemType: "main.node" }, length: 1 }) : Array.from({ length: 1 }, () => null))
+			sub: init?.sub ?? (null! as $.Slice<node | $.VarRef<node> | null>),
+			sub0: init?.sub0 !== undefined ? $.cloneArrayValue(init.sub0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.node"), 1)) : Array.from({ length: 1 }, () => null)
 		}
 	}
 
 	public clone(): node {
-		const cloned = new node()
-		cloned._fields = {
-			sub: $.varRef(this._fields.sub.value),
-			sub0: $.varRef($.cloneArrayValue(this._fields.sub0.value, { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Pointer, elemType: "main.node" }, length: 1 }))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new node(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["sub", "sub0"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -44,7 +33,7 @@ export class node {
 		() => new node(),
 		() => [],
 		node,
-		() => [{ name: "sub", key: "sub", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Pointer, elemType: "main.node" } } }, { name: "sub0", key: "sub0", type: { kind: $.TypeKind.Array, elemType: { kind: $.TypeKind.Pointer, elemType: "main.node" }, length: 1 } }]
+		() => [{ name: "sub", key: "sub", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.node")) }, { name: "sub0", key: "sub0", type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.node"), 1) }]
 	)
 }
 

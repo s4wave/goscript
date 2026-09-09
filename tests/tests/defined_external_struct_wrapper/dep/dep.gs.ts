@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class hidden {
-	public get label(): string {
-		return this._fields.label.value
-	}
-	public set label(value: string) {
-		this._fields.label.value = value
-	}
+	public declare label: string
 
 	public _fields: {
-		label: $.VarRef<string>
+		label: string
 	}
 
 	constructor(init?: Partial<{label?: string}>) {
 		this._fields = {
-			label: $.varRef(init?.label ?? ("" as string))
+			label: init?.label ?? ("" as string)
 		}
 	}
 
 	public clone(): hidden {
-		const cloned = new hidden()
-		cloned._fields = {
-			label: $.varRef(this._fields.label.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new hidden(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["label"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -39,44 +34,33 @@ export class hidden {
 }
 
 export class Public {
-	public get Value(): string {
-		return this._fields.Value.value
-	}
-	public set Value(value: string) {
-		this._fields.Value.value = value
-	}
+	public declare Value: string
 
-	public get Hidden(): hidden {
-		return this._fields.Hidden.value
-	}
-	public set Hidden(value: hidden) {
-		this._fields.Hidden.value = value
-	}
+	public declare Hidden: hidden
 
 	public _fields: {
-		Value: $.VarRef<string>
-		Hidden: $.VarRef<hidden>
+		Value: string
+		Hidden: hidden
 	}
 
 	constructor(init?: Partial<{Value?: string, Hidden?: hidden}>) {
 		this._fields = {
-			Value: $.varRef(init?.Value ?? ("" as string)),
-			Hidden: $.varRef(init?.Hidden ? $.markAsStructValue($.cloneStructValue(init.Hidden)) : $.markAsStructValue(new hidden()))
+			Value: init?.Value ?? ("" as string),
+			Hidden: init?.Hidden ? $.markAsStructValue($.cloneStructValue(init.Hidden)) : $.markAsStructValue(new hidden())
 		}
 	}
 
 	public clone(): Public {
-		const cloned = new Public()
-		cloned._fields = {
-			Value: $.varRef(this._fields.Value.value),
-			Hidden: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.Hidden.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Public(this))
 	}
 
 	public Label(): string {
 		const p: Public | $.VarRef<Public> | null = this
 		return $.pointerValue<Public>(p).Value
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Value", "Hidden"])
 	}
 
 	static __typeInfo = $.registerStructType(

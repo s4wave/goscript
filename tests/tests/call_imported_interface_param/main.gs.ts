@@ -9,29 +9,20 @@ import * as __goscript_sink from "./sink.gs.ts"
 import "./sink.gs.ts"
 
 export class Buffer {
-	public get data(): $.Slice<number> {
-		return this._fields.data.value
-	}
-	public set data(value: $.Slice<number>) {
-		this._fields.data.value = value
-	}
+	public declare data: $.Slice<number>
 
 	public _fields: {
-		data: $.VarRef<$.Slice<number>>
+		data: $.Slice<number>
 	}
 
 	constructor(init?: Partial<{data?: $.Slice<number>}>) {
 		this._fields = {
-			data: $.varRef(init?.data ?? (null! as $.Slice<number>))
+			data: init?.data ?? (null! as $.Slice<number>)
 		}
 	}
 
 	public clone(): Buffer {
-		const cloned = new Buffer()
-		cloned._fields = {
-			data: $.varRef(this._fields.data.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Buffer(this))
 	}
 
 	public Write(p: $.Slice<number>): [number, $.GoError] {
@@ -40,18 +31,22 @@ export class Buffer {
 		return [$.len(p), null]
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["data"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Buffer",
 		() => new Buffer(),
 		() => [{ name: "Write", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
 		Buffer,
-		() => [{ name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }]
+		() => [{ name: "data", key: "data", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }]
 	)
 }
 
 export async function main(): globalThis.Promise<void> {
 	let b: $.VarRef<Buffer> = $.varRef($.markAsStructValue(new Buffer()))
-	await __goscript_sink.Use($.interfaceValue<subpkg.Writer | null>(b, "*main.Buffer", { kind: $.TypeKind.Pointer, elemType: "main.Buffer" }))
+	await __goscript_sink.Use($.interfaceValue<subpkg.Writer | null>(b, "*main.Buffer", /* @__PURE__ */ $.pointerType("main.Buffer")))
 	await $.println($.bytesToString(b.value.data))
 }
 

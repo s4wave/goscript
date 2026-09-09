@@ -14,34 +14,29 @@ $.registerInterfaceType(
 );
 
 export class Table {
-	public get name(): string {
-		return this._fields.name.value
-	}
-	public set name(value: string) {
-		this._fields.name.value = value
-	}
+	public declare name: string
 
 	public _fields: {
-		name: $.VarRef<string>
+		name: string
 	}
 
 	constructor(init?: Partial<{name?: string}>) {
 		this._fields = {
-			name: $.varRef(init?.name ?? ("" as string))
+			name: init?.name ?? ("" as string)
 		}
 	}
 
 	public clone(): Table {
-		const cloned = new Table()
-		cloned._fields = {
-			name: $.varRef(this._fields.name.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Table(this))
 	}
 
 	public Key(): string {
 		const t: Table | $.VarRef<Table> | null = this
 		return $.pointerValue<Table>(t).name
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["name"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -54,14 +49,14 @@ export class Table {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let node: Node | null = $.interfaceValue<Node | null>(new Table({name: "users"}), "*main.Table", { kind: $.TypeKind.Pointer, elemType: "main.Table" })
+	let node: Node | null = $.interfaceValue<Node | null>(new Table({name: "users"}), "*main.Table", /* @__PURE__ */ $.pointerType("main.Table"))
 	let seen: globalThis.Map<Node | null, boolean> | null = $.makeMap<Node | null, boolean>([[node, true]])
 	{
-		let __goscriptTuple0: any = $.typeAssertTuple<Table | $.VarRef<Table> | null>(node, { kind: $.TypeKind.Pointer, elemType: "main.Table" })
+		let __goscriptTuple0: any = $.typeAssertTuple<Table | $.VarRef<Table> | null>(node, /* @__PURE__ */ $.pointerType("main.Table"))
 		let table: Table | $.VarRef<Table> | null = __goscriptTuple0[0]
 		let ok = __goscriptTuple0[1]
 		if (ok) {
-			let [value, found] = $.mapGet<Node | null, boolean, boolean>(seen, $.interfaceValue<Node | null>(table, "*main.Table", { kind: $.TypeKind.Pointer, elemType: "main.Table" }), false)
+			let [value, found] = $.mapGet<Node | null, boolean, boolean>(seen, $.interfaceValue<Node | null>(table, "*main.Table", /* @__PURE__ */ $.pointerType("main.Table")), false)
 			await $.println(value, found)
 		}
 	}

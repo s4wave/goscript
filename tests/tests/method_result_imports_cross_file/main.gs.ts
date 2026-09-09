@@ -22,10 +22,7 @@ export class Holder {
 	}
 
 	public clone(): Holder {
-		const cloned = new Holder()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Holder(this))
 	}
 
 	public async Run(): globalThis.Promise<void> {

@@ -16,10 +16,7 @@ export class Server {
 	}
 
 	public clone(): Server {
-		const cloned = new Server()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Server(this))
 	}
 
 	public async Handle(rwc: io.ReadWriteCloser | null): globalThis.Promise<void> {

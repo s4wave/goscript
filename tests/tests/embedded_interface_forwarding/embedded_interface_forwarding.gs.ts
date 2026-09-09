@@ -14,33 +14,28 @@ $.registerInterfaceType(
 );
 
 export class Box {
-	public get Adder(): Adder | null {
-		return this._fields.Adder.value
-	}
-	public set Adder(value: Adder | null) {
-		this._fields.Adder.value = value
-	}
+	public declare Adder: Adder | null
 
 	public _fields: {
-		Adder: $.VarRef<Adder | null>
+		Adder: Adder | null
 	}
 
 	constructor(init?: Partial<{Adder?: Adder | null}>) {
 		this._fields = {
-			Adder: $.varRef(init?.Adder ?? (null! as Adder | null))
+			Adder: init?.Adder ?? (null! as Adder | null)
 		}
 	}
 
 	public clone(): Box {
-		const cloned = new Box()
-		cloned._fields = {
-			Adder: $.varRef(this._fields.Adder.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Box(this))
 	}
 
 	public Add(value: any): any {
 		return $.pointerValue<Exclude<Adder | null, null>>(this.Adder).Add(value)
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Adder"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -53,34 +48,29 @@ export class Box {
 }
 
 export class Counter {
-	public get base(): number {
-		return this._fields.base.value
-	}
-	public set base(value: number) {
-		this._fields.base.value = value
-	}
+	public declare base: number
 
 	public _fields: {
-		base: $.VarRef<number>
+		base: number
 	}
 
 	constructor(init?: Partial<{base?: number}>) {
 		this._fields = {
-			base: $.varRef(init?.base ?? (0 as number))
+			base: init?.base ?? (0 as number)
 		}
 	}
 
 	public clone(): Counter {
-		const cloned = new Counter()
-		cloned._fields = {
-			base: $.varRef(this._fields.base.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Counter(this))
 	}
 
 	public Add(value: number): number {
 		const c: Counter | $.VarRef<Counter> | null = this
 		return $.pointerValue<Counter>(c).base + value
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["base"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -97,9 +87,9 @@ export async function call(adder: Adder | null): globalThis.Promise<number> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let box: Box | $.VarRef<Box> | null = new Box({Adder: $.interfaceValue<Adder | null>(new Counter({base: 3}), "*main.Counter", { kind: $.TypeKind.Pointer, elemType: "main.Counter" })})
+	let box: Box | $.VarRef<Box> | null = new Box({Adder: $.interfaceValue<Adder | null>(new Counter({base: 3}), "*main.Counter", /* @__PURE__ */ $.pointerType("main.Counter"))})
 	await $.println($.pointerValue<Exclude<Adder, null>>($.pointerValue<Box>(box).Adder).Add(5))
-	await $.println(await call($.interfaceValue<Adder | null>(box, "*main.Box", { kind: $.TypeKind.Pointer, elemType: "main.Box" })))
+	await $.println(await call($.interfaceValue<Adder | null>(box, "*main.Box", /* @__PURE__ */ $.pointerType("main.Box"))))
 }
 
 if ($.isMainScript(import.meta)) {

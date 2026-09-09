@@ -6,39 +6,24 @@ import * as $ from "@goscript/builtin/index.js"
 export type Hash = ObjectID
 
 export class ObjectID {
-	public get hash(): Uint8Array {
-		return this._fields.hash.value
-	}
-	public set hash(value: Uint8Array) {
-		this._fields.hash.value = value
-	}
+	public declare hash: Uint8Array
 
-	public get format(): number {
-		return this._fields.format.value
-	}
-	public set format(value: number) {
-		this._fields.format.value = value
-	}
+	public declare format: number
 
 	public _fields: {
-		hash: $.VarRef<Uint8Array>
-		format: $.VarRef<number>
+		hash: Uint8Array
+		format: number
 	}
 
 	constructor(init?: Partial<{hash?: Uint8Array, format?: number}>) {
 		this._fields = {
-			hash: $.varRef(init?.hash !== undefined ? $.cloneArrayValue(init.hash, { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("uint8"), length: 4 }) : new Uint8Array(4)),
-			format: $.varRef(init?.format ?? (0 as number))
+			hash: init?.hash !== undefined ? $.cloneArrayValue(init.hash, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)) : new Uint8Array(4),
+			format: init?.format ?? (0 as number)
 		}
 	}
 
 	public clone(): ObjectID {
-		const cloned = new ObjectID()
-		cloned._fields = {
-			hash: $.varRef($.cloneArrayValue(this._fields.hash.value, { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("uint8"), length: 4 })),
-			format: $.varRef(this._fields.format.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new ObjectID(this))
 	}
 
 	public IsZero(): boolean {
@@ -51,12 +36,16 @@ export class ObjectID {
 		return !$.comparableEqual(s, $.markAsStructValue(new ObjectID()))
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["hash", "format"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.ObjectID",
 		() => new ObjectID(),
 		() => [{ name: "IsZero", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Valid", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }],
 		ObjectID,
-		() => [{ name: "hash", key: "hash", type: { kind: $.TypeKind.Array, elemType: /* @__PURE__ */ $.basicType("uint8"), length: 4 } }, { name: "format", key: "format", type: /* @__PURE__ */ $.basicType("uint8") }]
+		() => [{ name: "hash", key: "hash", type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4) }, { name: "format", key: "format", type: /* @__PURE__ */ $.basicType("uint8") }]
 	)
 }
 

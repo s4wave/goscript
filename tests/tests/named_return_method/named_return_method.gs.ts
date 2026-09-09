@@ -4,29 +4,20 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class content {
-	public get bytes(): $.Slice<number> {
-		return this._fields.bytes.value
-	}
-	public set bytes(value: $.Slice<number>) {
-		this._fields.bytes.value = value
-	}
+	public declare bytes: $.Slice<number>
 
 	public _fields: {
-		bytes: $.VarRef<$.Slice<number>>
+		bytes: $.Slice<number>
 	}
 
 	constructor(init?: Partial<{bytes?: $.Slice<number>}>) {
 		this._fields = {
-			bytes: $.varRef(init?.bytes ?? (null! as $.Slice<number>))
+			bytes: init?.bytes ?? (null! as $.Slice<number>)
 		}
 	}
 
 	public clone(): content {
-		const cloned = new content()
-		cloned._fields = {
-			bytes: $.varRef(this._fields.bytes.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new content(this))
 	}
 
 	public ProcessData(input: number): [number, string, boolean] {
@@ -69,12 +60,16 @@ export class content {
 		return [n, err]
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["bytes"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.content",
 		() => new content(),
 		() => [{ name: "ProcessData", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: /* @__PURE__ */ $.basicType("string") }, { type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "ReadAt", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
 		content,
-		() => [{ name: "bytes", key: "bytes", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }]
+		() => [{ name: "bytes", key: "bytes", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }]
 	)
 }
 

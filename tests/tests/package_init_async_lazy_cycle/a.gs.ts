@@ -7,29 +7,24 @@ import * as __goscript_b from "./b.gs.ts"
 import "./b.gs.ts"
 
 export class holder {
-	public get n(): number {
-		return this._fields.n.value
-	}
-	public set n(value: number) {
-		this._fields.n.value = value
-	}
+	public declare n: number
 
 	public _fields: {
-		n: $.VarRef<number>
+		n: number
 	}
 
 	constructor(init?: Partial<{n?: number}>) {
 		this._fields = {
-			n: $.varRef(init?.n ?? (0 as number))
+			n: init?.n ?? (0 as number)
 		}
 	}
 
 	public clone(): holder {
-		const cloned = new holder()
-		cloned._fields = {
-			n: $.varRef(this._fields.n.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new holder(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["n"])
 	}
 
 	static __typeInfo = $.registerStructType(

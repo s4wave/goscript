@@ -26,29 +26,20 @@ $.registerInterfaceType(
 );
 
 export class Stack {
-	public get items(): $.Slice<any> {
-		return this._fields.items.value
-	}
-	public set items(value: $.Slice<any>) {
-		this._fields.items.value = value
-	}
+	public declare items: $.Slice<any>
 
 	public _fields: {
-		items: $.VarRef<$.Slice<any>>
+		items: $.Slice<any>
 	}
 
 	constructor(init?: Partial<{items?: $.Slice<any>}>) {
 		this._fields = {
-			items: $.varRef(init?.items ?? (null! as $.Slice<any>))
+			items: init?.items ?? (null! as $.Slice<any>)
 		}
 	}
 
 	public clone(): Stack {
-		const cloned = new Stack()
-		cloned._fields = {
-			items: $.varRef(this._fields.items.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Stack(this))
 	}
 
 	public Len(__typeArgs: $.GenericTypeArgs | undefined): number {
@@ -72,39 +63,34 @@ export class Stack {
 		$.pointerValue<Stack>(s).items = $.append($.pointerValue<Stack>(s).items, value, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as any)))
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["items"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Stack",
 		() => new Stack(),
 		() => [{ name: "Len", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Pop", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }, { type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Push", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
 		Stack,
-		() => [{ name: "items", key: "items", type: { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Interface, methods: [] } } }]
+		() => [{ name: "items", key: "items", type: /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] }) }]
 	)
 }
 
 export class Item {
-	public get Name(): string {
-		return this._fields.Name.value
-	}
-	public set Name(value: string) {
-		this._fields.Name.value = value
-	}
+	public declare Name: string
 
 	public _fields: {
-		Name: $.VarRef<string>
+		Name: string
 	}
 
 	constructor(init?: Partial<{Name?: string}>) {
 		this._fields = {
-			Name: $.varRef(init?.Name ?? ("" as string))
+			Name: init?.Name ?? ("" as string)
 		}
 	}
 
 	public clone(): Item {
-		const cloned = new Item()
-		cloned._fields = {
-			Name: $.varRef(this._fields.Name.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Item(this))
 	}
 
 	public Clone(): Item | $.VarRef<Item> | null {
@@ -115,39 +101,34 @@ export class Item {
 		return new Item({Name: $.pointerValue<Item>(i).Name + " copy"})
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["Name"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Item",
 		() => new Item(),
-		() => [{ name: "Clone", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.Item" } }] }],
+		() => [{ name: "Clone", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.Item") }] }],
 		Item,
 		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
 export class Mapper {
-	public get values(): globalThis.Map<any, any> | null {
-		return this._fields.values.value
-	}
-	public set values(value: globalThis.Map<any, any> | null) {
-		this._fields.values.value = value
-	}
+	public declare values: globalThis.Map<any, any> | null
 
 	public _fields: {
-		values: $.VarRef<globalThis.Map<any, any> | null>
+		values: globalThis.Map<any, any> | null
 	}
 
 	constructor(init?: Partial<{values?: globalThis.Map<any, any> | null}>) {
 		this._fields = {
-			values: $.varRef(init?.values ?? (null! as globalThis.Map<any, any> | null))
+			values: init?.values ?? (null! as globalThis.Map<any, any> | null)
 		}
 	}
 
 	public clone(): Mapper {
-		const cloned = new Mapper()
-		cloned._fields = {
-			values: $.varRef(this._fields.values.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Mapper(this))
 	}
 
 	public Get(__typeArgs: $.GenericTypeArgs | undefined, key: any): [any, boolean] {
@@ -161,54 +142,47 @@ export class Mapper {
 		$.mapSet($.pointerValue<Mapper>(m).values, key, value)
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["values"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Mapper",
 		() => new Mapper(),
 		() => [{ name: "Get", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }, { type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Put", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
 		Mapper,
-		() => [{ name: "values", key: "values", type: { kind: $.TypeKind.Map, keyType: { kind: $.TypeKind.Interface, methods: [] }, elemType: { kind: $.TypeKind.Interface, methods: [] } } }]
+		() => [{ name: "values", key: "values", type: /* @__PURE__ */ $.mapType({ kind: $.TypeKind.Interface, methods: [] }, { kind: $.TypeKind.Interface, methods: [] }) }]
 	)
 }
 
 export class Pair {
-	public get First(): any {
-		return this._fields.First.value
-	}
-	public set First(value: any) {
-		this._fields.First.value = value
-	}
+	public declare First: any
 
-	public get Second(): any {
-		return this._fields.Second.value
-	}
-	public set Second(value: any) {
-		this._fields.Second.value = value
-	}
+	public declare Second: any
 
 	public _fields: {
-		First: $.VarRef<any>
-		Second: $.VarRef<any>
+		First: any
+		Second: any
 	}
 
 	constructor(init?: Partial<{First?: any, Second?: any}>) {
 		this._fields = {
-			First: $.varRef(init?.First ?? (null! as any)),
-			Second: $.varRef(init?.Second ?? (null! as any))
+			First: init?.First ?? (null! as any),
+			Second: init?.Second ?? (null! as any)
 		}
 	}
 
 	public clone(): Pair {
-		const cloned = new Pair()
-		cloned._fields = {
-			First: $.varRef(this._fields.First.value),
-			Second: $.varRef(this._fields.Second.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Pair(this))
 	}
 
 	public Swap(__typeArgs: $.GenericTypeArgs | undefined): Pair {
 		const p = this
 		return $.markAsStructValue(new Pair({First: p.Second, Second: p.First}))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["First", "Second"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -286,7 +260,7 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("=== Interface constraint ===")
 	let items: $.Slice<Item | $.VarRef<Item> | null> = $.arrayToSlice<Item | $.VarRef<Item> | null>([new Item({Name: "alpha"}), new Item({Name: "beta"})])
-	let clones: $.Slice<Item | $.VarRef<Item> | null> = (await CloneAll({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Pointer, elemType: "main.Item" }, zero: () => null, methods: {Clone: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Clone(...$.stripGenericTypeArgs(args))} }}, items) as $.Slice<Item | $.VarRef<Item> | null>)
+	let clones: $.Slice<Item | $.VarRef<Item> | null> = (await CloneAll({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.Item"), zero: () => null, methods: {Clone: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Clone(...$.stripGenericTypeArgs(args))} }}, items) as $.Slice<Item | $.VarRef<Item> | null>)
 	await $.println("clone:", $.pointerValue<Item>($.arrayIndex(clones!, 0)).Name, $.pointerValue<Item>($.arrayIndex(clones!, 1)).Name, $.pointerEqual($.arrayIndex(clones!, 0), $.arrayIndex(items!, 0)))
 
 	await $.println("=== Generic struct with map field ===")

@@ -15,29 +15,24 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("newat-local:", local.value)
 
 	class holder {
-		public get Count(): number {
-			return this._fields.Count.value
-		}
-		public set Count(value: number) {
-			this._fields.Count.value = value
-		}
+		public declare Count: number
 
 		public _fields: {
-			Count: $.VarRef<number>
+			Count: number
 		}
 
 		constructor(init?: Partial<{Count?: number}>) {
 			this._fields = {
-				Count: $.varRef(init?.Count ?? (0 as number))
+				Count: init?.Count ?? (0 as number)
 			}
 		}
 
 		public clone(): holder {
-			const cloned = new holder()
-			cloned._fields = {
-				Count: $.varRef(this._fields.Count.value)
-			}
-			return $.markAsStructValue(cloned)
+			return $.markAsStructValue(new holder(this))
+		}
+
+		static {
+			$.bindStructFields(this.prototype, ["Count"])
 		}
 
 		static __typeInfo = $.registerStructType(
@@ -45,11 +40,11 @@ export async function main(): globalThis.Promise<void> {
 			() => new holder(),
 			() => [],
 			holder,
-			() => [{ name: "Count", key: "Count", type: /* @__PURE__ */ $.basicType("int"), index: [0], offset: 0, exported: true }]
+			() => [/* @__PURE__ */ $.structField("Count", /* @__PURE__ */ $.basicType("int"), [0], 0, true)]
 		)
 	}
 	let h = $.markAsStructValue(new holder({Count: 5}))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}))!, (h._fields.Count as any)))).Elem())).SetInt(6n)
+	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}))!, ($.fieldRef(h._fields, "Count") as any)))).Elem())).SetInt(6n)
 	await $.println("newat-field:", h.Count)
 
 	let buf: $.Slice<number> = new Uint8Array([1, 2, 3, 4]) as $.Slice<number>

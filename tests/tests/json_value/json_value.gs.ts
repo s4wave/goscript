@@ -7,49 +7,32 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/reflect/index.js"
 
 export class Person {
-	public get Name(): string {
-		return this._fields.Name.value
-	}
-	public set Name(value: string) {
-		this._fields.Name.value = value
-	}
+	public declare Name: string
 
-	public get Age(): number {
-		return this._fields.Age.value
-	}
-	public set Age(value: number) {
-		this._fields.Age.value = value
-	}
+	public declare Age: number
 
-	public get Active(): boolean {
-		return this._fields.Active.value
-	}
-	public set Active(value: boolean) {
-		this._fields.Active.value = value
-	}
+	public declare Active: boolean
 
 	public _fields: {
-		Name: $.VarRef<string>
-		Age: $.VarRef<number>
-		Active: $.VarRef<boolean>
+		Name: string
+		Age: number
+		Active: boolean
 	}
 
 	constructor(init?: Partial<{Name?: string, Age?: number, Active?: boolean}>) {
 		this._fields = {
-			Name: $.varRef(init?.Name ?? ("" as string)),
-			Age: $.varRef(init?.Age ?? (0 as number)),
-			Active: $.varRef(init?.Active ?? (false as boolean))
+			Name: init?.Name ?? ("" as string),
+			Age: init?.Age ?? (0 as number),
+			Active: init?.Active ?? (false as boolean)
 		}
 	}
 
 	public clone(): Person {
-		const cloned = new Person()
-		cloned._fields = {
-			Name: $.varRef(this._fields.Name.value),
-			Age: $.varRef(this._fields.Age.value),
-			Active: $.varRef(this._fields.Active.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Person(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Name", "Age", "Active"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -57,7 +40,7 @@ export class Person {
 		() => new Person(),
 		() => [],
 		Person,
-		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string"), tag: "json:\"name\"", index: [0], offset: 0, exported: true }, { name: "Age", key: "Age", type: /* @__PURE__ */ $.basicType("int"), tag: "json:\"age\"", index: [1], offset: 16, exported: true }, { name: "Active", key: "Active", type: /* @__PURE__ */ $.basicType("bool"), tag: "json:\"active\"", index: [2], offset: 24, exported: true }]
+		() => [/* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [0], 0, true, { tag: "json:\"name\"" }), /* @__PURE__ */ $.structField("Age", /* @__PURE__ */ $.basicType("int"), [1], 16, true, { tag: "json:\"age\"" }), /* @__PURE__ */ $.structField("Active", /* @__PURE__ */ $.basicType("bool"), [2], 24, true, { tag: "json:\"active\"" })]
 	)
 }
 

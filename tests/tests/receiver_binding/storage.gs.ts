@@ -7,39 +7,24 @@ import * as __goscript_methods from "./methods.gs.ts"
 import "./methods.gs.ts"
 
 export class storage {
-	public get bytes(): $.Slice<number> {
-		return this._fields.bytes.value
-	}
-	public set bytes(value: $.Slice<number>) {
-		this._fields.bytes.value = value
-	}
+	public declare bytes: $.Slice<number>
 
-	public get name(): string {
-		return this._fields.name.value
-	}
-	public set name(value: string) {
-		this._fields.name.value = value
-	}
+	public declare name: string
 
 	public _fields: {
-		bytes: $.VarRef<$.Slice<number>>
-		name: $.VarRef<string>
+		bytes: $.Slice<number>
+		name: string
 	}
 
 	constructor(init?: Partial<{bytes?: $.Slice<number>, name?: string}>) {
 		this._fields = {
-			bytes: $.varRef(init?.bytes ?? (null! as $.Slice<number>)),
-			name: $.varRef(init?.name ?? ("" as string))
+			bytes: init?.bytes ?? (null! as $.Slice<number>),
+			name: init?.name ?? ("" as string)
 		}
 	}
 
 	public clone(): storage {
-		const cloned = new storage()
-		cloned._fields = {
-			bytes: $.varRef(this._fields.bytes.value),
-			name: $.varRef(this._fields.name.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new storage(this))
 	}
 
 	public IsEmpty(): boolean {
@@ -67,12 +52,16 @@ export class storage {
 		$.pointerValue<storage>(s).bytes = $.makeSlice<number>(0, undefined, "byte")
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["bytes", "name"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.storage",
 		() => new storage(),
 		() => [{ name: "IsEmpty", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Len", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "SetName", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "Truncate", args: [], returns: [] }],
 		storage,
-		() => [{ name: "bytes", key: "bytes", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }, { name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
+		() => [{ name: "bytes", key: "bytes", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 

@@ -14,34 +14,29 @@ $.registerInterfaceType(
 );
 
 export class MyStruct {
-	public get Value(): number {
-		return this._fields.Value.value
-	}
-	public set Value(value: number) {
-		this._fields.Value.value = value
-	}
+	public declare Value: number
 
 	public _fields: {
-		Value: $.VarRef<number>
+		Value: number
 	}
 
 	constructor(init?: Partial<{Value?: number}>) {
 		this._fields = {
-			Value: $.varRef(init?.Value ?? (0 as number))
+			Value: init?.Value ?? (0 as number)
 		}
 	}
 
 	public clone(): MyStruct {
-		const cloned = new MyStruct()
-		cloned._fields = {
-			Value: $.varRef(this._fields.Value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyStruct(this))
 	}
 
 	public Method1(): number {
 		const m = this
 		return m.Value
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Value"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -66,7 +61,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// try a second time since this generates something different when using = and not :=
-	let __goscriptTuple0: any = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
+	let __goscriptTuple0: any = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	ok = __goscriptTuple0[1]
 	if (ok) {
 		await $.println("Type assertion successful")
@@ -84,7 +79,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	let nilInterface: MyInterface | null = null! as MyInterface | null
-	let __goscriptTuple1: any = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(nilInterface, { kind: $.TypeKind.Pointer, elemType: "main.MyStruct" })
+	let __goscriptTuple1: any = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(nilInterface, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	let nilVal: MyStruct | $.VarRef<MyStruct> | null = __goscriptTuple1[0]
 	let ok3 = __goscriptTuple1[1]
 	if (ok3 && ($.pointerValue<MyStruct>(nilVal).Value == 0)) {

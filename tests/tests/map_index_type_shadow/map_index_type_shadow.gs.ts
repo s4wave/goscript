@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class item {
-	public get values(): $.Slice<number> {
-		return this._fields.values.value
-	}
-	public set values(value: $.Slice<number>) {
-		this._fields.values.value = value
-	}
+	public declare values: $.Slice<number>
 
 	public _fields: {
-		values: $.VarRef<$.Slice<number>>
+		values: $.Slice<number>
 	}
 
 	constructor(init?: Partial<{values?: $.Slice<number>}>) {
 		this._fields = {
-			values: $.varRef(init?.values ?? (null! as $.Slice<number>))
+			values: init?.values ?? (null! as $.Slice<number>)
 		}
 	}
 
 	public clone(): item {
-		const cloned = new item()
-		cloned._fields = {
-			values: $.varRef(this._fields.values.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new item(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["values"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -34,7 +29,7 @@ export class item {
 		() => new item(),
 		() => [],
 		item,
-		() => [{ name: "values", key: "values", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") } }]
+		() => [{ name: "values", key: "values", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")) }]
 	)
 }
 

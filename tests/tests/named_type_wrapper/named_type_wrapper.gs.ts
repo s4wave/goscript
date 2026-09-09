@@ -6,39 +6,28 @@ import * as $ from "@goscript/builtin/index.js"
 export type MyFileMode = number
 
 export class FileStatus {
-	public get mode(): MyFileMode {
-		return this._fields.mode.value
-	}
-	public set mode(value: MyFileMode) {
-		this._fields.mode.value = value
-	}
+	public declare mode: MyFileMode
 
-	public get size(): bigint {
-		return this._fields.size.value
-	}
-	public set size(value: bigint) {
-		this._fields.size.value = value
-	}
+	public declare size: bigint
 
 	public _fields: {
-		mode: $.VarRef<MyFileMode>
-		size: $.VarRef<bigint>
+		mode: MyFileMode
+		size: bigint
 	}
 
 	constructor(init?: Partial<{mode?: MyFileMode, size?: bigint}>) {
 		this._fields = {
-			mode: $.varRef(init?.mode ?? (0 as MyFileMode)),
-			size: $.varRef(init?.size ?? (0n as bigint))
+			mode: init?.mode ?? (0 as MyFileMode),
+			size: init?.size ?? (0n as bigint)
 		}
 	}
 
 	public clone(): FileStatus {
-		const cloned = new FileStatus()
-		cloned._fields = {
-			mode: $.varRef(this._fields.mode.value),
-			size: $.varRef(this._fields.size.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new FileStatus(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["mode", "size"])
 	}
 
 	static __typeInfo = $.registerStructType(

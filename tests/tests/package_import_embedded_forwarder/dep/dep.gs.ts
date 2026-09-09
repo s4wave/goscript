@@ -18,45 +18,40 @@ export type Store = {
 $.registerInterfaceType(
 	"dep.Store",
 	null,
-	[{ name: "NewTransaction", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "tx.Tx" } }] }]
+	[{ name: "NewTransaction", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("tx.Tx") }] }]
 );
 
 export class BaseStore {
-	public get CoreStore(): inner.CoreStore | $.VarRef<inner.CoreStore> | null {
-		return this._fields.CoreStore.value
-	}
-	public set CoreStore(value: inner.CoreStore | $.VarRef<inner.CoreStore> | null) {
-		this._fields.CoreStore.value = value
-	}
+	public declare CoreStore: inner.CoreStore | $.VarRef<inner.CoreStore> | null
 
 	public _fields: {
-		CoreStore: $.VarRef<inner.CoreStore | $.VarRef<inner.CoreStore> | null>
+		CoreStore: inner.CoreStore | $.VarRef<inner.CoreStore> | null
 	}
 
 	constructor(init?: Partial<{CoreStore?: inner.CoreStore | $.VarRef<inner.CoreStore> | null}>) {
 		this._fields = {
-			CoreStore: $.varRef(init?.CoreStore ?? (null! as inner.CoreStore | $.VarRef<inner.CoreStore> | null))
+			CoreStore: init?.CoreStore ?? (null! as inner.CoreStore | $.VarRef<inner.CoreStore> | null)
 		}
 	}
 
 	public clone(): BaseStore {
-		const cloned = new BaseStore()
-		cloned._fields = {
-			CoreStore: $.varRef(this._fields.CoreStore.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new BaseStore(this))
 	}
 
 	public NewTransaction(write: any): any {
 		return $.pointerValue<inner.CoreStore>(this.CoreStore).NewTransaction(write)
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["CoreStore"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"dep.BaseStore",
 		() => new BaseStore(),
-		() => [{ name: "NewTransaction", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "tx.Tx" } }] }],
+		() => [{ name: "NewTransaction", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("tx.Tx") }] }],
 		BaseStore,
-		() => [{ name: "CoreStore", key: "CoreStore", type: { kind: $.TypeKind.Pointer, elemType: "inner.CoreStore" }, anonymous: true }]
+		() => [{ name: "CoreStore", key: "CoreStore", type: /* @__PURE__ */ $.pointerType("inner.CoreStore"), anonymous: true }]
 	)
 }
 

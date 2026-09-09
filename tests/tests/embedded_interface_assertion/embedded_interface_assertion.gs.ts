@@ -44,10 +44,7 @@ export class MyStruct {
 	}
 
 	public clone(): MyStruct {
-		const cloned = new MyStruct()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyStruct(this))
 	}
 
 	public Close(): $.GoError {

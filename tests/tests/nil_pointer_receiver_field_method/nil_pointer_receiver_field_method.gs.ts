@@ -4,29 +4,20 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class child {
-	public get value(): string {
-		return this._fields.value.value
-	}
-	public set value(value: string) {
-		this._fields.value.value = value
-	}
+	public declare value: string
 
 	public _fields: {
-		value: $.VarRef<string>
+		value: string
 	}
 
 	constructor(init?: Partial<{value?: string}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? ("" as string))
+			value: init?.value ?? ("" as string)
 		}
 	}
 
 	public clone(): child {
-		const cloned = new child()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new child(this))
 	}
 
 	public Clone(): child | $.VarRef<child> | null {
@@ -37,39 +28,38 @@ export class child {
 		return new child({value: $.pointerValue<child>(c).value})
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["value"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.child",
 		() => new child(),
-		() => [{ name: "Clone", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.child" } }] }],
+		() => [{ name: "Clone", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.child") }] }],
 		child,
 		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
 export class parent {
-	public get child(): child | $.VarRef<child> | null {
-		return this._fields.child.value
-	}
-	public set child(value: child | $.VarRef<child> | null) {
-		this._fields.child.value = value
-	}
+	public declare child: child | $.VarRef<child> | null
 
 	public _fields: {
-		child: $.VarRef<child | $.VarRef<child> | null>
+		child: child | $.VarRef<child> | null
 	}
 
 	constructor(init?: Partial<{child?: child | $.VarRef<child> | null}>) {
 		this._fields = {
-			child: $.varRef(init?.child ?? (null! as child | $.VarRef<child> | null))
+			child: init?.child ?? (null! as child | $.VarRef<child> | null)
 		}
 	}
 
 	public clone(): parent {
-		const cloned = new parent()
-		cloned._fields = {
-			child: $.varRef(this._fields.child.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new parent(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["child"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -77,7 +67,7 @@ export class parent {
 		() => new parent(),
 		() => [],
 		parent,
-		() => [{ name: "child", key: "child", type: { kind: $.TypeKind.Pointer, elemType: "main.child" } }]
+		() => [{ name: "child", key: "child", type: /* @__PURE__ */ $.pointerType("main.child") }]
 	)
 }
 

@@ -5,9 +5,9 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let i: any = null! as any
-	i = $.interfaceValue($.makeMap<string, number>([["age", 30]]), "map[string]int", { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: /* @__PURE__ */ $.basicType("int") })
+	i = $.interfaceValue($.makeMap<string, number>([["age", 30]]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))
 
-	let __goscriptTuple0: any = $.typeAssertTuple<globalThis.Map<string, number> | null>(i, { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: /* @__PURE__ */ $.basicType("int") })
+	let __goscriptTuple0: any = $.typeAssertTuple<globalThis.Map<string, number> | null>(i, /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))
 	let m: globalThis.Map<string, number> | null = __goscriptTuple0[0]
 	let ok = __goscriptTuple0[1]
 	if (ok) {
@@ -16,7 +16,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("Type assertion failed")
 	}
 
-	let [, ok2] = $.typeAssertTuple<globalThis.Map<string, string> | null>(i, { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: /* @__PURE__ */ $.basicType("string") })
+	let [, ok2] = $.typeAssertTuple<globalThis.Map<string, string> | null>(i, /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string")))
 	if (ok2) {
 		// This block should not be reached if the assertion fails as expected.
 		// Depending on how Go handles failed assertions with incorrect types,
@@ -27,7 +27,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("Second type assertion (map[string]string) failed as expected")
 	}
 
-	let [, ok3] = $.typeAssertTuple<globalThis.Map<number, number> | null>(i, { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("int"), elemType: /* @__PURE__ */ $.basicType("int") })
+	let [, ok3] = $.typeAssertTuple<globalThis.Map<number, number> | null>(i, /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")))
 	if (ok3) {
 		// Similar to the above, this block should not be reached.
 		await $.println("Unexpected success for map[int]int assertion")

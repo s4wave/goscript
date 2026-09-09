@@ -23,10 +23,7 @@ export class MyProcessor {
 	}
 
 	public clone(): MyProcessor {
-		const cloned = new MyProcessor()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyProcessor(this))
 	}
 
 	public async Process(data: $.Slice<number>, count: number, _p2: string): globalThis.Promise<[boolean, $.GoError]> {

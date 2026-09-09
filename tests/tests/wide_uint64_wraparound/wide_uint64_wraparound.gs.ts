@@ -13,10 +13,7 @@ export class BigInt {
 	}
 
 	public clone(): BigInt {
-		const cloned = new BigInt()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new BigInt(this))
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -23,10 +23,7 @@ export class ConcreteA {
 	}
 
 	public clone(): ConcreteA {
-		const cloned = new ConcreteA()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new ConcreteA(this))
 	}
 
 	public Method(): string {
@@ -53,10 +50,7 @@ export class ConcreteB {
 	}
 
 	public clone(): ConcreteB {
-		const cloned = new ConcreteB()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new ConcreteB(this))
 	}
 
 	public Method(): string {
@@ -74,39 +68,28 @@ export class ConcreteB {
 }
 
 export class Container {
-	public get hasA(): boolean {
-		return this._fields.hasA.value
-	}
-	public set hasA(value: boolean) {
-		this._fields.hasA.value = value
-	}
+	public declare hasA: boolean
 
-	public get hasB(): boolean {
-		return this._fields.hasB.value
-	}
-	public set hasB(value: boolean) {
-		this._fields.hasB.value = value
-	}
+	public declare hasB: boolean
 
 	public _fields: {
-		hasA: $.VarRef<boolean>
-		hasB: $.VarRef<boolean>
+		hasA: boolean
+		hasB: boolean
 	}
 
 	constructor(init?: Partial<{hasA?: boolean, hasB?: boolean}>) {
 		this._fields = {
-			hasA: $.varRef(init?.hasA ?? (false as boolean)),
-			hasB: $.varRef(init?.hasB ?? (false as boolean))
+			hasA: init?.hasA ?? (false as boolean),
+			hasB: init?.hasB ?? (false as boolean)
 		}
 	}
 
 	public clone(): Container {
-		const cloned = new Container()
-		cloned._fields = {
-			hasA: $.varRef(this._fields.hasA.value),
-			hasB: $.varRef(this._fields.hasB.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Container(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["hasA", "hasB"])
 	}
 
 	static __typeInfo = $.registerStructType(

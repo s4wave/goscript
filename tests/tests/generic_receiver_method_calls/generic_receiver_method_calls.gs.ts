@@ -14,34 +14,29 @@ $.registerInterfaceType(
 );
 
 export class box {
-	public get value(): any {
-		return this._fields.value.value
-	}
-	public set value(value: any) {
-		this._fields.value.value = value
-	}
+	public declare value: any
 
 	public _fields: {
-		value: $.VarRef<any>
+		value: any
 	}
 
 	constructor(init?: Partial<{value?: any}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? (null! as any))
+			value: init?.value ?? (null! as any)
 		}
 	}
 
 	public clone(): box {
-		const cloned = new box()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new box(this))
 	}
 
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const b: box | $.VarRef<box> | null = this
 		return $.pointerValue<box>(b).value
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -54,33 +49,28 @@ export class box {
 }
 
 export class holder {
-	public get box(): box {
-		return this._fields.box.value
-	}
-	public set box(value: box) {
-		this._fields.box.value = value
-	}
+	public declare box: box
 
 	public _fields: {
-		box: $.VarRef<box>
+		box: box
 	}
 
 	constructor(init?: Partial<{box?: box}>) {
 		this._fields = {
-			box: $.varRef(init?.box ? $.markAsStructValue($.cloneStructValue(init.box)) : $.markAsStructValue(new box({value: null})))
+			box: init?.box ? $.markAsStructValue($.cloneStructValue(init.box)) : $.markAsStructValue(new box({value: null}))
 		}
 	}
 
 	public clone(): holder {
-		const cloned = new holder()
-		cloned._fields = {
-			box: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.box.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new holder(this))
 	}
 
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
 		return $.pointerValue<box>(this.box).Value({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["box"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -105,14 +95,14 @@ export function promoted(__typeArgs: $.GenericTypeArgs | undefined, h: holder | 
 }
 
 export async function methodExpression(__typeArgs: $.GenericTypeArgs | undefined, b: box | $.VarRef<box> | null): globalThis.Promise<any> {
-	let value: ((_p0: box | $.VarRef<box> | null) => any | globalThis.Promise<any>) | null = $.functionValue((b: box | $.VarRef<box> | null): any => $.pointerValue<box>(b).Value({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "main.box" }], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
+	let value: ((_p0: box | $.VarRef<box> | null) => any | globalThis.Promise<any>) | null = $.functionValue((b: box | $.VarRef<box> | null): any => $.pointerValue<box>(b).Value({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.box")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
 	return value!(b)
 }
 
 export async function main(): globalThis.Promise<void> {
 	let b: box | $.VarRef<box> | null = new box({value: 7})
 	await $.println("direct:", direct({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, b))
-	await $.println("interface:", await throughInterface({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, $.namedValueInterfaceValue<reader | null>(b, "*main.box", {Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "main.box" }, [{ name: "Value", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("int") }] }])))
+	await $.println("interface:", await throughInterface({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, $.namedValueInterfaceValue<reader | null>(b, "*main.box", {Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType("main.box"), [$.methodSignature("Value", [], [/* @__PURE__ */ $.basicType("int")])])))
 	await $.println("promoted:", promoted({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, new holder({box: $.markAsStructValue($.cloneStructValue($.pointerValue<box>(b)))})))
 	await $.println("expression:", await methodExpression({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, b))
 }

@@ -4,29 +4,20 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class MyStruct {
-	public get Value(): number {
-		return this._fields.Value.value
-	}
-	public set Value(value: number) {
-		this._fields.Value.value = value
-	}
+	public declare Value: number
 
 	public _fields: {
-		Value: $.VarRef<number>
+		Value: number
 	}
 
 	constructor(init?: Partial<{Value?: number}>) {
 		this._fields = {
-			Value: $.varRef(init?.Value ?? (0 as number))
+			Value: init?.Value ?? (0 as number)
 		}
 	}
 
 	public clone(): MyStruct {
-		const cloned = new MyStruct()
-		cloned._fields = {
-			Value: $.varRef(this._fields.Value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyStruct(this))
 	}
 
 	public DoesNotUseReceiver(): number {
@@ -37,6 +28,10 @@ export class MyStruct {
 	public UsesReceiver(): number {
 		const m: MyStruct | $.VarRef<MyStruct> | null = this
 		return $.pointerValue<MyStruct>(m).Value
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Value"])
 	}
 
 	static __typeInfo = $.registerStructType(

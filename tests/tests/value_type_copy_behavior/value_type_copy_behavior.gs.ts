@@ -4,39 +4,28 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class MyStruct {
-	public get MyInt(): number {
-		return this._fields.MyInt.value
-	}
-	public set MyInt(value: number) {
-		this._fields.MyInt.value = value
-	}
+	public declare MyInt: number
 
-	public get MyString(): string {
-		return this._fields.MyString.value
-	}
-	public set MyString(value: string) {
-		this._fields.MyString.value = value
-	}
+	public declare MyString: string
 
 	public _fields: {
-		MyInt: $.VarRef<number>
-		MyString: $.VarRef<string>
+		MyInt: number
+		MyString: string
 	}
 
 	constructor(init?: Partial<{MyInt?: number, MyString?: string}>) {
 		this._fields = {
-			MyInt: $.varRef(init?.MyInt ?? (0 as number)),
-			MyString: $.varRef(init?.MyString ?? ("" as string))
+			MyInt: init?.MyInt ?? (0 as number),
+			MyString: init?.MyString ?? ("" as string)
 		}
 	}
 
 	public clone(): MyStruct {
-		const cloned = new MyStruct()
-		cloned._fields = {
-			MyInt: $.varRef(this._fields.MyInt.value),
-			MyString: $.varRef(this._fields.MyString.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyStruct(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["MyInt", "MyString"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -49,39 +38,28 @@ export class MyStruct {
 }
 
 export class NestedStruct {
-	public get Value(): number {
-		return this._fields.Value.value
-	}
-	public set Value(value: number) {
-		this._fields.Value.value = value
-	}
+	public declare Value: number
 
-	public get InnerStruct(): MyStruct {
-		return this._fields.InnerStruct.value
-	}
-	public set InnerStruct(value: MyStruct) {
-		this._fields.InnerStruct.value = value
-	}
+	public declare InnerStruct: MyStruct
 
 	public _fields: {
-		Value: $.VarRef<number>
-		InnerStruct: $.VarRef<MyStruct>
+		Value: number
+		InnerStruct: MyStruct
 	}
 
 	constructor(init?: Partial<{Value?: number, InnerStruct?: MyStruct}>) {
 		this._fields = {
-			Value: $.varRef(init?.Value ?? (0 as number)),
-			InnerStruct: $.varRef(init?.InnerStruct ? $.markAsStructValue($.cloneStructValue(init.InnerStruct)) : $.markAsStructValue(new MyStruct()))
+			Value: init?.Value ?? (0 as number),
+			InnerStruct: init?.InnerStruct ? $.markAsStructValue($.cloneStructValue(init.InnerStruct)) : $.markAsStructValue(new MyStruct())
 		}
 	}
 
 	public clone(): NestedStruct {
-		const cloned = new NestedStruct()
-		cloned._fields = {
-			Value: $.varRef(this._fields.Value.value),
-			InnerStruct: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.InnerStruct.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new NestedStruct(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Value", "InnerStruct"])
 	}
 
 	static __typeInfo = $.registerStructType(

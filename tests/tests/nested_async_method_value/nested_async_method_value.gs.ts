@@ -14,29 +14,20 @@ $.registerInterfaceType(
 );
 
 export class Worker {
-	public get ch(): $.Channel<number> | null {
-		return this._fields.ch.value
-	}
-	public set ch(value: $.Channel<number> | null) {
-		this._fields.ch.value = value
-	}
+	public declare ch: $.Channel<number> | null
 
 	public _fields: {
-		ch: $.VarRef<$.Channel<number> | null>
+		ch: $.Channel<number> | null
 	}
 
 	constructor(init?: Partial<{ch?: $.Channel<number> | null}>) {
 		this._fields = {
-			ch: $.varRef(init?.ch ?? (null! as $.Channel<number> | null))
+			ch: init?.ch ?? (null! as $.Channel<number> | null)
 		}
 	}
 
 	public clone(): Worker {
-		const cloned = new Worker()
-		cloned._fields = {
-			ch: $.varRef(this._fields.ch.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Worker(this))
 	}
 
 	public async Spawn(): globalThis.Promise<$.GoError> {
@@ -47,12 +38,16 @@ export class Worker {
 		return null
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["ch"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Worker",
 		() => new Worker(),
 		() => [{ name: "Spawn", args: [], returns: [{ type: "error" }] }],
 		Worker,
-		() => [{ name: "ch", key: "ch", type: { kind: $.TypeKind.Channel, direction: "both", elemType: /* @__PURE__ */ $.basicType("int") } }]
+		() => [{ name: "ch", key: "ch", type: /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both") }]
 	)
 }
 
@@ -69,7 +64,7 @@ export async function main(): globalThis.Promise<void> {
 	let w: Worker | $.VarRef<Worker> | null = new Worker({ch: $.makeChannel<number>(1, 0, "both")})
 	await run($.functionValue(((__receiver) => () => __receiver.Spawn())($.pointerValue<Worker>(w)), ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo)))
 
-	let s: Spawner | null = $.interfaceValue<Spawner | null>(w, "*main.Worker", { kind: $.TypeKind.Pointer, elemType: "main.Worker" })
+	let s: Spawner | null = $.interfaceValue<Spawner | null>(w, "*main.Worker", /* @__PURE__ */ $.pointerType("main.Worker"))
 	let err = await $.pointerValue<Exclude<Spawner, null>>(s).Spawn()
 	if (err == null) {
 		await $.println("iface err: nil")

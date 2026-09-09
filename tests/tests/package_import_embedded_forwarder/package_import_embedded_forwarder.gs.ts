@@ -20,43 +20,28 @@ export type Store = {
 $.registerInterfaceType(
 	"main.Store",
 	null,
-	[{ name: "Execute", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "NewTransaction", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "tx.Tx" } }] }]
+	[{ name: "Execute", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "NewTransaction", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("tx.Tx") }] }]
 );
 
 export class VerboseStore {
-	public get BaseStore(): dep.BaseStore | $.VarRef<dep.BaseStore> | null {
-		return this._fields.BaseStore.value
-	}
-	public set BaseStore(value: dep.BaseStore | $.VarRef<dep.BaseStore> | null) {
-		this._fields.BaseStore.value = value
-	}
+	public declare BaseStore: dep.BaseStore | $.VarRef<dep.BaseStore> | null
 
-	public get name(): string {
-		return this._fields.name.value
-	}
-	public set name(value: string) {
-		this._fields.name.value = value
-	}
+	public declare name: string
 
 	public _fields: {
-		BaseStore: $.VarRef<dep.BaseStore | $.VarRef<dep.BaseStore> | null>
-		name: $.VarRef<string>
+		BaseStore: dep.BaseStore | $.VarRef<dep.BaseStore> | null
+		name: string
 	}
 
 	constructor(init?: Partial<{BaseStore?: dep.BaseStore | $.VarRef<dep.BaseStore> | null, name?: string}>) {
 		this._fields = {
-			BaseStore: $.varRef(init?.BaseStore ?? (null! as dep.BaseStore | $.VarRef<dep.BaseStore> | null)),
-			name: $.varRef(init?.name ?? ("" as string))
+			BaseStore: init?.BaseStore ?? (null! as dep.BaseStore | $.VarRef<dep.BaseStore> | null),
+			name: init?.name ?? ("" as string)
 		}
 	}
 
 	public clone(): VerboseStore {
-		const cloned = new VerboseStore()
-		cloned._fields = {
-			BaseStore: $.varRef(this._fields.BaseStore.value),
-			name: $.varRef(this._fields.name.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new VerboseStore(this))
 	}
 
 	public Execute(): string {
@@ -68,12 +53,16 @@ export class VerboseStore {
 		return $.pointerValue<any>($.pointerValue<dep.BaseStore>(this.BaseStore).CoreStore).NewTransaction(write)
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["BaseStore", "name"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.VerboseStore",
 		() => new VerboseStore(),
-		() => [{ name: "Execute", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "NewTransaction", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "tx.Tx" } }] }],
+		() => [{ name: "Execute", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "NewTransaction", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("tx.Tx") }] }],
 		VerboseStore,
-		() => [{ name: "BaseStore", key: "BaseStore", type: { kind: $.TypeKind.Pointer, elemType: "dep.BaseStore" }, anonymous: true }, { name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
+		() => [{ name: "BaseStore", key: "BaseStore", type: /* @__PURE__ */ $.pointerType("dep.BaseStore"), anonymous: true }, { name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
@@ -90,7 +79,7 @@ export async function useStore(store: Store | null): globalThis.Promise<void> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await useStore($.interfaceValue<Store | null>(NewVerboseStore("outer"), "*main.VerboseStore", { kind: $.TypeKind.Pointer, elemType: "main.VerboseStore" }))
+	await useStore($.interfaceValue<Store | null>(NewVerboseStore("outer"), "*main.VerboseStore", /* @__PURE__ */ $.pointerType("main.VerboseStore")))
 }
 
 if ($.isMainScript(import.meta)) {

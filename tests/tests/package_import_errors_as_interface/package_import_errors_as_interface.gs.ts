@@ -18,29 +18,20 @@ $.registerInterfaceType(
 );
 
 export class wrappedHealthError {
-	public get err(): $.GoError {
-		return this._fields.err.value
-	}
-	public set err(value: $.GoError) {
-		this._fields.err.value = value
-	}
+	public declare err: $.GoError
 
 	public _fields: {
-		err: $.VarRef<$.GoError>
+		err: $.GoError
 	}
 
 	constructor(init?: Partial<{err?: $.GoError}>) {
 		this._fields = {
-			err: $.varRef(init?.err ?? (null! as $.GoError))
+			err: init?.err ?? (null! as $.GoError)
 		}
 	}
 
 	public clone(): wrappedHealthError {
-		const cloned = new wrappedHealthError()
-		cloned._fields = {
-			err: $.varRef(this._fields.err.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new wrappedHealthError(this))
 	}
 
 	public async Error(): globalThis.Promise<string> {
@@ -58,6 +49,10 @@ export class wrappedHealthError {
 		return $.pointerValue<wrappedHealthError>(e).err
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["err"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.wrappedHealthError",
 		() => new wrappedHealthError(),
@@ -71,7 +66,7 @@ export async function main(): globalThis.Promise<void> {
 	let err: wrappedHealthError | $.VarRef<wrappedHealthError> | null = (() => { const __goscriptLiteralField0 = errors.New("root"); return new wrappedHealthError({err: __goscriptLiteralField0}) })()
 
 	let target: $.VarRef<healthError | null> = $.varRef(null! as healthError | null)
-	let ok = errors.As($.pointerValueOrNil($.interfaceValue<$.GoError>(err, "*main.wrappedHealthError", { kind: $.TypeKind.Pointer, elemType: "main.wrappedHealthError" }))!, $.interfaceValue(target, "*main.healthError", { kind: $.TypeKind.Pointer, elemType: "main.healthError" }))
+	let ok = errors.As($.pointerValueOrNil($.interfaceValue<$.GoError>(err, "*main.wrappedHealthError", /* @__PURE__ */ $.pointerType("main.wrappedHealthError")))!, $.interfaceValue(target, "*main.healthError", /* @__PURE__ */ $.pointerType("main.healthError")))
 	await $.println("matched:", ok)
 	if (ok) {
 		await $.println("health:", await $.pointerValue<Exclude<healthError, null>>(target.value).Health())

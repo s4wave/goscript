@@ -6,39 +6,28 @@ import * as $ from "@goscript/builtin/index.js"
 export type option = ((_p0: Thing | $.VarRef<Thing> | null) => void) | null
 
 export class Thing {
-	public get Value(): number {
-		return this._fields.Value.value
-	}
-	public set Value(value: number) {
-		this._fields.Value.value = value
-	}
+	public declare Value: number
 
-	public get Label(): string {
-		return this._fields.Label.value
-	}
-	public set Label(value: string) {
-		this._fields.Label.value = value
-	}
+	public declare Label: string
 
 	public _fields: {
-		Value: $.VarRef<number>
-		Label: $.VarRef<string>
+		Value: number
+		Label: string
 	}
 
 	constructor(init?: Partial<{Value?: number, Label?: string}>) {
 		this._fields = {
-			Value: $.varRef(init?.Value ?? (0 as number)),
-			Label: $.varRef(init?.Label ?? ("" as string))
+			Value: init?.Value ?? (0 as number),
+			Label: init?.Label ?? ("" as string)
 		}
 	}
 
 	public clone(): Thing {
-		const cloned = new Thing()
-		cloned._fields = {
-			Value: $.varRef(this._fields.Value.value),
-			Label: $.varRef(this._fields.Label.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Thing(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Value", "Label"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -53,13 +42,13 @@ export class Thing {
 export function WithValue(v: number): option | null {
 	return $.functionValue((t: Thing | $.VarRef<Thing> | null): void => {
 		$.pointerValue<Thing>(t).Value = v
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "subpkg.Thing" }], results: [] } as $.FunctionTypeInfo))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("subpkg.Thing")], results: [] } as $.FunctionTypeInfo))
 }
 
 export function WithLabel(l: string): option | null {
 	return $.functionValue((t: Thing | $.VarRef<Thing> | null): void => {
 		$.pointerValue<Thing>(t).Label = l
-	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "subpkg.Thing" }], results: [] } as $.FunctionTypeInfo))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("subpkg.Thing")], results: [] } as $.FunctionTypeInfo))
 }
 
 export async function New(opts: $.Slice<option | null>): globalThis.Promise<Thing | $.VarRef<Thing> | null> {

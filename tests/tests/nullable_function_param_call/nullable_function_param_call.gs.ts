@@ -27,7 +27,7 @@ export type Filesystem = {
 $.registerInterfaceType(
 	"main.Filesystem",
 	null,
-	[{ name: "ReadDir", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: "main.FileInfo" } }, { type: "error" }] }]
+	[{ name: "ReadDir", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType("main.FileInfo") }, { type: "error" }] }]
 );
 
 export type ProcessFunc = ((data: string) => [string, $.GoError] | globalThis.Promise<[string, $.GoError]>) | null
@@ -35,49 +35,28 @@ export type ProcessFunc = ((data: string) => [string, $.GoError] | globalThis.Pr
 export type OptionalProcessFunc = ((data: string) => [string, $.GoError] | globalThis.Promise<[string, $.GoError]>) | null
 
 export class MockFileInfo {
-	public get name(): string {
-		return this._fields.name.value
-	}
-	public set name(value: string) {
-		this._fields.name.value = value
-	}
+	public declare name: string
 
-	public get size(): bigint {
-		return this._fields.size.value
-	}
-	public set size(value: bigint) {
-		this._fields.size.value = value
-	}
+	public declare size: bigint
 
-	public get isDir(): boolean {
-		return this._fields.isDir.value
-	}
-	public set isDir(value: boolean) {
-		this._fields.isDir.value = value
-	}
+	public declare isDir: boolean
 
 	public _fields: {
-		name: $.VarRef<string>
-		size: $.VarRef<bigint>
-		isDir: $.VarRef<boolean>
+		name: string
+		size: bigint
+		isDir: boolean
 	}
 
 	constructor(init?: Partial<{name?: string, size?: bigint, isDir?: boolean}>) {
 		this._fields = {
-			name: $.varRef(init?.name ?? ("" as string)),
-			size: $.varRef(init?.size ?? (0n as bigint)),
-			isDir: $.varRef(init?.isDir ?? (false as boolean))
+			name: init?.name ?? ("" as string),
+			size: init?.size ?? (0n as bigint),
+			isDir: init?.isDir ?? (false as boolean)
 		}
 	}
 
 	public clone(): MockFileInfo {
-		const cloned = new MockFileInfo()
-		cloned._fields = {
-			name: $.varRef(this._fields.name.value),
-			size: $.varRef(this._fields.size.value),
-			isDir: $.varRef(this._fields.isDir.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MockFileInfo(this))
 	}
 
 	public IsDir(): boolean {
@@ -93,6 +72,10 @@ export class MockFileInfo {
 	public Size(): bigint {
 		const m: MockFileInfo | $.VarRef<MockFileInfo> | null = this
 		return $.pointerValue<MockFileInfo>(m).size
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["name", "size", "isDir"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -114,21 +97,18 @@ export class MockFilesystem {
 	}
 
 	public clone(): MockFilesystem {
-		const cloned = new MockFilesystem()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MockFilesystem(this))
 	}
 
 	public ReadDir(path: string): [$.Slice<FileInfo | null>, $.GoError] {
 		const m: MockFilesystem | $.VarRef<MockFilesystem> | null = this
-		return [$.arrayToSlice<FileInfo | null>([$.interfaceValue<FileInfo | null>(new MockFileInfo({name: "file1.txt", size: 100n, isDir: false}), "*main.MockFileInfo", { kind: $.TypeKind.Pointer, elemType: "main.MockFileInfo" }), $.interfaceValue<FileInfo | null>(new MockFileInfo({name: "subdir", size: 0n, isDir: true}), "*main.MockFileInfo", { kind: $.TypeKind.Pointer, elemType: "main.MockFileInfo" })]), null]
+		return [$.arrayToSlice<FileInfo | null>([$.interfaceValue<FileInfo | null>(new MockFileInfo({name: "file1.txt", size: 100n, isDir: false}), "*main.MockFileInfo", /* @__PURE__ */ $.pointerType("main.MockFileInfo")), $.interfaceValue<FileInfo | null>(new MockFileInfo({name: "subdir", size: 0n, isDir: true}), "*main.MockFileInfo", /* @__PURE__ */ $.pointerType("main.MockFileInfo"))]), null]
 	}
 
 	static __typeInfo = $.registerStructType(
 		"main.MockFilesystem",
 		() => new MockFilesystem(),
-		() => [{ name: "ReadDir", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: "main.FileInfo" } }, { type: "error" }] }],
+		() => [{ name: "ReadDir", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType("main.FileInfo") }, { type: "error" }] }],
 		MockFilesystem,
 		() => []
 	)
@@ -187,7 +167,7 @@ export async function main(): globalThis.Promise<void> {
 		return null
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), "main.FileInfo", "error"], results: ["error"] } as $.FunctionTypeInfo))
 
-	let err = await walk($.interfaceValue<Filesystem | null>(fs, "*main.MockFilesystem", { kind: $.TypeKind.Pointer, elemType: "main.MockFilesystem" }), "/test", $.interfaceValue<FileInfo | null>(fileInfo, "*main.MockFileInfo", { kind: $.TypeKind.Pointer, elemType: "main.MockFileInfo" }), walkFunc)
+	let err = await walk($.interfaceValue<Filesystem | null>(fs, "*main.MockFilesystem", /* @__PURE__ */ $.pointerType("main.MockFilesystem")), "/test", $.interfaceValue<FileInfo | null>(fileInfo, "*main.MockFileInfo", /* @__PURE__ */ $.pointerType("main.MockFileInfo")), walkFunc)
 	if (err != null) {
 		await $.println("Walk error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 	}

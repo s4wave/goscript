@@ -23,10 +23,7 @@ export class concrete {
 	}
 
 	public clone(): concrete {
-		const cloned = new concrete()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new concrete(this))
 	}
 
 	public Read(): number {
@@ -50,7 +47,7 @@ export async function main(): globalThis.Promise<void> {
 	let r: reader | null = null! as reader | null
 	let err: $.GoError = null! as $.GoError
 	let __goscriptTuple0: any = makeReader()
-	r = $.interfaceValue<reader | null>(__goscriptTuple0[0], "*main.concrete", { kind: $.TypeKind.Pointer, elemType: "main.concrete" })
+	r = $.interfaceValue<reader | null>(__goscriptTuple0[0], "*main.concrete", /* @__PURE__ */ $.pointerType("main.concrete"))
 	err = __goscriptTuple0[1]
 	await $.println("ok", (await $.pointerValue<Exclude<reader, null>>(r).Read() == 7) && (err == null))
 }

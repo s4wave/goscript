@@ -4,39 +4,28 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class MyStruct {
-	public get publicField(): string {
-		return this._fields.publicField.value
-	}
-	public set publicField(value: string) {
-		this._fields.publicField.value = value
-	}
+	public declare publicField: string
 
-	public get privateField(): number {
-		return this._fields.privateField.value
-	}
-	public set privateField(value: number) {
-		this._fields.privateField.value = value
-	}
+	public declare privateField: number
 
 	public _fields: {
-		publicField: $.VarRef<string>
-		privateField: $.VarRef<number>
+		publicField: string
+		privateField: number
 	}
 
 	constructor(init?: Partial<{publicField?: string, privateField?: number}>) {
 		this._fields = {
-			publicField: $.varRef(init?.publicField ?? ("" as string)),
-			privateField: $.varRef(init?.privateField ?? (0 as number))
+			publicField: init?.publicField ?? ("" as string),
+			privateField: init?.privateField ?? (0 as number)
 		}
 	}
 
 	public clone(): MyStruct {
-		const cloned = new MyStruct()
-		cloned._fields = {
-			publicField: $.varRef(this._fields.publicField.value),
-			privateField: $.varRef(this._fields.privateField.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyStruct(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["publicField", "privateField"])
 	}
 
 	static __typeInfo = $.registerStructType(

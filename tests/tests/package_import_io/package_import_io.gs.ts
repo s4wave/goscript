@@ -13,29 +13,24 @@ import "@goscript/io/index.js"
 import "@goscript/sync/index.js"
 
 export class writerHolder {
-	public get w(): io.Writer | null {
-		return this._fields.w.value
-	}
-	public set w(value: io.Writer | null) {
-		this._fields.w.value = value
-	}
+	public declare w: io.Writer | null
 
 	public _fields: {
-		w: $.VarRef<io.Writer | null>
+		w: io.Writer | null
 	}
 
 	constructor(init?: Partial<{w?: io.Writer | null}>) {
 		this._fields = {
-			w: $.varRef(init?.w ?? (null! as io.Writer | null))
+			w: init?.w ?? (null! as io.Writer | null)
 		}
 	}
 
 	public clone(): writerHolder {
-		const cloned = new writerHolder()
-		cloned._fields = {
-			w: $.varRef(this._fields.w.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new writerHolder(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["w"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -57,10 +52,7 @@ export class asyncBuffer {
 	}
 
 	public clone(): asyncBuffer {
-		const cloned = new asyncBuffer()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new asyncBuffer(this))
 	}
 
 	public async Reset(w: io.Writer | null): globalThis.Promise<void> {
@@ -88,29 +80,20 @@ export class asyncBuffer {
 }
 
 export class staticReader {
-	public get done(): boolean {
-		return this._fields.done.value
-	}
-	public set done(value: boolean) {
-		this._fields.done.value = value
-	}
+	public declare done: boolean
 
 	public _fields: {
-		done: $.VarRef<boolean>
+		done: boolean
 	}
 
 	constructor(init?: Partial<{done?: boolean}>) {
 		this._fields = {
-			done: $.varRef(init?.done ?? (false as boolean))
+			done: init?.done ?? (false as boolean)
 		}
 	}
 
 	public clone(): staticReader {
-		const cloned = new staticReader()
-		cloned._fields = {
-			done: $.varRef(this._fields.done.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new staticReader(this))
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
@@ -123,6 +106,10 @@ export class staticReader {
 		return [4, null]
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["done"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.staticReader",
 		() => new staticReader(),
@@ -133,29 +120,20 @@ export class staticReader {
 }
 
 export class asyncReader {
-	public get done(): boolean {
-		return this._fields.done.value
-	}
-	public set done(value: boolean) {
-		this._fields.done.value = value
-	}
+	public declare done: boolean
 
 	public _fields: {
-		done: $.VarRef<boolean>
+		done: boolean
 	}
 
 	constructor(init?: Partial<{done?: boolean}>) {
 		this._fields = {
-			done: $.varRef(init?.done ?? (false as boolean))
+			done: init?.done ?? (false as boolean)
 		}
 	}
 
 	public clone(): asyncReader {
-		const cloned = new asyncReader()
-		cloned._fields = {
-			done: $.varRef(this._fields.done.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new asyncReader(this))
 	}
 
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
@@ -169,6 +147,10 @@ export class asyncReader {
 		return [5, null]
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["done"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.asyncReader",
 		() => new asyncReader(),
@@ -179,29 +161,20 @@ export class asyncReader {
 }
 
 export class asyncReaderAt {
-	public get data(): $.Slice<number> {
-		return this._fields.data.value
-	}
-	public set data(value: $.Slice<number>) {
-		this._fields.data.value = value
-	}
+	public declare data: $.Slice<number>
 
 	public _fields: {
-		data: $.VarRef<$.Slice<number>>
+		data: $.Slice<number>
 	}
 
 	constructor(init?: Partial<{data?: $.Slice<number>}>) {
 		this._fields = {
-			data: $.varRef(init?.data ?? (null! as $.Slice<number>))
+			data: init?.data ?? (null! as $.Slice<number>)
 		}
 	}
 
 	public clone(): asyncReaderAt {
-		const cloned = new asyncReaderAt()
-		cloned._fields = {
-			data: $.varRef(this._fields.data.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new asyncReaderAt(this))
 	}
 
 	public async ReadAt(p: $.Slice<number>, off: bigint): globalThis.Promise<[number, $.GoError]> {
@@ -217,69 +190,50 @@ export class asyncReaderAt {
 		return [n, null]
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["data"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.asyncReaderAt",
 		() => new asyncReaderAt(),
 		() => [{ name: "ReadAt", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
 		asyncReaderAt,
-		() => [{ name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }]
+		() => [{ name: "data", key: "data", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }]
 	)
 }
 
 export class pipeReadResult {
-	public get n(): number {
-		return this._fields.n.value
-	}
-	public set n(value: number) {
-		this._fields.n.value = value
-	}
+	public declare n: number
 
-	public get data(): string {
-		return this._fields.data.value
-	}
-	public set data(value: string) {
-		this._fields.data.value = value
-	}
+	public declare data: string
 
-	public get errNil(): boolean {
-		return this._fields.errNil.value
-	}
-	public set errNil(value: boolean) {
-		this._fields.errNil.value = value
-	}
+	public declare errNil: boolean
 
-	public get errEOF(): boolean {
-		return this._fields.errEOF.value
-	}
-	public set errEOF(value: boolean) {
-		this._fields.errEOF.value = value
-	}
+	public declare errEOF: boolean
 
 	public _fields: {
-		n: $.VarRef<number>
-		data: $.VarRef<string>
-		errNil: $.VarRef<boolean>
-		errEOF: $.VarRef<boolean>
+		n: number
+		data: string
+		errNil: boolean
+		errEOF: boolean
 	}
 
 	constructor(init?: Partial<{n?: number, data?: string, errNil?: boolean, errEOF?: boolean}>) {
 		this._fields = {
-			n: $.varRef(init?.n ?? (0 as number)),
-			data: $.varRef(init?.data ?? ("" as string)),
-			errNil: $.varRef(init?.errNil ?? (false as boolean)),
-			errEOF: $.varRef(init?.errEOF ?? (false as boolean))
+			n: init?.n ?? (0 as number),
+			data: init?.data ?? ("" as string),
+			errNil: init?.errNil ?? (false as boolean),
+			errEOF: init?.errEOF ?? (false as boolean)
 		}
 	}
 
 	public clone(): pipeReadResult {
-		const cloned = new pipeReadResult()
-		cloned._fields = {
-			n: $.varRef(this._fields.n.value),
-			data: $.varRef(this._fields.data.value),
-			errNil: $.varRef(this._fields.errNil.value),
-			errEOF: $.varRef(this._fields.errEOF.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new pipeReadResult(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["n", "data", "errNil", "errEOF"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -294,7 +248,7 @@ export class pipeReadResult {
 export let asyncWrites: $.VarRef<sync.Map> = $.varRef($.markAsStructValue(new sync.Map()))
 
 export function __goscript_set_asyncWrites(__goscriptValue: sync.Map): void {
-	asyncWrites.value = __goscriptValue
+	$.assignStruct(asyncWrites.value, __goscriptValue)
 }
 
 export async function copyInterfaces(dst: io.Writer | null, src: io.Reader | null): globalThis.Promise<[bigint, $.GoError]> {
@@ -324,29 +278,29 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("WriteString field writer - bytes:", n, "err:", err == null)
 
 	let buf: asyncBuffer | $.VarRef<asyncBuffer> | null = new asyncBuffer()
-	await asyncBuffer.prototype.Reset.call(buf, $.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", { kind: $.TypeKind.Pointer, elemType: "main.asyncBuffer" }))
+	await asyncBuffer.prototype.Reset.call(buf, $.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", /* @__PURE__ */ $.pointerType("main.asyncBuffer")))
 	await asyncBuffer.prototype.Reset.call(buf, null)
-	let __goscriptTuple1: any = await copyInterfaces(io.Discard, $.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", { kind: $.TypeKind.Pointer, elemType: "main.staticReader" }))
+	let __goscriptTuple1: any = await copyInterfaces(io.Discard, $.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", /* @__PURE__ */ $.pointerType("main.staticReader")))
 	let n64 = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	await $.println("Copy interface - bytes:", n64, "err:", err == null)
-	let __goscriptTuple2: any = await io.Copy($.pointerValueOrNil(io.Discard)!, {Reader: $.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", { kind: $.TypeKind.Pointer, elemType: "main.staticReader" })})
+	let __goscriptTuple2: any = await io.Copy($.pointerValueOrNil(io.Discard)!, {Reader: $.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", /* @__PURE__ */ $.pointerType("main.staticReader"))})
 	n64 = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	await $.println("Copy embedded reader - bytes:", n64, "err:", err == null)
-	let __goscriptTuple3: any = await io.Copy({Writer: io.Discard}, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", { kind: $.TypeKind.Pointer, elemType: "main.staticReader" }))!)
+	let __goscriptTuple3: any = await io.Copy({Writer: io.Discard}, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", /* @__PURE__ */ $.pointerType("main.staticReader")))!)
 	n64 = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
 	await $.println("Copy embedded writer - bytes:", n64, "err:", err == null)
-	let __goscriptTuple4: any = await io.Copy($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", { kind: $.TypeKind.Pointer, elemType: "main.asyncBuffer" }))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", { kind: $.TypeKind.Pointer, elemType: "main.staticReader" }))!)
+	let __goscriptTuple4: any = await io.Copy($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", /* @__PURE__ */ $.pointerType("main.asyncBuffer")))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", /* @__PURE__ */ $.pointerType("main.staticReader")))!)
 	n64 = __goscriptTuple4[0]
 	err = __goscriptTuple4[1]
 	await $.println("Copy async writer - bytes:", n64, "err:", err == null)
-	let __goscriptTuple5: any = await io.CopyN($.pointerValueOrNil(io.Discard)!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new asyncReader(), "*main.asyncReader", { kind: $.TypeKind.Pointer, elemType: "main.asyncReader" }))!, 5n)
+	let __goscriptTuple5: any = await io.CopyN($.pointerValueOrNil(io.Discard)!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new asyncReader(), "*main.asyncReader", /* @__PURE__ */ $.pointerType("main.asyncReader")))!, 5n)
 	n64 = __goscriptTuple5[0]
 	err = __goscriptTuple5[1]
 	await $.println("CopyN async reader - bytes:", n64, "err:", err == null)
-	let __goscriptTuple6: any = await io.Copy($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", { kind: $.TypeKind.Pointer, elemType: "main.asyncBuffer" }))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewBuffer(new Uint8Array([99, 111, 112, 121])), "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!)
+	let __goscriptTuple6: any = await io.Copy($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", /* @__PURE__ */ $.pointerType("main.asyncBuffer")))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewBuffer(new Uint8Array([99, 111, 112, 121])), "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!)
 	n64 = __goscriptTuple6[0]
 	err = __goscriptTuple6[1]
 	await $.println("Copy bytes WriteTo async writer - bytes:", n64, "err:", err == null)
@@ -356,12 +310,12 @@ export async function main(): globalThis.Promise<void> {
 	err = __goscriptTuple7[1]
 	await $.println("Read into byte slice view - bytes:", n, "data:", $.bytesToString(viewBacking), "err:", err == null)
 	let dst: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
-	let __goscriptTuple8: any = await io.Copy($.pointerValueOrNil($.interfaceValue<io.Writer | null>(dst, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new asyncReader(), "*main.asyncReader", { kind: $.TypeKind.Pointer, elemType: "main.asyncReader" }))!)
+	let __goscriptTuple8: any = await io.Copy($.pointerValueOrNil($.interfaceValue<io.Writer | null>(dst, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new asyncReader(), "*main.asyncReader", /* @__PURE__ */ $.pointerType("main.asyncReader")))!)
 	n64 = __goscriptTuple8[0]
 	err = __goscriptTuple8[1]
 	await $.println("Copy bytes ReadFrom async reader - bytes:", n64, "data:", dst.value.String(), "err:", err == null)
-	let sectionReader: io.SectionReader | $.VarRef<io.SectionReader> | null = io.NewSectionReader($.pointerValueOrNil($.interfaceValue<io.ReaderAt | null>(new asyncReaderAt({data: new Uint8Array([97, 98, 99, 100, 101, 102])}), "*main.asyncReaderAt", { kind: $.TypeKind.Pointer, elemType: "main.asyncReaderAt" }))!, 1n, 3n)
-	let __goscriptTuple9: any = await io.CopyBuffer($.pointerValueOrNil(io.Discard)!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(sectionReader, "*io.SectionReader", { kind: $.TypeKind.Pointer, elemType: "io.SectionReader" }))!, $.makeSlice<number>(2, undefined, "byte"))
+	let sectionReader: io.SectionReader | $.VarRef<io.SectionReader> | null = io.NewSectionReader($.pointerValueOrNil($.interfaceValue<io.ReaderAt | null>(new asyncReaderAt({data: new Uint8Array([97, 98, 99, 100, 101, 102])}), "*main.asyncReaderAt", /* @__PURE__ */ $.pointerType("main.asyncReaderAt")))!, 1n, 3n)
+	let __goscriptTuple9: any = await io.CopyBuffer($.pointerValueOrNil(io.Discard)!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(sectionReader, "*io.SectionReader", /* @__PURE__ */ $.pointerType("io.SectionReader")))!, $.makeSlice<number>(2, undefined, "byte"))
 	n64 = __goscriptTuple9[0]
 	err = __goscriptTuple9[1]
 	await $.println("Copy section async readerat - bytes:", n64, "err:", err == null)

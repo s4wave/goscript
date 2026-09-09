@@ -23,39 +23,28 @@ $.registerInterfaceType(
 );
 
 export class MyStruct {
-	public get Name(): string {
-		return this._fields.Name.value
-	}
-	public set Name(value: string) {
-		this._fields.Name.value = value
-	}
+	public declare Name: string
 
-	public get Age(): number {
-		return this._fields.Age.value
-	}
-	public set Age(value: number) {
-		this._fields.Age.value = value
-	}
+	public declare Age: number
 
 	public _fields: {
-		Name: $.VarRef<string>
-		Age: $.VarRef<number>
+		Name: string
+		Age: number
 	}
 
 	constructor(init?: Partial<{Name?: string, Age?: number}>) {
 		this._fields = {
-			Name: $.varRef(init?.Name ?? ("" as string)),
-			Age: $.varRef(init?.Age ?? (0 as number))
+			Name: init?.Name ?? ("" as string),
+			Age: init?.Age ?? (0 as number)
 		}
 	}
 
 	public clone(): MyStruct {
-		const cloned = new MyStruct()
-		cloned._fields = {
-			Name: $.varRef(this._fields.Name.value),
-			Age: $.varRef(this._fields.Age.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyStruct(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Name", "Age"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -63,7 +52,7 @@ export class MyStruct {
 		() => new MyStruct(),
 		() => [],
 		MyStruct,
-		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string"), index: [0], offset: 0, exported: true }, { name: "Age", key: "Age", type: /* @__PURE__ */ $.basicType("int"), index: [1], offset: 16, exported: true }]
+		() => [/* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [0], 0, true), /* @__PURE__ */ $.structField("Age", /* @__PURE__ */ $.basicType("int"), [1], 16, true)]
 	)
 }
 

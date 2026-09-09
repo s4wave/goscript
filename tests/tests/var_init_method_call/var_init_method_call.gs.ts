@@ -4,29 +4,20 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class T {
-	public get val(): number {
-		return this._fields.val.value
-	}
-	public set val(value: number) {
-		this._fields.val.value = value
-	}
+	public declare val: number
 
 	public _fields: {
-		val: $.VarRef<number>
+		val: number
 	}
 
 	constructor(init?: Partial<{val?: number}>) {
 		this._fields = {
-			val: $.varRef(init?.val ?? (0 as number))
+			val: init?.val ?? (0 as number)
 		}
 	}
 
 	public clone(): T {
-		const cloned = new T()
-		cloned._fields = {
-			val: $.varRef(this._fields.val.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new T(this))
 	}
 
 	public WithDelta(delta: number): T | $.VarRef<T> | null {
@@ -34,10 +25,14 @@ export class T {
 		return new T({val: $.pointerValue<T>(t).val + delta})
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["val"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.T",
 		() => new T(),
-		() => [{ name: "WithDelta", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.T" } }] }],
+		() => [{ name: "WithDelta", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("main.T") }] }],
 		T,
 		() => [{ name: "val", key: "val", type: /* @__PURE__ */ $.basicType("int") }]
 	)

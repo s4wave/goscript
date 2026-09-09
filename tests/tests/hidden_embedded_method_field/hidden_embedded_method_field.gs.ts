@@ -13,10 +13,7 @@ export class embedded {
 	}
 
 	public clone(): embedded {
-		const cloned = new embedded()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new embedded(this))
 	}
 
 	public Database(): string {
@@ -38,24 +35,19 @@ export class holder {
 	public declare embedded: embedded
 
 	public _fields: {
-		Database: $.VarRef<string>
-		embedded: $.VarRef<embedded>
+		Database: string
+		embedded: embedded
 	}
 
 	constructor(init?: Partial<{Database?: string, embedded?: embedded}>) {
 		this._fields = {
-			Database: $.varRef(init?.Database ?? ("" as string)),
-			embedded: $.varRef(init?.embedded ? $.markAsStructValue($.cloneStructValue(init.embedded)) : $.markAsStructValue(new embedded()))
+			Database: init?.Database ?? ("" as string),
+			embedded: init?.embedded ? $.markAsStructValue($.cloneStructValue(init.embedded)) : $.markAsStructValue(new embedded())
 		}
 	}
 
 	public clone(): holder {
-		const cloned = new holder()
-		cloned._fields = {
-			Database: $.varRef(this._fields.Database.value),
-			embedded: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.embedded.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new holder(this))
 	}
 
 	static {

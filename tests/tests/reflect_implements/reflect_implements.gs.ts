@@ -26,10 +26,7 @@ export class MyType {
 	}
 
 	public clone(): MyType {
-		const cloned = new MyType()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyType(this))
 	}
 
 	public String(): string {

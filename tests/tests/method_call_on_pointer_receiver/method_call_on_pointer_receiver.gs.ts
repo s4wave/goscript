@@ -4,44 +4,33 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class MyStruct {
-	public get MyInt(): number {
-		return this._fields.MyInt.value
-	}
-	public set MyInt(value: number) {
-		this._fields.MyInt.value = value
-	}
+	public declare MyInt: number
 
-	public get MyString(): string {
-		return this._fields.MyString.value
-	}
-	public set MyString(value: string) {
-		this._fields.MyString.value = value
-	}
+	public declare MyString: string
 
 	public _fields: {
-		MyInt: $.VarRef<number>
-		MyString: $.VarRef<string>
+		MyInt: number
+		MyString: string
 	}
 
 	constructor(init?: Partial<{MyInt?: number, MyString?: string}>) {
 		this._fields = {
-			MyInt: $.varRef(init?.MyInt ?? (0 as number)),
-			MyString: $.varRef(init?.MyString ?? ("" as string))
+			MyInt: init?.MyInt ?? (0 as number),
+			MyString: init?.MyString ?? ("" as string)
 		}
 	}
 
 	public clone(): MyStruct {
-		const cloned = new MyStruct()
-		cloned._fields = {
-			MyInt: $.varRef(this._fields.MyInt.value),
-			MyString: $.varRef(this._fields.MyString.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyStruct(this))
 	}
 
 	public GetMyString(): string {
 		const m: MyStruct | $.VarRef<MyStruct> | null = this
 		return $.pointerValue<MyStruct>(m).MyString
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["MyInt", "MyString"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -54,29 +43,20 @@ export class MyStruct {
 }
 
 export class setterStruct {
-	public get value(): number {
-		return this._fields.value.value
-	}
-	public set value(value: number) {
-		this._fields.value.value = value
-	}
+	public declare value: number
 
 	public _fields: {
-		value: $.VarRef<number>
+		value: number
 	}
 
 	constructor(init?: Partial<{value?: number}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? (0 as number))
+			value: init?.value ?? (0 as number)
 		}
 	}
 
 	public clone(): setterStruct {
-		const cloned = new setterStruct()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new setterStruct(this))
 	}
 
 	public ["get"](): number {
@@ -89,6 +69,10 @@ export class setterStruct {
 		$.pointerValue<setterStruct>(s).value = value
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["value"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.setterStruct",
 		() => new setterStruct(),
@@ -99,34 +83,29 @@ export class setterStruct {
 }
 
 export class digest {
-	public get writes(): number {
-		return this._fields.writes.value
-	}
-	public set writes(value: number) {
-		this._fields.writes.value = value
-	}
+	public declare writes: number
 
 	public _fields: {
-		writes: $.VarRef<number>
+		writes: number
 	}
 
 	constructor(init?: Partial<{writes?: number}>) {
 		this._fields = {
-			writes: $.varRef(init?.writes ?? (0 as number))
+			writes: init?.writes ?? (0 as number)
 		}
 	}
 
 	public clone(): digest {
-		const cloned = new digest()
-		cloned._fields = {
-			writes: $.varRef(this._fields.writes.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new digest(this))
 	}
 
 	public Write(p: $.Slice<number>): void {
 		let d: digest | $.VarRef<digest> | null = this
 		$.pointerValue<digest>(d).writes = $.pointerValue<digest>(d).writes + ($.len(p))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["writes"])
 	}
 
 	static __typeInfo = $.registerStructType(

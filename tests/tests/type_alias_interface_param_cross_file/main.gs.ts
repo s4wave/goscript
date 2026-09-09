@@ -10,34 +10,29 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/type_alias_interface_pa
 import "./types.gs.ts"
 
 export class sink {
-	public get size(): number {
-		return this._fields.size.value
-	}
-	public set size(value: number) {
-		this._fields.size.value = value
-	}
+	public declare size: number
 
 	public _fields: {
-		size: $.VarRef<number>
+		size: number
 	}
 
 	constructor(init?: Partial<{size?: number}>) {
 		this._fields = {
-			size: $.varRef(init?.size ?? (0 as number))
+			size: init?.size ?? (0 as number)
 		}
 	}
 
 	public clone(): sink {
-		const cloned = new sink()
-		cloned._fields = {
-			size: $.varRef(this._fields.size.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new sink(this))
 	}
 
 	public Put(v: __goscript_types.Value): void {
 		let s: sink | $.VarRef<sink> | null = this
 		$.pointerValue<sink>(s).size = $.len((v as __goscript_types.Value))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["size"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -55,7 +50,7 @@ export async function write(tx: __goscript_types.Tx | null, v: dep.Value): globa
 
 export async function main(): globalThis.Promise<void> {
 	let s: sink | $.VarRef<sink> | null = new sink()
-	await write($.interfaceValue<__goscript_types.Tx | null>(s, "*main.sink", { kind: $.TypeKind.Pointer, elemType: "main.sink" }), (new Uint8Array([1, 2, 3]) as $.Slice<number> as dep.Value))
+	await write($.interfaceValue<__goscript_types.Tx | null>(s, "*main.sink", /* @__PURE__ */ $.pointerType("main.sink")), (new Uint8Array([1, 2, 3]) as $.Slice<number> as dep.Value))
 	await $.println("size:", $.pointerValue<sink>(s).size)
 }
 

@@ -9,7 +9,7 @@ import "@goscript/syscall/js/index.js"
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
 	let global = $.markAsStructValue($.cloneStructValue(js.Global()))
-	$.markAsStructValue($.cloneStructValue(global)).Set("__GOSCRIPT_JS_TEST__", $.interfaceValue($.markAsStructValue($.cloneStructValue(js.ValueOf($.interfaceValue($.makeMap<string, any>([["name", "goscript"], ["nums", $.interfaceValue($.arrayToSlice<any>([$.basicInterfaceValue(1, "int"), $.basicInterfaceValue(2, "int"), $.basicInterfaceValue(3, "int")]), "[]any", { kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Interface, methods: [] } })]]), "map[string]any", { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: { kind: $.TypeKind.Interface, methods: [] } })))), "js.Value", "js.Value"))
+	$.markAsStructValue($.cloneStructValue(global)).Set("__GOSCRIPT_JS_TEST__", $.interfaceValue($.markAsStructValue($.cloneStructValue(js.ValueOf($.interfaceValue($.makeMap<string, any>([["name", "goscript"], ["nums", $.interfaceValue($.arrayToSlice<any>([$.basicInterfaceValue(1, "int"), $.basicInterfaceValue(2, "int"), $.basicInterfaceValue(3, "int")]), "[]any", /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] }))]]), "map[string]any", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))), "js.Value", "js.Value"))
 	let obj = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(global)).Get("__GOSCRIPT_JS_TEST__")))
 	await $.println("type:", js.Type_String($.markAsStructValue($.cloneStructValue(obj)).Type()))
 	await $.println("name:", $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(obj)).Get("name"))).String())
@@ -17,7 +17,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let cb = $.markAsStructValue($.cloneStructValue(js.FuncOf($.functionValue((_this: js.Value, args: $.Slice<js.Value>): any => {
 		return $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).Int() + 1, "int")
-	}, ({ kind: $.TypeKind.Function, params: ["js.Value", { kind: $.TypeKind.Slice, elemType: "js.Value" }], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))))
+	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))))
 	__defer.defer(() => { $.markAsStructValue($.cloneStructValue(cb)).Release() })
 	await $.println("callback:", $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(cb)).Invoke($.basicInterfaceValue(41, "int")))).Int())
 

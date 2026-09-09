@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class holder {
-	public get values(): $.VarRef<$.Slice<number>> | null {
-		return this._fields.values.value
-	}
-	public set values(value: $.VarRef<$.Slice<number>> | null) {
-		this._fields.values.value = value
-	}
+	public declare values: $.VarRef<$.Slice<number>> | null
 
 	public _fields: {
-		values: $.VarRef<$.VarRef<$.Slice<number>> | null>
+		values: $.VarRef<$.Slice<number>> | null
 	}
 
 	constructor(init?: Partial<{values?: $.VarRef<$.Slice<number>> | null}>) {
 		this._fields = {
-			values: $.varRef(init?.values ?? (null! as $.VarRef<$.Slice<number>> | null))
+			values: init?.values ?? (null! as $.VarRef<$.Slice<number>> | null)
 		}
 	}
 
 	public clone(): holder {
-		const cloned = new holder()
-		cloned._fields = {
-			values: $.varRef(this._fields.values.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new holder(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["values"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -34,7 +29,7 @@ export class holder {
 		() => new holder(),
 		() => [],
 		holder,
-		() => [{ name: "values", key: "values", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("int") } } }]
+		() => [{ name: "values", key: "values", type: /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))) }]
 	)
 }
 

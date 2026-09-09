@@ -4,39 +4,28 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class namedItem {
-	public get key(): string {
-		return this._fields.key.value
-	}
-	public set key(value: string) {
-		this._fields.key.value = value
-	}
+	public declare key: string
 
-	public get data(): $.Slice<number> {
-		return this._fields.data.value
-	}
-	public set data(value: $.Slice<number>) {
-		this._fields.data.value = value
-	}
+	public declare data: $.Slice<number>
 
 	public _fields: {
-		key: $.VarRef<string>
-		data: $.VarRef<$.Slice<number>>
+		key: string
+		data: $.Slice<number>
 	}
 
 	constructor(init?: Partial<{key?: string, data?: $.Slice<number>}>) {
 		this._fields = {
-			key: $.varRef(init?.key ?? ("" as string)),
-			data: $.varRef(init?.data ?? (null! as $.Slice<number>))
+			key: init?.key ?? ("" as string),
+			data: init?.data ?? (null! as $.Slice<number>)
 		}
 	}
 
 	public clone(): namedItem {
-		const cloned = new namedItem()
-		cloned._fields = {
-			key: $.varRef(this._fields.key.value),
-			data: $.varRef(this._fields.data.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new namedItem(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["key", "data"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -44,7 +33,7 @@ export class namedItem {
 		() => new namedItem(),
 		() => [],
 		namedItem,
-		() => [{ name: "key", key: "key", type: /* @__PURE__ */ $.basicType("string") }, { name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }]
+		() => [{ name: "key", key: "key", type: /* @__PURE__ */ $.basicType("string") }, { name: "data", key: "data", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }]
 	)
 }
 

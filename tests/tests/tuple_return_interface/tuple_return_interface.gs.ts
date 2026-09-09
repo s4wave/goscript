@@ -14,34 +14,29 @@ $.registerInterfaceType(
 );
 
 export class blockImpl {
-	public get size(): number {
-		return this._fields.size.value
-	}
-	public set size(value: number) {
-		this._fields.size.value = value
-	}
+	public declare size: number
 
 	public _fields: {
-		size: $.VarRef<number>
+		size: number
 	}
 
 	constructor(init?: Partial<{size?: number}>) {
 		this._fields = {
-			size: $.varRef(init?.size ?? (0 as number))
+			size: init?.size ?? (0 as number)
 		}
 	}
 
 	public clone(): blockImpl {
-		const cloned = new blockImpl()
-		cloned._fields = {
-			size: $.varRef(this._fields.size.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new blockImpl(this))
 	}
 
 	public Size(): number {
 		const b: blockImpl | $.VarRef<blockImpl> | null = this
 		return $.pointerValue<blockImpl>(b).size
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["size"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -62,7 +57,7 @@ export function newInterface(size: number): [Block | null, $.GoError] {
 		return [null, null]
 	}
 	const __goscriptReturn0 = newBlock(size)
-	return [$.interfaceValue<Block | null>(__goscriptReturn0[0], "*main.blockImpl", { kind: $.TypeKind.Pointer, elemType: "main.blockImpl" }), __goscriptReturn0[1]]
+	return [$.interfaceValue<Block | null>(__goscriptReturn0[0], "*main.blockImpl", /* @__PURE__ */ $.pointerType("main.blockImpl")), __goscriptReturn0[1]]
 	throw new globalThis.Error("goscript: unreachable return")
 }
 

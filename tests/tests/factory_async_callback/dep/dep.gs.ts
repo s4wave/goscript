@@ -23,10 +23,7 @@ export class Bus {
 	}
 
 	public clone(): Bus {
-		const cloned = new Bus()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Bus(this))
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -48,10 +45,7 @@ export class factory {
 	}
 
 	public clone(): factory {
-		const cloned = new factory()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new factory(this))
 	}
 
 	public GetConfigID(__typeArgs: $.GenericTypeArgs | undefined): string {
@@ -72,5 +66,5 @@ export async function NewFactory(b: Bus): globalThis.Promise<Factory | null> {
 	let ch: $.Channel<{}> | null = $.makeChannel<{}>(1, {}, "both")
 	await $.chanSend(ch, {})
 	await $.chanRecv(ch)
-	return $.namedValueInterfaceValue<Factory | null>(new factory(), "*dep.factory", {GetConfigID: (receiver: any, ...args: any[]) => $.pointerValue(receiver).GetConfigID({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "dep.Bus", zero: () => $.markAsStructValue(new Bus()) }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "dep.factory" }, [{ name: "GetConfigID", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }] }])
+	return $.namedValueInterfaceValue<Factory | null>(new factory(), "*dep.factory", {GetConfigID: (receiver: any, ...args: any[]) => $.pointerValue(receiver).GetConfigID({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "dep.Bus", zero: () => $.markAsStructValue(new Bus()) }}, ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType("dep.factory"), [$.methodSignature("GetConfigID", [], [/* @__PURE__ */ $.basicType("string")])])
 }

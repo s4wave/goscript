@@ -16,10 +16,7 @@ export class thing {
 	}
 
 	public clone(): thing {
-		const cloned = new thing()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new thing(this))
 	}
 
 	static __typeInfo = $.registerStructType(

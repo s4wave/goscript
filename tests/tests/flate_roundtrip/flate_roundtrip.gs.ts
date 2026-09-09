@@ -21,7 +21,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget1 = $.arrayToSlice<number>([flate.BestSpeed, flate.DefaultCompression, flate.BestCompression]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
 		let level = __goscriptRangeTarget1![__rangeIndex]
 		let compressed: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
-		let __goscriptTuple0: any = flate.NewWriter($.interfaceValue<io.Writer | null>(compressed, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }), level)
+		let __goscriptTuple0: any = flate.NewWriter($.interfaceValue<io.Writer | null>(compressed, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), level)
 		let writer: flate.Writer | $.VarRef<flate.Writer> | null = __goscriptTuple0[0]
 		let err = __goscriptTuple0[1]
 		if (err != null) {
@@ -41,7 +41,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 
 		// The decoded bytes must retain the complete original payload.
-		let reader = await flate.NewReader($.interfaceValue<io.Reader | null>(compressed, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))
+		let reader = await flate.NewReader($.interfaceValue<io.Reader | null>(compressed, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))
 		let __goscriptTuple1: any = await io.ReadAll($.pointerValueOrNil((reader as io.Reader | null))!)
 		let output: $.Slice<number> = __goscriptTuple1[0]
 		err = __goscriptTuple1[1]

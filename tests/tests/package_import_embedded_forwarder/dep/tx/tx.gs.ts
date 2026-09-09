@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Tx {
-	public get Name(): string {
-		return this._fields.Name.value
-	}
-	public set Name(value: string) {
-		this._fields.Name.value = value
-	}
+	public declare Name: string
 
 	public _fields: {
-		Name: $.VarRef<string>
+		Name: string
 	}
 
 	constructor(init?: Partial<{Name?: string}>) {
 		this._fields = {
-			Name: $.varRef(init?.Name ?? ("" as string))
+			Name: init?.Name ?? ("" as string)
 		}
 	}
 
 	public clone(): Tx {
-		const cloned = new Tx()
-		cloned._fields = {
-			Name: $.varRef(this._fields.Name.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Tx(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Name"])
 	}
 
 	static __typeInfo = $.registerStructType(

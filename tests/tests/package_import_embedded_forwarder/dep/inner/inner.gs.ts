@@ -7,29 +7,20 @@ import * as tx from "@goscript/github.com/s4wave/goscript/tests/tests/package_im
 import "@goscript/github.com/s4wave/goscript/tests/tests/package_import_embedded_forwarder/dep/tx/index.js"
 
 export class CoreStore {
-	public get Prefix(): string {
-		return this._fields.Prefix.value
-	}
-	public set Prefix(value: string) {
-		this._fields.Prefix.value = value
-	}
+	public declare Prefix: string
 
 	public _fields: {
-		Prefix: $.VarRef<string>
+		Prefix: string
 	}
 
 	constructor(init?: Partial<{Prefix?: string}>) {
 		this._fields = {
-			Prefix: $.varRef(init?.Prefix ?? ("" as string))
+			Prefix: init?.Prefix ?? ("" as string)
 		}
 	}
 
 	public clone(): CoreStore {
-		const cloned = new CoreStore()
-		cloned._fields = {
-			Prefix: $.varRef(this._fields.Prefix.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new CoreStore(this))
 	}
 
 	public NewTransaction(write: boolean): tx.Tx | $.VarRef<tx.Tx> | null {
@@ -40,10 +31,14 @@ export class CoreStore {
 		return new tx.Tx({Name: $.pointerValue<CoreStore>(s).Prefix + ":read"})
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["Prefix"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"inner.CoreStore",
 		() => new CoreStore(),
-		() => [{ name: "NewTransaction", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "tx.Tx" } }] }],
+		() => [{ name: "NewTransaction", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("tx.Tx") }] }],
 		CoreStore,
 		() => [{ name: "Prefix", key: "Prefix", type: /* @__PURE__ */ $.basicType("string") }]
 	)

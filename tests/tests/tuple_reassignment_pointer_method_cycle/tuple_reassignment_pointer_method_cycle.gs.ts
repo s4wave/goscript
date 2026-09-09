@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class box {
-	public get value(): number {
-		return this._fields.value.value
-	}
-	public set value(value: number) {
-		this._fields.value.value = value
-	}
+	public declare value: number
 
 	public _fields: {
-		value: $.VarRef<number>
+		value: number
 	}
 
 	constructor(init?: Partial<{value?: number}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? (0 as number))
+			value: init?.value ?? (0 as number)
 		}
 	}
 
 	public clone(): box {
-		const cloned = new box()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new box(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -48,10 +43,7 @@ export class cursor {
 	}
 
 	public clone(): cursor {
-		const cloned = new cursor()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new cursor(this))
 	}
 
 	public rotate(a: box | $.VarRef<box> | null, b: box | $.VarRef<box> | null, c: box | $.VarRef<box> | null): [box | $.VarRef<box> | null, box | $.VarRef<box> | null, box | $.VarRef<box> | null] {
@@ -61,7 +53,7 @@ export class cursor {
 	static __typeInfo = $.registerStructType(
 		"main.cursor",
 		() => new cursor(),
-		() => [{ name: "rotate", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "main.box" } }, { type: { kind: $.TypeKind.Pointer, elemType: "main.box" } }, { type: { kind: $.TypeKind.Pointer, elemType: "main.box" } }] }],
+		() => [{ name: "rotate", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("main.box") }, { type: /* @__PURE__ */ $.pointerType("main.box") }, { type: /* @__PURE__ */ $.pointerType("main.box") }] }],
 		cursor,
 		() => []
 	)

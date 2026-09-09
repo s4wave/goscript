@@ -14,34 +14,29 @@ $.registerInterfaceType(
 );
 
 export class blankImpl {
-	public get value(): number {
-		return this._fields.value.value
-	}
-	public set value(value: number) {
-		this._fields.value.value = value
-	}
+	public declare value: number
 
 	public _fields: {
-		value: $.VarRef<number>
+		value: number
 	}
 
 	constructor(init?: Partial<{value?: number}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? (0 as number))
+			value: init?.value ?? (0 as number)
 		}
 	}
 
 	public clone(): blankImpl {
-		const cloned = new blankImpl()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new blankImpl(this))
 	}
 
 	public Value(): number {
 		const b: blankImpl | $.VarRef<blankImpl> | null = this
 		return $.pointerValue<blankImpl>(b).value
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -63,10 +58,7 @@ export class Packer {
 	}
 
 	public clone(): Packer {
-		const cloned = new Packer()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Packer(this))
 	}
 
 	public pack(msg: $.Slice<number>, _p1: globalThis.Map<string, number> | null, _p2: number): $.Slice<number> {
@@ -76,7 +68,7 @@ export class Packer {
 	static __typeInfo = $.registerStructType(
 		"main.Packer",
 		() => new Packer(),
-		() => [{ name: "pack", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }] }],
+		() => [{ name: "pack", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }],
 		Packer,
 		() => []
 	)

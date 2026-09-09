@@ -8,7 +8,7 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/import_alias_type_asser
 
 export function unwrap(v: any): number {
 	{
-		let __goscriptTuple0: any = $.typeAssertTuple<dep2.Thing | $.VarRef<dep2.Thing> | null>(v, { kind: $.TypeKind.Pointer, elemType: "dep.Thing" })
+		let __goscriptTuple0: any = $.typeAssertTuple<dep2.Thing | $.VarRef<dep2.Thing> | null>(v, /* @__PURE__ */ $.pointerType("dep.Thing"))
 		let __goscriptShadow0: dep2.Thing | $.VarRef<dep2.Thing> | null = __goscriptTuple0[0]
 		let ok = __goscriptTuple0[1]
 		if (ok) {
@@ -19,7 +19,7 @@ export function unwrap(v: any): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println(unwrap($.interfaceValue(new dep2.Thing({Value: 7}), "*dep.Thing", { kind: $.TypeKind.Pointer, elemType: "dep.Thing" })))
+	await $.println(unwrap($.interfaceValue(new dep2.Thing({Value: 7}), "*dep.Thing", /* @__PURE__ */ $.pointerType("dep.Thing"))))
 }
 
 if ($.isMainScript(import.meta)) {

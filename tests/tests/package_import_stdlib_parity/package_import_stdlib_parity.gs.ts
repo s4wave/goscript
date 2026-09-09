@@ -54,10 +54,7 @@ export class xof {
 	}
 
 	public clone(): xof {
-		const cloned = new xof()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new xof(this))
 	}
 
 	public BlockSize(): number {
@@ -103,7 +100,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("leaf:", $.uint(bits.Rem32($.uint(1, 32), $.uint(0, 32), $.uint(3, 32)), 32), strings.ToValidUTF8("abc", "?"), strconv.FormatComplex(parsed, $.uint(102, 8), -1, 128), $.int($.real(parsed)), $.int($.imag(parsed)), zlib.NoCompression, await $.pointerValue<Exclude<$.GoError, null>>(os.ErrNoHandle).Error(), strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "go"), $.stringEqual(strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "iki"), "İKİ"))
 
 	let scan: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
-	await scanner.PrintError($.pointerValueOrNil($.interfaceValue<io.Writer | null>(scan, "*bytes.Buffer", { kind: $.TypeKind.Pointer, elemType: "bytes.Buffer" }))!, $.pointerValueOrNil(errors.New("scan failed"))!)
+	await scanner.PrintError($.pointerValueOrNil($.interfaceValue<io.Writer | null>(scan, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.pointerValueOrNil(errors.New("scan failed"))!)
 	await $.println("scanner:", strings.TrimSpace(scan.value.String()))
 
 	let h: hash.XOF | null = $.interfaceValue<hash.XOF | null>($.markAsStructValue(new xof()), "main.xof", "main.xof")

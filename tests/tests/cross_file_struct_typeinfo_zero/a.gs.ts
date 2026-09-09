@@ -7,29 +7,24 @@ import * as __goscript_b from "./b.gs.ts"
 import "./b.gs.ts"
 
 export class aValue {
-	public get next(): __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null {
-		return this._fields.next.value
-	}
-	public set next(value: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null) {
-		this._fields.next.value = value
-	}
+	public declare next: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null
 
 	public _fields: {
-		next: $.VarRef<__goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null>
+		next: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null
 	}
 
 	constructor(init?: Partial<{next?: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null}>) {
 		this._fields = {
-			next: $.varRef(init?.next ?? (null! as __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null))
+			next: init?.next ?? (null! as __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null)
 		}
 	}
 
 	public clone(): aValue {
-		const cloned = new aValue()
-		cloned._fields = {
-			next: $.varRef(this._fields.next.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new aValue(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["next"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -37,7 +32,7 @@ export class aValue {
 		() => new aValue(),
 		() => [],
 		aValue,
-		() => [{ name: "next", key: "next", type: { kind: $.TypeKind.Pointer, elemType: "main.bValue" } }]
+		() => [{ name: "next", key: "next", type: /* @__PURE__ */ $.pointerType("main.bValue") }]
 	)
 }
 

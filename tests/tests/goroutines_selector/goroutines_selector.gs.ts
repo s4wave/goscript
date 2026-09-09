@@ -4,29 +4,20 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Foo {
-	public get done(): $.Channel<boolean> | null {
-		return this._fields.done.value
-	}
-	public set done(value: $.Channel<boolean> | null) {
-		this._fields.done.value = value
-	}
+	public declare done: $.Channel<boolean> | null
 
 	public _fields: {
-		done: $.VarRef<$.Channel<boolean> | null>
+		done: $.Channel<boolean> | null
 	}
 
 	constructor(init?: Partial<{done?: $.Channel<boolean> | null}>) {
 		this._fields = {
-			done: $.varRef(init?.done ?? (null! as $.Channel<boolean> | null))
+			done: init?.done ?? (null! as $.Channel<boolean> | null)
 		}
 	}
 
 	public clone(): Foo {
-		const cloned = new Foo()
-		cloned._fields = {
-			done: $.varRef(this._fields.done.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Foo(this))
 	}
 
 	public async Bar(): globalThis.Promise<void> {
@@ -35,12 +26,16 @@ export class Foo {
 		await $.chanSend($.pointerValue<Foo>(f).done, true)
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["done"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Foo",
 		() => new Foo(),
 		() => [{ name: "Bar", args: [], returns: [] }],
 		Foo,
-		() => [{ name: "done", key: "done", type: { kind: $.TypeKind.Channel, direction: "both", elemType: /* @__PURE__ */ $.basicType("bool") } }]
+		() => [{ name: "done", key: "done", type: /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("bool"), "both") }]
 	)
 }
 

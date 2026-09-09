@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class node {
-	public get next(): number {
-		return this._fields.next.value
-	}
-	public set next(value: number) {
-		this._fields.next.value = value
-	}
+	public declare next: number
 
 	public _fields: {
-		next: $.VarRef<number>
+		next: number
 	}
 
 	constructor(init?: Partial<{next?: number}>) {
 		this._fields = {
-			next: $.varRef(init?.next ?? (0 as number))
+			next: init?.next ?? (0 as number)
 		}
 	}
 
 	public clone(): node {
-		const cloned = new node()
-		cloned._fields = {
-			next: $.varRef(this._fields.next.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new node(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["next"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -39,29 +34,24 @@ export class node {
 }
 
 export class queue {
-	public get value(): number {
-		return this._fields.value.value
-	}
-	public set value(value: number) {
-		this._fields.value.value = value
-	}
+	public declare value: number
 
 	public _fields: {
-		value: $.VarRef<number>
+		value: number
 	}
 
 	constructor(init?: Partial<{value?: number}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? (0 as number))
+			value: init?.value ?? (0 as number)
 		}
 	}
 
 	public clone(): queue {
-		const cloned = new queue()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new queue(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -4,39 +4,28 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class point {
-	public get x(): number {
-		return this._fields.x.value
-	}
-	public set x(value: number) {
-		this._fields.x.value = value
-	}
+	public declare x: number
 
-	public get y(): number {
-		return this._fields.y.value
-	}
-	public set y(value: number) {
-		this._fields.y.value = value
-	}
+	public declare y: number
 
 	public _fields: {
-		x: $.VarRef<number>
-		y: $.VarRef<number>
+		x: number
+		y: number
 	}
 
 	constructor(init?: Partial<{x?: number, y?: number}>) {
 		this._fields = {
-			x: $.varRef(init?.x ?? (0 as number)),
-			y: $.varRef(init?.y ?? (0 as number))
+			x: init?.x ?? (0 as number),
+			y: init?.y ?? (0 as number)
 		}
 	}
 
 	public clone(): point {
-		const cloned = new point()
-		cloned._fields = {
-			x: $.varRef(this._fields.x.value),
-			y: $.varRef(this._fields.y.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new point(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["x", "y"])
 	}
 
 	static __typeInfo = $.registerStructType(

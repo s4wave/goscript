@@ -14,34 +14,29 @@ $.registerInterfaceType(
 );
 
 export class stream {
-	public get name(): string {
-		return this._fields.name.value
-	}
-	public set name(value: string) {
-		this._fields.name.value = value
-	}
+	public declare name: string
 
 	public _fields: {
-		name: $.VarRef<string>
+		name: string
 	}
 
 	constructor(init?: Partial<{name?: string}>) {
 		this._fields = {
-			name: $.varRef(init?.name ?? ("" as string))
+			name: init?.name ?? ("" as string)
 		}
 	}
 
 	public clone(): stream {
-		const cloned = new stream()
-		cloned._fields = {
-			name: $.varRef(this._fields.name.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new stream(this))
 	}
 
 	public Close(): string {
 		const s = this
 		return "close:" + s.name
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["name"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -54,33 +49,28 @@ export class stream {
 }
 
 export class stopStream {
-	public get stream(): stream {
-		return this._fields.stream.value
-	}
-	public set stream(value: stream) {
-		this._fields.stream.value = value
-	}
+	public declare stream: stream
 
 	public _fields: {
-		stream: $.VarRef<stream>
+		stream: stream
 	}
 
 	constructor(init?: Partial<{stream?: stream}>) {
 		this._fields = {
-			stream: $.varRef(init?.stream ? $.markAsStructValue($.cloneStructValue(init.stream)) : $.markAsStructValue(new stream()))
+			stream: init?.stream ? $.markAsStructValue($.cloneStructValue(init.stream)) : $.markAsStructValue(new stream())
 		}
 	}
 
 	public clone(): stopStream {
-		const cloned = new stopStream()
-		cloned._fields = {
-			stream: $.varRef($.markAsStructValue($.cloneStructValue(this._fields.stream.value)))
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new stopStream(this))
 	}
 
 	public Close(): any {
 		return $.pointerValue<stream>(this.stream).Close()
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["stream"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -93,33 +83,28 @@ export class stopStream {
 }
 
 export class pointerStopStream {
-	public get stream(): stream | $.VarRef<stream> | null {
-		return this._fields.stream.value
-	}
-	public set stream(value: stream | $.VarRef<stream> | null) {
-		this._fields.stream.value = value
-	}
+	public declare stream: stream | $.VarRef<stream> | null
 
 	public _fields: {
-		stream: $.VarRef<stream | $.VarRef<stream> | null>
+		stream: stream | $.VarRef<stream> | null
 	}
 
 	constructor(init?: Partial<{stream?: stream | $.VarRef<stream> | null}>) {
 		this._fields = {
-			stream: $.varRef(init?.stream ?? (null! as stream | $.VarRef<stream> | null))
+			stream: init?.stream ?? (null! as stream | $.VarRef<stream> | null)
 		}
 	}
 
 	public clone(): pointerStopStream {
-		const cloned = new pointerStopStream()
-		cloned._fields = {
-			stream: $.varRef(this._fields.stream.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new pointerStopStream(this))
 	}
 
 	public Close(): any {
 		return $.pointerValue<stream>(this.stream).Close()
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["stream"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -127,7 +112,7 @@ export class pointerStopStream {
 		() => new pointerStopStream(),
 		() => [{ name: "Close", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		pointerStopStream,
-		() => [{ name: "stream", key: "stream", type: { kind: $.TypeKind.Pointer, elemType: "main.stream" }, anonymous: true }]
+		() => [{ name: "stream", key: "stream", type: /* @__PURE__ */ $.pointerType("main.stream"), anonymous: true }]
 	)
 }
 
@@ -140,7 +125,7 @@ export async function main(): globalThis.Promise<void> {
 	await closeIt($.interfaceValue<closer | null>($.markAsStructValue($.cloneStructValue(value)), "main.stopStream", "main.stopStream"))
 
 	let ptr: stopStream | $.VarRef<stopStream> | null = new stopStream({stream: $.markAsStructValue(new stream({name: "pointer"}))})
-	await closeIt($.interfaceValue<closer | null>(ptr, "*main.stopStream", { kind: $.TypeKind.Pointer, elemType: "main.stopStream" }))
+	await closeIt($.interfaceValue<closer | null>(ptr, "*main.stopStream", /* @__PURE__ */ $.pointerType("main.stopStream")))
 
 	let promotedPtr = $.markAsStructValue(new pointerStopStream({stream: new stream({name: "embedded pointer"})}))
 	await closeIt($.interfaceValue<closer | null>($.markAsStructValue($.cloneStructValue(promotedPtr)), "main.pointerStopStream", "main.pointerStopStream"))

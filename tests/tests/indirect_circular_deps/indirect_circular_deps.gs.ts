@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class A {
-	public get BB(): $.Slice<B> {
-		return this._fields.BB.value
-	}
-	public set BB(value: $.Slice<B>) {
-		this._fields.BB.value = value
-	}
+	public declare BB: $.Slice<B>
 
 	public _fields: {
-		BB: $.VarRef<$.Slice<B>>
+		BB: $.Slice<B>
 	}
 
 	constructor(init?: Partial<{BB?: $.Slice<B>}>) {
 		this._fields = {
-			BB: $.varRef(init?.BB ?? (null! as $.Slice<B>))
+			BB: init?.BB ?? (null! as $.Slice<B>)
 		}
 	}
 
 	public clone(): A {
-		const cloned = new A()
-		cloned._fields = {
-			BB: $.varRef(this._fields.BB.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new A(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["BB"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -34,34 +29,29 @@ export class A {
 		() => new A(),
 		() => [],
 		A,
-		() => [{ name: "BB", key: "BB", type: { kind: $.TypeKind.Slice, elemType: "main.B" } }]
+		() => [{ name: "BB", key: "BB", type: /* @__PURE__ */ $.sliceType("main.B") }]
 	)
 }
 
 export class B {
-	public get AA(): $.Slice<A> {
-		return this._fields.AA.value
-	}
-	public set AA(value: $.Slice<A>) {
-		this._fields.AA.value = value
-	}
+	public declare AA: $.Slice<A>
 
 	public _fields: {
-		AA: $.VarRef<$.Slice<A>>
+		AA: $.Slice<A>
 	}
 
 	constructor(init?: Partial<{AA?: $.Slice<A>}>) {
 		this._fields = {
-			AA: $.varRef(init?.AA ?? (null! as $.Slice<A>))
+			AA: init?.AA ?? (null! as $.Slice<A>)
 		}
 	}
 
 	public clone(): B {
-		const cloned = new B()
-		cloned._fields = {
-			AA: $.varRef(this._fields.AA.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new B(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["AA"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -69,7 +59,7 @@ export class B {
 		() => new B(),
 		() => [],
 		B,
-		() => [{ name: "AA", key: "AA", type: { kind: $.TypeKind.Slice, elemType: "main.A" } }]
+		() => [{ name: "AA", key: "AA", type: /* @__PURE__ */ $.sliceType("main.A") }]
 	)
 }
 

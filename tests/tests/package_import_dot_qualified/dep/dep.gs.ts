@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Box {
-	public get N(): number {
-		return this._fields.N.value
-	}
-	public set N(value: number) {
-		this._fields.N.value = value
-	}
+	public declare N: number
 
 	public _fields: {
-		N: $.VarRef<number>
+		N: number
 	}
 
 	constructor(init?: Partial<{N?: number}>) {
 		this._fields = {
-			N: $.varRef(init?.N ?? (0 as number))
+			N: init?.N ?? (0 as number)
 		}
 	}
 
 	public clone(): Box {
-		const cloned = new Box()
-		cloned._fields = {
-			N: $.varRef(this._fields.N.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Box(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["N"])
 	}
 
 	static __typeInfo = $.registerStructType(

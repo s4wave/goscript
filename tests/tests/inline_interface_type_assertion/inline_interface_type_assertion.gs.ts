@@ -23,10 +23,7 @@ export class Greeter {
 	}
 
 	public clone(): Greeter {
-		const cloned = new Greeter()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Greeter(this))
 	}
 
 	public Greet(): string {
@@ -53,10 +50,7 @@ export class MyStringer {
 	}
 
 	public clone(): MyStringer {
-		const cloned = new MyStringer()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new MyStringer(this))
 	}
 
 	public String(): string {
@@ -117,9 +111,9 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Test case: nil value of an inline interface type assigned to interface{}
-	let l: any = $.interfaceValue(null, "*struct{Name string}", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Struct, methods: [], fields: [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string"), index: [0], offset: 0, exported: true }] } })
+	let l: any = $.interfaceValue(null, "*struct{Name string}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [0], 0, true)] }))
 
-	let [ptr, ok6] = $.typeAssertTuple<$.VarRef<{"Name": string}> | null>(l, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Struct, methods: [], fields: [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string"), index: [0], offset: 0, exported: true }] } })
+	let [ptr, ok6] = $.typeAssertTuple<$.VarRef<{"Name": string}> | null>(l, /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [0], 0, true)] }))
 	if (ok6) {
 		if (ptr == null) {
 			await $.println("l.(*struct{ Name string }) successful, ptr is nil as expected")

@@ -7,29 +7,20 @@ import * as io from "@goscript/io/index.js"
 import "@goscript/io/index.js"
 
 export class asyncReader {
-	public get ch(): $.Channel<number> | null {
-		return this._fields.ch.value
-	}
-	public set ch(value: $.Channel<number> | null) {
-		this._fields.ch.value = value
-	}
+	public declare ch: $.Channel<number> | null
 
 	public _fields: {
-		ch: $.VarRef<$.Channel<number> | null>
+		ch: $.Channel<number> | null
 	}
 
 	constructor(init?: Partial<{ch?: $.Channel<number> | null}>) {
 		this._fields = {
-			ch: $.varRef(init?.ch ?? (null! as $.Channel<number> | null))
+			ch: init?.ch ?? (null! as $.Channel<number> | null)
 		}
 	}
 
 	public clone(): asyncReader {
-		const cloned = new asyncReader()
-		cloned._fields = {
-			ch: $.varRef(this._fields.ch.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new asyncReader(this))
 	}
 
 	public async Read(b: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
@@ -38,12 +29,16 @@ export class asyncReader {
 		return [await $.chanRecv(r.ch), null]
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["ch"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.asyncReader",
 		() => new asyncReader(),
 		() => [{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
 		asyncReader,
-		() => [{ name: "ch", key: "ch", type: { kind: $.TypeKind.Channel, direction: "both", elemType: /* @__PURE__ */ $.basicType("int") } }]
+		() => [{ name: "ch", key: "ch", type: /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both") }]
 	)
 }
 

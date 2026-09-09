@@ -6,29 +6,24 @@ import * as $ from "@goscript/builtin/index.js"
 export type ObjectIdentifier = $.Slice<number>
 
 export class RawValue {
-	public get Tag(): number {
-		return this._fields.Tag.value
-	}
-	public set Tag(value: number) {
-		this._fields.Tag.value = value
-	}
+	public declare Tag: number
 
 	public _fields: {
-		Tag: $.VarRef<number>
+		Tag: number
 	}
 
 	constructor(init?: Partial<{Tag?: number}>) {
 		this._fields = {
-			Tag: $.varRef(init?.Tag ?? (0 as number))
+			Tag: init?.Tag ?? (0 as number)
 		}
 	}
 
 	public clone(): RawValue {
-		const cloned = new RawValue()
-		cloned._fields = {
-			Tag: $.varRef(this._fields.Tag.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new RawValue(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Tag"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -184,13 +179,13 @@ export async function main(): globalThis.Promise<void> {
 
 	let oid: $.VarRef<ObjectIdentifier> = $.varRef(null! as ObjectIdentifier)
 	let ok = false
-	let oidValue: any = $.interfaceValue(oid, "*main.ObjectIdentifier", { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, typeName: "main.ObjectIdentifier", elemType: /* @__PURE__ */ $.basicType("int") } })
+	let oidValue: any = $.interfaceValue(oid, "*main.ObjectIdentifier", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "main.ObjectIdentifier")))
 	{
 		const __goscriptTypeSwitchValue = oidValue
 		switch (true) {
-			case $.typeAssert<$.VarRef<ObjectIdentifier> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, typeName: "main.ObjectIdentifier", elemType: /* @__PURE__ */ $.basicType("int") } }).ok:
+			case $.typeAssert<$.VarRef<ObjectIdentifier> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "main.ObjectIdentifier"))).ok:
 				{
-					let v: $.VarRef<ObjectIdentifier> | null = $.typeAssert<$.VarRef<ObjectIdentifier> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Slice, typeName: "main.ObjectIdentifier", elemType: /* @__PURE__ */ $.basicType("int") } }).value
+					let v: $.VarRef<ObjectIdentifier> | null = $.typeAssert<$.VarRef<ObjectIdentifier> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "main.ObjectIdentifier"))).value
 					let __goscriptTuple0: any = parseObjectIdentifier()
 					v!.value = (__goscriptTuple0[0] as ObjectIdentifier)
 					ok = __goscriptTuple0[1]
@@ -201,13 +196,13 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("oid", $.len((oid.value as ObjectIdentifier)), $.arrayIndex(oid.value!, 0), ok)
 
 	let raw: $.VarRef<RawValue> = $.varRef($.markAsStructValue(new RawValue()))
-	let rawValue: any = $.interfaceValue(raw, "*main.RawValue", { kind: $.TypeKind.Pointer, elemType: "main.RawValue" })
+	let rawValue: any = $.interfaceValue(raw, "*main.RawValue", /* @__PURE__ */ $.pointerType("main.RawValue"))
 	{
 		const __goscriptTypeSwitchValue = rawValue
 		switch (true) {
-			case $.typeAssert<RawValue | $.VarRef<RawValue> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "main.RawValue" }).ok:
+			case $.typeAssert<RawValue | $.VarRef<RawValue> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.RawValue")).ok:
 				{
-					let v: RawValue | $.VarRef<RawValue> | null = $.typeAssert<RawValue | $.VarRef<RawValue> | null>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Pointer, elemType: "main.RawValue" }).value
+					let v: RawValue | $.VarRef<RawValue> | null = $.typeAssert<RawValue | $.VarRef<RawValue> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.RawValue")).value
 					let __goscriptTuple1: any = parseRawValue()
 					$.assignStruct($.pointerValue<RawValue>(v), __goscriptTuple1[0])
 					ok = __goscriptTuple1[1]

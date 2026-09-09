@@ -24,5 +24,5 @@ export function __goscript_get_Default(): __goscript_register.thing {
 }
 
 export function __goscript_set_Default(__goscriptValue: __goscript_register.thing): void {
-	Default = __goscriptValue
+	$.assignStruct(Default, __goscriptValue)
 }

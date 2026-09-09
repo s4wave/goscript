@@ -6,34 +6,29 @@ import * as $ from "@goscript/builtin/index.js"
 export type ErrorList = $.Slice<string>
 
 export class AStruct {
-	public get Msg(): string {
-		return this._fields.Msg.value
-	}
-	public set Msg(value: string) {
-		this._fields.Msg.value = value
-	}
+	public declare Msg: string
 
 	public _fields: {
-		Msg: $.VarRef<string>
+		Msg: string
 	}
 
 	constructor(init?: Partial<{Msg?: string}>) {
 		this._fields = {
-			Msg: $.varRef(init?.Msg ?? ("" as string))
+			Msg: init?.Msg ?? ("" as string)
 		}
 	}
 
 	public clone(): AStruct {
-		const cloned = new AStruct()
-		cloned._fields = {
-			Msg: $.varRef(this._fields.Msg.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new AStruct(this))
 	}
 
 	public Set(msg: string): void {
 		let a: AStruct | $.VarRef<AStruct> | null = this
 		$.pointerValue<AStruct>(a).Msg = msg
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Msg"])
 	}
 
 	static __typeInfo = $.registerStructType(

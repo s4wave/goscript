@@ -7,7 +7,7 @@ import * as asn1 from "@goscript/encoding/asn1/index.js"
 import "@goscript/encoding/asn1/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let [, err] = await asn1.Marshal($.interfaceValue($.makeChannel<number>(0, 0, "both"), "chan int", { kind: $.TypeKind.Channel, direction: "both", elemType: /* @__PURE__ */ $.basicType("int") }))
+	let [, err] = await asn1.Marshal($.interfaceValue($.makeChannel<number>(0, 0, "both"), "chan int", /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both")))
 	await $.println("err nil", err == null)
 	if (err != null) {
 		await $.println("err", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())

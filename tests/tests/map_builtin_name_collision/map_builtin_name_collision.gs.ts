@@ -4,29 +4,24 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Map {
-	public get values(): globalThis.Map<string, number> | null {
-		return this._fields.values.value
-	}
-	public set values(value: globalThis.Map<string, number> | null) {
-		this._fields.values.value = value
-	}
+	public declare values: globalThis.Map<string, number> | null
 
 	public _fields: {
-		values: $.VarRef<globalThis.Map<string, number> | null>
+		values: globalThis.Map<string, number> | null
 	}
 
 	constructor(init?: Partial<{values?: globalThis.Map<string, number> | null}>) {
 		this._fields = {
-			values: $.varRef(init?.values ?? (null! as globalThis.Map<string, number> | null))
+			values: init?.values ?? (null! as globalThis.Map<string, number> | null)
 		}
 	}
 
 	public clone(): Map {
-		const cloned = new Map()
-		cloned._fields = {
-			values: $.varRef(this._fields.values.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Map(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["values"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -34,7 +29,7 @@ export class Map {
 		() => new Map(),
 		() => [],
 		Map,
-		() => [{ name: "values", key: "values", type: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: /* @__PURE__ */ $.basicType("int") } }]
+		() => [{ name: "values", key: "values", type: /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")) }]
 	)
 }
 

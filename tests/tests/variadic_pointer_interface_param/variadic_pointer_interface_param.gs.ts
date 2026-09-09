@@ -14,34 +14,29 @@ $.registerInterfaceType(
 );
 
 export class lit {
-	public get n(): number {
-		return this._fields.n.value
-	}
-	public set n(value: number) {
-		this._fields.n.value = value
-	}
+	public declare n: number
 
 	public _fields: {
-		n: $.VarRef<number>
+		n: number
 	}
 
 	constructor(init?: Partial<{n?: number}>) {
 		this._fields = {
-			n: $.varRef(init?.n ?? (0 as number))
+			n: init?.n ?? (0 as number)
 		}
 	}
 
 	public clone(): lit {
-		const cloned = new lit()
-		cloned._fields = {
-			n: $.varRef(this._fields.n.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new lit(this))
 	}
 
 	public Value(): number {
 		const l: lit | $.VarRef<lit> | null = this
 		return $.pointerValue<lit>(l).n
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["n"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -66,8 +61,8 @@ export function replace(to: Expr | null, exprs: $.Slice<$.VarRef<Expr | null> | 
 }
 
 export async function main(): globalThis.Promise<void> {
-	let expr: $.VarRef<Expr | null> = $.varRef($.interfaceValue<Expr | null>(new lit({n: 1}), "*main.lit", { kind: $.TypeKind.Pointer, elemType: "main.lit" }))
-	let next: Expr | null = $.interfaceValue<Expr | null>(new lit({n: 7}), "*main.lit", { kind: $.TypeKind.Pointer, elemType: "main.lit" })
+	let expr: $.VarRef<Expr | null> = $.varRef($.interfaceValue<Expr | null>(new lit({n: 1}), "*main.lit", /* @__PURE__ */ $.pointerType("main.lit")))
+	let next: Expr | null = $.interfaceValue<Expr | null>(new lit({n: 7}), "*main.lit", /* @__PURE__ */ $.pointerType("main.lit"))
 	await $.println(replace(next, $.arrayToSlice<$.VarRef<Expr | null> | null>([expr])), await $.pointerValue<Exclude<Expr, null>>(expr.value).Value())
 }
 

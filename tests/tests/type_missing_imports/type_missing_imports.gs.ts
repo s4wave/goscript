@@ -4,39 +4,28 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class file {
-	public get name(): string {
-		return this._fields.name.value
-	}
-	public set name(value: string) {
-		this._fields.name.value = value
-	}
+	public declare name: string
 
-	public get data(): $.Slice<number> {
-		return this._fields.data.value
-	}
-	public set data(value: $.Slice<number>) {
-		this._fields.data.value = value
-	}
+	public declare data: $.Slice<number>
 
 	public _fields: {
-		name: $.VarRef<string>
-		data: $.VarRef<$.Slice<number>>
+		name: string
+		data: $.Slice<number>
 	}
 
 	constructor(init?: Partial<{name?: string, data?: $.Slice<number>}>) {
 		this._fields = {
-			name: $.varRef(init?.name ?? ("" as string)),
-			data: $.varRef(init?.data ?? (null! as $.Slice<number>))
+			name: init?.name ?? ("" as string),
+			data: init?.data ?? (null! as $.Slice<number>)
 		}
 	}
 
 	public clone(): file {
-		const cloned = new file()
-		cloned._fields = {
-			name: $.varRef(this._fields.name.value),
-			data: $.varRef(this._fields.data.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new file(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["name", "data"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -44,44 +33,33 @@ export class file {
 		() => new file(),
 		() => [],
 		file,
-		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }, { name: "data", key: "data", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }]
+		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }, { name: "data", key: "data", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }]
 	)
 }
 
 export class storage {
-	public get files(): globalThis.Map<string, file | $.VarRef<file> | null> | null {
-		return this._fields.files.value
-	}
-	public set files(value: globalThis.Map<string, file | $.VarRef<file> | null> | null) {
-		this._fields.files.value = value
-	}
+	public declare files: globalThis.Map<string, file | $.VarRef<file> | null> | null
 
-	public get children(): globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null {
-		return this._fields.children.value
-	}
-	public set children(value: globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null) {
-		this._fields.children.value = value
-	}
+	public declare children: globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null
 
 	public _fields: {
-		files: $.VarRef<globalThis.Map<string, file | $.VarRef<file> | null> | null>
-		children: $.VarRef<globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null>
+		files: globalThis.Map<string, file | $.VarRef<file> | null> | null
+		children: globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null
 	}
 
 	constructor(init?: Partial<{files?: globalThis.Map<string, file | $.VarRef<file> | null> | null, children?: globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null}>) {
 		this._fields = {
-			files: $.varRef(init?.files ?? (null! as globalThis.Map<string, file | $.VarRef<file> | null> | null)),
-			children: $.varRef(init?.children ?? (null! as globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null))
+			files: init?.files ?? (null! as globalThis.Map<string, file | $.VarRef<file> | null> | null),
+			children: init?.children ?? (null! as globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null)
 		}
 	}
 
 	public clone(): storage {
-		const cloned = new storage()
-		cloned._fields = {
-			files: $.varRef(this._fields.files.value),
-			children: $.varRef(this._fields.children.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new storage(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["files", "children"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -89,7 +67,7 @@ export class storage {
 		() => new storage(),
 		() => [],
 		storage,
-		() => [{ name: "files", key: "files", type: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: { kind: $.TypeKind.Pointer, elemType: "main.file" } } }, { name: "children", key: "children", type: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: { kind: $.TypeKind.Map, keyType: /* @__PURE__ */ $.basicType("string"), elemType: { kind: $.TypeKind.Pointer, elemType: "main.file" } } } }]
+		() => [{ name: "files", key: "files", type: /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.pointerType("main.file")) }, { name: "children", key: "children", type: /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.pointerType("main.file"))) }]
 	)
 }
 

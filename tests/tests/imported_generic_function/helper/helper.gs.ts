@@ -14,29 +14,24 @@ $.registerInterfaceType(
 );
 
 export class Box {
-	public get Value(): any {
-		return this._fields.Value.value
-	}
-	public set Value(value: any) {
-		this._fields.Value.value = value
-	}
+	public declare Value: any
 
 	public _fields: {
-		Value: $.VarRef<any>
+		Value: any
 	}
 
 	constructor(init?: Partial<{Value?: any}>) {
 		this._fields = {
-			Value: $.varRef(init?.Value ?? (null! as any))
+			Value: init?.Value ?? (null! as any)
 		}
 	}
 
 	public clone(): Box {
-		const cloned = new Box()
-		cloned._fields = {
-			Value: $.varRef(this._fields.Value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new Box(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Value"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -49,34 +44,29 @@ export class Box {
 }
 
 export class IntValue {
-	public get N(): number {
-		return this._fields.N.value
-	}
-	public set N(value: number) {
-		this._fields.N.value = value
-	}
+	public declare N: number
 
 	public _fields: {
-		N: $.VarRef<number>
+		N: number
 	}
 
 	constructor(init?: Partial<{N?: number}>) {
 		this._fields = {
-			N: $.varRef(init?.N ?? (0 as number))
+			N: init?.N ?? (0 as number)
 		}
 	}
 
 	public clone(): IntValue {
-		const cloned = new IntValue()
-		cloned._fields = {
-			N: $.varRef(this._fields.N.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new IntValue(this))
 	}
 
 	public GetValue(): number {
 		const v = this
 		return v.N
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["N"])
 	}
 
 	static __typeInfo = $.registerStructType(

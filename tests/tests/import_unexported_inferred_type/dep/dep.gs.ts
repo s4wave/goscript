@@ -13,10 +13,7 @@ export class hiddenError {
 	}
 
 	public clone(): hiddenError {
-		const cloned = new hiddenError()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new hiddenError(this))
 	}
 
 	public Error(): string {
@@ -35,5 +32,5 @@ export class hiddenError {
 export let ErrClosed: hiddenError = $.markAsStructValue(new hiddenError())
 
 export function __goscript_set_ErrClosed(__goscriptValue: hiddenError): void {
-	ErrClosed = __goscriptValue
+	$.assignStruct(ErrClosed, __goscriptValue)
 }

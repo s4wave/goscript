@@ -25,39 +25,24 @@ $.registerInterfaceType(
 );
 
 export class impl {
-	public get value(): any {
-		return this._fields.value.value
-	}
-	public set value(value: any) {
-		this._fields.value.value = value
-	}
+	public declare value: any
 
-	public get other(): any {
-		return this._fields.other.value
-	}
-	public set other(value: any) {
-		this._fields.other.value = value
-	}
+	public declare other: any
 
 	public _fields: {
-		value: $.VarRef<any>
-		other: $.VarRef<any>
+		value: any
+		other: any
 	}
 
 	constructor(init?: Partial<{value?: any, other?: any}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? (null! as any)),
-			other: $.varRef(init?.other ?? (null! as any))
+			value: init?.value ?? (null! as any),
+			other: init?.other ?? (null! as any)
 		}
 	}
 
 	public clone(): impl {
-		const cloned = new impl()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value),
-			other: $.varRef(this._fields.other.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new impl(this))
 	}
 
 	public Other(__typeArgs: $.GenericTypeArgs | undefined): any {
@@ -68,6 +53,10 @@ export class impl {
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const i: impl | $.VarRef<impl> | null = this
 		return $.pointerValue<impl>(i).value
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["value", "other"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -85,7 +74,7 @@ export async function read(__typeArgs: $.GenericTypeArgs | undefined, d: derived
 
 export async function main(): globalThis.Promise<void> {
 	let i: impl | $.VarRef<impl> | null = new impl({value: 7, other: "ok"})
-	await $.println(await read({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }, E: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, $.namedValueInterfaceValue<derived | null>(i, "*main.impl", {Other: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Other({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }, E: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, ...$.stripGenericTypeArgs(args)), Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }, E: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, ...$.stripGenericTypeArgs(args))}, { kind: $.TypeKind.Pointer, elemType: "main.impl" }, [{ name: "Other", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Value", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("int") }] }])))
+	await $.println(await read({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }, E: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, $.namedValueInterfaceValue<derived | null>(i, "*main.impl", {Other: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Other({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }, E: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, ...$.stripGenericTypeArgs(args)), Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }, E: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType("main.impl"), [$.methodSignature("Other", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Value", [], [/* @__PURE__ */ $.basicType("int")])])))
 }
 
 if ($.isMainScript(import.meta)) {

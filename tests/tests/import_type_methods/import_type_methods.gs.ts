@@ -7,29 +7,24 @@ import * as errlist from "@goscript/github.com/s4wave/goscript/tests/tests/impor
 import "@goscript/github.com/s4wave/goscript/tests/tests/import_type_methods/errlist/index.js"
 
 export class parser {
-	public get errors(): errlist.ErrorList {
-		return this._fields.errors.value
-	}
-	public set errors(value: errlist.ErrorList) {
-		this._fields.errors.value = value
-	}
+	public declare errors: errlist.ErrorList
 
 	public _fields: {
-		errors: $.VarRef<errlist.ErrorList>
+		errors: errlist.ErrorList
 	}
 
 	constructor(init?: Partial<{errors?: errlist.ErrorList}>) {
 		this._fields = {
-			errors: $.varRef(init?.errors ?? (null! as errlist.ErrorList))
+			errors: init?.errors ?? (null! as errlist.ErrorList)
 		}
 	}
 
 	public clone(): parser {
-		const cloned = new parser()
-		cloned._fields = {
-			errors: $.varRef(this._fields.errors.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new parser(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["errors"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -37,7 +32,7 @@ export class parser {
 		() => new parser(),
 		() => [],
 		parser,
-		() => [{ name: "errors", key: "errors", type: { kind: $.TypeKind.Slice, typeName: "errlist.ErrorList", elemType: /* @__PURE__ */ $.basicType("string") } }]
+		() => [{ name: "errors", key: "errors", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"), "errlist.ErrorList") }]
 	)
 }
 

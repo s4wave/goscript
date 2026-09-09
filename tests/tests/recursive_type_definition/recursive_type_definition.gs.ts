@@ -43,10 +43,7 @@ export class B {
 	}
 
 	public clone(): B {
-		const cloned = new B()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new B(this))
 	}
 
 	public MethodB(valB: B | $.VarRef<B> | null): void {

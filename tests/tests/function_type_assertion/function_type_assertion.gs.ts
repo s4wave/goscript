@@ -8,29 +8,24 @@ export type Greeter = ((name: string) => string | globalThis.Promise<string>) | 
 export type Adder = ((a: number, b: number) => number | globalThis.Promise<number>) | null
 
 export class FuncContainer {
-	public get myFunc(): any {
-		return this._fields.myFunc.value
-	}
-	public set myFunc(value: any) {
-		this._fields.myFunc.value = value
-	}
+	public declare myFunc: any
 
 	public _fields: {
-		myFunc: $.VarRef<any>
+		myFunc: any
 	}
 
 	constructor(init?: Partial<{myFunc?: any}>) {
 		this._fields = {
-			myFunc: $.varRef(init?.myFunc ?? (null! as any))
+			myFunc: init?.myFunc ?? (null! as any)
 		}
 	}
 
 	public clone(): FuncContainer {
-		const cloned = new FuncContainer()
-		cloned._fields = {
-			myFunc: $.varRef(this._fields.myFunc.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new FuncContainer(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["myFunc"])
 	}
 
 	static __typeInfo = $.registerStructType(

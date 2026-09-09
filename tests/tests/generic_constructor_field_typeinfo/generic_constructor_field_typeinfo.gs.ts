@@ -11,43 +11,28 @@ export type Block = {
 $.registerInterfaceType(
 	"main.Block",
 	null,
-	[{ name: "MarshalBlock", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }, { type: "error" }] }, { name: "UnmarshalBlock", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }]
+	[{ name: "MarshalBlock", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "UnmarshalBlock", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }]
 );
 
 export class blockType {
-	public get typeID(): string {
-		return this._fields.typeID.value
-	}
-	public set typeID(value: string) {
-		this._fields.typeID.value = value
-	}
+	public declare typeID: string
 
-	public get _constructor(): (() => any | globalThis.Promise<any>) | null {
-		return this._fields._constructor.value
-	}
-	public set _constructor(value: (() => any | globalThis.Promise<any>) | null) {
-		this._fields._constructor.value = value
-	}
+	public declare _constructor: (() => any | globalThis.Promise<any>) | null
 
 	public _fields: {
-		typeID: $.VarRef<string>
-		_constructor: $.VarRef<(() => any | globalThis.Promise<any>) | null>
+		typeID: string
+		_constructor: (() => any | globalThis.Promise<any>) | null
 	}
 
 	constructor(init?: Partial<{typeID?: string, _constructor?: (() => any | globalThis.Promise<any>) | null}>) {
 		this._fields = {
-			typeID: $.varRef(init?.typeID ?? ("" as string)),
-			_constructor: $.varRef(init?._constructor ?? (null! as (() => any | globalThis.Promise<any>) | null))
+			typeID: init?.typeID ?? ("" as string),
+			_constructor: init?._constructor ?? (null! as (() => any | globalThis.Promise<any>) | null)
 		}
 	}
 
 	public clone(): blockType {
-		const cloned = new blockType()
-		cloned._fields = {
-			typeID: $.varRef(this._fields.typeID.value),
-			_constructor: $.varRef(this._fields._constructor.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new blockType(this))
 	}
 
 	public async Constructor(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<Block | null> {
@@ -60,12 +45,16 @@ export class blockType {
 		return $.pointerValue<blockType>(t).typeID
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["typeID", "_constructor"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.blockType",
 		() => new blockType(),
 		() => [{ name: "Constructor", args: [], returns: [{ type: "main.Block" }] }, { name: "GetBlockTypeID", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		blockType,
-		() => [{ name: "typeID", key: "typeID", type: /* @__PURE__ */ $.basicType("string") }, { name: "constructor", key: "_constructor", type: ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [{ name: "MarshalBlock", args: [], returns: [{ name: "_r0", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }, { name: "_r1", type: "error" }] }, { name: "UnmarshalBlock", args: [{ name: "_p0", type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }], returns: [{ name: "_r0", type: "error" }] }] }] } as $.FunctionTypeInfo) }]
+		() => [{ name: "typeID", key: "typeID", type: /* @__PURE__ */ $.basicType("string") }, { name: "constructor", key: "_constructor", type: ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [$.methodSignature("MarshalBlock", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("UnmarshalBlock", [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["error"])] }] } as $.FunctionTypeInfo) }]
 	)
 }
 
@@ -79,10 +68,7 @@ export class sampleBlock {
 	}
 
 	public clone(): sampleBlock {
-		const cloned = new sampleBlock()
-		cloned._fields = {
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new sampleBlock(this))
 	}
 
 	public MarshalBlock(): [$.Slice<number>, $.GoError] {
@@ -96,7 +82,7 @@ export class sampleBlock {
 	static __typeInfo = $.registerStructType(
 		"main.sampleBlock",
 		() => new sampleBlock(),
-		() => [{ name: "MarshalBlock", args: [], returns: [{ type: { kind: $.TypeKind.Slice, elemType: /* @__PURE__ */ $.basicType("uint8") } }, { type: "error" }] }, { name: "UnmarshalBlock", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
+		() => [{ name: "MarshalBlock", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "UnmarshalBlock", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
 		sampleBlock,
 		() => []
 	)
@@ -109,11 +95,11 @@ export function NewBlockType(__typeArgs: $.GenericTypeArgs | undefined, typeID: 
 export async function main(): globalThis.Promise<void> {
 	let bt: blockType | $.VarRef<blockType> | null = (NewBlockType(undefined, "sample", $.functionValue((): sampleBlock | $.VarRef<sampleBlock> | null => {
 		return new sampleBlock()
-	}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Pointer, elemType: "main.sampleBlock" }] } as $.FunctionTypeInfo))) as blockType | $.VarRef<blockType> | null)
-	let blk = await blockType.prototype.Constructor.call(bt, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Pointer, elemType: "main.sampleBlock" }, zero: () => null, methods: {MarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalBlock(...$.stripGenericTypeArgs(args)), UnmarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalBlock(...$.stripGenericTypeArgs(args))} }})
+	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.sampleBlock")] } as $.FunctionTypeInfo))) as blockType | $.VarRef<blockType> | null)
+	let blk = await blockType.prototype.Constructor.call(bt, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.sampleBlock"), zero: () => null, methods: {MarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalBlock(...$.stripGenericTypeArgs(args)), UnmarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalBlock(...$.stripGenericTypeArgs(args))} }})
 	let __goscriptTuple0: any = await $.pointerValue<Exclude<Block, null>>(blk).MarshalBlock()
 	let data: $.Slice<number> = __goscriptTuple0[0]
-	await $.println(blockType.prototype.GetBlockTypeID.call(bt, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Pointer, elemType: "main.sampleBlock" }, zero: () => null, methods: {MarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalBlock(...$.stripGenericTypeArgs(args)), UnmarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalBlock(...$.stripGenericTypeArgs(args))} }}), $.len(data))
+	await $.println(blockType.prototype.GetBlockTypeID.call(bt, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.sampleBlock"), zero: () => null, methods: {MarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalBlock(...$.stripGenericTypeArgs(args)), UnmarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalBlock(...$.stripGenericTypeArgs(args))} }}), $.len(data))
 }
 
 if ($.isMainScript(import.meta)) {
