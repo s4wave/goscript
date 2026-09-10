@@ -28,7 +28,7 @@ export class FileTracker {
 	}
 
 	public async AddLine(offset: number): globalThis.Promise<void> {
-		let f: FileTracker | $.VarRef<FileTracker> | null = this
+		let f: FileTracker | $.VarRef<FileTracker> | null = this;
 		await $.pointerValue<FileTracker>(f).mutex.Lock()
 		$.pointerValue<FileTracker>(f).lines = $.append($.pointerValue<FileTracker>(f).lines, offset)
 		$.pointerValue<FileTracker>(f).mutex.Unlock()
@@ -65,7 +65,7 @@ export class Scanner {
 	}
 
 	public async next(): globalThis.Promise<void> {
-		const s: Scanner | $.VarRef<Scanner> | null = this
+		const s: Scanner | $.VarRef<Scanner> | null = this;
 		await FileTracker.prototype.AddLine.call($.pointerValue<Scanner>(s).file, 10)
 	}
 

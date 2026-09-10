@@ -21,7 +21,7 @@ export class Worker {
 	}
 
 	public async lookup(network: string): globalThis.Promise<number> {
-		const w: Worker | $.VarRef<Worker> | null = this
+		const w: Worker | $.VarRef<Worker> | null = this;
 		await $.chanSend($.pointerValue<Worker>(w).ch, $.len(network))
 		return await $.chanRecv($.pointerValue<Worker>(w).ch)
 	}

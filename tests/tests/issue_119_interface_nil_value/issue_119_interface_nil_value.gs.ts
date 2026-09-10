@@ -31,7 +31,7 @@ export class Dog {
 	}
 
 	public Name(): string {
-		const d: Dog | $.VarRef<Dog> | null = this
+		const d: Dog | $.VarRef<Dog> | null = this;
 		if (d == null) {
 			return "unknown dog"
 		}
@@ -69,7 +69,7 @@ export class Cat {
 	}
 
 	public Name(): string {
-		const c: Cat | $.VarRef<Cat> | null = this
+		const c: Cat | $.VarRef<Cat> | null = this;
 		if (c == null) {
 			return "unknown cat"
 		}

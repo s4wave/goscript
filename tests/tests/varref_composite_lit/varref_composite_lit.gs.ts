@@ -21,7 +21,7 @@ export class MockInode {
 	}
 
 	public getValue(): number {
-		const m: MockInode | $.VarRef<MockInode> | null = this
+		const m: MockInode | $.VarRef<MockInode> | null = this;
 		return $.pointerValue<MockInode>(m).Value
 	}
 

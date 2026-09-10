@@ -21,7 +21,7 @@ export class AsyncResource {
 	}
 
 	public async Release(): globalThis.Promise<void> {
-		const r: AsyncResource | $.VarRef<AsyncResource> | null = this
+		const r: AsyncResource | $.VarRef<AsyncResource> | null = this;
 		let ch: $.Channel<boolean> | null = $.makeChannel<boolean>(1, false, "both")
 		queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
 			await $.chanSend(ch, true)

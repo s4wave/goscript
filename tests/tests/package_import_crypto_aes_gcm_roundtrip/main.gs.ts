@@ -40,22 +40,22 @@ export class wrappedAEAD {
 	}
 
 	public async NonceSize(): globalThis.Promise<number> {
-		const w: wrappedAEAD | $.VarRef<wrappedAEAD> | null = this
+		const w: wrappedAEAD | $.VarRef<wrappedAEAD> | null = this;
 		return $.pointerValue<Exclude<cipher.AEAD, null>>($.pointerValue<wrappedAEAD>(w).inner).NonceSize()
 	}
 
 	public async Open(dst: $.Slice<number>, nonce: $.Slice<number>, ciphertext: $.Slice<number>, additionalData: $.Slice<number>): globalThis.Promise<[$.Slice<number>, $.GoError]> {
-		const w: wrappedAEAD | $.VarRef<wrappedAEAD> | null = this
+		const w: wrappedAEAD | $.VarRef<wrappedAEAD> | null = this;
 		return $.pointerValue<Exclude<cipher.AEAD, null>>($.pointerValue<wrappedAEAD>(w).inner).Open(dst, nonce, ciphertext, additionalData)
 	}
 
 	public async Overhead(): globalThis.Promise<number> {
-		const w: wrappedAEAD | $.VarRef<wrappedAEAD> | null = this
+		const w: wrappedAEAD | $.VarRef<wrappedAEAD> | null = this;
 		return $.pointerValue<Exclude<cipher.AEAD, null>>($.pointerValue<wrappedAEAD>(w).inner).Overhead()
 	}
 
 	public async Seal(dst: $.Slice<number>, nonce: $.Slice<number>, plaintext: $.Slice<number>, additionalData: $.Slice<number>): globalThis.Promise<$.Slice<number>> {
-		const w: wrappedAEAD | $.VarRef<wrappedAEAD> | null = this
+		const w: wrappedAEAD | $.VarRef<wrappedAEAD> | null = this;
 		return $.pointerValue<Exclude<cipher.AEAD, null>>($.pointerValue<wrappedAEAD>(w).inner).Seal(dst, nonce, plaintext, additionalData)
 	}
 
@@ -98,7 +98,7 @@ export class nestedSealer {
 	}
 
 	public async Seal(dst: $.Slice<number>, plaintext: $.Slice<number>): globalThis.Promise<$.Slice<number>> {
-		const s: nestedSealer | $.VarRef<nestedSealer> | null = this
+		const s: nestedSealer | $.VarRef<nestedSealer> | null = this;
 		return $.pointerValue<Exclude<cipher.AEAD, null>>($.pointerValue<nestedSealer>(s).aead).Seal(dst, $.pointerValue<nestedSealer>(s).nonce, plaintext, $.pointerValue<nestedSealer>(s).aad)
 	}
 

@@ -21,7 +21,7 @@ export class counter {
 	}
 
 	public Load(): number {
-		const c: counter | $.VarRef<counter> | null = this
+		const c: counter | $.VarRef<counter> | null = this;
 		return $.pointerValue<counter>(c).value
 	}
 

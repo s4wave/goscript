@@ -25,7 +25,7 @@ export class MyStruct {
 	}
 
 	public GetMyString(): string {
-		const m = this
+		const m = this;
 		return m.MyString
 	}
 

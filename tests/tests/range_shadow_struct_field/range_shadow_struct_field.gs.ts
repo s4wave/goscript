@@ -51,12 +51,12 @@ export class Matcher {
 	}
 
 	public Blocks(): $.Slice<Match> {
-		const m: Matcher | $.VarRef<Matcher> | null = this
+		const m: Matcher | $.VarRef<Matcher> | null = this;
 		return $.pointerValue<Matcher>(m).matches
 	}
 
 	public Total(): number {
-		const m: Matcher | $.VarRef<Matcher> | null = this
+		const m: Matcher | $.VarRef<Matcher> | null = this;
 		let total = 0
 		for (let __goscriptRangeTarget0 = Matcher.prototype.Blocks.call(m), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 			let __goscriptRangeShadow0 = __goscriptRangeTarget0![__rangeIndex]

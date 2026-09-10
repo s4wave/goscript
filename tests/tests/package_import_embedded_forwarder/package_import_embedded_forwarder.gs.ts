@@ -45,7 +45,7 @@ export class VerboseStore {
 	}
 
 	public Execute(): string {
-		const s: VerboseStore | $.VarRef<VerboseStore> | null = this
+		const s: VerboseStore | $.VarRef<VerboseStore> | null = this;
 		return "execute:" + $.pointerValue<VerboseStore>(s).name
 	}
 

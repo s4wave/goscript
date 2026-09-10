@@ -32,12 +32,12 @@ export class pairingOffer {
 	}
 
 	public MarshalVT(): [$.Slice<number>, $.GoError] {
-		const o: pairingOffer | $.VarRef<pairingOffer> | null = this
+		const o: pairingOffer | $.VarRef<pairingOffer> | null = this;
 		return [$.stringToBytes($.pointerValue<pairingOffer>(o).Note), null]
 	}
 
 	public UnmarshalVT(data: $.Slice<number>): $.GoError {
-		let o: pairingOffer | $.VarRef<pairingOffer> | null = this
+		let o: pairingOffer | $.VarRef<pairingOffer> | null = this;
 		$.pointerValue<pairingOffer>(o).Note = "decoded:" + $.bytesToString(data)
 		return null
 	}

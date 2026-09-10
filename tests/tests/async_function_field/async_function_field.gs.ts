@@ -24,7 +24,7 @@ export class loader {
 	}
 
 	public getLoad(): ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null {
-		const l: loader | $.VarRef<loader> | null = this
+		const l: loader | $.VarRef<loader> | null = this;
 		return $.pointerValue<loader>(l).load
 	}
 

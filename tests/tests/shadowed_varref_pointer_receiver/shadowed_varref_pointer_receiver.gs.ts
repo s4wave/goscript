@@ -21,12 +21,12 @@ export class locked {
 	}
 
 	public Inc(): void {
-		let l: locked | $.VarRef<locked> | null = this
+		let l: locked | $.VarRef<locked> | null = this;
 		$.pointerValue<locked>(l).value++
 	}
 
 	public Value(): number {
-		const l: locked | $.VarRef<locked> | null = this
+		const l: locked | $.VarRef<locked> | null = this;
 		return $.pointerValue<locked>(l).value
 	}
 

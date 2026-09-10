@@ -27,12 +27,12 @@ export class ObjectID {
 	}
 
 	public IsZero(): boolean {
-		const s = this
+		const s = this;
 		return $.comparableEqual(s, $.markAsStructValue(new ObjectID()))
 	}
 
 	public Valid(): boolean {
-		const s = this
+		const s = this;
 		return !$.comparableEqual(s, $.markAsStructValue(new ObjectID()))
 	}
 

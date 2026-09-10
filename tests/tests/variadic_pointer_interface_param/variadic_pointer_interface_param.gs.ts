@@ -31,7 +31,7 @@ export class lit {
 	}
 
 	public Value(): number {
-		const l: lit | $.VarRef<lit> | null = this
+		const l: lit | $.VarRef<lit> | null = this;
 		return $.pointerValue<lit>(l).n
 	}
 

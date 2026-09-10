@@ -21,7 +21,7 @@ export class item {
 	}
 
 	public dec(): item {
-		let s: item = this
+		let s: item = this;
 		if (s.n > 0) {
 			$.assignStruct(s, $.markAsStructValue(new item({n: s.n - 1})))
 		}

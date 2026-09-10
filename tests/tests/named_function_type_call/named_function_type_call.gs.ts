@@ -68,17 +68,17 @@ export class MockFileInfo {
 	}
 
 	public IsDir(): boolean {
-		const m: MockFileInfo | $.VarRef<MockFileInfo> | null = this
+		const m: MockFileInfo | $.VarRef<MockFileInfo> | null = this;
 		return $.pointerValue<MockFileInfo>(m).isDir
 	}
 
 	public Name(): string {
-		const m: MockFileInfo | $.VarRef<MockFileInfo> | null = this
+		const m: MockFileInfo | $.VarRef<MockFileInfo> | null = this;
 		return $.pointerValue<MockFileInfo>(m).name
 	}
 
 	public Size(): bigint {
-		const m: MockFileInfo | $.VarRef<MockFileInfo> | null = this
+		const m: MockFileInfo | $.VarRef<MockFileInfo> | null = this;
 		return $.pointerValue<MockFileInfo>(m).size
 	}
 
@@ -109,7 +109,7 @@ export class MockFilesystem {
 	}
 
 	public ReadDir(path: string): [$.Slice<FileInfo | null>, $.GoError] {
-		const m: MockFilesystem | $.VarRef<MockFilesystem> | null = this
+		const m: MockFilesystem | $.VarRef<MockFilesystem> | null = this;
 		return [$.arrayToSlice<FileInfo | null>([$.interfaceValue<FileInfo | null>(new MockFileInfo({name: "file1.txt", size: 100n, isDir: false}), "*main.MockFileInfo", /* @__PURE__ */ $.pointerType("main.MockFileInfo")), $.interfaceValue<FileInfo | null>(new MockFileInfo({name: "subdir", size: 0n, isDir: true}), "*main.MockFileInfo", /* @__PURE__ */ $.pointerType("main.MockFileInfo"))]), null]
 	}
 
@@ -140,7 +140,7 @@ export class shapeNode {
 	}
 
 	public Stats(): number {
-		const s: shapeNode | $.VarRef<shapeNode> | null = this
+		const s: shapeNode | $.VarRef<shapeNode> | null = this;
 		return $.pointerValue<shapeNode>(s).value
 	}
 
@@ -175,12 +175,12 @@ export class MorphismHolder {
 	}
 
 	public async apply(s: Shape | null): globalThis.Promise<number> {
-		const h: MorphismHolder | $.VarRef<MorphismHolder> | null = this
+		const h: MorphismHolder | $.VarRef<MorphismHolder> | null = this;
 		return $.pointerValue<Exclude<Shape, null>>((await $.pointerValue<MorphismHolder>(h).morphism!(s))).Stats()
 	}
 
 	public async cloneApply(s: Shape | null): globalThis.Promise<number> {
-		const h: MorphismHolder | $.VarRef<MorphismHolder> | null = this
+		const h: MorphismHolder | $.VarRef<MorphismHolder> | null = this;
 		return $.pointerValue<Exclude<Shape, null>>((await $.pointerValue<MorphismHolder>(cloneMorphism($.pointerValue<MorphismHolder>(h).morphism)).morphism!(s))).Stats()
 	}
 
@@ -215,7 +215,7 @@ export class morphismWorker {
 	}
 
 	public async lookup(s: Shape | null): globalThis.Promise<Shape | null> {
-		const w: morphismWorker | $.VarRef<morphismWorker> | null = this
+		const w: morphismWorker | $.VarRef<morphismWorker> | null = this;
 		await $.chanSend($.pointerValue<morphismWorker>(w).ready, true)
 		await $.chanRecv($.pointerValue<morphismWorker>(w).ready)
 		return s

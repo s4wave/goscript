@@ -26,7 +26,7 @@ export class customErr {
 	}
 
 	public Error(): string {
-		const e: customErr | $.VarRef<customErr> | null = this
+		const e: customErr | $.VarRef<customErr> | null = this;
 		return $.pointerValue<customErr>(e).msg
 	}
 
@@ -61,12 +61,12 @@ export class wrappedErr {
 	}
 
 	public async Error(): globalThis.Promise<string> {
-		const e = this
+		const e = this;
 		return "wrapped: " + await $.pointerValue<Exclude<$.GoError, null>>(e.err).Error()
 	}
 
 	public Unwrap(): $.GoError {
-		const e = this
+		const e = this;
 		return e.err
 	}
 

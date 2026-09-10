@@ -36,7 +36,7 @@ export class recreateError {
 	}
 
 	public Error(): string {
-		const e: recreateError | $.VarRef<recreateError> | null = this
+		const e: recreateError | $.VarRef<recreateError> | null = this;
 		return "recreate"
 	}
 

@@ -31,7 +31,7 @@ export class blockImpl {
 	}
 
 	public Size(): number {
-		const b: blockImpl | $.VarRef<blockImpl> | null = this
+		const b: blockImpl | $.VarRef<blockImpl> | null = this;
 		return $.pointerValue<blockImpl>(b).size
 	}
 

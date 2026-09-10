@@ -268,7 +268,7 @@ export class memoryRpcStream {
 	}
 
 	public async Close(): globalThis.Promise<$.GoError> {
-		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this
+		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this;
 		await memoryRpcStream.prototype.CloseSend.call(m)
 		await $.pointerValue<memoryRpcStream>(m).cancelLocal.Do($.functionValue(async (): globalThis.Promise<void> => {
 			await $.pointerValue<memoryRpcStream>(m).cancel!()
@@ -277,7 +277,7 @@ export class memoryRpcStream {
 	}
 
 	public async CloseSend(): globalThis.Promise<$.GoError> {
-		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this
+		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this;
 		await $.pointerValue<memoryRpcStream>(m).closeSend.Do($.functionValue((): void => {
 			$.pointerValue<memoryRpcStream>(m).send!.close()
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
@@ -285,12 +285,12 @@ export class memoryRpcStream {
 	}
 
 	public Context(): context.Context | null {
-		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this
+		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this;
 		return $.pointerValue<memoryRpcStream>(m).ctx
 	}
 
 	public async MsgRecv(msg: srpc.Message): globalThis.Promise<$.GoError> {
-		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this
+		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this;
 		while (true) {
 			let __goscriptTuple0: any = await memoryRpcStream.prototype.Recv.call(m)
 			let pkt: rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null = __goscriptTuple0[0]
@@ -308,7 +308,7 @@ export class memoryRpcStream {
 	}
 
 	public async MsgSend(msg: srpc.Message): globalThis.Promise<$.GoError> {
-		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this
+		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this;
 		let __goscriptTuple1: any = await $.pointerValue<Exclude<protobuf_go_lite.Message, null>>(msg).MarshalVT()
 		let data: $.Slice<number> = __goscriptTuple1[0]
 		let err = __goscriptTuple1[1]
@@ -319,7 +319,7 @@ export class memoryRpcStream {
 	}
 
 	public async Recv(): globalThis.Promise<[rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null, $.GoError]> {
-		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this
+		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this;
 		const [__goscriptSelect0HasReturn, __goscriptSelect0Value] = await $.selectStatement<any, [rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null, $.GoError]>([
 			{
 				id: 0,
@@ -351,7 +351,7 @@ export class memoryRpcStream {
 	}
 
 	public async Send(pkt: rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null): globalThis.Promise<$.GoError> {
-		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this
+		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this;
 		const [__goscriptSelect1HasReturn, __goscriptSelect1Value] = await $.selectStatement<any, $.GoError>([
 			{
 				id: 0,
@@ -413,17 +413,17 @@ export class memoryRpcContext {
 	}
 
 	public Deadline(): [time.Time, boolean] {
-		const m: memoryRpcContext | $.VarRef<memoryRpcContext> | null = this
+		const m: memoryRpcContext | $.VarRef<memoryRpcContext> | null = this;
 		return [$.markAsStructValue(new time.Time()), false]
 	}
 
 	public Done(): $.Channel<{}> | null {
-		const m: memoryRpcContext | $.VarRef<memoryRpcContext> | null = this
+		const m: memoryRpcContext | $.VarRef<memoryRpcContext> | null = this;
 		return $.pointerValue<memoryRpcContext>(m).done
 	}
 
 	public async Err(): globalThis.Promise<$.GoError> {
-		const m: memoryRpcContext | $.VarRef<memoryRpcContext> | null = this
+		const m: memoryRpcContext | $.VarRef<memoryRpcContext> | null = this;
 		const [__goscriptSelect2HasReturn, __goscriptSelect2Value] = await $.selectStatement<any, $.GoError>([
 			{
 				id: 0,
@@ -450,7 +450,7 @@ export class memoryRpcContext {
 	}
 
 	public async Value(key: any): globalThis.Promise<any> {
-		const m: memoryRpcContext | $.VarRef<memoryRpcContext> | null = this
+		const m: memoryRpcContext | $.VarRef<memoryRpcContext> | null = this;
 		return $.pointerValue<Exclude<context.Context, null>>(context.Background()).Value(key)
 	}
 

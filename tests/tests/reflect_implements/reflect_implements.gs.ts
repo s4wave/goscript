@@ -30,7 +30,7 @@ export class MyType {
 	}
 
 	public String(): string {
-		const m = this
+		const m = this;
 		return "MyType"
 	}
 

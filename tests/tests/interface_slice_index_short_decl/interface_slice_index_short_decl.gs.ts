@@ -42,12 +42,12 @@ export class Action {
 	}
 
 	public Mark(): boolean {
-		const a = this
+		const a = this;
 		return a.Filter != null
 	}
 
 	public SetFilter(k: number, v: dep.Ref | null): void {
-		let a: Action | $.VarRef<Action> | null = this
+		let a: Action | $.VarRef<Action> | null = this;
 		if ($.pointerValue<Action>(a).Filter == null) {
 			$.pointerValue<Action>(a).Filter = $.makeMap<number, dep.Ref | null>()
 		}

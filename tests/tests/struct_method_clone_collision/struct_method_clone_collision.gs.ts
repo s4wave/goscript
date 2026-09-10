@@ -21,7 +21,7 @@ export class Box {
 	}
 
 	public clone(): Box | $.VarRef<Box> | null {
-		const b: Box | $.VarRef<Box> | null = this
+		const b: Box | $.VarRef<Box> | null = this;
 		return new Box({Value: $.pointerValue<Box>(b).Value + 1})
 	}
 

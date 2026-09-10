@@ -27,7 +27,7 @@ export class sink {
 	}
 
 	public Put(v: __goscript_types.Value): void {
-		let s: sink | $.VarRef<sink> | null = this
+		let s: sink | $.VarRef<sink> | null = this;
 		$.pointerValue<sink>(s).size = $.len((v as __goscript_types.Value))
 	}
 

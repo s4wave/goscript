@@ -48,13 +48,13 @@ export class MyStruct {
 	}
 
 	public Close(): $.GoError {
-		const m = this
+		const m = this;
 		// Dummy implementation
 		return null
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
-		const m = this
+		const m = this;
 		// Dummy implementation
 		return [0, null]
 	}

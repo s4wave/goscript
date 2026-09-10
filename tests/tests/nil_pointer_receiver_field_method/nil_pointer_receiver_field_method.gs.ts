@@ -21,7 +21,7 @@ export class child {
 	}
 
 	public Clone(): child | $.VarRef<child> | null {
-		const c: child | $.VarRef<child> | null = this
+		const c: child | $.VarRef<child> | null = this;
 		if (c == null) {
 			return null
 		}

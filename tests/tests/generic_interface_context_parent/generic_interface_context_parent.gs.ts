@@ -109,7 +109,7 @@ export class genericValue {
 	}
 
 	public Get(__typeArgs: $.GenericTypeArgs | undefined): number {
-		const v = this
+		const v = this;
 		return v.value
 	}
 

@@ -42,13 +42,13 @@ export class ChannelProcessor {
 	}
 
 	public GetResult(): number {
-		const p: ChannelProcessor | $.VarRef<ChannelProcessor> | null = this
+		const p: ChannelProcessor | $.VarRef<ChannelProcessor> | null = this;
 		// This method is sync
 		return 42
 	}
 
 	public async Process(data: number): globalThis.Promise<number> {
-		const p: ChannelProcessor | $.VarRef<ChannelProcessor> | null = this
+		const p: ChannelProcessor | $.VarRef<ChannelProcessor> | null = this;
 		// Channel operation makes this function async
 		await $.chanSend($.pointerValue<ChannelProcessor>(p).ch, data)
 		let result = await $.chanRecv($.pointerValue<ChannelProcessor>(p).ch)
@@ -86,12 +86,12 @@ export class SimpleProcessor {
 	}
 
 	public GetResult(): number {
-		const p: SimpleProcessor | $.VarRef<SimpleProcessor> | null = this
+		const p: SimpleProcessor | $.VarRef<SimpleProcessor> | null = this;
 		return $.pointerValue<SimpleProcessor>(p).value
 	}
 
 	public Process(data: number): number {
-		const p: SimpleProcessor | $.VarRef<SimpleProcessor> | null = this
+		const p: SimpleProcessor | $.VarRef<SimpleProcessor> | null = this;
 		// Simple operation, but must be async due to interface constraint
 		return data + 10
 	}
@@ -131,7 +131,7 @@ export class GenericChannelStore {
 	}
 
 	public async Load(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<any> {
-		const s: GenericChannelStore | $.VarRef<GenericChannelStore> | null = this
+		const s: GenericChannelStore | $.VarRef<GenericChannelStore> | null = this;
 		await $.chanSend($.pointerValue<GenericChannelStore>(s).ch, $.pointerValue<GenericChannelStore>(s).value)
 		return await $.chanRecv($.pointerValue<GenericChannelStore>(s).ch)
 	}

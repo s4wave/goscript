@@ -61,7 +61,7 @@ export class IntValue {
 	}
 
 	public GetValue(): number {
-		const v = this
+		const v = this;
 		return v.N
 	}
 

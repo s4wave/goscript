@@ -131,17 +131,17 @@ export class retransmissionQueue {
 	}
 
 	public AppDataAckHandler(): FrameHandler | null {
-		const q: retransmissionQueue | $.VarRef<retransmissionQueue> | null = this
+		const q: retransmissionQueue | $.VarRef<retransmissionQueue> | null = this;
 		return $.interfaceValue<FrameHandler | null>($.unsafePointerCast<retransmissionQueueAppDataAckHandler | $.VarRef<retransmissionQueueAppDataAckHandler> | null>(q, retransmissionQueueAppDataAckHandler), "*main.retransmissionQueueAppDataAckHandler", /* @__PURE__ */ $.pointerType("main.retransmissionQueueAppDataAckHandler"))
 	}
 
 	public HandshakeAckHandler(): FrameHandler | null {
-		const q: retransmissionQueue | $.VarRef<retransmissionQueue> | null = this
+		const q: retransmissionQueue | $.VarRef<retransmissionQueue> | null = this;
 		return $.interfaceValue<FrameHandler | null>($.unsafePointerCast<retransmissionQueueHandshakeAckHandler | $.VarRef<retransmissionQueueHandshakeAckHandler> | null>(q, retransmissionQueueHandshakeAckHandler), "*main.retransmissionQueueHandshakeAckHandler", /* @__PURE__ */ $.pointerType("main.retransmissionQueueHandshakeAckHandler"))
 	}
 
 	public InitialAckHandler(): FrameHandler | null {
-		const q: retransmissionQueue | $.VarRef<retransmissionQueue> | null = this
+		const q: retransmissionQueue | $.VarRef<retransmissionQueue> | null = this;
 		return $.interfaceValue<FrameHandler | null>($.unsafePointerCast<retransmissionQueueInitialAckHandler | $.VarRef<retransmissionQueueInitialAckHandler> | null>(q, retransmissionQueueInitialAckHandler), "*main.retransmissionQueueInitialAckHandler", /* @__PURE__ */ $.pointerType("main.retransmissionQueueInitialAckHandler"))
 	}
 
@@ -176,11 +176,11 @@ export class retransmissionQueueInitialAckHandler {
 	}
 
 	public OnAcked(_p0: wireFrame | null): void {
-		const q: retransmissionQueueInitialAckHandler | $.VarRef<retransmissionQueueInitialAckHandler> | null = this
+		const q: retransmissionQueueInitialAckHandler | $.VarRef<retransmissionQueueInitialAckHandler> | null = this;
 	}
 
 	public async OnLost(_p0: wireFrame | null): globalThis.Promise<void> {
-		let q: retransmissionQueueInitialAckHandler | $.VarRef<retransmissionQueueInitialAckHandler> | null = this
+		let q: retransmissionQueueInitialAckHandler | $.VarRef<retransmissionQueueInitialAckHandler> | null = this;
 		$.pointerValue<retransmissionQueueInitialAckHandler>(q).lost++
 		await $.println("initial")
 	}
@@ -216,11 +216,11 @@ export class retransmissionQueueHandshakeAckHandler {
 	}
 
 	public OnAcked(_p0: wireFrame | null): void {
-		const q: retransmissionQueueHandshakeAckHandler | $.VarRef<retransmissionQueueHandshakeAckHandler> | null = this
+		const q: retransmissionQueueHandshakeAckHandler | $.VarRef<retransmissionQueueHandshakeAckHandler> | null = this;
 	}
 
 	public async OnLost(_p0: wireFrame | null): globalThis.Promise<void> {
-		let q: retransmissionQueueHandshakeAckHandler | $.VarRef<retransmissionQueueHandshakeAckHandler> | null = this
+		let q: retransmissionQueueHandshakeAckHandler | $.VarRef<retransmissionQueueHandshakeAckHandler> | null = this;
 		$.pointerValue<retransmissionQueueHandshakeAckHandler>(q).lost++
 		await $.println("handshake")
 	}
@@ -256,11 +256,11 @@ export class retransmissionQueueAppDataAckHandler {
 	}
 
 	public OnAcked(_p0: wireFrame | null): void {
-		const q: retransmissionQueueAppDataAckHandler | $.VarRef<retransmissionQueueAppDataAckHandler> | null = this
+		const q: retransmissionQueueAppDataAckHandler | $.VarRef<retransmissionQueueAppDataAckHandler> | null = this;
 	}
 
 	public async OnLost(_p0: wireFrame | null): globalThis.Promise<void> {
-		let q: retransmissionQueueAppDataAckHandler | $.VarRef<retransmissionQueueAppDataAckHandler> | null = this
+		let q: retransmissionQueueAppDataAckHandler | $.VarRef<retransmissionQueueAppDataAckHandler> | null = this;
 		$.pointerValue<retransmissionQueueAppDataAckHandler>(q).lost++
 		await $.println("app")
 	}

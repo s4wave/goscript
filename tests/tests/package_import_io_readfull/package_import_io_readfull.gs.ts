@@ -31,7 +31,7 @@ export class fixedReader {
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
-		let r: fixedReader | $.VarRef<fixedReader> | null = this
+		let r: fixedReader | $.VarRef<fixedReader> | null = this;
 		if ($.len($.pointerValue<fixedReader>(r).data) == 0) {
 			return [0, io.EOF]
 		}

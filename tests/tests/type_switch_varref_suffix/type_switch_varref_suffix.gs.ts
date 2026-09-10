@@ -31,7 +31,7 @@ export class branch {
 	}
 
 	public value(): number {
-		const b: branch | $.VarRef<branch> | null = this
+		const b: branch | $.VarRef<branch> | null = this;
 		return $.pointerValue<branch>(b).n
 	}
 

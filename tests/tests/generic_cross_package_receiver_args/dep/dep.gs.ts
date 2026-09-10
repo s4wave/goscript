@@ -31,7 +31,7 @@ export class Impl {
 	}
 
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
-		const i: Impl | $.VarRef<Impl> | null = this
+		const i: Impl | $.VarRef<Impl> | null = this;
 		return $.pointerValue<Impl>(i).Item
 	}
 
@@ -62,7 +62,7 @@ export class Keyed {
 	}
 
 	public SetValues(__typeArgs: $.GenericTypeArgs | undefined, value: any): any {
-		const k: Keyed | $.VarRef<Keyed> | null = this
+		const k: Keyed | $.VarRef<Keyed> | null = this;
 		let zero: any = $.genericZero(__typeArgs, "U", null)
 		return zero
 	}

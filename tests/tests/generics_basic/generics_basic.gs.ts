@@ -43,12 +43,12 @@ export class Stack {
 	}
 
 	public Len(__typeArgs: $.GenericTypeArgs | undefined): number {
-		const s: Stack | $.VarRef<Stack> | null = this
+		const s: Stack | $.VarRef<Stack> | null = this;
 		return $.len($.pointerValue<Stack>(s).items)
 	}
 
 	public Pop(__typeArgs: $.GenericTypeArgs | undefined): [any, boolean] {
-		let s: Stack | $.VarRef<Stack> | null = this
+		let s: Stack | $.VarRef<Stack> | null = this;
 		if ($.len($.pointerValue<Stack>(s).items) == 0) {
 			$.panic("pop from empty stack")
 		}
@@ -59,7 +59,7 @@ export class Stack {
 	}
 
 	public Push(__typeArgs: $.GenericTypeArgs | undefined, value: any): void {
-		let s: Stack | $.VarRef<Stack> | null = this
+		let s: Stack | $.VarRef<Stack> | null = this;
 		$.pointerValue<Stack>(s).items = $.append($.pointerValue<Stack>(s).items, value, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as any)))
 	}
 
@@ -94,7 +94,7 @@ export class Item {
 	}
 
 	public Clone(): Item | $.VarRef<Item> | null {
-		const i: Item | $.VarRef<Item> | null = this
+		const i: Item | $.VarRef<Item> | null = this;
 		if (i == null) {
 			return null
 		}
@@ -132,13 +132,13 @@ export class Mapper {
 	}
 
 	public Get(__typeArgs: $.GenericTypeArgs | undefined, key: any): [any, boolean] {
-		const m: Mapper | $.VarRef<Mapper> | null = this
+		const m: Mapper | $.VarRef<Mapper> | null = this;
 		let [value, ok] = $.mapGet<any, any, any>($.pointerValue<Mapper>(m).values, key, null)
 		return [value, ok]
 	}
 
 	public Put(__typeArgs: $.GenericTypeArgs | undefined, key: any, value: any): void {
-		let m: Mapper | $.VarRef<Mapper> | null = this
+		let m: Mapper | $.VarRef<Mapper> | null = this;
 		$.mapSet($.pointerValue<Mapper>(m).values, key, value)
 	}
 
@@ -177,7 +177,7 @@ export class Pair {
 	}
 
 	public Swap(__typeArgs: $.GenericTypeArgs | undefined): Pair {
-		const p = this
+		const p = this;
 		return $.markAsStructValue(new Pair({First: p.Second, Second: p.First}))
 	}
 

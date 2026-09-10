@@ -21,7 +21,7 @@ export class T {
 	}
 
 	public WithDelta(delta: number): T | $.VarRef<T> | null {
-		const t: T | $.VarRef<T> | null = this
+		const t: T | $.VarRef<T> | null = this;
 		return new T({val: $.pointerValue<T>(t).val + delta})
 	}
 

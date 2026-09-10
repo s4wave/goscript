@@ -31,7 +31,7 @@ export class item {
 	}
 
 	public CloneVT(): item | $.VarRef<item> | null {
-		const i: item | $.VarRef<item> | null = this
+		const i: item | $.VarRef<item> | null = this;
 		if (i == null) {
 			return null
 		}

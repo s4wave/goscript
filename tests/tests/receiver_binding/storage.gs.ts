@@ -28,27 +28,27 @@ export class storage {
 	}
 
 	public IsEmpty(): boolean {
-		const s: storage | $.VarRef<storage> | null = this
+		const s: storage | $.VarRef<storage> | null = this;
 		return $.len($.pointerValue<storage>(s).bytes) == 0
 	}
 
 	public Len(): number {
-		const s: storage | $.VarRef<storage> | null = this
+		const s: storage | $.VarRef<storage> | null = this;
 		return $.len($.pointerValue<storage>(s).bytes)
 	}
 
 	public Name(): string {
-		const s: storage | $.VarRef<storage> | null = this
+		const s: storage | $.VarRef<storage> | null = this;
 		return $.pointerValue<storage>(s).name
 	}
 
 	public SetName(name: string): void {
-		let s: storage | $.VarRef<storage> | null = this
+		let s: storage | $.VarRef<storage> | null = this;
 		$.pointerValue<storage>(s).name = name
 	}
 
 	public Truncate(): void {
-		let s: storage | $.VarRef<storage> | null = this
+		let s: storage | $.VarRef<storage> | null = this;
 		$.pointerValue<storage>(s).bytes = $.makeSlice<number>(0, undefined, "byte")
 	}
 

@@ -21,12 +21,12 @@ export class MyStruct {
 	}
 
 	public DoesNotUseReceiver(): number {
-		const m: MyStruct | $.VarRef<MyStruct> | null = this
+		const m: MyStruct | $.VarRef<MyStruct> | null = this;
 		return 42
 	}
 
 	public UsesReceiver(): number {
-		const m: MyStruct | $.VarRef<MyStruct> | null = this
+		const m: MyStruct | $.VarRef<MyStruct> | null = this;
 		return $.pointerValue<MyStruct>(m).Value
 	}
 

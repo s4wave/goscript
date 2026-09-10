@@ -49,7 +49,7 @@ export class factory {
 	}
 
 	public GetConfigID(__typeArgs: $.GenericTypeArgs | undefined): string {
-		const f: factory | $.VarRef<factory> | null = this
+		const f: factory | $.VarRef<factory> | null = this;
 		return "factory-async"
 	}
 

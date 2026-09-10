@@ -65,7 +65,7 @@ export class Counter {
 	}
 
 	public Add(value: number): number {
-		const c: Counter | $.VarRef<Counter> | null = this
+		const c: Counter | $.VarRef<Counter> | null = this;
 		return $.pointerValue<Counter>(c).base + value
 	}
 

@@ -25,7 +25,7 @@ export class MyStruct {
 	}
 
 	public GetMyString(): string {
-		const m: MyStruct | $.VarRef<MyStruct> | null = this
+		const m: MyStruct | $.VarRef<MyStruct> | null = this;
 		return $.pointerValue<MyStruct>(m).MyString
 	}
 
@@ -60,12 +60,12 @@ export class setterStruct {
 	}
 
 	public ["get"](): number {
-		const s: setterStruct | $.VarRef<setterStruct> | null = this
+		const s: setterStruct | $.VarRef<setterStruct> | null = this;
 		return $.pointerValue<setterStruct>(s).value
 	}
 
 	public ["set"](value: number): void {
-		let s: setterStruct | $.VarRef<setterStruct> | null = this
+		let s: setterStruct | $.VarRef<setterStruct> | null = this;
 		$.pointerValue<setterStruct>(s).value = value
 	}
 
@@ -100,7 +100,7 @@ export class digest {
 	}
 
 	public Write(p: $.Slice<number>): void {
-		let d: digest | $.VarRef<digest> | null = this
+		let d: digest | $.VarRef<digest> | null = this;
 		$.pointerValue<digest>(d).writes = $.pointerValue<digest>(d).writes + ($.len(p))
 	}
 

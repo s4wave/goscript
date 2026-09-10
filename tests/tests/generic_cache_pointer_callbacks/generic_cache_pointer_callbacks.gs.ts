@@ -21,7 +21,7 @@ export class cache {
 	}
 
 	public async Get(__typeArgs: $.GenericTypeArgs | undefined, k: any, _new: (() => [any, $.GoError] | globalThis.Promise<[any, $.GoError]>) | null, check: ((_p0: any) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<[any, $.GoError]> {
-		let c: cache | $.VarRef<cache> | null = this
+		let c: cache | $.VarRef<cache> | null = this;
 		if (($.pointerValue<cache>(c).stored != null) && await check!($.pointerValue<cache>(c).stored)) {
 			return [$.pointerValue<cache>(c).stored, null]
 		}

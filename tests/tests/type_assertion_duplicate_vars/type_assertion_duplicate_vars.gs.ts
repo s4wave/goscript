@@ -27,7 +27,7 @@ export class ConcreteA {
 	}
 
 	public Method(): string {
-		const c = this
+		const c = this;
 		return "A"
 	}
 
@@ -54,7 +54,7 @@ export class ConcreteB {
 	}
 
 	public Method(): string {
-		const c = this
+		const c = this;
 		return "B"
 	}
 

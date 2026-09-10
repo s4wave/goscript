@@ -31,7 +31,7 @@ export class box {
 	}
 
 	public Value(): number {
-		const b: box | $.VarRef<box> | null = this
+		const b: box | $.VarRef<box> | null = this;
 		return $.pointerValue<box>(b).value
 	}
 

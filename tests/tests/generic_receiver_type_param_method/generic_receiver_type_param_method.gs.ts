@@ -27,12 +27,12 @@ export class nistCurve {
 	}
 
 	public async Add(__typeArgs: $.GenericTypeArgs | undefined, p1: any, p2: any): globalThis.Promise<any> {
-		const curve: nistCurve | $.VarRef<nistCurve> | null = this
+		const curve: nistCurve | $.VarRef<nistCurve> | null = this;
 		return (await $.callGenericMethod(__typeArgs, "Point", "Add", p1, p1, p2) as any)
 	}
 
 	public Zero(__typeArgs: $.GenericTypeArgs | undefined): any {
-		const curve: nistCurve | $.VarRef<nistCurve> | null = this
+		const curve: nistCurve | $.VarRef<nistCurve> | null = this;
 		let p: any = $.genericZero(__typeArgs, "Point", null)
 		return p
 	}
@@ -64,7 +64,7 @@ export class point {
 	}
 
 	public Add(a: point | $.VarRef<point> | null, b: point | $.VarRef<point> | null): point | $.VarRef<point> | null {
-		const p: point | $.VarRef<point> | null = this
+		const p: point | $.VarRef<point> | null = this;
 		return new point({N: $.pointerValue<point>(a).N + $.pointerValue<point>(b).N})
 	}
 

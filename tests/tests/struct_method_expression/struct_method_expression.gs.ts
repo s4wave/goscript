@@ -21,7 +21,7 @@ export class worker {
 	}
 
 	public add(v: number): number {
-		const w: worker | $.VarRef<worker> | null = this
+		const w: worker | $.VarRef<worker> | null = this;
 		return $.pointerValue<worker>(w).base + v
 	}
 

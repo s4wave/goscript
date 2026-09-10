@@ -21,12 +21,12 @@ export class MyStruct {
 	}
 
 	public GetValue(): number {
-		const m = this
+		const m = this;
 		return m.MyInt
 	}
 
 	public SetValue(v: number): void {
-		let m: MyStruct | $.VarRef<MyStruct> | null = this
+		let m: MyStruct | $.VarRef<MyStruct> | null = this;
 		$.pointerValue<MyStruct>(m).MyInt = v
 	}
 

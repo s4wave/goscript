@@ -26,7 +26,7 @@ export class Setting {
 	}
 
 	public async Value(): globalThis.Promise<string> {
-		const s: Setting | $.VarRef<Setting> | null = this
+		const s: Setting | $.VarRef<Setting> | null = this;
 		await $.pointerValue<Setting>(s).once.Do($.functionValue((): void => {
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 		return ""

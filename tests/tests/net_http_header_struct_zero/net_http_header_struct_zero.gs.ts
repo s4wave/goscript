@@ -24,7 +24,7 @@ export class responseWriter {
 	}
 
 	public Header(): http.Header {
-		const w: responseWriter | $.VarRef<responseWriter> | null = this
+		const w: responseWriter | $.VarRef<responseWriter> | null = this;
 		return $.pointerValue<responseWriter>(w).header
 	}
 

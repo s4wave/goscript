@@ -29,12 +29,12 @@ export class msg {
 	}
 
 	public CloneMessageVT(): protobuf_go_lite.CloneMessage | null {
-		const m: msg | $.VarRef<msg> | null = this
+		const m: msg | $.VarRef<msg> | null = this;
 		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(msg.prototype.CloneVT.call(m), "*main.msg", /* @__PURE__ */ $.pointerType("main.msg"))
 	}
 
 	public CloneVT(): msg | $.VarRef<msg> | null {
-		const m: msg | $.VarRef<msg> | null = this
+		const m: msg | $.VarRef<msg> | null = this;
 		if (m == null) {
 			return null
 		}
@@ -42,31 +42,31 @@ export class msg {
 	}
 
 	public EqualVT(other: msg | $.VarRef<msg> | null): boolean {
-		const m: msg | $.VarRef<msg> | null = this
+		const m: msg | $.VarRef<msg> | null = this;
 		return (other != null) && ($.pointerValue<msg>(m).v == $.pointerValue<msg>(other).v)
 	}
 
 	public MarshalToSizedBufferVT(_p0: $.Slice<number>): [number, $.GoError] {
-		const m: msg | $.VarRef<msg> | null = this
+		const m: msg | $.VarRef<msg> | null = this;
 		return [0, null]
 	}
 
 	public MarshalVT(): [$.Slice<number>, $.GoError] {
-		const m: msg | $.VarRef<msg> | null = this
+		const m: msg | $.VarRef<msg> | null = this;
 		return [null, null]
 	}
 
 	public Reset(): void {
-		const m: msg | $.VarRef<msg> | null = this
+		const m: msg | $.VarRef<msg> | null = this;
 	}
 
 	public SizeVT(): number {
-		const m: msg | $.VarRef<msg> | null = this
+		const m: msg | $.VarRef<msg> | null = this;
 		return 0
 	}
 
 	public UnmarshalVT(_p0: $.Slice<number>): $.GoError {
-		const m: msg | $.VarRef<msg> | null = this
+		const m: msg | $.VarRef<msg> | null = this;
 		return null
 	}
 

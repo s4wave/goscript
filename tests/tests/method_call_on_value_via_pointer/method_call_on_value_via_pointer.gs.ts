@@ -21,7 +21,7 @@ export class MyStruct {
 	}
 
 	public GetValue(): number {
-		const m = this
+		const m = this;
 		return m.MyInt
 	}
 

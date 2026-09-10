@@ -35,17 +35,17 @@ export class wrappedHealthError {
 	}
 
 	public async Error(): globalThis.Promise<string> {
-		const e: wrappedHealthError | $.VarRef<wrappedHealthError> | null = this
+		const e: wrappedHealthError | $.VarRef<wrappedHealthError> | null = this;
 		return $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<wrappedHealthError>(e).err).Error()
 	}
 
 	public Health(): string {
-		const e: wrappedHealthError | $.VarRef<wrappedHealthError> | null = this
+		const e: wrappedHealthError | $.VarRef<wrappedHealthError> | null = this;
 		return "closed"
 	}
 
 	public Unwrap(): $.GoError {
-		const e: wrappedHealthError | $.VarRef<wrappedHealthError> | null = this
+		const e: wrappedHealthError | $.VarRef<wrappedHealthError> | null = this;
 		return $.pointerValue<wrappedHealthError>(e).err
 	}
 

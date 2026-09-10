@@ -27,7 +27,7 @@ export class openOnlyFS {
 	}
 
 	public async Open(name: string): globalThis.Promise<[fs.File | null, $.GoError]> {
-		const o = this
+		const o = this;
 		return fstest.MapFS_Open(o.fsys, name)
 	}
 

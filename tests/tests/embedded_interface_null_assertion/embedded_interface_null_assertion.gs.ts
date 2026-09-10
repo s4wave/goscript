@@ -73,7 +73,7 @@ export class StringReader {
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
-		let s: StringReader | $.VarRef<StringReader> | null = this
+		let s: StringReader | $.VarRef<StringReader> | null = this;
 		if ($.pointerValue<StringReader>(s).pos >= $.len($.pointerValue<StringReader>(s).data)) {
 			return [0, null]
 		}

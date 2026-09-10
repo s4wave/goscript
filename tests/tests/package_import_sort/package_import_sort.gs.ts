@@ -29,17 +29,17 @@ export class descending {
 	}
 
 	public Len(): number {
-		const d = this
+		const d = this;
 		return $.len(d.values)
 	}
 
 	public Less(i: number, j: number): boolean {
-		const d = this
+		const d = this;
 		return $.arrayIndex(d.values!, i) > $.arrayIndex(d.values!, j)
 	}
 
 	public Swap(i: number, j: number): void {
-		let d: descending = this
+		let d: descending = this;
 		let __goscriptAssign0_0: number = $.arrayIndex(d.values!, j)
 		let __goscriptAssign0_1: number = $.arrayIndex(d.values!, i)
 		d.values![i] = __goscriptAssign0_0

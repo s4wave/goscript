@@ -31,7 +31,7 @@ export class stream {
 	}
 
 	public Close(): string {
-		const s = this
+		const s = this;
 		return "close:" + s.name
 	}
 

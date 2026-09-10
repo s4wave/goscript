@@ -31,7 +31,7 @@ export class listProvider {
 	}
 
 	public Items(): $.Slice<Group | $.VarRef<Group> | null> {
-		const p: listProvider | $.VarRef<listProvider> | null = this
+		const p: listProvider | $.VarRef<listProvider> | null = this;
 		return $.pointerValue<listProvider>(p).items
 	}
 
@@ -70,7 +70,7 @@ export class Group {
 	}
 
 	public async Build(): globalThis.Promise<void> {
-		const g: Group | $.VarRef<Group> | null = this
+		const g: Group | $.VarRef<Group> | null = this;
 		let __goscriptRangeReturn0 = false
 		;await (async () => {
 			await $.functionValue(((__receiver) => (_yield: ((_p0: Group | $.VarRef<Group> | null) => boolean | globalThis.Promise<boolean>) | null) => __receiver.Each(_yield))($.pointerValue<Group>(g)), ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Group")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo))!(async (child) => {
@@ -84,7 +84,7 @@ export class Group {
 	}
 
 	public async Each(_yield: ((_p0: Group | $.VarRef<Group> | null) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<void> {
-		const g: Group | $.VarRef<Group> | null = this
+		const g: Group | $.VarRef<Group> | null = this;
 		for (let __goscriptRangeTarget0 = await $.pointerValue<Exclude<provider, null>>($.pointerValue<Group>(g).provider).Items(), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 			let child = __goscriptRangeTarget0![__rangeIndex]
 			if (!await _yield!(child)) {

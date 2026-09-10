@@ -21,7 +21,7 @@ export class content {
 	}
 
 	public ProcessData(input: number): [number, string, boolean] {
-		const c: content | $.VarRef<content> | null = this
+		const c: content | $.VarRef<content> | null = this;
 		let result: number = 0
 		let status: string = ""
 		let valid: boolean = false
@@ -42,7 +42,7 @@ export class content {
 	}
 
 	public ReadAt(b: $.Slice<number>, off: bigint): [number, $.GoError] {
-		const c: content | $.VarRef<content> | null = this
+		const c: content | $.VarRef<content> | null = this;
 		let n: number = 0
 		let err: $.GoError = null! as $.GoError
 		if ((off < 0n) || (off >= $.int64($.len($.pointerValue<content>(c).bytes)))) {

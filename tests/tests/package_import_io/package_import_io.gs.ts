@@ -56,7 +56,7 @@ export class asyncBuffer {
 	}
 
 	public async Reset(w: io.Writer | null): globalThis.Promise<void> {
-		const b: asyncBuffer | $.VarRef<asyncBuffer> | null = this
+		const b: asyncBuffer | $.VarRef<asyncBuffer> | null = this;
 		if ($.comparableEqual(b, w)) {
 			await $.println("Reset same writer")
 			return
@@ -65,7 +65,7 @@ export class asyncBuffer {
 	}
 
 	public async Write(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
-		const b: asyncBuffer | $.VarRef<asyncBuffer> | null = this
+		const b: asyncBuffer | $.VarRef<asyncBuffer> | null = this;
 		await asyncWrites.value.Load("last")
 		return [$.len(p), null]
 	}
@@ -97,7 +97,7 @@ export class staticReader {
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
-		let r: staticReader | $.VarRef<staticReader> | null = this
+		let r: staticReader | $.VarRef<staticReader> | null = this;
 		if ($.pointerValue<staticReader>(r).done) {
 			return [0, io.EOF]
 		}
@@ -137,7 +137,7 @@ export class asyncReader {
 	}
 
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
-		let r: asyncReader | $.VarRef<asyncReader> | null = this
+		let r: asyncReader | $.VarRef<asyncReader> | null = this;
 		await asyncWrites.value.Load("read")
 		if ($.pointerValue<asyncReader>(r).done) {
 			return [0, io.EOF]
@@ -178,7 +178,7 @@ export class asyncReaderAt {
 	}
 
 	public async ReadAt(p: $.Slice<number>, off: bigint): globalThis.Promise<[number, $.GoError]> {
-		const r: asyncReaderAt | $.VarRef<asyncReaderAt> | null = this
+		const r: asyncReaderAt | $.VarRef<asyncReaderAt> | null = this;
 		await asyncWrites.value.Load("readat")
 		if (off >= $.int64($.len($.pointerValue<asyncReaderAt>(r).data))) {
 			return [0, io.EOF]

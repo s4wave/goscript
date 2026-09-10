@@ -21,7 +21,7 @@ export class entry {
 	}
 
 	public add(value: number): void {
-		let e: entry | $.VarRef<entry> | null = this
+		let e: entry | $.VarRef<entry> | null = this;
 		$.pointerValue<entry>(e).value = $.pointerValue<entry>(e).value + (value)
 	}
 

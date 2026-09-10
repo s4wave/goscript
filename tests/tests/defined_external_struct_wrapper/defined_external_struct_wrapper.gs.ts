@@ -28,7 +28,7 @@ export class Wrapped {
 	}
 
 	public ["public"](): dep.Public | $.VarRef<dep.Public> | null {
-		const w: Wrapped | $.VarRef<Wrapped> | null = this
+		const w: Wrapped | $.VarRef<Wrapped> | null = this;
 		return $.unsafePointerCast<dep.Public | $.VarRef<dep.Public> | null>(w, dep.Public)
 	}
 

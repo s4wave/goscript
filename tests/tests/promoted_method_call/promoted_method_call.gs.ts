@@ -21,7 +21,7 @@ export class base {
 	}
 
 	public Add(n: number): number {
-		const b: base | $.VarRef<base> | null = this
+		const b: base | $.VarRef<base> | null = this;
 		return $.pointerValue<base>(b).value + n
 	}
 

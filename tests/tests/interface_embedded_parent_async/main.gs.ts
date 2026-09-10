@@ -31,14 +31,14 @@ export class impl {
 	}
 
 	public async Name(): globalThis.Promise<string> {
-		const i: impl | $.VarRef<impl> | null = this
+		const i: impl | $.VarRef<impl> | null = this;
 		await $.chanSend(ready, true)
 		await $.chanRecv(ready)
 		return "ok"
 	}
 
 	public async Validate(): globalThis.Promise<$.GoError> {
-		const i: impl | $.VarRef<impl> | null = this
+		const i: impl | $.VarRef<impl> | null = this;
 		await $.chanSend(ready, true)
 		await $.chanRecv(ready)
 		return null

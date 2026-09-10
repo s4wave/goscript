@@ -30,7 +30,7 @@ export class PathJoiner {
 	}
 
 	public Join(elem: $.Slice<string>): string {
-		const p = this
+		const p = this;
 		let result: $.VarRef<strings.Builder> = $.varRef($.markAsStructValue(new strings.Builder()))
 		for (let __goscriptRangeTarget0 = elem, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
 			let e = __goscriptRangeTarget0![i]

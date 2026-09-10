@@ -24,7 +24,7 @@ export class asyncReader {
 	}
 
 	public async Read(b: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
-		const r = this
+		const r = this;
 		await $.chanSend(r.ch, $.len(b))
 		return [await $.chanRecv(r.ch), null]
 	}

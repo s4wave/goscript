@@ -21,7 +21,7 @@ export class Foo {
 	}
 
 	public async Bar(): globalThis.Promise<void> {
-		const f: Foo | $.VarRef<Foo> | null = this
+		const f: Foo | $.VarRef<Foo> | null = this;
 		await $.println("Foo.Bar called")
 		await $.chanSend($.pointerValue<Foo>(f).done, true)
 	}

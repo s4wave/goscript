@@ -41,7 +41,7 @@ export class segmentedReader {
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
-		let r: segmentedReader | $.VarRef<segmentedReader> | null = this
+		let r: segmentedReader | $.VarRef<segmentedReader> | null = this;
 		if ($.pointerValue<segmentedReader>(r).offset >= $.len($.pointerValue<segmentedReader>(r).data)) {
 			return [0, io.EOF]
 		}

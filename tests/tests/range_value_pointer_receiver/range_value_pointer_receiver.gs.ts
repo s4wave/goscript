@@ -21,7 +21,7 @@ export class item {
 	}
 
 	public Name(): string {
-		const i: item | $.VarRef<item> | null = this
+		const i: item | $.VarRef<item> | null = this;
 		if (i == null) {
 			return ""
 		}

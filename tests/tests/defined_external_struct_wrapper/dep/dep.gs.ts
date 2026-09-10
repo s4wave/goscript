@@ -55,7 +55,7 @@ export class Public {
 	}
 
 	public Label(): string {
-		const p: Public | $.VarRef<Public> | null = this
+		const p: Public | $.VarRef<Public> | null = this;
 		return $.pointerValue<Public>(p).Value
 	}
 

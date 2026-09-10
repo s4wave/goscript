@@ -21,13 +21,13 @@ export class Counter {
 	}
 
 	public PointerAfterIncrement(): Counter | $.VarRef<Counter> | null {
-		let c = $.varRef(this)
+		let c = $.varRef(this);
 		c.value.value++
 		return c
 	}
 
 	public Value(): number {
-		const c: Counter | $.VarRef<Counter> | null = this
+		const c: Counter | $.VarRef<Counter> | null = this;
 		return $.pointerValue<Counter>(c).value
 	}
 

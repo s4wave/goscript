@@ -101,7 +101,7 @@ export class printer {
 	}
 
 	public async format(verb: number): globalThis.Promise<void> {
-		const p: printer | $.VarRef<printer> | null = this
+		const p: printer | $.VarRef<printer> | null = this;
 		// Use the formatter
 		if ($.pointerValue<printer>(p).fmt.minus) {
 			await $.println("minus flag set")
@@ -112,7 +112,7 @@ export class printer {
 	}
 
 	public init(): void {
-		let p: printer | $.VarRef<printer> | null = this
+		let p: printer | $.VarRef<printer> | null = this;
 		$.assignStruct($.pointerValue<printer>(p).fmt, $.markAsStructValue(new formatter()))
 	}
 

@@ -54,7 +54,7 @@ export class arena {
 	}
 
 	public New(__typeArgs: $.GenericTypeArgs | undefined): any {
-		let a: arena | $.VarRef<arena> | null = this
+		let a: arena | $.VarRef<arena> | null = this;
 		if ($.len($.pointerValue<arena>(a).data) == $.cap($.pointerValue<arena>(a).data)) {
 			let nextSize = 1
 			$.pointerValue<arena>(a).data = (slices.Grow(null, nextSize, () => ($.genericZero(__typeArgs, "T", null) as any)) as $.Slice<any>)

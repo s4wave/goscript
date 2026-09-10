@@ -46,12 +46,12 @@ export class MyStruct {
 	}
 
 	public MyString1(): string {
-		const m = this
+		const m = this;
 		return m.Value1
 	}
 
 	public MyString2(): string {
-		const m = this
+		const m = this;
 		return m.Value2
 	}
 

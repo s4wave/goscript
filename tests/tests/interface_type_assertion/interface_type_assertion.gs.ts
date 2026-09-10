@@ -31,7 +31,7 @@ export class MyStruct {
 	}
 
 	public Method1(): number {
-		const m = this
+		const m = this;
 		return m.Value
 	}
 

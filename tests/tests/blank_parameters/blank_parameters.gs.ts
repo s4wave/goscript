@@ -31,7 +31,7 @@ export class blankImpl {
 	}
 
 	public Value(): number {
-		const b: blankImpl | $.VarRef<blankImpl> | null = this
+		const b: blankImpl | $.VarRef<blankImpl> | null = this;
 		return $.pointerValue<blankImpl>(b).value
 	}
 

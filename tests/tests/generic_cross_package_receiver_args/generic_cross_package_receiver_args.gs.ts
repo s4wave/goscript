@@ -35,7 +35,7 @@ export class wrapper {
 	}
 
 	public Other(__typeArgs: $.GenericTypeArgs | undefined): any {
-		const w: wrapper | $.VarRef<wrapper> | null = this
+		const w: wrapper | $.VarRef<wrapper> | null = this;
 		let zero: any = $.genericZero(__typeArgs, "E", null)
 		return zero
 	}

@@ -31,7 +31,7 @@ export class Table {
 	}
 
 	public Key(): string {
-		const t: Table | $.VarRef<Table> | null = this
+		const t: Table | $.VarRef<Table> | null = this;
 		return $.pointerValue<Table>(t).name
 	}
 
