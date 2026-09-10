@@ -47,7 +47,11 @@ func uintShiftAssign(n uint) uint {
 	return n
 }
 
+// main exercises wide arithmetic through the compiled runtime.
 func main() {
+	wide := uint64(1<<63 + 17)
+	signed := int64(-1<<62 + 3)
+	println(+wide, +signed, +(+wide))
 	println(hash6(0x0102030405, 14))
 	println(mix(0xf0f0f0f0f0f0f0f0, 0x0f0f0f0f0f0f0f0f))
 	println(uint32(highAfterMask(0x1234) >> 48))

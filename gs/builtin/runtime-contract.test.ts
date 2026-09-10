@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { queueTask } from './scheduler.js'
+
 import {
   append,
   appendSlice,
@@ -354,6 +356,76 @@ describe('builtin runtime contract helpers', () => {
     expect(target.value).toBe(42)
     source.value = 7
     expect(target.value).toBe(42)
+  })
+
+  it('preserves nested struct fields when package type names collide', () => {
+    class Record {
+      constructor(public object = '') {}
+
+      static __typeInfo = registerStructType(
+        'assignment.Record',
+        () => new Record(),
+        [],
+        Record,
+        [
+          {
+            name: 'object',
+            type: 'string',
+            index: [0],
+            offset: 0,
+            exported: true,
+          },
+        ],
+      )
+    }
+    class OtherRecord {
+      constructor(public target = '') {}
+
+      static __typeInfo = registerStructType(
+        'assignment.Record',
+        () => new OtherRecord(),
+        [],
+        OtherRecord,
+        [
+          {
+            name: 'target',
+            type: 'string',
+            index: [0],
+            offset: 0,
+            exported: true,
+          },
+        ],
+      )
+    }
+    class Container {
+      constructor(public record = new Record()) {}
+
+      static __typeInfo = registerStructType(
+        'assignment.Container',
+        () => new Container(),
+        [],
+        Container,
+        [
+          {
+            name: 'record',
+            type: 'assignment.Record',
+            index: [0],
+            offset: 0,
+            exported: true,
+          },
+        ],
+      )
+    }
+
+    const destination = new Container()
+    const address = destination.record
+    assignStruct(destination, new Container(new Record('retained')))
+
+    expect(destination.record).toBe(address)
+    expect(destination.record.object).toBe('retained')
+    const other = new OtherRecord()
+    assignStruct(other, new OtherRecord('separate'))
+    expect(other.target).toBe('separate')
   })
 
   it('attaches owned pointer handles to variable and field refs', () => {
@@ -1211,6 +1283,26 @@ describe('builtin runtime contract helpers', () => {
 
     await receive
     expect(events).toEqual(['queued', 'receiver'])
+  })
+
+  it('lets queued shutdown work progress when receiving an already closed channel', async () => {
+    const channel = makeChannel(0, 0)
+    channel.close()
+    const receivers = [
+      () => channel.receive(),
+      () => channel.receiveWithOk(),
+      () => channel.selectReceive(0),
+      () => selectStatement([{ id: 0, isSend: false, channel }]),
+    ]
+
+    for (const receive of receivers) {
+      let shutdownFinished = false
+      queueTask(() => {
+        shutdownFinished = true
+      })
+      await receive()
+      expect(shutdownFinished).toBe(true)
+    }
   })
 
   it('preserves values offered to losing select branches in the same turn', async () => {

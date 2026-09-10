@@ -94,7 +94,8 @@ export function assignStruct<T>(
   }
   const targetFields = (target as any)._fields
   const sourceFields = (source as any)._fields
-  const info = typeInfo ?? (source as any).constructor?.__typeInfo
+  // The value identifies its layout even when package names collide.
+  const info = (source as any).constructor?.__typeInfo ?? typeInfo
   const resolved = typeof info === 'string' ? getTypeByName(info) : info
   if (resolved?.kind === TypeKind.Struct) {
     const destination = targetFields ?? target

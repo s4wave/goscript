@@ -31,6 +31,7 @@ import {
   NewTicker,
   NewTimer,
   Now,
+  Parse,
   ParseDuration,
   Since,
   RFC1123,
@@ -48,6 +49,7 @@ import {
   Unix,
   UnixMicro,
   UnixMilli,
+  UnixNano,
 } from './time.js'
 import type { Month } from './time.js'
 
@@ -238,6 +240,24 @@ describe('time.Time calendar and binary helpers', () => {
     expect(fractional.UnixNano()).toBe(1234567890987654321n)
     expect(normalized.Unix()).toBe(1234567891n)
     expect(normalized.UnixNano()).toBe(1234567891500000000n)
+  })
+
+  it('preserves fractional instants through formatting and persistence', () => {
+    const nanos = 1789067045987654321n
+    const value = UnixNano(nanos).UTC()
+    const text = value.Format(RFC3339Nano)
+    const [restored, err] = Parse(RFC3339Nano, text)
+
+    expect(value.UnixNano()).toBe(nanos)
+    expect(value.Nanosecond()).toBe(987654321)
+    expect(text).toBe('2026-09-10T19:04:05.987654321Z')
+    expect(err).toBeNull()
+    expect(restored.Equal(value)).toBe(true)
+    expect(restored.Add(Second).Sub(value)).toBe(Second)
+    expect(value.Add(-1n).UnixNano()).toBe(nanos - 1n)
+    expect(UnixMilli(1789067045987n).Format(RFC3339Nano)).toBe(
+      '2026-09-10T19:04:05.987Z',
+    )
   })
 
   it('appends formatted text to byte slices', () => {

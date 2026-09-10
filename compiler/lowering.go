@@ -11712,9 +11712,14 @@ func isRealNumericConstantExpr(ctx lowerFileContext, expr ast.Expr) bool {
 	}
 }
 
+// lowerPrefixUnaryExpr preserves Go's identity plus and separates repeated signs.
 func lowerPrefixUnaryExpr(op token.Token, value string) string {
+	// JavaScript unary plus converts to number and rejects bigint operands.
+	if op == token.ADD {
+		return value
+	}
 	prefix := op.String()
-	if (op == token.SUB && strings.HasPrefix(value, "-")) || (op == token.ADD && strings.HasPrefix(value, "+")) {
+	if op == token.SUB && strings.HasPrefix(value, "-") {
 		return prefix + "(" + value + ")"
 	}
 	return prefix + value

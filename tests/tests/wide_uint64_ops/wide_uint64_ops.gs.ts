@@ -52,6 +52,9 @@ export function uintShiftAssign(n: number): number {
 }
 
 export async function main(): globalThis.Promise<void> {
+	let wide = 9223372036854775825n
+	let signed = -4611686018427387901n
+	await $.println(wide, signed, (wide))
 	await $.println($.uint(hash6(4328719365n, 14), 32))
 	await $.println(mix(17361641481138401520n, 1085102592571150095n))
 	await $.println($.uint($.uint($.uint64Shr(highAfterMask(4660n), 48n), 32), 32))

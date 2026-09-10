@@ -138,6 +138,69 @@ describe('net/http override', () => {
     })
   })
 
+  it('serves directory redirects, indexes, and escaped listings beneath a prefix', async () => {
+    const info = (name: string, directory: boolean, size = 0) => ({
+      Name: () => name,
+      IsDir: () => directory,
+      Size: () => size,
+      Mode: () => 0,
+      ModTime: () => null as never,
+      Sys: () => null,
+    })
+    let closed = 0
+    const root: FileSystem = {
+      Open(name) {
+        const directory = name === 'docs' || name === 'listing'
+        if (!directory && name !== 'docs/index.html') {
+          return [null, io.EOF]
+        }
+        const data = $.stringToBytes('directory index')
+        const reader = bytes.NewReader(data)
+        return [
+          {
+            Read: (buffer) => reader.Read(buffer),
+            Seek: (offset, whence) => reader.Seek(offset, whence),
+            Close: () => {
+              closed++
+              return null
+            },
+            Stat: () => [
+              info(name, directory, directory ? 0 : data.length),
+              null,
+            ],
+            Readdir: () => [[info('z', true), info('a<&.txt', false)], null],
+          },
+          null,
+        ]
+      },
+    }
+    const handler = StripPrefix('/mounted', FileServer(root))
+    for (const [target, status, location] of [
+      ['/mounted/docs?sort=name', 301, 'docs/?sort=name'],
+      ['/mounted/docs/index.html', 301, './'],
+    ] as const) {
+      const writer = new testResponseWriter()
+      const [request] = NewRequest(MethodGet, target, null)
+      await handler.ServeHTTP(writer, request)
+      expect(writer.Code).toBe(status)
+      expect(Header_Get(writer.Header(), 'Location')).toBe(location)
+    }
+    const indexWriter = new testResponseWriter()
+    const [indexRequest] = NewRequest(MethodGet, '/mounted/docs/', null)
+    await handler.ServeHTTP(indexWriter, indexRequest)
+    expect(indexWriter.Code).toBe(200)
+    expect(indexWriter.Body.String()).toBe('directory index')
+
+    const listWriter = new testResponseWriter()
+    const [listRequest] = NewRequest(MethodGet, '/mounted/listing/', null)
+    await handler.ServeHTTP(listWriter, listRequest)
+    expect(listWriter.Code).toBe(200)
+    expect(listWriter.Body.String()).toContain(
+      '<a href="a%3C%26.txt">a&lt;&amp;.txt</a>\n<a href="z/">z/</a>',
+    )
+    expect(closed).toBe(4)
+  })
+
   it('exports response status helpers', () => {
     const resp = new Response({ StatusCode: StatusOK })
 

@@ -4,7 +4,7 @@ import { makeChannel, ChannelRef, makeChannelRef } from '../builtin/channel.js'
 // Time represents a time instant with nanosecond precision.
 export class Time {
   private _date: globalThis.Date
-  private _nsec: number // nanoseconds within the second
+  private _nsec: number // nanoseconds within the millisecond
   private _monotonic?: number // high-resolution monotonic timestamp in nanoseconds
   private _location: Location // timezone location
 
@@ -16,7 +16,7 @@ export class Time {
     this._location = UTC
   }
 
-  // create is a static factory method that creates a Time instance with specific parameters
+  // create adds submillisecond precision to a wall clock and normalizes carries.
   public static create(
     date: globalThis.Date,
     nsec: number = 0,
@@ -24,8 +24,9 @@ export class Time {
     location?: Location,
   ): Time {
     const time = new Time()
-    time._date = new globalThis.Date(date.getTime())
-    time._nsec = nsec
+    const milliseconds = Math.floor(nsec / 1000000)
+    time._date = new globalThis.Date(date.getTime() + milliseconds)
+    time._nsec = nsec - milliseconds * 1000000
     time._monotonic = monotonic
     time._location = location || UTC
     return time
@@ -131,7 +132,7 @@ export class Time {
 
   // Nanosecond returns the nanosecond offset within the second specified by t, in the range [0, 999999999]
   public Nanosecond(): number {
-    return this._nsec
+    return this._date.getUTCMilliseconds() * 1000000 + this._nsec
   }
 
   public Date(): [number, Month, number] {
@@ -204,7 +205,7 @@ export class Time {
       second = this._date.getSeconds() // 0-59
     }
 
-    const nsec = this._nsec // Nanoseconds (0-999,999,999)
+    const nsec = this.Nanosecond()
 
     const shortMonthNames = [
       'Jan',
@@ -600,11 +601,12 @@ export class Time {
   // Add adds the duration d to t, returning the sum
   // Preserves monotonic reading if present
   public Add(d: Duration): Time {
-    const durationNs = durationNumber(d)
+    const duration = BigInt(d)
+    const durationNs = Number(duration)
     const newDate = new globalThis.Date(
-      this._date.getTime() + Math.floor(durationNs / 1000000),
+      this._date.getTime() + Number(duration / 1000000n),
     )
-    const newNsec = this._nsec + (durationNs % 1000000)
+    const newNsec = this._nsec + Number(duration % 1000000n)
     const newMonotonic =
       this._monotonic !== undefined ? this._monotonic + durationNs : undefined
     return Time.create(newDate, newNsec, newMonotonic, this._location)
@@ -1180,7 +1182,12 @@ export function Date(
       Math.floor(nsec / 1000000),
     )
   }
-  return Time.create(date, nsec % 1000000000, undefined, loc) // No monotonic reading
+  return Time.create(
+    date,
+    nsec - Math.floor(nsec / 1000000) * 1000000,
+    undefined,
+    loc,
+  )
 }
 
 // UTC Common locations.
@@ -1265,10 +1272,8 @@ export const TimeOnly = '15:04:05'
 // Unix returns the local Time corresponding to the given Unix time,
 // sec seconds and nsec nanoseconds since January 1, 1970 UTC.
 export function Unix(sec: bigint, nsec: bigint = 0n): Time {
-  const secNum = Number(sec)
-  const nsecNum = Number(nsec)
-  const ms = secNum * 1000 + Math.floor(nsecNum / 1000000)
-  const remainingNsec = nsecNum % 1000000
+  const ms = Number(sec * 1000n + nsec / 1000000n)
+  const remainingNsec = Number(nsec % 1000000n)
   return Time.create(new globalThis.Date(ms), remainingNsec, undefined, UTC)
 }
 
@@ -1281,19 +1286,15 @@ export function UnixMilli(msec: bigint): Time {
 // UnixMicro returns the local Time corresponding to the given Unix time,
 // usec microseconds since January 1, 1970 UTC.
 export function UnixMicro(usec: bigint): Time {
-  const usecNum = Number(usec)
-  const ms = Math.floor(usecNum / 1000)
-  const nsec = (usecNum % 1000) * 1000
+  const ms = Number(usec / 1000n)
+  const nsec = Number(usec % 1000n) * 1000
   return Time.create(new globalThis.Date(ms), nsec, undefined, UTC)
 }
 
 // UnixNano returns the local Time corresponding to the given Unix time,
 // nsec nanoseconds since January 1, 1970 UTC.
 export function UnixNano(nsec: bigint): Time {
-  const nsecNum = Number(nsec)
-  const ms = Math.floor(nsecNum / 1000000)
-  const remainingNsec = nsecNum % 1000000
-  return Time.create(new globalThis.Date(ms), remainingNsec, undefined, UTC)
+  return Unix(0n, nsec)
 }
 
 // ParseDuration parses a duration string
@@ -1516,7 +1517,7 @@ export function ParseInLocation(
   // A full implementation would need to parse according to the layout format
 
   // Handle common layouts
-  if (layout === RFC3339 || layout === '2006-01-02T15:04:05Z07:00') {
+  if (layout === RFC3339 || layout === RFC3339Nano) {
     const date = new globalThis.Date(value)
     if (isNaN(date.getTime())) {
       return [
@@ -1532,7 +1533,9 @@ export function ParseInLocation(
         ),
       ]
     }
-    return [Time.create(date, 0, undefined, loc), null]
+    const fraction = value.match(/[.,](\d+)(?:Z|[+-]\d{2}:\d{2})$/)?.[1] ?? ''
+    const nanos = Number(fraction.slice(0, 9).padEnd(9, '0'))
+    return [Time.create(date, nanos % 1000000, undefined, loc), null]
   }
 
   if (layout === DateTime || layout === '2006-01-02 15:04:05') {
