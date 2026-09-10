@@ -680,7 +680,7 @@ func renderFunction(b *strings.Builder, fn *loweredFunction) {
 		}
 		b.WriteString(" = ")
 		b.WriteString(receiverValue(fn))
-		b.WriteString("\n")
+		b.WriteString(";\n")
 	}
 	renderStmts(b, fn.paramBindings, 1)
 	renderNamedResults(b, fn.namedResults, 1)
@@ -739,7 +739,7 @@ func renderMethod(b *strings.Builder, fn *loweredFunction) {
 		}
 		b.WriteString(" = ")
 		b.WriteString(receiverValue(fn))
-		b.WriteString("\n")
+		b.WriteString(";\n")
 	}
 	renderStmts(b, fn.paramBindings, 2)
 	renderNamedResults(b, fn.namedResults, 2)

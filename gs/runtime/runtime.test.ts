@@ -10,11 +10,19 @@ import {
   ReadMemStats,
   ReadTrace,
   SetFinalizer,
+  Stack,
   StartTrace,
   StopTrace,
 } from './runtime.js'
 
 describe('runtime override', () => {
+  it('copies a stack into the caller buffer within its bounds', () => {
+    const buffer = new Uint8Array(8)
+    expect(Stack(buffer, false)).toBe(8)
+    expect(new TextDecoder().decode(buffer)).toMatch(/^Error/)
+    expect(Stack(null, true)).toBe(0)
+  })
+
   it('exposes stack and trace compatibility helpers', () => {
     expect(Compiler).toBe('gc')
     expect(FuncForPC(0)).toBeNull()

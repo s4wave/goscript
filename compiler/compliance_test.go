@@ -1,6 +1,7 @@
 package compiler_test
 
 import (
+	"go/build"
 	"os"
 	"path/filepath"
 	"slices"
@@ -35,6 +36,17 @@ func TestCompliance(t *testing.T) {
 		testPath := filepath.Join(testsDir, entry.Name())
 		goFiles, err := filepath.Glob(filepath.Join(testPath, "*.go"))
 		if err != nil || len(goFiles) == 0 {
+			continue
+		}
+		matchesBuild := false
+		for _, goFile := range goFiles {
+			matches, err := build.Default.MatchFile(testPath, filepath.Base(goFile))
+			if err != nil {
+				t.Fatal(err)
+			}
+			matchesBuild = matchesBuild || matches
+		}
+		if !matchesBuild {
 			continue
 		}
 		name := entry.Name()
@@ -340,7 +352,6 @@ var expectedV2ComplianceGaps = map[string]bool{
 	"method_receiver_call_return":       true,
 	"method_receiver_paren_line":        true,
 	"method_receiver_shadowing":         true,
-	"method_receiver_with_call_expr":    true,
 	"missing_valueof_error":             true,
 	"multi_return_same_type":            true,
 	"named_slice_wrapper":               true,

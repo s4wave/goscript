@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import * as $ from '@goscript/builtin/index.js'
 import * as time from '@goscript/time/index.js'
+import { cloneStructValue } from '@goscript/builtin/index.js'
 
 import {
   Bool,
@@ -13,8 +14,11 @@ import {
   IsValue,
   RowsAffected_LastInsertId,
   RowsAffected_RowsAffected,
+  RowsColumnScanner,
   String,
 } from './index.js'
+import { NewScanContext, ScanContextValue } from '@goscript/database/sql/internal/index.js'
+import { ScanContext } from './index.js'
 
 function expectGoErrorThrow(fn: () => unknown, message: string): void {
   try {
@@ -79,6 +83,72 @@ describe('database/sql/driver override', () => {
     const [id, err] = RowsAffected_LastInsertId(42n)
     expect(id).toBe(0n)
     expect(err?.Error()).toBe('LastInsertId is not supported by this driver')
+  })
+
+  it('preserves the opaque value identity through ScanContext', () => {
+    const token = { cursor: 7 }
+    const scanCtx = NewScanContext(token)
+
+    expect(ScanContextValue(scanCtx)).toBe(token)
+    expect(scanCtx.clone().v).toBe(token)
+  })
+
+  it('constructs driver.ScanContext and transports internal values', () => {
+    const zero = new ScanContext()
+    expect(zero.v).toBe(null)
+    expect(zero.clone().v).toBe(null)
+
+    const token = { cursor: 42 }
+    const wrapped = new ScanContext({ v: token })
+    expect(wrapped.v).toBe(token)
+    expect(wrapped.clone().v).toBe(token)
+    expect(ScanContextValue(wrapped)).toBe(token)
+  })
+
+  it('asserts RowsColumnScanner structurally at runtime', () => {
+    class scannerRows {
+      Columns(): string[] {
+        return []
+      }
+      Close(): $.GoError {
+        return null
+      }
+      Next(_dest: unknown[]): $.GoError {
+        return null
+      }
+      NextRow(): $.GoError {
+        return null
+      }
+      ScanColumn(_scanCtx: unknown, _index: number, _dest: unknown): $.GoError {
+        return null
+      }
+    }
+
+    const info = $.getTypeByName('driver.RowsColumnScanner')
+    expect(info).toBeDefined()
+    expect($.is(new scannerRows(), info!)).toBe(true)
+
+    const scanner: RowsColumnScanner = new scannerRows()
+    expect(scanner.NextRow()).toBe(null)
+  })
+
+  it('clones DefaultParameterConverter and converts through the clone', () => {
+    const cloned = cloneStructValue(DefaultParameterConverter)
+    expect(cloned).not.toBe(DefaultParameterConverter)
+
+    expect(cloned.ConvertValue(123n)).toEqual([123n, null])
+    expect(cloned.ConvertValue('already')).toEqual(['already', null])
+    expect(cloned.ConvertValue(true)).toEqual([true, null])
+    expect(cloned.ConvertValue(new Uint8Array([7]))).toEqual([
+      new Uint8Array([7]),
+      null,
+    ])
+  })
+
+  it('clones Bool, Int32, and String converters', () => {
+    expect(cloneStructValue(Bool).ConvertValue('true')).toEqual([true, null])
+    expect(cloneStructValue(Int32).ConvertValue(123)).toEqual([123, null])
+    expect(cloneStructValue(String).ConvertValue('x')).toEqual(['x', null])
   })
 
   it('keeps sentinel error identity stable', () => {

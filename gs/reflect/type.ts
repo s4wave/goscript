@@ -378,6 +378,9 @@ export interface Type {
   // AssignableTo reports whether a value of this type is assignable to u.
   AssignableTo(u: Type | null): boolean
 
+  // ConvertibleTo reports whether the Go conversion rules permit conversion to u.
+  ConvertibleTo(u: Type | null): boolean
+
   // common returns the common type implementation.
   common?(): rtype
 
@@ -471,6 +474,10 @@ class InvalidTypeClass implements Type {
   Implements(_u: Type | null): boolean {
     return false
   }
+  ConvertibleTo(u: Type | null): boolean {
+    return typeConvertibleTo(this, u)
+  }
+
   AssignableTo(_u: Type | null): boolean {
     return false
   }
@@ -1622,6 +1629,10 @@ export class BasicType implements Type {
     return typeAssignableTo(this, u)
   }
 
+  public ConvertibleTo(u: Type | null): boolean {
+    return typeConvertibleTo(this, u)
+  }
+
   public common?(): rtype {
     return new rtype(this._kind)
   }
@@ -1840,6 +1851,10 @@ class SliceType implements Type {
     return typeAssignableTo(this, u)
   }
 
+  public ConvertibleTo(u: Type | null): boolean {
+    return typeConvertibleTo(this, u)
+  }
+
   public OverflowInt(_x: bigint): boolean {
     throw new Error('reflect: call of reflect.Type.OverflowInt on slice Type')
   }
@@ -1964,6 +1979,10 @@ class ArrayType implements Type {
     return typeAssignableTo(this, u)
   }
 
+  public ConvertibleTo(u: Type | null): boolean {
+    return typeConvertibleTo(this, u)
+  }
+
   public common?(): rtype {
     return new rtype(this.Kind())
   }
@@ -2082,6 +2101,10 @@ class PointerType implements Type {
 
   public AssignableTo(u: Type | null): boolean {
     return typeAssignableTo(this, u)
+  }
+
+  public ConvertibleTo(u: Type | null): boolean {
+    return typeConvertibleTo(this, u)
   }
 
   public common?(): rtype {
@@ -2281,6 +2304,10 @@ class FunctionType implements Type {
 
   public AssignableTo(u: Type | null): boolean {
     return typeAssignableTo(this, u)
+  }
+
+  public ConvertibleTo(u: Type | null): boolean {
+    return typeConvertibleTo(this, u)
   }
 
   public common?(): rtype {
@@ -2661,6 +2688,10 @@ class MapType implements Type {
 
   public AssignableTo(u: Type | null): boolean {
     return typeAssignableTo(this, u)
+  }
+
+  public ConvertibleTo(u: Type | null): boolean {
+    return typeConvertibleTo(this, u)
   }
 
   public common?(): rtype {
@@ -3053,6 +3084,152 @@ function typeAssignableTo(t: Type, u: Type | null): boolean {
   return t.Implements(u)
 }
 
+// typeConvertibleTo follows reflect's type-level rules; slice length checks
+// remain part of the value conversion to an array or array pointer.
+function typeConvertibleTo(source: Type, target: Type | null): boolean {
+  if (target === null) {
+    throw new Error('reflect: nil type passed to Type.ConvertibleTo')
+  }
+  const from = source.Kind()
+  const to = target.Kind()
+  if (from >= Int && from <= Float64 && to >= Int && to <= Float64) return true
+  if (from >= Int && from <= Uintptr && to === String) return true
+  if (
+    (from === Complex64 || from === Complex128) &&
+    (to === Complex64 || to === Complex128)
+  )
+    return true
+  if (
+    from === String &&
+    to === Slice &&
+    (target.Elem().Kind() === Uint8 || target.Elem().Kind() === Int32)
+  )
+    return true
+  if (from === Slice) {
+    const element = source.Elem()
+    if (to === String && (element.Kind() === Uint8 || element.Kind() === Int32))
+      return true
+    const array = to === Ptr ? target.Elem() : target
+    if (
+      array.Kind() === Array &&
+      typeIdentityKey(element) === typeIdentityKey(array.Elem())
+    )
+      return true
+  }
+  if (
+    from === Chan &&
+    to === Chan &&
+    channelDirectionFromString(source.String()) === 'both' &&
+    (!typeIsNamed(source) || !typeIsNamed(target)) &&
+    typeIdentityKey(source.Elem()) === typeIdentityKey(target.Elem())
+  )
+    return true
+  if (conversionUnderlyingEqual(source, target, new globalThis.Map()))
+    return true
+  if (
+    from === Ptr &&
+    to === Ptr &&
+    !typeIsNamed(source) &&
+    !typeIsNamed(target) &&
+    conversionUnderlyingEqual(
+      source.Elem(),
+      target.Elem(),
+      new globalThis.Map(),
+    )
+  )
+    return true
+  return to === Interface && source.Implements(target)
+}
+
+// conversionTypeEqual preserves named member identities while ignoring tags.
+function conversionTypeEqual(
+  source: Type,
+  target: Type,
+  seen: Map<Type, Set<Type>>,
+): boolean {
+  return (
+    source.Name() === target.Name() &&
+    source.PkgPath() === target.PkgPath() &&
+    conversionUnderlyingEqual(source, target, seen)
+  )
+}
+
+// conversionUnderlyingEqual compares the underlying type without struct tags.
+function conversionUnderlyingEqual(
+  source: Type,
+  target: Type,
+  seen: Map<Type, Set<Type>>,
+): boolean {
+  if (source === target) return true
+  const kind = source.Kind()
+  if (kind !== target.Kind()) return false
+  if (
+    (kind >= Bool && kind <= Complex128) ||
+    kind === String ||
+    kind === UnsafePointer
+  )
+    return true
+  if (seen.get(source)?.has(target)) return true
+  const targets = seen.get(source) ?? new Set<Type>()
+  targets.add(target)
+  seen.set(source, targets)
+  switch (kind) {
+    case Array:
+      return (
+        source.Len() === target.Len() &&
+        conversionTypeEqual(source.Elem(), target.Elem(), seen)
+      )
+    case Chan:
+      return (
+        channelDirectionFromString(source.String()) ===
+          channelDirectionFromString(target.String()) &&
+        conversionTypeEqual(source.Elem(), target.Elem(), seen)
+      )
+    case Ptr:
+    case Slice:
+      return conversionTypeEqual(source.Elem(), target.Elem(), seen)
+    case Map:
+      return (
+        conversionTypeEqual(source.Key(), target.Key(), seen) &&
+        conversionTypeEqual(source.Elem(), target.Elem(), seen)
+      )
+    case Func:
+      if (
+        source.NumIn() !== target.NumIn() ||
+        source.NumOut() !== target.NumOut() ||
+        source.IsVariadic() !== target.IsVariadic()
+      )
+        return false
+      for (let index = 0; index < source.NumIn(); index++) {
+        if (!conversionTypeEqual(source.In(index), target.In(index), seen))
+          return false
+      }
+      for (let index = 0; index < source.NumOut(); index++) {
+        if (!conversionTypeEqual(source.Out(index), target.Out(index), seen))
+          return false
+      }
+      return true
+    case Interface:
+      return source.NumMethod() === 0 && target.NumMethod() === 0
+    case Struct:
+      if (source.NumField() !== target.NumField()) return false
+      for (let index = 0; index < source.NumField(); index++) {
+        const left = source.Field(index)
+        const right = target.Field(index)
+        if (
+          left.Name !== right.Name ||
+          left.PkgPath !== right.PkgPath ||
+          left.Anonymous !== right.Anonymous ||
+          !conversionTypeEqual(left.Type, right.Type, seen)
+        )
+          return false
+      }
+      return true
+    default:
+      return false
+  }
+}
+
 export function structFieldStorageKey(t: Type, i: number): string {
   if (t instanceof StructType) {
     return t.fieldKey(i)
@@ -3293,6 +3470,10 @@ class StructType implements Type {
 
   public AssignableTo(u: Type | null): boolean {
     return typeAssignableTo(this, u)
+  }
+
+  public ConvertibleTo(u: Type | null): boolean {
+    return typeConvertibleTo(this, u)
   }
 
   public common?(): rtype {
@@ -3600,6 +3781,10 @@ class ChannelType implements Type {
     return typeAssignableTo(this, u)
   }
 
+  public ConvertibleTo(u: Type | null): boolean {
+    return typeConvertibleTo(this, u)
+  }
+
   public common?(): rtype {
     return new rtype(this.Kind())
   }
@@ -3740,6 +3925,10 @@ class InterfaceType implements Type {
 
   public AssignableTo(u: Type | null): boolean {
     return typeAssignableTo(this, u)
+  }
+
+  public ConvertibleTo(u: Type | null): boolean {
+    return typeConvertibleTo(this, u)
   }
 
   public common?(): rtype {

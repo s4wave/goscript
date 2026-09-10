@@ -6714,6 +6714,12 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	rangeValue, diagnostics := o.lowerExpr(ctx, stmt.X)
 	aliases := o.lowerRangeDeclShadowAliases(ctx, stmt)
 	bodyCtx := ctx.withoutLoopLabel()
+	loopPrefix := ""
+	if stmtListNeedsLoopBranchLabel(stmt.Body.List) {
+		loopLabel := ctx.tempName("Loop")
+		loopPrefix = loopLabel + ": "
+		bodyCtx = bodyCtx.withLoopLabel(loopLabel)
+	}
 	if len(aliases) != 0 {
 		bodyCtx = bodyCtx.withIdentAliases(aliases)
 	}
@@ -6739,7 +6745,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		children = append(children, body...)
 		return loweredStmt{
 			hasBlock: true,
-			text:     "while (true)",
+			text:     loopPrefix + "while (true)",
 			children: children,
 		}, diagnostics
 	}
@@ -6751,7 +6757,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		}
 		return loweredStmt{
 			hasBlock: true,
-			text:     "for (let " + keyName + " = 0; " + keyName + " < " + rangeValue + "; " + keyName + "++)",
+			text:     loopPrefix + "for (let " + keyName + " = 0; " + keyName + " < " + rangeValue + "; " + keyName + "++)",
 			children: body,
 		}, diagnostics
 	}
@@ -6775,7 +6781,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		children = append(children, body...)
 		return loweredStmt{
 			hasBlock: true,
-			text:     "for (" + binding + " [" + key + ", " + value + "] of " + rangeTarget + "?.entries() ?? [])",
+			text:     loopPrefix + "for (" + binding + " [" + key + ", " + value + "] of " + rangeTarget + "?.entries() ?? [])",
 			children: children,
 		}, diagnostics
 	}
@@ -6797,7 +6803,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		}
 		return loweredStmt{
 			hasBlock: true,
-			text:     "for (" + binding + " [" + key + ", " + value + "] of " + o.runtimeOwner.QualifiedHelper(RuntimeHelperRangeString) + "(" + rangeValue + "))",
+			text:     loopPrefix + "for (" + binding + " [" + key + ", " + value + "] of " + o.runtimeOwner.QualifiedHelper(RuntimeHelperRangeString) + "(" + rangeValue + "))",
 			children: body,
 		}, diagnostics
 	}
@@ -6833,7 +6839,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	}
 	return loweredStmt{
 		hasBlock: true,
-		text:     "for (let " + rangeTarget + " = " + rangeTargetValue + ", " + indexName + " = 0; " + indexName + " < " + o.runtimeOwner.QualifiedHelper(RuntimeHelperLen) + "(" + rangeTarget + "); " + indexName + "++)",
+		text:     loopPrefix + "for (let " + rangeTarget + " = " + rangeTargetValue + ", " + indexName + " = 0; " + indexName + " < " + o.runtimeOwner.QualifiedHelper(RuntimeHelperLen) + "(" + rangeTarget + "); " + indexName + "++)",
 		children: children,
 	}, diagnostics
 }

@@ -5,18 +5,18 @@
         "./*"
       ],
       "@goscript/*": [
-        "../../../tests/tests/method_receiver_with_call_expr/run/output/@goscript/*",
+        "../../../tests/tests/database_sql_scan/run/output/@goscript/*",
         "../../../gs/*",
         "../../../tests/deps/*"
       ],
-      "@goscript/github.com/s4wave/goscript/tests/tests/method_receiver_with_call_expr/*": [
+      "@goscript/github.com/s4wave/goscript/tests/tests/database_sql_scan/*": [
         "./*"
       ]
     }
   },
   "extends": "../../../tests/tsconfig.base.json",
   "include": [
-    "index.ts",
-    "method_receiver_with_call_expr.gs.ts"
+    "database_sql_scan.gs.ts",
+    "index.ts"
   ]
 }
