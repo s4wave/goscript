@@ -1,3 +1,6 @@
 same struct key: accepted true 1
 different struct key: false
 deleted struct key: false 0
+distinct pointer keys: 2 1 2
+delete one pointer: 1 2
+cyclic pointer keys: 2 3 4

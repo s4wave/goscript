@@ -9097,8 +9097,7 @@ func (o *LoweringOwner) lowerMakeExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperMakeSlice) +
 			"<" + o.tsSliceElemTypeFor(ctx, typed.Elem()) + ">(" + strings.Join(args, ", ") + ")", diagnostics
 	case *types.Map:
-		return o.runtimeOwner.QualifiedHelper(RuntimeHelperMakeMap) +
-			"<" + o.tsTypeFor(ctx, typed.Key()) + ", " + o.tsTypeFor(ctx, typed.Elem()) + ">()", nil
+		return o.lowerMapConstructor(ctx, typed, ""), nil
 	case *types.Chan:
 		capacity := "0"
 		var diagnostics []Diagnostic
@@ -11524,7 +11523,22 @@ func (o *LoweringOwner) lowerMapCompositeLit(
 		value = o.lowerValueForTarget(ctx, keyed.Value, mapType.Elem(), value)
 		entries = append(entries, "["+key+", "+value+"]")
 	}
-	return o.runtimeOwner.QualifiedHelper(RuntimeHelperMakeMap) + "<" + o.tsTypeFor(ctx, mapType.Key()) + ", " + o.tsTypeFor(ctx, mapType.Elem()) + ">([" + strings.Join(entries, ", ") + "])", diagnostics
+	return o.lowerMapConstructor(ctx, mapType, "["+strings.Join(entries, ", ")+"]"), diagnostics
+}
+
+// lowerMapConstructor preserves the declared equality of pointer keys. Generic
+// keys carry their runtime type so pointer instantiations use the same path.
+func (o *LoweringOwner) lowerMapConstructor(ctx lowerFileContext, mapType *types.Map, entries string) string {
+	args := entries
+	_, generic := types.Unalias(mapType.Key()).(*types.TypeParam)
+	_, pointer := types.Unalias(mapType.Key()).Underlying().(*types.Pointer)
+	if generic || pointer {
+		if args == "" {
+			args = "undefined"
+		}
+		args += ", " + o.runtimeTypeAssertInfoExpr(ctx, mapType.Key())
+	}
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperMakeMap) + "<" + o.tsTypeFor(ctx, mapType.Key()) + ", " + o.tsTypeFor(ctx, mapType.Elem()) + ">(" + args + ")"
 }
 
 func tsNativeMapType(keyType, elemType string) string {
