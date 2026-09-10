@@ -1471,6 +1471,9 @@ func renderTypeScriptProject(req *normalizedRequest, outputRoot string, runnerFi
 		b.WriteString("    \"types\": [],\n")
 	}
 	b.WriteString("    \"paths\": {\n")
+	if req.RuntimeBackend == RuntimeBackendBrowser {
+		b.WriteString("      \"vitest\": [\"./" + browserAmbientTypesFile + "\"],\n")
+	}
 	b.WriteString("      \"*\": [\"./*\"],\n")
 	b.WriteString("      \"@goscript/*\": [")
 	b.WriteString(strconv.Quote("./" + typeScriptOutputAlias(req, outputRoot)))
@@ -1531,6 +1534,9 @@ func renderRuntimeTypeScriptProject(req *normalizedRequest, outputRoots []string
 		b.WriteString("    \"types\": [],\n")
 	}
 	b.WriteString("    \"paths\": {\n")
+	if req.RuntimeBackend == RuntimeBackendBrowser {
+		b.WriteString("      \"vitest\": [\"./" + browserAmbientTypesFile + "\"],\n")
+	}
 	b.WriteString("      \"*\": [\"./*\"],\n")
 	b.WriteString("      \"@goscript/*\": [")
 	for idx, alias := range aliases {

@@ -1590,6 +1590,11 @@ func TestRenderBrowserTypeScriptProjectsExcludeNodeAmbientDeclarations(t *testin
 	if !strings.Contains(aggregateTSConfig, "goscript-browser.d.ts") {
 		t.Fatalf("browser aggregate tsconfig should include browser ambient declarations: %s", aggregateTSConfig)
 	}
+	for _, tsconfig := range []string{packageTSConfig, aggregateTSConfig} {
+		if !strings.Contains(tsconfig, `"vitest": ["./goscript-browser.d.ts"]`) {
+			t.Fatalf("browser tsconfig must resolve the test API without loading host Vitest declarations: %s", tsconfig)
+		}
+	}
 }
 
 func TestRenderTypeScriptProjectUsesNodeTypesWhenAvailable(t *testing.T) {
