@@ -202,7 +202,7 @@ export function min(__typeArgs: $.GenericTypeArgs | undefined, a: any, b: any): 
 }
 
 export function NewSet<T>(__typeArgs: $.GenericTypeArgs | undefined, values: $.Slice<T>): Set {
-	let _set: Set = $.makeMap<any, {}>()
+	let _set: Set = $.makeMap<any, {}>(undefined, __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })
 	for (let __goscriptRangeTarget0 = values, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let value = __goscriptRangeTarget0![__rangeIndex]
 		$.mapSet(_set, value, {})
@@ -229,7 +229,7 @@ export async function CloneAll<T>(__typeArgs: $.GenericTypeArgs | undefined, ite
 }
 
 export function NewMapper(__typeArgs: $.GenericTypeArgs | undefined): Mapper | $.VarRef<Mapper> | null {
-	return new Mapper({values: $.makeMap<any, any>()})
+	return new Mapper({values: $.makeMap<any, any>(undefined, __typeArgs?.["K"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })})
 }
 
 export async function Apply(__typeArgs: $.GenericTypeArgs | undefined, value: any, fn: ((_p0: any) => any | globalThis.Promise<any>) | null): globalThis.Promise<any> {
