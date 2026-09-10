@@ -1157,7 +1157,8 @@ function pointerCastSource(value: unknown): PointerCastSource | null {
   return { identity: value, object: value }
 }
 
-function canonicalPointerIdentity(value: object): object {
+// canonicalPointerIdentity resolves the backing storage shared by pointer aliases.
+export function canonicalPointerIdentity(value: object): object {
   const identity = pointerIdentities.get(value)
   if (identity !== undefined) {
     return identity
@@ -1275,9 +1276,9 @@ export function cloneArrayValue<T>(value: T, typeInfo?: string | TypeInfo): T {
 
   const info = typeInfo === undefined ? undefined : normalizeTypeInfo(typeInfo)
   const element =
-    info?.kind === TypeKind.Array && info.elemType !== undefined
-      ? normalizeTypeInfo(info.elemType)
-      : undefined
+    info?.kind === TypeKind.Array && info.elemType !== undefined ?
+      normalizeTypeInfo(info.elemType)
+    : undefined
   if (element?.kind === TypeKind.Array) {
     return value.map((item) => cloneArrayValue(item, element)) as T
   }

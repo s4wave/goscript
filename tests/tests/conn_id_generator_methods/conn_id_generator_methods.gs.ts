@@ -164,7 +164,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("boxed same pointer:", $.pointerEqual(t, runnerAgain))
 	await $.pointerValue<Exclude<sourceRunner, null>>(sourceInterface).SourceOnly(4)
 	await $.pointerValue<Exclude<connRunner, null>>(destinationInterface).Add(8)
-	let pointerValues: globalThis.Map<transport | $.VarRef<transport> | null, number> | null = $.makeMap<transport | $.VarRef<transport> | null, number>([[t, 42]])
+	let pointerValues: globalThis.Map<transport | $.VarRef<transport> | null, number> | null = $.makeMap<transport | $.VarRef<transport> | null, number>([[t, 42]], /* @__PURE__ */ $.pointerType("main.transport"))
 	await $.println("map lookup:", $.mapGet<transport | $.VarRef<transport> | null, number, number>(pointerValues, runnerAgain, 0)[0])
 	await testVarRefConversion()
 }

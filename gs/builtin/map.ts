@@ -1,17 +1,38 @@
 import { comparableEqual } from './builtin.js'
 import { GoBinaryString, stringEqual, stringMapKey } from './slice.js'
+import {
+  canonicalPointerIdentity,
+  getTypeByName,
+  TypeKind,
+  type TypeInfo,
+} from './type.js'
 
 // GoMap indexes Go string representations by their canonical byte value and
 // structs whose fields are all strings by their canonical field values.
+// Pointer-key maps use backing identity without inspecting their targets.
 // Iteration retains the original key; object and struct equality stays in the
 // shared comparison path below. Keys without an indexed representation
 // allocate no secondary index and fall back to the shared comparison scan.
 class GoMap<K, V> extends Map<K, V> {
+  readonly pointerKeys: boolean
+  private pointerIndex?: Map<object, K>
   private stringKeys?: Map<string, K>
   private structKeys?: Map<string, K[]>
 
+  constructor(keyType?: TypeInfo | string) {
+    super()
+    const info = typeof keyType === 'string' ? getTypeByName(keyType) : keyType
+    this.pointerKeys = info?.kind === TypeKind.Pointer
+  }
+
   override set(key: K, value: V): this {
-    if (isGoStringKey(key)) {
+    if (this.pointerKeys) {
+      key = this.storedKey(key)
+      if (typeof key === 'object' && key !== null) {
+        this.pointerIndex ??= new Map<object, K>()
+        this.pointerIndex.set(canonicalPointerIdentity(key), key)
+      }
+    } else if (isGoStringKey(key)) {
       const canonical = stringMapKey(key)
       this.stringKeys ??= new Map<string, K>()
       key = this.stringKeys.get(canonical) ?? key
@@ -37,12 +58,16 @@ class GoMap<K, V> extends Map<K, V> {
 
   override delete(key: K): boolean {
     const stored = this.storedKey(key)
-    if (isGoStringKey(key)) this.stringKeys?.delete(stringMapKey(key))
+    if (this.pointerKeys) {
+      if (typeof key === 'object' && key !== null)
+        this.pointerIndex?.delete(canonicalPointerIdentity(key))
+    } else if (isGoStringKey(key)) this.stringKeys?.delete(stringMapKey(key))
     else this.removeStructKey(stored)
     return super.delete(stored)
   }
 
   override clear(): void {
+    this.pointerIndex?.clear()
     this.stringKeys?.clear()
     this.structKeys?.clear()
     super.clear()
@@ -64,6 +89,11 @@ class GoMap<K, V> extends Map<K, V> {
   }
 
   private storedKey(key: K): K {
+    if (this.pointerKeys) {
+      return typeof key === 'object' && key !== null ?
+          (this.pointerIndex?.get(canonicalPointerIdentity(key)) ?? key)
+        : key
+    }
     if (isGoStringKey(key)) {
       return this.stringKeys?.get(stringMapKey(key)) ?? key
     }
@@ -96,9 +126,13 @@ class GoMap<K, V> extends Map<K, V> {
   }
 }
 
-// makeMap creates a Go map with indexed string and flat string-struct keys.
-export function makeMap<K, V>(entries?: Iterable<readonly [K, V]>): Map<K, V> {
-  const map = new GoMap<K, V>()
+// makeMap receives pointer or generic key metadata from the compiler; other
+// key types use Go value equality and the available value indexes.
+export function makeMap<K, V>(
+  entries?: Iterable<readonly [K, V]>,
+  keyType?: TypeInfo | string,
+): Map<K, V> {
+  const map = new GoMap<K, V>(keyType)
   if (entries) for (const [key, value] of entries) mapSet(map, key, value)
   return map
 }
@@ -149,6 +183,7 @@ function findMapEntry<K, V>(
   if (map.has(key)) {
     return { found: true, key, value: map.get(key)! }
   }
+  if (map instanceof GoMap && map.pointerKeys) return { found: false }
   if (isGoStringKey(key)) {
     if (map instanceof GoMap) return { found: false }
     for (const [candidate, value] of map.entries()) {

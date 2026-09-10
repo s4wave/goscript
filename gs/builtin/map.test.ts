@@ -2,6 +2,39 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { deleteMapEntry, makeMap, mapGet, mapHas, mapSet } from './map.js'
 import { bytesToString, GoBinaryString } from './slice.js'
+import { pointerType } from './type.js'
+
+describe('Go map pointer keys', () => {
+  it('indexes distinct equal-valued targets without reading fields or scanning', () => {
+    const map = makeMap<object, number>(undefined, pointerType('node'))
+    const entries = vi.spyOn(map, 'entries')
+    const fields = vi.fn(() => {
+      throw new Error('pointer target read')
+    })
+    const first = {
+      get _fields() {
+        return fields()
+      },
+    }
+    const second = {
+      get _fields() {
+        return fields()
+      },
+    }
+    mapSet(map, first, 1)
+    mapSet(map, second, 2)
+    expect(map.size).toBe(2)
+    expect(mapGet(map, second, 0)).toEqual([2, true])
+    expect(mapHas(map, {})).toBe(false)
+    deleteMapEntry(map, first)
+    expect(mapHas(map, first)).toBe(false)
+    expect(mapGet(map, second, 0)).toEqual([2, true])
+    map.clear()
+    expect(map.size).toBe(0)
+    expect(entries).not.toHaveBeenCalled()
+    expect(fields).not.toHaveBeenCalled()
+  })
+})
 
 describe('Go map string keys', () => {
   it('does not scan existing entries for string misses or insertion', () => {
