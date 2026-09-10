@@ -1,0 +1,12 @@
+false 42
+true 42
+zero context 7
+blob durable
+raw rejected true
+nil pointer identity false false
+named integer true
+boolean string false
+byte string true
+slice array true
+named elements false
+struct tags true

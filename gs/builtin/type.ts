@@ -1682,11 +1682,13 @@ export function typeAssert<T>(
     }
 
     const storedTypeInfo = value.__goTypeInfo as TypeInfo | string | undefined
-    if (
-      storedTypeInfo !== undefined &&
-      areTypeInfosIdentical(storedTypeInfo, normalizedType)
-    ) {
-      return { value: null as T, ok: true }
+    if (storedTypeInfo !== undefined) {
+      return {
+        value: null as T,
+        ok:
+          (typeof typeInfo === 'string' && value.__goType === typeInfo) ||
+          areTypeInfosIdentical(storedTypeInfo, normalizedType),
+      }
     }
 
     // Go permits asserting a typed-nil interface value to its identical
@@ -1700,6 +1702,25 @@ export function typeAssert<T>(
 
   if (isPointerTypeInfo(normalizedType) && value === null) {
     return { value: null as T, ok: false }
+  }
+  // A boxed concrete value carries its exact dynamic Go type. Its contents
+  // cannot establish identity, especially for pointers to nil named slices.
+  if (
+    typeof value === 'object' &&
+    value !== null &&
+    value.__goTypeInfo !== undefined &&
+    !isInterfaceTypeInfo(normalizedType)
+  ) {
+    const ok =
+      (typeof typeInfo === 'string' && value.__goType === typeInfo) ||
+      areTypeInfosIdentical(value.__goTypeInfo, normalizedType)
+    return {
+      value:
+        ok ?
+          (('__goValue' in value ? value.__goValue : value) as T)
+        : (null as T),
+      ok,
+    }
   }
   if (
     typeof value === 'object' &&

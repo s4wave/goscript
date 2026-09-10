@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "strict": true,
+  "symbols": {
+    "NewScanContext": {
+      "status": "real"
+    },
+    "ScanContext": {
+      "status": "real"
+    },
+    "ScanContextValue": {
+      "status": "real"
+    }
+  }
+}

@@ -1,60 +1,72 @@
 // Generated file based on method_receiver_with_call_expr.go
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
-import * as $ from "@goscript/builtin/index.ts"
+import * as $ from "@goscript/builtin/index.js"
 
 export class State {
-	public get value(): number {
-		return this._fields.value.value
-	}
-	public set value(value: number) {
-		this._fields.value.value = value
-	}
+	public declare value: number
+
+	public declare index: $.VarRef<number> | null
 
 	public _fields: {
-		value: $.VarRef<number>
+		value: number
+		index: $.VarRef<number> | null
 	}
 
-	constructor(init?: Partial<{value?: number}>) {
+	constructor(init?: Partial<{value?: number, index?: $.VarRef<number> | null}>) {
 		this._fields = {
-			value: $.varRef(init?.value ?? 0)
+			value: init?.value ?? (0 as number),
+			index: init?.index ?? (null! as $.VarRef<number> | null)
 		}
 	}
 
 	public clone(): State {
-		const cloned = new State()
-		cloned._fields = {
-			value: $.varRef(this._fields.value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return $.markAsStructValue(new State(this))
 	}
 
-	public Process(): void {
-		const s = this
-		getProcessor()(s)
+	public async Process(): globalThis.Promise<void> {
+		const s: State | $.VarRef<State> | null = this;
+		// This should generate:
+		// const s = this
+		// ;(getProcessor())!(s)
+		// The semicolon is important to prevent: const s = this(getProcessor())!(s)
+		await getProcessor()!(s)
+	}
+
+	public markIndex(): void {
+		let s: State | $.VarRef<State> | null = this;
+		// The first body statement begins with a parenthesized pointer expression.
+		$.pointerValue<State>(s).index!.value = -1
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["value", "index"])
 	}
 
 	static __typeInfo = $.registerStructType(
 		"main.State",
-		new State(),
-		[{ name: "Process", args: [], returns: [] }],
+		() => new State(),
+		() => [{ name: "Process", args: [], returns: [] }, { name: "markIndex", args: [], returns: [] }],
 		State,
-		{"value": { kind: $.TypeKind.Basic, name: "int" }}
+		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }, { name: "index", key: "index", type: /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")) }]
 	)
 }
 
-export function getProcessor(): (_p0: State | $.VarRef<State> | null) => void {
-	return (s: State | $.VarRef<State> | null): void => {
-	$.pointerValue(s).value = 42
-}
-}
-
-export async function main(): Promise<void> {
-	let state = new State()
-	$.pointerValue(state).Process()
-	$.println("value:", $.pointerValue(state).value)
+export function getProcessor(): ((_p0: State | $.VarRef<State> | null) => void) | null {
+	return $.functionValue((s: State | $.VarRef<State> | null): void => {
+		$.pointerValue<State>(s).value = 42
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.State")], results: [] } as $.FunctionTypeInfo))
 }
 
+export async function main(): globalThis.Promise<void> {
+	let state: State | $.VarRef<State> | null = new State()
+	await State.prototype.Process.call(state)
+	await $.println("value:", $.pointerValue<State>(state).value)
+	let index = $.varRef(7)
+	$.pointerValue<State>(state).index = index
+	State.prototype.markIndex.call(state)
+	await $.println("index:", index.value)
+}
 
 if ($.isMainScript(import.meta)) {
 	await main()

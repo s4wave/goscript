@@ -176,12 +176,11 @@ export function CallersFrames(_callers: $.Slice<number>): Frames {
   return new Frames()
 }
 
-// Stack returns a formatted stack trace of the calling goroutine.
-// In JavaScript, we use Error.stack.
-export function Stack(): Uint8Array {
+// Stack writes the current JavaScript stack into buf and returns bytes written.
+// The host does not expose suspended goroutine stacks when all is requested.
+export function Stack(buf: $.Slice<number>, _all: boolean): number {
   const stack = new Error().stack || 'stack trace unavailable'
-  const encoder = new TextEncoder()
-  return encoder.encode(stack)
+  return $.copy(buf, new TextEncoder().encode(stack))
 }
 
 // MemStats represents memory allocation statistics.

@@ -1,5 +1,7 @@
 import * as $ from '@goscript/builtin/index.js'
 import * as context from '@goscript/context/index.js'
+import * as internal from '@goscript/database/sql/internal/index.js'
+import type { Type } from '@goscript/reflect/index.js'
 import * as time from '@goscript/time/index.js'
 
 export type Value = any
@@ -165,8 +167,36 @@ export interface RowsNextResultSet extends Rows {
   NextResultSet(): $.GoError
 }
 
+// ScanContext carries state related to the current query through
+// RowsColumnScanner.ScanColumn into database/sql.ConvertAssign. It is
+// a distinct named struct over internal.ScanContext; the wrapped value
+// stays opaque behind the internal accessors.
+export class ScanContext extends internal.ScanContext {
+  public override clone(): ScanContext {
+    return new ScanContext({ v: this._fields.v })
+  }
+
+  static __typeInfo = $.registerStructType(
+    'driver.ScanContext',
+    new ScanContext(),
+    [],
+    ScanContext,
+    [
+      {
+        name: 'v',
+        key: 'v',
+        type: { kind: $.TypeKind.Interface, methods: [] },
+        index: [0],
+        offset: 0,
+        exported: false,
+        pkgPath: 'database/sql/internal',
+      },
+    ],
+  )
+}
+
 export interface RowsColumnTypeScanType extends Rows {
-  ColumnTypeScanType(index: number): unknown
+  ColumnTypeScanType(index: number): Type | null
 }
 
 export interface RowsColumnTypeDatabaseTypeName extends Rows {
@@ -183,6 +213,14 @@ export interface RowsColumnTypeNullable extends Rows {
 
 export interface RowsColumnTypePrecisionScale extends Rows {
   ColumnTypePrecisionScale(index: number): [number, number, boolean]
+}
+
+// RowsColumnScanner extends Rows so the driver scans directly into the
+// user-provided destination. When implemented, database/sql calls NextRow
+// and ScanColumn instead of Next.
+export interface RowsColumnScanner extends Rows {
+  NextRow(): $.GoError
+  ScanColumn(scanCtx: ScanContext, index: number, dest: any): $.GoError
 }
 
 export interface Tx {
@@ -225,6 +263,10 @@ export interface Valuer {
 }
 
 class boolType implements ValueConverter {
+  public clone(): boolType {
+    return new boolType()
+  }
+
   public String(): string {
     return 'Bool'
   }
@@ -263,6 +305,10 @@ class boolType implements ValueConverter {
 export const Bool = new boolType()
 
 class int32Type implements ValueConverter {
+  public clone(): int32Type {
+    return new int32Type()
+  }
+
   public ConvertValue(v: any): [Value, $.GoError] {
     guardReflectValue('Int32.ConvertValue', v)
     const [value, parseErr] = int32InputValue(v)
@@ -290,6 +336,10 @@ class int32Type implements ValueConverter {
 export const Int32 = new int32Type()
 
 class stringType implements ValueConverter {
+  public clone(): stringType {
+    return new stringType()
+  }
+
   public ConvertValue(v: any): [Value, $.GoError] {
     guardReflectValue('String.ConvertValue', v)
     if (typeof v === 'string' || isBytes(v)) {
@@ -352,6 +402,10 @@ export class NotNull implements ValueConverter {
 }
 
 class defaultConverter implements ValueConverter {
+  public clone(): defaultConverter {
+    return new defaultConverter()
+  }
+
   public ConvertValue(v: any): [Value, $.GoError] {
     if (IsValue(v)) {
       return [v ?? null, null]
@@ -763,6 +817,20 @@ $.registerInterfaceType('driver.RowsNextResultSet', null, [
   ...rowsMethods,
   { name: 'HasNextResultSet', args: [], returns: [ret('_r0', boolTypeInfo)] },
   { name: 'NextResultSet', args: [], returns: [ret('_r0', errorType)] },
+])
+
+$.registerInterfaceType('driver.RowsColumnScanner', null, [
+  ...rowsMethods,
+  { name: 'NextRow', args: [], returns: [ret('_r0', errorType)] },
+  {
+    name: 'ScanColumn',
+    args: [
+      arg('scanCtx', 'driver.ScanContext'),
+      arg('index', intTypeInfo),
+      arg('dest', anyType),
+    ],
+    returns: [ret('_r0', errorType)],
+  },
 ])
 
 $.registerInterfaceType('driver.RowsColumnTypeScanType', null, [
