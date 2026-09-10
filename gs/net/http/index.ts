@@ -352,7 +352,11 @@ export function Header_sortedKeyValues(
   return [values, null]
 }
 
-export function Header_write(h: HeaderValue, w: io.Writer, _trace: unknown): $.GoError {
+export function Header_write(
+  h: HeaderValue,
+  w: io.Writer,
+  _trace: unknown,
+): $.GoError {
   return Header_WriteSubset(h, w, null)
 }
 
@@ -1607,6 +1611,7 @@ function httpFileFromFSFile(file: Exclude<fs.File, null>): File {
   }
 }
 
+// FileServer serves files and directories with paths relative to its mounted root.
 export function FileServer(root: fileServerFileSystem | null): Handler {
   return {
     async ServeHTTP(w, r): Promise<void> {
@@ -1618,9 +1623,13 @@ export function FileServer(root: fileServerFileSystem | null): Handler {
         Error(w, 'method not allowed', StatusMethodNotAllowed)
         return
       }
-      const [file, err] = (await root?.Open(
-        cleanFileServerPath(req.URL?.Path ?? ''),
-      )) ?? [null, fs.ErrInvalid]
+      const requestPath = req.URL?.Path ?? ''
+      if (requestPath.endsWith('/index.html')) {
+        await fileServerRedirect(w, req, './')
+        return
+      }
+      const name = cleanFileServerPath(requestPath)
+      const [file, err] = (await root?.Open(name)) ?? [null, fs.ErrInvalid]
       if (err != null || file == null) {
         NotFound(w, req)
         return
@@ -1632,7 +1641,44 @@ export function FileServer(root: fileServerFileSystem | null): Handler {
           return
         }
         if (info?.IsDir?.() === true) {
-          NotFound(w, req)
+          if (!requestPath.endsWith('/')) {
+            await fileServerRedirect(w, req, path.Base(requestPath) + '/')
+            return
+          }
+          const [index, indexErr] = (await root?.Open(
+            name.replace(/\/$/, '') + '/index.html',
+          )) ?? [null, fs.ErrInvalid]
+          if (indexErr == null && index != null) {
+            try {
+              const [indexInfo, statErr] = await index.Stat()
+              if (statErr == null && indexInfo != null && !indexInfo.IsDir()) {
+                await serveContent(
+                  w,
+                  req,
+                  indexInfo.Name(),
+                  index as io.Reader,
+                  Number(indexInfo.Size()),
+                )
+                return
+              }
+            } finally {
+              await index.Close()
+            }
+          }
+          await serveDirectory(w, req, file)
+          return
+        }
+        if (requestPath.endsWith('/')) {
+          const base = path.Base(requestPath)
+          if (base === '/' || base === '.') {
+            Error(
+              w,
+              'http: attempting to traverse a non-directory',
+              StatusInternalServerError,
+            )
+          } else {
+            await fileServerRedirect(w, req, '../' + base)
+          }
           return
         }
         await serveContent(
@@ -1646,6 +1692,75 @@ export function FileServer(root: fileServerFileSystem | null): Handler {
         await file.Close()
       }
     },
+  }
+}
+
+// fileServerRedirect preserves relative routing beneath StripPrefix.
+async function fileServerRedirect(
+  w: ResponseWriter,
+  req: Request,
+  target: string,
+): Promise<void> {
+  if (/%2f/i.test(req.URL?.RawPath ?? '')) {
+    NotFound(w, req)
+    return
+  }
+  const query = req.URL?.RawQuery ?? ''
+  Header_Set(
+    await w.Header(),
+    'Location',
+    target + (query === '' ? '' : '?' + query),
+  )
+  await w.WriteHeader(StatusMovedPermanently)
+}
+
+// serveDirectory lists directory entries in name order with escaped links.
+async function serveDirectory(
+  w: ResponseWriter,
+  req: Request,
+  file: fileServerFile,
+): Promise<void> {
+  const [entries, err] = await file.Readdir(-1)
+  if (err != null) {
+    Error(w, 'Error reading directory', StatusInternalServerError)
+    return
+  }
+  const names = $.asArray(entries)
+    .map((entry) => ({
+      name: entry!.Name(),
+      directory: entry!.IsDir(),
+    }))
+    .sort((a, b) =>
+      a.name < b.name ? -1
+      : a.name > b.name ? 1
+      : 0,
+    )
+  let body =
+    '<!doctype html>\n<meta name="viewport" content="width=device-width">\n<pre>\n'
+  for (const entry of names) {
+    const suffix = entry.directory ? '/' : ''
+    const href = encodeURIComponent(entry.name).replace(/'/g, '%27') + suffix
+    const label = (entry.name + suffix).replace(/[&<>"']/g, (character) => {
+      switch (character) {
+        case '&':
+          return '&amp;'
+        case '<':
+          return '&lt;'
+        case '>':
+          return '&gt;'
+        case '"':
+          return '&#34;'
+        default:
+          return '&#39;'
+      }
+    })
+    body += `<a href="${href}">${label}</a>\n`
+  }
+  body += '</pre>\n'
+  Header_Set(await w.Header(), 'Content-Type', 'text/html; charset=utf-8')
+  await w.WriteHeader(StatusOK)
+  if (req.Method !== MethodHead) {
+    await w.Write($.stringToBytes(body))
   }
 }
 

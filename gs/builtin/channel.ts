@@ -242,6 +242,9 @@ export async function selectStatement<T, V = void>(
         const result =
           selectedCase.channel.trySelectReceive(selectedCase.id) ??
           (await selectedCase.channel.selectReceive(selectedCase.id))
+        if (!result.ok) {
+          await new Promise<void>(scheduleClosedChannelWake)
+        }
         if (selectedCase.onSelected) {
           const handlerResult = await selectedCase.onSelected(result)
           return selectHandlerResult<V>(handlerResult)
@@ -480,6 +483,7 @@ class BufferedChannel<T> implements Channel<T> {
     // Buffer is empty.
     // If channel is closed (and buffer is empty), return zero value.
     if (this.closed) {
+      await new Promise<void>(scheduleClosedChannelWake)
       return this.zeroValue
     }
 
@@ -520,6 +524,7 @@ class BufferedChannel<T> implements Channel<T> {
     // Buffer is empty, no waiting senders.
     // If channel is closed, return zero value with ok: false.
     if (this.closed) {
+      await new Promise<void>(scheduleClosedChannelWake)
       return { value: this.zeroValue, ok: false }
     }
 
@@ -581,6 +586,7 @@ class BufferedChannel<T> implements Channel<T> {
 
     if (this.closed) {
       onCommit?.()
+      await new Promise<void>(scheduleClosedChannelWake)
       return { value: this.zeroValue, ok: false, id }
     }
 
