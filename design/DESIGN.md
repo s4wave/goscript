@@ -498,6 +498,7 @@ After reviewing the code and tests, some important implementation considerations
             -   Appending to a nil slice allocates a new underlying array.
             -   Byte slices use `Uint8Array` views with backing-window metadata. Both byte and generic slices use the same capacity-growth policy, avoiding a full copy on every append. Spare capacity is zero-initialized and can be exposed by reslicing.
 - **Arrays:** Go arrays (e.g., `[5]int`) have a fixed size known at compile time. They are also mapped to TypeScript arrays (`T[]`), but their fixed-size nature is enforced during compilation (e.g., preventing `append`). Slicing an array (`arr[:]`, `arr[low:high]`, etc.) uses the `$.goSlice` helper, resulting in a Go-style slice backed by the original array data.
+    - **Empty Array Literals:** `[N]T{}` uses the same compact zero-value initialization as an array declaration. Byte arrays use `new Uint8Array(N)`; other arrays use an element factory so struct and nested-array elements remain independent. Generated source size does not grow with `N`.
     -   **Sparse Array Literals:** For Go array literals with specific indices (e.g., `[5]int{1: 10, 3: 30}`), unspecified indices are filled with the zero value of the element type in the generated TypeScript. For example, `[5]int{1: 10, 3: 30}` becomes `[0, 10, 0, 30, 0]`.
 
 *Slice helpers (`makeSlice`, `goSlice`, `len`, `cap`, `append`, and `appendSlice`) preserve backing-window metadata when length differs from capacity.*

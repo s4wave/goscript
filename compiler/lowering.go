@@ -11372,14 +11372,18 @@ func (o *LoweringOwner) lowerAnonymousStructCompositeLit(
 	return "{" + strings.Join(fields, ", ") + "}", diagnostics
 }
 
+// lowerArrayCompositeLit preserves element values without expanding empty arrays into source.
 func (o *LoweringOwner) lowerArrayCompositeLit(
 	ctx lowerFileContext,
 	lit *ast.CompositeLit,
 	array *types.Array,
 ) (string, []Diagnostic) {
-	if len(lit.Elts) == 0 && isByteType(array.Elem()) {
-		return "new Uint8Array(" + strconv.FormatInt(array.Len(), 10) + ")", nil
+	// Reuse declaration initialization so each mutable element gets its own zero value.
+	if len(lit.Elts) == 0 {
+		return o.lowerZeroValueExprFor(ctx, array), nil
 	}
+
+	// Overlay explicit elements on the array's implicit zero values.
 	values := make([]string, int(array.Len()))
 	for idx := range values {
 		values[idx] = o.lowerZeroValueExprFor(ctx, array.Elem())
