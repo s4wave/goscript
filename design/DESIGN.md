@@ -332,6 +332,7 @@ After reviewing the code and tests, some important implementation considerations
         ```
 -   **Field Access:** Accessing struct fields uses standard TypeScript dot notation (`instance.FieldName`). Go's automatic dereferencing for pointer field access (`ptr.Field`) translates to accessing the value with appropriate null checks. Unexported fields become public class members.
 -   **Struct Composite Literals:**
+        -   **Promoted Fields (Go 1.27):** Keys may name fields inside embedded struct values. The compiler resolves their field paths with `go/types`, initializes enclosing values with the appropriate zero values, and evaluates initializers in source order. This applies to named, anonymous, generic, and pointer literals. Go rejects ambiguous keys, overlapping enclosing and promoted initializers, and implicit pointer indirection through an embedding.
         -   **Value Initialization (`T{...}`):** Translates to `new TypeName({...})`.
             ```go
             type Point struct{ X, Y int }

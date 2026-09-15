@@ -1,0 +1,9 @@
+evaluate promoted
+evaluate city
+evaluate phone
+evaluate street
+promoted 42 street city phone 0
+nested copy 0 7 true
+inferred 0
+anonymous 0 true
+generic  17 0

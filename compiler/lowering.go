@@ -11157,6 +11157,9 @@ func (o *LoweringOwner) lowerCompositeLit(
 	lit *ast.CompositeLit,
 	markStruct bool,
 ) (string, []Diagnostic) {
+	if value, diagnostics, ok := o.lowerPromotedStructCompositeLit(ctx, lit, markStruct); ok {
+		return value, diagnostics
+	}
 	if len(lit.Elts) == 0 {
 		if typeParam, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(lit)).(*types.TypeParam); ok {
 			if typeParamInScope(ctx, typeParam) {
