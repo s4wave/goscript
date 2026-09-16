@@ -375,161 +375,93 @@ export function LimitReader(r: Reader, n: bigint): Reader {
   return new LimitedReader(r, n)
 }
 
-// SectionReader implements Read, Seek, and ReadAt on a section of an underlying ReaderAt.
-export class SectionReader implements Reader, Seeker, ReaderAt {
-  private r: ReaderAt
-  private base: number
-  private off: number
-  private limit: number
+const maxInt64 = (1n << 63n) - 1n
 
-  constructor(r: ReaderAt, off: bigint, n: bigint) {
-    this.r = r
-    this.base = Number(off)
-    this.off = Number(off)
-    this.limit = Number(off) + Number(n)
+// File positions remain int64 values; only buffer-bounded slice lengths narrow.
+export class SectionReader implements Reader, Seeker, ReaderAt {
+  private off: bigint
+  private readonly limit: bigint
+
+  constructor(private r: ReaderAt, private base: bigint, private n: bigint) {
+    this.off = base
+    this.limit = base <= BigInt.asIntN(64, maxInt64 - n) ?
+      BigInt.asIntN(64, base + n) : maxInt64
   }
 
   Read(p: $.Bytes): Awaitable<IOResult> {
-    if (this.off >= this.limit) {
-      return [0, EOF]
-    }
-
-    const max = this.limit - this.off
-    if ($.len(p) > max) {
-      p = $.goSlice(p, 0, max)
-    }
-
-    const res = this.r.ReadAt(p, BigInt(this.off)) as any
-    if (res instanceof Promise) {
-      return res.then(([n, err]: [number, $.GoError]) => {
-        this.off += n
-        return [n, err]
-      }) as any
-    }
-
-    const [n, err] = res
-    this.off += n
-    return [n, err]
+    if (this.off >= this.limit) return [0, EOF]
+    const remaining = this.limit - this.off
+    if (BigInt($.len(p)) > remaining) p = $.goSlice(p, 0, Number(remaining))
+    return mapResult(this.r.ReadAt(p, this.off), ([n, err]) => {
+      this.off = BigInt.asIntN(64, this.off + BigInt(n))
+      return [n, err]
+    })
   }
 
   Seek(offset: bigint, whence: number): [bigint, $.GoError] {
-    const offNum = Number(offset)
-    let abs: number
+    let absolute: bigint
     switch (whence) {
-      case SeekStart:
-        abs = this.base + offNum
-        break
-      case SeekCurrent:
-        abs = this.off + offNum
-        break
-      case SeekEnd:
-        abs = this.limit + offNum
-        break
-      default:
-        return [0n, newError('io.SectionReader.Seek: invalid whence')]
+      case SeekStart: absolute = BigInt.asIntN(64, this.base + offset); break
+      case SeekCurrent: absolute = BigInt.asIntN(64, this.off + offset); break
+      case SeekEnd: absolute = BigInt.asIntN(64, this.limit + offset); break
+      default: return [0n, newError('io.SectionReader.Seek: invalid whence')]
     }
-
-    if (abs < this.base) {
-      return [0n, newError('io.SectionReader.Seek: negative position')]
-    }
-
-    this.off = abs
-    return [BigInt(abs - this.base), null]
+    if (absolute < this.base) return [0n, newError('io.SectionReader.Seek: negative position')]
+    this.off = absolute
+    return [BigInt.asIntN(64, absolute - this.base), null]
   }
 
   ReadAt(p: $.Bytes, off: bigint): Awaitable<IOResult> {
-    let offNum = Number(off)
-    if (offNum < 0 || offNum >= this.limit - this.base) {
-      return [0, EOF]
+    if (off < 0n || off >= this.Size()) return [0, EOF]
+    const absolute = BigInt.asIntN(64, this.base + off)
+    const remaining = this.limit - absolute
+    if (BigInt($.len(p)) > remaining) {
+      p = $.goSlice(p, 0, Number(remaining))
+      return mapResult(this.r.ReadAt(p, absolute), ([n, err]) => [n, err ?? EOF])
     }
-
-    offNum += this.base
-    if (offNum + $.len(p) > this.limit) {
-      p = $.goSlice(p, 0, this.limit - offNum)
-      const res = this.r.ReadAt(p, BigInt(offNum)) as any
-      if (res instanceof Promise) {
-        return res.then(([n, err]: [number, $.GoError]) => {
-          if (err === null) {
-            return [n, EOF]
-          }
-          return [n, err]
-        }) as any
-      }
-      const [n, err] = res
-      if (err === null) {
-        return [n, EOF]
-      }
-      return [n, err]
-    }
-
-    return this.r.ReadAt(p, BigInt(offNum))
+    return this.r.ReadAt(p, absolute)
   }
 
-  Size(): bigint {
-    return BigInt(this.limit - this.base)
-  }
+  Size(): bigint { return BigInt.asIntN(64, this.limit - this.base) }
+  Outer(): [ReaderAt, bigint, bigint] { return [this.r, this.base, this.n] }
 }
 
-// NewSectionReader returns a SectionReader that reads from r starting at offset off and stops with EOF after n bytes.
-export function NewSectionReader(
-  r: ReaderAt,
-  off: bigint,
-  n: bigint,
-): SectionReader {
+export function NewSectionReader(r: ReaderAt, off: bigint, n: bigint): SectionReader {
   return new SectionReader(r, off, n)
 }
 
-// OffsetWriter maps writes at offset base to offset base+off in the underlying writer.
-export class OffsetWriter implements Writer, WriterAt {
-  private w: WriterAt
-  private base: number
-  private off: number
+export class OffsetWriter implements Writer, WriterAt, Seeker {
+  private off: bigint
 
-  constructor(w: WriterAt, off: bigint) {
-    this.w = w
-    this.base = Number(off)
-    this.off = 0
+  constructor(private w: WriterAt, private base: bigint) {
+    this.off = base
   }
 
   Write(p: $.Bytes): Awaitable<IOResult> {
-    return mapResult(this.w.WriteAt(p, BigInt(this.base + this.off)), ([n, err]) => {
-      this.off += n
+    return mapResult(this.w.WriteAt(p, this.off), ([n, err]) => {
+      this.off = BigInt.asIntN(64, this.off + BigInt(n))
       return [n, err]
     })
   }
 
   WriteAt(p: $.Bytes, off: bigint): Awaitable<IOResult> {
-    const offNum = Number(off)
-    if (offNum < 0) {
-      return [0, newError('io.OffsetWriter.WriteAt: negative offset')]
-    }
-    return this.w.WriteAt(p, BigInt(this.base + offNum))
+    if (off < 0n) return [0, newError('io.OffsetWriter.WriteAt: negative offset')]
+    return this.w.WriteAt(p, BigInt.asIntN(64, this.base + off))
   }
 
   Seek(offset: bigint, whence: number): [bigint, $.GoError] {
-    const offNum = Number(offset)
-    let abs: number
+    let absolute: bigint
     switch (whence) {
-      case SeekStart:
-        abs = offNum
-        break
-      case SeekCurrent:
-        abs = this.off + offNum
-        break
-      default:
-        return [0n, newError('io.OffsetWriter.Seek: invalid whence')]
+      case SeekStart: absolute = BigInt.asIntN(64, this.base + offset); break
+      case SeekCurrent: absolute = BigInt.asIntN(64, this.off + offset); break
+      default: return [0n, newError('io.OffsetWriter.Seek: invalid whence')]
     }
-
-    if (abs < 0) {
-      return [0n, newError('io.OffsetWriter.Seek: negative position')]
-    }
-
-    this.off = abs
-    return [BigInt(abs), null]
+    if (absolute < this.base) return [0n, newError('io.OffsetWriter.Seek: negative position')]
+    this.off = absolute
+    return [BigInt.asIntN(64, absolute - this.base), null]
   }
 }
 
-// NewOffsetWriter returns an OffsetWriter that writes to w starting at offset off.
 export function NewOffsetWriter(w: WriterAt, off: bigint): OffsetWriter {
   return new OffsetWriter(w, off)
 }
