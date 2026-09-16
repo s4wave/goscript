@@ -1,4 +1,5 @@
 import * as $ from '@goscript/builtin/index.js'
+import * as io from '@goscript/io/index.js'
 
 export type Block = {
   BlockSize(): number
@@ -365,9 +366,8 @@ export function NewCFBEncrypter(_b: Block | null, _iv: $.Bytes): Stream {
   throw new Error('crypto/cipher: CFB is not implemented in GoScript')
 }
 
-// ctrStream implements the CTR stream over an arbitrary cipher Block.
-// It encrypts an incrementing counter block and XORs the result with the
-// input, matching NIST SP 800-38A.
+// ctrStream implements CTR over an arbitrary Block, retaining unused keystream
+// across calls. Only the counter and one block of keystream are buffered.
 class ctrStream implements Stream {
   private readonly counter: Uint8Array
   private readonly keystream: Uint8Array
@@ -377,8 +377,9 @@ class ctrStream implements Stream {
     private readonly block: Block,
     iv: Uint8Array,
   ) {
-    this.counter = iv.slice()
-    this.keystream = new Uint8Array(block.BlockSize())
+    // Buffer.slice() aliases its input, unlike Uint8Array.slice().
+    this.counter = new Uint8Array(iv)
+    this.keystream = new Uint8Array(iv.length)
     this.keystreamUsed = this.keystream.length
   }
 
@@ -387,25 +388,39 @@ class ctrStream implements Stream {
     if ($.len(dst) < n) {
       $.panic('crypto/cipher: output smaller than input')
     }
-    const srcBytes = $.bytesToUint8Array(src)
-    const result = new Uint8Array(n)
-    const blockSize = this.block.BlockSize()
+    if (n === 0) {
+      return
+    }
+
+    // Normalize Go slice headers without copying their contents. Check the
+    // original backing ranges before writing or consuming any keystream.
+    const input = $.goSlice(src, 0, n)!
+    const output = $.goSlice(dst, 0, n)!
+    const [srcBacking, srcOffset] = ctrByteRange(input)
+    const [dstBacking, dstOffset] = ctrByteRange(output)
+    if (
+      srcBacking === dstBacking &&
+      srcOffset !== dstOffset &&
+      srcOffset < dstOffset + n &&
+      dstOffset < srcOffset + n
+    ) {
+      $.panic('crypto/cipher: invalid buffer overlap')
+    }
+
     let done = 0
     while (done < n) {
-      if (this.keystreamUsed >= this.keystream.length) {
+      if (this.keystreamUsed === this.keystream.length) {
         this.block.Encrypt(this.keystream, this.counter)
         this.keystreamUsed = 0
         this.incrementCounter()
       }
-      const chunk = Math.min(blockSize - this.keystreamUsed, n - done)
+      const chunk = Math.min(this.keystream.length - this.keystreamUsed, n - done)
       for (let i = 0; i < chunk; i++) {
-        result[done + i] =
-          srcBytes[done + i] ^ this.keystream[this.keystreamUsed + i]
+        output[done + i] = input[done + i] ^ this.keystream[this.keystreamUsed + i]
       }
       done += chunk
       this.keystreamUsed += chunk
     }
-    $.copyByteRanges(dst, 0, n, result, 0, n)
   }
 
   private incrementCounter(): void {
@@ -418,11 +433,28 @@ class ctrStream implements Stream {
   }
 }
 
+// Keep storage identity separate from the view object. Both typed-array views
+// and GoScript's array-backed slice proxies can alias another slice.
+function ctrByteRange(bytes: NonNullable<$.Bytes>): [object, number] {
+  if (bytes instanceof Uint8Array) {
+    return [bytes.buffer, bytes.byteOffset]
+  }
+  if ($.isSliceProxy(bytes)) {
+    const { backing, offset } = bytes.__meta__
+    return [backing, offset]
+  }
+  return [bytes, 0]
+}
+
 export function NewCTR(b: Block | null, iv: $.Bytes): Stream {
   if (b == null) {
     $.panic('cipher.NewCTR: nil block')
   }
-  if ($.len(iv) !== b.BlockSize()) {
+  const blockSize = b.BlockSize()
+  if (!Number.isSafeInteger(blockSize) || blockSize <= 0) {
+    $.panic('cipher.NewCTR: invalid block size')
+  }
+  if ($.len(iv) !== blockSize) {
     $.panic('cipher.NewCTR: IV length must equal block size')
   }
   return new ctrStream(b, $.bytesToUint8Array(iv))
@@ -432,63 +464,98 @@ export function NewOFB(_b: Block | null, _iv: $.Bytes): Stream {
   throw new Error('crypto/cipher: OFB is not implemented in GoScript')
 }
 
-export class StreamReader {
-  private readonly S: Stream | undefined
-  private readonly R: unknown
+type StreamIOResult = [number, $.GoError]
+type StreamReaderSource = {
+  Read(dst: $.Bytes): StreamIOResult | PromiseLike<StreamIOResult>
+}
+type StreamWriterSink = {
+  Write(src: $.Bytes): StreamIOResult | PromiseLike<StreamIOResult>
+  Close?(): $.GoError | PromiseLike<$.GoError>
+}
+type MappedIOResult<T> = T extends PromiseLike<StreamIOResult> ?
+  Promise<StreamIOResult>
+: StreamIOResult
 
-  constructor(init?: Partial<{ S: Stream; R: unknown }>) {
-    this.S = init?.S
-    this.R = init?.R
+type StreamCloseResult<W> = W extends { Close(): infer Result } ?
+  Result | null
+: $.GoError
+
+// A synchronous delegate must remain synchronous for io.MultiReader and other
+// synchronous consumers. Promise-returning delegates are transformed only after
+// settlement. The conditional type preserves that distinction for TS callers.
+function mapStreamIOResult<T extends StreamIOResult | PromiseLike<StreamIOResult>>(
+  result: T,
+  transform: (result: StreamIOResult) => StreamIOResult,
+): MappedIOResult<T> {
+  return (
+    Array.isArray(result) ? transform(result) : Promise.resolve(result).then(transform)
+  ) as MappedIOResult<T>
+}
+
+export class StreamReader<R extends StreamReaderSource = io.Reader> {
+  S: Stream | null
+  R: R | null
+
+  constructor(init?: Partial<{ S: Stream | null; R: R | null }>) {
+    this.S = init?.S ?? null
+    this.R = init?.R ?? null
   }
 
-  async Read(dst: $.Bytes): Promise<[number, $.GoError]> {
-    const reader = this.R as {
-      Read(p: $.Bytes): Promise<[number, $.GoError]> | [number, $.GoError]
-    } | null
+  Read(dst: $.Bytes): MappedIOResult<ReturnType<R['Read']>> {
+    const reader = this.R
+    const stream = this.S
     if (reader == null) {
       $.panic('crypto/cipher: StreamReader has nil reader')
     }
-    const [n, err] = await reader.Read(dst)
-    if (n > 0) {
-      this.S!.XORKeyStream($.goSlice(dst, 0, n), $.goSlice(dst, 0, n))
-    }
-    return [n, err]
+    const result = reader.Read(dst) as ReturnType<R['Read']>
+    return mapStreamIOResult(result, ([n, err]) => {
+      if (stream == null) {
+        $.panic('crypto/cipher: StreamReader has nil stream')
+      }
+      const data = $.goSlice(dst, 0, n)
+      stream.XORKeyStream(data, data)
+      return [n, err]
+    })
   }
 }
 
-export class StreamWriter {
-  private readonly S: Stream | undefined
-  private readonly W: unknown
+// As in Go, discard a StreamWriter after a short write: the stream has already
+// advanced for all of src. Close only forwards Close; there is nothing to flush.
+export class StreamWriter<W extends StreamWriterSink = io.Writer> {
+  S: Stream | null
+  W: W | null
+  Err: $.GoError // Unused; retained for compatibility with Go's public struct.
 
-  constructor(init?: Partial<{ S: Stream; W: unknown }>) {
-    this.S = init?.S
-    this.W = init?.W
+  constructor(init?: Partial<{ S: Stream | null; W: W | null; Err: $.GoError }>) {
+    this.S = init?.S ?? null
+    this.W = init?.W ?? null
+    this.Err = init?.Err ?? null
   }
 
-  async Write(src: $.Bytes): Promise<[number, $.GoError]> {
-    const writer = this.W as {
-      Write(p: $.Bytes): Promise<[number, $.GoError]> | [number, $.GoError]
-    } | null
+  Write(src: $.Bytes): MappedIOResult<ReturnType<W['Write']>> {
+    const writer = this.W
+    if (this.S == null) {
+      $.panic('crypto/cipher: StreamWriter has nil stream')
+    }
+    const nsrc = $.len(src)
+    const ciphertext = new Uint8Array(nsrc)
+    this.S.XORKeyStream(ciphertext, src)
     if (writer == null) {
       $.panic('crypto/cipher: StreamWriter has nil writer')
     }
-    const c = $.makeSlice<number>($.len(src), undefined, 'byte')
-    this.S!.XORKeyStream(c, src)
-    const [n, err] = await writer.Write(c)
-    if (n !== $.len(src) && err == null) {
-      return [n, $.newError('io: short write')]
-    }
-    return [n, err]
+    const result = writer.Write(ciphertext) as ReturnType<W['Write']>
+    return mapStreamIOResult(result, ([n, err]) => [
+      n,
+      n !== nsrc && err == null ? io.ErrShortWrite : err,
+    ])
   }
 
-  async Close(): Promise<$.GoError> {
-    const closer = this.W as {
-      Close?(): Promise<$.GoError> | $.GoError
-    } | null
-    if (closer != null && typeof closer.Close === 'function') {
-      return await closer.Close()
+  Close(): StreamCloseResult<W> {
+    const writer = this.W
+    if (writer != null && typeof writer.Close === 'function') {
+      return writer.Close() as StreamCloseResult<W>
     }
-    return null
+    return null as StreamCloseResult<W>
   }
 }
 
