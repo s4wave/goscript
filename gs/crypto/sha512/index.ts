@@ -27,7 +27,7 @@ class Digest {
     const bytes = $.bytesToUint8Array(p)
     this.hash?.update(bytes)
     if (!this.canCopyHash) {
-      this.chunks.push(bytes.slice())
+      this.chunks.push(new Uint8Array(bytes))
       this.dataLength += bytes.length
     }
     return [bytes.length, null]
