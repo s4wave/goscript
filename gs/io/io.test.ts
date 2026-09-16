@@ -369,7 +369,7 @@ describe('io override', () => {
     })
 
     expect(err).toBeNull()
-    expect(out).toEqual(input)
+    expect(Buffer.from(out).equals(input)).toBe(true)
     expect(reader.requestedSizes.length).toBeLessThanOrEqual(64)
     expect(reader.requestedSizes[0]).toBeLessThanOrEqual(1024)
     expect(Math.max(...reader.requestedSizes)).toBeLessThanOrEqual(32 * 1024)
