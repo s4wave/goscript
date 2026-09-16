@@ -23,6 +23,32 @@ export async function main(): globalThis.Promise<void> {
 		await $.println($.uint(mask, 8))
 	}
 	await $.println(count)
+
+	// Compound assignment must wrap like plain assignment on narrow integers.
+	let sum: number = $.uint(4294967294, 32)
+	sum = $.uint(sum + ($.uint(7, 32)), 32)
+	await $.println($.uint(sum, 32))
+	sum = $.uint(sum - ($.uint(9, 32)), 32)
+	await $.println($.uint(sum, 32))
+	let prod: number = $.uint(0x10000, 32)
+	prod = Math.imul(prod, $.uint(0x10000, 32)) >>> 0
+	await $.println($.uint(prod, 32) == $.uint(0, 32))
+	let shifted: number = $.uint(0x40000000, 32)
+	shifted = $.uint(shifted << ($.uint(1, 32)), 32)
+	await $.println($.uint(shifted, 32) == $.uint(0x80000000, 32))
+	shifted = $.uint(shifted << ($.uint(1, 32)), 32)
+	await $.println($.uint(shifted, 32))
+	let small: number = $.uint(65535, 16)
+	small = $.uint(small + ($.uint(2, 16)), 16)
+	await $.println($.uint(small, 16))
+	small = $.uint(small - ($.uint(4, 16)), 16)
+	await $.println($.uint(small, 16))
+	let half: number = $.uint(0x8000, 16)
+	half = $.uint(half << ($.uint(1, 16)), 16)
+	await $.println($.uint(half, 16) == $.uint(0, 16))
+	let down: number = $.int(-128, 8)
+	down = $.int(down - ($.int(1, 8)), 8)
+	await $.println($.int(down, 8) == $.int(127, 8))
 }
 
 if ($.isMainScript(import.meta)) {

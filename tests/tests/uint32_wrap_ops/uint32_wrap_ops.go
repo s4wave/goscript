@@ -20,4 +20,30 @@ func main() {
 		println(mask)
 	}
 	println(count)
+
+	// Compound assignment must wrap like plain assignment on narrow integers.
+	var sum uint32 = 4294967294
+	sum += 7
+	println(sum)
+	sum -= 9
+	println(sum)
+	var prod uint32 = 0x10000
+	prod *= 0x10000
+	println(prod == 0)
+	var shifted uint32 = 0x40000000
+	shifted <<= 1
+	println(shifted == 0x80000000)
+	shifted <<= 1
+	println(shifted)
+	var small uint16 = 65535
+	small += 2
+	println(small)
+	small -= 4
+	println(small)
+	var half uint16 = 0x8000
+	half <<= 1
+	println(half == 0)
+	var down int8 = -128
+	down -= 1
+	println(down == 127)
 }
