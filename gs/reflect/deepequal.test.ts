@@ -62,4 +62,21 @@ describe('DeepEqual', () => {
 
     expect(v.Uint()).toBe(7n)
   })
+
+  it('compares named-value boxes by their Go type and value', () => {
+    const box = (value: unknown, typeName: string) => ({
+      __goType: typeName,
+      __goValue: value,
+      __goTypeInfo: { kind: 'basic', name: typeName },
+      valueOf: () => value,
+      toString: () => String(value),
+    })
+
+    const a = box(3381945770n, 'uint64')
+    const b = box(3381945770n, 'uint64')
+    expect(DeepEqual(a, b)).toBe(true)
+    expect(DeepEqual(a, box(3381945771n, 'uint64'))).toBe(false)
+    expect(DeepEqual(a, box(3381945770n, 'int64'))).toBe(false)
+  })
+
 })
