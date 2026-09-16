@@ -1,6 +1,16 @@
 {
-  "dependencies": [],
+  "dependencies": [
+    "internal/flateio"
+  ],
   "asyncMethods": {
-    "Writer.Close": true
+    "Writer.Close": true,
+    "Writer.Write": true,
+    "Writer.Flush": true,
+    "Reader.Read": true,
+    "Reader.Close": true,
+    "Reader.Reset": true
+  },
+  "asyncFunctions": {
+    "NewReader": true
   }
 }

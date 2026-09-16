@@ -1,6 +1,21 @@
 {
-  "dependencies": [],
+  "dependencies": [
+    "internal/flateio"
+  ],
   "asyncMethods": {
-    "Writer.Close": true
+    "Writer.Close": true,
+    "Writer.Write": true,
+    "Writer.Flush": true,
+    "reader.Read": true,
+    "reader.Close": true,
+    "reader.Reset": true,
+    "zlibReader.Read": true,
+    "zlibReader.Close": true,
+    "zlibReader.Reset": true,
+    "Resetter.Reset": true
+  },
+  "asyncFunctions": {
+    "NewReader": true,
+    "NewReaderDict": true
   }
 }

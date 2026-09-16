@@ -20,3 +20,31 @@ slice must use the slice itself or a slice-aware copy helper.
 
 This document describes the runtime overrides, not the historical async
 contracts in `design/`. The implementation and metadata are authoritative.
+
+## Incremental compression
+
+`compress/gzip` and `compress/zlib` share `internal/flateio`. It uses the
+low-level pako 1.0.11 codec, pinned in package.json and bun.lock. The pin is
+intentional: the low-level API, decoder state transitions, and declarations
+are version-specific. Upgrade it with the regression suite, not a silent
+substitution of a newer high-level wrapper. Native Node compression is an
+independent test oracle, not a required runtime dependency.
+
+A writer snapshots each accepted input and serializes outstanding operations.
+It emits compressed chunks as they become available. Flush emits a sync-flush
+boundary without ending the stream; Close emits the final block and trailer.
+Both wait for asynchronous destinations. Destination errors remain sticky
+until Reset, and repeated Close calls share the original result. Reset during
+pending operations is a caller error. There is no whole-stream accumulation.
+
+A reader parses only its header during construction, then incrementally
+produces bounded output. Body and trailer errors are reported by Read, not
+precomputed at construction. Read and Reset can suspend when the source does.
+Consumers must fully read to EOF to validate a checksum. gzip Close reports
+DEFLATE errors; zlib Close also returns a stored wrapper error, like Go.
+
+Reader-only inputs use a 32 KiB buffer and may be read ahead. Inputs that also
+implement ByteReader are consumed byte-exactly, preserving protocol data after
+a zlib stream or a gzip member with Multistream(false). No byte-at-a-time
+Reader.Read collection is used. gzip's default concatenated-member support
+starts a new decoder for every member and preserves first-member metadata.

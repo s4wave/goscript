@@ -43,12 +43,12 @@ describe('compress/gzip override', () => {
     const buf = $.markAsStructValue(new bytes.Buffer())
     const writer = NewWriter(buf)
 
-    const [written, writeErr] = writer.Write(input)
+    const [written, writeErr] = await writer.Write(input)
     expect(writeErr).toBeNull()
     expect(written).toBe(input.length)
     expect(await writer.Close()).toBeNull()
 
-    const [reader, readerErr] = NewReader(bytes.NewReader(buf.Bytes()))
+    const [reader, readerErr] = await NewReader(bytes.NewReader(buf.Bytes()))
     expect(readerErr).toBeNull()
     expect(reader).not.toBeNull()
 
@@ -69,7 +69,7 @@ describe('compress/gzip override', () => {
 
     const compressed = $.markAsStructValue(new bytes.Buffer())
     const writer = NewWriter(compressed)
-    expect(writer.Write(input)[1]).toBeNull()
+    expect((await writer.Write(input))[1]).toBeNull()
     expect(await writer.Close()).toBeNull()
 
     const source = bytes.NewReader(compressed.Bytes())
@@ -81,7 +81,7 @@ describe('compress/gzip override', () => {
       },
     }
 
-    const [reader, readerErr] = NewReader(observedReader as io.Reader)
+    const [reader, readerErr] = await NewReader(observedReader as io.Reader)
     expect(readerErr).toBeNull()
     const [out, readErr] = await io.ReadAll(reader!)
     expect(readErr).toBeNull()
@@ -92,7 +92,7 @@ describe('compress/gzip override', () => {
   test('reader reset accepts async generated readers', async () => {
     const compressed = $.markAsStructValue(new bytes.Buffer())
     const writer = NewWriter(compressed)
-    expect(writer.Write($.stringToBytes('async gzip source'))[1]).toBeNull()
+    expect((await writer.Write($.stringToBytes('async gzip source')))[1]).toBeNull()
     expect(await writer.Close()).toBeNull()
 
     const source = bytes.NewReader(compressed.Bytes())
@@ -103,20 +103,20 @@ describe('compress/gzip override', () => {
       },
     }
 
-    const [reader, readerErr] = NewReader(asyncReader as io.Reader)
+    const [reader, readerErr] = await NewReader(asyncReader as io.Reader)
     expect(readerErr).toBeNull()
     const [out, readErr] = await io.ReadAll(reader!)
     expect(readErr).toBeNull()
     expect($.bytesToString(out)).toBe('async gzip source')
   })
 
-  test('invalid gzip bytes return ErrHeader', () => {
-    const [reader, err] = NewReader(bytes.NewReader($.stringToBytes('plain')))
+  test('invalid gzip bytes return ErrHeader', async () => {
+    const [reader, err] = await NewReader(bytes.NewReader($.stringToBytes('plain invalid header')))
     expect(reader).toBeNull()
     expect(err).toBe(ErrHeader)
   })
 
-  describe('native compression streams', () => {
+  describe('portable incremental codec', () => {
     afterEach(() => vi.unstubAllGlobals())
 
     test('round trips owned writer bytes through an async reader', async () => {
@@ -133,12 +133,12 @@ describe('compress/gzip override', () => {
       const expected = payload.slice()
       const compressed = $.markAsStructValue(new bytes.Buffer())
       const writer = NewWriter(compressed)
-      expect(writer.Write(payload)).toEqual([payload.length, null])
+      expect((await writer.Write(payload))).toEqual([payload.length, null])
       payload.fill(0)
       expect(await writer.Close()).toBeNull()
 
       const source = bytes.NewReader(compressed.Bytes())
-      const [reader, readerErr] = NewReader({
+      const [reader, readerErr] = await NewReader({
         async Read(p: $.Bytes): Promise<[number, $.GoError]> {
           return source.Read(p)
         },
@@ -149,15 +149,13 @@ describe('compress/gzip override', () => {
       expect($.bytesToUint8Array(output)).toEqual(expected)
     })
 
-    test('reports invalid compressed input through Read', async () => {
+    test('reports invalid headers consistently without native codec support', async () => {
       vi.stubGlobal('process', { ...process, getBuiltinModule: undefined })
-      const [reader, readerErr] = NewReader(
-        bytes.NewReader($.stringToBytes('plain')),
+      const [reader, readerErr] = await NewReader(
+        bytes.NewReader($.stringToBytes('plain invalid header')),
       )
-      expect(readerErr).toBeNull()
-      const [output, readErr] = await io.ReadAll(reader!)
-      expect($.len(output)).toBe(0)
-      expect(readErr).toBe(ErrHeader)
+      expect(reader).toBeNull()
+      expect(readerErr).toBe(ErrHeader)
     })
   })
 })

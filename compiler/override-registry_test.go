@@ -1239,3 +1239,44 @@ func TestOverrideRegistryMarksDelegatedIOAsAsync(t *testing.T) {
 		}
 	}
 }
+
+func TestOverrideRegistryCopiesIncrementalCodecAndMarksCompressionIO(t *testing.T) {
+	owner := NewOverrideRegistryOwner()
+	facts, diagnostics := owner.Facts(context.Background())
+	if diagnosticsHaveErrors(diagnostics) {
+		t.Fatalf("override facts failed: %#v", diagnostics)
+	}
+	for _, pkg := range []string{"compress/gzip", "compress/zlib"} {
+		metadata := facts.Metadata(pkg)
+		for _, method := range []string{"Writer.Write", "Writer.Flush", "Writer.Close"} {
+			if !metadata.AsyncMethods[method] {
+				t.Errorf("%s.%s lacks async metadata", pkg, method)
+			}
+		}
+		if !metadata.AsyncFunctions["NewReader"] {
+			t.Errorf("%s.NewReader lacks async metadata", pkg)
+		}
+		plan, diagnostics := owner.CopyPlan(context.Background(), &CompileRequest{RuntimeEmissionMode: RuntimeEmissionModeEmit}, &PackageGraph{Nodes: []*PackageGraphNode{{PkgPath: pkg, OverrideCandidate: true}}})
+		if diagnosticsHaveErrors(diagnostics) {
+			t.Fatalf("copy plan failed: %#v", diagnostics)
+		}
+		found := false
+		for _, copied := range plan.packages {
+			if copied.path == "internal/flateio" {
+				found = true
+				declarations := false
+				for _, file := range copied.files {
+					if file.path == "internal/flateio/codec-types.ts" {
+						declarations = true
+					}
+				}
+				if !declarations {
+					t.Errorf("%s copy plan omits codec declarations", pkg)
+				}
+			}
+		}
+		if !found {
+			t.Errorf("%s copy plan omits incremental codec", pkg)
+		}
+	}
+}

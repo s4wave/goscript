@@ -116,7 +116,8 @@
   "dependencies": {
     "@noble/ciphers": "2.2.0",
     "@noble/hashes": "2.2.0",
-    "globals": "^17.4.0"
+    "globals": "^17.4.0",
+    "pako": "1.0.11"
   },
   "resolutions": {
     "@aptre/protobuf-es-lite": "1.1.0"
