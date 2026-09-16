@@ -11,7 +11,7 @@ import "@goscript/io/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let buf: $.Slice<number> = $.makeSlice<number>(32, undefined, "byte")
-	let [n, err] = rand.Read(buf)
+	let [n, err] = await rand.Read(buf)
 	await $.println("read len", n)
 	await $.println("read err nil", err == null)
 	await $.println("read has data", hasData(buf))
