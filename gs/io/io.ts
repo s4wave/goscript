@@ -125,103 +125,83 @@ class pipeState {
   private writerErr: $.GoError = null
   private pendingReads: Array<{
     data: $.Bytes
-    resolve: (result: [number, $.GoError]) => void
+    resolve: (result: IOResult) => void
   }> = []
   private pendingWrites: Array<{
     data: Uint8Array
     offset: number
-    resolve: (result: [number, $.GoError]) => void
+    resolve: (result: IOResult) => void
   }> = []
 
-  Read(p: $.Bytes): Promise<[number, $.GoError]> {
-    return (async (): Promise<[number, $.GoError]> => {
-      if (this.readerClosed) {
-        return [0, this.readerErr ?? ErrClosedPipe]
-      }
-      if ($.len(p) === 0) {
-        return [0, null]
-      }
-      if (this.pendingWrites.length > 0) {
-        return this.consumeNextWrite(p)
-      }
-      if (this.writerClosed) {
-        return [0, this.writerErr ?? EOF]
-      }
-      return await new Promise<[number, $.GoError]>((resolve) => {
-        this.pendingReads.push({ data: p, resolve })
-      })
-    })()
+  Read(p: $.Bytes): Promise<IOResult> {
+    if (this.readerClosed || this.writerClosed) {
+      return Promise.resolve([0, this.readCloseError()])
+    }
+    // Even a zero-length read must rendezvous with a writer, like io.Pipe.
+    return new Promise(resolve => {
+      this.pendingReads.push({ data: p, resolve })
+      this.drain()
+    })
   }
 
-  Write(p: $.Bytes): Promise<[number, $.GoError]> {
-    return (async (): Promise<[number, $.GoError]> => {
-      if (this.writerClosed || this.readerClosed) {
-        return [0, this.readerErr ?? ErrClosedPipe]
-      }
-      if ($.len(p) === 0) {
-        return [0, null]
-      }
-      const data = new Uint8Array($.len(p))
-      $.copy(data, p)
-      return await new Promise<[number, $.GoError]>((resolve) => {
-        this.pendingWrites.push({ data, offset: 0, resolve })
-        this.drain()
-      })
-    })()
+  Write(p: $.Bytes): Promise<IOResult> {
+    if (this.writerClosed || this.readerClosed) {
+      return Promise.resolve([0, this.writeCloseError()])
+    }
+    const data = new Uint8Array($.bytesToUint8Array(p))
+    return new Promise(resolve => {
+      this.pendingWrites.push({ data, offset: 0, resolve })
+      this.drain()
+    })
   }
 
   CloseReader(err: $.GoError): $.GoError {
-    this.readerClosed = true
-    this.readerErr = err
-    this.resolvePendingReads(ErrClosedPipe)
-    this.resolvePendingWrites(ErrClosedPipe)
+    if (!this.readerClosed) {
+      this.readerClosed = true
+      this.readerErr = err ?? ErrClosedPipe
+    }
+    this.release()
     return null
   }
 
   CloseWriter(err: $.GoError): $.GoError {
-    this.writerClosed = true
-    this.writerErr = err
-    if (this.pendingWrites.length === 0) {
-      this.resolvePendingReads(err ?? EOF)
+    if (!this.writerClosed) {
+      this.writerClosed = true
+      this.writerErr = err ?? EOF
     }
+    this.release()
     return null
+  }
+
+  private readCloseError(): $.GoError {
+    return !this.readerClosed && this.writerClosed ? this.writerErr : ErrClosedPipe
+  }
+
+  private writeCloseError(): $.GoError {
+    return !this.writerClosed && this.readerClosed ? this.readerErr : ErrClosedPipe
   }
 
   private drain(): void {
     while (this.pendingWrites.length > 0 && this.pendingReads.length > 0) {
-      if (this.readerClosed) {
-        this.resolvePendingWrites(this.readerErr ?? ErrClosedPipe)
-        return
-      }
-      const pending = this.pendingReads.shift()!
-      pending.resolve(this.consumeNextWrite(pending.data))
-    }
-  }
-
-  private consumeNextWrite(p: $.Bytes): [number, $.GoError] {
-    const pending = this.pendingWrites[0]
-    const n = Math.min($.len(p), pending.data.length - pending.offset)
-    $.copy(p, pending.data.subarray(pending.offset, pending.offset + n))
-    pending.offset += n
-    if (pending.offset === pending.data.length) {
-      this.pendingWrites.shift()
-      pending.resolve([pending.data.length, null])
-      if (this.writerClosed && this.pendingWrites.length === 0) {
-        this.resolvePendingReads(this.writerErr ?? EOF)
+      const read = this.pendingReads.shift()!
+      const write = this.pendingWrites[0]
+      const n = Math.min($.len(read.data), write.data.length - write.offset)
+      $.copy(read.data, write.data.subarray(write.offset, write.offset + n))
+      write.offset += n
+      read.resolve([n, null])
+      if (write.offset === write.data.length) {
+        this.pendingWrites.shift()
+        write.resolve([write.offset, null])
       }
     }
-    return [n, null]
   }
 
-  private resolvePendingReads(err: $.GoError): void {
-    while (this.pendingReads.length > 0) {
-      this.pendingReads.shift()!.resolve([0, err])
-    }
-  }
-
-  private resolvePendingWrites(err: $.GoError): void {
-    while (this.pendingWrites.length > 0) {
-      this.pendingWrites.shift()!.resolve([0, err])
+  private release(): void {
+    const readError = this.readCloseError()
+    const writeError = this.writeCloseError()
+    for (const read of this.pendingReads.splice(0)) read.resolve([0, readError])
+    for (const write of this.pendingWrites.splice(0)) {
+      write.resolve([write.offset, writeError])
     }
   }
 }
