@@ -31,6 +31,7 @@ export const ErrNoProgress = newError(
 export const ErrShortBuffer = newError('short buffer')
 export const ErrShortWrite = newError('short write')
 export const ErrUnexpectedEOF = newError('unexpected EOF')
+const errInvalidWrite = newError('invalid Write result')
 
 // SeekStart measures offsets from the beginning.
 export const SeekStart = 0 // seek relative to the origin of the file
@@ -548,6 +549,9 @@ export async function CopyBuffer(
   src: ReaderLike,
   buf: $.Bytes | null,
 ): Promise<[bigint, $.GoError]> {
+  if (buf !== null && $.len(buf) === 0) {
+    $.panic('empty buffer in CopyBuffer')
+  }
   dst = unwrapWriter(dst)
   src = unwrapReader(src)
   if (dst === null || src === null) {
@@ -570,12 +574,12 @@ export async function CopyBuffer(
 
   let written = 0n
   while (true) {
-    const [nr, er] = await (src.Read(buf) as any)
+    const [nr, er] = await src.Read(buf)
     if (nr > 0) {
-      const [nw, ew] = await (dst.Write($.goSlice(buf, 0, nr)) as any)
+      const [nw, ew] = await dst.Write($.goSlice(buf, 0, nr))
       if (nw < 0 || nr < nw) {
         if (ew === null) {
-          return [written, ErrShortWrite]
+          return [written, errInvalidWrite]
         }
         return [written, ew]
       }
@@ -649,12 +653,10 @@ export async function ReadAtLeast(
 
   let n = 0
   while (n < min) {
-    const [nn, err] = await (r.Read($.goSlice(buf, n)) as any)
+    const [nn, err] = await r.Read($.goSlice(buf, n))
     n += nn
+    if (n >= min) return [n, null]
     if (err !== null) {
-      if (err === EOF && n >= min) {
-        return [n, null]
-      }
       if (err === EOF && n === 0) {
         return [n, EOF]
       }
