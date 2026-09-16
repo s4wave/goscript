@@ -1,4 +1,6 @@
 // Declarations for the deliberately pinned low-level pako codec API.
+// `import X = require(...)` is the only syntax that references pako's `export =` modules.
+/* eslint-disable @typescript-eslint/no-require-imports */
 // This script is imported so the declarations accompany emitted override files.
 declare module 'pako/lib/zlib/zstream.js' {
   class ZStream {

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import * as $ from '@goscript/builtin/index.js'
 import * as io from './io.js'
-type Result = [number, $.GoError]
 async function settled<T>(pending: PromiseLike<T> | T): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined
   try {
