@@ -9,7 +9,11 @@
     "Redirect": true,
     "ServeContent": true,
     "ServeFileFS": true,
-    "SetCookie": true
+    "SetCookie": true,
+    "Header_Write": true,
+    "Header_WriteSubset": true,
+    "Header_write": true,
+    "Header_writeSubset": true
   },
   "asyncMethods": {
     "Client.Do": true,
@@ -21,6 +25,11 @@
     "HandlerFunc.ServeHTTP": true,
     "ServeMux.ServeHTTP": true,
     "RoundTripper.RoundTrip": true,
-    "Transport.RoundTrip": true
+    "Transport.RoundTrip": true,
+    "Header.Write": true,
+    "Header.WriteSubset": true,
+    "Response.Write": true,
+    "maxBytesReader.Read": true,
+    "maxBytesReader.Close": true
   }
 }

@@ -3,7 +3,7 @@ import * as errors from '@goscript/errors/index.js'
 import * as io from '@goscript/io/index.js'
 
 type maybeAsyncWriter = {
-  Write(p: $.Bytes): [number, $.GoError] | Promise<[number, $.GoError]>
+  Write(p: $.Bytes): io.Awaitable<io.IOResult>
 }
 
 type compressionRuntime = {
@@ -233,8 +233,8 @@ function readGunzipped(
   const buf = $.makeSlice<number>(readerBufferSize, undefined, 'byte')
   while (true) {
     const read = r.Read(buf)
-    if (read instanceof Promise) {
-      return readGunzippedAsync(read, r, buf, chunks)
+    if (io.isAsync(read)) {
+      return readGunzippedAsync(Promise.resolve(read), r, buf, chunks)
     }
     const [n, err] = read
     recordChunk(chunks, buf, n)

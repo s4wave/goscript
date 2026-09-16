@@ -76,7 +76,7 @@ export class Replacer {
     if ($.len(oldnew) == 0) {
       return {
         Replace: (s: string): string => s,
-        WriteString: (w: io.Writer, s: string): [number, $.GoError] => {
+        WriteString: (w: io.Writer, s: string): io.Awaitable<io.IOResult> => {
           const bytes = $.stringToBytes(s)
           return w.Write(bytes)
         },
@@ -120,7 +120,7 @@ export class Replacer {
           }
           return result
         },
-        WriteString: (w: io.Writer, s: string): [number, $.GoError] => {
+        WriteString: (w: io.Writer, s: string): io.Awaitable<io.IOResult> => {
           const replaced = this.Replace(s)
           const bytes = $.stringToBytes(replaced)
           return w.Write(bytes)
@@ -160,7 +160,7 @@ export class Replacer {
   }
 
   // WriteString writes s to w with all replacements performed.
-  public WriteString(w: io.Writer, s: string): [number, $.GoError] {
+  public WriteString(w: io.Writer, s: string): io.Awaitable<io.IOResult> {
     const r = this
     r.buildOnce()
     return r.r!.WriteString(w, s)
@@ -226,7 +226,7 @@ export class Replacer {
 
 type replacer = null | {
   Replace(s: string): string
-  WriteString(w: io.Writer, s: string): [number, $.GoError]
+  WriteString(w: io.Writer, s: string): io.Awaitable<io.IOResult>
 }
 
 $.registerInterfaceType(
@@ -577,51 +577,54 @@ class genericReplacer {
     return result
   }
 
-  public WriteString(w: io.Writer, s: string): [number, $.GoError] {
-    const r = this
-    let sw = getStringWriter(w)
-    let last: number = 0
-    let n: number = 0
-    let prevMatchEmpty: boolean = false
-    for (let i = 0; i <= $.len(s); ) {
-      // Fast path: s[i] is not a prefix of any pattern.
-      if (i != $.len(s) && r!.root.priority == 0) {
-        let index = r!.mapping![$.indexString(s, i)] as number
-        if (index == r!.tableSize || r!.root.table![index] == null) {
-          i++
+  public WriteString(w: io.Writer, s: string): io.Awaitable<io.IOResult> {
+    const self = this
+    return io.runIO((function* (): Generator<io.Awaitable<io.IOResult>, io.IOResult, io.IOResult> {
+      const r = self
+      let sw = getStringWriter(w)
+      let last: number = 0
+      let n: number = 0
+      let prevMatchEmpty: boolean = false
+      for (let i = 0; i <= $.len(s); ) {
+        // Fast path: s[i] is not a prefix of any pattern.
+        if (i != $.len(s) && r!.root.priority == 0) {
+          let index = r!.mapping![$.indexString(s, i)] as number
+          if (index == r!.tableSize || r!.root.table![index] == null) {
+            i++
+            continue
+          }
+        }
+
+        // Ignore the empty match iff the previous loop found the empty match.
+        let [val, keylen, match] = r!.lookup(
+          $.sliceString(s, i, undefined),
+          prevMatchEmpty,
+        )
+        prevMatchEmpty = match && keylen == 0
+        if (match) {
+          let [wn, err] = yield sw!.WriteString($.sliceString(s, last, i))
+          n += wn
+          if (err != null) {
+            return [n, err]
+          }
+          ;[wn, err] = yield sw!.WriteString(val)
+          n += wn
+          if (err != null) {
+            return [n, err]
+          }
+          i += keylen
+          last = i
           continue
         }
+        i++
       }
-
-      // Ignore the empty match iff the previous loop found the empty match.
-      let [val, keylen, match] = r!.lookup(
-        $.sliceString(s, i, undefined),
-        prevMatchEmpty,
-      )
-      prevMatchEmpty = match && keylen == 0
-      if (match) {
-        let [wn, err] = sw!.WriteString($.sliceString(s, last, i))
+      if (last != $.len(s)) {
+        const [wn, err] = yield sw!.WriteString($.sliceString(s, last, undefined))
         n += wn
-        if (err != null) {
-          return [n, err]
-        }
-        ;[wn, err] = sw!.WriteString(val)
-        n += wn
-        if (err != null) {
-          return [n, err]
-        }
-        i += keylen
-        last = i
-        continue
+        return [n, err]
       }
-      i++
-    }
-    if (last != $.len(s)) {
-      const [wn, err] = sw!.WriteString($.sliceString(s, last, undefined))
-      n += wn
-      return [n, err]
-    }
-    return [n, null]
+      return [n, null]
+    })())
   }
 }
 
@@ -681,7 +684,7 @@ class stringWriter {
     }
   }
 
-  public WriteString(s: string): [number, $.GoError] {
+  public WriteString(s: string): io.Awaitable<io.IOResult> {
     const w = this
     return w.w!.Write($.stringToBytes(s))
   }
@@ -759,31 +762,34 @@ class singleStringReplacer {
     return buf.String()
   }
 
-  public WriteString(w: io.Writer, s: string): [number, $.GoError] {
-    const r = this
-    let sw = getStringWriter(w)
-    let i: number = 0
-    let n: number = 0
-    for (;;) {
-      let match = r!.finder!.next($.sliceString(s, i, undefined))
-      if (match == -1) {
-        break
+  public WriteString(w: io.Writer, s: string): io.Awaitable<io.IOResult> {
+    const self = this
+    return io.runIO((function* (): Generator<io.Awaitable<io.IOResult>, io.IOResult, io.IOResult> {
+      const r = self
+      let sw = getStringWriter(w)
+      let i: number = 0
+      let n: number = 0
+      for (;;) {
+        let match = r!.finder!.next($.sliceString(s, i, undefined))
+        if (match == -1) {
+          break
+        }
+        let [wn, err] = yield sw!.WriteString($.sliceString(s, i, i + match))
+        n += wn
+        if (err != null) {
+          return [n, err]
+        }
+        ;[wn, err] = yield sw!.WriteString(r!.value)
+        n += wn
+        if (err != null) {
+          return [n, err]
+        }
+        i += match + $.len(r!.finder!.pattern)
       }
-      let [wn, err] = sw!.WriteString($.sliceString(s, i, i + match))
+      const [wn, err] = yield sw!.WriteString($.sliceString(s, i, undefined))
       n += wn
-      if (err != null) {
-        return [n, err]
-      }
-      ;[wn, err] = sw!.WriteString(r!.value)
-      n += wn
-      if (err != null) {
-        return [n, err]
-      }
-      i += match + $.len(r!.finder!.pattern)
-    }
-    const [wn, err] = sw!.WriteString($.sliceString(s, i, undefined))
-    n += wn
-    return [n, err]
+      return [n, err]
+    })())
   }
 }
 
@@ -1023,39 +1029,42 @@ class byteStringReplacer {
     return $.bytesToString(buf)
   }
 
-  public WriteString(w: io.Writer, s: string): [number, $.GoError] {
-    const r = this
-    let sw = getStringWriter(w)
-    let last = 0
-    let n: number = 0
-    let err: $.GoError | null = null
-    for (let i = 0; i < $.len(s); i++) {
-      let b = $.indexString(s, i)
-      if (r!.replacements![b] == null) {
-        continue
-      }
-      if (last != i) {
-        let [nw, err] = sw!.WriteString($.sliceString(s, last, i))
+  public WriteString(w: io.Writer, s: string): io.Awaitable<io.IOResult> {
+    const self = this
+    return io.runIO((function* (): Generator<io.Awaitable<io.IOResult>, io.IOResult, io.IOResult> {
+      const r = self
+      let sw = getStringWriter(w)
+      let last = 0
+      let n: number = 0
+      let err: $.GoError | null = null
+      for (let i = 0; i < $.len(s); i++) {
+        let b = $.indexString(s, i)
+        if (r!.replacements![b] == null) {
+          continue
+        }
+        if (last != i) {
+          let [nw, err] = yield sw!.WriteString($.sliceString(s, last, i))
+          n += nw
+          if (err != null) {
+            return [n, err]
+          }
+        }
+        last = i + 1
+        let [nw, err] = yield w!.Write(r!.replacements![b])
         n += nw
         if (err != null) {
           return [n, err]
         }
       }
-      last = i + 1
-      let [nw, err] = w!.Write(r!.replacements![b])
-      n += nw
-      if (err != null) {
-        return [n, err]
+      if (last != $.len(s)) {
+        let [nw, err] = yield sw!.WriteString($.sliceString(s, last, undefined))
+        n += nw
+        if (err != null) {
+          return [n, err]
+        }
       }
-    }
-    if (last != $.len(s)) {
-      let [nw, err] = sw!.WriteString($.sliceString(s, last, undefined))
-      n += nw
-      if (err != null) {
-        return [n, err]
-      }
-    }
-    return [n, err]
+      return [n, err]
+    })())
   }
 }
 

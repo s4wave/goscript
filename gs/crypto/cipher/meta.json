@@ -1,6 +1,9 @@
 {
   "asyncMethods": {
     "AEAD.Open": true,
-    "AEAD.Seal": true
+    "AEAD.Seal": true,
+    "StreamReader.Read": true,
+    "StreamWriter.Write": true,
+    "StreamWriter.Close": true
   }
 }

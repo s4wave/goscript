@@ -4,6 +4,8 @@
   ],
   "asyncFunctions": {
     "Prime": true,
-    "Text": true
+    "Text": true,
+    "Read": true,
+    "Int": true
   }
 }

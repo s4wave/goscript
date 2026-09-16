@@ -1217,3 +1217,25 @@ func parityFixtureJSON(t *testing.T, symbols map[string]overrideParityEntry) str
 	b.WriteString("}}\n")
 	return b.String()
 }
+
+func TestOverrideRegistryMarksDelegatedIOAsAsync(t *testing.T) {
+	facts, diagnostics := NewOverrideRegistryOwner().Facts(context.Background())
+	if diagnosticsHaveErrors(diagnostics) {
+		t.Fatalf("override facts failed: %#v", diagnostics)
+	}
+	for pkg, methods := range map[string][]string{
+		"io":            {"Reader.Read", "Writer.Write", "Closer.Close", "ReaderAt.ReadAt", "WriterAt.WriteAt", "LimitedReader.Read", "SectionReader.Read", "OffsetWriter.Write", "PipeReader.Read", "PipeWriter.Write"},
+		"crypto/cipher": {"StreamReader.Read", "StreamWriter.Write", "StreamWriter.Close"},
+		"crypto/ecdh":   {"Curve.GenerateKey", "x25519Curve.GenerateKey"},
+		"encoding/json": {"Encoder.Encode"},
+		"strings":       {"Replacer.WriteString", "replacer.WriteString"},
+		"net/http":      {"Header.Write", "Response.Write", "maxBytesReader.Read", "maxBytesReader.Close"},
+	} {
+		metadata := facts.Metadata(pkg)
+		for _, method := range methods {
+			if !metadata.AsyncMethods[method] {
+				t.Errorf("%s.%s can delegate asynchronous I/O but lacks async metadata", pkg, method)
+			}
+		}
+	}
+}

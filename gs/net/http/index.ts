@@ -307,7 +307,7 @@ export function Header_Clone(h: HeaderValue): Header {
   return cloned
 }
 
-export function Header_Write(h: HeaderValue, w: io.Writer): $.GoError {
+export function Header_Write(h: HeaderValue, w: io.Writer): io.Awaitable<$.GoError> {
   return Header_WriteSubset(h, w, null)
 }
 
@@ -315,19 +315,21 @@ export function Header_WriteSubset(
   h: HeaderValue,
   w: io.Writer,
   exclude: Map<string, boolean> | null,
-): $.GoError {
-  for (const [key, values] of headerMap(h).entries()) {
-    if (exclude?.get(key) === true) {
-      continue
-    }
-    for (const value of Array.from(values ?? [])) {
-      const [, err] = w.Write($.stringToBytes(`${key}: ${value}\r\n`))
-      if (err != null) {
-        return err
+): io.Awaitable<$.GoError> {
+  return io.runIO((function* (): Generator<io.Awaitable<io.IOResult>, $.GoError, io.IOResult> {
+    for (const [key, values] of headerMap(h).entries()) {
+      if (exclude?.get(key) === true) {
+        continue
+      }
+      for (const value of Array.from(values ?? [])) {
+        const [, err] = yield w.Write($.stringToBytes(`${key}: ${value}\r\n`))
+        if (err != null) {
+          return err
+        }
       }
     }
-  }
-  return null
+    return null
+  })())
 }
 
 export function Header__get(h: HeaderValue, key: string): string {
@@ -356,7 +358,7 @@ export function Header_write(
   h: HeaderValue,
   w: io.Writer,
   _trace: unknown,
-): $.GoError {
+): io.Awaitable<$.GoError> {
   return Header_WriteSubset(h, w, null)
 }
 
@@ -365,7 +367,7 @@ export function Header_writeSubset(
   w: io.Writer,
   exclude: Map<string, boolean> | null,
   _trace: unknown,
-): $.GoError {
+): io.Awaitable<$.GoError> {
   return Header_WriteSubset(h, w, exclude)
 }
 
@@ -1007,46 +1009,49 @@ export class Response {
     )
   }
 
-  public Write(w: io.Writer): $.GoError {
-    const write = (data: $.Bytes): $.GoError => {
-      const [n, err] = w.Write(data)
+  public Write(w: io.Writer): io.Awaitable<$.GoError> {
+    const write = (data: $.Bytes): io.Awaitable<io.IOResult> => io.mapResult(w.Write(data), ([n, err]) => {
+      if (err != null) {
+        return [n, err]
+      }
+      return [n, n === $.len(data) ? null : io.ErrShortWrite]
+    })
+    const self = this
+    return io.runIO((function* (): Generator<io.Awaitable<io.IOResult>, $.GoError, io.IOResult> {
+      let [, err] = yield write($.stringToBytes(`${self.Proto} ${self.Status}\r\n`))
       if (err != null) {
         return err
       }
-      return n === $.len(data) ? null : io.ErrShortWrite
-    }
-    let err = write($.stringToBytes(`${this.Proto} ${this.Status}\r\n`))
-    if (err != null) {
-      return err
-    }
-    err = Header_Write(this.Header, w)
-    if (err != null) {
-      return err
-    }
-    err = write($.stringToBytes('\r\n'))
-    if (err != null) {
-      return err
-    }
-    if (this.Body == null) {
-      return null
-    }
-    const buf = $.makeSlice<number>(32 * 1024, undefined, 'byte')
-    while (true) {
-      const [n, readErr] = this.Body.Read(buf)
-      if (n > 0) {
-        err = write($.goSlice(buf, 0, n))
-        if (err != null) {
-          return err
-        }
+      ;[, err] = yield io.mapResult(Header_Write(self.Header, w), err => [0, err])
+      if (err != null) {
+        return err
       }
-      if (readErr === io.EOF) {
+      ;[, err] = yield write($.stringToBytes('\r\n'))
+      if (err != null) {
+        return err
+      }
+      if (self.Body == null) {
         return null
       }
-      if (readErr != null) {
-        return readErr
+      const buf = $.makeSlice<number>(32 * 1024, undefined, 'byte')
+      while (true) {
+        const [n, readErr] = yield self.Body!.Read(buf)
+        if (n > 0) {
+          ;[, err] = yield write($.goSlice(buf, 0, n))
+          if (err != null) {
+            return err
+          }
+        }
+        if (readErr === io.EOF) {
+          return null
+        }
+        if (readErr != null) {
+          return readErr
+        }
       }
-    }
+    })())
   }
+
 }
 
 export class Client {
@@ -1304,7 +1309,7 @@ export class Transport implements RoundTripper {
         await served
       }
     } finally {
-      closeErr = request.Body?.Close?.() ?? null
+      closeErr = (await request.Body?.Close?.()) ?? null
     }
     if (closeErr != null) {
       return [null, closeErr]
@@ -1349,7 +1354,7 @@ class fileTransport implements RoundTripper {
     try {
       await FileServer(this.root).ServeHTTP(recorder, request)
     } finally {
-      closeErr = request?.Body?.Close?.() ?? null
+      closeErr = (await request?.Body?.Close?.()) ?? null
     }
     if (closeErr != null) {
       return [null, closeErr]
@@ -1370,14 +1375,14 @@ async function fetchRoundTrip(
   request: Request,
 ): Promise<[Response | null, $.GoError]> {
   const requestBody = request.Body
-  const closeRequestBody = (): $.GoError => {
+  const closeRequestBody = async (): Promise<$.GoError> => {
     if (requestBody == null) {
       return null
     }
-    return requestBody.Close()
+    return await requestBody.Close()
   }
   if (typeof globalThis.fetch !== 'function') {
-    closeRequestBody()
+    await closeRequestBody()
     return [
       null,
       errors.New('net/http: Client.Do is not implemented in GoScript'),
@@ -1385,7 +1390,7 @@ async function fetchRoundTrip(
   }
   const ctxErr = request.Context()?.Err?.()
   if (ctxErr != null) {
-    closeRequestBody()
+    await closeRequestBody()
     return [null, ctxErr]
   }
   const headers = new globalThis.Headers()
@@ -1401,7 +1406,7 @@ async function fetchRoundTrip(
     request.Method !== MethodHead
   ) {
     const [data, err] = await io.ReadAll(requestBody)
-    const closeErr = closeRequestBody()
+    const closeErr = await closeRequestBody()
     if (err != null) {
       return [null, err]
     }
@@ -1410,7 +1415,7 @@ async function fetchRoundTrip(
     }
     body = Uint8Array.from(data ?? [])
   } else {
-    const closeErr = closeRequestBody()
+    const closeErr = await closeRequestBody()
     if (closeErr != null) {
       return [null, closeErr]
     }
@@ -1552,7 +1557,7 @@ async function readFetchBody(
   return [new Uint8Array(buffer ?? new ArrayBuffer(0)), null]
 }
 
-type maybePromise<T> = T | Promise<T>
+type maybePromise<T> = io.Awaitable<T>
 
 type httpRange = {
   start: number
@@ -2209,29 +2214,32 @@ class maxBytesReader implements io.ReadCloser {
     this.remaining = this.initialLimit
   }
 
-  public Read(p: $.Bytes): [number, $.GoError] {
-    if (this.err != null) {
-      return [0, this.err]
-    }
-    if ($.len(p) === 0) {
-      return [0, null]
-    }
-    const readLen =
-      $.len(p) - 1 > this.remaining ? this.remaining + 1 : $.len(p)
-    const target = $.goSlice(p, 0, readLen)
-    const [n, err] = this.reader.Read(target)
-    if (n <= this.remaining) {
-      this.remaining -= n
-      this.err = err
-      return [n, err]
-    }
-    const accepted = this.remaining
-    this.remaining = 0
-    this.err = new MaxBytesError({ Limit: this.initialLimit })
-    return [accepted, this.err]
+  public Read(p: $.Bytes): io.Awaitable<io.IOResult> {
+    const self = this
+    return io.runIO((function* (): Generator<io.Awaitable<io.IOResult>, io.IOResult, io.IOResult> {
+      if (self.err != null) {
+        return [0, self.err]
+      }
+      if ($.len(p) === 0) {
+        return [0, null]
+      }
+      const readLen =
+        $.len(p) - 1 > self.remaining ? self.remaining + 1 : $.len(p)
+      const target = $.goSlice(p, 0, readLen)
+      const [n, err] = yield self.reader.Read(target)
+      if (n <= self.remaining) {
+        self.remaining -= n
+        self.err = err
+        return [n, err]
+      }
+      const accepted = self.remaining
+      self.remaining = 0
+      self.err = new MaxBytesError({ Limit: self.initialLimit })
+      return [accepted, self.err]
+    })())
   }
 
-  public Close(): $.GoError {
+  public Close(): io.Awaitable<$.GoError> {
     return this.reader.Close()
   }
 }

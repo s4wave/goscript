@@ -1,6 +1,6 @@
 import * as $ from '@goscript/builtin/index.js'
 import * as bytes from '@goscript/bytes/index.js'
-import type * as io from '@goscript/io/index.js'
+import * as io from '@goscript/io/index.js'
 
 export interface Marshaler {
   MarshalJSON(): [$.Slice<number>, $.GoError]
@@ -279,7 +279,7 @@ export class Encoder {
 
   public constructor(private readonly writer: io.Writer) {}
 
-  public Encode(v: unknown): $.GoError {
+  public Encode(v: unknown): io.Awaitable<$.GoError> {
     const [data, err] =
       this.indent === '' && this.prefix === '' ?
         marshalBytes(v, '', '', this.escapeHTML)
@@ -289,14 +289,10 @@ export class Encoder {
     }
 
     const out = $.stringToBytes($.bytesToString(data) + '\n')
-    const [n, writeErr] = this.writer.Write(out)
-    if (writeErr !== null) {
-      return writeErr
-    }
-    if (n < $.len(out)) {
-      return $.newError('short write')
-    }
-    return null
+    return io.mapResult(this.writer.Write(out), ([n, writeErr]) => {
+      if (writeErr !== null) return writeErr
+      return n !== $.len(out) ? io.ErrShortWrite : null
+    })
   }
 
   public SetEscapeHTML(on: boolean): void {
@@ -837,7 +833,7 @@ function readAllSync(r: io.Reader): [$.Bytes, $.GoError] {
   const buf = $.makeSlice<number>(512, undefined, 'byte')
   while (true) {
     const read = r.Read(buf)
-    if (read instanceof Promise) {
+    if (io.isAsync(read)) {
       return [null, $.newError('json: asynchronous reader is unsupported')]
     }
     const [n, err] = read

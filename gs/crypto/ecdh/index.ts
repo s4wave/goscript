@@ -89,28 +89,31 @@ export class PrivateKey {
 }
 
 export class x25519Curve {
-  public GenerateKey(r: io.Reader | null): [PrivateKey | null, $.GoError] {
-    const key = new Uint8Array(x25519PrivateKeySize)
-    if (r == null) {
-      globalThis.crypto.getRandomValues(key)
-      return this.NewPrivateKey(key)
-    }
+  public GenerateKey(r: io.Reader | null): io.Awaitable<[PrivateKey | null, $.GoError]> {
+    const self = this
+    return io.runIO((function* (): Generator<io.Awaitable<io.IOResult>, [PrivateKey | null, $.GoError], io.IOResult> {
+      const key = new Uint8Array(x25519PrivateKeySize)
+      if (r == null) {
+        globalThis.crypto.getRandomValues(key)
+        return self.NewPrivateKey(key)
+      }
 
-    let offset = 0
-    while (offset < key.length) {
-      const [n, err] = r.Read(key.subarray(offset))
-      offset += n
-      if (offset >= key.length) {
-        break
+      let offset = 0
+      while (offset < key.length) {
+        const [n, err] = yield r.Read(key.subarray(offset))
+        offset += n
+        if (offset >= key.length) {
+          break
+        }
+        if (err != null) {
+          return [null, err === io.EOF && offset > 0 ? io.ErrUnexpectedEOF : err]
+        }
+        if (n === 0) {
+          return [null, io.ErrUnexpectedEOF]
+        }
       }
-      if (err != null) {
-        return [null, err === io.EOF && offset > 0 ? io.ErrUnexpectedEOF : err]
-      }
-      if (n === 0) {
-        return [null, io.ErrUnexpectedEOF]
-      }
-    }
-    return this.NewPrivateKey(key)
+      return self.NewPrivateKey(key)
+    })())
   }
 
   public NewPrivateKey(key: $.Bytes): [PrivateKey | null, $.GoError] {

@@ -478,7 +478,7 @@ type MappedIOResult<T> = T extends PromiseLike<StreamIOResult> ?
 
 type StreamCloseResult<W> = W extends { Close(): infer Result } ?
   Result | null
-: $.GoError
+: io.Awaitable<$.GoError>
 
 // A synchronous delegate must remain synchronous for io.MultiReader and other
 // synchronous consumers. Promise-returning delegates are transformed only after

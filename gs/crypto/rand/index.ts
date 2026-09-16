@@ -24,46 +24,44 @@ class WebCryptoReader implements io.Reader {
 
 export let Reader: io.Reader = new WebCryptoReader()
 
-export function Read(b: $.Bytes): [number, $.GoError] {
-  const [n, err] = Reader.Read(b)
-  if (err != null) {
-    return [n, err]
-  }
-  if (n !== $.len(b)) {
-    return [n, io.ErrUnexpectedEOF]
-  }
-  return [n, null]
+export function Read(b: $.Bytes): io.Awaitable<io.IOResult> {
+  return io.mapResult(Reader.Read(b), ([n, err]) => {
+    if (err != null) return [n, err]
+    return [n, n === $.len(b) ? null : io.ErrUnexpectedEOF]
+  })
 }
 
-export function Int(rand: io.Reader | null, max: any): [any, $.GoError] {
-  if (max == null || typeof max.Sign !== 'function' || max.Sign() <= 0) {
-    return [null, new RandError('crypto/rand: argument to Int is <= 0')]
-  }
-
-  const bitLen = max.BitLen()
-  const byteLen = Math.ceil(bitLen / 8)
-  const excessBits = byteLen * 8 - bitLen
-  const reader = rand ?? Reader
-
-  while (true) {
-    const bytes = new Uint8Array(byteLen)
-    const [n, err] = reader.Read(bytes)
-    if (err != null) {
-      return [null, err]
-    }
-    if (n !== byteLen) {
-      return [null, io.ErrUnexpectedEOF]
-    }
-    if (excessBits > 0) {
-      bytes[0] &= 0xff >>> excessBits
+export function Int(rand: io.Reader | null, max: any): io.Awaitable<[any, $.GoError]> {
+  return io.runIO((function* (): Generator<io.Awaitable<io.IOResult>, [any, $.GoError], io.IOResult> {
+    if (max == null || typeof max.Sign !== 'function' || max.Sign() <= 0) {
+      return [null, new RandError('crypto/rand: argument to Int is <= 0')]
     }
 
-    const candidate = new max.constructor()
-    candidate.SetBytes(bytes)
-    if (candidate.Cmp(max) < 0) {
-      return [candidate, null]
+    const bitLen = max.BitLen()
+    const byteLen = Math.ceil(bitLen / 8)
+    const excessBits = byteLen * 8 - bitLen
+    const reader = rand ?? Reader
+
+    while (true) {
+      const bytes = new Uint8Array(byteLen)
+      const [n, err] = yield reader.Read(bytes)
+      if (err != null) {
+        return [null, err]
+      }
+      if (n !== byteLen) {
+        return [null, io.ErrUnexpectedEOF]
+      }
+      if (excessBits > 0) {
+        bytes[0] &= 0xff >>> excessBits
+      }
+
+      const candidate = new max.constructor()
+      candidate.SetBytes(bytes)
+      if (candidate.Cmp(max) < 0) {
+        return [candidate, null]
+      }
     }
-  }
+  })())
 }
 
 export async function Prime(
@@ -83,7 +81,7 @@ export async function Prime(
   const reader = rand ?? Reader
 
   while (true) {
-    const err = readFull(reader, bytes)
+    const err = await readFull(reader, bytes)
     if (err != null) {
       return [null, err]
     }
@@ -109,7 +107,7 @@ export async function Prime(
 
 export async function Text(): Promise<string> {
   const src = new Uint8Array(26)
-  const [, err] = Read(src)
+  const [, err] = await Read(src)
   if (err != null) {
     throw new Error(await err.Error())
   }
@@ -136,20 +134,22 @@ function newBigInt(): any {
   throw new Error('crypto/rand: math/big.Int type is not registered')
 }
 
-function readFull(reader: io.Reader, dst: Uint8Array): $.GoError {
-  let offset = 0
-  while (offset < dst.length) {
-    const chunk = dst.subarray(offset)
-    const [n, err] = reader.Read(chunk)
-    if (err != null) {
-      return err
+function readFull(reader: io.Reader, dst: Uint8Array): io.Awaitable<$.GoError> {
+  return io.runIO((function* (): Generator<io.Awaitable<io.IOResult>, $.GoError, io.IOResult> {
+    let offset = 0
+    while (offset < dst.length) {
+      const chunk = dst.subarray(offset)
+      const [n, err] = yield reader.Read(chunk)
+      if (err != null) {
+        return err
+      }
+      if (n <= 0) {
+        return io.ErrUnexpectedEOF
+      }
+      offset += n
     }
-    if (n <= 0) {
-      return io.ErrUnexpectedEOF
-    }
-    offset += n
-  }
-  return null
+    return null
+  })())
 }
 
 function fillSecureBytes(dst: $.Bytes): $.GoError {

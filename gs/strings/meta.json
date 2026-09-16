@@ -7,6 +7,8 @@
     "unicode/utf8"
   ],
   "asyncMethods": {
-    "Reader.WriteTo": true
+    "Reader.WriteTo": true,
+    "Replacer.WriteString": true,
+    "replacer.WriteString": true
   }
 }

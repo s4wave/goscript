@@ -185,7 +185,7 @@ class serverTransport implements http.RoundTripper {
         await served
       }
     } finally {
-      closeErr = request.Body?.Close?.() ?? null
+      closeErr = (await request.Body?.Close?.()) ?? null
     }
     if (closeErr != null) {
       return [null, closeErr]

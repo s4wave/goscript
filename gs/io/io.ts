@@ -37,35 +37,40 @@ export const SeekStart = 0 // seek relative to the origin of the file
 export const SeekCurrent = 1 // seek relative to the current offset
 export const SeekEnd = 2 // seek relative to the end
 
-// Reader is the interface that wraps the basic Read method.
+// Generated Go I/O may suspend. Interfaces expose that possibility rather than
+// disguising a Promise as a tuple; concrete synchronous adapters still return
+// their result immediately.
+export type IOResult = [number, $.GoError]
+export type Awaitable<T> = T | PromiseLike<T>
+
 export interface Reader {
-  Read(p: $.Bytes): [number, $.GoError]
+  Read(p: $.Bytes): Awaitable<IOResult>
 }
-
-// AsyncReader completes each read asynchronously.
-export interface AsyncReader {
-  Read(p: $.Bytes): Promise<[number, $.GoError]>
+export interface SyncReader extends Reader {
+  Read(p: $.Bytes): IOResult
 }
-
-// Writer is the interface that wraps the basic Write method.
+export interface AsyncReader extends Reader {
+  Read(p: $.Bytes): Promise<IOResult>
+}
 export interface Writer {
-  Write(p: $.Bytes): [number, $.GoError]
+  Write(p: $.Bytes): Awaitable<IOResult>
+}
+export interface SyncWriter extends Writer {
+  Write(p: $.Bytes): IOResult
+}
+export interface AsyncWriter extends Writer {
+  Write(p: $.Bytes): Promise<IOResult>
 }
 
 type ReaderLike = Reader | { Reader: Reader | null } | null
 type WriterLike = Writer | { Writer: Writer | null } | null
 
-// Closer is the interface that wraps the basic Close method.
 export interface Closer {
-  Close(): $.GoError
+  Close(): Awaitable<$.GoError>
 }
-
-// Seeker is the interface that wraps the basic Seek method.
 export interface Seeker {
   Seek(offset: bigint, whence: number): [bigint, $.GoError]
 }
-
-// ReadWriter combines sequential reads and writes.
 export interface ReadWriter extends Reader, Writer {}
 export interface ReadCloser extends Reader, Closer {}
 export interface WriteCloser extends Writer, Closer {}
@@ -74,6 +79,43 @@ export interface ReadSeeker extends Reader, Seeker {}
 export interface ReadSeekCloser extends Reader, Seeker, Closer {}
 export interface WriteSeeker extends Writer, Seeker {}
 export interface ReadWriteSeeker extends Reader, Writer, Seeker {}
+
+export function isAsync<T>(value: Awaitable<T>): value is PromiseLike<T> {
+  return value != null &&
+    (typeof value === 'object' || typeof value === 'function') &&
+    'then' in value && typeof value.then === 'function'
+}
+
+// Map a delegated result without introducing a microtask on synchronous paths.
+export function mapResult<T, U>(
+  value: Awaitable<T>,
+  transform: (value: T) => Awaitable<U>,
+): Awaitable<U> {
+  return isAsync(value) ? Promise.resolve(value).then(transform) : transform(value)
+}
+
+// Drive sequential delegated I/O without changing synchronous completion into
+// asynchronous completion. Rejections are thrown back into the operation so
+// its cleanup and error handling run just as they do for a synchronous throw.
+export function runIO<T>(
+  operation: Generator<Awaitable<IOResult>, T, IOResult>,
+): Awaitable<T> {
+  let step = operation.next()
+  const pump = (): Awaitable<T> => {
+    while (!step.done) {
+      const value = step.value
+      if (isAsync(value)) {
+        return Promise.resolve(value).then(
+          value => { step = operation.next(value); return pump() },
+          error => { step = operation.throw(error); return pump() },
+        )
+      }
+      step = operation.next(value)
+    }
+    return step.value
+  }
+  return pump()
+}
 
 class pipeState {
   private readerClosed = false
@@ -184,11 +226,11 @@ class pipeState {
 }
 
 // PipeReader is the read half of a pipe.
-export class PipeReader implements Reader, Closer {
+export class PipeReader implements AsyncReader, Closer {
   constructor(private pipe: pipeState) {}
 
-  Read(data: $.Bytes): [number, $.GoError] {
-    return this.pipe.Read(data) as any
+  Read(data: $.Bytes): Promise<IOResult> {
+    return this.pipe.Read(data)
   }
 
   Close(): $.GoError {
@@ -201,11 +243,11 @@ export class PipeReader implements Reader, Closer {
 }
 
 // PipeWriter is the write half of a pipe.
-export class PipeWriter implements Writer, Closer {
+export class PipeWriter implements AsyncWriter, Closer {
   constructor(private pipe: pipeState) {}
 
-  Write(data: $.Bytes): [number, $.GoError] {
-    return this.pipe.Write(data) as any
+  Write(data: $.Bytes): Promise<IOResult> {
+    return this.pipe.Write(data)
   }
 
   Close(): $.GoError {
@@ -225,17 +267,17 @@ export function Pipe(): [PipeReader, PipeWriter] {
 
 // ReaderAt is the interface that wraps the basic ReadAt method.
 export interface ReaderAt {
-  ReadAt(p: $.Bytes, off: bigint): [number, $.GoError]
+  ReadAt(p: $.Bytes, off: bigint): Awaitable<IOResult>
 }
 
 // WriterAt is the interface that wraps the basic WriteAt method.
 export interface WriterAt {
-  WriteAt(p: $.Bytes, off: bigint): [number, $.GoError]
+  WriteAt(p: $.Bytes, off: bigint): Awaitable<IOResult>
 }
 
 // ByteReader is the interface that wraps the ReadByte method.
 export interface ByteReader {
-  ReadByte(): [number, $.GoError]
+  ReadByte(): Awaitable<IOResult>
 }
 
 // ByteWriter is the interface that wraps the WriteByte method.
@@ -260,17 +302,17 @@ export interface RuneScanner extends RuneReader {
 
 // StringWriter is the interface that wraps the WriteString method.
 export interface StringWriter {
-  WriteString(s: string): [number, $.GoError]
+  WriteString(s: string): Awaitable<IOResult>
 }
 
 // WriterTo is the interface that wraps the WriteTo method.
 export interface WriterTo {
-  WriteTo(w: Writer): [bigint, $.GoError]
+  WriteTo(w: Writer): Awaitable<[bigint, $.GoError]>
 }
 
 // ReaderFrom is the interface that wraps the ReadFrom method.
 export interface ReaderFrom {
-  ReadFrom(r: Reader): [bigint, $.GoError]
+  ReadFrom(r: Reader): Awaitable<[bigint, $.GoError]>
 }
 
 // DiscardWriter accepts every byte without retaining it.
@@ -315,28 +357,19 @@ export class LimitedReader implements Reader {
     this.N = n ?? 0n
   }
 
-  Read(p: $.Bytes): [number, $.GoError] {
-    return (async (): Promise<[number, $.GoError]> => {
-      if (this.N <= 0n) {
-        return [0, EOF]
-      }
-      if (this.R == null) {
-        throw new Error('io.LimitedReader: nil reader')
-      }
-
-      let readBuf = p
-      if ($.len(p) > Number(this.N)) {
-        readBuf = $.goSlice(p, 0, Number(this.N))
-      }
-
-      const [n, err] = await (this.R.Read(readBuf) as any)
+  Read(p: $.Bytes): Awaitable<IOResult> {
+    if (this.N <= 0n) return [0, EOF]
+    if (this.R == null) throw new Error('io.LimitedReader: nil reader')
+    const buf = BigInt($.len(p)) > this.N ? $.goSlice(p, 0, Number(this.N)) : p
+    return mapResult(this.R.Read(buf), ([n, err]) => {
       this.N -= BigInt(n)
       return [n, err]
-    })() as any
+    })
   }
 }
 
-// LimitReader returns a Reader that reads from r but stops with EOF after n bytes.
+export function LimitReader(r: SyncReader, n: bigint): SyncReader
+export function LimitReader(r: Reader, n: bigint): Reader
 export function LimitReader(r: Reader, n: bigint): Reader {
   return new LimitedReader(r, n)
 }
@@ -355,7 +388,7 @@ export class SectionReader implements Reader, Seeker, ReaderAt {
     this.limit = Number(off) + Number(n)
   }
 
-  Read(p: $.Bytes): [number, $.GoError] {
+  Read(p: $.Bytes): Awaitable<IOResult> {
     if (this.off >= this.limit) {
       return [0, EOF]
     }
@@ -403,7 +436,7 @@ export class SectionReader implements Reader, Seeker, ReaderAt {
     return [BigInt(abs - this.base), null]
   }
 
-  ReadAt(p: $.Bytes, off: bigint): [number, $.GoError] {
+  ReadAt(p: $.Bytes, off: bigint): Awaitable<IOResult> {
     let offNum = Number(off)
     if (offNum < 0 || offNum >= this.limit - this.base) {
       return [0, EOF]
@@ -457,13 +490,14 @@ export class OffsetWriter implements Writer, WriterAt {
     this.off = 0
   }
 
-  Write(p: $.Bytes): [number, $.GoError] {
-    const [n, err] = this.w.WriteAt(p, BigInt(this.base + this.off))
-    this.off += n
-    return [n, err]
+  Write(p: $.Bytes): Awaitable<IOResult> {
+    return mapResult(this.w.WriteAt(p, BigInt(this.base + this.off)), ([n, err]) => {
+      this.off += n
+      return [n, err]
+    })
   }
 
-  WriteAt(p: $.Bytes, off: bigint): [number, $.GoError] {
+  WriteAt(p: $.Bytes, off: bigint): Awaitable<IOResult> {
     const offNum = Number(off)
     if (offNum < 0) {
       return [0, newError('io.OffsetWriter.WriteAt: negative offset')]
@@ -644,7 +678,7 @@ export async function ReadFull(
 // ReadAll reads until EOF or an error, preserving bytes returned with an error.
 // EOF is reported as a nil error; other errors accompany the partial result.
 export async function ReadAll(
-  r: Reader | AsyncReader,
+  r: Reader,
 ): Promise<[$.Bytes, $.GoError]> {
   const chunks: $.Bytes[] = []
   let totalLength = 0
@@ -700,111 +734,91 @@ export function NopCloser(r: Reader | null): ReadCloser {
   }
 }
 
-// MultiReader returns a Reader that's the logical concatenation of the provided input readers.
+// MultiReader preserves bytes returned with EOF before advancing to the next
+// input. Empty readers are skipped iteratively, including deeply nested readers.
+export function MultiReader(...readers: SyncReader[]): SyncReader
+export function MultiReader(...readers: Reader[]): Reader
 export function MultiReader(...readers: Reader[]): Reader {
   return new multiReader(readers.slice())
 }
 
 class multiReader implements Reader {
-  private readers: Reader[]
+  constructor(private readers: Reader[]) {}
 
-  constructor(readers: Reader[]) {
-    this.readers = readers
-  }
-
-  Read(p: $.Bytes): [number, $.GoError] {
-    while (this.readers.length > 0) {
-      if (this.readers.length === 1) {
-        // The final reader owns terminal EOF.
-        const r = this.readers[0]
-        const [n, err] = r.Read(p)
-        if (err === EOF) {
-          this.readers = []
-        }
-        return [n, err]
+  Read(p: $.Bytes): Awaitable<IOResult> {
+    const finish = ([n, err]: IOResult): IOResult | null => {
+      if (err === EOF) this.readers.shift()
+      if (n > 0 || err !== EOF) {
+        return [n, err === EOF && this.readers.length > 0 ? null : err]
       }
-
-      const [n, err] = this.readers[0].Read(p)
-      if (err === EOF) {
-        this.readers.shift()
+      return null
+    }
+    while (this.readers.length > 0) {
+      if (this.readers.length === 1 && this.readers[0] instanceof multiReader) {
+        this.readers = this.readers[0].readers
         continue
       }
-      if (n > 0 || err !== EOF) {
-        if (err === EOF && this.readers.length > 1) {
-          // Intermediate EOF does not terminate the combined reader.
-          return [n, null]
-        }
-        return [n, err]
+      const result = this.readers[0].Read(p)
+      if (isAsync(result)) {
+        return Promise.resolve(result).then(result => finish(result) ?? this.Read(p))
       }
+      const out = finish(result)
+      if (out != null) return out
     }
     return [0, EOF]
   }
 }
 
-// MultiWriter creates a writer that duplicates its writes to all the provided writers.
+export function MultiWriter(...writers: (SyncWriter | null)[]): SyncWriter
+export function MultiWriter(...writers: (Writer | null)[]): Writer
 export function MultiWriter(...writers: (Writer | null)[]): Writer {
-  return new multiWriter(writers.slice()) as any
+  return new multiWriter(writers.slice())
 }
 
-class multiWriter {
-  private writers: (Writer | null)[]
+class multiWriter implements Writer {
+  constructor(private writers: (Writer | null)[]) {}
 
-  constructor(writers: (Writer | null)[]) {
-    this.writers = writers
-  }
-
-  async Write(p: $.Bytes): Promise<[number, $.GoError]> {
-    for (const w of this.writers) {
-      if (w == null) {
-        throw new Error('io.MultiWriter: nil writer')
-      }
-      const [n, err] = await w.Write(p)
-      if (err !== null) {
-        return [n, err]
-      }
-      if (n !== $.len(p)) {
-        return [n, ErrShortWrite]
-      }
+  Write(p: $.Bytes): Awaitable<IOResult> {
+    const finish = ([n, err]: IOResult): IOResult | null => {
+      if (err != null) return [n, err]
+      return n === $.len(p) ? null : [n, ErrShortWrite]
     }
-    return [$.len(p), null]
+    const run = (index: number): Awaitable<IOResult> => {
+      for (; index < this.writers.length; index++) {
+        const w = this.writers[index]
+        if (w == null) throw new Error('io.MultiWriter: nil writer')
+        const result = w.Write(p)
+        if (isAsync(result)) {
+          return Promise.resolve(result).then(result => finish(result) ?? run(index + 1))
+        }
+        const out = finish(result)
+        if (out != null) return out
+      }
+      return [$.len(p), null]
+    }
+    return run(0)
   }
 }
 
-// TeeReader returns a Reader that writes to w what it reads from r.
+export function TeeReader(r: SyncReader | null, w: SyncWriter | null): SyncReader
+export function TeeReader(r: Reader | null, w: Writer | null): Reader
 export function TeeReader(r: Reader | null, w: Writer | null): Reader {
   return new teeReader(r, w)
 }
 
 class teeReader implements Reader {
-  private r: Reader | null
-  private w: Writer | null
+  constructor(private r: Reader | null, private w: Writer | null) {}
 
-  constructor(r: Reader | null, w: Writer | null) {
-    this.r = r
-    this.w = w
-  }
-
-  Read(p: $.Bytes): [number, $.GoError] {
-    return this.read(p) as any
-  }
-
-  private async read(p: $.Bytes): Promise<[number, $.GoError]> {
-    if (this.r == null) {
-      throw new Error('io.TeeReader: nil reader')
-    }
-    const [n, err] = await this.r.Read(p)
-    if (n > 0) {
-      if (this.w == null) {
-        throw new Error('io.TeeReader: nil writer')
-      }
-      const [nw, ew] = await this.w.Write($.goSlice(p, 0, n))
-      if (ew !== null) {
-        return [n, ew]
-      }
-      if (nw !== n) {
-        return [n, ErrShortWrite]
-      }
-    }
-    return [n, err]
+  Read(p: $.Bytes): Awaitable<IOResult> {
+    if (this.r == null) throw new Error('io.TeeReader: nil reader')
+    return mapResult(this.r.Read(p), ([n, err]) => {
+      if (n === 0) return [n, err]
+      if (this.w == null) throw new Error('io.TeeReader: nil writer')
+      return mapResult(this.w.Write($.goSlice(p, 0, n)), ([nw, ew]) => {
+        if (ew != null) return [nw, ew]
+        if (nw !== n) return [nw, ErrShortWrite]
+        return [n, err]
+      })
+    })
   }
 }

@@ -7,7 +7,7 @@ export type Resetter = {
 }
 
 type maybeAsyncWriter = {
-  Write(p: $.Bytes): [number, $.GoError] | Promise<[number, $.GoError]>
+  Write(p: $.Bytes): io.Awaitable<io.IOResult>
 }
 
 export const NoCompression = 0
@@ -249,8 +249,8 @@ function readInflated(
   const buf = $.makeSlice<number>(1, undefined, 'byte')
   while (true) {
     const read = r.Read(buf)
-    if (read instanceof Promise) {
-      return readInflatedAsync(read, r, buf, chunks, dict)
+    if (io.isAsync(read)) {
+      return readInflatedAsync(Promise.resolve(read), r, buf, chunks, dict)
     }
     const [n, err] = read
     const result = recordCompressedBytes(chunks, buf, n, dict)
