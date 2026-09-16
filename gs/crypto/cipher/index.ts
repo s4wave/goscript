@@ -365,8 +365,67 @@ export function NewCFBEncrypter(_b: Block | null, _iv: $.Bytes): Stream {
   throw new Error('crypto/cipher: CFB is not implemented in GoScript')
 }
 
-export function NewCTR(_b: Block | null, _iv: $.Bytes): Stream {
-  throw new Error('crypto/cipher: CTR is not implemented in GoScript')
+// ctrStream implements the CTR stream over an arbitrary cipher Block.
+// It encrypts an incrementing counter block and XORs the result with the
+// input, matching NIST SP 800-38A.
+class ctrStream implements Stream {
+  private readonly counter: Uint8Array
+  private readonly keystream: Uint8Array
+  private keystreamUsed: number
+
+  constructor(
+    private readonly block: Block,
+    iv: Uint8Array,
+  ) {
+    this.counter = iv.slice()
+    this.keystream = new Uint8Array(block.BlockSize())
+    this.keystreamUsed = this.keystream.length
+  }
+
+  XORKeyStream(dst: $.Bytes, src: $.Bytes): void {
+    const n = $.len(src)
+    if ($.len(dst) < n) {
+      $.panic('crypto/cipher: output smaller than input')
+    }
+    const srcBytes = $.bytesToUint8Array(src)
+    const result = new Uint8Array(n)
+    const blockSize = this.block.BlockSize()
+    let done = 0
+    while (done < n) {
+      if (this.keystreamUsed >= this.keystream.length) {
+        this.block.Encrypt(this.keystream, this.counter)
+        this.keystreamUsed = 0
+        this.incrementCounter()
+      }
+      const chunk = Math.min(blockSize - this.keystreamUsed, n - done)
+      for (let i = 0; i < chunk; i++) {
+        result[done + i] =
+          srcBytes[done + i] ^ this.keystream[this.keystreamUsed + i]
+      }
+      done += chunk
+      this.keystreamUsed += chunk
+    }
+    $.copyByteRanges(dst, 0, n, result, 0, n)
+  }
+
+  private incrementCounter(): void {
+    for (let i = this.counter.length - 1; i >= 0; i--) {
+      this.counter[i] = (this.counter[i] + 1) & 0xff
+      if (this.counter[i] !== 0) {
+        break
+      }
+    }
+  }
+}
+
+export function NewCTR(b: Block | null, iv: $.Bytes): Stream {
+  if (b == null) {
+    $.panic('cipher.NewCTR: nil block')
+  }
+  if ($.len(iv) !== b.BlockSize()) {
+    $.panic('cipher.NewCTR: IV length must equal block size')
+  }
+  return new ctrStream(b, $.bytesToUint8Array(iv))
 }
 
 export function NewOFB(_b: Block | null, _iv: $.Bytes): Stream {
@@ -374,11 +433,63 @@ export function NewOFB(_b: Block | null, _iv: $.Bytes): Stream {
 }
 
 export class StreamReader {
-  constructor(_init?: Partial<{ S: Stream; R: unknown }>) {}
+  private readonly S: Stream | undefined
+  private readonly R: unknown
+
+  constructor(init?: Partial<{ S: Stream; R: unknown }>) {
+    this.S = init?.S
+    this.R = init?.R
+  }
+
+  async Read(dst: $.Bytes): Promise<[number, $.GoError]> {
+    const reader = this.R as {
+      Read(p: $.Bytes): Promise<[number, $.GoError]> | [number, $.GoError]
+    } | null
+    if (reader == null) {
+      $.panic('crypto/cipher: StreamReader has nil reader')
+    }
+    const [n, err] = await reader.Read(dst)
+    if (n > 0) {
+      this.S!.XORKeyStream($.goSlice(dst, 0, n), $.goSlice(dst, 0, n))
+    }
+    return [n, err]
+  }
 }
 
 export class StreamWriter {
-  constructor(_init?: Partial<{ S: Stream; W: unknown }>) {}
+  private readonly S: Stream | undefined
+  private readonly W: unknown
+
+  constructor(init?: Partial<{ S: Stream; W: unknown }>) {
+    this.S = init?.S
+    this.W = init?.W
+  }
+
+  async Write(src: $.Bytes): Promise<[number, $.GoError]> {
+    const writer = this.W as {
+      Write(p: $.Bytes): Promise<[number, $.GoError]> | [number, $.GoError]
+    } | null
+    if (writer == null) {
+      $.panic('crypto/cipher: StreamWriter has nil writer')
+    }
+    const c = $.makeSlice<number>($.len(src), undefined, 'byte')
+    this.S!.XORKeyStream(c, src)
+    const [n, err] = await writer.Write(c)
+    if (n !== $.len(src) && err == null) {
+      return [n, $.newError('io: short write')]
+    }
+    return [n, err]
+  }
+
+  async Close(): Promise<$.GoError> {
+    const closer = this.W as {
+      Close?(): Promise<$.GoError> | $.GoError
+    } | null
+    if (closer != null && typeof closer.Close === 'function') {
+      return await closer.Close()
+    }
+    return null
+  }
 }
 
 function newGCM(
