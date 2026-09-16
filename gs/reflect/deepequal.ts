@@ -49,6 +49,7 @@
 // values that have been compared before, it treats the values as
 // equal rather than examining the values to which they point.
 // This ensures that DeepEqual terminates.
+import { isNamedValueBox } from '../builtin/index.js'
 import { ReflectValue } from './types.js'
 
 function hasGeneratedStructFields(
@@ -159,6 +160,19 @@ export function DeepEqual(
       }
     }
     return true
+  }
+
+  // Handle boxed named-type interface values. Their valueOf, toString, and
+  // symbol-keyed members are runtime plumbing closures, not Go-level data, so
+  // compare only the Go type and value they carry.
+  if (isNamedValueBox(x) && isNamedValueBox(y)) {
+    if (x.__goType !== y.__goType) {
+      return false
+    }
+    return DeepEqual(
+      x.__goValue as ReflectValue,
+      y.__goValue as ReflectValue,
+    )
   }
 
   // Handle objects (structs)

@@ -970,6 +970,19 @@ export class Value {
     return new Value(this._value, t)
   }
 
+  // CanConvert reports whether the value is convertible to type t. The
+  // interface dynamic-type case from Go does not arise here because values
+  // are always built from their dynamic type.
+  public CanConvert(t: Type | null): boolean {
+    if (t === null) {
+      return false
+    }
+    if (!this.IsValid()) {
+      return false
+    }
+    return this.Type().ConvertibleTo(t)
+  }
+
   public CanAddr(): boolean {
     return (
       this.Kind() !== Ptr &&
@@ -1155,7 +1168,7 @@ export class Value {
     return $.arrayToSlice(keys)
   }
 
-  public Complex(): number | $.Complex | null {
+  public Complex(): $.Complex {
     const k = this.Kind()
     if (k !== Complex64 && k !== Complex128) {
       throw new Error(
@@ -1165,7 +1178,13 @@ export class Value {
       )
     }
     const value = this._parentVarRef ? this._parentVarRef.value : this._value
-    return value as number | $.Complex | null
+    if (value === null || value === undefined) {
+      return $.complex(0, 0)
+    }
+    if (typeof value === 'number') {
+      return $.complex(value, 0)
+    }
+    return value as $.Complex
   }
 
   // Send sends a value to a channel

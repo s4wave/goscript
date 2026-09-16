@@ -5326,25 +5326,37 @@ func lowerCompoundAssignValue(
 		return value
 	}
 	right = "(" + right + ")"
+	wrapNarrow := func(value string) string {
+		if targetType == nil || isFloatType(targetType) {
+			return value
+		}
+		if bits, ok := unsignedIntegerBits(targetType); ok && bits < 64 {
+			return runtimeOwner.QualifiedHelper(RuntimeHelperUint) + "(" + value + ", " + strconv.Itoa(bits) + ")"
+		}
+		if bits, ok := signedIntegerBits(targetType); ok && bits < 64 {
+			return runtimeOwner.QualifiedHelper(RuntimeHelperInt) + "(" + value + ", " + strconv.Itoa(bits) + ")"
+		}
+		return value
+	}
 	switch tok {
 	case token.ADD_ASSIGN:
 		value := left + " + " + right
 		if isFloat32Type(targetType) {
 			return runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + value + ")"
 		}
-		return value
+		return wrapNarrow(value)
 	case token.SUB_ASSIGN:
 		value := left + " - " + right
 		if isFloat32Type(targetType) {
 			return runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + value + ")"
 		}
-		return value
+		return wrapNarrow(value)
 	case token.MUL_ASSIGN:
 		value := left + " * " + right
 		if isFloat32Type(targetType) {
 			return runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + value + ")"
 		}
-		return value
+		return wrapNarrow(value)
 	case token.QUO_ASSIGN:
 		value := left + " / " + right
 		if isFloat32Type(targetType) {
@@ -5360,7 +5372,7 @@ func lowerCompoundAssignValue(
 	case token.XOR_ASSIGN:
 		return left + " ^ " + right
 	case token.SHL_ASSIGN:
-		return left + " << " + right
+		return wrapNarrow(left + " << " + right)
 	case token.SHR_ASSIGN:
 		if bits, ok := unsignedIntegerBits(targetType); ok && bits <= 32 {
 			return "(" + left + " >>> " + right + ") >>> 0"
