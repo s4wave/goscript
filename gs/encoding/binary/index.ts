@@ -128,12 +128,12 @@ class littleEndian implements ByteOrder, AppendByteOrder {
   }
 
   public AppendUint16(b: $.Slice<number>, v: number): $.Slice<number> {
-    return $.append(b, v, v >> 8)
+    return $.append(b, v & 0xff, (v >>> 8) & 0xff)
   }
 
   public AppendUint32(b: $.Slice<number>, v: number): $.Slice<number> {
     const value = Number($.uint(v, 32))
-    return $.append(b, value, value >>> 8, value >>> 16, value >>> 24)
+    return $.append(b, value & 0xff, (value >>> 8) & 0xff, (value >>> 16) & 0xff, value >>> 24)
   }
 
   public AppendUint64(b: $.Slice<number>, v: number | bigint): $.Slice<number> {
@@ -212,12 +212,12 @@ class bigEndian implements ByteOrder, AppendByteOrder {
   }
 
   public AppendUint16(b: $.Slice<number>, v: number): $.Slice<number> {
-    return $.append(b, v >> 8, v)
+    return $.append(b, (v >>> 8) & 0xff, v & 0xff)
   }
 
   public AppendUint32(b: $.Slice<number>, v: number): $.Slice<number> {
     const value = Number($.uint(v, 32))
-    return $.append(b, value >>> 24, value >>> 16, value >>> 8, value)
+    return $.append(b, value >>> 24, (value >>> 16) & 0xff, (value >>> 8) & 0xff, value & 0xff)
   }
 
   public AppendUint64(b: $.Slice<number>, v: number | bigint): $.Slice<number> {
