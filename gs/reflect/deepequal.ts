@@ -79,6 +79,26 @@ export function DeepEqual(
     return x === y
   }
 
+  // Boxed named-type interface values: their valueOf, toString, and
+  // symbol-keyed members are runtime plumbing closures, not Go-level data.
+  // Two boxes compare by Go type and value; a box against a raw value
+  // unwraps the box, because it is a transparent carrier for the value.
+  if (isNamedValueBox(x) && isNamedValueBox(y)) {
+    if (x.__goType !== y.__goType) {
+      return false
+    }
+    return DeepEqual(
+      x.__goValue as ReflectValue,
+      y.__goValue as ReflectValue,
+    )
+  }
+  if (isNamedValueBox(x)) {
+    return DeepEqual(x.__goValue as ReflectValue, y as ReflectValue)
+  }
+  if (isNamedValueBox(y)) {
+    return DeepEqual(x as ReflectValue, y.__goValue as ReflectValue)
+  }
+
   // Check for identical references first
   if (x === y) {
     return true
@@ -162,18 +182,6 @@ export function DeepEqual(
     return true
   }
 
-  // Handle boxed named-type interface values. Their valueOf, toString, and
-  // symbol-keyed members are runtime plumbing closures, not Go-level data, so
-  // compare only the Go type and value they carry.
-  if (isNamedValueBox(x) && isNamedValueBox(y)) {
-    if (x.__goType !== y.__goType) {
-      return false
-    }
-    return DeepEqual(
-      x.__goValue as ReflectValue,
-      y.__goValue as ReflectValue,
-    )
-  }
 
   // Handle objects (structs)
   if (typeof x === 'object' && typeof y === 'object') {

@@ -79,4 +79,19 @@ describe('DeepEqual', () => {
     expect(DeepEqual(a, box(3381945770n, 'int64'))).toBe(false)
   })
 
+  it('unwraps a named-value box compared against a raw value', () => {
+    const box = (value: unknown, typeName: string) => ({
+      __goType: typeName,
+      __goValue: value,
+      __goTypeInfo: { kind: 'basic', name: typeName },
+      valueOf: () => value,
+      toString: () => String(value),
+    })
+
+    expect(DeepEqual(box(0, 'int'), 0)).toBe(true)
+    expect(DeepEqual(0, box(0, 'int'))).toBe(true)
+    expect(DeepEqual(box(1, 'int'), 0)).toBe(false)
+    expect(DeepEqual(box('x', 'string'), 'x')).toBe(true)
+  })
+
 })
