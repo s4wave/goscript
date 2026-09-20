@@ -8380,6 +8380,8 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 				}
 				return "await " + o.runtimeOwner.QualifiedHelper(helper) + "(" + strings.Join(args, ", ") + ")", diagnostics
 			case "append":
+				// Appended values copy at the argument boundary, before callers
+				// can reuse a struct or array used to build the slice.
 				if len(expr.Args) > 0 {
 					if slice, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(expr.Args[0])).Underlying().(*types.Slice); ok {
 						for idx := 1; idx < len(args); idx++ {
@@ -8391,7 +8393,7 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 								slice.Elem(),
 								ctx.semPkg.source.TypesInfo.TypeOf(expr.Args[idx]),
 								args[idx],
-								false,
+								shouldCloneStructValue(expr.Args[idx]),
 							)
 						}
 					}
