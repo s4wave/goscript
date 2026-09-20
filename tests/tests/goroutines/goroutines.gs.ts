@@ -82,7 +82,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Collect all messages from goroutines
 	for (let __rangeIndex = 0; __rangeIndex < 8; __rangeIndex++) {
-		allMessages = $.append(allMessages, await $.chanRecv(messages))
+		allMessages = $.append(allMessages, $.markAsStructValue($.cloneStructValue(await $.chanRecv(messages))))
 	}
 
 	// Add final message
