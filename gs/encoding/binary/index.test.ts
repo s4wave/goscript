@@ -211,6 +211,14 @@ describe('encoding/binary override', () => {
 
     const signedReader = bytes.NewReader($.goSlice(signed, 0, signedN))!
     expect(await ReadVarint(signedReader)).toEqual([-150n, null])
+
+    let index = 0
+    const promiseLikeReader: io.ByteReader = {
+      ReadByte(): PromiseLike<io.IOResult> {
+        return Promise.resolve([buf[index++], null] as io.IOResult)
+      },
+    }
+    expect(await ReadUvarint(promiseLikeReader)).toEqual([300n, null])
   })
 
   it('reports varint short buffers and overflows', async () => {

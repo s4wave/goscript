@@ -63,10 +63,6 @@ type decodedTarget = {
   settable: ((value: unknown) => void) | null
 }
 
-type byteReader = {
-  ReadByte(): [number, $.GoError] | Promise<[number, $.GoError]>
-}
-
 const errBufferTooSmall = $.newError('buffer too small')
 const errOverflow = $.newError('binary: varint overflows a 64-bit integer')
 
@@ -396,7 +392,9 @@ export function Varint(buf: $.Slice<number>): [bigint, number] {
   return [decodeSignedVarint(ux), n]
 }
 
-export async function ReadUvarint(r: byteReader): Promise<[bigint, $.GoError]> {
+export async function ReadUvarint(
+  r: io.ByteReader,
+): Promise<[bigint, $.GoError]> {
   let x = 0n
   let s = 0n
   for (let i = 0; i < MaxVarintLen64; i++) {
@@ -416,7 +414,9 @@ export async function ReadUvarint(r: byteReader): Promise<[bigint, $.GoError]> {
   return [uint64Result(x), errOverflow]
 }
 
-export async function ReadVarint(r: byteReader): Promise<[bigint, $.GoError]> {
+export async function ReadVarint(
+  r: io.ByteReader,
+): Promise<[bigint, $.GoError]> {
   const [ux, err] = await ReadUvarint(r)
   return [decodeSignedVarint(ux), err]
 }
