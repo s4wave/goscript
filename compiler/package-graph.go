@@ -147,14 +147,12 @@ func (o *PackageGraphOwner) load(ctx context.Context, req *CompileRequest, shape
 		}
 	}
 
-	var diagnostics []Diagnostic
 	seen := make(map[string]bool)
 	for _, pkg := range pkgs {
 		if isTestMainPackage(pkg) {
 			continue
 		}
 		o.collect(graph, pkg, req.DependencyMode, requested, samePackageTestVariants, overrideFacts, seen)
-		diagnostics = append(diagnostics, packageDiagnostics(pkg)...)
 	}
 	slices.SortFunc(graph.Nodes, func(a, b *PackageGraphNode) int {
 		if a.PkgPath == b.PkgPath {
@@ -162,6 +160,17 @@ func (o *PackageGraphOwner) load(ctx context.Context, req *CompileRequest, shape
 		}
 		return strings.Compare(a.PkgPath, b.PkgPath)
 	})
+
+	// Lowering assumes complete type information, so every lowered node must
+	// load cleanly, including dependencies the request did not name. Override
+	// candidates ship hand-written TypeScript and never lower their Go source.
+	var diagnostics []Diagnostic
+	for _, node := range graph.Nodes {
+		if node.OverrideCandidate {
+			continue
+		}
+		diagnostics = append(diagnostics, packageDiagnostics(graph.packagesByPath[node.PkgPath])...)
+	}
 	if len(graph.Nodes) == 0 {
 		diagnostics = append(diagnostics, Diagnostic{
 			Severity: DiagnosticSeverityError,
@@ -423,8 +432,8 @@ func packageDiagnostics(pkg *packages.Package) []Diagnostic {
 		diagnostics = append(diagnostics, Diagnostic{
 			Severity: DiagnosticSeverityError,
 			Code:     "goscript/package-graph:load-error",
-			Message:  "Go package contains load errors",
-			Detail:   pkgErr.Msg,
+			Message:  "Go package " + packagePath(pkg) + " contains load errors",
+			Detail:   pkgErr.Error(),
 		})
 	}
 	return diagnostics

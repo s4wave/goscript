@@ -148,6 +148,24 @@ func TestPackageGraphReportsLoadErrors(t *testing.T) {
 	requireDiagnosticCode(t, diagnostics, "goscript/package-graph:load-error")
 }
 
+// A dependency that fails to type-check must stop the build before lowering
+// reads its incomplete type information.
+func TestPackageGraphReportsDependencyLoadErrors(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod":     "module example.test/deperr\n\ngo 1.25.3\n",
+		"main.go":    "package main\nimport \"example.test/deperr/dep\"\nfunc main() { dep.Run() }\n",
+		"dep/dep.go": "package dep\nfunc Run() error { return errors.New(\"unimported\") }\n",
+	})
+	_, diagnostics := NewPackageGraphOwner().Load(context.Background(), &CompileRequest{
+		Patterns:            []string{"."},
+		Dir:                 moduleDir,
+		OutputPath:          filepath.Join(t.TempDir(), "out"),
+		DependencyMode:      DependencyModeAll,
+		RuntimeEmissionMode: RuntimeEmissionModeEmit,
+	})
+	requireDiagnosticCode(t, diagnostics, "goscript/package-graph:load-error")
+}
+
 func TestPackageGraphHonorsBuildFlags(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod":      "module example.test/tags\n\ngo 1.25.3\n",
