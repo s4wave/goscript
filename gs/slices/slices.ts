@@ -24,7 +24,7 @@ type EqualCallback<T, U = T> =
  * @param s2 Second slice
  * @returns -1, 0, or 1
  */
-export function Compare<T extends string | number>(
+export function Compare<T extends cmp.Ordered>(
   s1: $.Slice<T>,
   s2: $.Slice<T>,
 ): number {
@@ -285,7 +285,8 @@ export function AppendSeq<T>(
   return out
 }
 
-export function Sorted<T extends string | number>(
+/** Sorted collects an iterator and orders all Go ordered types, including 64-bit integers. */
+export function Sorted<T extends cmp.Ordered>(
   seq: iter.Seq<T>,
 ): $.Slice<T> {
   const out = Collect<T>(seq)
