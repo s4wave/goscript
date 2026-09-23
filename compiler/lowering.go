@@ -9680,7 +9680,7 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 		return call, diagnostics, true
 	}
 	callArgs := append([]string{receiverExpr}, args...)
-	call := o.namedTypeExpr(ctx, receiver) + ".prototype." + selector.Sel.Name + ".call(" + strings.Join(callArgs, ", ") + ")"
+	call := namedValueExpr(ctx, receiver) + ".prototype." + selector.Sel.Name + ".call(" + strings.Join(callArgs, ", ") + ")"
 	return call, diagnostics, true
 }
 
@@ -14199,20 +14199,31 @@ func (o *LoweringOwner) methodFunctionExpr(
 	return name
 }
 
+// namedTypeExpr returns the type-position spelling of named, including type
+// arguments for instantiated override types.
 func (o *LoweringOwner) namedTypeExpr(ctx lowerFileContext, named *types.Named) string {
+	baseName := namedValueExpr(ctx, named)
+	if args := o.overrideTypeArgsExpr(ctx, named); args != "" {
+		return baseName + "<" + args + ">"
+	}
+	return baseName
+}
+
+// namedValueExpr returns the value-position spelling of named: the qualified
+// class name without type arguments. TypeScript rejects a property access such
+// as .prototype after an instantiation expression.
+func namedValueExpr(ctx lowerFileContext, named *types.Named) string {
 	if named == nil || named.Obj() == nil {
 		return "unknown"
 	}
 	baseName := safeIdentifier(named.Obj().Name())
 	if alias := ctx.localAliases[named.Obj()]; alias != "" {
-		baseName = alias + "." + baseName
-	} else if named.Obj().Pkg() != nil {
-		if alias := ctx.importPaths[named.Obj().Pkg().Path()]; alias != "" {
-			baseName = alias + "." + baseName
-		}
+		return alias + "." + baseName
 	}
-	if args := o.overrideTypeArgsExpr(ctx, named); args != "" {
-		return baseName + "<" + args + ">"
+	if named.Obj().Pkg() != nil {
+		if alias := ctx.importPaths[named.Obj().Pkg().Path()]; alias != "" {
+			return alias + "." + baseName
+		}
 	}
 	return baseName
 }
