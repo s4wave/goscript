@@ -50,13 +50,13 @@ export class handler {
 
 	public async InvokeMethod(serviceID: string, methodID: string, strm: srpc.Stream | null): globalThis.Promise<[boolean, $.GoError]> {
 		if ($.stringEqual(methodID, "empty")) {
-			return [true, await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage(null, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))]
+			return [true, await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message | null>(srpc.NewRawMessage(null, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))]
 		}
 		if (($.stringEqual(methodID, "stream")) || ($.stringEqual(methodID, "hold"))) {
 			let total = 0
 			while (true) {
 				let msg: srpc.RawMessage | $.VarRef<srpc.RawMessage> | null = srpc.NewRawMessage(null, false)
-				let err = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgRecv($.interfaceValue<srpc.Message>(msg, "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
+				let err = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgRecv($.interfaceValue<srpc.Message | null>(msg, "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
 				if ($.comparableEqual(err, io.EOF)) {
 					break
 				}
@@ -65,12 +65,12 @@ export class handler {
 				}
 				total = total + ($.len(srpc.RawMessage.prototype.GetData.call(msg)))
 			}
-			return [true, await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage(new Uint8Array([$.uint(total, 8)]) as $.Slice<number>, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))]
+			return [true, await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message | null>(srpc.NewRawMessage(new Uint8Array([$.uint(total, 8)]) as $.Slice<number>, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))]
 		}
 		if (strm == null) {
 			return [true, null]
 		}
-		return [true, await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage(new Uint8Array([111, 107]), false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))]
+		return [true, await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message | null>(srpc.NewRawMessage(new Uint8Array([111, 107]), false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))]
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -289,7 +289,7 @@ export class memoryRpcStream {
 		return $.pointerValue<memoryRpcStream>(m).ctx
 	}
 
-	public async MsgRecv(msg: srpc.Message): globalThis.Promise<$.GoError> {
+	public async MsgRecv(msg: srpc.Message | null): globalThis.Promise<$.GoError> {
 		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this;
 		while (true) {
 			let __goscriptTuple0: any = await memoryRpcStream.prototype.Recv.call(m)
@@ -307,7 +307,7 @@ export class memoryRpcStream {
 		throw new globalThis.Error("goscript: unreachable return")
 	}
 
-	public async MsgSend(msg: srpc.Message): globalThis.Promise<$.GoError> {
+	public async MsgSend(msg: srpc.Message | null): globalThis.Promise<$.GoError> {
 		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this;
 		let __goscriptTuple1: any = await $.pointerValue<Exclude<protobuf_go_lite.Message, null>>(msg).MarshalVT()
 		let data: $.Slice<number> = __goscriptTuple1[0]
@@ -503,7 +503,7 @@ export async function openHeldStreams(ctx: context.Context | null, client: srpc.
 		queueMicrotask(async () => { await (async (idx: number): globalThis.Promise<void> => {
 			let [strm, err] = await $.pointerValue<Exclude<srpc.Client, null>>(client).NewStream(ctx, "svc", "hold", null)
 			if (err == null) {
-				err = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage(new Uint8Array([$.uint(idx, 8)]) as $.Slice<number>, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
+				err = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message | null>(srpc.NewRawMessage(new Uint8Array([$.uint(idx, 8)]) as $.Slice<number>, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
 			}
 			await $.chanSend(resultCh, $.markAsStructValue(new streamOpenResult({stream: strm, err: err})))
 		})(i) })
@@ -555,7 +555,7 @@ export async function closeHeldStreams(streams: $.Slice<srpc.Stream | null>): gl
 		}
 		let resp: srpc.RawMessage | $.VarRef<srpc.RawMessage> | null = srpc.NewRawMessage(null, false)
 		{
-			let err = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgRecv($.interfaceValue<srpc.Message>(resp, "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
+			let err = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgRecv($.interfaceValue<srpc.Message | null>(resp, "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
 			if (err != null) {
 				await $.println("hold recv error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 				return false
@@ -623,13 +623,13 @@ export async function probeStream(ctx: context.Context | null, client: srpc.Clie
 		return [0, err]
 	}
 	{
-		let __goscriptShadow0 = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage(new Uint8Array([a]) as $.Slice<number>, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
+		let __goscriptShadow0 = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message | null>(srpc.NewRawMessage(new Uint8Array([a]) as $.Slice<number>, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
 		if (__goscriptShadow0 != null) {
 			return [0, __goscriptShadow0]
 		}
 	}
 	{
-		let __goscriptShadow1 = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage(new Uint8Array([b]) as $.Slice<number>, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
+		let __goscriptShadow1 = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message | null>(srpc.NewRawMessage(new Uint8Array([b]) as $.Slice<number>, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
 		if (__goscriptShadow1 != null) {
 			return [0, __goscriptShadow1]
 		}
@@ -642,7 +642,7 @@ export async function probeStream(ctx: context.Context | null, client: srpc.Clie
 	}
 	let resp: srpc.RawMessage | $.VarRef<srpc.RawMessage> | null = srpc.NewRawMessage(null, false)
 	{
-		let __goscriptShadow3 = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgRecv($.interfaceValue<srpc.Message>(resp, "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
+		let __goscriptShadow3 = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgRecv($.interfaceValue<srpc.Message | null>(resp, "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
 		if (__goscriptShadow3 != null) {
 			return [0, __goscriptShadow3]
 		}
@@ -1000,7 +1000,7 @@ export async function main(): globalThis.Promise<void> {
 	let server: srpc.Server | $.VarRef<srpc.Server> | null = srpc.NewServer((mux as srpc.Invoker | null))
 	let client = srpc.NewClient(srpc.NewServerPipe(server))
 	let unaryResp: srpc.RawMessage | $.VarRef<srpc.RawMessage> | null = srpc.NewRawMessage(null, false)
-	let err = await $.pointerValue<Exclude<srpc.Client, null>>(client).ExecCall(ctx, "svc", "method", $.interfaceValue<srpc.Message>(srpc.NewRawMessage(null, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")), $.interfaceValue<srpc.Message>(unaryResp, "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
+	let err = await $.pointerValue<Exclude<srpc.Client, null>>(client).ExecCall(ctx, "svc", "method", $.interfaceValue<srpc.Message | null>(srpc.NewRawMessage(null, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")), $.interfaceValue<srpc.Message | null>(unaryResp, "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
 	if (err != null) {
 		await $.println("exec error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
@@ -1013,12 +1013,12 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("stream open error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
 	}
-	await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage(new Uint8Array([1, 2, 3]) as $.Slice<number>, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
-	await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message>(srpc.NewRawMessage(new Uint8Array([4, 5]) as $.Slice<number>, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
+	await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message | null>(srpc.NewRawMessage(new Uint8Array([1, 2, 3]) as $.Slice<number>, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
+	await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message | null>(srpc.NewRawMessage(new Uint8Array([4, 5]) as $.Slice<number>, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
 	await $.pointerValue<Exclude<srpc.Stream, null>>(strm).CloseSend()
 	let resp: srpc.RawMessage | $.VarRef<srpc.RawMessage> | null = srpc.NewRawMessage(null, false)
 	{
-		let __goscriptShadow5 = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgRecv($.interfaceValue<srpc.Message>(resp, "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
+		let __goscriptShadow5 = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgRecv($.interfaceValue<srpc.Message | null>(resp, "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
 		if (__goscriptShadow5 != null) {
 			await $.println("stream recv error:", await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow5).Error())
 			return
@@ -1032,7 +1032,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("stream bytes:", $.uint($.arrayIndex(data!, 0), 8))
 	let emptyResp: srpc.RawMessage | $.VarRef<srpc.RawMessage> | null = srpc.NewRawMessage(null, false)
 	{
-		let __goscriptShadow6 = await $.pointerValue<Exclude<srpc.Client, null>>(client).ExecCall(ctx, "svc", "empty", $.interfaceValue<srpc.Message>(srpc.NewRawMessage(null, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")), $.interfaceValue<srpc.Message>(emptyResp, "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
+		let __goscriptShadow6 = await $.pointerValue<Exclude<srpc.Client, null>>(client).ExecCall(ctx, "svc", "empty", $.interfaceValue<srpc.Message | null>(srpc.NewRawMessage(null, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")), $.interfaceValue<srpc.Message | null>(emptyResp, "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))
 		if (__goscriptShadow6 != null) {
 			await $.println("empty exec error:", await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow6).Error())
 			return
