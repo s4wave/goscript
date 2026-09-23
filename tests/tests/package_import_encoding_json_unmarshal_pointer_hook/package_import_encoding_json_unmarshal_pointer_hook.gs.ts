@@ -80,7 +80,14 @@ export class Box {
 	)
 }
 
+export function missingHooks(): [json.Marshaler | null, json.Unmarshaler | null] {
+	return [null, null]
+}
+
 export async function main(): globalThis.Promise<void> {
+	let [marshaler, unmarshaler] = missingHooks()
+	await fmt.Println("missing hooks", marshaler == null, unmarshaler == null)
+
 	// A non-nil *T field with UnmarshalJSON must use the hook before any
 	// pointer-to-struct population path can inspect fields.
 	let box = $.varRef($.markAsStructValue(new Box({Value: new Hooked({Seen: "before"})})))
