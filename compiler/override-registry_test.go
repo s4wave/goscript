@@ -205,6 +205,32 @@ func TestOverrideRegistryPlansOsOverrideDependencies(t *testing.T) {
 	}
 }
 
+// TestOverrideRegistryPlansHashInterfaceDependency requires the hash
+// implementations to copy the hash package, whose interfaces their
+// constructors return.
+func TestOverrideRegistryPlansHashInterfaceDependency(t *testing.T) {
+	for _, pkgPath := range []string{"hash/crc32", "hash/fnv"} {
+		owner := NewOverrideRegistryOwner()
+		plan, diagnostics := owner.CopyPlan(context.Background(), &CompileRequest{
+			RuntimeEmissionMode: RuntimeEmissionModeEmit,
+		}, &PackageGraph{Nodes: []*PackageGraphNode{{
+			PkgPath:           pkgPath,
+			OverrideCandidate: true,
+		}}})
+		if diagnosticsHaveErrors(diagnostics) {
+			t.Fatalf("%s copy plan failed: %#v", pkgPath, diagnostics)
+		}
+
+		var packages []string
+		for _, pkg := range plan.packages {
+			packages = append(packages, pkg.path)
+		}
+		if !slices.Contains(packages, "hash") {
+			t.Fatalf("%s copy plan is missing hash: %v", pkgPath, packages)
+		}
+	}
+}
+
 func TestOverrideRegistryPlansNestedOverrideMetadataDependencies(t *testing.T) {
 	owner := NewOverrideRegistryOwner()
 	plan, diagnostics := owner.CopyPlan(context.Background(), &CompileRequest{
