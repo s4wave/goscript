@@ -12755,6 +12755,11 @@ func (o *LoweringOwner) aliasTypeExpr(ctx lowerFileContext, alias *types.Alias) 
 	} else if importAlias := ctx.importPaths[alias.Obj().Pkg().Path()]; importAlias != "" {
 		baseName = importAlias + "." + baseName
 	}
+	// Override packages can export an interface shape for a Go alias. Keep
+	// its nil value in generated uses, just as for a named Go interface.
+	if _, ok := types.Unalias(alias).Underlying().(*types.Interface); ok {
+		return baseName + " | null"
+	}
 	return baseName
 }
 

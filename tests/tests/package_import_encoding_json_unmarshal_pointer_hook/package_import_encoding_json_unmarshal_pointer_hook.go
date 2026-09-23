@@ -20,7 +20,15 @@ type Box struct {
 	Value *Hooked `json:"value"`
 }
 
+// Missing hooks remain nil when returned through standard-library aliases.
+func missingHooks() (json.Marshaler, json.Unmarshaler) {
+	return nil, nil
+}
+
 func main() {
+	marshaler, unmarshaler := missingHooks()
+	fmt.Println("missing hooks", marshaler == nil, unmarshaler == nil)
+
 	// A non-nil *T field with UnmarshalJSON must use the hook before any
 	// pointer-to-struct population path can inspect fields.
 	box := Box{Value: &Hooked{Seen: "before"}}
