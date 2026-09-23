@@ -58,11 +58,19 @@ export function localStringBytes(s: string): $.Slice<number> {
 	return $.stringToBytes(s)
 }
 
+export function samePointers(s: $.VarRef<string> | null, b: $.VarRef<$.Slice<number>> | null): [$.VarRef<string> | null, $.VarRef<$.Slice<number>> | null] {
+	return [s, b]
+}
+
 export async function main(): globalThis.Promise<void> {
 	let b: $.Slice<number> = stringBytes("abc")
 	await $.println($.len(b), $.cap(b), $.uint($.arrayIndex(b!, 0), 8), $.uint($.arrayIndex(b!, 1), 8), $.uint($.arrayIndex(b!, 2), 8))
 	let local: $.Slice<number> = localStringBytes("wxyz")
 	await $.println($.len(local), $.cap(local), $.uint($.arrayIndex(local!, 0), 8), $.uint($.arrayIndex(local!, 3), 8))
+	let str = $.varRef("pointer")
+	let bytes: $.VarRef<$.Slice<number>> = $.varRef(new Uint8Array([103, 111]))
+	let [sp, bp] = samePointers(str, bytes)
+	await $.println($.pointerValue<string>(sp), $.len($.pointerValue<$.Slice<number>>(bp)))
 }
 
 if ($.isMainScript(import.meta)) {

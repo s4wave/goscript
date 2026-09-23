@@ -23,9 +23,16 @@ func localStringBytes(s string) []byte {
 	return *(*[]byte)(unsafe.Pointer(&localSliceHeader{s, len(s)}))
 }
 
+func samePointers(s *string, b *[]byte) (*string, *[]byte) {
+	return (*string)(s), (*[]byte)(b)
+}
+
 func main() {
 	b := stringBytes("abc")
 	println(len(b), cap(b), b[0], b[1], b[2])
 	local := localStringBytes("wxyz")
 	println(len(local), cap(local), local[0], local[3])
+	str, bytes := "pointer", []byte("go")
+	sp, bp := samePointers(&str, &bytes)
+	println(*sp, len(*bp))
 }

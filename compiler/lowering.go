@@ -10576,8 +10576,11 @@ func (o *LoweringOwner) lowerUnsafeStringPointerValue(ctx lowerFileContext, expr
 		return "", nil, false
 	}
 	unsafeCall, ok := unwrapParenExpr(call.Args[0]).(*ast.CallExpr)
+	if !ok || len(unsafeCall.Args) != 1 {
+		return "", nil, false
+	}
 	unsafeTargetType := typeFromExpr(ctx, unsafeCall.Fun)
-	if !ok || len(unsafeCall.Args) != 1 || unsafeTargetType == nil || !isUnsafePointerType(unsafeTargetType) {
+	if unsafeTargetType == nil || !isUnsafePointerType(unsafeTargetType) {
 		return "", nil, false
 	}
 	address, ok := unwrapParenExpr(unsafeCall.Args[0]).(*ast.UnaryExpr)
@@ -10602,8 +10605,11 @@ func (o *LoweringOwner) lowerUnsafeStringByteSlicePointerValue(ctx lowerFileCont
 		return "", nil, false
 	}
 	unsafeCall, ok := unwrapParenExpr(call.Args[0]).(*ast.CallExpr)
+	if !ok || len(unsafeCall.Args) != 1 {
+		return "", nil, false
+	}
 	unsafeTargetType := typeFromExpr(ctx, unsafeCall.Fun)
-	if !ok || len(unsafeCall.Args) != 1 || unsafeTargetType == nil || !isUnsafePointerType(unsafeTargetType) {
+	if unsafeTargetType == nil || !isUnsafePointerType(unsafeTargetType) {
 		return "", nil, false
 	}
 	address, ok := unwrapParenExpr(unsafeCall.Args[0]).(*ast.UnaryExpr)
