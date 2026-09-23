@@ -209,7 +209,7 @@ func TestOverrideRegistryPlansOsOverrideDependencies(t *testing.T) {
 // implementations to copy the hash package, whose interfaces their
 // constructors return.
 func TestOverrideRegistryPlansHashInterfaceDependency(t *testing.T) {
-	for _, pkgPath := range []string{"hash/crc32", "hash/fnv"} {
+	for _, pkgPath := range []string{"hash/crc32", "hash/fnv", "hash/maphash"} {
 		owner := NewOverrideRegistryOwner()
 		plan, diagnostics := owner.CopyPlan(context.Background(), &CompileRequest{
 			RuntimeEmissionMode: RuntimeEmissionModeEmit,
