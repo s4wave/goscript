@@ -1,0 +1,11 @@
+RawMessage: {"hello": true} true
+RawMessage EOF: true
+RawMessage valid: true 123
+RawMessage format: true {"hello":true}
+RawMessage HTML: true {"x":"\u003c"}
+RawMessage duplicates: false true
+RawMessage compact bytes: true true
+RawMessage indent bytes: true true
+RawMessage invalid UTF8 replacement: true ["�"]
+RawMessage surrogate replacement: true "�"
+RawMessage duplicate ordering: true {"a":1,"a":2,"b":0}

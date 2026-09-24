@@ -194,7 +194,7 @@ export class Decoder {
     this.fill()
     this.pos = skipJSONWhitespace(this.buf, this.pos)
     if (this.pos >= this.buf.length) {
-      return this.readErr ?? $.newError('EOF')
+      return this.readErr ?? io.EOF
     }
     let end: number
     try {
@@ -249,7 +249,7 @@ export class Decoder {
     }
     this.pos = cursor
     if (this.pos >= this.buf.length) {
-      return [null, this.readErr ?? $.newError('EOF')]
+      return [null, this.readErr ?? io.EOF]
     }
     const c = this.buf[this.pos]
     if (c === '{' || c === '[' || c === '}' || c === ']') {
