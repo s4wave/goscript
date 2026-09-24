@@ -10,7 +10,7 @@ export const blockTypeRaw: blockType = 0
 export const blockTypeRLE: blockType = 1
 
 export async function main(): globalThis.Promise<void> {
-	let __goscriptShadow0 = $.uint(1, 8)
+	let __goscriptShadow0 = 1
 	switch (__goscriptShadow0) {
 		case 0:
 		{

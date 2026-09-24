@@ -13,9 +13,9 @@ export async function main(): globalThis.Promise<void> {
 	const space: number = 32
 
 	// Print the imported rune constants
-	await $.println("separator:", $.int(47, 32))
-	await $.println("newline:", $.int(10, 32))
-	await $.println("space:", $.int(32, 32))
+	await $.println("separator:", 47)
+	await $.println("newline:", 10)
+	await $.println("space:", 32)
 
 	// Use them in comparisons to ensure they're actually numbers
 	if ((47 as number) == 47) {
@@ -29,8 +29,8 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Test arithmetic operations (only works with numbers)
-	await $.println("separator + 1:", $.int(47 + 1, 32))
-	await $.println("space - 1:", $.int(32 - 1, 32))
+	await $.println("separator + 1:", 48)
+	await $.println("space - 1:", 31)
 }
 
 if ($.isMainScript(import.meta)) {

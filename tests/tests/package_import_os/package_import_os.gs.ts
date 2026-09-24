@@ -58,7 +58,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	let fileName = "os-runtime-file.txt"
-	let writeErr = os.WriteFile(fileName, new Uint8Array([114, 117, 110, 116, 105, 109, 101, 32, 102, 105, 108, 101, 32, 99, 111, 110, 116, 101, 110, 116, 115]), $.uint(0o644, 32))
+	let writeErr = os.WriteFile(fileName, new Uint8Array([114, 117, 110, 116, 105, 109, 101, 32, 102, 105, 108, 101, 32, 99, 111, 110, 116, 101, 110, 116, 115]), 0o644)
 	if (writeErr == null) {
 		await $.println("WriteFile ok")
 	} else {

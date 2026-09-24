@@ -29,7 +29,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let [major, minor, ok] = http.ParseHTTPVersion("HTTP/2.0")
 	await $.println("proto:", major, minor, ok)
-	await $.println("status:", http.MethodPatch, http.StatusNetworkAuthenticationRequired, http.StatusText(http.StatusNetworkAuthenticationRequired))
+	await $.println("status:", http.MethodPatch, 511, http.StatusText(511))
 
 	let __goscriptTuple0: any = http.NewRequest(http.MethodPut, "https://example.invalid/path?q=1", $.interfaceValue<io.Reader | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(http.NoBody))), "http.noBody", "http.noBody"))
 	let req: http.Request | $.VarRef<http.Request> | null = __goscriptTuple0[0]
@@ -42,7 +42,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("request:", $.pointerValue<http.Request>(req).Method, $.pointerValue<any>($.pointerValue<http.Request>(req).URL).Path, http.Request.prototype.ProtoAtLeast.call($.pointerValue<http.Request>(req), 1, 1), $.len(http.Request.prototype.Cookies.call($.pointerValue<http.Request>(req))))
 
 	let rec: httptest.ResponseRecorder | $.VarRef<httptest.ResponseRecorder> | null = httptest.NewRecorder()
-	http.Error($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, http.ProtocolError.prototype.Error.call($.pointerValue<http.ProtocolError>(http.ErrNotSupported)), http.StatusForbidden)
+	http.Error($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, http.ProtocolError.prototype.Error.call($.pointerValue<http.ProtocolError>(http.ErrNotSupported)), 403)
 	await $.println("recorder:", $.pointerValue<httptest.ResponseRecorder>(rec).Code, bytes.Buffer.prototype.String.call($.pointerValue<bytes.Buffer>($.pointerValue<httptest.ResponseRecorder>(rec).Body)))
 
 	rec = httptest.NewRecorder()

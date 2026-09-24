@@ -749,6 +749,42 @@ func TestCompilePackagesLowersWideIntegerConstantsForUint64Targets(t *testing.T)
 	}
 }
 
+// TestCompilePackagesLowersSizedIntegerConstantsAsLiterals keeps constant
+// tables as plain literals. A generated parser table of width helper calls
+// overflows the WebKit worker stack when its module loads.
+func TestCompilePackagesLowersSizedIntegerConstantsAsLiterals(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/sizedconst\n\ngo 1.25.3\n",
+		"main.go": strings.Join([]string{
+			"package main",
+			"var yyAct = [...]int16{765, -1, 32767}",
+			"var yyTok = []uint16{1, 65535}",
+			"func take(v int8) int8 { return v }",
+			"func main() { _ = take(-5) }",
+			"",
+		}, "\n"),
+	})
+	outputDir := filepath.Join(t.TempDir(), "output")
+	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir}, nil, nil)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatal(err.Error())
+	}
+	content, err := os.ReadFile(filepath.Join(outputDir, "@goscript", "example.test", "sizedconst", "main.gs.ts"))
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	text := string(content)
+	for _, want := range []string{`[765, -1, 32767]`, `[1, 65535]`, `take(-5)`} {
+		if !strings.Contains(text, want) {
+			t.Fatalf("missing literal sized integer constant %q in generated output:\n%s", want, text)
+		}
+	}
+}
+
 func TestCompilePackagesRoutesUint64BinaryOpsThroughHelpers(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod": "module example.test/wideops\n\ngo 1.25.3\n",
@@ -4566,7 +4602,7 @@ func TestCompilePackagesMarksFunctionLiteralAsyncForInterfaceMethodCall(t *testi
 	text := string(content)
 	for _, want := range []string{
 		"$.functionValue(async (block: BlockWithRefs | null): globalThis.Promise<$.GoError> => {",
-		"let err = await $.pointerValue<Exclude<BlockWithRefs, null>>(block).ApplyBlockRef($.uint(7, 32), ref)",
+		"let err = await $.pointerValue<Exclude<BlockWithRefs, null>>(block).ApplyBlockRef(7, ref)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)

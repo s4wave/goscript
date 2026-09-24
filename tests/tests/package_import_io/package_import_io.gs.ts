@@ -263,9 +263,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("ErrUnexpectedEOF:", await $.pointerValue<Exclude<$.GoError, null>>(io.ErrUnexpectedEOF).Error())
 
 	// Test seek constants
-	await $.println("SeekStart:", io.SeekStart)
-	await $.println("SeekCurrent:", io.SeekCurrent)
-	await $.println("SeekEnd:", io.SeekEnd)
+	await $.println("SeekStart:", 0)
+	await $.println("SeekCurrent:", 1)
+	await $.println("SeekEnd:", 2)
 
 	// Test Discard writer
 	let [n, err] = await io.WriteString($.pointerValueOrNil(io.Discard)!, "hello world")

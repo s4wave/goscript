@@ -45,16 +45,16 @@ export function makeAtomicCallback(): [(() => void) | null, $.GoError] {
 export async function main(): globalThis.Promise<void> {
 	// Test atomic.Int32
 	let i32: $.VarRef<atomic.Int32> = $.varRef($.markAsStructValue(new atomic.Int32()))
-	i32.value.Store($.int(42, 32))
+	i32.value.Store(42)
 	await $.println("Int32 stored 42, value:", $.int(i32.value.Load(), 32))
 
-	let old = $.int(i32.value.Swap($.int(100, 32)), 32)
+	let old = $.int(i32.value.Swap(100), 32)
 	await $.println("Int32 swapped to 100, old value:", $.int(old, 32), "new value:", $.int(i32.value.Load(), 32))
 
-	let newVal = $.int(i32.value.Add($.int(5, 32)), 32)
+	let newVal = $.int(i32.value.Add(5), 32)
 	await $.println("Int32 added 5, new value:", $.int(newVal, 32))
 
-	if (i32.value.CompareAndSwap($.int(105, 32), $.int(200, 32))) {
+	if (i32.value.CompareAndSwap(105, 200)) {
 		await $.println("Int32 CompareAndSwap 105->200 succeeded, value:", $.int(i32.value.Load(), 32))
 	}
 
@@ -68,10 +68,10 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test atomic.Uint32
 	let u32: $.VarRef<atomic.Uint32> = $.varRef($.markAsStructValue(new atomic.Uint32()))
-	u32.value.Store($.uint(50, 32))
+	u32.value.Store(50)
 	await $.println("Uint32 stored 50, value:", $.uint(u32.value.Load(), 32))
 
-	u32.value.Add($.uint(25, 32))
+	u32.value.Add(25)
 	await $.println("Uint32 after adding 25:", $.uint(u32.value.Load(), 32))
 
 	// Test atomic.Uint64

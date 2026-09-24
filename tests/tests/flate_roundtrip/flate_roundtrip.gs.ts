@@ -18,7 +18,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget0 = input, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
 		input![i] = $.uint($.uint((i * 31) ^ (i >> 5), 8), 8)
 	}
-	for (let __goscriptRangeTarget1 = $.arrayToSlice<number>([flate.BestSpeed, flate.DefaultCompression, flate.BestCompression]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
+	for (let __goscriptRangeTarget1 = $.arrayToSlice<number>([1, -1, 9]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
 		let level = __goscriptRangeTarget1![__rangeIndex]
 		let compressed: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
 		let __goscriptTuple0: any = flate.NewWriter($.interfaceValue<io.Writer | null>(compressed, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), level)

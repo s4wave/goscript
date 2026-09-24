@@ -50,8 +50,8 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test that the atomic fields work correctly
 	s.closed.Store(true)
-	s.count.Store($.int(42, 32))
-	s.flag.Store($.uint(100, 32))
+	s.count.Store(42)
+	s.flag.Store(100)
 
 	await $.println("closed:", s.closed.Load())
 	await $.println("count:", $.int(s.count.Load(), 32))
@@ -61,8 +61,8 @@ export async function main(): globalThis.Promise<void> {
 	let s2 = $.markAsStructValue(new MyStruct({closed: $.markAsStructValue(new atomic.Bool()), count: $.markAsStructValue(new atomic.Int32()), flag: $.markAsStructValue(new atomic.Uint32())}))
 
 	s2.closed.Store(false)
-	s2.count.Store($.int(24, 32))
-	s2.flag.Store($.uint(50, 32))
+	s2.count.Store(24)
+	s2.flag.Store(50)
 
 	await $.println("s2 closed:", s2.closed.Load())
 	await $.println("s2 count:", $.int(s2.count.Load(), 32))

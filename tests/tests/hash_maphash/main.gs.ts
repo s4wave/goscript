@@ -27,7 +27,7 @@ export async function main(): globalThis.Promise<void> {
 	let h: $.VarRef<maphash.Hash> = $.varRef($.markAsStructValue(new maphash.Hash()))
 	h.value.SetSeed($.markAsStructValue($.cloneStructValue(seed)))
 	h.value.WriteString("hello")
-	h.value.WriteByte($.uint(32, 8))
+	h.value.WriteByte(32)
 	h.value.Write(new Uint8Array([119, 111, 114, 108, 100]))
 	await $.println(h.value.Sum64() == whole)
 

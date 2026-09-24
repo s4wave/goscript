@@ -53,21 +53,21 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test EncodeRune
 	let buf: Uint8Array = new Uint8Array(4)
-	let n = utf8.EncodeRune($.goSlice(buf, undefined, undefined), $.int(19990, 32))
+	let n = utf8.EncodeRune($.goSlice(buf, undefined, undefined), 19990)
 	await $.println("Encoded rune size:", n)
 
 	// Test RuneLen
-	let runeLen = utf8.RuneLen($.int(19990, 32))
+	let runeLen = utf8.RuneLen(19990)
 	await $.println("Rune length:", runeLen)
 
 	// Test ValidRune
-	let validRune = utf8.ValidRune($.int(19990, 32))
+	let validRune = utf8.ValidRune(19990)
 	await $.println("Valid rune:", validRune)
 
 	// Test constants
-	await $.println("RuneSelf:", utf8.RuneSelf)
-	await $.println("MaxRune:", $.int(utf8.MaxRune, 32))
-	await $.println("UTFMax:", utf8.UTFMax)
+	await $.println("RuneSelf:", 128)
+	await $.println("MaxRune:", 1114111)
+	await $.println("UTFMax:", 4)
 }
 
 if ($.isMainScript(import.meta)) {

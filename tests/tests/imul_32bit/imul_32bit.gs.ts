@@ -46,7 +46,7 @@ export class multiplyCase {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let cases: $.Slice<multiplyCase> = $.arrayToSlice<multiplyCase>([$.markAsStructValue(new multiplyCase({x: $.uint(65535, 32), y: $.uint(65535, 32), unsigned: $.uint(4294836225, 32), signed: $.int(-131071, 32)})), $.markAsStructValue(new multiplyCase({x: $.uint(134217729, 32), y: $.uint(134217729, 32), unsigned: $.uint(268435457, 32), signed: $.int(268435457, 32)})), $.markAsStructValue(new multiplyCase({x: $.uint(4294967295, 32), y: $.uint(4294967295, 32), unsigned: $.uint(1, 32), signed: $.int(1, 32)})), $.markAsStructValue(new multiplyCase({x: $.uint(4294967295, 32), y: $.uint(3221225473, 32), unsigned: $.uint(1073741823, 32), signed: $.int(1073741823, 32)})), $.markAsStructValue(new multiplyCase({x: $.uint(4294967295, 32), y: $.uint(134217729, 32), unsigned: $.uint(4160749567, 32), signed: $.int(-134217729, 32)}))])
+	let cases: $.Slice<multiplyCase> = $.arrayToSlice<multiplyCase>([$.markAsStructValue(new multiplyCase({x: 65535, y: 65535, unsigned: 4294836225, signed: -131071})), $.markAsStructValue(new multiplyCase({x: 134217729, y: 134217729, unsigned: 268435457, signed: 268435457})), $.markAsStructValue(new multiplyCase({x: 4294967295, y: 4294967295, unsigned: 1, signed: 1})), $.markAsStructValue(new multiplyCase({x: 4294967295, y: 3221225473, unsigned: 1073741823, signed: 1073741823})), $.markAsStructValue(new multiplyCase({x: 4294967295, y: 134217729, unsigned: 4160749567, signed: -134217729}))])
 
 	for (let __goscriptRangeTarget0 = cases, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let tc = __goscriptRangeTarget0![__rangeIndex]
@@ -54,8 +54,8 @@ export async function main(): globalThis.Promise<void> {
 		await checkInt32($.int($.int(tc.x, 32), 32), $.int($.int(tc.y, 32), 32), $.int(tc.signed, 32))
 	}
 
-	await checkInt32($.int(-2147483647, 32), $.int(-2147483647, 32), $.int(1, 32))
-	await checkInt32($.int(-2147483648, 32), $.int(-1, 32), $.int(-2147483648, 32))
+	await checkInt32(-2147483647, -2147483647, 1)
+	await checkInt32(-2147483648, -1, -2147483648)
 
 	await checkPlatformIntWidths()
 	await $.println("ok")
@@ -89,13 +89,13 @@ export async function checkInt32(x: number, y: number, want: number): globalThis
 
 export async function checkPlatformIntWidths(): globalThis.Promise<void> {
 	let neg: bigint = -1n
-	if ($.uint(neg, 64) == $.uint(0xffffffff, 64)) {
+	if ($.uint(neg, 64) == 4294967295) {
 		await $.println("uint is 32-bit")
 	}
-	if ($.int(neg) == $.int(0xffffffff)) {
+	if ($.int(neg) == 4294967295) {
 		await $.println("int is 32-bit")
 	}
-	if ($.uint($.uint(neg, 64), 64) == $.uint($.uint(0xffffffff, 64), 64)) {
+	if ($.uint($.uint(neg, 64), 64) == 4294967295) {
 		await $.println("uintptr is 32-bit")
 	}
 }

@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let limit = (274877906944) - 64
+	let limit = 274877906880
 	await $.println(limit > 1024, limit)
 }
 

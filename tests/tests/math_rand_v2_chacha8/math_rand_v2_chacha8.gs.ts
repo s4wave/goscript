@@ -43,7 +43,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println(rand.ChaCha8.prototype.Uint64.call(r2))
 	}
 	let seed2 = $.cloneArrayValue(seed, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 32))
-	seed2[0] = $.uint(0xff, 8)
+	seed2[0] = 0xff
 	rand.ChaCha8.prototype.Seed.call(r, $.cloneArrayValue(seed2, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 32)))
 	await $.println(rand.ChaCha8.prototype.Uint64.call(r))
 }

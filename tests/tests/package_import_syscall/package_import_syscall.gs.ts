@@ -30,12 +30,12 @@ export async function main(): globalThis.Promise<void> {
 			return
 		}
 	}
-	if ((syscall.F_DUPFD_CLOEXEC as number) != 0) {
+	if ((1 as number) != 0) {
 		await fmt.Println("cloexec supported")
 	}
 	await fmt.Println("signals:", $.basicInterfaceValue($.int(syscall.SIGINT), "int"), $.basicInterfaceValue($.int(syscall.SIGKILL), "int"), $.basicInterfaceValue($.int(syscall.SIGTERM), "int"))
 	{
-		let err = syscall.Kill(1, syscall.SIGKILL)
+		let err = syscall.Kill(1, 3)
 		if (err == null) {
 			await fmt.Println("kill unexpectedly succeeded")
 		} else {
@@ -50,7 +50,7 @@ export async function main(): globalThis.Promise<void> {
 		syscall.Close(-1)
 		syscall.Dup(-1)
 		syscall.Fchdir(-1)
-		syscall.Fchmod(-1, $.uint(0, 32))
+		syscall.Fchmod(-1, 0)
 		syscall.Fchown(-1, 0, 0)
 		syscall.Fstat(-1, st)
 		syscall.Fsync(-1)

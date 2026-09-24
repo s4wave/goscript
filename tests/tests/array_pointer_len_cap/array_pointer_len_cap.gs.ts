@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export function sum(values: $.VarRef<number[]> | null): number {
-	let out = $.len($.pointerValue<number[]>(values)) + $.cap($.pointerValue<number[]>(values))
+	let out = 8
 	for (let i = 0; i < $.len($.pointerValue<number[]>(values)); i++) {
 		out = out + ($.arrayIndex($.pointerValue<number[]>(values), i))
 	}

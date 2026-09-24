@@ -13,7 +13,7 @@ import "@goscript/encoding/binary/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
-	let signed: number = $.int(2, 32)
+	let signed: number = 2
 	{
 		let err = await binary.Write($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.BigEndian))), "binary.bigEndian", "binary.bigEndian"), $.basicInterfaceValue(signed, "int32"))
 		if (err != null) {

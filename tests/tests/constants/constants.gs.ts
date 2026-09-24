@@ -15,7 +15,7 @@ export const IV1: number = 2
 
 export const IV2: number = 3
 
-export let DigestIV: number[] = [$.uint(1, 32), $.uint(2, 32), $.uint(3, 32)]
+export let DigestIV: number[] = [1, 2, 3]
 
 export function __goscript_set_DigestIV(__goscriptValue: number[]): void {
 	DigestIV = __goscriptValue
@@ -34,7 +34,7 @@ export async function main(): globalThis.Promise<void> {
 	// println(Small) // Commented out as it depends on Big
 	await $.println("Hello, Constants!")
 	await $.println($.uint($.arrayIndex(DigestIV, 0), 32), $.uint($.arrayIndex(DigestIV, 1), 32), $.uint($.arrayIndex(DigestIV, 2), 32))
-	await $.println($.uint($.uint(4, 8), 8))
+	await $.println(4)
 }
 
 if ($.isMainScript(import.meta)) {

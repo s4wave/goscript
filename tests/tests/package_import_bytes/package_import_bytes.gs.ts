@@ -121,7 +121,7 @@ export async function main(): globalThis.Promise<void> {
 	n = __goscriptTuple1[0]
 	let err = __goscriptTuple1[1]
 	await $.println("Reader ReadAt", n, "bytes:", $.bytesToString($.goSlice(at, undefined, n)), "err:", err == null)
-	let __goscriptTuple2: any = bytes.Reader.prototype.Seek.call($.pointerValue<bytes.Reader>(reader), off, io.SeekStart)
+	let __goscriptTuple2: any = bytes.Reader.prototype.Seek.call($.pointerValue<bytes.Reader>(reader), off, 0)
 	let pos = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	await $.println("Reader Seek", pos, "err:", err == null)

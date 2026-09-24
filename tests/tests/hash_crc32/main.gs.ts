@@ -16,16 +16,16 @@ import "@goscript/hash/crc32/index.js"
 import "@goscript/io/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	if (((((crc32.Size as number) != 4) || ((crc32.IEEE as number) != 0xedb88320)) || ((crc32.Castagnoli as number) != 0x82f63b78)) || ((crc32.Koopman as number) != 0xeb31d82e)) {
+	if (((((4 as number) != 4) || ((3988292384 as number) != 0xedb88320)) || ((2197175160 as number) != 0x82f63b78)) || ((3945912366 as number) != 0xeb31d82e)) {
 		$.panic("public constants")
 	}
-	if ((!$.pointerEqual(crc32.MakeTable($.uint(crc32.IEEE, 32)), crc32.IEEETable)) || (!$.pointerEqual(crc32.MakeTable($.uint(crc32.IEEE, 32)), crc32.MakeTable($.uint(crc32.IEEE, 32))))) {
+	if ((!$.pointerEqual(crc32.MakeTable(3988292384), crc32.IEEETable)) || (!$.pointerEqual(crc32.MakeTable(3988292384), crc32.MakeTable(3988292384)))) {
 		$.panic("IEEE table reuse")
 	}
-	if (!$.pointerEqual(crc32.MakeTable($.uint(crc32.Castagnoli, 32)), crc32.MakeTable($.uint(crc32.Castagnoli, 32)))) {
+	if (!$.pointerEqual(crc32.MakeTable(2197175160), crc32.MakeTable(2197175160))) {
 		$.panic("Castagnoli table reuse")
 	}
-	if ($.pointerEqual(crc32.MakeTable($.uint(crc32.Koopman, 32)), crc32.MakeTable($.uint(crc32.Koopman, 32)))) {
+	if ($.pointerEqual(crc32.MakeTable(3945912366), crc32.MakeTable(3945912366))) {
 		$.panic("custom tables unexpectedly reused")
 	}
 
@@ -34,7 +34,7 @@ export async function main(): globalThis.Promise<void> {
 		payload![i] = $.uint($.uint(((i * 31) + (Math.trunc(i / 3))) + 7, 8), 8)
 	}
 
-	let tables: $.Slice<{"name": string, "table": $.VarRef<crc32.Table> | null}> = $.arrayToSlice<{"name": string, "table": $.VarRef<crc32.Table> | null}>([{name: "ieee", table: crc32.IEEETable}, {name: "castagnoli", table: crc32.MakeTable($.uint(crc32.Castagnoli, 32))}, {name: "koopman", table: crc32.MakeTable($.uint(crc32.Koopman, 32))}, {name: "custom", table: crc32.MakeTable($.uint(0xd5828281, 32))}])
+	let tables: $.Slice<{"name": string, "table": $.VarRef<crc32.Table> | null}> = $.arrayToSlice<{"name": string, "table": $.VarRef<crc32.Table> | null}>([{name: "ieee", table: crc32.IEEETable}, {name: "castagnoli", table: crc32.MakeTable(2197175160)}, {name: "koopman", table: crc32.MakeTable(3945912366)}, {name: "custom", table: crc32.MakeTable(0xd5828281)}])
 	let lengths: $.Slice<number> = $.arrayToSlice<number>([0, 1, 7, 8, 9, 15, 16, 17, $.len(payload)])
 	for (let __goscriptRangeTarget2 = tables, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget2); __rangeIndex++) {
 		let tc = __goscriptRangeTarget2![__rangeIndex]
@@ -43,7 +43,7 @@ export async function main(): globalThis.Promise<void> {
 			let data: $.Slice<number> = $.goSlice(payload, undefined, length)
 			let oneShot = $.uint(crc32.Checksum(data, tc.table), 32)
 			let split = Math.trunc(length / 2)
-			let updated = $.uint(crc32.Update($.uint(crc32.Update($.uint(0, 32), tc.table, $.goSlice(data, undefined, split)), 32), tc.table, $.goSlice(data, split, undefined)), 32)
+			let updated = $.uint(crc32.Update($.uint(crc32.Update(0, tc.table, $.goSlice(data, undefined, split)), 32), tc.table, $.goSlice(data, split, undefined)), 32)
 			let stream = crc32.New(tc.table)
 			{
 				let [n, err] = await $.pointerValue<Exclude<hash.Hash32, null>>(stream).Write($.goSlice(data, undefined, split))
@@ -86,7 +86,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let prefix: $.Slice<number> = new Uint8Array([9, 8, 7]) as $.Slice<number>
 	let summed: $.Slice<number> = await $.pointerValue<Exclude<hash.Hash32, null>>(ieee).Sum($.goSlice(prefix, undefined, $.len(prefix), $.len(prefix)))
-	if (((($.len(summed) != ($.len(prefix) + crc32.Size)) || ($.uint($.arrayIndex(summed!, 0), 8) != $.uint(9, 8))) || ($.uint($.arrayIndex(summed!, 1), 8) != $.uint(8, 8))) || ($.uint($.arrayIndex(summed!, 2), 8) != $.uint(7, 8))) {
+	if (((($.len(summed) != ($.len(prefix) + crc32.Size)) || ($.uint($.arrayIndex(summed!, 0), 8) != 9)) || ($.uint($.arrayIndex(summed!, 1), 8) != 8)) || ($.uint($.arrayIndex(summed!, 2), 8) != 7)) {
 		$.panic("prefix-preserving Sum")
 	}
 	await $.println("sum", $.len(summed), $.uint($.arrayIndex(summed!, 3), 8), $.uint($.arrayIndex(summed!, 4), 8), $.uint($.arrayIndex(summed!, 5), 8), $.uint($.arrayIndex(summed!, 6), 8))
@@ -110,7 +110,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple2: any = await $.pointerValue<Exclude<encoding.BinaryAppender, null>>(appender).AppendBinary(new Uint8Array([4, 5]) as $.Slice<number>)
 	let appended: $.Slice<number> = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
-	if ((((err != null) || ($.len(appended) != ($.len(state) + 2))) || ($.uint($.arrayIndex(appended!, 0), 8) != $.uint(4, 8))) || ($.uint($.arrayIndex(appended!, 1), 8) != $.uint(5, 8))) {
+	if ((((err != null) || ($.len(appended) != ($.len(state) + 2))) || ($.uint($.arrayIndex(appended!, 0), 8) != 4)) || ($.uint($.arrayIndex(appended!, 1), 8) != 5)) {
 		$.panic("AppendBinary")
 	}
 	for (let __goscriptRangeTarget3 = state, i = 0; i < $.len(__goscriptRangeTarget3); i++) {
@@ -159,7 +159,7 @@ export async function main(): globalThis.Promise<void> {
 			$.panic("invalid state changed hash")
 		}
 	}
-	let other = crc32.New(crc32.MakeTable($.uint(crc32.Castagnoli, 32)))
+	let other = crc32.New(crc32.MakeTable(2197175160))
 	let otherUnmarshaler = $.mustTypeAssert<encoding.BinaryUnmarshaler | null>(other, "encoding.BinaryUnmarshaler")
 	{
 		let __goscriptShadow3 = await $.pointerValue<Exclude<encoding.BinaryUnmarshaler, null>>(otherUnmarshaler).UnmarshalBinary(state)
@@ -193,7 +193,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("clone", $.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Sum32(), 32), $.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(clone).Sum32(), 32))
 
 	await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Reset()
-	if ((($.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Sum32(), 32) != $.uint(0, 32)) || (await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Size() != crc32.Size)) || (await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).BlockSize() != 1)) {
+	if ((($.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Sum32(), 32) != 0) || (await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Size() != 4)) || (await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).BlockSize() != 1)) {
 		$.panic("Reset/Size/BlockSize")
 	}
 	await $.println("reset", $.uint(await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Sum32(), 32), await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).Size(), await $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource).BlockSize())

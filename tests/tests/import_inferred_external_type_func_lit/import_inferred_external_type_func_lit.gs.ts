@@ -13,7 +13,7 @@ export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
 	let fileName = "external-type-func-lit.txt"
 	{
-		let err = os.WriteFile(fileName, new Uint8Array([99, 111, 110, 116, 101, 110, 116, 115]), $.uint(0o644, 32))
+		let err = os.WriteFile(fileName, new Uint8Array([99, 111, 110, 116, 101, 110, 116, 115]), 0o644)
 		if (err != null) {
 			await $.println("write error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return

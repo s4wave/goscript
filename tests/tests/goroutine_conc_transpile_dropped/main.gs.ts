@@ -60,7 +60,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 
-	if (completed == (16 * 8)) {
+	if (completed == 128) {
 		await $.println("all 128 leaves completed")
 	} else {
 		await $.println("INCOMPLETE")

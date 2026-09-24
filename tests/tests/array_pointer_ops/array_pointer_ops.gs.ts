@@ -115,15 +115,15 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("array fields:", $.arrayIndex($.arrayIndex(original.slices, 0)!, 0), $.arrayIndex(original.items, 0).value, $.arrayIndex(copied.items, 0).value)
 
 	// Assigning an array element copies its value instead of aliasing the row.
-	let rows = [[$.int(1, 32), $.int(2, 32)], [$.int(3, 32), $.int(4, 32)]]
+	let rows = [[1, 2], [3, 4]]
 	rows[1] = $.cloneArrayValue($.arrayIndex(rows, 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int32"), 2))
-	$.arrayIndex(rows, 1)[0] = $.int(9, 32)
+	$.arrayIndex(rows, 1)[0] = 9
 	await $.println("row copy:", $.int($.arrayIndex($.arrayIndex(rows, 0), 0), 32), $.int($.arrayIndex($.arrayIndex(rows, 0), 1), 32), $.int($.arrayIndex($.arrayIndex(rows, 1), 0), 32), $.int($.arrayIndex($.arrayIndex(rows, 1), 1), 32))
 
 	let buckets: bigint[][] = Array.from({ length: 2 }, () => Array.from({ length: 3 }, () => 0n))
 	let cache: $.VarRef<bigint[]> | null = $.indexRef(buckets, 1)
 
-	await $.println("len:", $.len($.pointerValue<bigint[]>(cache)))
+	await $.println("len:", 3)
 
 	$.pointerValue<bigint[]>(cache)[0] = 5n
 	$.pointerValue<bigint[]>(cache)[1] = 7n

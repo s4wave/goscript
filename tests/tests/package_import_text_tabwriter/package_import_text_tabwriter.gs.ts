@@ -14,7 +14,7 @@ import "@goscript/text/tabwriter/index.js"
 export async function main(): globalThis.Promise<void> {
 	// Buffer multiple rows through the standard table formatter.
 	let output: $.VarRef<strings.Builder> = $.varRef($.markAsStructValue(new strings.Builder()))
-	let writer: tabwriter.Writer | $.VarRef<tabwriter.Writer> | null = tabwriter.NewWriter($.interfaceValue<io.Writer | null>(output, "*strings.Builder", /* @__PURE__ */ $.pointerType("strings.Builder")), 0, 0, 2, $.uint(32, 8), 0)
+	let writer: tabwriter.Writer | $.VarRef<tabwriter.Writer> | null = tabwriter.NewWriter($.interfaceValue<io.Writer | null>(output, "*strings.Builder", /* @__PURE__ */ $.pointerType("strings.Builder")), 0, 0, 2, 32, 0)
 	{
 		let [, err] = await tabwriter.Writer.prototype.Write.call(writer, new Uint8Array([73, 68, 9, 78, 65, 77, 69, 10, 49, 9, 67, 97, 110, 118, 97, 115, 10, 50, 50, 9, 83, 116, 111, 114, 101, 10]))
 		if (err != null) {

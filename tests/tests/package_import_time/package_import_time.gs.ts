@@ -11,7 +11,7 @@ import "@goscript/time/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let now = $.markAsStructValue($.cloneStructValue(time.Now()))
-	let setTime = $.markAsStructValue($.cloneStructValue(time.Date(2025, time.May, 15, 1, 10, 42, 0, time.UTC)))
+	let setTime = $.markAsStructValue($.cloneStructValue(time.Date(2025, 5, 15, 1, 10, 42, 0, time.UTC)))
 	if ($.markAsStructValue($.cloneStructValue(now)).Sub($.markAsStructValue($.cloneStructValue(setTime))) < 86400000000000n) {
 		await $.println("expected we are > 24 hrs past may 15, incorrect")
 	}
@@ -25,7 +25,7 @@ export async function main(): globalThis.Promise<void> {
 	// day, month, etc.
 	await $.println("day", $.markAsStructValue($.cloneStructValue(setTime)).Day())
 	await $.println("month", $.markAsStructValue($.cloneStructValue(setTime)).Month())
-	await $.println("january", time.January)
+	await $.println("january", 1)
 	await $.println("year", $.markAsStructValue($.cloneStructValue(setTime)).Year())
 	await $.println("hour", $.markAsStructValue($.cloneStructValue(setTime)).Hour())
 	await $.println("minute", $.markAsStructValue($.cloneStructValue(setTime)).Minute())

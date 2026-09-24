@@ -7592,10 +7592,10 @@ func isArrayType(typ types.Type) bool {
 func (o *LoweringOwner) lowerEqualityOperands(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, string) {
 	leftType := ctx.semPkg.source.TypesInfo.TypeOf(expr.X)
 	rightType := ctx.semPkg.source.TypesInfo.TypeOf(expr.Y)
+	left, right = o.lowerNumericComparisonOperands(ctx, expr, left, right)
 	if constantComparableType(ctx, expr.X) != "" && constantComparableType(ctx, expr.X) == constantComparableType(ctx, expr.Y) {
 		left = lowerConstantComparableValue(ctx, expr.X, left)
 	}
-	left, right = o.lowerNumericComparisonOperands(ctx, expr, left, right)
 	if isStringType(leftType) && isStringType(rightType) {
 		leftLiteral := isStringLiteralExpr(expr.X)
 		rightLiteral := isStringLiteralExpr(expr.Y)
@@ -11648,8 +11648,35 @@ func (o *LoweringOwner) lowerValueForTarget(
 		if constantValue, ok := o.lowerNumericConstantExprForTarget(ctx, expr, targetType); ok {
 			return constantValue
 		}
+		if constantValue, ok := lowerNumberIntegerConstantExpr(ctx, expr, targetType); ok {
+			// Keep a literal's own lowered spelling, such as 0o700.
+			if lit, ok := unwrapParenExpr(expr).(*ast.BasicLit); ok && lit.Kind == token.INT {
+				return value
+			}
+			return constantValue
+		}
 	}
 	return o.lowerValueForTargetTypes(ctx, targetType, sourceType, value, shouldCloneStructValue(expr))
+}
+
+// lowerNumberIntegerConstantExpr lowers an integer constant stored into a
+// number-represented integer type as its plain literal. Go rejects a constant
+// its type cannot represent, so a $.int/$.uint width helper cannot change the
+// value. Literals also keep large constant tables cheap: JavaScriptCore gives
+// each call element of an array literal its own register, so a generated
+// parser table of helper calls overflows a worker stack when its module loads.
+func lowerNumberIntegerConstantExpr(ctx lowerFileContext, expr ast.Expr, targetType types.Type) (string, bool) {
+	if !isIntegerType(targetType) || isBigIntBackedType(targetType) {
+		return "", false
+	}
+	if ctx.semPkg == nil || ctx.semPkg.source == nil {
+		return "", false
+	}
+	tv, ok := ctx.semPkg.source.TypesInfo.Types[expr]
+	if !ok || tv.Value == nil || tv.Value.Kind() != constant.Int || constant.BitLen(tv.Value) > 53 {
+		return "", false
+	}
+	return lowerConstantValue(tv.Value)
 }
 
 func lowerRealNumericConstantExpr(ctx lowerFileContext, expr ast.Expr) (string, bool) {

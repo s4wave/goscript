@@ -20,8 +20,8 @@ export async function main(): globalThis.Promise<void> {
 	quotient = Math.trunc(quotient / 2)
 	await $.println(quotient)
 
-	let unsignedQuotient: number = $.uint(5, 32)
-	unsignedQuotient = (unsignedQuotient / $.uint(2, 32)) >>> 0
+	let unsignedQuotient: number = 5
+	unsignedQuotient = (unsignedQuotient / 2) >>> 0
 	await $.println($.uint(unsignedQuotient, 32))
 
 	let d: number = 3
@@ -58,7 +58,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(k)
 
 	let m: number = 10
-	m = m - (1 + 2)
+	m = m - (3)
 	await $.println(m)
 }
 

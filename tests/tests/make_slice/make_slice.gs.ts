@@ -55,7 +55,7 @@ export async function main(): globalThis.Promise<void> {
 	// Test 8: Append to bytes with extra capacity
 	await $.println("--- Append to bytes with extra capacity ---")
 	let b3: $.Slice<number> = $.makeSlice<number>(1, 10, "byte")
-	b3![0] = $.uint(65, 8)
+	b3![0] = 65
 	await $.println("Before append - len:", $.len(b3), "cap:", $.cap(b3))
 	b3 = $.append(b3, $.uint(66, 8), $.byteSliceHint)
 	await $.println("After append - len:", $.len(b3), "cap:", $.cap(b3))

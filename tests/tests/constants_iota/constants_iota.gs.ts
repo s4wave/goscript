@@ -57,16 +57,16 @@ export const C: number = 4
 
 export async function main(): globalThis.Promise<void> {
 	await $.println("ByteSize constants:")
-	await $.println("KB:", $.int(1024))
-	await $.println("MB:", $.int(1048576))
-	await $.println("GB:", $.int(1073741824))
-	await $.println("TB:", $.int(1099511627776))
+	await $.println("KB:", 1024)
+	await $.println("MB:", 1048576)
+	await $.println("GB:", 1073741824)
+	await $.println("TB:", 1099511627776)
 
 	await $.println("Direction constants:")
-	await $.println("North:", $.int(0))
-	await $.println("East:", $.int(1))
-	await $.println("South:", $.int(2))
-	await $.println("West:", $.int(3))
+	await $.println("North:", 0)
+	await $.println("East:", 1)
+	await $.println("South:", 2)
+	await $.println("West:", 3)
 
 	await $.println("Color constants:")
 	await $.println("Red:", 0)

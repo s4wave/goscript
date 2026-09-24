@@ -9,20 +9,20 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(myVar)
 
 	// === string(rune) Conversion ===
-	let r = $.int(65, 32)
+	let r = 65
 	let s = String.fromCodePoint(r)
 	await $.println(s)
 
-	let r2: number = $.int(97, 32)
+	let r2: number = 97
 	let s2 = String.fromCodePoint(r2)
 	await $.println(s2)
 
-	let r3: number = $.int(0x20AC, 32)
+	let r3: number = 0x20AC
 	let s3 = String.fromCodePoint(r3)
 	await $.println(s3)
 
 	// === string([]rune) Conversion ===
-	let myRunes: $.Slice<number> = $.arrayToSlice<number>([$.int(71, 32), $.int(111, 32), $.int(83, 32), $.int(99, 32), $.int(114, 32), $.int(105, 32), $.int(112, 32), $.int(116, 32)])
+	let myRunes: $.Slice<number> = $.arrayToSlice<number>([71, 111, 83, 99, 114, 105, 112, 116])
 	let myStringFromRunes = $.runesToString(myRunes)
 	await $.println(myStringFromRunes)
 
@@ -40,8 +40,8 @@ export async function main(): globalThis.Promise<void> {
 
 	// === Modify []rune and convert back to string ===
 	let mutableRunes: $.Slice<number> = $.stringToRunes("Mutable String")
-	mutableRunes![0] = $.int(109, 32)
-	mutableRunes![8] = $.int(115, 32)
+	mutableRunes![0] = 109
+	mutableRunes![8] = 115
 	let modifiedString = $.runesToString(mutableRunes)
 	await $.println(modifiedString)
 
@@ -57,17 +57,17 @@ export async function main(): globalThis.Promise<void> {
 	await $.println((10 as number) == 10)
 	let magicBytes: $.Slice<number> = new Uint8Array([255, 6, 0, 0, 83, 50, 115, 84, 119, 79])
 	await $.println($.len(magicBytes) == 10)
-	await $.println($.uint($.arrayIndex(magicBytes!, 0), 8) == $.uint(255, 8))
-	await $.println($.uint($.arrayIndex(magicBytes!, 1), 8) == $.uint(6, 8))
+	await $.println($.uint($.arrayIndex(magicBytes!, 0), 8) == 255)
+	await $.println($.uint($.arrayIndex(magicBytes!, 1), 8) == 6)
 	await $.println($.stringEqual($.bytesToString(magicBytes), $.bytesToString(new Uint8Array([255, 6, 0, 0, 83, 50, 115, 84, 119, 79]))))
 	await $.println((2 as number) == 2)
 	let utf8Bytes: $.Slice<number> = new Uint8Array([195, 169])
 	await $.println($.len(utf8Bytes) == 2)
-	await $.println($.uint($.arrayIndex(utf8Bytes!, 0), 8) == $.uint(195, 8))
-	await $.println($.uint($.arrayIndex(utf8Bytes!, 1), 8) == $.uint(169, 8))
+	await $.println($.uint($.arrayIndex(utf8Bytes!, 0), 8) == 195)
+	await $.println($.uint($.arrayIndex(utf8Bytes!, 1), 8) == 169)
 
 	// string(int32) conversion
-	let i32 = $.int($.int(66, 32), 32)
+	let i32 = 66
 	let i32String = String.fromCodePoint(i32)
 	await $.println(i32String)
 
@@ -82,7 +82,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(convertedString)
 
 	// === Test string(byte) conversion ===
-	let b: number = $.uint(65, 8)
+	let b: number = 65
 	let byteString = String.fromCodePoint(b)
 	await $.println(byteString)
 }

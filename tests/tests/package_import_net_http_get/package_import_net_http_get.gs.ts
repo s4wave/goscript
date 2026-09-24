@@ -25,7 +25,7 @@ export async function main(): globalThis.Promise<void> {
 			data = __goscriptTuple0[0]
 			readErr = __goscriptTuple0[1]
 			if (readErr != null) {
-				await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).WriteHeader(http.StatusInternalServerError)
+				await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).WriteHeader(500)
 				{
 					let [, writeErr] = await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Write($.stringToBytes("read error: " + await $.pointerValue<Exclude<$.GoError, null>>(readErr).Error()))
 					if (writeErr != null) {

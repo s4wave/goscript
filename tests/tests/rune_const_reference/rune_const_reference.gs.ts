@@ -12,8 +12,8 @@ export async function main(): globalThis.Promise<void> {
 	const newline: number = 10
 
 	// This should use the variable name instead of evaluating to numeric literal
-	await $.println("separator used in function:", $.int(useInFunction($.int(47, 32)), 32))
-	await $.println("newline used in function:", $.int(useInFunction($.int(10, 32)), 32))
+	await $.println("separator used in function:", $.int(useInFunction(47), 32))
+	await $.println("newline used in function:", $.int(useInFunction(10), 32))
 }
 
 export function useInFunction(r: number): number {

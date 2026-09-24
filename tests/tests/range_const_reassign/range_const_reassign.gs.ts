@@ -6,7 +6,7 @@ import * as $ from "@goscript/builtin/index.js"
 export async function main(): globalThis.Promise<void> {
 	let s = "abc"
 	for (let [__rangeIndex, c] of $.rangeString(s)) {
-		if ($.int(c, 32) >= $.int(97, 32)) {
+		if ($.int(c, 32) >= 97) {
 			c = $.int((c - 97) + 10, 32)
 		}
 		await $.println($.int(c))

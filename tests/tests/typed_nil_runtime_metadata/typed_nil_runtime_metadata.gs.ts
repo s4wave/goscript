@@ -97,10 +97,10 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("reader", readerOK, count)
 
 	let mappedReflect = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(mapped, "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int"))))))
-	await $.println("reflect-map", $.markAsStructValue($.cloneStructValue(mappedReflect)).Kind() == reflect.Map, $.markAsStructValue($.cloneStructValue(mappedReflect)).IsNil())
+	await $.println("reflect-map", $.markAsStructValue($.cloneStructValue(mappedReflect)).Kind() == 21, $.markAsStructValue($.cloneStructValue(mappedReflect)).IsNil())
 
 	let pointerReflect = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(pointer, "*main.source", /* @__PURE__ */ $.pointerType("main.source")))))
-	await $.println("reflect-pointer", $.markAsStructValue($.cloneStructValue(pointerReflect)).Kind() == reflect.Pointer, $.markAsStructValue($.cloneStructValue(pointerReflect)).IsNil(), await $.pointerValue<Exclude<reflect.Type, null>>((await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(pointerReflect)).Type()).Elem())).Kind() == reflect.Struct)
+	await $.println("reflect-pointer", $.markAsStructValue($.cloneStructValue(pointerReflect)).Kind() == 22, $.markAsStructValue($.cloneStructValue(pointerReflect)).IsNil(), await $.pointerValue<Exclude<reflect.Type, null>>((await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(pointerReflect)).Type()).Elem())).Kind() == 25)
 
 	await $.println("map-comparison-panics", mapComparisonPanics())
 }
