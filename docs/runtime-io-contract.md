@@ -24,11 +24,12 @@ contracts in `design/`. The implementation and metadata are authoritative.
 ## Incremental compression
 
 `compress/gzip` and `compress/zlib` share `internal/flateio`. It uses the
-low-level pako 1.0.11 codec, pinned in package.json and bun.lock. The pin is
-intentional: the low-level API, decoder state transitions, and declarations
-are version-specific. Upgrade it with the regression suite, not a silent
-substitution of a newer high-level wrapper. Native Node compression is an
-independent test oracle, not a required runtime dependency.
+low-level zlib API that pako exports from its package root, pinned in
+package.json and bun.lock, and computes the CRC-32 and Adler-32 trailers
+itself. Decoder state transitions are version-specific, so upgrade pako with
+the regression suite, not a silent substitution of its high-level wrappers.
+Native Node compression is an independent test oracle, not a required runtime
+dependency.
 
 A writer snapshots each accepted input and serializes outstanding operations.
 It emits compressed chunks as they become available. Flush emits a sync-flush

@@ -1,21 +1,35 @@
-import './codec-types.js'
+import {
+  ZStream,
+  Z_BLOCK,
+  Z_BUF_ERROR,
+  Z_FINISH,
+  Z_NEED_DICT,
+  Z_NO_FLUSH,
+  Z_OK,
+  Z_STREAM_END,
+  Z_SYNC_FLUSH,
+  type Z_FlushMode,
+  zlibDeflate,
+  zlibDeflateEnd,
+  zlibDeflateInit2,
+  zlibDeflateSetDictionary,
+  zlibInflate,
+  zlibInflateEnd,
+  zlibInflateInit2,
+  zlibInflateSetDictionary,
+} from 'pako'
+
 import * as $ from '@goscript/builtin/index.js'
 import * as io from '@goscript/io/index.js'
-import ZStream from 'pako/lib/zlib/zstream.js'
-import * as deflate from 'pako/lib/zlib/deflate.js'
-import * as inflate from 'pako/lib/zlib/inflate.js'
-import crc32 from 'pako/lib/zlib/crc32.js'
-import adler32 from 'pako/lib/zlib/adler32.js'
+
+import { adler32, crc32 } from './checksum.js'
 
 export const chunkSize = 32 * 1024
-const noFlush = 0
-const syncFlush = 2
-const finish = 4
-const blockFlush = 5
-const ok = 0
-const streamEnd = 1
-const needDictionary = 2
-const bufferError = -5
+
+// released replaces a stream's buffers between operations so the stream does
+// not retain the caller's input or a spent output chunk.
+const released = new Uint8Array(0)
+
 export type Format = 'gzip' | 'zlib'
 type Operation<T> = Generator<io.Awaitable<io.IOResult>, T, io.IOResult>
 
@@ -106,19 +120,19 @@ export class Deflater {
   Write(p: $.Bytes): io.Awaitable<io.IOResult> {
     if (this.closed) return [0, this.error ?? $.newError('flate: closed writer')]
     const input = new Uint8Array($.bytesToUint8Array(p))
-    return this.queue.run(() => io.runIO(this.process(input, noFlush)))
+    return this.queue.run(() => io.runIO(this.process(input, Z_NO_FLUSH)))
   }
 
   Flush(): io.Awaitable<$.GoError> {
     if (this.closed) return this.error ?? $.newError('flate: closed writer')
-    return this.queue.run(() => io.mapResult(io.runIO(this.process(new Uint8Array(0), syncFlush)), ([, err]) => err))
+    return this.queue.run(() => io.mapResult(io.runIO(this.process(new Uint8Array(0), Z_SYNC_FLUSH)), ([, err]) => err))
   }
 
   Close(): io.Awaitable<$.GoError> {
     if (this.closeResult !== undefined) return this.closeResult
     this.closed = true
     this.closeResult = this.queue.run(() => io.mapResult(
-      io.runIO(this.process(new Uint8Array(0), finish)),
+      io.runIO(this.process(new Uint8Array(0), Z_FINISH)),
       ([, err]) => { this.release(); return err },
     ))
     return this.closeResult
@@ -136,7 +150,7 @@ export class Deflater {
   }
 
   private release(): void {
-    if (this.stream != null) deflate.deflateEnd(this.stream)
+    if (this.stream != null) zlibDeflateEnd(this.stream)
     this.stream = null
   }
 
@@ -150,12 +164,12 @@ export class Deflater {
   private *initialize(): Operation<$.GoError> {
     if (!validLevel(this.level)) return $.newError(`${this.format}: invalid compression level: ${this.level}`)
     const stream = new ZStream()
-    const status = deflate.deflateInit2(stream, this.level === -2 ? -1 : this.level, 8, -15, 8, this.level === -2 ? 2 : 0)
-    if (status !== ok) return $.newError(`flate: ${stream.msg || 'initialization failed'}`)
+    const status = zlibDeflateInit2(stream, this.level === -2 ? -1 : this.level, 8, -15, 8, this.level === -2 ? 2 : 0)
+    if (status !== Z_OK) return $.newError(`flate: ${stream.msg || 'initialization failed'}`)
     this.stream = stream
     if (this.dictionary != null) {
-      const status = deflate.deflateSetDictionary(stream, this.dictionary)
-      if (status !== ok) return $.newError(`flate: ${stream.msg || 'invalid dictionary'}`)
+      const status = zlibDeflateSetDictionary(stream, this.dictionary)
+      if (status !== Z_OK) return $.newError(`flate: ${stream.msg || 'invalid dictionary'}`)
     }
     let header: Uint8Array
     if (this.format === 'gzip') {
@@ -174,7 +188,7 @@ export class Deflater {
     return yield* this.emit(header)
   }
 
-  private *process(input: Uint8Array, flush: number): Operation<io.IOResult> {
+  private *process(input: Uint8Array, flush: Z_FlushMode): Operation<io.IOResult> {
     if (this.error != null) return [0, this.error]
     if (this.stream == null) {
       this.error = yield* this.initialize()
@@ -192,12 +206,12 @@ export class Deflater {
         stream.next_out = 0
         stream.avail_out = output.length
         const offset = stream.next_in
-        const status = deflate.deflate(stream, flush)
+        const status = zlibDeflate(stream, flush)
         const n = stream.next_in - offset
         this.checksum = (this.format === 'gzip' ? crc32 : adler32)(this.checksum, input, n, offset)
         this.size = (this.size + n) >>> 0
         accepted += n
-        if (status !== ok && status !== streamEnd && status !== bufferError) {
+        if (status !== Z_OK && status !== Z_STREAM_END && status !== Z_BUF_ERROR) {
           this.error = $.newError(`flate: ${stream.msg || `codec error ${status}`}`)
           return [accepted, this.error]
         }
@@ -205,7 +219,7 @@ export class Deflater {
           this.error = yield* this.emit(output.subarray(0, stream.next_out))
           if (this.error != null) return [accepted, this.error]
         }
-        if (status === streamEnd) {
+        if (status === Z_STREAM_END) {
           const trailer = this.format === 'gzip' ?
             new Uint8Array([...word(this.checksum, true), ...word(this.size, true)]) : word(this.checksum)
           this.error = yield* this.emit(trailer)
@@ -214,9 +228,9 @@ export class Deflater {
         if (stream.avail_in === 0 && stream.avail_out > 0) return [accepted, null]
       }
     } finally {
-      stream.input = null
+      stream.input = released
       stream.avail_in = 0
-      stream.output = null
+      stream.output = released
     }
   }
 }
@@ -335,7 +349,7 @@ export class Inflater {
   }
 
   private release(): void {
-    if (this.stream != null) inflate.inflateEnd(this.stream)
+    if (this.stream != null) zlibInflateEnd(this.stream)
     this.stream = null
   }
 
@@ -404,7 +418,7 @@ export class Inflater {
     }
     this.release()
     const stream = new ZStream()
-    if (inflate.inflateInit2(stream, this.format === 'gzip' ? 31 : 15) !== ok) return $.newError('flate: initialization failed')
+    if (zlibInflateInit2(stream, this.format === 'gzip' ? 31 : 15) !== Z_OK) return $.newError('flate: initialization failed')
     this.stream = stream
     stream.input = new Uint8Array(bytes)
     stream.next_in = 0
@@ -412,15 +426,15 @@ export class Inflater {
     stream.output = new Uint8Array(1)
     stream.next_out = 0
     stream.avail_out = 1
-    const status = inflate.inflate(stream, noFlush)
-    if (status === needDictionary && dictionary) {
-      if (inflate.inflateSetDictionary(stream, this.dictionary) !== ok) return this.errors.dictionary()
-    } else if (status !== ok && status !== bufferError) {
+    const status = zlibInflate(stream, Z_NO_FLUSH)
+    if (status === Z_NEED_DICT && dictionary) {
+      if (zlibInflateSetDictionary(stream, this.dictionary) !== Z_OK) return this.errors.dictionary()
+    } else if (status !== Z_OK && status !== Z_BUF_ERROR) {
       return this.errors.header()
     }
     if (stream.avail_in !== 0 || stream.next_out !== 0) return this.errors.header()
-    stream.input = null
-    stream.output = null
+    stream.input = released
+    stream.output = released
     this.ended = false
     this.bodyEnded = false
     this.bodyError = null
@@ -448,16 +462,16 @@ export class Inflater {
       const before = stream.avail_in
       // Z_BLOCK exposes the final DEFLATE boundary before the wrapper trailer.
       // gzip.Close reports decompressor errors, not gzip trailer/checksum errors.
-      const status = inflate.inflate(stream, blockFlush)
+      const status = zlibInflate(stream, Z_BLOCK)
       const boundary = (stream.data_type & 128) !== 0
       if ((stream.data_type & 192) === 192) this.bodyEnded = true
       const consumed = before - stream.avail_in
       input.consume(consumed)
       const n = stream.next_out
-      if (status === streamEnd) {
+      if (status === Z_STREAM_END) {
         this.ended = true
         if (this.format === 'zlib' || !this.multistream) this.error = io.EOF
-      } else if (status !== ok && status !== bufferError) {
+      } else if (status !== Z_OK && status !== Z_BUF_ERROR) {
         this.error = stream.msg === 'incorrect data check' || stream.msg === 'incorrect length check' ?
           this.errors.checksum() : $.newError(`flate: ${stream.msg || `codec error ${status}`}`)
         if (!this.bodyEnded) this.bodyError = this.error

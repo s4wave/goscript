@@ -1290,14 +1290,14 @@ func TestOverrideRegistryCopiesIncrementalCodecAndMarksCompressionIO(t *testing.
 		for _, copied := range plan.packages {
 			if copied.path == "internal/flateio" {
 				found = true
-				declarations := false
+				checksums := false
 				for _, file := range copied.files {
-					if file.path == "internal/flateio/codec-types.ts" {
-						declarations = true
+					if file.path == "internal/flateio/checksum.ts" {
+						checksums = true
 					}
 				}
-				if !declarations {
-					t.Errorf("%s copy plan omits codec declarations", pkg)
+				if !checksums {
+					t.Errorf("%s copy plan omits codec checksums", pkg)
 				}
 			}
 		}
