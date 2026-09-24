@@ -31,6 +31,23 @@ function exactSource(data: Uint8Array) {
     ReadByte(): io.IOResult { return position === data.length ? [0, io.EOF] : [data[position++], null] },
   }
 }
+function seekableSource(data: Uint8Array) {
+  let position = 0
+  return {
+    get position() { return position },
+    Read(p: $.Bytes): io.IOResult {
+      const n = $.copy(p, data.subarray(position))
+      position += n
+      return [n, n === 0 ? io.EOF : null]
+    },
+    ReadByte(): io.IOResult { throw new Error('must read seekable input in bulk') },
+    Seek(offset: bigint, whence: number): [bigint, $.GoError] {
+      if (whence !== io.SeekCurrent) throw new Error('unexpected whence')
+      position += Number(offset)
+      return [BigInt(position), null]
+    },
+  }
+}
 const asBytes = (p: $.Bytes) => new Uint8Array($.bytesToUint8Array(p))
 
 for (const [name, codec, encode] of [['gzip', gzip, gzipSync], ['zlib', zlib, deflateSync]] as const) {
@@ -82,6 +99,17 @@ for (const [name, codec, encode] of [['gzip', gzip, gzipSync], ['zlib', zlib, de
       expect(input.position).toBe(encoded.length)
       expect(await reader!.Close()).toBeNull()
       expect(input.ReadByte()).toEqual([116, null])
+    })
+    it('reads a seekable ByteReader in bulk and rewinds to the frame boundary', async () => {
+      const encoded = encode(Buffer.from('one frame'))
+      const input = seekableSource(Buffer.concat([encoded, Buffer.from('trailing')]))
+      const [reader, err] = await codec.NewReader(input)
+      expect(err).toBeNull()
+      if (reader instanceof gzip.Reader) reader.Multistream(false)
+      const [out, readErr] = await io.ReadAll(reader!)
+      expect(readErr).toBeNull()
+      expect(Buffer.from(asBytes(out)).toString()).toBe('one frame')
+      expect(input.position).toBe(encoded.length)
     })
     it('keeps checksum failures sticky and preserves delivered data', async () => {
       const encoded = encode(Buffer.from('payload'))

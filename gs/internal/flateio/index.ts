@@ -16,6 +16,7 @@ import {
   zlibInflate,
   zlibInflateEnd,
   zlibInflateInit2,
+  zlibInflateReset,
   zlibInflateSetDictionary,
 } from 'pako'
 
@@ -236,23 +237,42 @@ export class Deflater {
 }
 
 // A Reader may overread into its bounded scratch buffer. A ByteReader is used
-// byte-exactly so framed protocols can retain bytes following a member. This
-// never emulates ReadByte with one-byte Reader.Read calls.
+// byte-exactly so framed protocols can retain bytes following a member, unless
+// it is also a Seeker: then it is read in bulk and rewind returns the unread
+// bytes. This never emulates ReadByte with one-byte Reader.Read calls. The
+// buffer is kept across resets.
 class Input {
   readonly buffer = new Uint8Array(chunkSize)
   offset = 0
   available = 0
+  reader: io.Reader | null = null
   private terminal: $.GoError = null
-  private readonly byteReader: io.ByteReader | null
+  private byteReader: io.ByteReader | null = null
+  private seeker: io.Seeker | null = null
 
-  constructor(private readonly reader: io.Reader) {
-    this.byteReader = 'ReadByte' in reader && typeof reader.ReadByte === 'function' ?
-      reader as io.Reader & io.ByteReader : null
+  reset(reader: io.Reader | null): void {
+    this.reader = reader
+    this.offset = 0
+    this.available = 0
+    this.terminal = null
+    const byteReader = reader != null && 'ReadByte' in reader && typeof reader.ReadByte === 'function'
+    const seeker = byteReader && 'Seek' in reader && typeof reader.Seek === 'function'
+    this.byteReader = byteReader && !seeker ? reader as io.Reader & io.ByteReader : null
+    this.seeker = seeker ? reader as io.Reader & io.Seeker : null
+  }
+
+  // rewind seeks a bulk-read ByteReader back over the unconsumed bytes.
+  rewind(): void {
+    if (this.seeker == null || this.available === 0) return
+    this.seeker.Seek(BigInt(-this.available), io.SeekCurrent)
+    this.available = 0
+    this.terminal = null
   }
 
   *fill(): Operation<$.GoError> {
     if (this.available > 0) return null
     if (this.terminal != null) return this.terminal
+    if (this.reader == null) return $.newError('compress: nil reader')
     this.offset = 0
     if (this.byteReader != null) {
       const [value, err] = yield this.byteReader.ReadByte()
@@ -303,7 +323,8 @@ export type DecodeErrors = {
 export class Inflater {
   header: GzipHeader = { name: '', comment: '', extra: null, time: 0, os: 255 }
   private stream: ZStream | null = null
-  private input: Input | null = null
+  private readonly input = new Input()
+  private scratch: Uint8Array<ArrayBuffer> | null = null
   private dictionary = new Uint8Array(0)
   private error: $.GoError = null
   private ended = false
@@ -317,8 +338,7 @@ export class Inflater {
 
   Reset(reader: io.Reader | null, dictionary: $.Bytes = null): io.Awaitable<$.GoError> {
     this.queue.assertIdle()
-    this.release()
-    this.input = reader == null ? null : new Input($.pointerValue<io.Reader>(reader))
+    this.input.reset(reader == null ? null : $.pointerValue<io.Reader>(reader))
     this.dictionary = new Uint8Array($.bytesToUint8Array(dictionary))
     this.header = { name: '', comment: '', extra: null, time: 0, os: 255 }
     this.error = null
@@ -355,7 +375,7 @@ export class Inflater {
 
   private *initialize(first: boolean): Operation<$.GoError> {
     const input = this.input
-    if (input == null) return $.newError(`${this.format}: nil reader`)
+    if (input.reader == null) return $.newError(`${this.format}: nil reader`)
     const bytes: number[] = []
     const fixed = this.format === 'gzip' ? 10 : 2
     for (let index = 0; index < fixed; index++) {
@@ -416,10 +436,13 @@ export class Inflater {
         if ((low | (high << 8)) !== expected) return this.errors.header()
       }
     }
-    this.release()
-    const stream = new ZStream()
-    if (zlibInflateInit2(stream, this.format === 'gzip' ? 31 : 15) !== Z_OK) return $.newError('flate: initialization failed')
-    this.stream = stream
+    // Resetting keeps the stream's window allocation for the next member.
+    let stream = this.stream
+    if (stream == null || zlibInflateReset(stream) !== Z_OK) {
+      stream = new ZStream()
+      if (zlibInflateInit2(stream, this.format === 'gzip' ? 31 : 15) !== Z_OK) return $.newError('flate: initialization failed')
+      this.stream = stream
+    }
     stream.input = new Uint8Array(bytes)
     stream.next_in = 0
     stream.avail_in = bytes.length
@@ -446,7 +469,10 @@ export class Inflater {
     if (this.error != null) return [0, this.error]
     if (this.closed) return [0, io.ErrClosedPipe]
     if ($.len(p) === 0) return [0, null]
-    const output = new Uint8Array(Math.min($.len(p), chunkSize))
+    // A byte slice is inflated in place; other destinations copy from scratch.
+    // The codec only indexes its output, so any backing buffer is valid.
+    const direct = p instanceof Uint8Array
+    const output = direct ? p as Uint8Array<ArrayBuffer> : this.scratch ??= new Uint8Array(chunkSize)
     while (true) {
       if (this.ended) {
         if (this.format === 'zlib' || !this.multistream) { this.error = io.EOF; return [0, this.error] }
@@ -455,14 +481,15 @@ export class Inflater {
       }
       const stream = this.stream
       const input = this.input
-      if (stream == null || input == null) return [0, $.newError(`${this.format}: reader is not initialized`)]
+      if (stream == null || input.reader == null) return [0, $.newError(`${this.format}: reader is not initialized`)]
       stream.output = output
       stream.next_out = 0
-      stream.avail_out = output.length
+      stream.avail_out = Math.min($.len(p), output.length)
       const before = stream.avail_in
       // Z_BLOCK exposes the final DEFLATE boundary before the wrapper trailer.
       // gzip.Close reports decompressor errors, not gzip trailer/checksum errors.
       const status = zlibInflate(stream, Z_BLOCK)
+      stream.output = released
       const boundary = (stream.data_type & 128) !== 0
       if ((stream.data_type & 192) === 192) this.bodyEnded = true
       const consumed = before - stream.avail_in
@@ -470,14 +497,17 @@ export class Inflater {
       const n = stream.next_out
       if (status === Z_STREAM_END) {
         this.ended = true
-        if (this.format === 'zlib' || !this.multistream) this.error = io.EOF
+        if (this.format === 'zlib' || !this.multistream) {
+          this.error = io.EOF
+          input.rewind()
+        }
       } else if (status !== Z_OK && status !== Z_BUF_ERROR) {
         this.error = stream.msg === 'incorrect data check' || stream.msg === 'incorrect length check' ?
           this.errors.checksum() : $.newError(`flate: ${stream.msg || `codec error ${status}`}`)
         if (!this.bodyEnded) this.bodyError = this.error
       }
       if (n > 0) {
-        $.copyByteRanges(p, 0, n, output, 0, n)
+        if (!direct) $.copyByteRanges(p, 0, n, output, 0, n)
         return [n, this.error]
       }
       if (this.error != null) return [0, this.error]
