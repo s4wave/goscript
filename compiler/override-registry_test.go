@@ -36,6 +36,40 @@ func TestOverrideRegistryPlansRuntimeAndOverrideDependencies(t *testing.T) {
 	}
 }
 
+func TestOverrideRegistryIncludesJSONText(t *testing.T) {
+	owner := NewOverrideRegistryOwner()
+	req := &CompileRequest{
+		OutputPath:          filepath.Join(t.TempDir(), "out"),
+		RuntimeEmissionMode: RuntimeEmissionModeEmit,
+	}
+	plan, diagnostics := owner.CopyPlan(context.Background(), req, &PackageGraph{Nodes: []*PackageGraphNode{{
+		PkgPath:           "encoding/json",
+		OverrideCandidate: true,
+	}}})
+	if diagnosticsHaveErrors(diagnostics) {
+		t.Fatalf("copy plan failed: %#v", diagnostics)
+	}
+
+	var packages []string
+	for _, pkg := range plan.packages {
+		packages = append(packages, pkg.path)
+	}
+	jsontext := slices.Index(packages, "encoding/json/jsontext")
+	json := slices.Index(packages, "encoding/json")
+	if jsontext < 0 || json < 0 || jsontext > json {
+		t.Fatalf("jsontext must precede encoding/json in copy plan: %v", packages)
+	}
+
+	_, diagnostics = owner.CopyPackages(context.Background(), req, plan)
+	if diagnosticsHaveErrors(diagnostics) {
+		t.Fatalf("copy failed: %#v", diagnostics)
+	}
+	path := filepath.Join(req.OutputPath, "@goscript", "encoding", "json", "jsontext", "index.ts")
+	if _, err := os.Stat(path); err != nil {
+		t.Fatalf("expected copied jsontext index.ts: %v", err)
+	}
+}
+
 func TestOverrideRegistryFactsAreImmutable(t *testing.T) {
 	owner := NewOverrideRegistryOwner()
 	facts, diagnostics := owner.Facts(context.Background())
