@@ -17,4 +17,16 @@ stable: b d a c
 is sorted func: true
 delete func: 1 3 5 3
 sorted: a b c
+value: 1
+value: 2
+value: 3
+value: 4
+value: 5
+value stop: 1
+value stop: 2
+nil values: 0
+sorted values: a b c
+repeat: 6 6 7 8 false 0
+sorted func: 3 2 1 true
+sorted stable func: b d a c
 test finished

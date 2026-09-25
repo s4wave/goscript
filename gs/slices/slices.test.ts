@@ -24,10 +24,14 @@ import {
   MaxFunc,
   Min,
   MinFunc,
+  Repeat,
   Replace,
   Sorted,
+  SortedFunc,
+  SortedStableFunc,
   SortFunc,
   SortStableFunc,
+  Values,
 } from './slices.js'
 
 describe('slices Go comparable equality and lower-bound search', () => {
@@ -296,6 +300,150 @@ describe('slices.Chunk', () => {
 
   it('panics when n is less than 1', () => {
     expect(() => Chunk($.arrayToSlice([1]), 0)).toThrow()
+  })
+})
+
+describe('slices.Values', () => {
+  it('yields elements in order and stops when yield returns false', () => {
+    const visited: string[] = []
+    Values($.arrayToSlice(['a', 'b', 'c']))((value) => {
+      visited.push(value)
+      return value !== 'b'
+    })
+
+    expect(visited).toEqual(['a', 'b'])
+  })
+
+  it('yields nothing for a nil or empty slice', () => {
+    const visited: number[] = []
+    Values<number>(null)((value) => {
+      visited.push(value)
+      return true
+    })
+    Values($.arrayToSlice<number>([]))((value) => {
+      visited.push(value)
+      return true
+    })
+
+    expect(visited).toEqual([])
+  })
+
+  it('accepts async yield callbacks', async () => {
+    const visited: string[] = []
+    await Values($.arrayToSlice(['a', 'b', 'c']))(async (value) => {
+      visited.push(value)
+      return value === 'a'
+    })
+
+    expect(visited).toEqual(['a', 'b'])
+  })
+})
+
+describe('slices.Repeat', () => {
+  it('repeats elements and returns a non-nil empty slice for a zero count', () => {
+    const source = $.arrayToSlice([1, 2])
+    const repeated = Repeat(source, 3)
+    ;(repeated as number[])[0] = 9
+
+    expect(Array.from(repeated ?? [])).toEqual([9, 2, 1, 2, 1, 2])
+    expect($.len(repeated)).toBe(6)
+    expect($.cap(repeated)).toBe(6)
+    expect(source?.[0]).toBe(1)
+
+    const empty = Repeat($.arrayToSlice([7]), 0)
+    const fromNil = Repeat<number>(null, 4)
+    expect(empty).not.toBeNull()
+    expect($.len(empty)).toBe(0)
+    expect($.cap(empty)).toBe(0)
+    expect(fromNil).not.toBeNull()
+    expect($.len(fromNil)).toBe(0)
+  })
+
+  it('repeats only the visible window of a resliced value', () => {
+    const window = $.goSlice($.arrayToSlice([1, 2, 3, 4]), 1, 3)
+    const repeated = Repeat(window, 2)
+
+    expect(Array.from(repeated ?? [])).toEqual([2, 3, 2, 3])
+    expect($.cap(repeated)).toBe(4)
+  })
+
+  it('keeps byte slices as byte slices', () => {
+    const repeated = Repeat(new Uint8Array([1, 2]), 2)
+
+    expect(repeated).toBeInstanceOf(Uint8Array)
+    expect(Array.from(repeated ?? [])).toEqual([1, 2, 1, 2])
+  })
+
+  it('returns an empty slice for an empty source without walking count', () => {
+    expect($.len(Repeat($.arrayToSlice<number>([]), 2 ** 52))).toBe(0)
+  })
+
+  it('panics on a negative count or a product above maxInt', () => {
+    expect(() => Repeat($.arrayToSlice([1]), -1)).toThrow('cannot be negative')
+    expect(() => Repeat($.arrayToSlice([1, 2]), 2 ** 62)).toThrow(
+      'the result of (len(x) * count) overflows',
+    )
+  })
+})
+
+describe('slices.SortedFunc', () => {
+  it('collects iterator values in the order cmp defines', async () => {
+    const values = await SortedFunc<number>(
+      (yieldValue) => {
+        yieldValue!(1)
+        yieldValue!(3)
+        yieldValue!(2)
+      },
+      (a, b) => b - a,
+    )
+
+    expect(Array.from(values ?? [])).toEqual([3, 2, 1])
+    expect(await SortedFunc<number>(() => {}, null)).toBeNull()
+  })
+
+  it('awaits an asynchronous sequence and comparison', async () => {
+    const values = await SortedFunc<number>(
+      async (yieldValue) => {
+        for (const value of [2, 3, 1]) {
+          if (!(await yieldValue!(value))) {
+            return
+          }
+        }
+      },
+      async (a, b) => b - a,
+    )
+
+    expect(Array.from(values ?? [])).toEqual([3, 2, 1])
+  })
+
+  it('rejects a nil comparison when there is something to sort', async () => {
+    await expect(
+      SortedFunc<number>((yieldValue) => {
+        yieldValue!(2)
+        yieldValue!(1)
+      }, null),
+    ).rejects.toThrow('slices.SortFunc: nil comparison function')
+  })
+})
+
+describe('slices.SortedStableFunc', () => {
+  it('keeps the original order of equal elements', async () => {
+    const values = await SortedStableFunc<{ group: number; label: string }>(
+      (yieldValue) => {
+        yieldValue!({ group: 2, label: 'a' })
+        yieldValue!({ group: 1, label: 'b' })
+        yieldValue!({ group: 2, label: 'c' })
+        yieldValue!({ group: 1, label: 'd' })
+      },
+      (a, b) => a.group - b.group,
+    )
+
+    expect(Array.from(values ?? []).map((value) => value.label)).toEqual([
+      'b',
+      'd',
+      'a',
+      'c',
+    ])
   })
 })
 

@@ -109,6 +109,59 @@ export async function main(): globalThis.Promise<void> {
 	let sortedKeys: $.Slice<string> = (slices.Sorted(maps.Keys($.makeMap<string, number>([["c", 3], ["a", 1], ["b", 2]]))) as $.Slice<string>)
 	await $.println("sorted:", $.arrayIndex(sortedKeys!, 0), $.arrayIndex(sortedKeys!, 1), $.arrayIndex(sortedKeys!, 2))
 
+	let __goscriptRangeReturn2 = false
+	;await (async () => {
+		await slices.Values(s)!(async (v) => {
+			await $.println("value:", v)
+			return true
+		})
+	})()
+	if (__goscriptRangeReturn2) {
+		return
+	}
+	let __goscriptRangeReturn3 = false
+	;await (async () => {
+		await slices.Values(s)!(async (v) => {
+			if (v > 2) {
+				return false
+			}
+			await $.println("value stop:", v)
+			return true
+		})
+	})()
+	if (__goscriptRangeReturn3) {
+		return
+	}
+	let valueCount = 0
+	let __goscriptRangeReturn4 = false
+	;await (async () => {
+		await slices.Values(nilSlice)!(async (__goscriptRange4_0) => {
+			valueCount++
+			return true
+		})
+	})()
+	if (__goscriptRangeReturn4) {
+		return
+	}
+	await $.println("nil values:", valueCount)
+	let sortedValues: $.Slice<string> = (slices.Sorted(slices.Values($.arrayToSlice<string>(["c", "a", "b"]))) as $.Slice<string>)
+	await $.println("sorted values:", $.arrayIndex(sortedValues!, 0), $.arrayIndex(sortedValues!, 1), $.arrayIndex(sortedValues!, 2))
+
+	let repeated: $.Slice<number> = (slices.Repeat($.arrayToSlice<number>([7, 8]), 3) as $.Slice<number>)
+	await $.println("repeat:", $.len(repeated), $.cap(repeated), $.arrayIndex(repeated!, 0), $.arrayIndex(repeated!, 5), slices.Repeat(null, 2) == null, $.len(slices.Repeat($.arrayToSlice<number>([1]), 0)))
+
+	let sortedFunc: $.Slice<number> = (await slices.SortedFunc(slices.Values($.arrayToSlice<number>([1, 3, 2])), $.functionValue((a: number, b: number): number => {
+		return b - a
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))) as $.Slice<number>)
+	await $.println("sorted func:", $.arrayIndex(sortedFunc!, 0), $.arrayIndex(sortedFunc!, 1), $.arrayIndex(sortedFunc!, 2), await slices.SortedFunc(slices.Values($.arrayToSlice<number>([])), $.functionValue((a: number, b: number): number => {
+		return a - b
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))) == null)
+
+	let stableSeq: $.Slice<item> = (await slices.SortedStableFunc(slices.Values($.arrayToSlice<item>([$.markAsStructValue(new item({group: 2, label: "a"})), $.markAsStructValue(new item({group: 1, label: "b"})), $.markAsStructValue(new item({group: 2, label: "c"})), $.markAsStructValue(new item({group: 1, label: "d"}))])), $.functionValue((a: item, b: item): number => {
+		return a.group - b.group
+	}, ({ kind: $.TypeKind.Function, params: ["main.item", "main.item"], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))) as $.Slice<item>)
+	await $.println("sorted stable func:", $.arrayIndex(stableSeq!, 0).label, $.arrayIndex(stableSeq!, 1).label, $.arrayIndex(stableSeq!, 2).label, $.arrayIndex(stableSeq!, 3).label)
+
 	await $.println("test finished")
 }
 

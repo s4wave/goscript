@@ -1,7 +1,9 @@
 {
   "asyncFunctions": {
     "DeleteFunc": true,
-    "SortFunc": true
+    "SortFunc": true,
+    "SortedFunc": true,
+    "SortedStableFunc": true
   },
   "dependencies": ["cmp", "iter"]
 }

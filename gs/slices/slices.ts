@@ -126,6 +126,31 @@ export function Concat<T>(...slices: $.Slice<T>[]): $.Slice<T> {
 }
 
 /**
+ * Repeat returns a new slice that repeats x count times.
+ * The result has length and capacity len(x) * count and is never nil.
+ * Repeat panics if count is negative or if len(x) * count exceeds Go's
+ * 64-bit maxInt. makeSlice rejects a length JavaScript cannot allocate.
+ */
+export function Repeat<T>(x: $.Slice<T>, count: number): $.Slice<T> {
+  if (count < 0) {
+    $.panic('cannot be negative')
+  }
+  const length = $.len(x)
+  const total = length * count
+  if (total >= 2 ** 63) {
+    $.panic('the result of (len(x) * count) overflows')
+  }
+  const out =
+    x instanceof Uint8Array ?
+      $.makeSlice<T>(total, total, 'byte')
+    : $.makeSlice<T>(total)
+  for (let i = 0; i < total; i++) {
+    ;(out as any)[i] = (x as any)[i % length]
+  }
+  return out
+}
+
+/**
  * All returns an iterator over index-value pairs in the slice.
  * This is equivalent to Go's slices.All function.
  * @param s The slice to iterate over
@@ -188,6 +213,34 @@ export function Backward<T>(
       return
     }
     return walk(length - 1)
+  }
+}
+
+/**
+ * Values returns an iterator that yields the slice elements in order.
+ * Iteration stops when yield returns false. A nil slice yields nothing.
+ */
+export function Values<T>(s: $.Slice<T>): iter.Seq<T> {
+  return function (
+    _yield: ((value: T) => iter.YieldResult) | null,
+  ): void | globalThis.Promise<void> {
+    const length = $.len(s)
+    const walk = (i: number): void | globalThis.Promise<void> => {
+      for (; i < length; i++) {
+        const keepGoing = _yield!((s as any)[i] as T)
+        if (keepGoing instanceof Promise) {
+          return keepGoing.then((next) => {
+            if (next) {
+              return walk(i + 1)
+            }
+          })
+        }
+        if (!keepGoing) {
+          return
+        }
+      }
+    }
+    return walk(0)
   }
 }
 
@@ -330,6 +383,44 @@ export function AppendSeq<T>(
 export function Sorted<T extends cmp.Ordered>(seq: iter.Seq<T>): $.Slice<T> {
   const out = Collect<T>(seq)
   Sort(out)
+  return out
+}
+
+/**
+ * SortedFunc collects seq and sorts it with cmp, awaiting an asynchronous
+ * sequence or comparison. An empty sequence stays nil and never calls cmp.
+ */
+export async function SortedFunc<T>(
+  seq: iter.Seq<T>,
+  cmp: CompareCallback<T>,
+): globalThis.Promise<$.Slice<T>> {
+  const out = await collectAsync(seq)
+  if ($.len(out) > 1) {
+    await SortFunc(out, cmp)
+  }
+  return out
+}
+
+/** SortedStableFunc is SortedFunc, whose SortFunc merge sort is stable. */
+export function SortedStableFunc<T>(
+  seq: iter.Seq<T>,
+  cmp: CompareCallback<T>,
+): globalThis.Promise<$.Slice<T>> {
+  return SortedFunc(seq, cmp)
+}
+
+// collectAsync collects seq, awaiting a sequence that yields asynchronously.
+async function collectAsync<T>(
+  seq: iter.Seq<T> | null,
+): globalThis.Promise<$.Slice<T>> {
+  if (seq == null) {
+    throw new Error('slices: nil iterator')
+  }
+  let out: $.Slice<T> = null
+  await seq((value: T) => {
+    out = $.append(out, value)
+    return true
+  })
   return out
 }
 
@@ -627,7 +718,7 @@ export function Grow<T>(
 /**
  * SortFunc sorts the slice using the provided comparison function.
  * The comparison function should return a negative number if a < b, zero if a == b, or a positive number if a > b.
- * This is equivalent to Go's slices.SortFunc function.
+ * The sort is a stable merge sort so it can await an asynchronous comparison.
  * @param s The slice to sort in place
  * @param cmp Comparison function
  */
