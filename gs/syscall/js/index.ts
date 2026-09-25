@@ -196,93 +196,10 @@ export class Value {
   }
 }
 
-export class Error {
-  public Value: Value
-
-  constructor(init?: Partial<Error>) {
-    this.Value = init?.Value?.clone() ?? Undefined()
-  }
-
-  public clone(): Error {
-    return new Error({ Value: this.Value })
-  }
-
-  public Error(): string {
-    return `JavaScript error: ${this.Value.Get('message').String()}`
-  }
-}
-
-// callJS runs a JavaScript call and wraps its result. A thrown JavaScript value
-// panics with Error, as Value.Call, Invoke and New do in Go, so a deferred
-// recover can catch it. A GoPanic thrown by a Go callback unwinds unchanged.
-function callJS(call: () => unknown): Value {
-  let raw: unknown
-  try {
-    raw = call()
-  } catch (err) {
-    if (err instanceof $.GoPanic) {
-      throw err
-    }
-    const thrown = $.markAsStructValue(
-      new Error({ Value: new Value({ raw: err }) }),
-    )
-    $.panic($.interfaceValue(thrown, 'js.Error', 'js.Error'))
-  }
-  return new Value({ raw })
-}
-
-export class ValueError {
-  public Method: string
-  public Type: Type
-
-  constructor(init?: Partial<ValueError>) {
-    this.Method = init?.Method ?? ''
-    this.Type = init?.Type ?? TypeUndefined
-  }
-
-  public clone(): ValueError {
-    return new ValueError({ Method: this.Method, Type: this.Type })
-  }
-
-  public Error(): string {
-    return `syscall/js: call of ${this.Method} on ${Type_String(this.Type)}`
-  }
-}
-
-export class Func {
-  public Value: Value
-  private _released = false
-
-  constructor(
-    init?: Partial<Func> & {
-      fn?: (this$: Value, args: $.Slice<Value>) => unknown
-    },
-  ) {
-    const fn = init?.fn
-    this.Value =
-      init?.Value?.clone() ??
-      new Value({
-        raw: function (this: unknown, ...args: unknown[]) {
-          if (fn === undefined) {
-            return undefined
-          }
-          return ValueOf(
-            fn(
-              new Value({ raw: this }),
-              args.map((arg) => new Value({ raw: arg })) as $.Slice<Value>,
-            ),
-          )._raw
-        },
-      })
-  }
-
-  public clone(): Func {
-    return new Func({ Value: this.Value })
-  }
-
-  public Release(): void {
-    this._released = true
-  }
+// EmbeddedValue forwards the method set of an embedded Value field, as Go
+// promotes those methods on Error and Func.
+abstract class EmbeddedValue {
+  public abstract Value: Value
 
   public Equal(w: Value): boolean {
     return this.Value.Equal(w)
@@ -362,6 +279,97 @@ export class Func {
 
   public String(): string {
     return this.Value.String()
+  }
+}
+
+export class Error extends EmbeddedValue {
+  public Value: Value
+
+  constructor(init?: Partial<Error>) {
+    super()
+    this.Value = init?.Value?.clone() ?? Undefined()
+  }
+
+  public clone(): Error {
+    return new Error({ Value: this.Value })
+  }
+
+  public Error(): string {
+    return `JavaScript error: ${this.Value.Get('message').String()}`
+  }
+}
+
+// callJS runs a JavaScript call and wraps its result. A thrown JavaScript value
+// panics with Error, as Value.Call, Invoke and New do in Go, so a deferred
+// recover can catch it. A GoPanic thrown by a Go callback unwinds unchanged.
+function callJS(call: () => unknown): Value {
+  let raw: unknown
+  try {
+    raw = call()
+  } catch (err) {
+    if (err instanceof $.GoPanic) {
+      throw err
+    }
+    const thrown = $.markAsStructValue(
+      new Error({ Value: new Value({ raw: err }) }),
+    )
+    $.panic($.interfaceValue(thrown, 'js.Error', 'js.Error'))
+  }
+  return new Value({ raw })
+}
+
+export class ValueError {
+  public Method: string
+  public Type: Type
+
+  constructor(init?: Partial<ValueError>) {
+    this.Method = init?.Method ?? ''
+    this.Type = init?.Type ?? TypeUndefined
+  }
+
+  public clone(): ValueError {
+    return new ValueError({ Method: this.Method, Type: this.Type })
+  }
+
+  public Error(): string {
+    return `syscall/js: call of ${this.Method} on ${Type_String(this.Type)}`
+  }
+}
+
+export class Func extends EmbeddedValue {
+  public Value: Value
+  private _released = false
+
+  constructor(
+    init?: Partial<Func> & {
+      fn?: (this$: Value, args: $.Slice<Value>) => unknown
+    },
+  ) {
+    super()
+    const fn = init?.fn
+    this.Value =
+      init?.Value?.clone() ??
+      new Value({
+        raw: function (this: unknown, ...args: unknown[]) {
+          if (fn === undefined) {
+            return undefined
+          }
+          return ValueOf(
+            fn(
+              new Value({ raw: this }),
+              args.map((arg) => new Value({ raw: arg })) as $.Slice<Value>,
+            ),
+          )._raw
+        },
+      })
+  }
+
+  public clone(): Func {
+    return new Func({ Value: this.Value })
+  }
+
+  public Release(): void {
+    this._released = true
   }
 }
 

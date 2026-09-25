@@ -26,4 +26,14 @@ func main() {
 	dst := make([]byte, 3)
 	js.CopyBytesToGo(dst, bytes)
 	println("bytes:", string(dst))
+
+	// A JavaScript exception surfaces as a js.Error panic.
+	func() {
+		defer func() {
+			if err, ok := recover().(js.Error); ok {
+				println("recovered:", err.Get("name").String())
+			}
+		}()
+		global.Get("JSON").Call("parse", "{")
+	}()
 }

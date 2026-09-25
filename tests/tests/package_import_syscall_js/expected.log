@@ -3,3 +3,4 @@ name: goscript
 length: 3
 callback: 42
 bytes: ABC
+recovered: SyntaxError

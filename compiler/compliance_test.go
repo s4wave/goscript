@@ -28,6 +28,11 @@ func TestCompliance(t *testing.T) {
 		t.Fatalf("failed to read tests dir: %v", err)
 	}
 
+	// target is the build context the compiler loads packages with, so a
+	// fixture's file constraints select the same files the compiler sees.
+	target := build.Default
+	target.GOOS, target.GOARCH = "js", "wasm"
+
 	fixtures := make([]complianceFixture, 0, len(entries))
 	for _, entry := range entries {
 		if !entry.IsDir() {
@@ -40,7 +45,7 @@ func TestCompliance(t *testing.T) {
 		}
 		matchesBuild := false
 		for _, goFile := range goFiles {
-			matches, err := build.Default.MatchFile(testPath, filepath.Base(goFile))
+			matches, err := target.MatchFile(testPath, filepath.Base(goFile))
 			if err != nil {
 				t.Fatal(err)
 			}
