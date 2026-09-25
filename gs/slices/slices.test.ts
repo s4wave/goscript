@@ -7,6 +7,7 @@ import {
   AppendSeq,
   Backward,
   BinarySearch,
+  Chunk,
   Clip,
   Compact,
   CompactFunc,
@@ -259,6 +260,42 @@ describe('slices.Backward', () => {
       [2, 'c'],
       [1, 'b'],
     ])
+  })
+})
+
+describe('slices.Chunk', () => {
+  it('yields capacity-clipped chunks with a short final chunk', () => {
+    const chunks: Array<[number[], number]> = []
+    Chunk(
+      $.arrayToSlice([1, 2, 3, 4, 5]),
+      2,
+    )((chunk) => {
+      chunks.push([$.asArray(chunk), $.cap(chunk)])
+      return true
+    })
+
+    expect(chunks).toEqual([
+      [[1, 2], 2],
+      [[3, 4], 2],
+      [[5], 1],
+    ])
+  })
+
+  it('stops when yield returns false', async () => {
+    const chunks: number[][] = []
+    await Chunk(
+      $.arrayToSlice([1, 2, 3, 4, 5]),
+      2,
+    )(async (chunk) => {
+      chunks.push($.asArray(chunk))
+      return false
+    })
+
+    expect(chunks).toEqual([[1, 2]])
+  })
+
+  it('panics when n is less than 1', () => {
+    expect(() => Chunk($.arrayToSlice([1]), 0)).toThrow()
   })
 })
 

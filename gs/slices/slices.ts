@@ -191,6 +191,47 @@ export function Backward<T>(
   }
 }
 
+/**
+ * Chunk returns an iterator over consecutive subslices of up to n elements of
+ * s. All but the last subslice have exactly n elements. Each subslice has its
+ * capacity clipped to its length. Chunk panics if n is less than 1.
+ * @param s The slice to split
+ * @param n The chunk length
+ * @returns An iterator function that yields the subslices
+ */
+export function Chunk<T>(
+  s: $.Slice<T>,
+  n: number,
+): (
+  _yield: (chunk: $.Slice<T>) => iter.YieldResult,
+) => void | globalThis.Promise<void> {
+  if (n < 1) {
+    $.panic('cannot be less than 1')
+  }
+  return function (
+    _yield: (chunk: $.Slice<T>) => iter.YieldResult,
+  ): void | globalThis.Promise<void> {
+    const length = $.len(s)
+    const walk = (i: number): void | globalThis.Promise<void> => {
+      for (; i < length; i += n) {
+        const end = Math.min(i + n, length)
+        const keepGoing = _yield($.goSlice(s, i, end, end))
+        if (keepGoing instanceof Promise) {
+          return keepGoing.then((next) => {
+            if (next) {
+              return walk(i + n)
+            }
+          })
+        }
+        if (!keepGoing) {
+          return
+        }
+      }
+    }
+    return walk(0)
+  }
+}
+
 export function Sort<T extends cmp.Ordered>(s: $.Slice<T>): void {
   $.sortSlice(s)
 }
@@ -286,9 +327,7 @@ export function AppendSeq<T>(
 }
 
 /** Sorted collects an iterator and orders all Go ordered types, including 64-bit integers. */
-export function Sorted<T extends cmp.Ordered>(
-  seq: iter.Seq<T>,
-): $.Slice<T> {
+export function Sorted<T extends cmp.Ordered>(seq: iter.Seq<T>): $.Slice<T> {
   const out = Collect<T>(seq)
   Sort(out)
   return out
