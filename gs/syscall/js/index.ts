@@ -105,33 +105,33 @@ export class Value {
         `syscall/js: Value.Call: property ${m} is not a function, got ${Type_String(ValueOf(fn).Type())}`,
       )
     }
-    return new Value({
-      raw: fn.apply(
+    return callJS(() =>
+      fn.apply(
         this._raw,
         args.map((arg) => ValueOf(arg)._raw),
       ),
-    })
+    )
   }
 
   public Invoke(...args: unknown[]): Value {
     if (typeof this._raw !== 'function') {
       $.panic(new ValueError({ Method: 'Value.Invoke', Type: this.Type() }))
     }
-    return new Value({
-      raw: this._raw(...args.map((arg) => ValueOf(arg)._raw)),
-    })
+    const fn = this._raw
+    return callJS(() => fn(...args.map((arg) => ValueOf(arg)._raw)))
   }
 
   public New(...args: unknown[]): Value {
     if (typeof this._raw !== 'function') {
-      $.panic(new ValueError({ Method: 'Value.Invoke', Type: this.Type() }))
+      $.panic(new ValueError({ Method: 'Value.New', Type: this.Type() }))
     }
-    return new Value({
-      raw: Reflect.construct(
-        this._raw,
+    const fn = this._raw
+    return callJS(() =>
+      Reflect.construct(
+        fn,
         args.map((arg) => ValueOf(arg)._raw),
       ),
-    })
+    )
   }
 
   public InstanceOf(t: Value): boolean {
@@ -210,6 +210,25 @@ export class Error {
   public Error(): string {
     return `JavaScript error: ${this.Value.Get('message').String()}`
   }
+}
+
+// callJS runs a JavaScript call and wraps its result. A thrown JavaScript value
+// panics with Error, as Value.Call, Invoke and New do in Go, so a deferred
+// recover can catch it. A GoPanic thrown by a Go callback unwinds unchanged.
+function callJS(call: () => unknown): Value {
+  let raw: unknown
+  try {
+    raw = call()
+  } catch (err) {
+    if (err instanceof $.GoPanic) {
+      throw err
+    }
+    const thrown = $.markAsStructValue(
+      new Error({ Value: new Value({ raw: err }) }),
+    )
+    $.panic($.interfaceValue(thrown, 'js.Error', 'js.Error'))
+  }
+  return new Value({ raw })
 }
 
 export class ValueError {

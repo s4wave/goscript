@@ -3,6 +3,7 @@
 package browserapi
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"syscall/js"
@@ -53,4 +54,30 @@ func TestBrowserStderrUsesConsoleLog(t *testing.T) {
 	if len(calls) != 1 || calls[0] != "log:goscript stderr proof" {
 		t.Fatalf("stderr console calls = %#v, want console.log", calls)
 	}
+}
+
+func TestBrowserThrownErrorRecovers(t *testing.T) {
+	err := parseJSON("{")
+	var jsErr js.Error
+	if !errors.As(err, &jsErr) {
+		t.Fatalf("parseJSON error = %v, want js.Error", err)
+	}
+	if name := jsErr.Value.Get("name").String(); name != "SyntaxError" {
+		t.Fatalf("thrown name = %q, want SyntaxError", name)
+	}
+}
+
+// parseJSON calls JSON.parse and recovers the js.Error panic a throw raises.
+func parseJSON(text string) (err error) {
+	defer func() {
+		switch r := recover().(type) {
+		case nil:
+		case js.Error:
+			err = r
+		default:
+			panic(r)
+		}
+	}()
+	js.Global().Get("JSON").Call("parse", text)
+	return nil
 }
