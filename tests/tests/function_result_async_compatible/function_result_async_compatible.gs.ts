@@ -65,7 +65,7 @@ export async function wrapNew(__typeArgs: $.GenericTypeArgs | undefined, newValu
 }
 
 export async function main(): globalThis.Promise<void> {
-	let fn: (() => Value | null | globalThis.Promise<Value | null>) | null = await wrapNew(undefined, asyncBox)
+	let fn: (() => Value | null | globalThis.Promise<Value | null>) | null = await wrapNew({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.box"), zero: () => null, methods: {Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value(...$.stripGenericTypeArgs(args))} }}, asyncBox)
 	await $.println(await $.pointerValue<Exclude<Value, null>>((await fn!())).Value())
 }
 

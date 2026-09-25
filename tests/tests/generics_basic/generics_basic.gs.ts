@@ -254,7 +254,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("pop:", value, ok, stack.value.Len({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}))
 
 	await $.println("=== Generic map alias ===")
-	let seen: Set = (NewSet(undefined, $.arrayToSlice<string>(["go", "ts"])) as Set)
+	let seen: Set = (NewSet({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, $.arrayToSlice<string>(["go", "ts"])) as Set)
 	Set_Add(seen, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, "wasm")
 	await $.println("set:", Set_Has(seen, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, "go"), Set_Has(seen, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, "rust"), $.len(seen))
 

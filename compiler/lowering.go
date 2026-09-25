@@ -8479,8 +8479,8 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 				return args[0] + "!.close()", diagnostics
 			}
 		}
-		if signature := genericFunctionSignature(ctx, fun); signature != nil {
-			args = append([]string{o.inferredGenericTypeArgsExpr(ctx, signature, expr.Args)}, args...)
+		if genericFunctionSignature(ctx, fun) != nil {
+			args = append([]string{o.genericTypeArgsExpr(ctx, fun, nil)}, args...)
 		}
 		callee := o.lowerCallableExpr(ctx, fun, o.lowerIdent(ctx, fun, false))
 		call := callee + "(" + strings.Join(args, ", ") + ")"
@@ -8499,10 +8499,10 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 				return o.awaitCallIfNeeded(ctx, fun, call), diagnostics
 			}
 			// A generic method on a plain receiver takes its own type dictionary.
-			if signature := genericFunctionSignature(ctx, fun); signature != nil &&
+			if genericFunctionSignature(ctx, fun) != nil &&
 				len(genericReceiverTypeParams(selection.Recv())) == 0 &&
 				!o.callUsesOverridePackage(ctx, fun) {
-				args = append([]string{o.inferredGenericTypeArgsExpr(ctx, signature, expr.Args)}, args...)
+				args = append([]string{o.genericTypeArgsExpr(ctx, fun, nil)}, args...)
 			}
 			if genericArgs := o.genericReceiverTypeArgsExpr(ctx, selection); genericArgs != "" &&
 				!o.callUsesOverridePackage(ctx, fun) {
@@ -8533,8 +8533,8 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 			return o.awaitCallIfNeeded(ctx, fun, call), diagnostics
 		}
 		selector, selectorDiagnostics := o.lowerSelectorExpr(ctx, fun)
-		if signature := genericFunctionSignature(ctx, fun); signature != nil && !o.callUsesOverridePackage(ctx, fun) {
-			args = append([]string{o.inferredGenericTypeArgsExpr(ctx, signature, expr.Args)}, args...)
+		if genericFunctionSignature(ctx, fun) != nil && !o.callUsesOverridePackage(ctx, fun) {
+			args = append([]string{o.genericTypeArgsExpr(ctx, fun, nil)}, args...)
 		}
 		args = o.appendSlicesGrowZeroFactory(ctx, fun, expr, args)
 		call := o.lowerCallableExpr(ctx, fun, selector) + "(" + strings.Join(args, ", ") + ")"
@@ -9155,7 +9155,7 @@ func (o *LoweringOwner) lowerNewExpr(ctx lowerFileContext, expr *ast.CallExpr) (
 			"<" + o.tsTypeFor(ctx, typ) + ">(" + value + ")", diagnostics
 	}
 	if named := namedStructType(typ); named != nil {
-		return "new " + o.namedTypeExpr(ctx, named) + "()", nil
+		return o.lowerNamedStructZeroValueExpr(ctx, named), nil
 	}
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperVarRef) +
 		"<" + o.tsTypeFor(ctx, typ) + ">(" + o.lowerDeclarationZeroValueExpr(ctx, typ) + ")", nil
@@ -13932,9 +13932,9 @@ func (o *LoweringOwner) genericTypeArgsExpr(ctx lowerFileContext, callee ast.Exp
 	return o.genericTypeArgsLiteral(entries)
 }
 
-// instantiatedTypeArgs resolves the full type argument list recorded for an
-// explicit generic instantiation, including trailing arguments Go inferred
-// through constraint core types rather than explicit syntax.
+// instantiatedTypeArgs resolves the full type argument list the type checker
+// recorded for a generic instantiation, whether written explicitly, partly
+// inferred, or wholly inferred from the call's arguments.
 func instantiatedTypeArgs(ctx lowerFileContext, callee ast.Expr) *types.TypeList {
 	if ctx.semPkg == nil || ctx.semPkg.source == nil {
 		return nil
@@ -13954,95 +13954,6 @@ func instantiatedTypeArgs(ctx lowerFileContext, callee ast.Expr) *types.TypeList
 		}
 	}
 	return nil
-}
-
-func (o *LoweringOwner) inferredGenericTypeArgsExpr(
-	ctx lowerFileContext,
-	signature *types.Signature,
-	args []ast.Expr,
-) string {
-	typeParams := signature.TypeParams()
-	if typeParams == nil || typeParams.Len() == 0 {
-		return "undefined"
-	}
-	inferred := make(map[*types.TypeParam]types.Type)
-	params := signature.Params()
-	if params != nil {
-		for idx := range params.Len() {
-			if idx >= len(args) {
-				break
-			}
-			o.inferGenericTypeArg(inferred, params.At(idx).Type(), ctx.semPkg.source.TypesInfo.TypeOf(args[idx]))
-		}
-	}
-	entries := make([]string, 0, typeParams.Len())
-	for typeParam := range typeParams.TypeParams() {
-		typ := inferred[typeParam]
-		if typ == nil {
-			continue
-		}
-		entries = append(entries, typeParam.Obj().Name()+": "+o.genericTypeDescriptorExpr(ctx, typ))
-	}
-	if len(entries) == 0 {
-		return "undefined"
-	}
-	return o.genericTypeArgsLiteral(entries)
-}
-
-func (o *LoweringOwner) inferGenericTypeArg(
-	inferred map[*types.TypeParam]types.Type,
-	paramType types.Type,
-	argType types.Type,
-) {
-	if paramType == nil || argType == nil {
-		return
-	}
-	if typeParam, ok := types.Unalias(paramType).(*types.TypeParam); ok {
-		if inferred[typeParam] == nil {
-			inferred[typeParam] = argType
-		}
-		return
-	}
-	if paramNamed, ok := types.Unalias(paramType).(*types.Named); ok {
-		if argNamed, ok := types.Unalias(argType).(*types.Named); ok &&
-			namedOriginsEqual(paramNamed, argNamed) {
-			paramArgs := paramNamed.TypeArgs()
-			argArgs := argNamed.TypeArgs()
-			if paramArgs != nil && argArgs != nil {
-				for idx := range min(paramArgs.Len(), argArgs.Len()) {
-					o.inferGenericTypeArg(inferred, paramArgs.At(idx), argArgs.At(idx))
-				}
-			}
-		}
-	}
-	switch param := types.Unalias(paramType).Underlying().(type) {
-	case *types.Slice:
-		if arg, ok := types.Unalias(argType).Underlying().(*types.Slice); ok {
-			o.inferGenericTypeArg(inferred, param.Elem(), arg.Elem())
-		}
-	case *types.Pointer:
-		if arg, ok := types.Unalias(argType).Underlying().(*types.Pointer); ok {
-			o.inferGenericTypeArg(inferred, param.Elem(), arg.Elem())
-		}
-	}
-}
-
-func namedOriginsEqual(a, b *types.Named) bool {
-	if a == nil || b == nil {
-		return false
-	}
-	aOrigin := a.Origin()
-	if aOrigin == nil {
-		aOrigin = a
-	}
-	bOrigin := b.Origin()
-	if bOrigin == nil {
-		bOrigin = b
-	}
-	if aOrigin.Obj() == nil || bOrigin.Obj() == nil {
-		return aOrigin == bOrigin
-	}
-	return aOrigin.Obj() == bOrigin.Obj()
 }
 
 func (o *LoweringOwner) genericTypeDescriptorExpr(ctx lowerFileContext, typ types.Type) string {
