@@ -6,10 +6,13 @@ import (
 	"go/ast"
 	"go/token"
 	"go/types"
+	"maps"
+	"runtime"
 	"slices"
 	"strconv"
 	"strings"
 
+	"golang.org/x/sync/errgroup"
 	"golang.org/x/tools/go/packages"
 )
 
@@ -45,21 +48,18 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, def
 	}
 
 	model := newSemanticModel()
-	var diagnostics []Diagnostic
+	overrideFacts, diagnostics := o.overrideOwner.Facts(ctx)
+	if diagnosticsHaveErrors(diagnostics) {
+		model.freeze()
+		return model, diagnostics
+	}
+
+	var nodes []*PackageGraphNode
 	for _, node := range graph.Nodes {
-		if err := ctx.Err(); err != nil {
-			diagnostics = append(diagnostics, Diagnostic{
-				Severity: DiagnosticSeverityError,
-				Code:     "goscript/context:canceled",
-				Message:  err.Error(),
-			})
-			break
-		}
 		if node.OverrideCandidate {
 			continue
 		}
-		pkg := graph.packagesByPath[node.PkgPath]
-		if pkg == nil {
+		if graph.packagesByPath[node.PkgPath] == nil {
 			diagnostics = append(diagnostics, Diagnostic{
 				Severity: DiagnosticSeverityError,
 				Code:     "goscript/semantic:missing-package",
@@ -68,7 +68,24 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, def
 			})
 			continue
 		}
-		diagnostics = append(diagnostics, o.buildPackage(ctx, model, node, pkg)...)
+		nodes = append(nodes, node)
+	}
+
+	// A package's facts depend only on that package, so each package is built
+	// into its own shard concurrently. The shards then merge in graph order.
+	shards := make([]*SemanticModel, len(nodes))
+	forEachParallel(len(nodes), func(idx int) {
+		if ctx.Err() == nil {
+			shards[idx] = o.buildPackage(nodes[idx], graph.packagesByPath[nodes[idx].PkgPath], overrideFacts)
+		}
+	})
+	if err := ctx.Err(); err != nil {
+		diagnostics = append(diagnostics, contextCanceledDiagnostic(err))
+		model.freeze()
+		return model, diagnostics
+	}
+	for _, shard := range shards {
+		model.mergePackage(shard)
 	}
 	if diagnosticsHaveErrors(diagnostics) {
 		model.freeze()
@@ -182,32 +199,81 @@ func newSemanticModel() *SemanticModel {
 	}
 }
 
+// buildPackage collects one package's declarations and syntax facts into a
+// new shard. It reads no other package's facts, so packages build
+// concurrently.
 func (o *SemanticModelOwner) buildPackage(
-	ctx context.Context,
-	model *SemanticModel,
 	node *PackageGraphNode,
 	pkg *packages.Package,
-) []Diagnostic {
-	overrideFacts, diagnostics := o.overrideOwner.Facts(ctx)
-	if diagnosticsHaveErrors(diagnostics) {
-		return diagnostics
-	}
+	overrideFacts *OverrideFacts,
+) *SemanticModel {
+	shard := newSemanticModel()
 	semPkg := &semanticPackage{
 		pkgPath:          node.PkgPath,
 		name:             node.Name,
 		source:           pkg,
 		generatedImports: make(map[string]map[string]bool),
 	}
-	model.packages[node.PkgPath] = semPkg
+	shard.packages[node.PkgPath] = semPkg
+	for _, file := range pkg.Syntax {
+		o.collectFileDeclarations(shard, semPkg, pkg, file)
+		o.collectFacts(shard, semPkg, pkg, file, nil)
+	}
+	for _, file := range pkg.Syntax {
+		collectFunctionFacts(shard, pkg, file, overrideFacts)
+	}
+	return shard
+}
 
-	for _, file := range pkg.Syntax {
-		o.collectFileDeclarations(model, semPkg, pkg, file)
-		o.collectFileFacts(model, semPkg, pkg, file)
+// mergePackage adds a shard built by buildPackage to the model. A function
+// another package already added, such as a method of an embedded interface,
+// keeps its first entry and leaves the shard's package function list.
+func (m *SemanticModel) mergePackage(shard *SemanticModel) {
+	maps.Copy(m.functionFullNames, shard.functionFullNames)
+	merged := make(map[*semanticFunction]*semanticFunction, len(shard.functions))
+	for pkgPath, semPkg := range shard.packages {
+		m.packages[pkgPath] = semPkg
+		kept := semPkg.functions[:0]
+		for _, semFn := range semPkg.functions {
+			if existing := m.existingFunction(semFn.function); existing != nil {
+				merged[semFn] = existing
+				continue
+			}
+			merged[semFn] = semFn
+			kept = append(kept, semFn)
+			if fullName := m.functionFullName(semFn.function); fullName != "" {
+				m.functionsByFullName[fullName] = semFn
+			}
+		}
+		semPkg.functions = kept
 	}
-	for _, file := range pkg.Syntax {
-		diagnostics = append(diagnostics, o.collectFunctionFacts(model, pkg, file, overrideFacts)...)
+	for fn, semFn := range shard.functions {
+		if m.functions[fn] == nil {
+			m.functions[fn] = merged[semFn]
+		}
 	}
-	return diagnostics
+	maps.Copy(m.types, shard.types)
+	maps.Copy(m.values, shard.values)
+	maps.Copy(m.addressTaken, shard.addressTaken)
+	maps.Copy(m.needsVarRef, shard.needsVarRef)
+	maps.Copy(m.generatedImports, shard.generatedImports)
+	maps.Copy(m.generatedImportTypes, shard.generatedImportTypes)
+}
+
+// existingFunction returns the entry addFunction would reuse for fn.
+func (m *SemanticModel) existingFunction(fn *types.Func) *semanticFunction {
+	if existing := m.functions[fn]; existing != nil {
+		return existing
+	}
+	if origin := fn.Origin(); origin != nil {
+		if existing := m.functions[origin]; existing != nil {
+			return existing
+		}
+	}
+	if fullName := m.functionFullName(fn); fullName != "" {
+		return m.functionsByFullName[fullName]
+	}
+	return nil
 }
 
 func (o *SemanticModelOwner) collectFileDeclarations(
@@ -309,24 +375,6 @@ func (o *SemanticModelOwner) collectGenDecl(
 	}
 }
 
-func (o *SemanticModelOwner) collectFileFacts(
-	model *SemanticModel,
-	semPkg *semanticPackage,
-	pkg *packages.Package,
-	file *ast.File,
-) {
-	o.collectFacts(model, semPkg, pkg, file, nil)
-}
-
-func (o *SemanticModelOwner) collectFuncLitFacts(
-	model *SemanticModel,
-	semPkg *semanticPackage,
-	pkg *packages.Package,
-	lit *ast.FuncLit,
-) {
-	o.collectFacts(model, semPkg, pkg, lit.Body, lit)
-}
-
 func (o *SemanticModelOwner) collectFacts(
 	model *SemanticModel,
 	semPkg *semanticPackage,
@@ -350,21 +398,15 @@ func (o *SemanticModelOwner) collectFacts(
 			o.recordTypeAssertion(semPkg, pkg, typed)
 		case *ast.ValueSpec:
 			o.recordValueSpecNilFacts(semPkg, pkg, typed)
-			names := make([]ast.Expr, 0, len(typed.Names))
-			for _, name := range typed.Names {
-				names = append(names, name)
-			}
-			o.recordAsyncCompatibleFunctionAssignments(model, pkg, names, typed.Values)
 		case *ast.AssignStmt:
 			o.recordAssignNilFacts(semPkg, pkg, typed)
-			o.recordAsyncCompatibleFunctionAssignments(model, pkg, typed.Lhs, typed.Rhs)
 			if lit != nil {
 				for _, lhs := range typed.Lhs {
 					o.recordFuncLitAssignedCapture(model, pkg, lit, lhs)
 				}
 			}
 		case *ast.FuncLit:
-			o.collectFuncLitFacts(model, semPkg, pkg, typed)
+			o.collectFacts(model, semPkg, pkg, typed.Body, typed)
 			return false
 		case *ast.CallExpr:
 			o.recordCallSignatureImports(model, semPkg, pkg, typed)
@@ -429,29 +471,6 @@ func (o *SemanticModelOwner) recordCallSignatureImports(
 	seen := model.generatedImportSeen(position.file)
 	o.recordTupleImports(model, semPkg, position.file, pkg.PkgPath, signature.Params(), seen)
 	o.recordTupleImports(model, semPkg, position.file, pkg.PkgPath, signature.Results(), seen)
-}
-
-func (o *SemanticModelOwner) recordAsyncCompatibleFunctionAssignments(
-	model *SemanticModel,
-	pkg *packages.Package,
-	lhs []ast.Expr,
-	rhs []ast.Expr,
-) {
-	for idx, target := range lhs {
-		if idx >= len(rhs) {
-			return
-		}
-		obj := objectForAddress(pkg, target)
-		if obj == nil || signatureForType(obj.Type()) == nil {
-			continue
-		}
-		if !exprMayNeedAwait(model, pkg, rhs[idx]) {
-			continue
-		}
-		if value := model.values[obj]; value != nil {
-			value.asyncCompatibleFunction = true
-		}
-	}
 }
 
 func signatureForType(typ types.Type) *types.Signature {
@@ -594,23 +613,12 @@ func (o *SemanticModelOwner) addFunction(
 	if fn == nil {
 		return nil
 	}
-	if existing := model.functions[fn]; existing != nil {
+	if existing := model.existingFunction(fn); existing != nil {
+		model.functions[fn] = existing
+		if origin := fn.Origin(); origin != nil && model.functions[origin] == nil {
+			model.functions[origin] = existing
+		}
 		return existing
-	}
-	if origin := fn.Origin(); origin != nil {
-		if existing := model.functions[origin]; existing != nil {
-			model.functions[fn] = existing
-			return existing
-		}
-	}
-	if fullName := model.functionFullName(fn); fullName != "" {
-		if existing := model.functionsByFullName[fullName]; existing != nil {
-			model.functions[fn] = existing
-			if origin := fn.Origin(); origin != nil {
-				model.functions[origin] = existing
-			}
-			return existing
-		}
 	}
 	signature, _ := fn.Type().(*types.Signature)
 	semFn := &semanticFunction{
@@ -632,9 +640,7 @@ func (o *SemanticModelOwner) addFunction(
 		model.functions[origin] = semFn
 	}
 	if fullName := model.functionFullName(fn); fullName != "" {
-		if existing := model.functionsByFullName[fullName]; existing == nil {
-			model.functionsByFullName[fullName] = semFn
-		}
+		model.functionsByFullName[fullName] = semFn
 	}
 	semPkg.functions = append(semPkg.functions, semFn)
 	return semFn
@@ -754,13 +760,16 @@ func objectForAddress(pkg *packages.Package, expr ast.Expr) types.Object {
 	return nil
 }
 
-func (o *SemanticModelOwner) collectFunctionFacts(
+// collectFunctionFacts records the calls and direct async causes of the
+// functions declared in file. A callee from another package is not in the
+// shard yet; its async mark reaches the caller through the recorded call when
+// Build propagates async across the merged model.
+func collectFunctionFacts(
 	model *SemanticModel,
 	pkg *packages.Package,
 	file *ast.File,
 	overrideFacts *OverrideFacts,
-) []Diagnostic {
-	var diagnostics []Diagnostic
+) {
 	for _, decl := range file.Decls {
 		fnDecl, ok := decl.(*ast.FuncDecl)
 		if !ok || fnDecl.Body == nil {
@@ -820,7 +829,6 @@ func (o *SemanticModelOwner) collectFunctionFacts(
 			return true
 		})
 	}
-	return diagnostics
 }
 
 func rangeFunctionExprNeedsAwait(
@@ -925,47 +933,56 @@ type asyncArgumentCallSite struct {
 	args      []ast.Expr
 }
 
+// collectAsyncArgumentCallSites finds the calls to functions with bodies.
+// Each package's syntax is walked concurrently; the callees resolve against the
+// model afterwards on one goroutine because resolution fills its memo maps.
 func (o *SemanticModelOwner) collectAsyncArgumentCallSites(
 	ctx context.Context,
 	model *SemanticModel,
 ) ([]asyncArgumentCallSite, []Diagnostic) {
-	var sites []asyncArgumentCallSite
-	for _, semPkg := range model.packages {
-		if err := ctx.Err(); err != nil {
-			return nil, []Diagnostic{contextCanceledDiagnostic(err)}
-		}
-		pkg := semPkg.source
+	type call struct {
+		pkg    *packages.Package
+		called *types.Func
+		args   []ast.Expr
+	}
+	semPkgs := slices.Collect(maps.Values(model.packages))
+	calls := make([][]call, len(semPkgs))
+	forEachParallel(len(semPkgs), func(idx int) {
+		pkg := semPkgs[idx].source
 		if pkg == nil {
-			continue
+			return
 		}
 		for _, file := range pkg.Syntax {
-			var inspectErr error
+			if ctx.Err() != nil {
+				return
+			}
 			ast.Inspect(file, func(node ast.Node) bool {
-				if inspectErr = ctx.Err(); inspectErr != nil {
-					return false
+				if expr, ok := node.(*ast.CallExpr); ok {
+					if called := calledFunction(pkg, expr.Fun); called != nil {
+						calls[idx] = append(calls[idx], call{pkg: pkg, called: called, args: expr.Args})
+					}
 				}
-				call, ok := node.(*ast.CallExpr)
-				if !ok {
-					return true
-				}
-				called := calledFunction(pkg, call.Fun)
-				semFn := semanticFunctionFor(model, called)
-				if semFn == nil || !semFn.hasBody {
-					return true
-				}
-				signature, _ := called.Type().(*types.Signature)
-				sites = append(sites, asyncArgumentCallSite{
-					pkg:       pkg,
-					semFn:     semFn,
-					signature: signature,
-					args:      call.Args,
-				})
 				return true
 			})
-			if inspectErr != nil {
-				return nil, []Diagnostic{contextCanceledDiagnostic(inspectErr)}
-			}
 		}
+	})
+	if err := ctx.Err(); err != nil {
+		return nil, []Diagnostic{contextCanceledDiagnostic(err)}
+	}
+
+	var sites []asyncArgumentCallSite
+	for _, call := range slices.Concat(calls...) {
+		semFn := semanticFunctionFor(model, call.called)
+		if semFn == nil || !semFn.hasBody {
+			continue
+		}
+		signature, _ := call.called.Type().(*types.Signature)
+		sites = append(sites, asyncArgumentCallSite{
+			pkg:       call.pkg,
+			semFn:     semFn,
+			signature: signature,
+			args:      call.args,
+		})
 	}
 	return sites, nil
 }
@@ -1399,6 +1416,9 @@ func semanticAsyncFunctionCount(model *SemanticModel) int {
 	return count
 }
 
+// resolveInterfaceImplementationGraph pairs every named interface with the
+// method sets that implement it. Each interface resolves independently, so they
+// resolve concurrently and join in sorted interface order.
 func (o *SemanticModelOwner) resolveInterfaceImplementationGraph(
 	ctx context.Context,
 	model *SemanticModel,
@@ -1408,86 +1428,95 @@ func (o *SemanticModelOwner) resolveInterfaceImplementationGraph(
 	sortNamedTypes(interfaces)
 
 	methodSetIndexByName := indexImplementationMethodSets(methodSets)
-	implementationGraph := make([]semanticInterfaceImplementationGraphEntry, 0)
-	for _, ifaceNamed := range interfaces {
-		if err := ctx.Err(); err != nil {
-			return nil, []Diagnostic{contextCanceledDiagnostic(err)}
+	entries := make([][]semanticInterfaceImplementationGraphEntry, len(interfaces))
+	forEachParallel(len(interfaces), func(idx int) {
+		if ctx.Err() != nil {
+			return
 		}
+		ifaceNamed := interfaces[idx]
 		iface, _ := ifaceNamed.Underlying().(*types.Interface)
-		if iface == nil {
-			continue
-		}
-		iface.Complete()
 		ifaceMethods := interfaceMethodMap(iface)
 		if len(ifaceMethods) == 0 {
-			continue
+			return
 		}
 		for _, methodSetIdx := range implementationMethodSetCandidates(methodSetIndexByName, ifaceMethods) {
-			if err := ctx.Err(); err != nil {
-				return nil, []Diagnostic{contextCanceledDiagnostic(err)}
-			}
-			methodSet := methodSets[methodSetIdx]
-			if implementation, ok := o.interfaceImplementationGraphEntry(methodSet, ifaceNamed, ifaceMethods); ok {
-				implementationGraph = append(implementationGraph, implementation)
+			if implementation, ok := o.interfaceImplementationGraphEntry(methodSets[methodSetIdx], ifaceNamed, ifaceMethods); ok {
+				entries[idx] = append(entries[idx], implementation)
 			}
 		}
+	})
+	if err := ctx.Err(); err != nil {
+		return nil, []Diagnostic{contextCanceledDiagnostic(err)}
 	}
-	return implementationGraph, nil
+	return slices.Concat(entries...), nil
 }
 
+// resolveAnonymousInterfaceImplementationGraph pairs the targets of type
+// assertions from package-sealed interfaces with the method sets that can
+// satisfy both sides. Each package's assertions resolve concurrently.
 func (o *SemanticModelOwner) resolveAnonymousInterfaceImplementationGraph(
 	ctx context.Context,
 	model *SemanticModel,
 	methodSets []semanticImplementationMethodSet,
 ) ([]semanticAnonymousInterfaceImplementation, []Diagnostic) {
 	methodSetIndexByName := indexImplementationMethodSets(methodSets)
-	implementationGraph := make([]semanticAnonymousInterfaceImplementation, 0)
-	for _, semPkg := range model.packages {
-		for _, assertion := range semPkg.typeAssertions {
-			if err := ctx.Err(); err != nil {
-				return nil, []Diagnostic{contextCanceledDiagnostic(err)}
+	semPkgs := slices.Collect(maps.Values(model.packages))
+	entries := make([][]semanticAnonymousInterfaceImplementation, len(semPkgs))
+	forEachParallel(len(semPkgs), func(idx int) {
+		for _, assertion := range semPkgs[idx].typeAssertions {
+			if ctx.Err() != nil {
+				return
 			}
-			if assertion.source == nil || assertion.target == nil {
-				continue
-			}
-			sourceIface, _ := types.Unalias(assertion.source).Underlying().(*types.Interface)
-			iface, _ := types.Unalias(assertion.target).Underlying().(*types.Interface)
-			if sourceIface == nil || iface == nil || !interfaceIsPackageSealed(sourceIface) {
-				continue
-			}
-			sourceIface.Complete()
-			iface.Complete()
-			ifaceMethods := interfaceMethodMap(iface)
-			if len(ifaceMethods) == 0 {
-				continue
-			}
-			for _, methodSetIdx := range implementationMethodSetCandidates(methodSetIndexByName, ifaceMethods) {
-				if err := ctx.Err(); err != nil {
-					return nil, []Diagnostic{contextCanceledDiagnostic(err)}
+			entries[idx] = append(entries[idx], anonymousInterfaceImplementations(assertion, methodSets, methodSetIndexByName)...)
+		}
+	})
+	if err := ctx.Err(); err != nil {
+		return nil, []Diagnostic{contextCanceledDiagnostic(err)}
+	}
+	return slices.Concat(entries...), nil
+}
+
+func anonymousInterfaceImplementations(
+	assertion semanticTypeAssertion,
+	methodSets []semanticImplementationMethodSet,
+	methodSetIndexByName map[string][]int,
+) []semanticAnonymousInterfaceImplementation {
+	if assertion.source == nil || assertion.target == nil {
+		return nil
+	}
+	sourceIface, _ := types.Unalias(assertion.source).Underlying().(*types.Interface)
+	iface, _ := types.Unalias(assertion.target).Underlying().(*types.Interface)
+	if sourceIface == nil || iface == nil || !interfaceIsPackageSealed(sourceIface) {
+		return nil
+	}
+	iface.Complete()
+	ifaceMethods := interfaceMethodMap(iface)
+	if len(ifaceMethods) == 0 {
+		return nil
+	}
+	var implementations []semanticAnonymousInterfaceImplementation
+	for _, methodSetIdx := range implementationMethodSetCandidates(methodSetIndexByName, ifaceMethods) {
+		methodSet := methodSets[methodSetIdx]
+		receiver := methodSet.receiver
+		if (methodSet.typ.TypeArgs() == nil || methodSet.typ.TypeArgs().Len() == 0) &&
+			methodSet.typ.TypeParams() != nil && methodSet.typ.TypeParams().Len() != 0 {
+			args := typeParamTypes(methodSet.typ.TypeParams())
+			if instantiated, err := types.Instantiate(nil, methodSet.typ, args, false); err == nil {
+				receiver = instantiated
+				if methodSet.pointer {
+					receiver = types.NewPointer(instantiated)
 				}
-				methodSet := methodSets[methodSetIdx]
-				receiver := methodSet.receiver
-				if (methodSet.typ.TypeArgs() == nil || methodSet.typ.TypeArgs().Len() == 0) &&
-					methodSet.typ.TypeParams() != nil && methodSet.typ.TypeParams().Len() != 0 {
-					args := typeParamTypes(methodSet.typ.TypeParams())
-					if instantiated, err := types.Instantiate(nil, methodSet.typ, args, false); err == nil {
-						receiver = instantiated
-						if methodSet.pointer {
-							receiver = types.NewPointer(instantiated)
-						}
-					}
-				}
-				if !types.Implements(receiver, sourceIface) || !types.Implements(receiver, iface) {
-					continue
-				}
-				implementationGraph = append(implementationGraph, semanticAnonymousInterfaceImplementation{
-					ifaceMethods: ifaceMethods,
-					implMethods:  methodSet.methods,
-				})
 			}
 		}
+		if !types.Implements(receiver, sourceIface) || !types.Implements(receiver, iface) {
+			continue
+		}
+		implementations = append(implementations, semanticAnonymousInterfaceImplementation{
+			ifaceMethods: ifaceMethods,
+			implMethods:  methodSet.methods,
+		})
 	}
-	return implementationGraph, nil
+	return implementations
 }
 
 func (o *SemanticModelOwner) resolveImplementationMethodSets(
@@ -1957,23 +1986,40 @@ func (m *SemanticModel) functionFullName(fn *types.Func) string {
 	return fullName
 }
 
+// implementationMethodSets returns the value and pointer method sets of each
+// concrete type, in that order, computing them concurrently.
 func implementationMethodSets(concretes []*types.Named) []semanticImplementationMethodSet {
-	methodSets := make([]semanticImplementationMethodSet, 0, len(concretes)*2)
-	for _, concrete := range concretes {
-		methodSets = append(methodSets, semanticImplementationMethodSet{
+	methodSets := make([]semanticImplementationMethodSet, len(concretes)*2)
+	forEachParallel(len(concretes), func(idx int) {
+		concrete := concretes[idx]
+		pointer := types.NewPointer(concrete)
+		methodSets[idx*2] = semanticImplementationMethodSet{
 			typ:      concrete,
 			receiver: concrete,
 			methods:  methodSetMap(concrete),
-		})
-		pointer := types.NewPointer(concrete)
-		methodSets = append(methodSets, semanticImplementationMethodSet{
+		}
+		methodSets[idx*2+1] = semanticImplementationMethodSet{
 			typ:      concrete,
 			receiver: pointer,
 			pointer:  true,
 			methods:  methodSetMap(pointer),
+		}
+	})
+	return methodSets
+}
+
+// forEachParallel calls fn for each index in [0, n) on up to GOMAXPROCS
+// goroutines and returns after every call returns.
+func forEachParallel(n int, fn func(idx int)) {
+	var group errgroup.Group
+	group.SetLimit(runtime.GOMAXPROCS(0))
+	for idx := range n {
+		group.Go(func() error {
+			fn(idx)
+			return nil
 		})
 	}
-	return methodSets
+	_ = group.Wait()
 }
 
 func methodSetMap(receiver types.Type) map[string]*types.Func {
