@@ -7201,6 +7201,12 @@ func (o *LoweringOwner) lowerSelectReceiveComm(
 	return channel, prelude, diagnostics
 }
 
+// taglessSwitchValue is the tag of a switch whose cases are conditions. It is
+// widened to boolean because TypeScript may narrow a case condition to a
+// literal type, such as a constant or a variable only assigned in a closure,
+// and reject a literal case that is not comparable with the literal true.
+const taglessSwitchValue = "(true as boolean)"
+
 func (o *LoweringOwner) lowerSwitchStmt(ctx lowerFileContext, stmt *ast.SwitchStmt) ([]loweredStmt, []Diagnostic) {
 	var diagnostics []Diagnostic
 	var init []loweredStmt
@@ -7210,7 +7216,7 @@ func (o *LoweringOwner) lowerSwitchStmt(ctx lowerFileContext, stmt *ast.SwitchSt
 		init = append(init, lowered...)
 	}
 
-	value := "true"
+	value := taglessSwitchValue
 	var tagType types.Type
 	if stmt.Tag != nil {
 		var valueDiagnostics []Diagnostic
@@ -7218,8 +7224,6 @@ func (o *LoweringOwner) lowerSwitchStmt(ctx lowerFileContext, stmt *ast.SwitchSt
 		diagnostics = append(diagnostics, valueDiagnostics...)
 		value = lowerConstantComparableValue(ctx, stmt.Tag, value)
 		tagType = ctx.semPkg.source.TypesInfo.TypeOf(stmt.Tag)
-	} else if switchHasConstantCaseExpr(ctx, stmt) {
-		value = "(true as boolean)"
 	}
 
 	compareCases := tagType != nil && isInterfaceType(tagType)
@@ -7227,7 +7231,7 @@ func (o *LoweringOwner) lowerSwitchStmt(ctx lowerFileContext, stmt *ast.SwitchSt
 	if compareCases {
 		compareValue = ctx.tempName("Switch")
 		init = append(init, loweredStmt{text: "let " + compareValue + " = " + value})
-		value = "true"
+		value = taglessSwitchValue
 	}
 	switchIR := &loweredSwitch{value: value}
 	for _, raw := range stmt.Body.List {
@@ -7282,21 +7286,6 @@ func (o *LoweringOwner) lowerSwitchStmt(ctx lowerFileContext, stmt *ast.SwitchSt
 	}
 	init = append(init, lowered)
 	return []loweredStmt{{children: init}}, diagnostics
-}
-
-func switchHasConstantCaseExpr(ctx lowerFileContext, stmt *ast.SwitchStmt) bool {
-	for _, raw := range stmt.Body.List {
-		clause, ok := raw.(*ast.CaseClause)
-		if !ok {
-			continue
-		}
-		for _, expr := range clause.List {
-			if constantComparableType(ctx, expr) != "" {
-				return true
-			}
-		}
-	}
-	return false
 }
 
 func lowerConstantComparableValue(ctx lowerFileContext, expr ast.Expr, value string) string {

@@ -56,4 +56,25 @@ func main() {
 	default: // x > 0
 		println("positive")
 	}
+
+	// Conditions set only inside a callback are still runtime values.
+	var data []byte
+	rejected := false
+	hold(func() {
+		data = []byte("x")
+		rejected = true
+	})
+	println("\nSwitch on conditions set in a callback:")
+	switch {
+	case data == nil && rejected:
+		println("rejected")
+	case data == nil:
+		println("missing")
+	default:
+		println("found")
+	}
+}
+
+func hold(fn func()) {
+	fn()
 }

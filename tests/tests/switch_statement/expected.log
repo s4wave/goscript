@@ -12,3 +12,6 @@ zero
 
 Switch without expression (positive):
 positive
+
+Switch on conditions set in a callback:
+found

@@ -5590,7 +5590,7 @@ func TestCompilePackagesLowersSwitchesAndFunctionValueCalls(t *testing.T) {
 		"case 2:",
 		"case 3:",
 		"let local = \"two-three\"",
-		"switch (true) {",
+		"switch ((true as boolean)) {",
 		"Block: while (value > 0)",
 		"break Block",
 		"Again: while (true)",
