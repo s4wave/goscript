@@ -674,6 +674,18 @@ export class Time {
     return thisMs > uMs || (thisMs === uMs && this._nsec > u._nsec)
   }
 
+  // Compare returns -1 if t is before u, +1 if t is after u, and 0 if they are
+  // the same instant. Uses monotonic clock if both times have it
+  public Compare(u: Time): number {
+    if (this.Before(u)) {
+      return -1
+    }
+    if (this.After(u)) {
+      return 1
+    }
+    return 0
+  }
+
   // Round returns the result of rounding t to the nearest multiple of d
   // Strips monotonic reading as per Go specification
   public Round(_d: Duration): Time {

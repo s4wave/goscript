@@ -214,6 +214,16 @@ describe('time.Time.In', () => {
     )
   })
 
+  it('compares instants across locations', () => {
+    const utc = Date(2025, May, 15, 1, 10, 42, 0, UTC)
+    const pdt = utc.In(FixedZone('PDT', -7 * 60 * 60))
+    const later = Unix(utc.Unix(), 1n)
+
+    expect(utc.Compare(pdt)).toBe(0)
+    expect(utc.Compare(later)).toBe(-1)
+    expect(later.Compare(pdt)).toBe(1)
+  })
+
   it('panics for nil locations', () => {
     expect(() => new Time().In(null)).toThrow(
       'time: missing Location in call to Time.In',
