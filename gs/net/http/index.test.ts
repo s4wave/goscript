@@ -871,6 +871,16 @@ describe('net/http override', () => {
     expect(resp?.Uncompressed).toBe(false)
   })
 
+  it('asserts DefaultTransport as a Transport pointer', () => {
+    const { value, ok } = $.typeAssert<Transport>(
+      DefaultTransport,
+      $.pointerType('http.Transport'),
+    )
+    expect(ok).toBe(true)
+    expect(value).toBe(DefaultTransport)
+    expect(value.Clone()).toBeInstanceOf(Transport)
+  })
+
   it('reports a body fetch decoded as uncompressed', async () => {
     Object.defineProperty(globalThis, 'fetch', {
       configurable: true,
