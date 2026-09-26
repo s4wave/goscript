@@ -117,7 +117,7 @@ export async function main(): globalThis.Promise<void> {
 		fnPtr.value.Store(callback)
 		let loadedFn = (fnPtr.value.Load() as $.VarRef<(() => void) | null> | null)
 		if (loadedFn != null) {
-			void ($.pointerValue<(() => void) | null>(loadedFn))!()
+			await ($.pointerValue<(() => void) | null>(loadedFn))!()
 		}
 	}
 

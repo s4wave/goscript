@@ -159,7 +159,7 @@ export async function main(): globalThis.Promise<void> {
 			switch (true) {
 				case $.typeAssert<MyStruct>(__goscriptTypeSwitchValue, "main.MyStruct").ok:
 					{
-						let v: MyStruct = $.typeAssert<MyStruct>(__goscriptTypeSwitchValue, "main.MyStruct").value
+						let v: MyStruct = $.markAsStructValue($.cloneStructValue($.typeAssert<MyStruct>(__goscriptTypeSwitchValue, "main.MyStruct").value))
 						await $.println("testItems[", i, "] is MyStruct value:", v.Value)
 					}
 					break

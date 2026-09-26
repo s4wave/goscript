@@ -92,7 +92,7 @@ export async function main(): globalThis.Promise<void> {
 					break
 				case $.typeAssert<Action>(__goscriptTypeSwitchValue, "main.Action").ok:
 					{
-						let shape: $.VarRef<Action> = $.varRef($.typeAssert<Action>(__goscriptTypeSwitchValue, "main.Action").value)
+						let shape: $.VarRef<Action> = $.varRef($.markAsStructValue($.cloneStructValue($.typeAssert<Action>(__goscriptTypeSwitchValue, "main.Action").value)))
 						let fix: Fixed = ($.arrayIndex(fixed!, 0) as Fixed)
 						let fv = $.arrayIndex(fix!, 0)
 						{
