@@ -98,23 +98,8 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, def
 		return model, diagnostics
 	}
 	model.functionCallers = semanticFunctionCallers(model)
-	propagatedCallers := make(map[*types.Func]bool)
-	diagnostics = append(diagnostics, o.propagateFunctionAsync(ctx, model, propagatedCallers)...)
-	if diagnosticsHaveErrors(diagnostics) {
-		model.freeze()
-		return model, diagnostics
-	}
-	// The calls that can make a callee async are fixed by the syntax trees, so
-	// they are collected once here and threaded through every propagation pass
-	// below instead of rewalking every file each time.
 	asyncArgumentSites, siteDiagnostics := o.collectAsyncArgumentCallSites(ctx, model)
 	diagnostics = append(diagnostics, siteDiagnostics...)
-	if diagnosticsHaveErrors(diagnostics) {
-		model.freeze()
-		return model, diagnostics
-	}
-	asyncArgumentSites, argumentDiagnostics := o.propagateAsyncFunctionArguments(ctx, model, asyncArgumentSites, propagatedCallers)
-	diagnostics = append(diagnostics, argumentDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
 		model.freeze()
 		return model, diagnostics
@@ -144,37 +129,7 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, def
 		model.freeze()
 		return model, diagnostics
 	}
-	for {
-		asyncCount := semanticAsyncFunctionCount(model)
-		var applyDiagnostics []Diagnostic
-		interfaceAsyncMarks, applyDiagnostics = o.applyInterfaceAsyncMethods(ctx, model, interfaceAsyncMarks)
-		diagnostics = append(diagnostics, applyDiagnostics...)
-		if diagnosticsHaveErrors(diagnostics) {
-			model.freeze()
-			return model, diagnostics
-		}
-		diagnostics = append(diagnostics, o.applyAnonymousInterfaceAsyncMethods(ctx, model, anonymousInterfaceGraph)...)
-		if diagnosticsHaveErrors(diagnostics) {
-			model.freeze()
-			return model, diagnostics
-		}
-		diagnostics = append(diagnostics, o.propagateFunctionAsync(ctx, model, propagatedCallers)...)
-		if diagnosticsHaveErrors(diagnostics) {
-			model.freeze()
-			return model, diagnostics
-		}
-		// Interface coloring can reveal async calls inside function arguments.
-		var loopDiagnostics []Diagnostic
-		asyncArgumentSites, loopDiagnostics = o.propagateAsyncFunctionArguments(ctx, model, asyncArgumentSites, propagatedCallers)
-		diagnostics = append(diagnostics, loopDiagnostics...)
-		if diagnosticsHaveErrors(diagnostics) {
-			model.freeze()
-			return model, diagnostics
-		}
-		if semanticAsyncFunctionCount(model) == asyncCount {
-			break
-		}
-	}
+	diagnostics = append(diagnostics, colorAsyncFunctions(ctx, model, asyncArgumentSites, interfaceAsyncMarks, anonymousInterfaceGraph)...)
 	model.freeze()
 	return model, diagnostics
 }
@@ -899,111 +854,6 @@ func recordImmediateFuncLitAsyncFacts(
 	})
 }
 
-// asyncArgumentCallSite is a call whose arguments may make its callee async.
-// Which calls exist is fixed by the syntax tree; only the async marks change as
-// the fixpoint runs, so the sites are collected once and reused.
-type asyncArgumentCallSite struct {
-	pkg       *packages.Package
-	semFn     *semanticFunction
-	signature *types.Signature
-	args      []ast.Expr
-}
-
-// collectAsyncArgumentCallSites finds the calls to functions with bodies.
-// Each package's syntax is walked concurrently; the callees resolve against the
-// model afterwards on one goroutine because resolution fills its memo maps.
-func (o *SemanticModelOwner) collectAsyncArgumentCallSites(
-	ctx context.Context,
-	model *SemanticModel,
-) ([]asyncArgumentCallSite, []Diagnostic) {
-	type call struct {
-		pkg    *packages.Package
-		called *types.Func
-		args   []ast.Expr
-	}
-	semPkgs := slices.Collect(maps.Values(model.packages))
-	calls := make([][]call, len(semPkgs))
-	forEachParallel(len(semPkgs), func(idx int) {
-		pkg := semPkgs[idx].source
-		if pkg == nil {
-			return
-		}
-		for _, file := range pkg.Syntax {
-			if ctx.Err() != nil {
-				return
-			}
-			ast.Inspect(file, func(node ast.Node) bool {
-				if expr, ok := node.(*ast.CallExpr); ok {
-					if called := calledFunction(pkg, expr.Fun); called != nil {
-						calls[idx] = append(calls[idx], call{pkg: pkg, called: called, args: expr.Args})
-					}
-				}
-				return true
-			})
-		}
-	})
-	if err := ctx.Err(); err != nil {
-		return nil, []Diagnostic{contextCanceledDiagnostic(err)}
-	}
-
-	var sites []asyncArgumentCallSite
-	for _, call := range slices.Concat(calls...) {
-		semFn := semanticFunctionFor(model, call.called)
-		if semFn == nil || !semFn.hasBody {
-			continue
-		}
-		signature, _ := call.called.Type().(*types.Signature)
-		sites = append(sites, asyncArgumentCallSite{
-			pkg:       call.pkg,
-			semFn:     semFn,
-			signature: signature,
-			args:      call.args,
-		})
-	}
-	return sites, nil
-}
-
-// propagateAsyncFunctionArguments runs the async-argument fixpoint over the
-// supplied call sites and returns the sites that can still report a change.
-// Build collects the sites once and threads them through every round of the
-// outer interface-coloring fixpoint, so the syntax trees are walked once per
-// compile rather than once per propagation pass.
-func (o *SemanticModelOwner) propagateAsyncFunctionArguments(
-	ctx context.Context,
-	model *SemanticModel,
-	sites []asyncArgumentCallSite,
-	propagatedCallers map[*types.Func]bool,
-) ([]asyncArgumentCallSite, []Diagnostic) {
-	for len(sites) != 0 {
-		if err := ctx.Err(); err != nil {
-			return sites, []Diagnostic{contextCanceledDiagnostic(err)}
-		}
-		changed := false
-		remaining := sites[:0]
-		for _, site := range sites {
-			if callPassesAsyncFunctionArgument(model, site.pkg, site.signature, site.args) {
-				if markFunctionAsync(site.semFn) {
-					changed = true
-				}
-			}
-			// An async callee can never report a change again, so drop the site
-			// instead of rescanning its arguments.
-			if site.semFn.async {
-				continue
-			}
-			remaining = append(remaining, site)
-		}
-		sites = remaining
-		if !changed {
-			break
-		}
-		if diagnostics := o.propagateFunctionAsync(ctx, model, propagatedCallers); diagnosticsHaveErrors(diagnostics) {
-			return sites, diagnostics
-		}
-	}
-	return sites, nil
-}
-
 func overrideCallPackage(pkg *packages.Package, expr ast.Expr) string {
 	selector, ok := expr.(*ast.SelectorExpr)
 	if !ok {
@@ -1227,33 +1077,6 @@ func callUsesFunctionIdentifier(pkg *packages.Package, expr ast.Expr) bool {
 	return ok
 }
 
-func callPassesAsyncFunctionArgument(
-	model *SemanticModel,
-	pkg *packages.Package,
-	signature *types.Signature,
-	args []ast.Expr,
-) bool {
-	if signature == nil || signature.Params() == nil {
-		return false
-	}
-	for idx, arg := range args {
-		paramIdx := idx
-		if signature.Variadic() && idx >= signature.Params().Len()-1 {
-			paramIdx = signature.Params().Len() - 1
-		}
-		if paramIdx < 0 || paramIdx >= signature.Params().Len() {
-			continue
-		}
-		if signatureForType(signature.Params().At(paramIdx).Type()) == nil {
-			continue
-		}
-		if exprMayNeedAwait(model, pkg, arg) {
-			return true
-		}
-	}
-	return false
-}
-
 func exprMayNeedAwait(model *SemanticModel, pkg *packages.Package, expr ast.Expr) bool {
 	if called := calledFunction(pkg, expr); called != nil {
 		return model.functionAsync(called)
@@ -1309,49 +1132,6 @@ func receiverNamedType(typ types.Type) *types.Named {
 	return named
 }
 
-// propagateFunctionAsync walks the caller edges of newly async functions.
-// The caller graph is fixed before propagation and async state only grows, so a
-// function's caller edges need to be traversed once per model build.
-func (o *SemanticModelOwner) propagateFunctionAsync(
-	ctx context.Context,
-	model *SemanticModel,
-	propagated map[*types.Func]bool,
-) []Diagnostic {
-	if err := ctx.Err(); err != nil {
-		return []Diagnostic{contextCanceledDiagnostic(err)}
-	}
-	queue := make([]*types.Func, 0)
-	enqueue := func(fn *types.Func) {
-		fn = functionOriginOrSelf(fn)
-		if fn == nil || propagated[fn] {
-			return
-		}
-		propagated[fn] = true
-		queue = append(queue, fn)
-	}
-	for called := range model.functionCallers {
-		if !propagated[called] && model.functionAsync(called) {
-			enqueue(called)
-		}
-	}
-	for len(queue) != 0 {
-		if err := ctx.Err(); err != nil {
-			return []Diagnostic{contextCanceledDiagnostic(err)}
-		}
-		called := queue[0]
-		queue = queue[1:]
-		for _, semFn := range model.functionCallers[called] {
-			if err := ctx.Err(); err != nil {
-				return []Diagnostic{contextCanceledDiagnostic(err)}
-			}
-			if markFunctionAsync(semFn) {
-				enqueue(semFn.function)
-			}
-		}
-	}
-	return nil
-}
-
 func semanticFunctionCallers(model *SemanticModel) map[*types.Func][]*semanticFunction {
 	callers := make(map[*types.Func][]*semanticFunction)
 	for _, semFn := range model.functions {
@@ -1373,19 +1153,6 @@ func markFunctionAsync(fn *semanticFunction) bool {
 	}
 	fn.async = true
 	return true
-}
-
-func semanticAsyncFunctionCount(model *SemanticModel) int {
-	if model == nil {
-		return 0
-	}
-	count := 0
-	for _, fn := range model.functions {
-		if fn != nil && fn.async {
-			count++
-		}
-	}
-	return count
 }
 
 // resolveInterfaceImplementationGraph pairs every named interface with the
@@ -1657,15 +1424,6 @@ func (o *SemanticModelOwner) applyUnknownInterfaceAsyncMethods(
 	}
 }
 
-// interfaceAsyncMark is one interface method waiting on its implementation to
-// become async. The async coloring loop reruns until it reaches a fixpoint, and
-// the pairs it has to consider never change, so they are flattened once here
-// instead of rewalking the whole implementation graph on every pass.
-type interfaceAsyncMark struct {
-	ifaceMethod *types.Func
-	implFn      *semanticFunction
-}
-
 // buildInterfaceAsyncMarks records the implementation graph on the model and
 // returns the interface methods whose async coloring is still undecided.
 func (o *SemanticModelOwner) buildInterfaceAsyncMarks(
@@ -1700,51 +1458,6 @@ func (o *SemanticModelOwner) buildInterfaceAsyncMarks(
 	return marks, nil
 }
 
-// applyInterfaceAsyncMethods colors the interface methods whose implementation
-// is now async and returns the marks still waiting. Async coloring only ever
-// adds, so a mark that fires is done and drops out of every later pass.
-func (o *SemanticModelOwner) applyInterfaceAsyncMethods(
-	ctx context.Context,
-	model *SemanticModel,
-	marks []interfaceAsyncMark,
-) ([]interfaceAsyncMark, []Diagnostic) {
-	pending := marks[:0]
-	for _, mark := range marks {
-		if err := ctx.Err(); err != nil {
-			return nil, []Diagnostic{contextCanceledDiagnostic(err)}
-		}
-		if !mark.implFn.async {
-			pending = append(pending, mark)
-			continue
-		}
-		model.markInterfaceMethodAsync(mark.ifaceMethod)
-		if ifaceFn := semanticFunctionFor(model, mark.ifaceMethod); ifaceFn != nil {
-			markFunctionAsync(ifaceFn)
-		}
-		markFunctionAsync(mark.implFn)
-	}
-	return pending, nil
-}
-
-func (o *SemanticModelOwner) applyAnonymousInterfaceAsyncMethods(
-	ctx context.Context,
-	model *SemanticModel,
-	interfaceGraph []semanticAnonymousInterfaceImplementation,
-) []Diagnostic {
-	for _, graphEntry := range interfaceGraph {
-		if err := ctx.Err(); err != nil {
-			return []Diagnostic{contextCanceledDiagnostic(err)}
-		}
-		for methodName, ifaceMethod := range graphEntry.ifaceMethods {
-			implMethod := graphEntry.implMethods[methodName]
-			if model.functionAsync(implMethod) {
-				model.markInterfaceMethodAsync(ifaceMethod)
-			}
-		}
-	}
-	return nil
-}
-
 func (m *SemanticModel) functionAsync(fn *types.Func) bool {
 	semFn := semanticFunctionFor(m, fn)
 	if semFn != nil && semFn.async {
@@ -1753,9 +1466,11 @@ func (m *SemanticModel) functionAsync(fn *types.Func) bool {
 	return m.interfaceMethodAsync(fn)
 }
 
-func (m *SemanticModel) markInterfaceMethodAsync(fn *types.Func) {
+// markInterfaceMethodAsync marks fn async and reports whether it was
+// synchronous.
+func (m *SemanticModel) markInterfaceMethodAsync(fn *types.Func) bool {
 	if m == nil || fn == nil || m.asyncInterfaceMethodObjs[fn] {
-		return
+		return false
 	}
 	m.asyncInterfaceMethodObjs[fn] = true
 	if interfaceMethodHasNamedReceiver(fn) {
@@ -1764,6 +1479,7 @@ func (m *SemanticModel) markInterfaceMethodAsync(fn *types.Func) {
 			m.asyncInterfaceMethods[key] = true
 		}
 	}
+	return true
 }
 
 func (m *SemanticModel) interfaceMethodAsync(fn *types.Func) bool {
