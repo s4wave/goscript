@@ -1317,7 +1317,7 @@ func renderTypeSwitch(b *strings.Builder, stmt *loweredTypeSwitch, indent int) {
 	writeIndent(b, indent)
 	b.WriteString("{\n")
 	writeIndent(b, indent+1)
-	b.WriteString("const __goscriptTypeSwitchValue = ")
+	b.WriteString("const " + typeSwitchValueName + " = ")
 	b.WriteString(stmt.value)
 	b.WriteString("\n")
 	writeIndent(b, indent+1)
@@ -1328,7 +1328,7 @@ func renderTypeSwitch(b *strings.Builder, stmt *loweredTypeSwitch, indent int) {
 	if len(stmt.defaultBody) != 0 {
 		writeIndent(b, indent+2)
 		b.WriteString("default:\n")
-		renderTypeSwitchInlineBody(b, stmt.varName, stmt.varRef || stmt.defaultRef, "any", "__goscriptTypeSwitchValue", stmt.defaultBody, indent+3)
+		renderTypeSwitchInlineBody(b, stmt.varName, stmt.varRef || stmt.defaultRef, "any", typeSwitchValueName, stmt.defaultBody, indent+3)
 		writeIndent(b, indent+3)
 		b.WriteString("break\n")
 	}
@@ -1348,7 +1348,7 @@ func renderTypeSwitchCase(b *strings.Builder, varName string, varRef bool, switc
 	if len(switchCase.types) == 1 {
 		b.WriteString("$.typeAssert<")
 		b.WriteString(typeSwitchAssertType(switchCase, 0))
-		b.WriteString(">(__goscriptTypeSwitchValue, ")
+		b.WriteString(">(" + typeSwitchValueName + ", ")
 		b.WriteString(switchCase.types[0])
 		b.WriteString(").ok")
 	} else {
@@ -1356,18 +1356,13 @@ func renderTypeSwitchCase(b *strings.Builder, varName string, varRef bool, switc
 			if idx != 0 {
 				b.WriteString(" || ")
 			}
-			b.WriteString("$.is(__goscriptTypeSwitchValue, ")
+			b.WriteString("$.is(" + typeSwitchValueName + ", ")
 			b.WriteString(typ)
 			b.WriteString(")")
 		}
 	}
 	b.WriteString(":\n")
-	value := "__goscriptTypeSwitchValue"
-	if len(switchCase.types) == 1 {
-		value = "$.typeAssert<" + typeSwitchAssertType(switchCase, 0) +
-			">(__goscriptTypeSwitchValue, " + switchCase.types[0] + ").value"
-	}
-	renderTypeSwitchInlineBody(b, varName, varRef || switchCase.varRef, typeSwitchCaseVariableType(switchCase), value, switchCase.body, indent+1)
+	renderTypeSwitchInlineBody(b, varName, varRef || switchCase.varRef, typeSwitchCaseVariableType(switchCase), switchCase.binding, switchCase.body, indent+1)
 	writeIndent(b, indent+1)
 	b.WriteString("break\n")
 }

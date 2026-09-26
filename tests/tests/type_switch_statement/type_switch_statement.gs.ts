@@ -211,6 +211,35 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	await $.println("raw", raw.value.Tag, ok)
+
+	// A case variable holds a copy of a struct or array dynamic value.
+	let boxed: any = $.interfaceValue($.markAsStructValue(new RawValue({Tag: 1})), "main.RawValue", "main.RawValue")
+	{
+		const __goscriptTypeSwitchValue = boxed
+		switch (true) {
+			case $.typeAssert<RawValue>(__goscriptTypeSwitchValue, "main.RawValue").ok:
+				{
+					let v: RawValue = $.markAsStructValue($.cloneStructValue($.typeAssert<RawValue>(__goscriptTypeSwitchValue, "main.RawValue").value))
+					v.Tag = 2
+				}
+				break
+		}
+	}
+	await $.println("struct copy", $.mustTypeAssert<RawValue>(boxed, "main.RawValue").Tag)
+
+	let boxedArray: any = [1, 2]
+	{
+		const __goscriptTypeSwitchValue = boxedArray
+		switch (true) {
+			case $.typeAssert<number[]>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)).ok:
+				{
+					let v: number[] = $.cloneArrayValue($.typeAssert<number[]>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)).value, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
+					v[0] = 9
+				}
+				break
+		}
+	}
+	await $.println("array copy", $.arrayIndex($.mustTypeAssert<number[]>(boxedArray, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), 0))
 }
 
 export function getInterface(): any {

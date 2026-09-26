@@ -11,3 +11,5 @@ after switch
 type switch count 3
 oid 3 1 true
 raw 9 true
+struct copy 1
+array copy 1

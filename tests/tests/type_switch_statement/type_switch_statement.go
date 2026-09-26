@@ -83,6 +83,21 @@ func main() {
 		*v, ok = parseRawValue()
 	}
 	println("raw", raw.Tag, ok)
+
+	// A case variable holds a copy of a struct or array dynamic value.
+	var boxed any = RawValue{Tag: 1}
+	switch v := boxed.(type) {
+	case RawValue:
+		v.Tag = 2
+	}
+	println("struct copy", boxed.(RawValue).Tag)
+
+	var boxedArray any = [2]int{1, 2}
+	switch v := boxedArray.(type) {
+	case [2]int:
+		v[0] = 9
+	}
+	println("array copy", boxedArray.([2]int)[0])
 }
 
 func getInterface() any {

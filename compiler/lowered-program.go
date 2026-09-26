@@ -208,9 +208,16 @@ type loweredTypeSwitch struct {
 	defaultRef  bool
 }
 
+// typeSwitchValueName holds a type switch operand, evaluated once.
+const typeSwitchValueName = "__goscriptTypeSwitchValue"
+
+// loweredTypeSwitchCase is one clause of a type switch. binding is the value
+// the case variable takes: the narrowed copy for a one-type case, or the operand
+// itself when the clause lists several types.
 type loweredTypeSwitchCase struct {
 	types   []string
 	tsTypes []string
+	binding string
 	varRef  bool
 	body    []loweredStmt
 }

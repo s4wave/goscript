@@ -7371,15 +7371,39 @@ func (o *LoweringOwner) lowerTypeSwitchStmt(ctx lowerFileContext, stmt *ast.Type
 				tsTypes = append(tsTypes, o.tsTypeSwitchCaseTypeFor(ctx, typ))
 			}
 		}
+		binding := typeSwitchValueName
+		if len(clause.List) == 1 {
+			typ := ctx.semPkg.source.TypesInfo.TypeOf(clause.List[0])
+			binding = o.lowerTypeSwitchBinding(typ, tsTypes[0], types[0])
+		}
 		switchIR.cases = append(switchIR.cases, loweredTypeSwitchCase{
 			types:   types,
 			tsTypes: tsTypes,
+			binding: binding,
 			varRef:  varRef || loweredStmtsUseVarRefName(body, varName),
 			body:    body,
 		})
 	}
 	lowered = append(lowered, loweredStmt{typeSwitch: switchIR})
 	return lowered, diagnostics
+}
+
+// lowerTypeSwitchBinding narrows the operand to typ for a one-type case. Go
+// binds a copy of the dynamic value, so struct and array values are cloned and
+// writes through the case variable do not reach the interface.
+func (o *LoweringOwner) lowerTypeSwitchBinding(typ types.Type, tsType string, typeInfo string) string {
+	value := o.runtimeOwner.QualifiedHelper(RuntimeHelperTypeAssert) + "<" + tsType + ">(" +
+		typeSwitchValueName + ", " + typeInfo + ").value"
+	switch {
+	case typ == nil:
+		return value
+	case isStructValueType(typ):
+		return o.lowerStructClone(value)
+	case isArrayType(typ):
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperCloneArrayValue) + "(" + value + ", " + typeInfo + ")"
+	default:
+		return value
+	}
 }
 
 func (o *LoweringOwner) tsTypeSwitchCaseTypeFor(ctx lowerFileContext, typ types.Type) string {
