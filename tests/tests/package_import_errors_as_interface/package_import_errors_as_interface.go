@@ -32,4 +32,11 @@ func main() {
 	if ok {
 		println("health:", target.Health())
 	}
+
+	var healthTarget interface{ Health() string }
+	ok = errors.As(err, &healthTarget)
+	println("anonymous matched:", ok)
+	if ok {
+		println("anonymous health:", healthTarget.Health())
+	}
 }

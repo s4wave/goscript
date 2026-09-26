@@ -308,7 +308,18 @@ function assignAsTarget(err: Exclude<$.GoError, null>, target: any): boolean {
   return false
 }
 
-function asTargetType(target: any): string | undefined {
+// asTargetType returns the type an As target points to. The pointer's type
+// info describes unnamed targets such as interface{ StatusCode() int }, whose
+// type name is not registered.
+function asTargetType(target: any): $.TypeInfo | string | undefined {
+  const typeInfo = target?.__goTypeInfo
+  if (
+    typeInfo !== undefined &&
+    typeof typeInfo !== 'string' &&
+    $.isPointerTypeInfo(typeInfo)
+  ) {
+    return typeInfo.elemType
+  }
   const goType = target?.__goType
   if (typeof goType !== 'string' || !goType.startsWith('*')) {
     return undefined
