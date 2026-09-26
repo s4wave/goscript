@@ -38,7 +38,7 @@ export async function main(): globalThis.Promise<void> {
 
 	{
 		let __goscriptSwitch0 = err
-		switch (true) {
+		switch ((true as boolean)) {
 			case $.comparableEqual(__goscriptSwitch0, $.namedValueInterfaceValue<$.GoError>(-1, "main.MyError", {"Error": MyError_Error}, /* @__PURE__ */ $.basicType("int", "main.MyError"))):
 			{
 				await $.println("switch: matched primitive error")
