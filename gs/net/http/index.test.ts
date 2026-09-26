@@ -470,6 +470,20 @@ describe('net/http override', () => {
     expect(protocols.String()).toBe('{HTTP1,UnencryptedHTTP2}')
   })
 
+  it('reads a nil Header as empty and panics on writes', () => {
+    const written = new bytes.Buffer()
+
+    expect(Header_Get(null, 'Content-Type')).toBe('')
+    expect(Header_Values(null, 'Content-Type')).toBeNull()
+    expect(Header_Clone(null)).toBeNull()
+    expect(Header_Write(null, written)).toBeNull()
+    expect(written.Len()).toBe(0)
+    Header_Del(null, 'Content-Type')
+    expect(() => Header_Set(null, 'Content-Type', 'text/plain')).toThrow(
+      'assign to nil map',
+    )
+  })
+
   it('accepts pointer-wrapped headers from generated ResponseWriter methods', () => {
     const header = varRef(new Header())
 

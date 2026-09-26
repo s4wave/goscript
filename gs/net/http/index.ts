@@ -249,12 +249,15 @@ export function StatusText(code: number): string {
   return statusTexts.get(code) ?? ''
 }
 
-export type Header = Map<string, $.Slice<string>>
+// Header is a Go map type, so a nil Header is null. Reads treat nil as empty;
+// writes to a nil Header panic like any Go nil map assignment.
+export type Header = Map<string, $.Slice<string>> | null
+type HeaderMap = NonNullable<Header>
 type HeaderBox = { __goValue: HeaderValue }
 type HeaderValue = Header | $.VarRef<Header> | HeaderBox
 
 export const Header = Map as {
-  new (entries?: Iterable<readonly [string, $.Slice<string>]> | null): Header
+  new (entries?: Iterable<readonly [string, $.Slice<string>]> | null): HeaderMap
 }
 
 export function CanonicalHeaderKey(s: string): string {
@@ -262,6 +265,9 @@ export function CanonicalHeaderKey(s: string): string {
 }
 
 function headerMap(h: HeaderValue): Header {
+  if (h === null) {
+    return null
+  }
   let value: unknown = $.pointerValue(h as Header | $.VarRef<Header>)
   while (
     value !== null &&
@@ -274,34 +280,42 @@ function headerMap(h: HeaderValue): Header {
   return value as Header
 }
 
+// headerEntries iterates a Header's entries; a nil Header has none.
+function headerEntries(h: HeaderValue): Iterable<[string, $.Slice<string>]> {
+  return headerMap(h)?.entries() ?? []
+}
+
 export function Header_Add(h: HeaderValue, key: string, value: string): void {
   const headers = headerMap(h)
   key = canonicalMIMEHeaderKey(key)
-  const values = Array.from(headers.get(key) ?? [])
+  const values = Array.from(headers?.get(key) ?? [])
   values.push(value)
-  headers.set(key, $.arrayToSlice(values))
+  $.mapSet(headers, key, $.arrayToSlice(values))
 }
 
 export function Header_Del(h: HeaderValue, key: string): void {
-  headerMap(h).delete(canonicalMIMEHeaderKey(key))
+  headerMap(h)?.delete(canonicalMIMEHeaderKey(key))
 }
 
 export function Header_Get(h: HeaderValue, key: string): string {
-  const values = headerMap(h).get(canonicalMIMEHeaderKey(key))
-  return values == null || values.length === 0 ? '' : String(values[0])
+  return Header__get(h, canonicalMIMEHeaderKey(key))
 }
 
 export function Header_Set(h: HeaderValue, key: string, value: string): void {
-  headerMap(h).set(canonicalMIMEHeaderKey(key), $.arrayToSlice([value]))
+  $.mapSet(headerMap(h), canonicalMIMEHeaderKey(key), $.arrayToSlice([value]))
 }
 
 export function Header_Values(h: HeaderValue, key: string): $.Slice<string> {
-  return headerMap(h).get(canonicalMIMEHeaderKey(key)) ?? null
+  return headerMap(h)?.get(canonicalMIMEHeaderKey(key)) ?? null
 }
 
 export function Header_Clone(h: HeaderValue): Header {
+  const headers = headerMap(h)
+  if (headers === null) {
+    return null
+  }
   const cloned = new Header()
-  for (const [key, values] of headerMap(h).entries()) {
+  for (const [key, values] of headers.entries()) {
     cloned.set(key, $.arrayToSlice(Array.from(values ?? [])))
   }
   return cloned
@@ -317,7 +331,7 @@ export function Header_WriteSubset(
   exclude: Map<string, boolean> | null,
 ): io.Awaitable<$.GoError> {
   return io.runIO((function* (): Generator<io.Awaitable<io.IOResult>, $.GoError, io.IOResult> {
-    for (const [key, values] of headerMap(h).entries()) {
+    for (const [key, values] of headerEntries(h)) {
       if (exclude?.get(key) === true) {
         continue
       }
@@ -333,12 +347,12 @@ export function Header_WriteSubset(
 }
 
 export function Header__get(h: HeaderValue, key: string): string {
-  const values = headerMap(h).get(key)
+  const values = headerMap(h)?.get(key)
   return values == null || values.length === 0 ? '' : String(values[0])
 }
 
 export function Header_has(h: HeaderValue, key: string): boolean {
-  return headerMap(h).has(key)
+  return headerMap(h)?.has(key) ?? false
 }
 
 export function Header_sortedKeyValues(
@@ -346,7 +360,7 @@ export function Header_sortedKeyValues(
   exclude: Map<string, boolean> | null,
 ): [Array<{ key: string; values: $.Slice<string> }>, null] {
   const values: Array<{ key: string; values: $.Slice<string> }> = []
-  for (const [key, headerValues] of headerMap(h).entries()) {
+  for (const [key, headerValues] of headerEntries(h)) {
     if (exclude?.get(key) === true) continue
     values.push({ key, values: headerValues })
   }
@@ -1394,7 +1408,7 @@ async function fetchRoundTrip(
     return [null, ctxErr]
   }
   const headers = new globalThis.Headers()
-  for (const [key, values] of request.Header.entries()) {
+  for (const [key, values] of headerEntries(request.Header)) {
     for (const value of Array.from(values ?? [])) {
       headers.append(key, String(value))
     }
