@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"slices"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -5069,13 +5070,19 @@ func leadingStmtLines(ctx lowerFileContext, prevEndLine int, startLine int) []st
 		return []string{""}
 	}
 
+	// Comment groups are sorted by position, so the gap's comments form one
+	// contiguous run starting after prevEndLine.
+	comments := ctx.file.Comments
+	first := sort.Search(len(comments), func(i int) bool {
+		return sourceLine(ctx, comments[i].Pos()) > prevEndLine
+	})
 	var lines []string
 	lastLine := prevEndLine
-	for _, group := range ctx.file.Comments {
+	for _, group := range comments[first:] {
 		groupStart := sourceLine(ctx, group.Pos())
 		groupEnd := sourceLine(ctx, group.End())
-		if groupStart <= prevEndLine || groupEnd >= startLine {
-			continue
+		if groupEnd >= startLine {
+			break
 		}
 		if groupStart > lastLine+1 {
 			lines = append(lines, "")
