@@ -404,9 +404,9 @@ export function Join(...errs: $.GoError[]): $.GoError {
       if (messages.every((message) => typeof message === 'string')) {
         return (messages as string[]).join('\n')
       }
-      return Promise.all(messages.map((message) => Promise.resolve(message))).then(
-        (resolved) => resolved.join('\n'),
-      )
+      return Promise.all(
+        messages.map((message) => Promise.resolve(message)),
+      ).then((resolved) => resolved.join('\n'))
     },
   }
 
