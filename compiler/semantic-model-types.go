@@ -1,6 +1,7 @@
 package compiler
 
 import (
+	"go/ast"
 	"go/types"
 	"sync"
 
@@ -35,19 +36,35 @@ type SemanticModel struct {
 	asyncInterfaceMethodObjs map[*types.Func]bool
 }
 
+// semanticPackage holds package facts built by one shard and read by lowering.
 type semanticPackage struct {
-	pkgPath          string
-	name             string
-	source           *packages.Package
-	declarations     []semanticDeclaration
-	imports          []semanticImport
-	types            []*semanticType
-	values           []*semanticValue
-	functions        []*semanticFunction
-	initOrder        []types.Object
+	// pkgPath is the package import path.
+	pkgPath string
+	// name is the declared package name.
+	name string
+	// source holds the loaded syntax and type information.
+	source *packages.Package
+	// declarations records package declarations in source order.
+	declarations []semanticDeclaration
+	// imports records imports and their source locations.
+	imports []semanticImport
+	// types holds the package's named types.
+	types []*semanticType
+	// values holds the package's variables and constants, including locals.
+	values []*semanticValue
+	// functions holds semantic facts for functions and methods.
+	functions []*semanticFunction
+	// functionDecls indexes exact function objects, including methods and init declarations.
+	// It is populated during declaration collection and immutable during lowering.
+	functionDecls map[*types.Func]*ast.FuncDecl
+	// initOrder records package variables in declaration order.
+	initOrder []types.Object
+	// generatedImports records implicit imports by source file.
 	generatedImports map[string]map[string]bool
-	typeAssertions   []semanticTypeAssertion
-	nilFacts         []semanticNilFact
+	// typeAssertions records source and target types of explicit assertions.
+	typeAssertions []semanticTypeAssertion
+	// nilFacts records nil conversions and typed nil interface risks.
+	nilFacts []semanticNilFact
 }
 
 type semanticDeclaration struct {

@@ -168,11 +168,13 @@ func (o *SemanticModelOwner) buildPackage(
 		name:             node.Name,
 		source:           pkg,
 		generatedImports: make(map[string]map[string]bool),
+		functionDecls:    make(map[*types.Func]*ast.FuncDecl),
 	}
 	shard.packages[node.PkgPath] = semPkg
 	for _, file := range pkg.Syntax {
-		o.collectFileDeclarations(shard, semPkg, pkg, file)
-		o.collectFacts(shard, semPkg, pkg, file, nil)
+		tokenFile := pkg.Fset.File(file.Pos())
+		o.collectFileDeclarations(shard, semPkg, pkg, tokenFile, file)
+		o.collectFacts(shard, semPkg, pkg, tokenFile, file, nil)
 	}
 	for _, file := range pkg.Syntax {
 		collectFunctionFacts(shard, pkg, file, overrideFacts)
@@ -231,10 +233,12 @@ func (m *SemanticModel) existingFunction(fn *types.Func) *semanticFunction {
 	return nil
 }
 
+// collectFileDeclarations records imports, declarations, and function syntax before lowering.
 func (o *SemanticModelOwner) collectFileDeclarations(
 	model *SemanticModel,
 	semPkg *semanticPackage,
 	pkg *packages.Package,
+	tokenFile *token.File,
 	file *ast.File,
 ) {
 	for _, importSpec := range file.Imports {
@@ -246,7 +250,7 @@ func (o *SemanticModelOwner) collectFileDeclarations(
 		if importSpec.Name != nil {
 			name = importSpec.Name.Name
 		}
-		position := sourcePos(pkg, importSpec.Pos())
+		position := sourcePosInFile(tokenFile, importSpec.Pos())
 		semPkg.imports = append(semPkg.imports, semanticImport{
 			path:     importPath,
 			name:     name,
@@ -258,15 +262,16 @@ func (o *SemanticModelOwner) collectFileDeclarations(
 	for _, decl := range file.Decls {
 		switch typed := decl.(type) {
 		case *ast.GenDecl:
-			o.collectGenDecl(model, semPkg, pkg, typed)
+			o.collectGenDecl(model, semPkg, pkg, tokenFile, typed)
 		case *ast.FuncDecl:
 			fn, _ := pkg.TypesInfo.Defs[typed.Name].(*types.Func)
 			if fn == nil {
 				continue
 			}
-			position := sourcePos(pkg, typed.Name.Pos())
+			position := sourcePosInFile(tokenFile, typed.Name.Pos())
 			semFn := o.addFunction(model, semPkg, fn, position)
 			semFn.hasBody = typed.Body != nil
+			semPkg.functionDecls[fn] = typed
 			semPkg.declarations = append(semPkg.declarations, semanticDeclaration{
 				kind:     "func",
 				name:     typed.Name.Name,
@@ -277,10 +282,12 @@ func (o *SemanticModelOwner) collectFileDeclarations(
 	}
 }
 
+// collectGenDecl records package types, values, and their generated imports.
 func (o *SemanticModelOwner) collectGenDecl(
 	model *SemanticModel,
 	semPkg *semanticPackage,
 	pkg *packages.Package,
+	tokenFile *token.File,
 	decl *ast.GenDecl,
 ) {
 	for _, spec := range decl.Specs {
@@ -290,7 +297,7 @@ func (o *SemanticModelOwner) collectGenDecl(
 			if obj == nil {
 				continue
 			}
-			position := sourcePos(pkg, typed.Name.Pos())
+			position := sourcePosInFile(tokenFile, typed.Name.Pos())
 			o.addType(model, semPkg, obj, position, typed.Type, pkg.TypesSizes)
 			o.recordGeneratedImports(model, semPkg, position.file, pkg.PkgPath, obj.Type())
 			semPkg.declarations = append(semPkg.declarations, semanticDeclaration{
@@ -304,7 +311,7 @@ func (o *SemanticModelOwner) collectGenDecl(
 				obj := pkg.TypesInfo.Defs[name]
 				switch concrete := obj.(type) {
 				case *types.Var:
-					position := sourcePos(pkg, name.Pos())
+					position := sourcePosInFile(tokenFile, name.Pos())
 					o.addValue(model, semPkg, concrete, position, true)
 					semPkg.initOrder = append(semPkg.initOrder, concrete)
 					semPkg.declarations = append(semPkg.declarations, semanticDeclaration{
@@ -315,7 +322,7 @@ func (o *SemanticModelOwner) collectGenDecl(
 					})
 					o.recordGeneratedImports(model, semPkg, position.file, pkg.PkgPath, concrete.Type())
 				case *types.Const:
-					position := sourcePos(pkg, name.Pos())
+					position := sourcePosInFile(tokenFile, name.Pos())
 					o.addValue(model, semPkg, concrete, position, true)
 					semPkg.declarations = append(semPkg.declarations, semanticDeclaration{
 						kind:     "const",
@@ -330,19 +337,21 @@ func (o *SemanticModelOwner) collectGenDecl(
 	}
 }
 
+// collectFacts walks syntax within tokenFile, including nested function literals.
 func (o *SemanticModelOwner) collectFacts(
 	model *SemanticModel,
 	semPkg *semanticPackage,
 	pkg *packages.Package,
+	tokenFile *token.File,
 	node ast.Node,
 	lit *ast.FuncLit,
 ) {
 	ast.Inspect(node, func(node ast.Node) bool {
 		switch typed := node.(type) {
 		case *ast.TypeSpec:
-			o.recordTypeSpec(model, semPkg, pkg, typed)
+			o.recordTypeSpec(model, semPkg, pkg, tokenFile, typed)
 		case *ast.Ident:
-			o.addDefinedObject(model, semPkg, pkg, typed)
+			o.addDefinedObject(model, semPkg, pkg, tokenFile, typed)
 		case *ast.UnaryExpr:
 			if typed.Op == token.AND {
 				o.recordAddressTaken(model, pkg, typed.X)
@@ -350,21 +359,21 @@ func (o *SemanticModelOwner) collectFacts(
 		case *ast.SelectorExpr:
 			o.recordPointerReceiverUse(model, pkg, typed)
 		case *ast.TypeAssertExpr:
-			o.recordTypeAssertion(semPkg, pkg, typed)
+			o.recordTypeAssertion(semPkg, pkg, tokenFile, typed)
 		case *ast.ValueSpec:
-			o.recordValueSpecNilFacts(semPkg, pkg, typed)
+			o.recordValueSpecNilFacts(semPkg, pkg, tokenFile, typed)
 		case *ast.AssignStmt:
-			o.recordAssignNilFacts(semPkg, pkg, typed)
+			o.recordAssignNilFacts(semPkg, pkg, tokenFile, typed)
 			if lit != nil {
 				for _, lhs := range typed.Lhs {
 					o.recordFuncLitAssignedCapture(model, pkg, lit, lhs)
 				}
 			}
 		case *ast.FuncLit:
-			o.collectFacts(model, semPkg, pkg, typed.Body, typed)
+			o.collectFacts(model, semPkg, pkg, tokenFile, typed.Body, typed)
 			return false
 		case *ast.CallExpr:
-			o.recordCallSignatureImports(model, semPkg, pkg, typed)
+			o.recordCallSignatureImports(model, semPkg, pkg, tokenFile, typed)
 		case *ast.IncDecStmt:
 			if lit != nil {
 				o.recordFuncLitAssignedCapture(model, pkg, lit, typed.X)
@@ -374,17 +383,19 @@ func (o *SemanticModelOwner) collectFacts(
 	})
 }
 
+// recordTypeSpec records a declared type and the imports needed to emit it.
 func (o *SemanticModelOwner) recordTypeSpec(
 	model *SemanticModel,
 	semPkg *semanticPackage,
 	pkg *packages.Package,
+	tokenFile *token.File,
 	spec *ast.TypeSpec,
 ) {
 	obj, _ := pkg.TypesInfo.Defs[spec.Name].(*types.TypeName)
 	if obj == nil {
 		return
 	}
-	position := sourcePos(pkg, spec.Name.Pos())
+	position := sourcePosInFile(tokenFile, spec.Name.Pos())
 	o.addType(model, semPkg, obj, position, spec.Type, pkg.TypesSizes)
 	o.recordGeneratedImports(model, semPkg, position.file, pkg.PkgPath, obj.Type())
 }
@@ -412,17 +423,19 @@ func (o *SemanticModelOwner) recordFuncLitAssignedCapture(
 	model.needsVarRef[obj] = true
 }
 
+// recordCallSignatureImports records types required by call parameters and results.
 func (o *SemanticModelOwner) recordCallSignatureImports(
 	model *SemanticModel,
 	semPkg *semanticPackage,
 	pkg *packages.Package,
+	tokenFile *token.File,
 	expr *ast.CallExpr,
 ) {
 	signature := signatureForType(pkg.TypesInfo.TypeOf(expr.Fun))
 	if signature == nil {
 		return
 	}
-	position := sourcePos(pkg, expr.Pos())
+	position := sourcePosInFile(tokenFile, expr.Pos())
 	seen := model.generatedImportSeen(position.file)
 	o.recordTupleImports(model, semPkg, position.file, pkg.PkgPath, signature.Params(), seen)
 	o.recordTupleImports(model, semPkg, position.file, pkg.PkgPath, signature.Results(), seen)
@@ -470,26 +483,28 @@ func (o *SemanticModelOwner) recordPointerReceiverUse(
 	model.needsVarRef[obj] = true
 }
 
+// addDefinedObject records the value, type, or function defined by ident.
 func (o *SemanticModelOwner) addDefinedObject(
 	model *SemanticModel,
 	semPkg *semanticPackage,
 	pkg *packages.Package,
+	tokenFile *token.File,
 	ident *ast.Ident,
 ) {
 	obj := pkg.TypesInfo.Defs[ident]
 	switch typed := obj.(type) {
 	case *types.Var:
-		position := sourcePos(pkg, ident.Pos())
+		position := sourcePosInFile(tokenFile, ident.Pos())
 		o.addValue(model, semPkg, typed, position, false)
 		o.recordGeneratedImports(model, semPkg, position.file, pkg.PkgPath, typed.Type())
 	case *types.Const:
-		position := sourcePos(pkg, ident.Pos())
+		position := sourcePosInFile(tokenFile, ident.Pos())
 		o.addValue(model, semPkg, typed, position, false)
 		o.recordGeneratedImports(model, semPkg, position.file, pkg.PkgPath, typed.Type())
 	case *types.TypeName:
-		o.addType(model, semPkg, typed, sourcePos(pkg, ident.Pos()), nil, pkg.TypesSizes)
+		o.addType(model, semPkg, typed, sourcePosInFile(tokenFile, ident.Pos()), nil, pkg.TypesSizes)
 	case *types.Func:
-		o.addFunction(model, semPkg, typed, sourcePos(pkg, ident.Pos()))
+		o.addFunction(model, semPkg, typed, sourcePosInFile(tokenFile, ident.Pos()))
 	}
 }
 
@@ -1858,24 +1873,28 @@ func namedTypeKey(named *types.Named) string {
 	return named.Obj().Pkg().Path() + "." + named.Obj().Name()
 }
 
+// recordTypeAssertion records the asserted and source types at their adjusted position.
 func (o *SemanticModelOwner) recordTypeAssertion(
 	semPkg *semanticPackage,
 	pkg *packages.Package,
+	tokenFile *token.File,
 	expr *ast.TypeAssertExpr,
 ) {
 	if expr.Type == nil {
 		return
 	}
 	semPkg.typeAssertions = append(semPkg.typeAssertions, semanticTypeAssertion{
-		position: sourcePos(pkg, expr.Pos()),
+		position: sourcePosInFile(tokenFile, expr.Pos()),
 		source:   pkg.TypesInfo.TypeOf(expr.X),
 		target:   pkg.TypesInfo.TypeOf(expr.Type),
 	})
 }
 
+// recordValueSpecNilFacts records nil conversions in value declarations.
 func (o *SemanticModelOwner) recordValueSpecNilFacts(
 	semPkg *semanticPackage,
 	pkg *packages.Package,
+	tokenFile *token.File,
 	spec *ast.ValueSpec,
 ) {
 	for idx, value := range spec.Values {
@@ -1886,13 +1905,15 @@ func (o *SemanticModelOwner) recordValueSpecNilFacts(
 		if obj == nil {
 			continue
 		}
-		o.recordNilFacts(semPkg, pkg, obj.Type(), value)
+		o.recordNilFacts(semPkg, pkg, tokenFile, obj.Type(), value)
 	}
 }
 
+// recordAssignNilFacts records nil conversions in assignments.
 func (o *SemanticModelOwner) recordAssignNilFacts(
 	semPkg *semanticPackage,
 	pkg *packages.Package,
+	tokenFile *token.File,
 	stmt *ast.AssignStmt,
 ) {
 	for idx, rhs := range stmt.Rhs {
@@ -1900,21 +1921,22 @@ func (o *SemanticModelOwner) recordAssignNilFacts(
 			continue
 		}
 		targetType := pkg.TypesInfo.TypeOf(stmt.Lhs[idx])
-		o.recordNilFacts(semPkg, pkg, targetType, rhs)
+		o.recordNilFacts(semPkg, pkg, tokenFile, targetType, rhs)
 	}
 }
 
+// recordNilFacts records nil values and typed nil interface conversions.
 func (o *SemanticModelOwner) recordNilFacts(
 	semPkg *semanticPackage,
 	pkg *packages.Package,
+	tokenFile *token.File,
 	targetType types.Type,
 	expr ast.Expr,
 ) {
-	position := sourcePos(pkg, expr.Pos())
 	if isNilIdent(expr) {
 		if kind := nilFactKind(targetType); kind != "" {
 			semPkg.nilFacts = append(semPkg.nilFacts, semanticNilFact{
-				position: position,
+				position: sourcePosInFile(tokenFile, expr.Pos()),
 				kind:     kind,
 				typ:      targetType,
 			})
@@ -1925,7 +1947,7 @@ func (o *SemanticModelOwner) recordNilFacts(
 	exprType := pkg.TypesInfo.TypeOf(expr)
 	if isInterfaceType(targetType) && !isInterfaceType(exprType) && isNilableType(exprType) {
 		semPkg.nilFacts = append(semPkg.nilFacts, semanticNilFact{
-			position: position,
+			position: sourcePosInFile(tokenFile, expr.Pos()),
 			kind:     "typed-nil-interface-risk",
 			typ:      exprType,
 		})
@@ -2124,6 +2146,7 @@ func zeroValueKind(typ types.Type) string {
 	}
 }
 
+// sourcePos resolves an adjusted position when the containing file is not known.
 func sourcePos(pkg *packages.Package, pos token.Pos) sourcePosition {
 	if pkg == nil || pkg.Fset == nil || !pos.IsValid() {
 		return sourcePosition{}
@@ -2131,6 +2154,16 @@ func sourcePos(pkg *packages.Package, pos token.Pos) sourcePosition {
 	return sourcePosFromTokenPosition(pkg.Fset.Position(pos))
 }
 
+// sourcePosInFile resolves an adjusted position within a known source file,
+// avoiding the shared FileSet lookup during parallel package walks.
+func sourcePosInFile(file *token.File, pos token.Pos) sourcePosition {
+	if file == nil || !pos.IsValid() {
+		return sourcePosition{}
+	}
+	return sourcePosFromTokenPosition(file.Position(pos))
+}
+
+// sourcePosFromTokenPosition retains the source coordinates used by semantic facts.
 func sourcePosFromTokenPosition(pos token.Position) sourcePosition {
 	return sourcePosition{
 		file:   pos.Filename,

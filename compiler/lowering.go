@@ -21,9 +21,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/pkg/errors"
-
 	"golang.org/x/sync/errgroup"
-
 	"golang.org/x/tools/go/packages"
 )
 
@@ -428,6 +426,7 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 		model:                model,
 		semPkg:               semPkg,
 		file:                 file,
+		tokenFile:            semPkg.source.Fset.File(file.Pos()),
 		importAliases:        importAliases,
 		importPaths:          importPaths,
 		importNames:          importNames,
@@ -758,6 +757,18 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 			}
 			return
 		}
+
+		// Resolve each local object's alias and dependencies once, but allow a
+		// later value use to promote a type-only import to a runtime import.
+		if seenObjects[obj] {
+			if runtime {
+				if alias := analysis.aliases[obj]; alias != "" {
+					analysis.runtimeAliases[alias] = true
+				}
+			}
+			return
+		}
+		seenObjects[obj] = true
 		declFile := declFiles[obj]
 		if declFile == "" {
 			if fn, ok := obj.(*types.Func); ok {
@@ -777,15 +788,6 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 				}
 			}
 		}
-		if runtime {
-			if alias := analysis.aliases[obj]; alias != "" {
-				analysis.runtimeAliases[alias] = true
-			}
-		}
-		if seenObjects[obj] {
-			return
-		}
-		seenObjects[obj] = true
 		switch typed := obj.(type) {
 		case *types.TypeName:
 			addTypeDeps(typed.Type())
@@ -1267,7 +1269,10 @@ func safeParamName(param *types.Var, idx int) string {
 	return safeIdentifier(param.Name())
 }
 
+// lowerFileContext carries source and scope facts through lowering.
 type lowerFileContext struct {
+	// tokenFile resolves positions in the current file without a shared FileSet lookup.
+	tokenFile                     *token.File
 	model                         *SemanticModel
 	semPkg                        *semanticPackage
 	file                          *ast.File
@@ -2561,19 +2566,13 @@ func functionReferencesOtherFileObject(
 	return references
 }
 
+// functionDeclForObject returns the declaration for the exact function object,
+// or nil for functions without syntax in the package.
 func functionDeclForObject(semPkg *semanticPackage, fn *types.Func) *ast.FuncDecl {
-	if semPkg == nil || semPkg.source == nil || fn == nil {
+	if semPkg == nil {
 		return nil
 	}
-	for _, file := range semPkg.source.Syntax {
-		for _, decl := range file.Decls {
-			fnDecl, ok := decl.(*ast.FuncDecl)
-			if ok && semPkg.source.TypesInfo.Defs[fnDecl.Name] == fn {
-				return fnDecl
-			}
-		}
-	}
-	return nil
+	return semPkg.functionDecls[fn]
 }
 
 func initializerReferencesOtherFileObject(
@@ -5100,8 +5099,20 @@ func leadingStmtLines(ctx lowerFileContext, prevEndLine int, startLine int) []st
 	return lines
 }
 
+// sourceLine returns the adjusted source line, including for associated methods
+// and comments whose positions belong to a different source file.
 func sourceLine(ctx lowerFileContext, pos token.Pos) int {
-	if ctx.semPkg == nil || ctx.semPkg.source == nil || ctx.semPkg.source.Fset == nil || !pos.IsValid() {
+	if !pos.IsValid() {
+		return 0
+	}
+
+	// Resolve positions in the current file without the shared FileSet lookup.
+	if file := ctx.tokenFile; file != nil && int(pos) >= file.Base() && int(pos) <= file.Base()+file.Size() {
+		return file.Position(pos).Line
+	}
+
+	// Associated methods can be emitted with a type declared in another file.
+	if ctx.semPkg == nil || ctx.semPkg.source == nil || ctx.semPkg.source.Fset == nil {
 		return 0
 	}
 	return ctx.semPkg.source.Fset.Position(pos).Line
