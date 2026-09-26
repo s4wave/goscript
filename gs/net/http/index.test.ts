@@ -867,6 +867,29 @@ describe('net/http override', () => {
     expect(err).toBeNull()
     expect(resp?.StatusCode).toBe(StatusOK)
     expect(Header_Get(resp!.Header, 'x-test')).toBe('ok')
+    expect(resp?.ContentLength).toBe(5n)
+    expect(resp?.Uncompressed).toBe(false)
+  })
+
+  it('reports a body fetch decoded as uncompressed', async () => {
+    Object.defineProperty(globalThis, 'fetch', {
+      configurable: true,
+      writable: true,
+      value: async () =>
+        new globalThis.Response('hello', {
+          status: StatusOK,
+          statusText: 'OK',
+          headers: { 'Content-Encoding': 'br', 'Content-Length': '3' },
+        }),
+    })
+
+    const [resp, err] = await Get('https://example.invalid')
+
+    expect(err).toBeNull()
+    expect(resp?.ContentLength).toBe(-1n)
+    expect(resp?.Uncompressed).toBe(true)
+    expect(Header_Get(resp!.Header, 'Content-Encoding')).toBe('')
+    expect(Header_Get(resp!.Header, 'Content-Length')).toBe('')
   })
 
   it('accepts VarRef requests for client calls', async () => {

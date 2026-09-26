@@ -1451,6 +1451,14 @@ async function fetchRoundTrip(
     }
     const respHeader = new Header()
     fetched.headers.forEach((value, key) => Header_Add(respHeader, key, value))
+    // fetch decodes every content coding but keeps the encoded headers, so
+    // report the body as uncompressed with an unknown length, as Go does.
+    const encoding = Header_Get(respHeader, 'Content-Encoding')
+    const uncompressed = encoding !== '' && encoding.toLowerCase() !== 'identity'
+    if (uncompressed) {
+      Header_Del(respHeader, 'Content-Encoding')
+      Header_Del(respHeader, 'Content-Length')
+    }
     const bodyReader: io.ReadCloser =
       request.Method === MethodHead ?
         NoBody
@@ -1469,7 +1477,11 @@ async function fetchRoundTrip(
         StatusCode: fetched.status,
         Body: bodyReader,
         Header: respHeader,
-        ContentLength: BigInt(fetched.headers.get('content-length') ?? -1),
+        ContentLength:
+          uncompressed ? -1n : (
+            BigInt(fetched.headers.get('content-length') ?? -1)
+          ),
+        Uncompressed: uncompressed,
         Request: request,
       }),
       null,
