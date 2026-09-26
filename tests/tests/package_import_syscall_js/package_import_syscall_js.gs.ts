@@ -10,7 +10,7 @@ export async function main(): globalThis.Promise<void> {
 	const __defer = new $.AsyncDisposableStack()
 	try {
 		let global = $.markAsStructValue($.cloneStructValue(js.Global()))
-		$.markAsStructValue($.cloneStructValue(global)).Set("__GOSCRIPT_JS_TEST__", $.interfaceValue($.markAsStructValue($.cloneStructValue(js.ValueOf($.interfaceValue($.makeMap<string, any>([["name", "goscript"], ["nums", $.interfaceValue($.arrayToSlice<any>([$.basicInterfaceValue(1, "int"), $.basicInterfaceValue(2, "int"), $.basicInterfaceValue(3, "int")]), "[]interface{}", /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] }))]]), "map[string]interface{}", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))), "js.Value", "js.Value"))
+		$.markAsStructValue($.cloneStructValue(global)).Set("__GOSCRIPT_JS_TEST__", $.interfaceValue($.markAsStructValue($.cloneStructValue(js.ValueOf($.interfaceValue($.makeMap<string, any>([["name", "goscript"], ["nums", $.interfaceValue($.arrayToSlice<any>([$.basicInterfaceValue(1, "int"), $.basicInterfaceValue(2, "int"), $.basicInterfaceValue(3, "int")]), "[]any", /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] }))]]), "map[string]any", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))), "js.Value", "js.Value"))
 		let obj = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(global)).Get("__GOSCRIPT_JS_TEST__")))
 		await $.println("type:", js.Type_String($.markAsStructValue($.cloneStructValue(obj)).Type()))
 		await $.println("name:", $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(obj)).Get("name"))).String())
