@@ -86,10 +86,9 @@ export function Clone<T>(s: $.Slice<T>): $.Slice<T> {
   if (s == null) {
     return null
   }
-  const out = $.makeSlice<T>($.len(s))
-  for (let i = 0; i < $.len(s); i++) {
-    ;(out as any)[i] = (s as any)[i] as T
-  }
+  const length = $.len(s)
+  const out = $.makeSlice<T>(length)
+  $.copySliceElements(out, 0, s, 0, length)
   return out
 }
 
@@ -118,9 +117,8 @@ export function Concat<T>(...slices: $.Slice<T>[]): $.Slice<T> {
   let pos = 0
   for (const slice of slices) {
     const length = $.len(slice)
-    for (let i = 0; i < length; i++) {
-      ;(out as any)[pos++] = (slice as any)[i] as T
-    }
+    $.copySliceElements(out, pos, slice, 0, length)
+    pos += length
   }
   return out
 }
@@ -140,12 +138,20 @@ export function Repeat<T>(x: $.Slice<T>, count: number): $.Slice<T> {
   if (total >= 2 ** 63) {
     $.panic('the result of (len(x) * count) overflows')
   }
-  const out =
-    x instanceof Uint8Array ?
-      $.makeSlice<T>(total, total, 'byte')
-    : $.makeSlice<T>(total)
-  for (let i = 0; i < total; i++) {
-    ;(out as any)[i] = (x as any)[i % length]
+  if (x instanceof Uint8Array) {
+    const out = new Uint8Array(total)
+    if (length > 0) {
+      for (let offset = 0; offset < total; offset += length) {
+        out.set(x.subarray(0, length), offset)
+      }
+    }
+    return out as $.Slice<T>
+  }
+  const out = $.makeSlice<T>(total)
+  if (length > 0) {
+    for (let offset = 0; offset < total; offset += length) {
+      $.copySliceElements(out, offset, x, 0, length)
+    }
   }
   return out
 }
@@ -167,7 +173,8 @@ export function All<T>(
     const length = $.len(s)
     const walk = (i: number): void | globalThis.Promise<void> => {
       for (; i < length; i++) {
-        const value = (s as any)[i] as T // Use proper indexing to avoid type issues
+        const stored = (s as any)[i] as T // Use proper indexing to avoid type issues
+        const value = $.copyElement(stored)
         const keepGoing = _yield(i, value)
         if (keepGoing instanceof Promise) {
           return keepGoing.then((next) => {
@@ -195,7 +202,9 @@ export function Backward<T>(
   ): void | globalThis.Promise<void> {
     const walk = (i: number): void | globalThis.Promise<void> => {
       for (; i >= 0; i--) {
-        const keepGoing = _yield(i, (s as any)[i] as T)
+        const stored = (s as any)[i] as T
+        const value = $.copyElement(stored)
+        const keepGoing = _yield(i, value)
         if (keepGoing instanceof Promise) {
           return keepGoing.then((next) => {
             if (next) {
@@ -227,7 +236,8 @@ export function Values<T>(s: $.Slice<T>): iter.Seq<T> {
     const length = $.len(s)
     const walk = (i: number): void | globalThis.Promise<void> => {
       for (; i < length; i++) {
-        const keepGoing = _yield!((s as any)[i] as T)
+        const stored = (s as any)[i] as T
+        const keepGoing = _yield!($.copyElement(stored))
         if (keepGoing instanceof Promise) {
           return keepGoing.then((next) => {
             if (next) {
@@ -513,16 +523,9 @@ export function Replace<T>(
     )
   }
   const out = $.makeSlice<T>(length - (j - i) + v.length)
-  let pos = 0
-  for (let idx = 0; idx < i; idx++) {
-    ;(out as any)[pos++] = (s as any)[idx]
-  }
-  for (const value of v) {
-    ;(out as any)[pos++] = value
-  }
-  for (let idx = j; idx < length; idx++) {
-    ;(out as any)[pos++] = (s as any)[idx]
-  }
+  $.copySliceElements(out, 0, s, 0, i)
+  $.copySliceElements(out, i, v, 0, v.length)
+  $.copySliceElements(out, i + v.length, s, j, length - j)
   return out
 }
 
@@ -653,15 +656,9 @@ export function Insert<T>(s: $.Slice<T>, i: number, ...v: T[]): $.Slice<T> {
     return s
   }
   const out = $.makeSlice<T>(length + v.length)
-  for (let idx = 0; idx < i; idx++) {
-    ;(out as any)[idx] = (s as any)[idx]
-  }
-  for (let idx = 0; idx < v.length; idx++) {
-    ;(out as any)[i + idx] = v[idx]
-  }
-  for (let idx = i; idx < length; idx++) {
-    ;(out as any)[idx + v.length] = (s as any)[idx]
-  }
+  $.copySliceElements(out, 0, s, 0, i)
+  $.copySliceElements(out, i, v, 0, v.length)
+  $.copySliceElements(out, i + v.length, s, i, length - i)
   return out
 }
 
@@ -708,9 +705,7 @@ export function Grow<T>(
   }
 
   const newSlice = $.makeSlice<T>(currentLen, newCap, undefined, zeroFactory)
-  for (let i = 0; i < currentLen; i++) {
-    ;(newSlice as any)[i] = (s as any)[i]
-  }
+  $.copySliceElements(newSlice, 0, s, 0, currentLen)
 
   return newSlice
 }

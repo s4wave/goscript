@@ -1,4 +1,5 @@
 import {
+  copyElement,
   isMarkedAsStructValue,
   isTypedNilValue,
   markAsStructValue,
@@ -1101,7 +1102,6 @@ export function append<T>(
     ) as any
   }
 
-  let originalElements: T[] | undefined
   let oldLength = 0
   let oldCapacity: number
   let isOriginalComplex = false
@@ -1120,20 +1120,17 @@ export function append<T>(
     originalTarget = meta.target
     originalOffset = meta.offset
   } else {
-    originalElements = (slice as T[]).slice()
-    oldLength = originalElements.length
+    oldLength = (slice as T[]).length
     oldCapacity = oldLength
   }
   const newLength = oldLength + numAdded
 
   if (isOriginalComplex && newLength <= oldCapacity && originalBacking) {
     for (let i = 0; i < numAdded; i++) {
-      originalBacking[originalOffset + oldLength + i] = elements[i] as T
-    }
-    const target = originalTarget
-    if (target !== undefined) {
-      for (let i = 0; i < numAdded; i++) {
-        target[oldLength + i] = elements[i] as T
+      const value = copyElement(elements[i] as T)
+      originalBacking[originalOffset + oldLength + i] = value
+      if (originalTarget !== undefined) {
+        originalTarget[oldLength + i] = value
       }
     }
     return sliceProxyFromBacking(
@@ -1141,24 +1138,18 @@ export function append<T>(
       originalOffset,
       newLength,
       oldCapacity,
-      target,
+      originalTarget,
     ) as any
   }
 
   const newCapacity = nextAppendCapacity(oldLength, oldCapacity, newLength)
 
   const newBacking = new Array<T>(newCapacity)
-  if (isOriginalComplex && originalBacking) {
-    for (let i = 0; i < oldLength; i++) {
-      newBacking[i] = originalBacking[originalOffset + i]
-    }
-  } else if (originalElements !== undefined) {
-    for (let i = 0; i < oldLength; i++) {
-      newBacking[i] = originalElements[i]
-    }
+  if (oldLength > 0) {
+    copySliceElements(newBacking, 0, slice as Slice<T>, 0, oldLength)
   }
   for (let i = 0; i < numAdded; i++) {
-    newBacking[oldLength + i] = elements[i] as T
+    newBacking[oldLength + i] = copyElement(elements[i] as T)
   }
   const sample: unknown = elements[0]
   zeroFactory ??= () => appendZeroValue(sample) as T
@@ -1220,12 +1211,10 @@ export function appendSlice<T>(
     const oldLength = meta.length
     const newLength = oldLength + count
     if (newLength <= meta.capacity) {
-      for (let i = 0; i < count; i++) {
-        meta.backing[meta.offset + oldLength + i] = (source as any)[i]
-      }
+      copySliceElements(meta.backing, meta.offset + oldLength, source as Slice<T>, 0, count)
       if (meta.target !== undefined) {
         for (let i = 0; i < count; i++) {
-          meta.target[oldLength + i] = (source as any)[i]
+          meta.target[oldLength + i] = meta.backing[meta.offset + oldLength + i]
         }
       }
       return sliceProxyFromBacking(
@@ -1246,12 +1235,8 @@ export function appendSlice<T>(
     newLength,
   )
   const next = new Array<T>(newCapacity)
-  for (let i = 0; i < baseLen; i++) {
-    next[i] = (result as any)[i]
-  }
-  for (let i = 0; i < count; i++) {
-    next[baseLen + i] = (source as any)[i]
-  }
+  copySliceElements(next, 0, result as Slice<T>, 0, baseLen)
+  copySliceElements(next, baseLen, source as Slice<T>, 0, count)
   const sample: unknown = (source as any)[0]
   const zeroFactory =
     appendZeroValueFactory<T>(elementHint) ??
@@ -1373,16 +1358,8 @@ export function copy<T>(
     dst.set(src.subarray(0, count))
     return count
   }
-
-  if (dst instanceof Uint8Array) {
-    return copyToUint8Array(dst, src as Slice<number>, count)
-  }
-
-  if (src instanceof Uint8Array) {
-    return copyFromUint8Array(dst as Slice<T>, src, count)
-  }
-
-  return copyBetweenSlices(dst as Slice<T>, src as Slice<T>, count)
+  copySliceElements(dst, 0, src, 0, count)
+  return count
 }
 
 /**
@@ -1459,73 +1436,39 @@ function copyFromString<T>(
   return count
 }
 
-function copyToUint8Array(
-  dst: Uint8Array,
-  src: Slice<number>,
+/** copySliceElements copies each value and traverses overlapping backing in the safe direction. */
+export function copySliceElements<T>(
+  dst: Slice<T> | Uint8Array | null,
+  dstIndex: number,
+  src: Slice<T> | Uint8Array | null | undefined,
+  srcIndex: number,
   count: number,
-): number {
-  const values = copySliceValues(src, count)
-  for (let i = 0; i < count; i++) {
-    dst[i] = values[i]
+): void {
+  if (dst == null || src == null || count <= 0) {
+    return
   }
-  return count
-}
-
-function copyFromUint8Array<T>(
-  dst: Slice<T>,
-  src: Uint8Array,
-  count: number,
-): number {
-  const values = Array.from(src.subarray(0, count))
-  if (isComplexSlice(dst)) {
-    const dstMeta = dst.__meta__
-    for (let i = 0; i < count; i++) {
-      dstMeta.backing[dstMeta.offset + i] = values[i] as T
-      ;(dst as any)[i] = values[i]
-    }
-  } else if (Array.isArray(dst)) {
-    for (let i = 0; i < count; i++) {
-      dst[i] = values[i] as T
-    }
+  if (dst instanceof Uint8Array && src instanceof Uint8Array) {
+    dst.set(src.subarray(srcIndex, srcIndex + count), dstIndex)
+    return
   }
-  return count
-}
-
-function copyBetweenSlices<T>(
-  dst: Slice<T>,
-  src: Slice<T>,
-  count: number,
-): number {
-  const values = copySliceValues(src, count)
-  if (isComplexSlice(dst)) {
-    const dstMeta = dst.__meta__
-    for (let i = 0; i < count; i++) {
-      dstMeta.backing[dstMeta.offset + i] = values[i]
-      ;(dst as any)[i] = values[i]
-    }
-  } else if (Array.isArray(dst)) {
-    for (let i = 0; i < count; i++) {
-      dst[i] = values[i]
+  const srcMeta = isComplexSlice(src) ? src.__meta__ : undefined
+  const dstMeta = isComplexSlice(dst) ? dst.__meta__ : undefined
+  const srcBacking = srcMeta?.backing ?? src
+  const dstBacking = dstMeta?.backing ?? dst
+  const srcStart = (srcMeta?.offset ?? 0) + srcIndex
+  const dstStart = (dstMeta?.offset ?? 0) + dstIndex
+  const backward =
+    srcBacking === dstBacking &&
+    dstStart > srcStart &&
+    dstStart < srcStart + count
+  for (let step = 0; step < count; step++) {
+    const i = backward ? count - 1 - step : step
+    const value = copyElement(srcBacking[srcStart + i] as T)
+    dstBacking[dstStart + i] = value
+    if (dstMeta?.target !== undefined) {
+      dstMeta.target[dstIndex + i] = value
     }
   }
-  return count
-}
-
-// copySliceValues snapshots the source before writing so overlapping slices follow Go's
-// memmove-style copy semantics.
-function copySliceValues<T>(src: Slice<T>, count: number): T[] {
-  const values = new Array<T>(count)
-  if (isComplexSlice(src)) {
-    const srcMeta = src.__meta__
-    for (let i = 0; i < count; i++) {
-      values[i] = srcMeta.backing[srcMeta.offset + i]
-    }
-  } else if (Array.isArray(src)) {
-    for (let i = 0; i < count; i++) {
-      values[i] = src[i]
-    }
-  }
-  return values
 }
 
 /**

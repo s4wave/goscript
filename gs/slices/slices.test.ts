@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import * as $ from '@goscript/builtin/index.js'
 
+import { Values as mapValues } from '../maps/index.js'
+
 import {
   All,
   AppendSeq,
@@ -9,6 +11,7 @@ import {
   BinarySearch,
   Chunk,
   Clip,
+  Collect,
   Compact,
   CompactFunc,
   CompareFunc,
@@ -16,8 +19,10 @@ import {
   DeleteFunc,
   Equal,
   EqualFunc,
+  Grow,
   Index,
   IndexFunc,
+  Insert,
   IsSorted,
   IsSortedFunc,
   Max,
@@ -33,6 +38,20 @@ import {
   SortStableFunc,
   Values,
 } from './slices.js'
+
+class Cell {
+  n: number
+  constructor(n: number) {
+    this.n = n
+  }
+  clone(): Cell {
+    return $.markAsStructValue(new Cell(this.n))
+  }
+}
+
+function cell(n: number): Cell {
+  return $.markAsStructValue(new Cell(n))
+}
 
 describe('slices Go comparable equality and lower-bound search', () => {
   // Go compares comparable elements (arrays/structs) by value with ==, and
@@ -235,6 +254,52 @@ describe('slices.AppendSeq', () => {
 
     expect(Array.from(values ?? [])).toEqual([4, 5])
     expect(empty).toBeNull()
+  })
+})
+
+describe('struct element copies', () => {
+  it('yields Backward values instead of the stored struct', () => {
+    const source = $.arrayToSlice([cell(1)])
+
+    Backward(source)((_, value) => {
+      value.n = 9
+      return true
+    })
+
+    expect(source[0].n).toBe(1)
+  })
+
+  it('gives Insert, Replace, and Grow their own struct elements', () => {
+    const inserted = $.arrayToSlice([cell(1)])
+    const insertedOut = Insert(inserted, 0, cell(0))
+    ;(insertedOut as Cell[])[1].n = 7
+    expect(inserted[0].n).toBe(1)
+
+    const replaced = $.arrayToSlice([cell(1)])
+    const replacedOut = Replace(replaced, 0, 0, cell(0))
+    ;(replacedOut as Cell[])[1].n = 8
+    expect(replaced[0].n).toBe(1)
+
+    const grown = $.arrayToSlice([cell(1)])
+    const grownOut = Grow(grown, 1)
+    ;(grownOut as Cell[])[0].n = 9
+    expect(grown[0].n).toBe(1)
+  })
+
+  it('copies structs yielded to AppendSeq and Collect', () => {
+    const stored = cell(1)
+    const appended = AppendSeq($.makeSlice<Cell>(0, 4), (yieldValue) => {
+      yieldValue!(stored)
+      return true
+    })
+    ;(appended as Cell[])[0].n = 9
+    expect(stored.n).toBe(1)
+
+    const values = $.makeMap<number, Cell>()
+    $.mapSet(values, 0, cell(1))
+    const collected = Collect(mapValues(values))
+    ;(collected as Cell[])[0].n = 9
+    expect($.mapGet(values, 0, cell(0))[0].n).toBe(1)
   })
 })
 

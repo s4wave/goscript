@@ -209,6 +209,38 @@ describe('append spare capacity', () => {
     expect(goSlice(values, undefined, 4)[3]).toBeNull()
   })
 
+  it('copies struct elements when append reallocates or spreads a slice', () => {
+    class Cell {
+      n: number
+      constructor(n: number) {
+        this.n = n
+      }
+      clone(): Cell {
+        return markAsStructValue(new Cell(this.n))
+      }
+    }
+    const cell = (n: number) => markAsStructValue(new Cell(n))
+    const source = [cell(1)]
+
+    const appended = append(source, cell(2))
+    ;(appended as Cell[])[0].n = 9
+    expect(source[0].n).toBe(1)
+
+    const spread = appendSlice(null, source)
+    ;(spread as Cell[])[0].n = 8
+    expect(source[0].n).toBe(1)
+  })
+
+  it('snapshots an overlapping variadic append before writing', () => {
+    const source = makeSlice<number>(2, 4, 'number')
+    source[0] = 1
+    source[1] = 2
+
+    const out = appendSlice(goSlice(source, 0, 1), source)
+
+    expect([out[0], out[1], out[2]]).toEqual([1, 1, 2])
+  })
+
   it('uses the static interface zero instead of the dynamic element type', () => {
     const dynamic = markAsStructValue(new Item())
     let values = append<Item | null>(null, dynamic, appendZeros.nil)

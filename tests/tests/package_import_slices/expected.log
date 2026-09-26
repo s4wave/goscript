@@ -29,4 +29,22 @@ sorted values: a b c
 repeat: 6 6 7 8 false 0
 sorted func: 3 2 1 true
 sorted stable func: b d a c
+copy struct: 1 2 9 2
+clone struct: 1 2 8 2
+repeat struct: 1 2 7 2 6 2
+concat struct: 1 2 5 2 4
+values struct: 1 2
+all struct: 1 2
+append realloc: 1
+append slice: 1
+append overlap: 1 1 2
+backward struct: 1
+insert struct: 1
+replace struct: 1
+grow struct: 1
+collect struct: 1
+interface struct: 1 1 1 1
+interface struct: 2 2 2 2
+append seq struct: 1 9
+sorted func struct: 2 1 9 2
 test finished

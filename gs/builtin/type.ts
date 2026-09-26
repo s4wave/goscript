@@ -1298,6 +1298,31 @@ export function isMarkedAsStructValue(value: unknown): boolean {
   )
 }
 
+// copyElement clones a marked struct value and returns every other value unchanged.
+// Array values are left unchanged: they share JavaScript arrays with slices, and
+// callers do not pass an element type that would make a clone distinguishable.
+// A marked value with no clone method is returned unchanged rather than panicking.
+export function copyElement<T>(value: T): T {
+  if (
+    typeof value !== 'object' ||
+    value === null ||
+    !isMarkedAsStructValue(value)
+  ) {
+    return value
+  }
+  const cloneable = value as T & {
+    __goscriptClone?: () => T
+    clone?: () => T
+  }
+  if (
+    typeof cloneable.__goscriptClone !== 'function' &&
+    typeof cloneable.clone !== 'function'
+  ) {
+    return value
+  }
+  return markAsStructValue(cloneStructValue(value))
+}
+
 /**
  * Checks if a value matches a pointer type info.
  *
