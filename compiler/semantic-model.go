@@ -1181,12 +1181,16 @@ func functionOriginOrSelf(fn *types.Func) *types.Func {
 	return fn
 }
 
+// callUsesFunctionValue reports whether a call's callee is a function value
+// computed at run time, whose body the analysis cannot see.
 func callUsesFunctionValue(pkg *packages.Package, expr ast.Expr) bool {
 	if signatureForType(pkg.TypesInfo.TypeOf(expr)) == nil {
 		return false
 	}
-	switch typed := expr.(type) {
+	switch typed := ast.Unparen(expr).(type) {
 	case *ast.CallExpr:
+		return true
+	case *ast.StarExpr:
 		return true
 	case *ast.TypeAssertExpr:
 		return true
@@ -1212,11 +1216,13 @@ func callUsesFunctionValue(pkg *packages.Package, expr ast.Expr) bool {
 	}
 }
 
+// callUsesFunctionIdentifier reports whether a call's callee is a variable of
+// function type.
 func callUsesFunctionIdentifier(pkg *packages.Package, expr ast.Expr) bool {
 	if signatureForType(pkg.TypesInfo.TypeOf(expr)) == nil {
 		return false
 	}
-	ident, ok := expr.(*ast.Ident)
+	ident, ok := ast.Unparen(expr).(*ast.Ident)
 	if !ok {
 		return false
 	}
