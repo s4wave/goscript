@@ -2,7 +2,6 @@ package compiler
 
 import (
 	"context"
-	"os"
 	"slices"
 	"strings"
 
@@ -40,7 +39,7 @@ func (o *PackageGraphOwner) LoadTestGraph(ctx context.Context, req *CompileReque
 	cfg := &packages.Config{
 		Context:    ctx,
 		Dir:        req.Dir,
-		Env:        append(os.Environ(), "GOOS=js", "GOARCH=wasm"),
+		Env:        goScriptLoaderEnv(),
 		BuildFlags: goScriptBuildFlags(req.BuildFlags),
 		Tests:      true,
 		Mode: packages.NeedName |

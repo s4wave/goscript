@@ -82,6 +82,13 @@ func (o *PackageGraphOwner) LoadIdentity(ctx context.Context, req *CompileReques
 	return o.load(ctx, req, packageGraphLoadIdentity)
 }
 
+// goScriptLoaderEnv returns the go command environment for loading GoScript
+// packages. GoScript never compiles cgo, so cgo stays disabled even when the
+// host toolchain defaults it on for js/wasm.
+func goScriptLoaderEnv() []string {
+	return append(os.Environ(), "GOOS=js", "GOARCH=wasm", "CGO_ENABLED=0")
+}
+
 func (o *PackageGraphOwner) load(ctx context.Context, req *CompileRequest, shape packageGraphLoadShape) (*PackageGraph, []Diagnostic) {
 	if err := ctx.Err(); err != nil {
 		return nil, []Diagnostic{{
@@ -94,7 +101,7 @@ func (o *PackageGraphOwner) load(ctx context.Context, req *CompileRequest, shape
 	cfg := &packages.Config{
 		Context:    ctx,
 		Dir:        req.Dir,
-		Env:        append(os.Environ(), "GOOS=js", "GOARCH=wasm"),
+		Env:        goScriptLoaderEnv(),
 		BuildFlags: goScriptBuildFlags(req.BuildFlags),
 		Tests:      req.Tests,
 		Mode:       packageGraphLoadMode(shape),

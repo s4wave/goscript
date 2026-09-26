@@ -471,7 +471,6 @@ func writeKeyField(b *strings.Builder, key, value string) {
 
 func goLoaderEnvKeys() []string {
 	return []string{
-		"CGO_ENABLED",
 		"GOFLAGS",
 		"GOMODCACHE",
 		"GONOPROXY",
