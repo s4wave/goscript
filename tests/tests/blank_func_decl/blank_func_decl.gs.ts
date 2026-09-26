@@ -4,12 +4,12 @@
 import * as $ from "@goscript/builtin/index.js"
 
 function __goscriptBlankFunc0(): void {
-	let x: {}[] = Array.from({ length: 1 }, () => ({}))
+	let x: {}[] = $.arrayValue(Array.from({ length: 1 }, () => ({})), /* @__PURE__ */ $.arrayType({ kind: $.TypeKind.Struct, methods: [], fields: [] }, 1))
 	$.arrayIndex(x, 0)
 }
 
 function __goscriptBlankFunc1(): void {
-	let x: {}[] = Array.from({ length: 1 }, () => ({}))
+	let x: {}[] = $.arrayValue(Array.from({ length: 1 }, () => ({})), /* @__PURE__ */ $.arrayType({ kind: $.TypeKind.Struct, methods: [], fields: [] }, 1))
 	$.arrayIndex(x, 0)
 }
 

@@ -12,7 +12,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println(count)
 
-	let a = ["alpha", "beta"]
+	let a = $.arrayValue(["alpha", "beta"])
 	await $.println("Looping over array (no vars):")
 	let arrCount = 0
 	for (let __goscriptRangeTarget1 = a, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {

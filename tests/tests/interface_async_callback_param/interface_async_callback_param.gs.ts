@@ -58,10 +58,10 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(await run($.interfaceValue<scanner | null>($.markAsStructValue(new listScanner()), "main.listScanner", "main.listScanner")) == null)
 
 	let m: $.VarRef<sync.Map> = $.varRef($.markAsStructValue(new sync.Map()))
-	let callbacks = [$.functionValue(async (v: number): globalThis.Promise<$.GoError> => {
+	let callbacks = $.arrayValue([$.functionValue(async (v: number): globalThis.Promise<$.GoError> => {
 		await m.value.Load($.basicInterfaceValue(v, "int"))
 		return null
-	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: ["error"] } as $.FunctionTypeInfo))]
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: ["error"] } as $.FunctionTypeInfo))])
 	await $.println(await $.arrayIndex(callbacks, 0)!(1) == null)
 }
 

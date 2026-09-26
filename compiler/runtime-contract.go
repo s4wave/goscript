@@ -75,8 +75,10 @@ const (
 
 	RuntimeHelperAssignStruct          RuntimeHelper = "value.assignStruct"
 	RuntimeHelperMarkAsStructValue     RuntimeHelper = "value.markAsStructValue"
+	RuntimeHelperAnonymousStructValue  RuntimeHelper = "value.anonymousStructValue"
 	RuntimeHelperCloneStructValue      RuntimeHelper = "value.cloneStructValue"
 	RuntimeHelperCloneArrayValue       RuntimeHelper = "value.cloneArrayValue"
+	RuntimeHelperArrayValue            RuntimeHelper = "value.arrayValue"
 	RuntimeHelperPointerValue          RuntimeHelper = "value.pointerValue"
 	RuntimeHelperPointerValueOrNil     RuntimeHelper = "value.pointerValueOrNil"
 	RuntimeHelperArrayEqual            RuntimeHelper = "value.arrayEqual"
@@ -337,8 +339,10 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperInt64Xor, "int64Xor", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperAssignStruct, "assignStruct", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperMarkAsStructValue, "markAsStructValue", RuntimeHelperCategoryValue),
+		runtimeHelper(RuntimeHelperAnonymousStructValue, "anonymousStructValue", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperCloneStructValue, "cloneStructValue", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperCloneArrayValue, "cloneArrayValue", RuntimeHelperCategoryValue),
+		runtimeHelper(RuntimeHelperArrayValue, "arrayValue", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperPointerValue, "pointerValue", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperNamedStructConversion, "namedStructConversion", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperUnsafePointerCast, "unsafePointerCast", RuntimeHelperCategoryValue),

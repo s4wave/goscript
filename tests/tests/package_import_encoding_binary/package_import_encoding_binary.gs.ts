@@ -31,7 +31,7 @@ export async function main(): globalThis.Promise<void> {
 	let out: $.Slice<number> = buf.value.Bytes()
 	await $.println("len:", $.len(out))
 	for (let __goscriptRangeTarget0 = out, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let b = __goscriptRangeTarget0![__rangeIndex]
+		let b = $.uint(__goscriptRangeTarget0![__rangeIndex], 8)
 		await $.println($.int(b))
 	}
 }

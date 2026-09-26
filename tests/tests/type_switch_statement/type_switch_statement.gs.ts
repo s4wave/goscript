@@ -227,7 +227,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("struct copy", $.mustTypeAssert<RawValue>(boxed, "main.RawValue").Tag)
 
-	let boxedArray: any = [1, 2]
+	let boxedArray: any = $.arrayValue([1, 2])
 	{
 		const __goscriptTypeSwitchValue = boxedArray
 		switch (true) {

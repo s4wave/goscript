@@ -107,11 +107,11 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let keyExt: pkix.Extension = $.markAsStructValue(new pkix.Extension())
 	for (let __goscriptRangeTarget1 = $.pointerValue<x509.Certificate>(cert).Extensions, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let ext = __goscriptRangeTarget1![__rangeIndex]
+		let ext = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget1![__rangeIndex]))
 		if (asn1.ObjectIdentifier_Equal(ext.Id, (extensionID as asn1.ObjectIdentifier))) {
 			$.assignStruct(keyExt, $.markAsStructValue($.cloneStructValue(ext)))
 			for (let __goscriptRangeTarget0 = $.pointerValue<x509.Certificate>(cert).UnhandledCriticalExtensions, idx = 0; idx < $.len(__goscriptRangeTarget0); idx++) {
-				let unhandled = __goscriptRangeTarget0![idx]
+				let unhandled = (__goscriptRangeTarget0![idx] as asn1.ObjectIdentifier)
 				if (asn1.ObjectIdentifier_Equal(unhandled, (extensionID as asn1.ObjectIdentifier))) {
 					$.pointerValue<x509.Certificate>(cert).UnhandledCriticalExtensions = (slices.Delete($.pointerValue<x509.Certificate>(cert).UnhandledCriticalExtensions, idx, idx + 1) as $.Slice<asn1.ObjectIdentifier>)
 					break

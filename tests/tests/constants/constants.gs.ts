@@ -15,7 +15,7 @@ export const IV1: number = 2
 
 export const IV2: number = 3
 
-export let DigestIV: number[] = [1, 2, 3]
+export let DigestIV: number[] = $.arrayValue([1, 2, 3])
 
 export function __goscript_set_DigestIV(__goscriptValue: number[]): void {
 	DigestIV = __goscriptValue

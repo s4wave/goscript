@@ -33,7 +33,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Frames empty:", frame.Line, more)
 	await $.println("FuncForPC nil:", runtime.FuncForPC(0) == null)
 
-	let box = $.varRef({value: 1})
+	let box = $.varRef($.anonymousStructValue({value: 1}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_runtime" })] }))
 	let cleanup = $.markAsStructValue($.cloneStructValue(runtime.AddCleanup(box, $.functionValue(async (value: number): globalThis.Promise<void> => {
 		await $.println("cleanup should not run during test:", value)
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo)), 1)))

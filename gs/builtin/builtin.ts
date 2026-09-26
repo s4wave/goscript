@@ -4,6 +4,7 @@ import {
   isTypeInfoComparable,
   pointerIdentityEqual,
   structFieldRuntimeKey,
+  structValueTypeInfo,
   TypeKind,
   type TypeInfo,
 } from './type.js'
@@ -95,7 +96,7 @@ export function assignStruct<T>(
   const targetFields = (target as any)._fields
   const sourceFields = (source as any)._fields
   // The value identifies its layout even when package names collide.
-  const info = (source as any).constructor?.__typeInfo ?? typeInfo
+  const info = structValueTypeInfo(source) ?? typeInfo
   const resolved = typeof info === 'string' ? getTypeByName(info) : info
   if (resolved?.kind === TypeKind.Struct) {
     const destination = targetFields ?? target

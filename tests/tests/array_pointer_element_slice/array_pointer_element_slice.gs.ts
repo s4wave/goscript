@@ -16,7 +16,7 @@ export class node {
 	constructor(init?: Partial<{sub?: $.Slice<node | $.VarRef<node> | null>, sub0?: (node | $.VarRef<node> | null)[]}>) {
 		this._fields = {
 			sub: init?.sub ?? (null! as $.Slice<node | $.VarRef<node> | null>),
-			sub0: init?.sub0 !== undefined ? $.cloneArrayValue(init.sub0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.node"), 1)) : Array.from({ length: 1 }, () => null)
+			sub0: init?.sub0 !== undefined ? $.cloneArrayValue(init.sub0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.node"), 1)) : $.arrayValue(Array.from({ length: 1 }, () => null))
 		}
 	}
 

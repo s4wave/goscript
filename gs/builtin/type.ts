@@ -1112,7 +1112,65 @@ export function markAsStructValue<T>(value: T): T {
   return value
 }
 
+// Symbol that holds an anonymous struct value's type descriptor
+const ANONYMOUS_STRUCT_TYPE = Symbol('anonymousStructType')
+
+/**
+ * anonymousStructValue gives an anonymous struct object the value semantics of
+ * a named struct: it is marked as a struct value and clones by its fields.
+ */
+export function anonymousStructValue<T extends object>(
+  value: T,
+  typeInfo: string | TypeInfo,
+): T {
+  ;(value as any)[ANONYMOUS_STRUCT_TYPE] = typeInfo
+  return markAsStructValue(value)
+}
+
+/** structValueTypeInfo returns the descriptor a struct value carries, if any. */
+export function structValueTypeInfo(
+  value: unknown,
+): TypeInfo | string | undefined {
+  if (typeof value !== 'object' || value === null) {
+    return undefined
+  }
+  return (
+    (value as any).constructor?.__typeInfo ??
+    (value as any)[ANONYMOUS_STRUCT_TYPE]
+  )
+}
+
+// cloneAnonymousStruct copies each field of an anonymous struct value, cloning
+// the struct and array fields that Go copies by value.
+function cloneAnonymousStruct(
+  value: Record<string, unknown>,
+  typeInfo: string | TypeInfo,
+): Record<string, unknown> {
+  const info = normalizeTypeInfo(typeInfo)
+  const clone = { ...value }
+  if (info.kind === TypeKind.Struct) {
+    for (const field of info.fields) {
+      const key = structFieldRuntimeKey(field)
+      const fieldValue = clone[key]
+      if (isMarkedAsStructValue(fieldValue)) {
+        clone[key] = markAsStructValue(cloneStructValue(fieldValue))
+        continue
+      }
+      if (normalizeTypeInfo(field.type).kind === TypeKind.Array) {
+        clone[key] = cloneArrayValue(fieldValue, field.type)
+      }
+    }
+  }
+  return anonymousStructValue(clone, typeInfo)
+}
+
 export function cloneStructValue<T>(value: T): T {
+  if (typeof value === 'object' && value !== null) {
+    const anonymousType = (value as any)[ANONYMOUS_STRUCT_TYPE]
+    if (anonymousType !== undefined) {
+      return cloneAnonymousStruct(value as any, anonymousType) as T
+    }
+  }
   const cloneable = value as T & {
     __goscriptClone?: () => T
     clone?: () => T
@@ -1262,30 +1320,65 @@ export function unsafePointerCast<T>(
   return destinationPointerView(source, target) as T
 }
 
+// Symbol that marks a JavaScript array as a Go array value. It holds the
+// array's type descriptor when its elements are values that need cloning.
+const ARRAY_VALUE_TYPE = Symbol('arrayValueType')
+
 /**
- * cloneArrayValue copies array storage and its value-typed elements.
- * Scalar arrays can omit typeInfo; composite arrays require their descriptor.
+ * arrayValue marks storage as a Go array value, so bulk slice copies clone it.
+ * Arrays of composite elements pass their descriptor; scalar arrays omit it.
+ */
+export function arrayValue<T extends object>(
+  value: T,
+  typeInfo?: string | TypeInfo,
+): T {
+  ;(value as any)[ARRAY_VALUE_TYPE] = typeInfo ?? true
+  return value
+}
+
+/** isArrayValue reports whether value is marked as a Go array value. */
+export function isArrayValue(value: unknown): boolean {
+  return typeof value === 'object' && value !== null && ARRAY_VALUE_TYPE in value
+}
+
+// arrayValueTypeInfo returns the descriptor a marked array value carries.
+function arrayValueTypeInfo(value: object): string | TypeInfo | undefined {
+  const info = (value as any)[ARRAY_VALUE_TYPE]
+  return info === true ? undefined : info
+}
+
+/**
+ * cloneArrayValue copies array storage and its value-typed elements. Scalar
+ * arrays can omit typeInfo; composite arrays require their descriptor unless
+ * the value carries it. The copy is marked as an array value.
  */
 export function cloneArrayValue<T>(value: T, typeInfo?: string | TypeInfo): T {
   if (value instanceof Uint8Array) {
-    return value.slice() as T
+    return arrayValue(value.slice()) as T
   }
   if (!Array.isArray(value)) {
     return value
   }
 
+  typeInfo ??= arrayValueTypeInfo(value)
   const info = typeInfo === undefined ? undefined : normalizeTypeInfo(typeInfo)
   const element =
     info?.kind === TypeKind.Array && info.elemType !== undefined ?
       normalizeTypeInfo(info.elemType)
     : undefined
   if (element?.kind === TypeKind.Array) {
-    return value.map((item) => cloneArrayValue(item, element)) as T
+    return arrayValue(
+      value.map((item) => cloneArrayValue(item, element)),
+      typeInfo,
+    ) as T
   }
   if (element?.kind === TypeKind.Struct) {
-    return value.map((item) => markAsStructValue(cloneStructValue(item))) as T
+    return arrayValue(
+      value.map((item) => markAsStructValue(cloneStructValue(item))),
+      typeInfo,
+    ) as T
   }
-  return value.slice() as T
+  return arrayValue(value.slice()) as T
 }
 
 // isMarkedAsStructValue reports whether value uses Go struct-value semantics.
@@ -1298,16 +1391,17 @@ export function isMarkedAsStructValue(value: unknown): boolean {
   )
 }
 
-// copyElement clones a marked struct value and returns every other value unchanged.
-// Array values are left unchanged: they share JavaScript arrays with slices, and
-// callers do not pass an element type that would make a clone distinguishable.
-// A marked value with no clone method is returned unchanged rather than panicking.
+// copyElement clones a marked struct or array value and returns every other
+// value unchanged. A marked struct with no clone method is returned unchanged
+// rather than panicking.
 export function copyElement<T>(value: T): T {
-  if (
-    typeof value !== 'object' ||
-    value === null ||
-    !isMarkedAsStructValue(value)
-  ) {
+  if (typeof value !== 'object' || value === null) {
+    return value
+  }
+  if (ARRAY_VALUE_TYPE in value) {
+    return cloneArrayValue(value, arrayValueTypeInfo(value))
+  }
+  if (!isMarkedAsStructValue(value)) {
     return value
   }
   const cloneable = value as T & {
@@ -1315,6 +1409,7 @@ export function copyElement<T>(value: T): T {
     clone?: () => T
   }
   if (
+    !(ANONYMOUS_STRUCT_TYPE in value) &&
     typeof cloneable.__goscriptClone !== 'function' &&
     typeof cloneable.clone !== 'function'
   ) {

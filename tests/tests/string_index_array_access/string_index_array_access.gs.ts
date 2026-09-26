@@ -6,7 +6,7 @@ import * as $ from "@goscript/builtin/index.js"
 export async function main(): globalThis.Promise<void> {
 	let encoder = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
-	let decodeMap: Uint8Array = new Uint8Array(256)
+	let decodeMap: Uint8Array = $.arrayValue(new Uint8Array(256))
 	for (let __goscriptRangeTarget0 = decodeMap, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
 		decodeMap[i] = 255
 	}

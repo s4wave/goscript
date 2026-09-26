@@ -56,7 +56,7 @@ export class Outer {
 	constructor(init?: Partial<{Child?: MyStruct, Items?: MyStruct[], Ptr?: MyStruct | $.VarRef<MyStruct> | null}>) {
 		this._fields = {
 			Child: init?.Child ? $.markAsStructValue($.cloneStructValue(init.Child)) : $.markAsStructValue(new MyStruct()),
-			Items: init?.Items !== undefined ? $.cloneArrayValue(init.Items, /* @__PURE__ */ $.arrayType("main.MyStruct", 2)) : Array.from({ length: 2 }, () => $.markAsStructValue(new MyStruct())),
+			Items: init?.Items !== undefined ? $.cloneArrayValue(init.Items, /* @__PURE__ */ $.arrayType("main.MyStruct", 2)) : $.arrayValue(Array.from({ length: 2 }, () => $.markAsStructValue(new MyStruct())), /* @__PURE__ */ $.arrayType("main.MyStruct", 2)),
 			Ptr: init?.Ptr ?? (null! as MyStruct | $.VarRef<MyStruct> | null)
 		}
 	}
@@ -108,7 +108,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("write through field:", val.value.MyInt, $.pointerValue<MyStruct>(ptrToVal).MyInt)
 
 	// TypeScript keywords use the same storage key for reads and addresses.
-	let keywords = {_catch: 5}
+	let keywords = $.anonymousStructValue({_catch: 5}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("catch", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { key: "_catch", pkgPath: "github.com/s4wave/goscript/tests/tests/varref_struct" })] })
 	let keyword = $.fieldRef(keywords, "_catch")
 	keyword!.value = 6
 	await $.println("keyword field:", keywords._catch, $.pointerEqual(keyword, $.fieldRef(keywords, "_catch")))
@@ -120,7 +120,7 @@ export async function main(): globalThis.Promise<void> {
 	let child = $.fieldRef(outer.Child._fields, "MyInt")
 	let item = $.fieldRef($.arrayIndex(outer.Items, 0)._fields, "MyInt")
 	let ptrField = $.fieldRef(outer._fields, "Ptr")
-	$.assignStruct(outer, $.markAsStructValue(new Outer({Child: $.markAsStructValue(new MyStruct({MyInt: 50})), Items: [$.markAsStructValue(new MyStruct({MyInt: 60})), $.markAsStructValue(new MyStruct())], Ptr: second})))
+	$.assignStruct(outer, $.markAsStructValue(new Outer({Child: $.markAsStructValue(new MyStruct({MyInt: 50})), Items: $.arrayValue([$.markAsStructValue(new MyStruct({MyInt: 60})), $.markAsStructValue(new MyStruct())], /* @__PURE__ */ $.arrayType("main.MyStruct", 2)), Ptr: second})))
 	await $.println("nested:", $.pointerValue<number>(child), $.pointerValue<number>(item), $.pointerEqual($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(ptrField), second), $.pointerValue<MyStruct>(first).MyInt)
 	await $.println("nested identity:", $.pointerEqual(child, $.fieldRef(outer.Child._fields, "MyInt")), $.pointerEqual(item, $.fieldRef($.arrayIndex(outer.Items, 0)._fields, "MyInt")), $.pointerEqual(ptrField, $.fieldRef(outer._fields, "Ptr")))
 

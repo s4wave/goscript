@@ -5,7 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	// Test simple keyed array literal with integer keys
-	let arr1 = ["", "first", "", "third", ""]
+	let arr1 = $.arrayValue(["", "first", "", "third", ""])
 	await $.println("arr1[0]:", $.arrayIndex(arr1, 0))
 	await $.println("arr1[1]:", $.arrayIndex(arr1, 1))
 	await $.println("arr1[2]:", $.arrayIndex(arr1, 2))
@@ -14,7 +14,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test keyed array literal with expression keys (this likely causes the issue)
 	const offset: number = 10
-	let arr2 = ["", "", "", "", "", "", "", "", "", "", "", "at index 11", "", "at index 13", ""]
+	let arr2 = $.arrayValue(["", "", "", "", "", "", "", "", "", "", "", "at index 11", "", "at index 13", ""])
 	await $.println("arr2[10]:", $.arrayIndex(arr2, 10))
 	await $.println("arr2[11]:", $.arrayIndex(arr2, 11))
 	await $.println("arr2[12]:", $.arrayIndex(arr2, 12))
@@ -22,7 +22,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("arr2[14]:", $.arrayIndex(arr2, 14))
 
 	// Test mixed keyed and unkeyed elements
-	let arr3 = [1, 2, 0, 0, 0, 100, 200, 0]
+	let arr3 = $.arrayValue([1, 2, 0, 0, 0, 100, 200, 0])
 	await $.println("arr3[0]:", $.arrayIndex(arr3, 0))
 	await $.println("arr3[1]:", $.arrayIndex(arr3, 1))
 	await $.println("arr3[2]:", $.arrayIndex(arr3, 2))

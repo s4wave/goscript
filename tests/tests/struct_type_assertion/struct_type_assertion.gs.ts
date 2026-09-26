@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let i: any = {Name: "Alice", Number: 8005553424}
+	let i: any = $.interfaceValue($.anonymousStructValue({Name: "Alice", Number: 8005553424}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [0], 0, true), /* @__PURE__ */ $.structField("Number", /* @__PURE__ */ $.basicType("int"), [1], 16, true)] }), "struct{Name string; Number int}", { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [0], 0, true), /* @__PURE__ */ $.structField("Number", /* @__PURE__ */ $.basicType("int"), [1], 16, true)] })
 
 	let [s, ok] = $.typeAssertTuple<{"Name": string, "Number": number}>(i, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [0], 0, true), /* @__PURE__ */ $.structField("Number", /* @__PURE__ */ $.basicType("int"), [1], 16, true)] })
 	if (ok) {

@@ -38,19 +38,19 @@ export class namedItem {
 }
 
 export async function main(): globalThis.Promise<void> {
-	for (let __goscriptRangeTarget0 = $.arrayToSlice<{"name": string, "input": string, "count": number}>([{name: "first", input: "alpha", count: 1}, {name: "second", input: "beta", count: 2}]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let tt = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = $.arrayToSlice<{"name": string, "input": string, "count": number}>([$.anonymousStructValue({name: "first", input: "alpha", count: 1}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" }), /* @__PURE__ */ $.structField("input", /* @__PURE__ */ $.basicType("string"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" }), /* @__PURE__ */ $.structField("count", /* @__PURE__ */ $.basicType("int"), [2], 32, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" })] }), $.anonymousStructValue({name: "second", input: "beta", count: 2}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" }), /* @__PURE__ */ $.structField("input", /* @__PURE__ */ $.basicType("string"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" }), /* @__PURE__ */ $.structField("count", /* @__PURE__ */ $.basicType("int"), [2], 32, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" })] })]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
+		let tt = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget0![__rangeIndex]))
 		await $.println(tt.name, tt.input, tt.count)
 	}
 
-	let x = {Name: "third", Offsets: (null as $.Slice<number>), Count: 3}
+	let x = $.anonymousStructValue({Name: "third", Offsets: (null as $.Slice<number>), Count: 3}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [0], 0, true), /* @__PURE__ */ $.structField("Offsets", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), [1], 16, true), /* @__PURE__ */ $.structField("Count", /* @__PURE__ */ $.basicType("int"), [2], 40, true)] })
 	x.Offsets = $.append(x.Offsets, 5)
 	await $.println(x.Name, $.arrayIndex(x.Offsets!, 0), x.Count)
 
 	let __goscriptTuple0: any = buildNamedItems()
 	let items: $.Slice<namedItem> = __goscriptTuple0[0]
 	for (let __goscriptRangeTarget1 = $.goSlice(items, 1, undefined), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let item = __goscriptRangeTarget1![__rangeIndex]
+		let item = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget1![__rangeIndex]))
 		await $.println(item.key, $.len(item.data))
 	}
 }

@@ -11,7 +11,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let seen: globalThis.Map<string, boolean> | null = $.makeMap<string, boolean>([])
 	for (let __goscriptRangeTarget0 = keys, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let key = __goscriptRangeTarget0![__rangeIndex]
+		let key = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget0![__rangeIndex]))
 		$.mapSet(seen, $.markAsStructValue($.cloneStructValue(key)).String(), true)
 	}
 

@@ -119,7 +119,7 @@ export function encodeHex(data: $.Slice<number>): string {
 	const digits: string = "0123456789abcdef"
 	let encoded: $.Slice<number> = $.makeSlice<number>($.len(data) * 2, undefined, "byte")
 	for (let __goscriptRangeTarget0 = data, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
-		let value = __goscriptRangeTarget0![i]
+		let value = $.uint(__goscriptRangeTarget0![i], 8)
 		encoded![i * 2] = $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", $.uintShr(value, 4, 8)), 8)
 		encoded![(i * 2) + 1] = $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", value & 0xf), 8)
 	}

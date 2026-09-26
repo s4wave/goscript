@@ -17,7 +17,7 @@ export function values(): $.Slice<number> {
 export async function main(): globalThis.Promise<void> {
 	let sum = 0
 	for (let __goscriptRangeTarget0 = $.goSlice(values(), 1, undefined), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let value = __goscriptRangeTarget0![__rangeIndex]
+		let value = $.uint(__goscriptRangeTarget0![__rangeIndex], 8)
 		sum = sum + ($.int(value))
 	}
 	await $.println("calls:", calls)

@@ -45,8 +45,8 @@ export class arrays {
 
 	constructor(init?: Partial<{slices?: $.Slice<number>[], items?: item[]}>) {
 		this._fields = {
-			slices: init?.slices !== undefined ? $.cloneArrayValue(init.slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1)) : Array.from({ length: 1 }, () => null),
-			items: init?.items !== undefined ? $.cloneArrayValue(init.items, /* @__PURE__ */ $.arrayType("main.item", 1)) : Array.from({ length: 1 }, () => $.markAsStructValue(new item()))
+			slices: init?.slices !== undefined ? $.cloneArrayValue(init.slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1)) : $.arrayValue(Array.from({ length: 1 }, () => null)),
+			items: init?.items !== undefined ? $.cloneArrayValue(init.items, /* @__PURE__ */ $.arrayType("main.item", 1)) : $.arrayValue(Array.from({ length: 1 }, () => $.markAsStructValue(new item())), /* @__PURE__ */ $.arrayType("main.item", 1))
 		}
 	}
 
@@ -76,7 +76,7 @@ export function fillArray(dst: $.VarRef<Uint8Array> | null): void {
 export function sumArray(src: $.VarRef<Uint8Array> | null): number {
 	let sum = 0
 	for (let __goscriptRangeTarget1 = $.pointerValue<Uint8Array>(src), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let v = __goscriptRangeTarget1![__rangeIndex]
+		let v = $.uint(__goscriptRangeTarget1![__rangeIndex], 8)
 		sum = sum + ($.int(v))
 	}
 	return sum
@@ -85,7 +85,7 @@ export function sumArray(src: $.VarRef<Uint8Array> | null): number {
 export function closureArrayAddress(): number {
 	let result = 0
 	void ((): void => {
-		let table = $.varRef(new Uint8Array([6, 7, 8, 9]))
+		let table = $.varRef($.arrayValue(new Uint8Array([6, 7, 8, 9])))
 		let ptr: $.VarRef<Uint8Array> | null = table
 		result = $.int($.arrayIndex($.pointerValue<Uint8Array>(ptr), 2))
 	})()
@@ -93,17 +93,17 @@ export function closureArrayAddress(): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let slices = [$.arrayToSlice<number>([1])]
+	let slices = $.arrayValue([$.arrayToSlice<number>([1])])
 	let slicesCopy = $.cloneArrayValue(slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1))
 	$.arrayIndex(slicesCopy, 0)![0] = 7
 	await $.println("slice sharing:", $.arrayIndex($.arrayIndex(slices, 0)!, 0))
 
-	let structs = [$.markAsStructValue(new item({value: 1}))]
+	let structs = $.arrayValue([$.markAsStructValue(new item({value: 1}))], /* @__PURE__ */ $.arrayType("main.item", 1))
 	let structsCopy = $.cloneArrayValue(structs, /* @__PURE__ */ $.arrayType("main.item", 1))
 	$.arrayIndex(structsCopy, 0).value = 7
 	await $.println("struct copy:", $.arrayIndex(structs, 0).value, $.arrayIndex(structsCopy, 0).value)
 
-	let pointers = [new item({value: 1})]
+	let pointers = $.arrayValue([new item({value: 1})])
 	let pointersCopy = $.cloneArrayValue(pointers, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.item"), 1))
 	$.pointerValue<item>($.arrayIndex(pointersCopy, 0)).value = 7
 	await $.println("pointer sharing:", $.pointerValue<item>($.arrayIndex(pointers, 0)).value, $.pointerEqual($.arrayIndex(pointers, 0), $.arrayIndex(pointersCopy, 0)))
@@ -115,12 +115,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("array fields:", $.arrayIndex($.arrayIndex(original.slices, 0)!, 0), $.arrayIndex(original.items, 0).value, $.arrayIndex(copied.items, 0).value)
 
 	// Assigning an array element copies its value instead of aliasing the row.
-	let rows = [[1, 2], [3, 4]]
+	let rows = $.arrayValue([$.arrayValue([1, 2]), $.arrayValue([3, 4])], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int32"), 2), 2))
 	rows[1] = $.cloneArrayValue($.arrayIndex(rows, 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int32"), 2))
 	$.arrayIndex(rows, 1)[0] = 9
 	await $.println("row copy:", $.int($.arrayIndex($.arrayIndex(rows, 0), 0), 32), $.int($.arrayIndex($.arrayIndex(rows, 0), 1), 32), $.int($.arrayIndex($.arrayIndex(rows, 1), 0), 32), $.int($.arrayIndex($.arrayIndex(rows, 1), 1), 32))
 
-	let buckets: bigint[][] = Array.from({ length: 2 }, () => Array.from({ length: 3 }, () => 0n))
+	let buckets: bigint[][] = $.arrayValue(Array.from({ length: 2 }, () => $.arrayValue(Array.from({ length: 3 }, () => 0n))), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint64"), 3), 2))
 	let cache: $.VarRef<bigint[]> | null = $.indexRef(buckets, 1)
 
 	await $.println("len:", 3)
@@ -142,7 +142,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("converted:", $.uint($.arrayIndex(buf!, 0), 8), $.uint($.arrayIndex(buf!, 1), 8), $.uint($.arrayIndex(buf!, 2), 8), $.uint($.arrayIndex(buf!, 3), 8), $.uint($.arrayIndex(buf!, 4), 8))
 	await $.println("converted sum:", sumArray(($.sliceToArrayPointer<number>($.goSlice(buf, 1, undefined), 4, "byte") as $.VarRef<Uint8Array> | null)))
 
-	let literal: $.VarRef<Uint8Array> | null = $.varRef(new Uint8Array([4, 3, 2, 1]))
+	let literal: $.VarRef<Uint8Array> | null = $.varRef($.arrayValue(new Uint8Array([4, 3, 2, 1])))
 	await $.println("literal sum:", sumArray(literal))
 	fillArray(literal)
 	await $.println("literal filled:", $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 0), 8), $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 1), 8), $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 2), 8), $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 3), 8))

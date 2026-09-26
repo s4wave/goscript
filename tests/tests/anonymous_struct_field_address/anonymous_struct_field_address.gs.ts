@@ -38,10 +38,10 @@ export class entry {
 	)
 }
 
-export let box: {"table": entry[]} = {"table": Array.from({ length: 2 }, () => $.markAsStructValue(new entry()))}
+export let box: {"table": entry[]} = $.anonymousStructValue({"table": $.arrayValue(Array.from({ length: 2 }, () => $.markAsStructValue(new entry())), /* @__PURE__ */ $.arrayType("main.entry", 2))}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.arrayType("main.entry", 2), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_field_address" })] })
 
 export function __goscript_set_box(__goscriptValue: {"table": entry[]}): void {
-	box = __goscriptValue
+	$.assignStruct(box, __goscriptValue)
 }
 
 export function entries(): $.VarRef<entry[]> | null {

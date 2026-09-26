@@ -1,5 +1,7 @@
 import {
+  arrayValue,
   copyElement,
+  isArrayValue,
   isMarkedAsStructValue,
   isTypedNilValue,
   markAsStructValue,
@@ -310,11 +312,11 @@ export function sliceToArray<T>(
     )
   }
   if (typeHint === 'byte') {
-    return new Uint8Array(
-      asArray(slice as Slice<T>).slice(0, length) as number[],
+    return arrayValue(
+      new Uint8Array(asArray(slice as Slice<T>).slice(0, length) as number[]),
     )
   }
-  return asArray(slice as Slice<T>).slice(0, length)
+  return arrayValue(asArray(slice as Slice<T>).slice(0, length))
 }
 
 /**
@@ -708,9 +710,12 @@ export function goSlice<T>(
     runtimePanic(`Slice index out of range: ${high} > ${scap}`)
   }
 
+  // A slice of a whole array shares its storage, but an array value's marker
+  // must not make the slice itself copy like an array, so it gets a view.
   if (
     Array.isArray(s) &&
     !isComplexSlice(s) &&
+    !isArrayValue(s) &&
     low === 0 &&
     high === s.length &&
     max === undefined
@@ -753,7 +758,12 @@ export function goSlice<T>(
   const newLength = high - low
   const newOffset = oldOffset + low
 
-  if (newOffset === 0 && newLength === newCap && backing.length === newLength) {
+  if (
+    !isArrayValue(backing) &&
+    newOffset === 0 &&
+    newLength === newCap &&
+    backing.length === newLength
+  ) {
     return backing as Slice<T>
   }
 

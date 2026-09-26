@@ -18,9 +18,9 @@ export class padded {
 
 	constructor(init?: Partial<{_blank0?: Uint8Array, Value?: number, _blank2?: Uint8Array}>) {
 		this._fields = {
-			_blank0: init?._blank0 !== undefined ? $.cloneArrayValue(init._blank0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)) : new Uint8Array(2),
+			_blank0: init?._blank0 !== undefined ? $.cloneArrayValue(init._blank0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)) : $.arrayValue(new Uint8Array(2)),
 			Value: init?.Value ?? (0 as number),
-			_blank2: init?._blank2 !== undefined ? $.cloneArrayValue(init._blank2, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 3)) : new Uint8Array(3)
+			_blank2: init?._blank2 !== undefined ? $.cloneArrayValue(init._blank2, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 3)) : $.arrayValue(new Uint8Array(3))
 		}
 	}
 
@@ -41,10 +41,10 @@ export class padded {
 	)
 }
 
-export let featureBlock: {"_blank0": padded, "Enabled": boolean, "_blank2": padded} = {"_blank0": $.markAsStructValue(new padded()), "Enabled": false, "_blank2": $.markAsStructValue(new padded())}
+export let featureBlock: {"_blank0": padded, "Enabled": boolean, "_blank2": padded} = $.anonymousStructValue({"_blank0": $.markAsStructValue(new padded()), "Enabled": false, "_blank2": $.markAsStructValue(new padded())}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("_", "main.padded", [0], 0, false, { key: "_blank0", pkgPath: "github.com/s4wave/goscript/tests/tests/blank_struct_fields" }), /* @__PURE__ */ $.structField("Enabled", /* @__PURE__ */ $.basicType("bool"), [1], 24, true), /* @__PURE__ */ $.structField("_", "main.padded", [2], 32, false, { key: "_blank2", pkgPath: "github.com/s4wave/goscript/tests/tests/blank_struct_fields" })] })
 
 export function __goscript_set_featureBlock(__goscriptValue: {"_blank0": padded, "Enabled": boolean, "_blank2": padded}): void {
-	featureBlock = __goscriptValue
+	$.assignStruct(featureBlock, __goscriptValue)
 }
 
 export async function main(): globalThis.Promise<void> {

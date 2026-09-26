@@ -8,7 +8,7 @@ import "@goscript/unsafe/index.js"
 
 export function writeBytes(words: $.Slice<bigint>, bytes: $.Slice<number>): void {
 	for (let __goscriptRangeTarget0 = bytes, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
-		let b = __goscriptRangeTarget0![i]
+		let b = $.uint(__goscriptRangeTarget0![i], 8)
 		$.unsafePointerRef<number>(($.uint($.uint64Add($.indexByteAddress(words!, 0, 8), $.uint(i, 64)), 64) as any)).value = $.uint(b, 8)
 	}
 }

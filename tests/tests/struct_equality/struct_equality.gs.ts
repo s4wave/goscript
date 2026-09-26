@@ -17,7 +17,7 @@ export class ObjectID {
 
 	constructor(init?: Partial<{hash?: Uint8Array, format?: number}>) {
 		this._fields = {
-			hash: init?.hash !== undefined ? $.cloneArrayValue(init.hash, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)) : new Uint8Array(4),
+			hash: init?.hash !== undefined ? $.cloneArrayValue(init.hash, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)) : $.arrayValue(new Uint8Array(4)),
 			format: init?.format ?? (0 as number)
 		}
 	}
@@ -52,9 +52,9 @@ export class ObjectID {
 export async function main(): globalThis.Promise<void> {
 	let zero: Hash = $.markAsStructValue(new ObjectID())
 	let otherZero = $.markAsStructValue(new ObjectID())
-	let one = $.markAsStructValue(new ObjectID({hash: new Uint8Array([0, 7, 0, 0])}))
-	let otherOne = $.markAsStructValue(new ObjectID({hash: new Uint8Array([0, 7, 0, 0])}))
-	let different = $.markAsStructValue(new ObjectID({hash: new Uint8Array([0, 0, 7, 0])}))
+	let one = $.markAsStructValue(new ObjectID({hash: $.arrayValue(new Uint8Array([0, 7, 0, 0]))}))
+	let otherOne = $.markAsStructValue(new ObjectID({hash: $.arrayValue(new Uint8Array([0, 7, 0, 0]))}))
+	let different = $.markAsStructValue(new ObjectID({hash: $.arrayValue(new Uint8Array([0, 0, 7, 0]))}))
 
 	await $.println("zero is zero:", $.markAsStructValue($.cloneStructValue(zero)).IsZero())
 	await $.println("zero valid:", $.markAsStructValue($.cloneStructValue(zero)).Valid())

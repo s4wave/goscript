@@ -17,7 +17,7 @@ export function flags_values(__goscriptReceiver0: flags): [number, number] {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let [left, right] = flags_values(Array.from({ length: 2 }, () => 0))
+	let [left, right] = flags_values($.arrayValue(Array.from({ length: 2 }, () => 0)))
 	await $.println(left)
 	await $.println(right)
 }

@@ -6843,7 +6843,10 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	}
 	children := body
 	if valueName != "" {
-		value := indexTarget + "[" + indexName + "]"
+		// The value variable holds a copy of the element, so struct and array
+		// elements are cloned.
+		valueType := ctx.semPkg.source.TypesInfo.TypeOf(stmt.Value)
+		value := o.lowerValueForTargetTypes(ctx, valueType, valueType, indexTarget+"["+indexName+"]", true)
 		if stmt.Tok == token.DEFINE {
 			value = o.lowerDeclaredValue(ctx, stmt.Value, value)
 		}
@@ -10207,11 +10210,9 @@ func fieldReceiverNeedsVarRefValue(ctx lowerFileContext, expr ast.Expr, obj type
 	if _, ok := expr.(*ast.Ident); !ok {
 		return true
 	}
+	// Identifier aliases already lower to the dereferenced value.
 	if ctx.identAliases[obj] != "" {
-		if obj == nil || ctx.model == nil || !ctx.model.needsVarRef[obj] {
-			return false
-		}
-		return !ctx.identAliasRefs[obj]
+		return false
 	}
 	if ctx.localAliases[obj] != "" {
 		if varObj, ok := obj.(*types.Var); ok && packageVarReadNeedsPointerValue(varObj.Type()) {
@@ -11405,7 +11406,17 @@ func (o *LoweringOwner) lowerAnonymousStructCompositeLit(
 		}
 		fields = append(fields, field)
 	}
-	return "{" + strings.Join(fields, ", ") + "}", diagnostics
+	return o.lowerAnonymousStructValue("{"+strings.Join(fields, ", ")+"}", structType), diagnostics
+}
+
+// lowerAnonymousStructValue marks an anonymous struct object as a struct value
+// that carries its type, so copies clone it like a named struct.
+func (o *LoweringOwner) lowerAnonymousStructValue(object string, structType *types.Struct) string {
+	if structType.NumFields() == 0 {
+		return object
+	}
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperAnonymousStructValue) + "(" +
+		object + ", " + o.runtimeTypeInfoExpr(structType) + ")"
 }
 
 // lowerArrayCompositeLit preserves element values without expanding empty arrays into source.
@@ -11471,11 +11482,24 @@ func (o *LoweringOwner) lowerArrayCompositeLit(
 				parsed, _ := strconv.ParseUint(value, 10, 8)
 				data[idx] = byte(parsed)
 			}
-			return o.runtimeOwner.BuiltinImport().Alias + ".bytesFromHex(" + strconv.Quote(hex.EncodeToString(data)) + ")", diagnostics
+			return o.lowerArrayValue(o.runtimeOwner.BuiltinImport().Alias+".bytesFromHex("+strconv.Quote(hex.EncodeToString(data))+")", array), diagnostics
 		}
-		return "new Uint8Array([" + strings.Join(values, ", ") + "])", diagnostics
+		return o.lowerArrayValue("new Uint8Array(["+strings.Join(values, ", ")+"])", array), diagnostics
 	}
-	return "[" + strings.Join(values, ", ") + "]", diagnostics
+	return o.lowerArrayValue("["+strings.Join(values, ", ")+"]", array), diagnostics
+}
+
+// lowerArrayValue marks array storage as a Go array value, so bulk slice copies
+// clone it. Arrays of struct or array elements carry their descriptor so the
+// clone can copy each element.
+func (o *LoweringOwner) lowerArrayValue(storage string, array *types.Array) string {
+	helper := o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayValue)
+	switch types.Unalias(array.Elem()).Underlying().(type) {
+	case *types.Struct, *types.Array:
+		return helper + "(" + storage + ", " + o.runtimeTypeInfoExpr(array) + ")"
+	default:
+		return helper + "(" + storage + ")"
+	}
 }
 
 func (o *LoweringOwner) lowerSliceCompositeLit(
@@ -12069,14 +12093,14 @@ func (o *LoweringOwner) lowerZeroValueExprFor(ctx lowerFileContext, typ types.Ty
 		return "undefined"
 	case *types.Array:
 		if isByteType(typed.Elem()) {
-			return "new Uint8Array(" + strconv.FormatInt(typed.Len(), 10) + ")"
+			return o.lowerArrayValue("new Uint8Array("+strconv.FormatInt(typed.Len(), 10)+")", typed)
 		}
 		elem := o.lowerZeroValueExprFor(ctx, typed.Elem())
-		return "Array.from({ length: " + strconv.FormatInt(typed.Len(), 10) + " }, () => " + arrowBodyExpr(elem) + ")"
+		return o.lowerArrayValue("Array.from({ length: "+strconv.FormatInt(typed.Len(), 10)+" }, () => "+arrowBodyExpr(elem)+")", typed)
 	case *types.Struct:
-		return anonymousStructZeroValueExpr(typed, func(fieldType types.Type) string {
+		return o.lowerAnonymousStructValue(anonymousStructZeroValueExpr(typed, func(fieldType types.Type) string {
 			return o.lowerZeroValueExprFor(ctx, fieldType)
-		})
+		}), typed)
 	default:
 		return "null"
 	}
@@ -13223,8 +13247,15 @@ func namedNonInterfaceNonStructType(named *types.Named) bool {
 	}
 }
 
+// isStructValueType reports whether typ is a named struct or a nonempty
+// anonymous struct, which Go copies by value. An empty anonymous struct has no
+// state to copy, so it stays a plain object.
 func isStructValueType(typ types.Type) bool {
-	return namedStructType(typ) != nil
+	if namedStructType(typ) != nil {
+		return true
+	}
+	structType, ok := types.Unalias(typ).(*types.Struct)
+	return ok && structType.NumFields() != 0
 }
 
 func isStructComparableType(typ types.Type) bool {

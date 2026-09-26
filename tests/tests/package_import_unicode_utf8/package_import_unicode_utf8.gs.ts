@@ -52,7 +52,7 @@ export async function main(): globalThis.Promise<void> {
 	await checkBytes("param bytes", b)
 
 	// Test EncodeRune
-	let buf: Uint8Array = new Uint8Array(4)
+	let buf: Uint8Array = $.arrayValue(new Uint8Array(4))
 	let n = utf8.EncodeRune($.goSlice(buf, undefined, undefined), 19990)
 	await $.println("Encoded rune size:", n)
 

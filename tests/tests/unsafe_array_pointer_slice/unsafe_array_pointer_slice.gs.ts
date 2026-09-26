@@ -16,7 +16,7 @@ export async function main(): globalThis.Promise<void> {
 	$.pointerValue<Uint8Array>(ptr)[2] = 7
 	await $.println($.uint($.arrayIndex(buf!, 3), 8))
 
-	let __goscriptShadow0: $.VarRef<Uint8Array> = $.varRef(new Uint8Array(4))
+	let __goscriptShadow0: $.VarRef<Uint8Array> = $.varRef($.arrayValue(new Uint8Array(4)))
 	fill(__goscriptShadow0)
 	let shadowView: $.Slice<number> = $.goSlice(__goscriptShadow0.value, undefined, undefined)
 	await $.println($.len(shadowView), $.uint($.arrayIndex(shadowView!, 0), 8), $.uint($.arrayIndex(shadowView!, 3), 8))

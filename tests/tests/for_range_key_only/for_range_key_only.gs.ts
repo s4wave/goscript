@@ -14,7 +14,7 @@ export async function main(): globalThis.Promise<void> {
 	// 1
 	// 2
 
-	let a = ["alpha", "beta"]
+	let a = $.arrayValue(["alpha", "beta"])
 	await $.println("Looping over array (key only):")
 	for (let __goscriptRangeTarget1 = a, k = 0; k < $.len(__goscriptRangeTarget1); k++) {
 		await $.println(k)

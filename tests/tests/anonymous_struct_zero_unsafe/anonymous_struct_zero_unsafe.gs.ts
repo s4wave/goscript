@@ -6,10 +6,10 @@ import * as $ from "@goscript/builtin/index.js"
 import * as unsafe from "@goscript/unsafe/index.js"
 import "@goscript/unsafe/index.js"
 
-export let linkinfo: {"Magic": Uint8Array, "Self": number, "Sects": {"Start": any, "End": any}[]} = {"Magic": new Uint8Array(2), "Self": 0, "Sects": Array.from({ length: 1 }, () => ({"Start": null, "End": null}))}
+export let linkinfo: {"Magic": Uint8Array, "Self": number, "Sects": {"Start": any, "End": any}[]} = $.anonymousStructValue({"Magic": $.arrayValue(new Uint8Array(2)), "Self": 0, "Sects": $.arrayValue(Array.from({ length: 1 }, () => $.anonymousStructValue({"Start": null, "End": null}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Start", /* @__PURE__ */ $.basicType("unknown"), [0], 0, true), /* @__PURE__ */ $.structField("End", /* @__PURE__ */ $.basicType("unknown"), [1], 8, true)] })), /* @__PURE__ */ $.arrayType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Start", /* @__PURE__ */ $.basicType("unknown"), [0], 0, true), /* @__PURE__ */ $.structField("End", /* @__PURE__ */ $.basicType("unknown"), [1], 8, true)] }, 1))}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Magic", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2), [0], 0, true), /* @__PURE__ */ $.structField("Self", /* @__PURE__ */ $.basicType("uintptr"), [1], 8, true), /* @__PURE__ */ $.structField("Sects", /* @__PURE__ */ $.arrayType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Start", /* @__PURE__ */ $.basicType("unknown"), [0], 0, true), /* @__PURE__ */ $.structField("End", /* @__PURE__ */ $.basicType("unknown"), [1], 8, true)] }, 1), [2], 16, true)] })
 
 export function __goscript_set_linkinfo(__goscriptValue: {"Magic": Uint8Array, "Self": number, "Sects": {"Start": any, "End": any}[]}): void {
-	linkinfo = __goscriptValue
+	$.assignStruct(linkinfo, __goscriptValue)
 }
 
 export async function main(): globalThis.Promise<void> {

@@ -38,7 +38,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println($.arrayIndex(s!, i))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await recoverMsg("array:", $.functionValue(async (): globalThis.Promise<void> => {
-		let a: number[] = Array.from({ length: 3 }, () => 0)
+		let a: number[] = $.arrayValue(Array.from({ length: 3 }, () => 0))
 		let i = 7
 		await $.println($.arrayIndex(a, i))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))

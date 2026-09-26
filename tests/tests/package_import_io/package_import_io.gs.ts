@@ -284,11 +284,11 @@ export async function main(): globalThis.Promise<void> {
 	let n64 = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	await $.println("Copy interface - bytes:", n64, "err:", err == null)
-	let __goscriptTuple2: any = await io.Copy($.pointerValueOrNil(io.Discard)!, {Reader: $.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", /* @__PURE__ */ $.pointerType("main.staticReader"))})
+	let __goscriptTuple2: any = await io.Copy($.pointerValueOrNil(io.Discard)!, $.interfaceValue<io.Reader | null>($.anonymousStructValue({Reader: $.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", /* @__PURE__ */ $.pointerType("main.staticReader"))}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Reader", "io.Reader", [0], 0, true, { anonymous: true })] }), "struct{io.Reader}", { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Reader", "io.Reader", [0], 0, true, { anonymous: true })] }))
 	n64 = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	await $.println("Copy embedded reader - bytes:", n64, "err:", err == null)
-	let __goscriptTuple3: any = await io.Copy({Writer: io.Discard}, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", /* @__PURE__ */ $.pointerType("main.staticReader")))!)
+	let __goscriptTuple3: any = await io.Copy($.interfaceValue<io.Writer | null>($.anonymousStructValue({Writer: io.Discard}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Writer", "io.Writer", [0], 0, true, { anonymous: true })] }), "struct{io.Writer}", { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Writer", "io.Writer", [0], 0, true, { anonymous: true })] }), $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", /* @__PURE__ */ $.pointerType("main.staticReader")))!)
 	n64 = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
 	await $.println("Copy embedded writer - bytes:", n64, "err:", err == null)

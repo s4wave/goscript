@@ -3,8 +3,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { queueTask } from './scheduler.js'
 
 import {
+  anonymousStructValue,
   append,
   appendSlice,
+  arrayValue,
   assignStruct,
   basicInterfaceValue,
   bytesToUint8Array,
@@ -14,6 +16,7 @@ import {
   copy,
   cloneArrayValue,
   cloneStructValue,
+  copyElement,
   callGenericMethod,
   chanRecvWithOk,
   fieldRef,
@@ -308,18 +311,42 @@ describe('builtin runtime contract helpers', () => {
     const clonedBytes = cloneArrayValue(fixedBytes)
     expect(clonedBytes).toEqual(fixedBytes)
     expect(clonedBytes).not.toBe(fixedBytes)
-    const fixedWords = [
-      [1, 2],
-      [3, 4],
-    ]
-    const clonedWords = cloneArrayValue(fixedWords, {
-      kind: TypeKind.Array,
-      length: 2,
-      elemType: { kind: TypeKind.Array, length: 2, elemType: 'int' },
-    })
+    const fixedWords = arrayValue(
+      [arrayValue([1, 2]), arrayValue([3, 4])],
+      {
+        kind: TypeKind.Array,
+        length: 2,
+        elemType: { kind: TypeKind.Array, length: 2, elemType: 'int' },
+      },
+    )
+    const clonedWords = cloneArrayValue(fixedWords)
     expect(clonedWords).toEqual(fixedWords)
     expect(clonedWords).not.toBe(fixedWords)
     expect(clonedWords[0]).not.toBe(fixedWords[0])
+    expect(copyElement(fixedWords[0])).toEqual(fixedWords[0])
+    expect(copyElement(fixedWords[0])).not.toBe(fixedWords[0])
+    const wordsSlice = goSlice(fixedWords)
+    expect(wordsSlice).not.toBe(fixedWords)
+    expect(copyElement(wordsSlice)).toBe(wordsSlice)
+    const pointInfo = {
+      kind: TypeKind.Struct,
+      methods: [],
+      fields: [
+        { name: 'X', type: 'int' },
+        {
+          name: 'Words',
+          type: { kind: TypeKind.Array, length: 2, elemType: 'int' },
+        },
+      ],
+    }
+    const point = anonymousStructValue(
+      { X: 1, Words: arrayValue([1, 2]) },
+      pointInfo,
+    )
+    const clonedPoint = cloneStructValue(point)
+    expect(clonedPoint).toEqual(point)
+    expect(clonedPoint).not.toBe(point)
+    expect(clonedPoint.Words).not.toBe(point.Words)
     expect(() => pointerValue(null)).toThrow('nil pointer dereference')
     const unsupported = unsupportedPointerRef<number>(0)
     expect(() => unsupported.value).toThrow('unsafe pointer dereference')
@@ -818,14 +845,14 @@ describe('builtin runtime contract helpers', () => {
     const array = sliceToArray<number>(source, 2)
     array[0] = 9
 
-    expect(array).toEqual([9, 3])
+    expect(array).toEqual(arrayValue([9, 3]))
     expect(source![0]).toBe(2)
     expect(() => sliceToArray<number>(source, 3)).toThrow(
       'cannot convert slice with length 2 to array or pointer to array with length 3',
     )
 
     expect(sliceToArray<number>(new Uint8Array([4, 5, 6]), 2, 'byte')).toEqual(
-      new Uint8Array([4, 5]),
+      arrayValue(new Uint8Array([4, 5])),
     )
   })
 

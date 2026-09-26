@@ -12,7 +12,7 @@ export function sum(values: $.VarRef<number[]> | null): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let values: $.VarRef<number[]> | null = $.varRef([1, 2, 3, 4])
+	let values: $.VarRef<number[]> | null = $.varRef($.arrayValue([1, 2, 3, 4]))
 	await $.println(sum(values))
 }
 

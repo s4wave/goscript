@@ -72,7 +72,7 @@ export async function main(): globalThis.Promise<void> {
 	right = __goscriptAssign0_1
 	await $.println($.pointerValue<queue>(left).value, $.pointerValue<queue>(right).value)
 
-	let nodes = [$.markAsStructValue(new node({next: 1})), $.markAsStructValue(new node({next: 0}))]
+	let nodes = $.arrayValue([$.markAsStructValue(new node({next: 1})), $.markAsStructValue(new node({next: 0}))], /* @__PURE__ */ $.arrayType("main.node", 2))
 	let pc = 0
 	let inst: node | $.VarRef<node> | null = $.indexRef(nodes, pc)
 	let __goscriptAssign1_0: number = $.pointerValue<node>(inst).next

@@ -42,7 +42,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("cell:", $.arrayIndex(cells!, 0).width, current.value.width)
 
 	// Arrays also copy at the argument boundary.
-	let row = [3, 4]
+	let row = $.arrayValue([3, 4])
 	let rows: $.Slice<number[]> = $.append<number[]>(null, $.cloneArrayValue(row, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)))
 	row[0] = 9
 	await $.println("array:", $.arrayIndex($.arrayIndex(rows!, 0), 0), $.arrayIndex(row, 0))

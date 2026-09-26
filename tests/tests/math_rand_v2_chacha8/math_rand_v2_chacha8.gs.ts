@@ -7,7 +7,7 @@ import * as rand from "@goscript/math/rand/v2/index.js"
 import "@goscript/math/rand/v2/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let seed: Uint8Array = new Uint8Array(32)
+	let seed: Uint8Array = $.arrayValue(new Uint8Array(32))
 	for (let __goscriptRangeTarget0 = seed, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
 		seed[i] = $.uint($.uint(i + 1, 8), 8)
 	}
@@ -29,7 +29,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println($.len(b))
 	for (let __goscriptRangeTarget1 = b, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let v = __goscriptRangeTarget1![__rangeIndex]
+		let v = $.uint(__goscriptRangeTarget1![__rangeIndex], 8)
 		await $.println($.uint(v, 8))
 	}
 	let r2: rand.ChaCha8 | $.VarRef<rand.ChaCha8> | null = rand.NewChaCha8($.cloneArrayValue(seed, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 32)))

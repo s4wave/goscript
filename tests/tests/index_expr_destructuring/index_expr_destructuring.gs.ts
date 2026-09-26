@@ -13,7 +13,7 @@ export function returnIntAndString(): [number, string] {
 
 export async function main(): globalThis.Promise<void> {
 	// Create arrays/slices to test index expressions in destructuring
-	let intArray: number[] = Array.from({ length: 2 }, () => 0)
+	let intArray: number[] = $.arrayValue(Array.from({ length: 2 }, () => 0))
 	let stringSlice: $.Slice<string> = $.makeSlice<string>(2, undefined, "string")
 
 	// This should trigger the "unhandled LHS expression in destructuring: *ast.IndexExpr" error
@@ -25,7 +25,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("stringSlice[1]:", $.arrayIndex(stringSlice!, 1))
 
 	// Test with more complex index expressions
-	let matrix: number[][] = Array.from({ length: 2 }, () => Array.from({ length: 2 }, () => 0))
+	let matrix: number[][] = $.arrayValue(Array.from({ length: 2 }, () => $.arrayValue(Array.from({ length: 2 }, () => 0))), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), 2))
 	let i: number = 0
 	let j: number = 1
 

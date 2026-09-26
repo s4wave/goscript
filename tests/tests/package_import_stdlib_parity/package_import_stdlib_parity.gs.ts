@@ -29,6 +29,8 @@ import * as time from "@goscript/time/index.js"
 
 import * as unicode from "@goscript/unicode/index.js"
 
+import * as jsontext from "@goscript/encoding/json/jsontext/index.js"
+
 import type * as io from "@goscript/io/index.js"
 import "@goscript/bytes/index.js"
 import "@goscript/compress/zlib/index.js"
@@ -43,6 +45,7 @@ import "@goscript/strconv/index.js"
 import "@goscript/strings/index.js"
 import "@goscript/time/index.js"
 import "@goscript/unicode/index.js"
+import "@goscript/encoding/json/jsontext/index.js"
 
 export class xof {
 	public _fields: {
@@ -85,7 +88,7 @@ export async function main(): globalThis.Promise<void> {
 	let compact: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	json.Compact(compact, new Uint8Array([123, 32, 34, 120, 34, 32, 58, 32, 49, 32, 125]))
 	let raw: json.RawMessage = ((compact.value.Bytes() as json.RawMessage) as json.RawMessage)
-	let __goscriptTuple0: any = json.RawMessage_MarshalJSON(raw)
+	let __goscriptTuple0: any = jsontext.Value_MarshalJSON(raw)
 	let rawBytes: $.Slice<number> = __goscriptTuple0[0]
 	let [num, ] = json.Number_Int64(String("42"))
 	await $.println("json:", json.Valid(rawBytes), $.bytesToString(rawBytes), num)

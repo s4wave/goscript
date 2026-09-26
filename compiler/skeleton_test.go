@@ -1247,7 +1247,7 @@ func TestCompilePackagesAnnotatesNewArrayPointerShortDecls(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"let buf: $.VarRef<Uint8Array> | null = $.varRef<Uint8Array>(new Uint8Array(32))",
+		"let buf: $.VarRef<Uint8Array> | null = $.varRef<Uint8Array>($.arrayValue(new Uint8Array(32)))",
 		"buf = null",
 		"use(buf)",
 	} {
@@ -2468,7 +2468,7 @@ func TestCompilePackagesEmitsArraySliceMapStringAndNamedMethods(t *testing.T) {
 		"export function MyInt_Double(m: MyInt): number",
 		"export type MySlice = $.Slice<number>",
 		"export function MySlice_Add(s: $.VarRef<MySlice> | null, v: number): void",
-		"let arr = [0, 10, 0]",
+		"let arr = $.arrayValue([0, 10, 0])",
 		"let slice: $.Slice<number> = $.makeSlice<number>(0, 2, \"number\")",
 		"let empty: $.Slice<number> = $.arrayToSlice<number>([])",
 		"let literal: $.Slice<number> = $.arrayToSlice<number>([1, 2])",

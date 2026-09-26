@@ -16,7 +16,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println(sum)
 
-	let arr = ["a", "b", "c"]
+	let arr = $.arrayValue(["a", "b", "c"])
 	let concat: $.VarRef<strings.Builder> = $.varRef($.markAsStructValue(new strings.Builder()))
 	for (let __goscriptRangeTarget1 = arr, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
 		let val = __goscriptRangeTarget1[__rangeIndex]

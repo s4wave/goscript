@@ -29,7 +29,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("--- New Tests ---")
 
 	// Create slice from array literal
-	let arrLit = [1, 2, 3, 4, 5]
+	let arrLit = $.arrayValue([1, 2, 3, 4, 5])
 	let sliceFromLit: $.Slice<number> = $.goSlice(arrLit, undefined, undefined)
 	await $.println($.len(sliceFromLit))
 	await $.println($.cap(sliceFromLit))
@@ -37,7 +37,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.arrayIndex(sliceFromLit!, 4))
 
 	// Create slice from array variable
-	let arrVar = ["a", "b", "c", "d"]
+	let arrVar = $.arrayValue(["a", "b", "c", "d"])
 	let sliceFromVar: $.Slice<string> = $.goSlice(arrVar, undefined, undefined)
 	await $.println($.len(sliceFromVar))
 	await $.println($.cap(sliceFromVar))
@@ -67,7 +67,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Modify slice, check original array
 	await $.println("--- Modify slice, check array ---")
-	let modArr = [10, 20, 30]
+	let modArr = $.arrayValue([10, 20, 30])
 	let modSlice: $.Slice<number> = $.goSlice(modArr, undefined, undefined)
 	modSlice![1] = 25
 	await $.println($.arrayIndex(modArr, 1))
@@ -81,7 +81,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Append to sub-slice within capacity
 	await $.println("--- Append sub-slice w/in capacity ---")
-	let appendArr = [1, 2, 3, 4, 5]
+	let appendArr = $.arrayValue([1, 2, 3, 4, 5])
 	let appendSlice1: $.Slice<number> = $.goSlice(appendArr, 0, 2)
 	await $.println($.len(appendSlice1))
 	await $.println($.cap(appendSlice1))
@@ -127,7 +127,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Three-index slicing (if supported) - Check capacity
 	await $.println("--- Three-index slicing ---")
-	let threeIndexArr = [0, 1, 2, 3, 4, 5]
+	let threeIndexArr = $.arrayValue([0, 1, 2, 3, 4, 5])
 	let threeIndexSlice: $.Slice<number> = $.goSlice(threeIndexArr, 1, 3, 4)
 	await $.println($.len(threeIndexSlice))
 	await $.println($.cap(threeIndexSlice))

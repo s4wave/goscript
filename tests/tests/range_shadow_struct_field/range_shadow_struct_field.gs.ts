@@ -59,7 +59,7 @@ export class Matcher {
 		const m: Matcher | $.VarRef<Matcher> | null = this;
 		let total = 0
 		for (let __goscriptRangeTarget0 = Matcher.prototype.Blocks.call(m), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-			let __goscriptRangeShadow0 = __goscriptRangeTarget0![__rangeIndex]
+			let __goscriptRangeShadow0 = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget0![__rangeIndex]))
 			total = total + (__goscriptRangeShadow0.Size)
 		}
 		return total
