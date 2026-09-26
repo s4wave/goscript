@@ -784,13 +784,11 @@ func collectFunctionFacts(
 			switch typed := node.(type) {
 			case *ast.FuncLit:
 				return false
-			case *ast.SendStmt:
-				markFunctionAsync(semFn, "channel-send")
-			case *ast.SelectStmt:
-				markFunctionAsync(semFn, "select")
+			case *ast.SendStmt, *ast.SelectStmt:
+				markFunctionAsync(semFn)
 			case *ast.UnaryExpr:
 				if typed.Op == token.ARROW {
-					markFunctionAsync(semFn, "channel-receive")
+					markFunctionAsync(semFn)
 				}
 			case *ast.RangeStmt:
 				if signatureForType(pkg.TypesInfo.TypeOf(typed.X)) != nil {
@@ -798,32 +796,18 @@ func collectFunctionFacts(
 						semFn.calls[functionOriginOrSelf(called)] = true
 					}
 					if rangeFunctionExprNeedsAwait(model, pkg, overrideFacts, typed.X) {
-						markFunctionAsync(semFn, "range-function")
+						markFunctionAsync(semFn)
 					}
 				}
 			case *ast.CallExpr:
 				if called := calledFunction(pkg, typed.Fun); called != nil {
 					semFn.calls[functionOriginOrSelf(called)] = true
 				}
-				if isBuiltinPrintCall(pkg, typed.Fun) {
-					// The print helpers await their rendered operands, so the
-					// enclosing function suspends until the write lands.
-					markFunctionAsync(semFn, "builtin-print")
-				}
 				if fun, ok := ast.Unparen(typed.Fun).(*ast.FuncLit); ok {
 					recordImmediateFuncLitAsyncFacts(model, pkg, overrideFacts, semFn, fun)
 				}
-				if callUsesFunctionValue(pkg, typed.Fun) {
-					markFunctionAsync(semFn, "function-value-call")
-				}
-				if callUsesFunctionIdentifier(pkg, typed.Fun) {
-					markFunctionAsync(semFn, "function-identifier-call")
-				}
-				if overrideFacts.IsMethodAsync(overrideCallPackage(pkg, typed.Fun), overrideCallMethod(pkg, typed.Fun)) {
-					markFunctionAsync(semFn, "override")
-				}
-				if overrideFacts.IsFunctionAsync(overrideFunctionCallPackage(pkg, typed.Fun), overrideFunctionCallName(pkg, typed.Fun)) {
-					markFunctionAsync(semFn, "override")
+				if !semFn.async && callSuspends(pkg, overrideFacts, typed.Fun) {
+					markFunctionAsync(semFn)
 				}
 			}
 			return true
@@ -854,6 +838,17 @@ func rangeFunctionExprNeedsAwait(
 	return callUsesFunctionValue(pkg, expr)
 }
 
+// callSuspends reports whether a call suspends its caller whatever the callee's
+// own coloring: printing, calling a function value, or calling an async
+// override.
+func callSuspends(pkg *packages.Package, overrideFacts *OverrideFacts, fun ast.Expr) bool {
+	return isBuiltinPrintCall(pkg, fun) ||
+		callUsesFunctionValue(pkg, fun) ||
+		callUsesFunctionIdentifier(pkg, fun) ||
+		overrideFacts.IsMethodAsync(overrideCallPackage(pkg, fun), overrideCallMethod(pkg, fun)) ||
+		overrideFacts.IsFunctionAsync(overrideFunctionCallPackage(pkg, fun), overrideFunctionCallName(pkg, fun))
+}
+
 // isBuiltinPrintCall reports whether the call targets the print or println
 // builtin. Both lower to awaited runtime helpers, so any function whose body
 // contains one renders output asynchronously.
@@ -880,48 +875,29 @@ func recordImmediateFuncLitAsyncFacts(
 		switch typed := node.(type) {
 		case *ast.FuncLit:
 			return false
-		case *ast.SendStmt:
-			markFunctionAsync(semFn, "async-function-literal-call")
-		case *ast.SelectStmt:
-			markFunctionAsync(semFn, "async-function-literal-call")
+		case *ast.SendStmt, *ast.SelectStmt:
+			markFunctionAsync(semFn)
 		case *ast.UnaryExpr:
 			if typed.Op == token.ARROW {
-				markFunctionAsync(semFn, "async-function-literal-call")
+				markFunctionAsync(semFn)
 			}
 		case *ast.CallExpr:
 			called := calledFunction(pkg, typed.Fun)
 			if called != nil {
 				semFn.calls[functionOriginOrSelf(called)] = true
 			}
-			if isBuiltinPrintCall(pkg, typed.Fun) {
-				markFunctionAsync(semFn, "builtin-print")
+			if semFn.async {
+				break
 			}
-			if callUsesFunctionValue(pkg, typed.Fun) {
-				markFunctionAsync(semFn, "async-function-literal-call")
-			}
-			if callUsesFunctionIdentifier(pkg, typed.Fun) {
-				markFunctionAsync(semFn, "async-function-literal-call")
-			}
-			if called != nil {
-				calledFn := semanticFunctionFor(model, called)
-				if calledFn != nil && calledFn.async {
-					markFunctionAsync(semFn, "async-function-literal-call")
-				}
-			}
-			if overrideFacts.IsMethodAsync(overrideCallPackage(pkg, typed.Fun), overrideCallMethod(pkg, typed.Fun)) {
-				markFunctionAsync(semFn, "async-function-literal-call")
-			}
-			if overrideFacts.IsFunctionAsync(overrideFunctionCallPackage(pkg, typed.Fun), overrideFunctionCallName(pkg, typed.Fun)) {
-				markFunctionAsync(semFn, "async-function-literal-call")
+			if calledFn := semanticFunctionFor(model, called); calledFn != nil && calledFn.async {
+				markFunctionAsync(semFn)
+			} else if callSuspends(pkg, overrideFacts, typed.Fun) {
+				markFunctionAsync(semFn)
 			}
 		}
 		return true
 	})
 }
-
-// asyncFunctionArgumentReason marks a function async because a call passes an
-// async function as one of its arguments.
-const asyncFunctionArgumentReason = "async-function-argument"
 
 // asyncArgumentCallSite is a call whose arguments may make its callee async.
 // Which calls exist is fixed by the syntax tree; only the async marks change as
@@ -1006,13 +982,13 @@ func (o *SemanticModelOwner) propagateAsyncFunctionArguments(
 		remaining := sites[:0]
 		for _, site := range sites {
 			if callPassesAsyncFunctionArgument(model, site.pkg, site.signature, site.args) {
-				if markFunctionAsync(site.semFn, asyncFunctionArgumentReason) {
+				if markFunctionAsync(site.semFn) {
 					changed = true
 				}
 			}
-			// A callee already carrying this reason can never report a change
-			// again, so drop the site instead of rescanning its arguments.
-			if site.semFn.async && slices.Contains(site.semFn.asyncReasons, asyncFunctionArgumentReason) {
+			// An async callee can never report a change again, so drop the site
+			// instead of rescanning its arguments.
+			if site.semFn.async {
 				continue
 			}
 			remaining = append(remaining, site)
@@ -1354,7 +1330,7 @@ func (o *SemanticModelOwner) propagateFunctionAsync(
 		queue = append(queue, fn)
 	}
 	for called := range model.functionCallers {
-		if model.functionAsync(called) {
+		if !propagated[called] && model.functionAsync(called) {
 			enqueue(called)
 		}
 	}
@@ -1368,7 +1344,7 @@ func (o *SemanticModelOwner) propagateFunctionAsync(
 			if err := ctx.Err(); err != nil {
 				return []Diagnostic{contextCanceledDiagnostic(err)}
 			}
-			if markFunctionAsync(semFn, "call:"+model.functionFullName(called)) {
+			if markFunctionAsync(semFn) {
 				enqueue(semFn.function)
 			}
 		}
@@ -1390,16 +1366,12 @@ func semanticFunctionCallers(model *SemanticModel) map[*types.Func][]*semanticFu
 	return callers
 }
 
-func markFunctionAsync(fn *semanticFunction, reason string) bool {
-	if fn == nil {
+// markFunctionAsync marks fn async and reports whether it was synchronous.
+func markFunctionAsync(fn *semanticFunction) bool {
+	if fn == nil || fn.async {
 		return false
 	}
-	changed := !fn.async
 	fn.async = true
-	if slices.Contains(fn.asyncReasons, reason) {
-		return changed
-	}
-	fn.asyncReasons = append(fn.asyncReasons, reason)
 	return true
 }
 
@@ -1680,7 +1652,7 @@ func (o *SemanticModelOwner) applyUnknownInterfaceAsyncMethods(
 		// the callers that invoke this method. The interface method itself stays
 		// synchronous until a compiled implementation proves it can suspend.
 		for _, caller := range model.functionCallers[method] {
-			markFunctionAsync(caller, "unknown-interface-method")
+			markFunctionAsync(caller)
 		}
 	}
 }
@@ -1702,7 +1674,11 @@ func (o *SemanticModelOwner) buildInterfaceAsyncMarks(
 	interfaceGraph []semanticInterfaceImplementationGraphEntry,
 ) ([]interfaceAsyncMark, []Diagnostic) {
 	model.interfaceImplementations = make([]semanticInterfaceImplementation, 0, len(interfaceGraph))
-	var marks []interfaceAsyncMark
+	var markCount int
+	for _, graphEntry := range interfaceGraph {
+		markCount += len(graphEntry.ifaceMethods)
+	}
+	marks := make([]interfaceAsyncMark, 0, markCount)
 	for _, graphEntry := range interfaceGraph {
 		if err := ctx.Err(); err != nil {
 			return nil, []Diagnostic{contextCanceledDiagnostic(err)}
@@ -1743,9 +1719,9 @@ func (o *SemanticModelOwner) applyInterfaceAsyncMethods(
 		}
 		model.markInterfaceMethodAsync(mark.ifaceMethod)
 		if ifaceFn := semanticFunctionFor(model, mark.ifaceMethod); ifaceFn != nil {
-			markFunctionAsync(ifaceFn, "interface-implementation")
+			markFunctionAsync(ifaceFn)
 		}
-		markFunctionAsync(mark.implFn, "interface-method")
+		markFunctionAsync(mark.implFn)
 	}
 	return pending, nil
 }
@@ -1778,7 +1754,7 @@ func (m *SemanticModel) functionAsync(fn *types.Func) bool {
 }
 
 func (m *SemanticModel) markInterfaceMethodAsync(fn *types.Func) {
-	if m == nil || fn == nil {
+	if m == nil || fn == nil || m.asyncInterfaceMethodObjs[fn] {
 		return
 	}
 	m.asyncInterfaceMethodObjs[fn] = true

@@ -28,7 +28,6 @@ func (m *SemanticModel) deferFunctions(names []string) []Diagnostic {
 		m.deferredPackages[fn.function.Pkg().Path()] = true
 		fn.deferred = true
 		fn.async = true
-		fn.asyncReasons = append(fn.asyncReasons, "deferred module import")
 	}
 	return diagnostics
 }

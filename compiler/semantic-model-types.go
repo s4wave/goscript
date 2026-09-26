@@ -103,7 +103,6 @@ type semanticFunction struct {
 	hasBody         bool
 	async           bool
 	deferred        bool
-	asyncReasons    []string
 	calls           map[*types.Func]bool
 }
 
