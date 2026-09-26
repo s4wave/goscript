@@ -29,6 +29,8 @@ func TestTestCommandRunsPackageTest(t *testing.T) {
 	writeFile(t, filepath.Join(dir, "go.mod"), "module example.test/cmdtest\n\ngo 1.25.3\n")
 	writeFile(t, filepath.Join(dir, "value.go"), strings.Join([]string{
 		"package cmdtest",
+		"type Result struct{ Count int }",
+		"func (r *Result) String() string { return \"result stringer\" }",
 		"func Value() int { return 7 }",
 		"",
 	}, "\n"))
@@ -39,6 +41,7 @@ func TestTestCommandRunsPackageTest(t *testing.T) {
 		"\tif Value() != 7 {",
 		"\t\tt.Fatal(\"bad value\")",
 		"\t}",
+		"\tt.Logf(\"logged %v\", &Result{Count: 1})",
 		"}",
 		"",
 	}, "\n"))
@@ -61,6 +64,9 @@ func TestTestCommandRunsPackageTest(t *testing.T) {
 	}
 	if !strings.Contains(out.String(), "ok  \texample.test/cmdtest") {
 		t.Fatalf("expected ok package output, got:\n%s", out.String())
+	}
+	if !strings.Contains(out.String(), "logged result stringer") {
+		t.Fatalf("expected the log to use the String method, got:\n%s", out.String())
 	}
 }
 

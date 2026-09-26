@@ -1,5 +1,6 @@
 {
   "asyncMethods": {
     "T.Run": true
-  }
+  },
+  "dependencies": ["context", "fmt"]
 }

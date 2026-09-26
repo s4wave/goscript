@@ -1,4 +1,5 @@
 import * as context from '@goscript/context/index.js'
+import * as fmt from '@goscript/fmt/index.js'
 
 export type TestFunc = (t: T) => void | Promise<void>
 export type TB = T | B | F
@@ -79,7 +80,7 @@ export class T {
   }
 
   public Errorf(format: string, ...args: unknown[]): void {
-    this.Log(formatMessage(format, args))
+    this.pushLog(fmt.Sprintf(format, ...args))
     this.Fail()
   }
 
@@ -89,33 +90,28 @@ export class T {
   }
 
   public Fatalf(format: string, ...args: unknown[]): never {
-    this.Log(formatMessage(format, args))
+    this.pushLog(fmt.Sprintf(format, ...args))
     this.FailNow()
   }
 
   public Log(...args: unknown[]): void {
-    this.pushLog(args.map(formatValue))
+    this.pushLog(fmt.Sprintln(...args).then((text) => text.slice(0, -1)))
   }
 
   public Logf(format: string, ...args: unknown[]): void {
-    this.pushLog([formatMessage(format, args)])
+    this.pushLog(fmt.Sprintf(format, ...args))
   }
 
-  // pushLog appends a rendered entry. When an operand resolves
-  // asynchronously, a placeholder entry holds its position and the resolved
-  // text replaces it once the microtask queue runs; flushLogs awaits these
-  // before printing so no entry is lost or flushed as a placeholder.
-  private pushLog(parts: MaybeText[]): void {
-    const joined = joinMaybeText(parts, ' ')
-    if (typeof joined === 'string') {
-      this.logs.push(joined)
-      return
-    }
+  // pushLog appends an entry formatted by fmt, which may call async
+  // transpiled Error() or String() methods. A placeholder holds the entry's
+  // position until its text resolves; flushLogs awaits every pending entry
+  // before printing.
+  private pushLog(text: Promise<string>): void {
     const index = this.logs.length
     this.logs.push('')
     this.pendingLogText.push(
-      Promise.resolve(joined).then((text) => {
-        this.logs[index] = text
+      text.then((resolved) => {
+        this.logs[index] = resolved
       }),
     )
   }
@@ -126,7 +122,7 @@ export class T {
   }
 
   public Skipf(format: string, ...args: unknown[]): never {
-    this.Log(formatMessage(format, args))
+    this.pushLog(fmt.Sprintf(format, ...args))
     this.SkipNow()
   }
 
@@ -268,9 +264,7 @@ export class T {
   }
 
   public async flushLogs(): Promise<void> {
-    // Entries rendered through an async transpiled Error()/String() method
-    // resolve after the microtask queue runs; settle them before flushing so
-    // the printed log carries the final text.
+    // Settle every pending entry so the printed log carries the final text.
     const pending = this.pendingLogText
     this.pendingLogText = []
     await Promise.all(pending)
@@ -424,28 +418,6 @@ export async function runTests(
   }
 }
 
-function formatMessage(format: string, args: unknown[]): MaybeText {
-  const parts: MaybeText[] = []
-  let index = 0
-  let cursor = 0
-  const verbPattern = /%#v|%\+v|%q|%[vds]/g
-  let match: RegExpExecArray | null
-  while ((match = verbPattern.exec(format)) !== null) {
-    if (match.index > cursor) {
-      parts.push(format.slice(cursor, match.index))
-    }
-    const value = args[index++]
-    parts.push(
-      match[0] === '%q' ? JSON.stringify(String(value)) : formatValue(value),
-    )
-    cursor = verbPattern.lastIndex
-  }
-  if (cursor < format.length) {
-    parts.push(format.slice(cursor))
-  }
-  return joinMaybeText(parts, '')
-}
-
 function requireHostModule<T>(name: string, api: string): T {
   const fromProcess = (globalThis as HostGlobal).process?.getBuiltinModule?.(
     name,
@@ -486,49 +458,4 @@ function isProcessExitError(err: unknown): boolean {
   }
   const code = (err as { __goscriptExitCode?: unknown }).__goscriptExitCode
   return typeof code === 'number'
-}
-
-// A transpiled Go Error() or String() method may be async, so log operands
-// render through the MaybePromise convention: text when synchronous, a
-// Promise that pushResolvedText settles onto the log entry otherwise.
-type MaybeText = string | PromiseLike<string>
-
-function isThenableText(value: unknown): value is PromiseLike<string> {
-  return (
-    value !== null &&
-    typeof value === 'object' &&
-    typeof (value as { then?: unknown }).then === 'function'
-  )
-}
-
-function formatValue(value: unknown): MaybeText {
-  if (isThenableText(value)) {
-    return value
-  }
-  if (value instanceof Error) {
-    return value.message
-  }
-  if (
-    value !== null &&
-    typeof value === 'object' &&
-    'Error' in value &&
-    typeof value.Error === 'function'
-  ) {
-    return value.Error() as MaybeText
-  }
-  if (value === null) {
-    return '<nil>'
-  }
-  return String(value)
-}
-
-// joinMaybeText joins rendered operands, returning a Promise only when one of
-// them is still resolving.
-function joinMaybeText(parts: MaybeText[], separator: string): MaybeText {
-  if (parts.some(isThenableText)) {
-    return Promise.all(parts.map((part) => Promise.resolve(part))).then(
-      (resolved) => resolved.join(separator),
-    )
-  }
-  return (parts as string[]).join(separator)
 }

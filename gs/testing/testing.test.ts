@@ -196,7 +196,7 @@ describe('testing.T', () => {
     expect(existsSync(second)).toBe(false)
   })
 
-  it('formats common testing printf verbs', async () => {
+  it('formats log operands with fmt', async () => {
     const t = new T('root')
     const messages: string[] = []
     const originalLog = console.log
@@ -205,21 +205,23 @@ describe('testing.T', () => {
     }
     try {
       t.Logf(
-        'quoted=%q value=%#v plus=%+v number=%d string=%s plain=%v',
+        'quoted=%q value=%#v stringer=%v number=%d string=%s plain=%v',
         'key',
         7,
-        { ok: true },
+        { String: () => 'check result' },
         3,
         'ok',
         true,
       )
+      t.Log('joined', 2, { String: () => 'operands' })
       await t.flushLogs()
     } finally {
       console.log = originalLog
     }
 
     expect(messages).toEqual([
-      '    quoted="key" value=7 plus=[object Object] number=3 string=ok plain=true',
+      '    quoted="key" value=7 stringer=check result number=3 string=ok plain=true',
+      '    joined 2 operands',
     ])
   })
 
