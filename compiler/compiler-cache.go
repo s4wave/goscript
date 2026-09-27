@@ -31,7 +31,7 @@ const compilerCacheSchema = "goscript-package-artifact-v2"
 // compilerSemanticsVersion versions emitted-output semantics. Bump this value
 // with every behavior-changing compiler commit so artifacts cached by an
 // older binary miss and rebuild instead of replaying stale bytes.
-const compilerSemanticsVersion = "14"
+const compilerSemanticsVersion = "15"
 
 type compilerCacheEntryKind string
 
@@ -309,7 +309,10 @@ func (o *CompilerCacheOwner) StoreGenerated(
 			compiledPackages: []string{pkg.pkgPath},
 		}
 		for filePath, contents := range files {
-			if !strings.HasPrefix(filePath, prefix) {
+			// A nested package's files share the prefix but belong to its
+			// own entry, keyed by its own sources.
+			name, ok := strings.CutPrefix(filePath, prefix)
+			if !ok || strings.Contains(name, "/") {
 				continue
 			}
 			manifest.files = append(manifest.files, compilerCacheManifestFile{

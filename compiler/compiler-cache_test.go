@@ -175,6 +175,62 @@ func TestCompilePackagesCacheReplaysEquivalentMultiPackageOutput(t *testing.T) {
 	}
 }
 
+func TestCompilePackagesCacheReplaysChangedNestedPackage(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/cachenest\n\ngo 1.25.3\n",
+		"main.go": strings.Join([]string{
+			"package cachenest",
+			"import (",
+			"  \"example.test/cachenest/lib\"",
+			"  \"example.test/cachenest/lib/child\"",
+			")",
+			"const Value = lib.Value + child.Value",
+			"",
+		}, "\n"),
+		"lib/lib.go":         "package lib\nconst Value = 1\n",
+		"lib/child/child.go": "package child\nconst Value = 2\n",
+	})
+	cacheRoot := filepath.Join(t.TempDir(), "cache")
+	compileCacheFixtureConfig(t, Config{AllDependencies: true}, moduleDir, filepath.Join(t.TempDir(), "first"), cacheRoot)
+
+	childFile := filepath.Join(moduleDir, "lib", "child", "child.go")
+	if err := os.WriteFile(childFile, []byte("package child\nconst Value = 3\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	compileCacheFixtureConfig(t, Config{AllDependencies: true}, moduleDir, filepath.Join(t.TempDir(), "second"), cacheRoot)
+	replayOut := filepath.Join(t.TempDir(), "replay")
+	compileCacheFixtureConfig(t, Config{AllDependencies: true}, moduleDir, replayOut, cacheRoot)
+	text := readOutputFile(t, replayOut, "example.test/cachenest/lib/child", "child.gs.ts")
+	if !strings.Contains(text, "Value: number = 3") {
+		t.Fatalf("replay wrote stale nested package output:\n%s", text)
+	}
+
+	err := filepath.WalkDir(cacheRoot, func(path string, entry os.DirEntry, err error) error {
+		if err != nil || entry.IsDir() || entry.Name() != "manifest.json" {
+			return err
+		}
+		data, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		manifest := parseCompilerCacheManifest(data)
+		if manifest.kind != compilerCacheEntryGenerated {
+			return nil
+		}
+		prefix := "@goscript/" + manifest.packagePath + "/"
+		for _, file := range manifest.files {
+			name, ok := strings.CutPrefix(file.path, prefix)
+			if !ok || strings.Contains(name, "/") {
+				t.Errorf("%s entry holds foreign file %s", manifest.packagePath, file.path)
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestCompilePackagesCacheInvalidatesSourceChange(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod":  "module example.test/cacheinvalidate\n\ngo 1.25.3\n",
