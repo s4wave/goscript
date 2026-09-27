@@ -552,6 +552,29 @@ func TestCompilePackagesCacheCorruptionFallsBackToFreshCompile(t *testing.T) {
 	}
 }
 
+// TestCompilePackagesCacheReplayRestoresEditedOutput pins that replay into an
+// existing output tree compares each file with the manifest, so an edited
+// output file is restored from its blob.
+func TestCompilePackagesCacheReplayRestoresEditedOutput(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod":  "module example.test/cacherestore\n\ngo 1.25.3\n",
+		"main.go": "package cacherestore\nconst Value = 1\n",
+	})
+	cacheRoot := filepath.Join(t.TempDir(), "cache")
+	out := filepath.Join(t.TempDir(), "out")
+	compileCacheFixture(t, moduleDir, out, cacheRoot)
+	want := readOutputFile(t, out, "example.test/cacherestore", "main.gs.ts")
+
+	path := filepath.Join(out, "@goscript", "example.test", "cacherestore", "main.gs.ts")
+	if err := os.WriteFile(path, []byte("edited"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	compileCacheFixture(t, moduleDir, out, cacheRoot)
+	if got := readOutputFile(t, out, "example.test/cacherestore", "main.gs.ts"); got != want {
+		t.Fatalf("replayed output = %q, want %q", got, want)
+	}
+}
+
 func TestCompilePackagesCacheInvalidManifestEntriesFallBackToFreshCompile(t *testing.T) {
 	cases := []struct {
 		name   string
