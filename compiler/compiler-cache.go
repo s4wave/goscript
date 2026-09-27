@@ -1026,7 +1026,7 @@ func (o *compilerCacheKeyOwner) goEmbedSideInputs(goFile string, data []byte) []
 	if !bytes.Contains(data, []byte("go:embed")) {
 		return nil
 	}
-	syntax, err := parser.ParseFile(token.NewFileSet(), goFile, data, parser.ParseComments)
+	syntax, err := parser.ParseFile(token.NewFileSet(), goFile, data, parser.ParseComments|parser.SkipObjectResolution)
 	if err != nil {
 		return []string{"go:embed-parse|" + o.keyPath(goFile)}
 	}

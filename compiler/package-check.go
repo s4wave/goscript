@@ -209,7 +209,7 @@ func (c *packageChecker) parse(ctx context.Context, name string) (*ast.File, err
 		parsed.err = err
 		return nil, err
 	}
-	parsed.file, parsed.err = parser.ParseFile(c.fset, name, src, parser.AllErrors|parser.ParseComments)
+	parsed.file, parsed.err = parser.ParseFile(c.fset, name, src, parser.AllErrors|parser.ParseComments|parser.SkipObjectResolution)
 	return parsed.file, parsed.err
 }
 
