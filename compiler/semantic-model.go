@@ -30,8 +30,23 @@ func NewSemanticModelOwner(overrideOwners ...*OverrideRegistryOwner) *SemanticMo
 	return &SemanticModelOwner{overrideOwner: overrideOwner}
 }
 
+// SemanticBuildOptions configures one semantic model build.
+type SemanticBuildOptions struct {
+	// DeferredFunctions names the functions lowered as deferred.
+	DeferredFunctions []string
+	// Summaries holds the stored body summaries of the packages checked
+	// without bodies, by package path.
+	Summaries map[string][]byte
+	// Summarize names the packages whose body summaries the build extracts.
+	Summarize map[string]bool
+}
+
 // Build constructs semantic facts for a package graph.
-func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, deferredFunctions ...string) (*SemanticModel, []Diagnostic) {
+//
+// When a stored body summary does not apply, Build stops after the package
+// shards and lists the package in the model's staleSummaries; the caller
+// checks it with bodies and builds again.
+func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opts SemanticBuildOptions) (*SemanticModel, []Diagnostic) {
 	if err := ctx.Err(); err != nil {
 		return nil, []Diagnostic{{
 			Severity: DiagnosticSeverityError,
@@ -73,14 +88,40 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, def
 
 	// A package's facts depend only on that package, so each package is built
 	// into its own shard concurrently. The shards then merge in graph order.
+	var objects *summaryObjects
+	if len(opts.Summaries) != 0 || len(opts.Summarize) != 0 {
+		objects = newSummaryObjects(graph)
+	}
 	shards := make([]*SemanticModel, len(nodes))
+	summaries := make([][]byte, len(nodes))
+	applied := make([]bool, len(nodes))
 	forEachParallel(len(nodes), func(idx int) {
 		if ctx.Err() == nil {
-			shards[idx] = o.buildPackage(nodes[idx], graph.packagesByPath[nodes[idx].PkgPath], overrideFacts)
+			pkgPath := nodes[idx].PkgPath
+			shards[idx], summaries[idx], applied[idx] = o.buildPackage(
+				nodes[idx],
+				graph.packagesByPath[pkgPath],
+				overrideFacts,
+				objects,
+				opts.Summaries[pkgPath],
+				opts.Summarize[pkgPath],
+			)
 		}
 	})
 	if err := ctx.Err(); err != nil {
 		diagnostics = append(diagnostics, contextCanceledDiagnostic(err))
+		model.freeze()
+		return model, diagnostics
+	}
+	for idx, node := range nodes {
+		if !applied[idx] {
+			model.staleSummaries = append(model.staleSummaries, node.PkgPath)
+		}
+		if summaries[idx] != nil {
+			model.summaries[node.PkgPath] = summaries[idx]
+		}
+	}
+	if len(model.staleSummaries) != 0 {
 		model.freeze()
 		return model, diagnostics
 	}
@@ -93,7 +134,7 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, def
 		return model, diagnostics
 	}
 
-	diagnostics = append(diagnostics, model.deferFunctions(deferredFunctions)...)
+	diagnostics = append(diagnostics, model.deferFunctions(opts.DeferredFunctions)...)
 	if diagnosticsHaveErrors(diagnostics) {
 		model.freeze()
 		return model, diagnostics
@@ -147,17 +188,27 @@ func newSemanticModel() *SemanticModel {
 		generatedImportTypes:     make(map[string]map[types.Type]bool),
 		asyncInterfaceMethods:    make(map[string]bool),
 		asyncInterfaceMethodObjs: make(map[*types.Func]bool),
+		summaries:                make(map[string][]byte),
 	}
 }
 
 // buildPackage collects one package's declarations and syntax facts into a
 // new shard. It reads no other package's facts, so packages build
 // concurrently.
+//
+// A package with a stored body summary was checked without bodies: the shard
+// collects the declaration region and applies the summary. It reports false
+// when the summary does not apply. Otherwise, when summarize is set, it
+// returns the package's body summary, or nil when the package cannot be
+// summarized.
 func (o *SemanticModelOwner) buildPackage(
 	node *PackageGraphNode,
 	pkg *packages.Package,
 	overrideFacts *OverrideFacts,
-) *SemanticModel {
+	objects *summaryObjects,
+	stored []byte,
+	summarize bool,
+) (*SemanticModel, []byte, bool) {
 	shard := newSemanticModel()
 	semPkg := &semanticPackage{
 		pkgPath:          node.PkgPath,
@@ -167,17 +218,59 @@ func (o *SemanticModelOwner) buildPackage(
 		functionDecls:    make(map[*types.Func]*ast.FuncDecl),
 	}
 	shard.packages[node.PkgPath] = semPkg
+	if stored != nil {
+		return shard, nil, o.applyBodySummary(shard, semPkg, pkg, objects, stored)
+	}
+
 	for _, file := range pkg.Syntax {
 		tokenFile := pkg.Fset.File(file.Pos())
 		o.collectFileDeclarations(shard, semPkg, pkg, tokenFile, file)
-		o.collectFacts(shard, semPkg, pkg, tokenFile, file, nil)
+		o.collectFacts(shard, semPkg, pkg, tokenFile, file, nil, nil)
 	}
 	for _, file := range pkg.Syntax {
 		collectFunctionFacts(shard, pkg, file, overrideFacts)
 	}
 	semPkg.lazyVars = lazyPackageVars(semPkg)
 	semPkg.asyncArgumentCalls = collectAsyncArgumentCalls(pkg)
-	return shard
+	if !summarize {
+		return shard, nil, true
+	}
+	summary, ok := summarizeBody(shard, semPkg, objects)
+	if !ok {
+		return shard, nil, true
+	}
+	encoded, ok := summary.encode()
+	if !ok {
+		return shard, nil, true
+	}
+	return shard, encoded, true
+}
+
+// applyBodySummary builds the shard of a package checked without bodies from
+// its declaration region and its stored body summary.
+func (o *SemanticModelOwner) applyBodySummary(
+	shard *SemanticModel,
+	semPkg *semanticPackage,
+	pkg *packages.Package,
+	objects *summaryObjects,
+	stored []byte,
+) bool {
+	summary, ok := decodeBodySummary(stored)
+	if !ok {
+		return false
+	}
+	applier, ok := newBodyApplier(summary, pkg, objects)
+	if !ok {
+		return false
+	}
+	for _, file := range pkg.Syntax {
+		tokenFile := pkg.Fset.File(file.Pos())
+		o.collectFileDeclarations(shard, semPkg, pkg, tokenFile, file)
+		o.collectFacts(shard, semPkg, pkg, tokenFile, file, nil, func(body ast.Node) {
+			applier.addLiterals(o, shard, semPkg, tokenFile, body)
+		})
+	}
+	return applier.apply(shard, semPkg)
 }
 
 // mergePackage adds a shard built by buildPackage to the model. A function
@@ -351,7 +444,9 @@ func (o *SemanticModelOwner) collectGenDecl(
 	}
 }
 
-// collectFacts walks syntax within tokenFile, including nested function literals.
+// collectFacts walks syntax within tokenFile, including nested function
+// literals. A non-nil skipBody receives each function and function literal
+// body instead, for a package checked without bodies.
 func (o *SemanticModelOwner) collectFacts(
 	model *SemanticModel,
 	semPkg *semanticPackage,
@@ -359,8 +454,16 @@ func (o *SemanticModelOwner) collectFacts(
 	tokenFile *token.File,
 	node ast.Node,
 	lit *ast.FuncLit,
+	skipBody func(ast.Node),
 ) {
 	ast.Inspect(node, func(node ast.Node) bool {
+		if skipBody != nil {
+			switch node.(type) {
+			case *ast.BlockStmt, *ast.FuncLit:
+				skipBody(node)
+				return false
+			}
+		}
 		switch typed := node.(type) {
 		case *ast.TypeSpec:
 			o.recordTypeSpec(model, semPkg, pkg, tokenFile, typed)
@@ -384,7 +487,7 @@ func (o *SemanticModelOwner) collectFacts(
 				}
 			}
 		case *ast.FuncLit:
-			o.collectFacts(model, semPkg, pkg, tokenFile, typed.Body, typed)
+			o.collectFacts(model, semPkg, pkg, tokenFile, typed.Body, typed, nil)
 			return false
 		case *ast.CallExpr:
 			o.recordCallSignatureImports(model, semPkg, pkg, tokenFile, typed)
@@ -1208,7 +1311,9 @@ func (o *SemanticModelOwner) resolveInterfaceImplementationGraph(
 	model *SemanticModel,
 	methodSets []semanticImplementationMethodSet,
 ) ([]semanticInterfaceImplementationGraphEntry, []Diagnostic) {
-	interfaces := collectInterfaceImplementationCandidates(model)
+	candidates := newInterfaceCandidates()
+	candidates.collectModel(model)
+	interfaces := candidates.interfaces
 	sortNamedTypes(interfaces)
 
 	methodSetIndexByName := indexImplementationMethodSets(methodSets)
@@ -1320,100 +1425,116 @@ func (o *SemanticModelOwner) resolveImplementationMethodSets(
 	return implementationMethodSets(concretes), nil
 }
 
-func collectInterfaceImplementationCandidates(model *SemanticModel) []*types.Named {
-	if model == nil {
-		return nil
-	}
-	seen := make(map[string]bool)
-	var interfaces []*types.Named
-	add := func(named *types.Named) {
-		if named == nil || named.Obj() == nil || named.Obj().Pkg() == nil {
-			return
-		}
-		named = namedOriginOrSelf(named)
-		if _, ok := types.Unalias(named.Underlying()).(*types.Interface); !ok {
-			return
-		}
-		key := named.Obj().Pkg().Path() + "." + named.Obj().Name()
-		if seen[key] {
-			return
-		}
-		seen[key] = true
-		interfaces = append(interfaces, named)
-	}
-	var collect func(types.Type)
-	seenTypes := make(map[types.Type]bool)
-	collect = func(typ types.Type) {
-		if typ == nil {
-			return
-		}
-		typ = types.Unalias(typ)
-		if seenTypes[typ] {
-			return
-		}
-		seenTypes[typ] = true
-		switch typed := typ.(type) {
-		case *types.Named:
-			add(typed)
-			collect(typed.Underlying())
-		case *types.Pointer:
-			collect(typed.Elem())
-		case *types.Slice:
-			collect(typed.Elem())
-		case *types.Array:
-			collect(typed.Elem())
-		case *types.Map:
-			collect(typed.Key())
-			collect(typed.Elem())
-		case *types.Chan:
-			collect(typed.Elem())
-		case *types.Struct:
-			for field := range typed.Fields() {
-				collect(field.Type())
-			}
-		case *types.Interface:
-			typed.Complete()
-			for method := range typed.Methods() {
-				collect(method.Type())
-			}
-		case *types.Signature:
-			if typed.Recv() != nil {
-				collect(typed.Recv().Type())
-			}
-			collectTuple(collect, typed.Params())
-			collectTuple(collect, typed.Results())
-		}
-	}
-	for _, semType := range model.types {
-		collect(semType.named)
-		for _, field := range semType.fields {
-			collect(field.typ)
-		}
-	}
-	for _, semFn := range model.functions {
-		collect(semFn.signature)
-	}
-	for _, semValue := range model.values {
-		collect(semValue.typ)
-	}
-	for _, semPkg := range model.packages {
-		for _, assertion := range semPkg.typeAssertions {
-			collect(assertion.source)
-			collect(assertion.target)
-		}
-		for _, fact := range semPkg.nilFacts {
-			collect(fact.typ)
-		}
-	}
-	return interfaces
+// interfaceCandidates collects the named interfaces reachable from a
+// model's types, signatures, values and type facts.
+type interfaceCandidates struct {
+	seen       map[string]bool
+	seenTypes  map[types.Type]bool
+	interfaces []*types.Named
 }
 
-func collectTuple(collect func(types.Type), tuple *types.Tuple) {
+func newInterfaceCandidates() *interfaceCandidates {
+	return &interfaceCandidates{
+		seen:      make(map[string]bool),
+		seenTypes: make(map[types.Type]bool),
+	}
+}
+
+// add records named's origin when it is a package-level interface.
+func (c *interfaceCandidates) add(named *types.Named) {
+	if named == nil || named.Obj() == nil || named.Obj().Pkg() == nil {
+		return
+	}
+	named = namedOriginOrSelf(named)
+	if _, ok := types.Unalias(named.Underlying()).(*types.Interface); !ok {
+		return
+	}
+	key := named.Obj().Pkg().Path() + "." + named.Obj().Name()
+	if c.seen[key] {
+		return
+	}
+	c.seen[key] = true
+	c.interfaces = append(c.interfaces, named)
+}
+
+// collect records the named interfaces typ reaches.
+func (c *interfaceCandidates) collect(typ types.Type) {
+	if typ == nil {
+		return
+	}
+	typ = types.Unalias(typ)
+	if c.seenTypes[typ] {
+		return
+	}
+	c.seenTypes[typ] = true
+	switch typed := typ.(type) {
+	case *types.Named:
+		c.add(typed)
+		c.collect(typed.Underlying())
+	case *types.Pointer:
+		c.collect(typed.Elem())
+	case *types.Slice:
+		c.collect(typed.Elem())
+	case *types.Array:
+		c.collect(typed.Elem())
+	case *types.Map:
+		c.collect(typed.Key())
+		c.collect(typed.Elem())
+	case *types.Chan:
+		c.collect(typed.Elem())
+	case *types.Struct:
+		for field := range typed.Fields() {
+			c.collect(field.Type())
+		}
+	case *types.Interface:
+		typed.Complete()
+		for method := range typed.Methods() {
+			c.collect(method.Type())
+		}
+	case *types.Signature:
+		if typed.Recv() != nil {
+			c.collect(typed.Recv().Type())
+		}
+		c.collectTuple(typed.Params())
+		c.collectTuple(typed.Results())
+	}
+}
+
+func (c *interfaceCandidates) collectTuple(tuple *types.Tuple) {
 	if tuple == nil {
 		return
 	}
 	for v := range tuple.Variables() {
-		collect(v.Type())
+		c.collect(v.Type())
+	}
+}
+
+// collectModel records the interfaces model reaches, including those a
+// package's body summary names.
+func (c *interfaceCandidates) collectModel(model *SemanticModel) {
+	for _, semType := range model.types {
+		c.collect(semType.named)
+		for _, field := range semType.fields {
+			c.collect(field.typ)
+		}
+	}
+	for _, semFn := range model.functions {
+		c.collect(semFn.signature)
+	}
+	for _, semValue := range model.values {
+		c.collect(semValue.typ)
+	}
+	for _, semPkg := range model.packages {
+		for _, assertion := range semPkg.typeAssertions {
+			c.collect(assertion.source)
+			c.collect(assertion.target)
+		}
+		for _, fact := range semPkg.nilFacts {
+			c.collect(fact.typ)
+		}
+		for _, named := range semPkg.bodyInterfaces {
+			c.add(named)
+		}
 	}
 }
 

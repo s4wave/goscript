@@ -158,7 +158,7 @@ func newLoweringBenchFixture(tb testing.TB) *loweringBenchFixture {
 	if diagnosticsHaveErrors(graphDiagnostics) {
 		tb.Fatal(graphDiagnostics)
 	}
-	model, semanticDiagnostics := service.SemanticModelOwner().Build(context.Background(), graph)
+	model, semanticDiagnostics := service.SemanticModelOwner().Build(context.Background(), graph, SemanticBuildOptions{})
 	if diagnosticsHaveErrors(semanticDiagnostics) {
 		tb.Fatal(semanticDiagnostics)
 	}

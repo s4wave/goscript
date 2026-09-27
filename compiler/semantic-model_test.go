@@ -682,7 +682,7 @@ func TestSemanticModelMarksInterfaceMethodCallAsync(t *testing.T) {
 func buildSemanticModel(t *testing.T, graph *PackageGraph) *SemanticModel {
 	t.Helper()
 
-	model, diagnostics := NewSemanticModelOwner(NewOverrideRegistryOwner()).Build(context.Background(), graph)
+	model, diagnostics := NewSemanticModelOwner(NewOverrideRegistryOwner()).Build(context.Background(), graph, SemanticBuildOptions{})
 	if diagnosticsHaveErrors(diagnostics) {
 		t.Fatalf("semantic model build failed: %#v", diagnostics)
 	}

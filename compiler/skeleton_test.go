@@ -6217,7 +6217,7 @@ func TestTypeScriptEmitOwnerEmitsToMemoryOnDiskPath(t *testing.T) {
 	if diagnosticsHaveErrors(diagnostics) {
 		t.Fatalf("graph diagnostics: %#v", diagnostics)
 	}
-	model, diagnostics := service.SemanticModelOwner().Build(context.Background(), graph)
+	model, diagnostics := service.SemanticModelOwner().Build(context.Background(), graph, SemanticBuildOptions{})
 	if diagnosticsHaveErrors(diagnostics) {
 		t.Fatalf("semantic diagnostics: %#v", diagnostics)
 	}

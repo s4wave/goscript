@@ -24,7 +24,7 @@ func CompileSourceToTypeScript(source string, packageName string) (string, error
 
 	ctx := context.Background()
 	service := NewCompileService()
-	model, modelDiagnostics := service.semanticOwner.Build(ctx, graph)
+	model, modelDiagnostics := service.semanticOwner.Build(ctx, graph, SemanticBuildOptions{})
 	diagnostics = append(diagnostics, modelDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
 		return "", NewCompileError(diagnostics)

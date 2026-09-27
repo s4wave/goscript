@@ -31,7 +31,7 @@ const compilerCacheSchema = "goscript-package-artifact-v2"
 // compilerSemanticsVersion versions emitted-output semantics. Bump this value
 // with every behavior-changing compiler commit so artifacts cached by an
 // older binary miss and rebuild instead of replaying stale bytes.
-const compilerSemanticsVersion = "15"
+const compilerSemanticsVersion = "16"
 
 type compilerCacheEntryKind string
 
@@ -39,6 +39,7 @@ const (
 	compilerCacheEntryGenerated compilerCacheEntryKind = "generated"
 	compilerCacheEntryCopied    compilerCacheEntryKind = "copied"
 	compilerCacheEntryProgram   compilerCacheEntryKind = "program"
+	compilerCacheEntrySummary   compilerCacheEntryKind = "summary"
 )
 
 // errCompilerCacheMiss stops a program replay at its first missing artifact.
@@ -46,12 +47,13 @@ var errCompilerCacheMiss = errors.New("compiler cache miss")
 
 // CompilerCacheOwner owns persistent compiler artifact lookup, replay, and store.
 //
-// Entries come in three kinds. A source entry is keyed by a package's
+// Entries come in four kinds. A source entry is keyed by a package's
 // transitive sources and the request. An artifact entry adds the semantic facts
 // of the package's import closure to its source key and stores one package's
 // output. A program entry is keyed by every source entry and lists the artifact
 // entries of the last complete compile, so an unchanged program replays before
-// semantic analysis.
+// semantic analysis. A summary entry is keyed by a package's source key and
+// stores its body summary, so the package checks without bodies.
 type CompilerCacheOwner struct{}
 
 type compilerCacheEntry struct {
@@ -273,6 +275,86 @@ func (o *CompilerCacheOwner) StoreProgram(
 	})
 }
 
+// summaryEntry returns the summary entry of a generated source entry.
+func summaryEntry(entry compilerCacheEntry) compilerCacheEntry {
+	var b strings.Builder
+	writeKeyField(&b, "schema", compilerCacheSchema)
+	writeKeyField(&b, "kind", string(compilerCacheEntrySummary))
+	writeKeyField(&b, "source-key", entry.key)
+	return compilerCacheEntry{
+		key:         sha256String(b.String()),
+		kind:        compilerCacheEntrySummary,
+		packagePath: entry.packagePath,
+	}
+}
+
+// Summaries reads the stored body summaries of the generated packages, by
+// package path.
+func (o *CompilerCacheOwner) Summaries(req *CompileRequest, sources compilerCacheSources) map[string][]byte {
+	summaries := make(map[string][]byte)
+	if !o.Enabled(req) {
+		return summaries
+	}
+	var mtx sync.Mutex
+	var group errgroup.Group
+	group.SetLimit(runtime.GOMAXPROCS(0))
+	for _, entry := range sources.packages {
+		if entry.kind != compilerCacheEntryGenerated {
+			continue
+		}
+		group.Go(func() error {
+			entry := summaryEntry(entry)
+			manifest, ok := o.readManifest(req, entry)
+			if !ok || manifest.kind != entry.kind || manifest.packagePath != entry.packagePath || len(manifest.files) != 1 {
+				return nil
+			}
+			data, ok := o.readBlob(req, manifest.files[0])
+			if !ok {
+				return nil
+			}
+			mtx.Lock()
+			summaries[entry.packagePath] = data
+			mtx.Unlock()
+			return nil
+		})
+	}
+	// Workers report misses by leaving no summary, never through the group.
+	_ = group.Wait()
+	return summaries
+}
+
+// StoreSummaries stores the body summaries a build extracted under their
+// packages' source entries.
+func (o *CompilerCacheOwner) StoreSummaries(
+	req *CompileRequest,
+	sources compilerCacheSources,
+	summaries map[string][]byte,
+) {
+	if !o.Enabled(req) || len(summaries) == 0 {
+		return
+	}
+	for _, entry := range sources.packages {
+		data, ok := summaries[entry.packagePath]
+		if !ok || entry.kind != compilerCacheEntryGenerated {
+			continue
+		}
+		entry := summaryEntry(entry)
+		o.storeManifest(req, compilerCacheManifest{
+			schema:      compilerCacheSchema,
+			key:         entry.key,
+			kind:        compilerCacheEntrySummary,
+			packagePath: entry.packagePath,
+			files: []compilerCacheManifestFile{{
+				path:   "summary",
+				kind:   string(compilerCacheEntrySummary),
+				sha256: sha256Hex(data),
+				size:   uint64(len(data)),
+				blob:   o.storeBlob(req, data),
+			}},
+		})
+	}
+}
+
 // replayEntry writes one package entry's files to the output tree.
 func (o *CompilerCacheOwner) replayEntry(req *CompileRequest, entry compilerCacheEntry) (compilerCacheManifest, bool) {
 	manifest, ok := o.readManifest(req, entry)
@@ -396,16 +478,12 @@ func (o *CompilerCacheOwner) readManifest(req *CompileRequest, entry compilerCac
 func (o *CompilerCacheOwner) replayManifest(req *CompileRequest, manifest compilerCacheManifest) bool {
 	var madeDir string
 	for _, file := range manifest.files {
-		if !safeOutputArtifactPath(file.path) || !safeCacheBlobPath(file.blob) {
+		if !safeOutputArtifactPath(file.path) {
 			return false
 		}
-		blobPath := filepath.Join(o.schemaRoot(req), filepath.FromSlash(file.blob))
-		data, err := os.ReadFile(blobPath)
-		if err != nil || uint64(len(data)) != file.size || sha256Hex(data) != file.sha256 {
+		data, ok := o.readBlob(req, file)
+		if !ok {
 			return false
-		}
-		if info, err := os.Stat(blobPath); err == nil {
-			markCompilerCacheUsed(blobPath, info)
 		}
 		dest := filepath.Join(req.OutputPath, filepath.FromSlash(file.path))
 		if dir := filepath.Dir(dest); dir != madeDir {
@@ -419,6 +497,22 @@ func (o *CompilerCacheOwner) replayManifest(req *CompileRequest, manifest compil
 		}
 	}
 	return true
+}
+
+// readBlob reads and verifies the blob of a manifest file.
+func (o *CompilerCacheOwner) readBlob(req *CompileRequest, file compilerCacheManifestFile) ([]byte, bool) {
+	if !safeCacheBlobPath(file.blob) {
+		return nil, false
+	}
+	blobPath := filepath.Join(o.schemaRoot(req), filepath.FromSlash(file.blob))
+	data, err := os.ReadFile(blobPath)
+	if err != nil || uint64(len(data)) != file.size || sha256Hex(data) != file.sha256 {
+		return nil, false
+	}
+	if info, err := os.Stat(blobPath); err == nil {
+		markCompilerCacheUsed(blobPath, info)
+	}
+	return data, true
 }
 
 // storeManifest writes cache metadata on a best-effort basis. A failed store leaves no entry, and the next compile rebuilds.
