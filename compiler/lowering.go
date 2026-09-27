@@ -4795,8 +4795,7 @@ func (o *LoweringOwner) lowerShortDeclStatementContext(
 	if !ok || assign.Tok != token.DEFINE {
 		return ctx, ctx, nil, false
 	}
-	oldAliases, prelude := o.lowerShortDeclShadowAliases(ctx, assign)
-	newAliases := o.lowerShortDeclNewShadowAliases(ctx, assign)
+	oldAliases, newAliases, prelude := o.lowerShortDeclShadowAliases(ctx, assign)
 	if len(oldAliases) == 0 && len(newAliases) == 0 {
 		return ctx, ctx, nil, false
 	}
@@ -5681,103 +5680,78 @@ func (o *LoweringOwner) lowerTupleReassignmentStmt(
 	return stmts, diagnostics
 }
 
-// lowerShortDeclShadowAliases saves outer values before a short declaration shadows them.
+// lowerShortDeclShadowAliases saves outer values and renames declarations whose
+// initializers would otherwise refer to the new bindings in TypeScript.
 func (o *LoweringOwner) lowerShortDeclShadowAliases(
 	ctx lowerFileContext,
-	stmt ast.Stmt,
-) (map[types.Object]string, []loweredStmt) {
-	assign, ok := stmt.(*ast.AssignStmt)
-	if !ok || assign.Tok != token.DEFINE {
-		return nil, nil
-	}
-	names := make(map[string]bool)
-	for _, expr := range assign.Lhs {
-		ident, ok := expr.(*ast.Ident)
-		if !ok || ident.Name == "_" || ctx.semPkg.source.TypesInfo.Defs[ident] == nil {
-			continue
-		}
-		names[ident.Name] = true
-	}
-	if len(names) == 0 {
-		return nil, nil
-	}
-	aliases := make(map[types.Object]string)
-	var prelude []loweredStmt
-	for _, rhs := range assign.Rhs {
-		walkShortDeclValueUses(ctx.semPkg.source.TypesInfo, rhs, func(ident *ast.Ident, obj types.Object) {
-			if !names[ident.Name] {
-				return
-			}
-			if _, ok := obj.(*types.PkgName); ok {
-				return
-			}
-			if aliases[obj] != "" || objectDeclaredInAssignRHS(obj, assign) {
-				return
-			}
-			alias := ctx.tempName("Shadow")
-			value := o.lowerIdent(ctx, ident, false)
-			aliases[obj] = alias
-			prelude = append(prelude, loweredStmt{text: "let " + alias + " = " + value})
-		})
-	}
-	return aliases, prelude
-}
-
-// lowerShortDeclNewShadowAliases renames declarations that would shadow initializer uses.
-func (o *LoweringOwner) lowerShortDeclNewShadowAliases(
-	ctx lowerFileContext,
 	assign *ast.AssignStmt,
-) map[types.Object]string {
-	type shortDeclDef struct {
-		name string
-		def  types.Object
-	}
-
+) (map[types.Object]string, map[types.Object]string, []loweredStmt) {
+	// Resolve the new bindings once for both old-value and new-name aliases.
 	defsByName := make(map[string]types.Object)
-	var defs []shortDeclDef
+	var defs []types.Object
 	for _, expr := range assign.Lhs {
 		ident, ok := expr.(*ast.Ident)
 		if !ok || ident.Name == "_" {
 			continue
 		}
-		obj := ctx.semPkg.source.TypesInfo.Defs[ident]
-		if obj != nil {
+		if obj := ctx.semPkg.source.TypesInfo.Defs[ident]; obj != nil {
 			defsByName[ident.Name] = obj
-			defs = append(defs, shortDeclDef{name: ident.Name, def: obj})
+			defs = append(defs, obj)
 		}
 	}
-	if len(defsByName) == 0 {
-		return nil
+	if len(defs) == 0 {
+		return nil, nil, nil
 	}
-	aliases := make(map[types.Object]string)
+
+	// Visit each initializer once. Reserve new aliases in encounter order, but
+	// assign their names after all old-value aliases to preserve emitted names.
+	var oldAliases, newAliases map[types.Object]string
+	var newDefs []types.Object
+	var prelude []loweredStmt
+	reserve := func(def types.Object) {
+		if _, exists := newAliases[def]; exists {
+			return
+		}
+		if newAliases == nil {
+			newAliases = make(map[types.Object]string)
+		}
+		newAliases[def] = ""
+		newDefs = append(newDefs, def)
+	}
 	for _, rhs := range assign.Rhs {
 		walkShortDeclValueUses(ctx.semPkg.source.TypesInfo, rhs, func(ident *ast.Ident, used types.Object) {
 			def := defsByName[ident.Name]
-			if def == nil || aliases[def] != "" {
+			if def == nil || objectDeclaredInAssignRHS(used, assign) {
 				return
 			}
-			if used != def && !objectDeclaredInAssignRHS(used, assign) {
-				aliases[def] = ctx.tempName("Shadow")
+			if _, isPackage := used.(*types.PkgName); !isPackage && oldAliases[used] == "" {
+				if oldAliases == nil {
+					oldAliases = make(map[types.Object]string)
+				}
+				alias := ctx.tempName("Shadow")
+				value := o.lowerIdent(ctx, ident, false)
+				oldAliases[used] = alias
+				prelude = append(prelude, loweredStmt{text: "let " + alias + " = " + value})
+			}
+			if used != def {
+				reserve(def)
 			}
 		})
-		for _, entry := range defs {
-			if entry.def == nil || aliases[entry.def] != "" {
-				continue
-			}
-			if o.mapIndexDefaultUsesShortDeclName(ctx, rhs, entry.name) {
-				aliases[entry.def] = ctx.tempName("Shadow")
+		for _, def := range defs {
+			if _, exists := newAliases[def]; !exists && o.mapIndexDefaultUsesShortDeclName(ctx, rhs, def.Name()) {
+				reserve(def)
 			}
 		}
 	}
-	for _, entry := range defs {
-		if entry.def == nil || aliases[entry.def] != "" {
-			continue
-		}
-		if shortDeclDefShadowsOuterName(ctx, entry.name, entry.def) {
-			aliases[entry.def] = ctx.tempName("Shadow")
+	for _, def := range defs {
+		if _, exists := newAliases[def]; !exists && shortDeclDefShadowsOuterName(ctx, def.Name(), def) {
+			reserve(def)
 		}
 	}
-	return aliases
+	for _, def := range newDefs {
+		newAliases[def] = ctx.tempName("Shadow")
+	}
+	return oldAliases, newAliases, prelude
 }
 
 // walkShortDeclValueUses visits initializer uses in source order, excluding type
@@ -6586,8 +6560,7 @@ func (o *LoweringOwner) lowerForStmt(ctx lowerFileContext, stmt *ast.ForStmt) (l
 	loopCtx := ctx
 	var initPrelude []loweredStmt
 	if assign, ok := stmt.Init.(*ast.AssignStmt); ok && assign.Tok == token.DEFINE {
-		oldAliases, prelude := o.lowerShortDeclShadowAliases(ctx, assign)
-		newAliases := o.lowerShortDeclNewShadowAliases(ctx, assign)
+		oldAliases, newAliases, prelude := o.lowerShortDeclShadowAliases(ctx, assign)
 		if len(oldAliases) != 0 || len(newAliases) != 0 {
 			initCtx = ctx.withIdentAliases(oldAliases).withIdentRefAliases(newAliases)
 			loopCtx = ctx.withIdentRefAliases(newAliases)

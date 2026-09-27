@@ -5,7 +5,10 @@ import (
 	"go/parser"
 	"go/token"
 	"go/types"
+	"os"
+	"path/filepath"
 	"slices"
+	"strings"
 	"testing"
 )
 
@@ -46,5 +49,47 @@ func check(value int, record Record, key int) {
 	want := []string{"take", "record", "value", "value", "key", "value", "value", "value", "local"}
 	if !slices.Equal(got, want) {
 		t.Fatalf("initializer uses = %v, want %v", got, want)
+	}
+}
+
+// TestShortDeclShadowAliasOrder keeps old values ahead of new names across
+// multiple initializers, even when their reference order differs from the LHS.
+func TestShortDeclShadowAliasOrder(t *testing.T) {
+	// Both initializers refer to parameters shadowed by the nested declaration.
+	directory := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/shadoworder\n\ngo 1.25.3\n",
+		"main.go": `package shadoworder
+func swap(first, second int) int {
+	{
+		first, second := second, first
+		return first - second
+	}
+}
+`,
+	})
+	output := filepath.Join(t.TempDir(), "output")
+	compiler, err := NewCompiler(&Config{Dir: directory, OutputPath: output}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := compiler.CompilePackages(t.Context(), "."); err != nil {
+		t.Fatal(err)
+	}
+
+	// Temporary numbering is part of the byte-identical output contract.
+	content, err := os.ReadFile(filepath.Join(output, "@goscript", "example.test", "shadoworder", "main.gs.ts"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := strings.Join([]string{
+		"let __goscriptShadow0 = second",
+		"let __goscriptShadow1 = first",
+		"let __goscriptShadow3 = __goscriptShadow0",
+		"let __goscriptShadow2 = __goscriptShadow1",
+		"return __goscriptShadow3 - __goscriptShadow2",
+	}, "\n")
+	text := strings.ReplaceAll(string(content), "\t", "")
+	if !strings.Contains(text, want) {
+		t.Fatalf("shadow declarations changed order:\n%s", content)
 	}
 }
