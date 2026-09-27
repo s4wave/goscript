@@ -62,6 +62,9 @@ type semanticPackage struct {
 	// lazyVars holds the package variables initialized lazily through a
 	// getter.
 	lazyVars map[types.Object]bool
+	// asyncArgumentCalls records the calls whose function arguments can make
+	// the callee async.
+	asyncArgumentCalls []asyncArgumentCall
 	// varRefNames holds the names of the package's values that any package
 	// marks as needing a variable reference.
 	varRefNames map[string]bool

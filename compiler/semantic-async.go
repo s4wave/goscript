@@ -5,8 +5,6 @@ import (
 	"go/ast"
 	"go/token"
 	"go/types"
-	"maps"
-	"slices"
 
 	"golang.org/x/tools/go/packages"
 )
@@ -27,65 +25,57 @@ type interfaceAsyncMark struct {
 	implFn      *semanticFunction
 }
 
-// collectAsyncArgumentCallSites finds the calls whose function arguments can
-// make a callee with a body async. Each package's syntax is walked
-// concurrently; the callees resolve against the model afterwards on one
-// goroutine because resolution fills its memo maps.
-func (o *SemanticModelOwner) collectAsyncArgumentCallSites(
-	ctx context.Context,
-	model *SemanticModel,
-) ([]asyncArgumentCallSite, []Diagnostic) {
-	type call struct {
-		called   *types.Func
-		suspends bool
-		deps     []*types.Func
-	}
-	semPkgs := slices.Collect(maps.Values(model.packages))
-	calls := make([][]call, len(semPkgs))
-	forEachParallel(len(semPkgs), func(idx int) {
-		pkg := semPkgs[idx].source
-		if pkg == nil {
-			return
-		}
-		for _, file := range pkg.Syntax {
-			if ctx.Err() != nil {
-				return
-			}
-			ast.Inspect(file, func(node ast.Node) bool {
-				expr, ok := node.(*ast.CallExpr)
-				if !ok {
-					return true
-				}
-				called := calledFunction(pkg, expr.Fun)
-				if called == nil {
-					return true
-				}
-				signature, _ := called.Type().(*types.Signature)
-				suspends, deps := asyncArgumentFacts(pkg, signature, expr.Args)
-				if suspends || len(deps) != 0 {
-					calls[idx] = append(calls[idx], call{called: called, suspends: suspends, deps: deps})
-				}
-				return true
-			})
-		}
-	})
-	if err := ctx.Err(); err != nil {
-		return nil, []Diagnostic{contextCanceledDiagnostic(err)}
-	}
+// asyncArgumentCall is a call in one package that passes function arguments
+// whose async marks can make the callee async.
+type asyncArgumentCall struct {
+	called   *types.Func
+	suspends bool
+	deps     []*types.Func
+}
 
-	var sites []asyncArgumentCallSite
-	for _, call := range slices.Concat(calls...) {
-		semFn := semanticFunctionFor(model, call.called)
-		if semFn == nil || !semFn.hasBody {
-			continue
-		}
-		sites = append(sites, asyncArgumentCallSite{
-			semFn:    semFn,
-			suspends: call.suspends,
-			deps:     call.deps,
+// collectAsyncArgumentCalls finds the calls in pkg whose function arguments
+// can make the callee async.
+func collectAsyncArgumentCalls(pkg *packages.Package) []asyncArgumentCall {
+	var calls []asyncArgumentCall
+	for _, file := range pkg.Syntax {
+		ast.Inspect(file, func(node ast.Node) bool {
+			expr, ok := node.(*ast.CallExpr)
+			if !ok {
+				return true
+			}
+			called := calledFunction(pkg, expr.Fun)
+			if called == nil {
+				return true
+			}
+			signature, _ := called.Type().(*types.Signature)
+			suspends, deps := asyncArgumentFacts(pkg, signature, expr.Args)
+			if suspends || len(deps) != 0 {
+				calls = append(calls, asyncArgumentCall{called: called, suspends: suspends, deps: deps})
+			}
+			return true
 		})
 	}
-	return sites, nil
+	return calls
+}
+
+// asyncArgumentCallSites resolves every package's async argument calls to the
+// callees with a body.
+func asyncArgumentCallSites(model *SemanticModel) []asyncArgumentCallSite {
+	var sites []asyncArgumentCallSite
+	for _, semPkg := range model.packages {
+		for _, call := range semPkg.asyncArgumentCalls {
+			semFn := semanticFunctionFor(model, call.called)
+			if semFn == nil || !semFn.hasBody {
+				continue
+			}
+			sites = append(sites, asyncArgumentCallSite{
+				semFn:    semFn,
+				suspends: call.suspends,
+				deps:     call.deps,
+			})
+		}
+	}
+	return sites
 }
 
 // asyncArgumentFacts inspects the arguments passed to function-typed

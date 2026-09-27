@@ -99,12 +99,7 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, def
 		return model, diagnostics
 	}
 	model.functionCallers = semanticFunctionCallers(model)
-	asyncArgumentSites, siteDiagnostics := o.collectAsyncArgumentCallSites(ctx, model)
-	diagnostics = append(diagnostics, siteDiagnostics...)
-	if diagnosticsHaveErrors(diagnostics) {
-		model.freeze()
-		return model, diagnostics
-	}
+	asyncArgumentSites := asyncArgumentCallSites(model)
 	methodSets, methodSetDiagnostics := o.resolveImplementationMethodSets(ctx, model)
 	diagnostics = append(diagnostics, methodSetDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
@@ -181,6 +176,7 @@ func (o *SemanticModelOwner) buildPackage(
 		collectFunctionFacts(shard, pkg, file, overrideFacts)
 	}
 	semPkg.lazyVars = lazyPackageVars(semPkg)
+	semPkg.asyncArgumentCalls = collectAsyncArgumentCalls(pkg)
 	return shard
 }
 
