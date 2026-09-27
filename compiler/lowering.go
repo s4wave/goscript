@@ -6744,7 +6744,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		bodyCtx = bodyCtx.withLoopLabel(loopLabel)
 	}
 	if len(aliases) != 0 {
-		bodyCtx = bodyCtx.withIdentAliases(aliases)
+		bodyCtx = bodyCtx.withIdentRefAliases(aliases)
 	}
 
 	keyName := rangeKeyNameFor(ctx, stmt.Key, aliases)

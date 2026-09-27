@@ -1,1 +1,1 @@
-export { holder } from "./range_shadow_rhs.gs.ts"
+export { holder, item } from "./range_shadow_rhs.gs.ts"
