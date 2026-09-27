@@ -95,6 +95,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 	if !slices.Equal(s.overrideOwner.overrideDirs, req.OverrideDirs) {
 		return NewCompileService(req.OverrideDirs...).Compile(ctx, req)
 	}
+	defer s.cacheOwner.Trim(req)
 
 	var programReplayTried bool
 	if s.cacheOwner.Enabled(req) {

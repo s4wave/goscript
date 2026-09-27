@@ -250,7 +250,8 @@ func (o *CompilerCacheOwner) ReplayGenerated(
 			return nil
 		})
 	}
-	group.Wait()
+	// Workers report misses through replayed, never through the group.
+	_ = group.Wait()
 	return replayed
 }
 
@@ -383,6 +384,9 @@ func (o *CompilerCacheOwner) readManifest(req *CompileRequest, entry compilerCac
 	if len(manifest.files) == 0 && len(manifest.artifacts) == 0 {
 		return compilerCacheManifest{}, false
 	}
+	if info, err := os.Stat(path); err == nil {
+		markCompilerCacheUsed(path, info)
+	}
 	return manifest, true
 }
 
@@ -396,6 +400,9 @@ func (o *CompilerCacheOwner) replayManifest(req *CompileRequest, manifest compil
 		data, err := os.ReadFile(blobPath)
 		if err != nil || uint64(len(data)) != file.size || sha256Hex(data) != file.sha256 {
 			return false
+		}
+		if info, err := os.Stat(blobPath); err == nil {
+			markCompilerCacheUsed(blobPath, info)
 		}
 		dest := filepath.Join(req.OutputPath, filepath.FromSlash(file.path))
 		if dir := filepath.Dir(dest); dir != madeDir {
@@ -424,7 +431,7 @@ func (o *CompilerCacheOwner) storeManifest(req *CompileRequest, manifest compile
 	if err != nil {
 		return
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	data := formatCompilerCacheManifest(manifest)
 	if err := os.WriteFile(filepath.Join(tmpDir, "manifest.json"), data, 0o644); err != nil {
@@ -438,8 +445,9 @@ func (o *CompilerCacheOwner) storeManifest(req *CompileRequest, manifest compile
 		return
 	}
 	if err := os.Rename(tmpDir, entryDir); err != nil {
-		if _, statErr := os.Stat(filepath.Join(entryDir, "complete")); statErr == nil {
-			return
+		manifestPath := filepath.Join(entryDir, "manifest.json")
+		if info, statErr := os.Stat(manifestPath); statErr == nil {
+			markCompilerCacheUsed(manifestPath, info)
 		}
 	}
 }
@@ -449,7 +457,8 @@ func (o *CompilerCacheOwner) storeBlob(req *CompileRequest, data []byte) string 
 	digest := sha256Hex(data)
 	rel := path.Join("blobs", "sha256", digest[:2], digest)
 	blobPath := filepath.Join(o.schemaRoot(req), filepath.FromSlash(rel))
-	if _, err := os.Stat(blobPath); err == nil {
+	if info, err := os.Stat(blobPath); err == nil {
+		markCompilerCacheUsed(blobPath, info)
 		return rel
 	}
 	if err := os.MkdirAll(filepath.Dir(blobPath), 0o755); err != nil {
@@ -463,11 +472,11 @@ func (o *CompilerCacheOwner) storeBlob(req *CompileRequest, data []byte) string 
 	written, writeErr := tmp.Write(data)
 	closeErr := tmp.Close()
 	if writeErr != nil || closeErr != nil || written != len(data) {
-		os.Remove(tmpName)
+		_ = os.Remove(tmpName)
 		return rel
 	}
 	if err := os.Rename(tmpName, blobPath); err != nil {
-		os.Remove(tmpName)
+		_ = os.Remove(tmpName)
 	}
 	return rel
 }
