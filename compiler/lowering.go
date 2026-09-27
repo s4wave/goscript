@@ -721,6 +721,7 @@ func (c *runtimeMethodSetCache) methodsFor(named *types.Named) []types.Object {
 	return methods
 }
 
+// analyzeLocalFileReferences collects local aliases and implicit type and runtime imports.
 func (o *LoweringOwner) analyzeLocalFileReferences(
 	semPkg *semanticPackage,
 	file *ast.File,
@@ -828,6 +829,10 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 		}
 	}
 	addTypeDeps = func(typ types.Type) {
+		// Basic types cannot introduce imports or refer to another type.
+		if _, ok := typ.(*types.Basic); ok {
+			return
+		}
 		if typ == nil || seenTypes[typ] {
 			return
 		}
@@ -909,7 +914,9 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 		}
 	}
 	addRuntimeTypeDeps = func(typ types.Type) {
-		if typ == nil {
+		// Unnamed basic and function types have no runtime type owner.
+		switch typ.(type) {
+		case nil, *types.Basic, *types.Signature:
 			return
 		}
 		if seenRuntimeTypes[typ] {
@@ -1003,7 +1010,8 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 				addRuntimeTypeDeps(semPkg.source.TypesInfo.TypeOf(typed.Type))
 			}
 		case *ast.Ident:
-			if obj := semPkg.source.TypesInfo.Defs[typed]; obj != nil {
+			obj := semPkg.source.TypesInfo.Defs[typed]
+			if obj != nil {
 				if _, ok := obj.(*types.PkgName); !ok {
 					name := safeIdentifier(obj.Name())
 					if name != "_" {
@@ -1011,10 +1019,23 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 					}
 				}
 			}
-			if tv, ok := semPkg.source.TypesInfo.Types[typed]; ok && tv.IsValue() {
-				addObject(semPkg.source.TypesInfo.Uses[typed], true)
+
+			// Reuse the maps already read here, preserving TypeOf's precedence:
+			// expression types first, then definitions, then uses. Embedded fields
+			// can have both a definition and a use for the same identifier.
+			if tv, ok := semPkg.source.TypesInfo.Types[typed]; ok {
+				if tv.IsValue() {
+					addObject(semPkg.source.TypesInfo.Uses[typed], true)
+				}
+				addTypeDeps(tv.Type)
+				return true
 			}
-			addTypeDeps(semPkg.source.TypesInfo.TypeOf(typed))
+			if obj == nil {
+				obj = semPkg.source.TypesInfo.Uses[typed]
+			}
+			if obj != nil {
+				addTypeDeps(obj.Type())
+			}
 		case *ast.SelectorExpr:
 			if selection := semPkg.source.TypesInfo.Selections[typed]; selection != nil {
 				switch selection.Kind() {
@@ -1309,7 +1330,10 @@ type lowerFileContext struct {
 	topLevel                      bool
 	protobufTSAdapter             bool
 	trimTypeInfo                  bool
-	displayRoot                   string
+	// noGoto records that an enclosing statement subtree contains no goto,
+	// including inside function literals, so nested lists need no further scan.
+	noGoto      bool
+	displayRoot string
 }
 
 func (ctx lowerFileContext) diagnosticPosition(pos token.Pos) *DiagnosticPosition {
@@ -4423,6 +4447,7 @@ func (o *LoweringOwner) lowerStmtList(ctx lowerFileContext, stmts []ast.Stmt) ([
 	return o.lowerStmtListAfter(ctx, stmts, 0)
 }
 
+// lowerStmtListAfter lowers statements while preserving source gaps and goto scopes.
 func (o *LoweringOwner) lowerStmtListAfter(
 	ctx lowerFileContext,
 	stmts []ast.Stmt,
@@ -4430,7 +4455,8 @@ func (o *LoweringOwner) lowerStmtListAfter(
 ) ([]loweredStmt, []Diagnostic) {
 	lowered := make([]loweredStmt, 0, len(stmts))
 	var diagnostics []Diagnostic
-	hasGoto := stmtListHasGoto(stmts)
+	hasGoto := !ctx.noGoto && stmtListHasGoto(stmts)
+	ctx.noGoto = !hasGoto
 	var gotoSpans map[string]int
 	var gotoLabels map[string]bool
 	var forwardSpans map[string]forwardGotoLabelSpan
@@ -5655,6 +5681,7 @@ func (o *LoweringOwner) lowerTupleReassignmentStmt(
 	return stmts, diagnostics
 }
 
+// lowerShortDeclShadowAliases saves outer values before a short declaration shadows them.
 func (o *LoweringOwner) lowerShortDeclShadowAliases(
 	ctx lowerFileContext,
 	stmt ast.Stmt,
@@ -5677,29 +5704,26 @@ func (o *LoweringOwner) lowerShortDeclShadowAliases(
 	aliases := make(map[types.Object]string)
 	var prelude []loweredStmt
 	for _, rhs := range assign.Rhs {
-		nonValueIdents := shortDeclShadowNonValueIdents(ctx, rhs)
-		ast.Inspect(rhs, func(node ast.Node) bool {
-			ident, ok := node.(*ast.Ident)
-			if !ok || nonValueIdents[ident] || !names[ident.Name] {
-				return true
+		walkShortDeclValueUses(ctx.semPkg.source.TypesInfo, rhs, func(ident *ast.Ident, obj types.Object) {
+			if !names[ident.Name] {
+				return
 			}
-			obj := ctx.semPkg.source.TypesInfo.Uses[ident]
 			if _, ok := obj.(*types.PkgName); ok {
-				return true
+				return
 			}
-			if obj == nil || aliases[obj] != "" || objectDeclaredInAssignRHS(obj, assign) {
-				return true
+			if aliases[obj] != "" || objectDeclaredInAssignRHS(obj, assign) {
+				return
 			}
 			alias := ctx.tempName("Shadow")
 			value := o.lowerIdent(ctx, ident, false)
 			aliases[obj] = alias
 			prelude = append(prelude, loweredStmt{text: "let " + alias + " = " + value})
-			return true
 		})
 	}
 	return aliases, prelude
 }
 
+// lowerShortDeclNewShadowAliases renames declarations that would shadow initializer uses.
 func (o *LoweringOwner) lowerShortDeclNewShadowAliases(
 	ctx lowerFileContext,
 	assign *ast.AssignStmt,
@@ -5727,20 +5751,14 @@ func (o *LoweringOwner) lowerShortDeclNewShadowAliases(
 	}
 	aliases := make(map[types.Object]string)
 	for _, rhs := range assign.Rhs {
-		nonValueIdents := shortDeclShadowNonValueIdents(ctx, rhs)
-		ast.Inspect(rhs, func(node ast.Node) bool {
-			ident, ok := node.(*ast.Ident)
-			if !ok || nonValueIdents[ident] {
-				return true
-			}
+		walkShortDeclValueUses(ctx.semPkg.source.TypesInfo, rhs, func(ident *ast.Ident, used types.Object) {
 			def := defsByName[ident.Name]
 			if def == nil || aliases[def] != "" {
-				return true
+				return
 			}
-			if used := ctx.semPkg.source.TypesInfo.Uses[ident]; used != nil && used != def && !objectDeclaredInAssignRHS(used, assign) {
+			if used != def && !objectDeclaredInAssignRHS(used, assign) {
 				aliases[def] = ctx.tempName("Shadow")
 			}
-			return true
 		})
 		for _, entry := range defs {
 			if entry.def == nil || aliases[entry.def] != "" {
@@ -5762,31 +5780,29 @@ func (o *LoweringOwner) lowerShortDeclNewShadowAliases(
 	return aliases
 }
 
-func shortDeclShadowNonValueIdents(ctx lowerFileContext, expr ast.Expr) map[*ast.Ident]bool {
-	idents := make(map[*ast.Ident]bool)
-	ast.Inspect(expr, func(node ast.Node) bool {
-		if ident, ok := node.(*ast.Ident); ok {
-			if _, ok := ctx.semPkg.source.TypesInfo.Uses[ident].(*types.TypeName); ok {
-				idents[ident] = true
-			}
-		}
+// walkShortDeclValueUses visits initializer uses in source order, excluding type
+// names, selector names, and bare literal keys from shadow alias analysis.
+func walkShortDeclValueUses(info *types.Info, expr ast.Expr, visit func(*ast.Ident, types.Object)) {
+	var inspect func(ast.Node) bool
+	inspect = func(node ast.Node) bool {
 		switch typed := node.(type) {
-		case *ast.CallExpr:
-			if ident, ok := typed.Fun.(*ast.Ident); ok {
-				if _, ok := ctx.semPkg.source.TypesInfo.Uses[ident].(*types.TypeName); ok {
-					idents[ident] = true
-				}
+		case *ast.Ident:
+			obj := info.Uses[typed]
+			if _, isType := obj.(*types.TypeName); obj != nil && !isType {
+				visit(typed, obj)
 			}
 		case *ast.SelectorExpr:
-			idents[typed.Sel] = true
+			ast.Inspect(typed.X, inspect)
+			return false
 		case *ast.KeyValueExpr:
-			if ident, ok := typed.Key.(*ast.Ident); ok {
-				idents[ident] = true
+			if _, ok := typed.Key.(*ast.Ident); ok {
+				ast.Inspect(typed.Value, inspect)
+				return false
 			}
 		}
 		return true
-	})
-	return idents
+	}
+	ast.Inspect(expr, inspect)
 }
 
 func shortDeclDefShadowsOuterName(ctx lowerFileContext, name string, def types.Object) bool {
@@ -6562,7 +6578,7 @@ func (o *LoweringOwner) recoverReturnStmt(ctx lowerFileContext, signature *types
 func (o *LoweringOwner) lowerForStmt(ctx lowerFileContext, stmt *ast.ForStmt) (loweredStmt, []Diagnostic) {
 	bodyCtx := ctx.withoutRangeLoopBranches().withoutLoopLabel()
 	loopLabel := ""
-	if stmtListNeedsLoopBranchLabel(stmt.Body.List) {
+	if !ctx.noGoto && stmtListNeedsLoopBranchLabel(stmt.Body.List) {
 		loopLabel = ctx.tempName("Loop")
 		bodyCtx = bodyCtx.withLoopLabel(loopLabel)
 	}
@@ -6745,7 +6761,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	aliases := o.lowerRangeDeclShadowAliases(ctx, stmt)
 	bodyCtx := ctx.withoutLoopLabel()
 	loopPrefix := ""
-	if stmtListNeedsLoopBranchLabel(stmt.Body.List) {
+	if !ctx.noGoto && stmtListNeedsLoopBranchLabel(stmt.Body.List) {
 		loopLabel := ctx.tempName("Loop")
 		loopPrefix = loopLabel + ": "
 		bodyCtx = bodyCtx.withLoopLabel(loopLabel)
