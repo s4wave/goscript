@@ -2,6 +2,7 @@ package compiler
 
 import (
 	"context"
+	"maps"
 	"slices"
 )
 
@@ -95,8 +96,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		return NewCompileService(req.OverrideDirs...).Compile(ctx, req)
 	}
 
-	var overrideFacts *OverrideFacts
-	var cacheReplayTried bool
+	var programReplayTried bool
 	if s.cacheOwner.Enabled(req) {
 		graph, graphDiagnostics := s.graphOwner.LoadIdentity(ctx, req)
 		diagnostics = append(diagnostics, graphDiagnostics...)
@@ -108,28 +108,22 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 			return result, NewCompileError(diagnostics)
 		}
 
-		var factsDiagnostics []Diagnostic
-		overrideFacts, factsDiagnostics = s.overrideOwner.Facts(ctx)
-		diagnostics = append(diagnostics, factsDiagnostics...)
-		if diagnosticsHaveErrors(diagnostics) {
-			result.Diagnostics = diagnostics
-			return result, NewCompileError(diagnostics)
-		}
-
-		if compilerCacheFastReplayAllowed(req, graph, overrideFacts) {
+		// The program key covers every input of the override parity check, so a
+		// program stored after a verified compile replays without the full load.
+		if req.DependencyMode == DependencyModeAll {
 			overridePlan, overrideDiagnostics := s.overrideOwner.CopyPlan(ctx, req, graph)
 			diagnostics = append(diagnostics, overrideDiagnostics...)
 			if diagnosticsHaveErrors(diagnostics) {
 				result.Diagnostics = diagnostics
 				return result, NewCompileError(diagnostics)
 			}
-			cacheEntries := s.cacheOwner.Entries(req, graph, overridePlan)
-			if cached, ok := s.cacheOwner.Replay(ctx, req, cacheEntries); ok {
+			sources := s.cacheOwner.Entries(req, graph, overridePlan)
+			if cached, ok := s.cacheOwner.ReplayProgram(ctx, req, sources); ok {
 				cached.OriginalPackages = slices.Clone(result.OriginalPackages)
 				cached.Diagnostics = diagnostics
 				return cached, nil
 			}
-			cacheReplayTried = true
+			programReplayTried = true
 		}
 	}
 
@@ -143,14 +137,11 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		return result, NewCompileError(diagnostics)
 	}
 
-	if overrideFacts == nil {
-		var factsDiagnostics []Diagnostic
-		overrideFacts, factsDiagnostics = s.overrideOwner.Facts(ctx)
-		diagnostics = append(diagnostics, factsDiagnostics...)
-		if diagnosticsHaveErrors(diagnostics) {
-			result.Diagnostics = diagnostics
-			return result, NewCompileError(diagnostics)
-		}
+	overrideFacts, factsDiagnostics := s.overrideOwner.Facts(ctx)
+	diagnostics = append(diagnostics, factsDiagnostics...)
+	if diagnosticsHaveErrors(diagnostics) {
+		result.Diagnostics = diagnostics
+		return result, NewCompileError(diagnostics)
 	}
 	parityDiagnostics := s.parityOwner.Verify(ctx, graph, overrideFacts)
 	diagnostics = append(diagnostics, parityDiagnostics...)
@@ -159,23 +150,18 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		return result, NewCompileError(diagnostics)
 	}
 
-	var cacheEntries []compilerCacheEntry
-	var overridePlan *overrideCopyPlan
-	if s.cacheOwner.Enabled(req) {
-		var overrideDiagnostics []Diagnostic
-		overridePlan, overrideDiagnostics = s.overrideOwner.CopyPlan(ctx, req, graph)
-		diagnostics = append(diagnostics, overrideDiagnostics...)
-		if diagnosticsHaveErrors(diagnostics) {
-			result.Diagnostics = diagnostics
-			return result, NewCompileError(diagnostics)
-		}
-		cacheEntries = s.cacheOwner.Entries(req, graph, overridePlan)
-		if !cacheReplayTried {
-			if cached, ok := s.cacheOwner.Replay(ctx, req, cacheEntries); ok {
-				cached.OriginalPackages = slices.Clone(result.OriginalPackages)
-				cached.Diagnostics = diagnostics
-				return cached, nil
-			}
+	overridePlan, overrideDiagnostics := s.overrideOwner.CopyPlan(ctx, req, graph)
+	diagnostics = append(diagnostics, overrideDiagnostics...)
+	if diagnosticsHaveErrors(diagnostics) {
+		result.Diagnostics = diagnostics
+		return result, NewCompileError(diagnostics)
+	}
+	sources := s.cacheOwner.Entries(req, graph, overridePlan)
+	if !programReplayTried {
+		if cached, ok := s.cacheOwner.ReplayProgram(ctx, req, sources); ok {
+			cached.OriginalPackages = slices.Clone(result.OriginalPackages)
+			cached.Diagnostics = diagnostics
+			return cached, nil
 		}
 	}
 
@@ -186,23 +172,19 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		return result, NewCompileError(diagnostics)
 	}
 
-	if overridePlan == nil {
-		var overrideDiagnostics []Diagnostic
-		overridePlan, overrideDiagnostics = s.overrideOwner.CopyPlan(ctx, req, graph)
-		diagnostics = append(diagnostics, overrideDiagnostics...)
-		if diagnosticsHaveErrors(diagnostics) {
-			result.Diagnostics = diagnostics
-			return result, NewCompileError(diagnostics)
-		}
-	}
-
+	// Packages whose closure sources and closure facts are unchanged replay
+	// from the cache; only the rest are lowered and emitted.
+	trimTypeInfo := !packageGraphContainsPackage(graph, "reflect")
+	artifactEntries := s.cacheOwner.ArtifactEntries(graph, sources, semanticModel, trimTypeInfo)
+	replayed := s.cacheOwner.ReplayGenerated(ctx, req, artifactEntries)
 	loweredProgram, loweringDiagnostics := s.loweringOwner.Build(ctx, semanticModel, LoweringOptions{
 		SourceRoot:                protobufTypeScriptBindingRoot(req.Dir),
 		DisplayRoot:               req.Dir,
 		OutputPath:                req.OutputPath,
 		ProtobufTypeScriptBinding: req.ProtobufTypeScriptBinding,
 		AdditionalBindingRoots:    slices.Clone(req.AdditionalBindingRoots),
-		TrimTypeInfo:              !packageGraphContainsPackage(graph, "reflect"),
+		TrimTypeInfo:              trimTypeInfo,
+		SkipPackages:              replayed,
 	})
 	diagnostics = append(diagnostics, loweringDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
@@ -223,25 +205,20 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		return result, NewCompileError(diagnostics)
 	}
 	result.CompiledPackages = append(result.CompiledPackages, compiledPackages...)
-	s.cacheOwner.StoreGenerated(req, cacheEntries, loweredProgram, files)
+	result.CompiledPackages = slices.AppendSeq(result.CompiledPackages, maps.Keys(replayed))
+	slices.Sort(result.CompiledPackages)
+	s.cacheOwner.StoreGenerated(req, artifactEntries, loweredProgram, files)
 
 	copiedPackages, copyDiagnostics := s.overrideOwner.CopyPackages(ctx, req, overridePlan)
+	result.CopiedPackages = append(result.CopiedPackages, copiedPackages...)
 	diagnostics = append(diagnostics, copyDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
-		result.CopiedPackages = append(result.CopiedPackages, copiedPackages...)
 		result.Diagnostics = diagnostics
 		return result, NewCompileError(diagnostics)
 	}
-	result.CopiedPackages = append(result.CopiedPackages, copiedPackages...)
-	s.cacheOwner.StoreCopied(req, cacheEntries, overridePlan)
+	s.cacheOwner.StoreCopied(req, artifactEntries, overridePlan)
+	s.cacheOwner.StoreProgram(req, sources, artifactEntries)
 
 	result.Diagnostics = diagnostics
 	return result, nil
-}
-
-func compilerCacheFastReplayAllowed(req *CompileRequest, graph *PackageGraph, facts *OverrideFacts) bool {
-	if req == nil || req.DependencyMode != DependencyModeAll {
-		return false
-	}
-	return !overrideParityRequiresTypedGraph(graph, facts)
 }

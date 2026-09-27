@@ -394,38 +394,37 @@ func TestCompilerCacheKeyTracksOverridesAndProtobufOutputRelation(t *testing.T) 
 	}
 }
 
-func TestCompilerCacheFastReplayRequiresTypedGraphForStrictParity(t *testing.T) {
-	graph := &PackageGraph{
-		Nodes: []*PackageGraphNode{{
-			PkgPath:           "example.test/override",
-			OverrideCandidate: true,
-		}},
-	}
-	if overrideParityRequiresTypedGraph(graph, &OverrideFacts{packages: map[string]overridePackageFacts{
-		"example.test/override": {
-			parity: overrideParityLedger{
-				Strict:  true,
-				Symbols: map[string]overrideParityEntry{"Value": {Status: overrideParityStatusReal}},
-			},
-		},
-	}}) {
-		return
-	}
-	t.Fatal("strict override parity did not require a typed graph")
-}
+func TestCompilePackagesCacheReplayRechecksChangedParityLedger(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod":     "module example.test/cacheparity\n\ngo 1.25.3\n",
+		"main.go":    "package main\nimport \"example.test/cacheparity/lib\"\nfunc main() { lib.Present() }\n",
+		"lib/lib.go": "package lib\nfunc Present() {}\n",
+	})
+	overrideDir := filepath.Join(t.TempDir(), "gs")
+	writeFixtureFile(t, overrideDir, "example.test/cacheparity/lib/index.ts", "export function Present(): void {}\n")
+	writeFixtureFile(t, overrideDir, "example.test/cacheparity/lib/parity.json", parityFixtureJSON(t, map[string]overrideParityEntry{
+		"Present": {Status: overrideParityStatusReal},
+	}))
+	config := Config{OverrideDirs: []string{overrideDir}, AllDependencies: true}
+	cacheRoot := filepath.Join(t.TempDir(), "cache")
+	compileCacheFixtureConfig(t, config, moduleDir, filepath.Join(t.TempDir(), "first"), cacheRoot)
 
-func TestCompilerCacheFastReplayAllowsUntypedOverrideMetadata(t *testing.T) {
-	graph := &PackageGraph{
-		Nodes: []*PackageGraphNode{{
-			PkgPath:           "context",
-			OverrideCandidate: true,
-		}},
+	writeFixtureFile(t, overrideDir, "example.test/cacheparity/lib/parity.json", parityFixtureJSON(t, map[string]overrideParityEntry{
+		"Present": {Status: overrideParityStatusReal},
+		"Absent":  {Status: overrideParityStatusReal},
+	}))
+	config.Dir = moduleDir
+	config.OutputPath = filepath.Join(t.TempDir(), "second")
+	config.CacheRoot = cacheRoot
+	comp, err := NewCompiler(&config, nil, nil)
+	if err != nil {
+		t.Fatal(err)
 	}
-	if overrideParityRequiresTypedGraph(graph, &OverrideFacts{packages: map[string]overridePackageFacts{
-		"context": {metadata: newOverrideMetadata()},
-	}}) {
-		t.Fatal("metadata-only override required a typed graph")
+	result, err := comp.CompilePackages(context.Background(), ".")
+	if err == nil {
+		t.Fatal("cache replayed a program whose parity ledger no longer verifies")
 	}
+	requireDiagnosticCode(t, result.Diagnostics, "goscript/overrides:parity-unknown-symbol")
 }
 
 func TestCompilePackagesCacheCorruptionFallsBackToFreshCompile(t *testing.T) {
@@ -629,7 +628,7 @@ func singleNodeCacheGraph(moduleDir, importPath string) *PackageGraph {
 
 func generatedCacheKey(t *testing.T, req *CompileRequest, graph *PackageGraph) string {
 	t.Helper()
-	entries := NewCompilerCacheOwner().Entries(req, graph, nil)
+	entries := NewCompilerCacheOwner().Entries(req, graph, nil).packages
 	if len(entries) == 0 {
 		t.Fatal("no cache entries")
 	}
@@ -638,7 +637,7 @@ func generatedCacheKey(t *testing.T, req *CompileRequest, graph *PackageGraph) s
 
 func copiedCacheKey(t *testing.T, req *CompileRequest, graph *PackageGraph, plan *overrideCopyPlan) string {
 	t.Helper()
-	entries := NewCompilerCacheOwner().Entries(req, graph, plan)
+	entries := NewCompilerCacheOwner().Entries(req, graph, plan).packages
 	for _, entry := range entries {
 		if entry.kind == compilerCacheEntryCopied {
 			return entry.key
@@ -708,6 +707,8 @@ func outputTreeSnapshot(t *testing.T, root string) string {
 	return snapshot.String()
 }
 
+// firstCacheManifestPath returns the first package manifest, skipping program
+// manifests.
 func firstCacheManifestPath(t *testing.T, cacheRoot string) string {
 	t.Helper()
 	var found string
@@ -715,7 +716,14 @@ func firstCacheManifestPath(t *testing.T, cacheRoot string) string {
 		if err != nil || found != "" {
 			return err
 		}
-		if !entry.IsDir() && entry.Name() == "manifest.json" {
+		if entry.IsDir() || entry.Name() != "manifest.json" {
+			return nil
+		}
+		data, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		if parseCompilerCacheManifest(data).kind != compilerCacheEntryProgram {
 			found = path
 		}
 		return nil
@@ -760,4 +768,135 @@ func countCacheManifests(t *testing.T, cacheRoot string) int {
 		t.Fatal(err)
 	}
 	return count
+}
+
+// cacheFactsFixture has a dependency whose lowered output depends on facts its
+// dependent establishes: an async implementation of dep.Runner makes dep.Use
+// async, and taking the address of dep.Var makes it a variable reference.
+// decls completes the dependent package.
+func cacheFactsFixture(decls string) map[string]string {
+	return map[string]string{
+		"go.mod": "module example.test/cachefacts\n\ngo 1.25.3\n",
+		"main.go": "package cachefacts\n\nimport \"example.test/cachefacts/dep\"\n\n" +
+			"type runner struct{}\n\n" + decls,
+		"dep/dep.go": strings.Join([]string{
+			"package dep",
+			"var Var int",
+			"type Runner interface { Run() }",
+			"func Use(r Runner) { r.Run() }",
+			"func Double(x int) int { return x * 2 }",
+			"",
+		}, "\n"),
+	}
+}
+
+const (
+	cacheFactsDecls = "func (runner) Run() {}\n\n" +
+		"func Start() int { dep.Use(runner{}); return dep.Double(1) }\n"
+	cacheFactsBodyEditDecls = "func (runner) Run() {}\n\n" +
+		"func Start() int { dep.Use(runner{}); return dep.Double(2) }\n"
+	cacheFactsAsyncDecls = "func (runner) Run() { ch := make(chan int, 1); ch <- 1; <-ch }\n\n" +
+		"func Start() int { dep.Use(runner{}); return dep.Double(1) }\n"
+	cacheFactsVarRefDecls = "func (runner) Run() {}\n\n" +
+		"func Start() int { dep.Use(runner{}); p := &dep.Var; *p = 1; return dep.Double(1) }\n"
+)
+
+func TestCompilerCacheArtifactKeysFollowClosureFacts(t *testing.T) {
+	const depPath = "example.test/cachefacts/dep"
+	const mainPath = "example.test/cachefacts"
+	moduleDir := writePackageGraphFixture(t, cacheFactsFixture(cacheFactsDecls))
+	keys := func(decls string) map[string]string {
+		t.Helper()
+		writeFixtureFile(t, moduleDir, "main.go", cacheFactsFixture(decls)["main.go"])
+		return cacheFactsArtifactKeys(t, moduleDir)
+	}
+	base := keys(cacheFactsDecls)
+
+	bodyEdit := keys(cacheFactsBodyEditDecls)
+	if bodyEdit[depPath] != base[depPath] {
+		t.Fatal("dependent body edit changed the dependency artifact key")
+	}
+	if bodyEdit[mainPath] == base[mainPath] {
+		t.Fatal("body edit kept the edited package artifact key")
+	}
+	for name, decls := range map[string]string{
+		"async implementation": cacheFactsAsyncDecls,
+		"variable ref":         cacheFactsVarRefDecls,
+	} {
+		if keys(decls)[depPath] == base[depPath] {
+			t.Fatalf("%s in the dependent kept the dependency artifact key", name)
+		}
+	}
+}
+
+// TestCompilePackagesCacheDownwardFactsMatchFreshCompile edits a dependent so
+// that a fact of its dependency changes, then checks the cached compile
+// against an uncached one.
+func TestCompilePackagesCacheDownwardFactsMatchFreshCompile(t *testing.T) {
+	cases := []struct {
+		name  string
+		decls string
+		// depChanges is set when the fact changes the dependency's output.
+		// Interface calls outside a sealed interface are already async, so the
+		// async implementation changes only the dependency's facts.
+		depChanges bool
+	}{
+		{name: "async implementation", decls: cacheFactsAsyncDecls},
+		{name: "variable ref", decls: cacheFactsVarRefDecls, depChanges: true},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			config := Config{AllDependencies: true}
+			moduleDir := writePackageGraphFixture(t, cacheFactsFixture(cacheFactsDecls))
+			cacheRoot := filepath.Join(t.TempDir(), "cache")
+			firstOut := filepath.Join(t.TempDir(), "first")
+			compileCacheFixtureConfig(t, config, moduleDir, firstOut, cacheRoot)
+
+			writeFixtureFile(t, moduleDir, "main.go", cacheFactsFixture(tc.decls)["main.go"])
+			cachedOut := filepath.Join(t.TempDir(), "cached")
+			compileCacheFixtureConfig(t, config, moduleDir, cachedOut, cacheRoot)
+			freshOut := filepath.Join(t.TempDir(), "fresh")
+			compileCacheFixtureConfig(t, config, moduleDir, freshOut, "")
+
+			cached := outputTreeSnapshot(t, cachedOut)
+			if fresh := outputTreeSnapshot(t, freshOut); cached != fresh {
+				t.Fatalf("cached output differs from fresh compile:\ncached:\n%s\nfresh:\n%s", cached, fresh)
+			}
+			depBefore := readOutputFile(t, firstOut, "example.test/cachefacts/dep", "dep.gs.ts")
+			depAfter := readOutputFile(t, cachedOut, "example.test/cachefacts/dep", "dep.gs.ts")
+			if tc.depChanges && depBefore == depAfter {
+				t.Fatalf("fixture edit did not change the dependency output:\n%s", depAfter)
+			}
+		})
+	}
+}
+
+// cacheFactsArtifactKeys loads moduleDir with all dependencies and returns the
+// generated artifact key of each package.
+func cacheFactsArtifactKeys(t *testing.T, moduleDir string) map[string]string {
+	t.Helper()
+	ctx := context.Background()
+	service := NewCompileService()
+	req := service.RequestOwner().NewRequest(Config{
+		Dir:             moduleDir,
+		OutputPath:      t.TempDir(),
+		CacheRoot:       t.TempDir(),
+		AllDependencies: true,
+	}, []string{"."})
+	graph, diagnostics := service.graphOwner.Load(ctx, req)
+	if diagnosticsHaveErrors(diagnostics) {
+		t.Fatalf("load: %v", diagnostics)
+	}
+	model, diagnostics := service.semanticOwner.Build(ctx, graph)
+	if diagnosticsHaveErrors(diagnostics) {
+		t.Fatalf("semantic model: %v", diagnostics)
+	}
+	sources := service.cacheOwner.Entries(req, graph, nil)
+	keys := make(map[string]string)
+	for _, entry := range service.cacheOwner.ArtifactEntries(graph, sources, model, true) {
+		if entry.kind == compilerCacheEntryGenerated {
+			keys[entry.packagePath] = entry.key
+		}
+	}
+	return keys
 }
