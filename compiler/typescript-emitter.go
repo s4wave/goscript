@@ -3,11 +3,15 @@ package compiler
 import (
 	"context"
 	"io"
+	"maps"
 	"os"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strconv"
 	"strings"
+
+	"golang.org/x/sync/errgroup"
 )
 
 // TypeScriptEmitOwner owns deterministic TypeScript file emission.
@@ -103,12 +107,12 @@ func (o *TypeScriptEmitOwner) WriteFiles(
 		for _, file := range pkg.files {
 			filePath := "@goscript/" + pkg.pkgPath + "/" + file.outputName
 			path := filepath.Join(req.OutputPath, filepath.FromSlash(filePath))
-			if err := writeFileString(path, files[filePath], 0o644); err != nil {
+			if err := writeOutputFile(path, files[filePath]); err != nil {
 				diagnostics = append(diagnostics, emitError("write TypeScript file", path, err))
 			}
 		}
 		indexPath := "@goscript/" + pkg.pkgPath + "/index.ts"
-		if err := writeFileString(filepath.Join(pkgDir, "index.ts"), files[indexPath], 0o644); err != nil {
+		if err := writeOutputFile(filepath.Join(pkgDir, "index.ts"), files[indexPath]); err != nil {
 			diagnostics = append(diagnostics, emitError("write package index", pkg.pkgPath, err))
 			continue
 		}
@@ -117,9 +121,14 @@ func (o *TypeScriptEmitOwner) WriteFiles(
 	return compiled, diagnostics
 }
 
-// writeFileString replaces a file and reports write, truncation, or close failures.
-func writeFileString(path string, contents string, perm os.FileMode) error {
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
+// writeOutputFile replaces an output file and reports write, truncation, or
+// close failures. A file that already holds contents is left untouched, so an
+// unchanged output keeps its modification time.
+func writeOutputFile(path string, contents string) error {
+	if existing, err := os.ReadFile(path); err == nil && string(existing) == contents {
+		return nil
+	}
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
 	if err != nil {
 		return err
 	}
@@ -149,15 +158,32 @@ func (o *TypeScriptEmitOwner) EmitToMemory(
 			Message:  "TypeScript emission requires a lowered program",
 		}}
 	}
+	// Packages render independently, so each worker fills its own map and the
+	// maps merge once rendering ends.
+	rendered := make([]map[string]string, len(program.packages))
+	group, groupCtx := errgroup.WithContext(ctx)
+	group.SetLimit(runtime.GOMAXPROCS(0))
+	for idx, pkg := range program.packages {
+		group.Go(func() error {
+			if err := groupCtx.Err(); err != nil {
+				return err
+			}
+			pkgFiles := make(map[string]string, len(pkg.files)+1)
+			for _, file := range pkg.files {
+				pkgFiles["@goscript/"+pkg.pkgPath+"/"+file.outputName] = o.renderLoweredFile(pkg, file, program.trimTypeInfo)
+			}
+			pkgFiles["@goscript/"+pkg.pkgPath+"/index.ts"] = renderIndex(pkg)
+			rendered[idx] = pkgFiles
+			return nil
+		})
+	}
+	if err := group.Wait(); err != nil {
+		return nil, []Diagnostic{contextCanceledDiagnostic(err)}
+	}
+
 	files := make(map[string]string)
-	for _, pkg := range program.packages {
-		if err := ctx.Err(); err != nil {
-			return files, []Diagnostic{contextCanceledDiagnostic(err)}
-		}
-		for _, file := range pkg.files {
-			files["@goscript/"+pkg.pkgPath+"/"+file.outputName] = o.renderLoweredFile(pkg, file, program.trimTypeInfo)
-		}
-		files["@goscript/"+pkg.pkgPath+"/index.ts"] = renderIndex(pkg)
+	for _, pkgFiles := range rendered {
+		maps.Copy(files, pkgFiles)
 	}
 	return files, nil
 }

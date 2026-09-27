@@ -17,12 +17,14 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 
 	jsoniter "github.com/aperturerobotics/json-iterator-lite"
+	"golang.org/x/sync/errgroup"
 )
 
 // compilerCacheSchema identifies the on-disk artifact entry format.
-const compilerCacheSchema = "goscript-package-artifact-v1"
+const compilerCacheSchema = "goscript-package-artifact-v2"
 
 // compilerSemanticsVersion versions emitted-output semantics. Bump this value
 // with every behavior-changing compiler commit so artifacts cached by an
@@ -34,9 +36,20 @@ type compilerCacheEntryKind string
 const (
 	compilerCacheEntryGenerated compilerCacheEntryKind = "generated"
 	compilerCacheEntryCopied    compilerCacheEntryKind = "copied"
+	compilerCacheEntryProgram   compilerCacheEntryKind = "program"
 )
 
+// errCompilerCacheMiss stops a program replay at its first missing artifact.
+var errCompilerCacheMiss = errors.New("compiler cache miss")
+
 // CompilerCacheOwner owns persistent compiler artifact lookup, replay, and store.
+//
+// Entries come in three kinds. A source entry is keyed by a package's
+// transitive sources and the request. An artifact entry adds the semantic facts
+// of the package's import closure to its source key and stores one package's
+// output. A program entry is keyed by every source entry and lists the artifact
+// entries of the last complete compile, so an unchanged program replays before
+// semantic analysis.
 type CompilerCacheOwner struct{}
 
 type compilerCacheEntry struct {
@@ -53,6 +66,8 @@ type compilerCacheManifest struct {
 	compiledPackages []string
 	copiedPackages   []string
 	files            []compilerCacheManifestFile
+	// artifacts lists the artifact entries of a program manifest.
+	artifacts []compilerCacheEntry
 }
 
 type compilerCacheManifestFile struct {
@@ -72,22 +87,37 @@ func (o *CompilerCacheOwner) Enabled(req *CompileRequest) bool {
 	return req != nil && strings.TrimSpace(req.CacheRoot) != ""
 }
 
+// compilerCacheSources identifies a compile by its sources: one entry per
+// generated or copied package, and the program entry over all of them.
+type compilerCacheSources struct {
+	program  compilerCacheEntry
+	packages []compilerCacheEntry
+}
+
+// Entries returns the source entries of a package graph and its override copy
+// plan.
 func (o *CompilerCacheOwner) Entries(
 	req *CompileRequest,
 	graph *PackageGraph,
 	overridePlan *overrideCopyPlan,
-) []compilerCacheEntry {
+) compilerCacheSources {
 	if !o.Enabled(req) || graph == nil {
-		return nil
+		return compilerCacheSources{}
 	}
 
 	keyOwner := newCompilerCacheKeyOwner(req, graph)
-	entries := make([]compilerCacheEntry, 0, len(graph.Nodes))
+	var sources compilerCacheSources
+	var program strings.Builder
+	writeKeyField(&program, "schema", compilerCacheSchema)
+	writeKeyField(&program, "kind", string(compilerCacheEntryProgram))
 	for _, node := range graph.Nodes {
+		// Override candidates emit no package, but the override parity check
+		// reads their types, so their sources identify the program.
 		if node.OverrideCandidate {
+			writeKeyField(&program, "override-candidate|"+node.PkgPath, keyOwner.nodeDigest(node.PkgPath))
 			continue
 		}
-		entries = append(entries, compilerCacheEntry{
+		sources.packages = append(sources.packages, compilerCacheEntry{
 			key:         keyOwner.generatedKey(node),
 			kind:        compilerCacheEntryGenerated,
 			packagePath: node.PkgPath,
@@ -95,40 +125,163 @@ func (o *CompilerCacheOwner) Entries(
 	}
 	if overridePlan != nil {
 		for _, pkg := range overridePlan.packages {
-			entries = append(entries, compilerCacheEntry{
+			sources.packages = append(sources.packages, compilerCacheEntry{
 				key:         keyOwner.copiedKey(pkg),
 				kind:        compilerCacheEntryCopied,
 				packagePath: pkg.path,
 			})
 		}
 	}
+	for _, entry := range sources.packages {
+		writeKeyField(&program, string(entry.kind)+"|"+entry.packagePath, entry.key)
+	}
+	for _, dir := range req.OverrideDirs {
+		writeKeyField(&program, "override-dir", overrideDirIdentity(dir))
+	}
+	sources.program = compilerCacheEntry{
+		key:  sha256String(program.String()),
+		kind: compilerCacheEntryProgram,
+	}
+	return sources
+}
+
+// ArtifactEntries rekeys the generated source entries by the semantic facts of
+// each package's import closure and the program-wide type info trimming.
+// Copied entries depend on their files alone and keep their keys.
+func (o *CompilerCacheOwner) ArtifactEntries(
+	graph *PackageGraph,
+	sources compilerCacheSources,
+	model *SemanticModel,
+	trimTypeInfo bool,
+) []compilerCacheEntry {
+	if len(sources.packages) == 0 || graph == nil || model == nil {
+		return nil
+	}
+
+	facts := newClosureFactsDigester(graph, model.packageFactDigests())
+	entries := make([]compilerCacheEntry, 0, len(sources.packages))
+	for _, entry := range sources.packages {
+		if entry.kind == compilerCacheEntryGenerated {
+			var b strings.Builder
+			writeKeyField(&b, "schema", compilerCacheSchema)
+			writeKeyField(&b, "kind", "artifact")
+			writeKeyField(&b, "source-key", entry.key)
+			writeKeyField(&b, "closure-facts", facts.digest(entry.packagePath))
+			writeKeyField(&b, "universe-facts", facts.facts[universeFactsPackage])
+			writeKeyField(&b, "trim-type-info", strconv.FormatBool(trimTypeInfo))
+			entry.key = sha256String(b.String())
+		}
+		entries = append(entries, entry)
+	}
 	return entries
 }
 
-func (o *CompilerCacheOwner) Replay(
+// ReplayProgram replays the artifacts of the last complete compile of the
+// program identified by its sources. Any missing artifact fails the whole
+// replay.
+func (o *CompilerCacheOwner) ReplayProgram(
 	ctx context.Context,
 	req *CompileRequest,
-	entries []compilerCacheEntry,
+	sources compilerCacheSources,
 ) (*CompilationResult, bool) {
-	if !o.Enabled(req) || len(entries) == 0 {
+	if !o.Enabled(req) || len(sources.packages) == 0 {
 		return nil, false
 	}
+	manifest, ok := o.readManifest(req, sources.program)
+	if !ok || manifest.kind != compilerCacheEntryProgram {
+		return nil, false
+	}
+
+	replayed := make([]compilerCacheManifest, len(manifest.artifacts))
+	group, groupCtx := errgroup.WithContext(ctx)
+	group.SetLimit(runtime.GOMAXPROCS(0))
+	for idx, artifact := range manifest.artifacts {
+		group.Go(func() error {
+			if err := groupCtx.Err(); err != nil {
+				return err
+			}
+			entryManifest, ok := o.replayEntry(req, artifact)
+			if !ok {
+				return errCompilerCacheMiss
+			}
+			replayed[idx] = entryManifest
+			return nil
+		})
+	}
+	if err := group.Wait(); err != nil {
+		return nil, false
+	}
+
 	result := &CompilationResult{}
-	for _, entry := range entries {
-		if err := ctx.Err(); err != nil {
-			return nil, false
-		}
-		manifest, ok := o.readManifest(req, entry)
-		if !ok || manifest.kind != entry.kind || manifest.packagePath != entry.packagePath {
-			return nil, false
-		}
-		if !o.replayManifest(req, manifest) {
-			return nil, false
-		}
-		result.CompiledPackages = append(result.CompiledPackages, manifest.compiledPackages...)
-		result.CopiedPackages = append(result.CopiedPackages, manifest.copiedPackages...)
+	for _, entryManifest := range replayed {
+		result.CompiledPackages = append(result.CompiledPackages, entryManifest.compiledPackages...)
+		result.CopiedPackages = append(result.CopiedPackages, entryManifest.copiedPackages...)
 	}
 	return result, true
+}
+
+// ReplayGenerated replays every generated artifact entry found in the cache and
+// returns the replayed package paths. Packages that miss must be compiled.
+func (o *CompilerCacheOwner) ReplayGenerated(
+	ctx context.Context,
+	req *CompileRequest,
+	artifactEntries []compilerCacheEntry,
+) map[string]bool {
+	if !o.Enabled(req) {
+		return nil
+	}
+	var mtx sync.Mutex
+	replayed := make(map[string]bool)
+	var group errgroup.Group
+	group.SetLimit(runtime.GOMAXPROCS(0))
+	for _, entry := range artifactEntries {
+		if entry.kind != compilerCacheEntryGenerated {
+			continue
+		}
+		group.Go(func() error {
+			if ctx.Err() != nil {
+				return nil
+			}
+			if _, ok := o.replayEntry(req, entry); ok {
+				mtx.Lock()
+				replayed[entry.packagePath] = true
+				mtx.Unlock()
+			}
+			return nil
+		})
+	}
+	group.Wait()
+	return replayed
+}
+
+// StoreProgram records the artifact entries of a complete compile under the
+// program's sources.
+func (o *CompilerCacheOwner) StoreProgram(
+	req *CompileRequest,
+	sources compilerCacheSources,
+	artifactEntries []compilerCacheEntry,
+) {
+	if !o.Enabled(req) || len(sources.packages) == 0 || len(artifactEntries) == 0 {
+		return
+	}
+	o.storeManifest(req, compilerCacheManifest{
+		schema:    compilerCacheSchema,
+		key:       sources.program.key,
+		kind:      compilerCacheEntryProgram,
+		artifacts: artifactEntries,
+	})
+}
+
+// replayEntry writes one package entry's files to the output tree.
+func (o *CompilerCacheOwner) replayEntry(req *CompileRequest, entry compilerCacheEntry) (compilerCacheManifest, bool) {
+	manifest, ok := o.readManifest(req, entry)
+	if !ok || manifest.kind != entry.kind || manifest.packagePath != entry.packagePath {
+		return compilerCacheManifest{}, false
+	}
+	if !o.replayManifest(req, manifest) {
+		return compilerCacheManifest{}, false
+	}
+	return manifest, true
 }
 
 func (o *CompilerCacheOwner) StoreGenerated(
@@ -212,6 +365,9 @@ func (o *CompilerCacheOwner) StoreCopied(
 }
 
 func (o *CompilerCacheOwner) readManifest(req *CompileRequest, entry compilerCacheEntry) (compilerCacheManifest, bool) {
+	if len(entry.key) != sha256.Size*2 {
+		return compilerCacheManifest{}, false
+	}
 	path := filepath.Join(o.entryDir(req, entry.key), "manifest.json")
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -224,13 +380,14 @@ func (o *CompilerCacheOwner) readManifest(req *CompileRequest, entry compilerCac
 	if manifest.schema != compilerCacheSchema || manifest.key != entry.key {
 		return compilerCacheManifest{}, false
 	}
-	if len(manifest.files) == 0 {
+	if len(manifest.files) == 0 && len(manifest.artifacts) == 0 {
 		return compilerCacheManifest{}, false
 	}
 	return manifest, true
 }
 
 func (o *CompilerCacheOwner) replayManifest(req *CompileRequest, manifest compilerCacheManifest) bool {
+	var madeDir string
 	for _, file := range manifest.files {
 		if !safeOutputArtifactPath(file.path) || !safeCacheBlobPath(file.blob) {
 			return false
@@ -241,7 +398,13 @@ func (o *CompilerCacheOwner) replayManifest(req *CompileRequest, manifest compil
 			return false
 		}
 		dest := filepath.Join(req.OutputPath, filepath.FromSlash(file.path))
-		if err := writeFileAtomic(dest, data, 0o644); err != nil {
+		if dir := filepath.Dir(dest); dir != madeDir {
+			if err := os.MkdirAll(dir, 0o755); err != nil {
+				return false
+			}
+			madeDir = dir
+		}
+		if err := writeOutputFile(dest, string(data)); err != nil {
 			return false
 		}
 	}
@@ -250,7 +413,7 @@ func (o *CompilerCacheOwner) replayManifest(req *CompileRequest, manifest compil
 
 // storeManifest writes cache metadata on a best-effort basis. A failed store leaves no entry, and the next compile rebuilds.
 func (o *CompilerCacheOwner) storeManifest(req *CompileRequest, manifest compilerCacheManifest) {
-	if len(manifest.files) == 0 {
+	if len(manifest.files) == 0 && len(manifest.artifacts) == 0 {
 		return
 	}
 	tmpRoot := filepath.Join(o.schemaRoot(req), "tmp")
@@ -327,18 +490,78 @@ func entriesByKindAndPackage(entries []compilerCacheEntry, kind compilerCacheEnt
 	return out
 }
 
+// closureFactsDigester combines the fact digests of each package's import
+// closure.
+type closureFactsDigester struct {
+	graph   *PackageGraph
+	facts   map[string]string
+	digests map[string]string
+}
+
+func newClosureFactsDigester(graph *PackageGraph, facts map[string]string) *closureFactsDigester {
+	return &closureFactsDigester{
+		graph:   graph,
+		facts:   facts,
+		digests: make(map[string]string),
+	}
+}
+
+// digest returns the facts digest of pkgPath and its transitive imports.
+func (d *closureFactsDigester) digest(pkgPath string) string {
+	if digest, ok := d.digests[pkgPath]; ok {
+		return digest
+	}
+	var b strings.Builder
+	writeKeyField(&b, "facts", d.facts[pkgPath])
+	if node := d.graph.NodesByPackagePath[pkgPath]; node != nil {
+		for _, importPath := range node.Imports {
+			writeKeyField(&b, "import", importPath)
+			writeKeyField(&b, "import-facts", d.digest(importPath))
+		}
+	}
+	digest := sha256String(b.String())
+	d.digests[pkgPath] = digest
+	return digest
+}
+
 type compilerCacheKeyOwner struct {
-	req          *CompileRequest
-	graph        *PackageGraph
+	req   *CompileRequest
+	graph *PackageGraph
+	// ownDigests holds the digest of each node's own files and side inputs.
+	ownDigests map[string]string
+	// graphDigests memoizes nodeDigest.
 	graphDigests map[string]string
 }
 
+// newCompilerCacheKeyOwner digests every node's own inputs in parallel. Each
+// module's identity files are read once and shared by its packages.
 func newCompilerCacheKeyOwner(req *CompileRequest, graph *PackageGraph) *compilerCacheKeyOwner {
-	return &compilerCacheKeyOwner{
+	moduleIdentities := make(map[string][]string)
+	for _, node := range graph.Nodes {
+		if _, ok := moduleIdentities[node.ModuleDir]; ok {
+			continue
+		}
+		var identities []string
+		for _, file := range moduleIdentityFiles(node.ModuleDir) {
+			identities = append(identities, fileIdentity(file))
+		}
+		moduleIdentities[node.ModuleDir] = identities
+	}
+
+	ownDigests := make([]string, len(graph.Nodes))
+	forEachParallel(len(graph.Nodes), func(idx int) {
+		ownDigests[idx] = nodeOwnDigest(req, graph.Nodes[idx], moduleIdentities[graph.Nodes[idx].ModuleDir])
+	})
+	owner := &compilerCacheKeyOwner{
 		req:          req,
 		graph:        graph,
-		graphDigests: make(map[string]string),
+		ownDigests:   make(map[string]string, len(graph.Nodes)),
+		graphDigests: make(map[string]string, len(graph.Nodes)),
 	}
+	for idx, node := range graph.Nodes {
+		owner.ownDigests[node.PkgPath] = ownDigests[idx]
+	}
+	return owner
 }
 
 func (o *compilerCacheKeyOwner) generatedKey(node *PackageGraphNode) string {
@@ -365,6 +588,7 @@ func (o *compilerCacheKeyOwner) copiedKey(pkg overrideCopyPackage) string {
 	return sha256String(b.String())
 }
 
+// nodeDigest digests a node's own inputs and those of its transitive imports.
 func (o *compilerCacheKeyOwner) nodeDigest(pkgPath string) string {
 	if digest := o.graphDigests[pkgPath]; digest != "" {
 		return digest
@@ -373,6 +597,22 @@ func (o *compilerCacheKeyOwner) nodeDigest(pkgPath string) string {
 	if node == nil {
 		return ""
 	}
+	var b strings.Builder
+	writeKeyField(&b, "own", o.ownDigests[pkgPath])
+	for _, importPath := range node.Imports {
+		writeKeyField(&b, "import", importPath)
+		if o.graph.NodesByPackagePath[importPath] != nil {
+			writeKeyField(&b, "import-digest", o.nodeDigest(importPath))
+		}
+	}
+	digest := sha256String(b.String())
+	o.graphDigests[pkgPath] = digest
+	return digest
+}
+
+// nodeOwnDigest digests a node's identity, files, side inputs and module
+// identity files.
+func nodeOwnDigest(req *CompileRequest, node *PackageGraphNode, moduleIdentities []string) string {
 	var b strings.Builder
 	writeKeyField(&b, "id", node.ID)
 	writeKeyField(&b, "path", node.PkgPath)
@@ -388,21 +628,30 @@ func (o *compilerCacheKeyOwner) nodeDigest(pkgPath string) string {
 	for _, file := range node.CompiledGoFiles {
 		writeKeyField(&b, "compiled-file", fileIdentity(file))
 	}
-	for _, input := range compilerCacheSideInputs(o.req, node) {
+	for _, input := range compilerCacheSideInputs(req, node) {
 		writeKeyField(&b, "side-input", input)
 	}
-	for _, file := range moduleIdentityFiles(node.ModuleDir) {
-		writeKeyField(&b, "module-file", fileIdentity(file))
+	for _, identity := range moduleIdentities {
+		writeKeyField(&b, "module-file", identity)
 	}
-	for _, importPath := range node.Imports {
-		writeKeyField(&b, "import", importPath)
-		if o.graph.NodesByPackagePath[importPath] != nil {
-			writeKeyField(&b, "import-digest", o.nodeDigest(importPath))
+	return sha256String(b.String())
+}
+
+// overrideDirIdentity digests every file under an override directory, which
+// decides the override facts the parity check reads.
+func overrideDirIdentity(dir string) string {
+	var b strings.Builder
+	err := filepath.WalkDir(dir, func(path string, entry os.DirEntry, err error) error {
+		if err != nil || entry.IsDir() {
+			return err
 		}
+		writeKeyField(&b, "file", fileIdentity(path))
+		return nil
+	})
+	if err != nil {
+		writeKeyField(&b, "error", err.Error())
 	}
-	digest := sha256String(b.String())
-	o.graphDigests[pkgPath] = digest
-	return digest
+	return cleanAbs(dir) + "|" + sha256String(b.String())
 }
 
 // writeCompilerIdentity writes the producing-binary identity fields of a
@@ -416,6 +665,7 @@ func writeCompilerIdentity(b *strings.Builder) {
 func writeCompilerIdentityWithSemantics(b *strings.Builder, semanticsVersion string) {
 	writeKeyField(b, "semantics-version", semanticsVersion)
 	writeKeyField(b, "go-version", runtime.Version())
+	writeKeyField(b, "executable", executableIdentity())
 	if info, ok := debug.ReadBuildInfo(); ok {
 		writeKeyField(b, "module", info.Main.Path+"@"+info.Main.Version)
 		for _, dep := range info.Deps {
@@ -426,6 +676,25 @@ func writeCompilerIdentityWithSemantics(b *strings.Builder, semanticsVersion str
 		}
 	}
 }
+
+// executableIdentity names the running compiler binary. Development builds
+// report no module version, so the binary's path, size and modification time
+// keep a rebuilt compiler from replaying another binary's output.
+var executableIdentity = sync.OnceValue(func() string {
+	exe, err := os.Executable()
+	if err != nil {
+		return "unknown|" + err.Error()
+	}
+	info, err := os.Stat(exe)
+	if err != nil {
+		return exe + "|stat|" + err.Error()
+	}
+	return strings.Join([]string{
+		exe,
+		strconv.FormatInt(info.Size(), 10),
+		strconv.FormatInt(info.ModTime().UnixNano(), 10),
+	}, "|")
+})
 
 func writeRequestIdentity(b *strings.Builder, req *CompileRequest) {
 	if req == nil {
@@ -498,7 +767,11 @@ func compilerCacheSideInputs(req *CompileRequest, node *PackageGraphNode) []stri
 }
 
 func compilerCacheGoEmbedSideInputs(goFile string) []string {
-	syntax, err := parser.ParseFile(token.NewFileSet(), goFile, nil, parser.ParseComments)
+	data, err := os.ReadFile(goFile)
+	if err != nil || !bytes.Contains(data, []byte("go:embed")) {
+		return nil
+	}
+	syntax, err := parser.ParseFile(token.NewFileSet(), goFile, data, parser.ParseComments)
 	if err != nil {
 		return []string{"go:embed-parse|" + cleanAbs(goFile) + "|" + err.Error()}
 	}
@@ -633,16 +906,7 @@ func fileIdentity(file string) string {
 	if err != nil {
 		return filepath.ToSlash(file) + "|missing|" + err.Error()
 	}
-	info, err := os.Stat(file)
-	if err != nil {
-		return filepath.ToSlash(file) + "|stat|" + err.Error()
-	}
-	return strings.Join([]string{
-		cleanAbs(file),
-		strconv.FormatInt(info.Size(), 10),
-		strconv.FormatInt(info.ModTime().UnixNano(), 10),
-		sha256Hex(data),
-	}, "|")
+	return cleanAbs(file) + "|" + sha256Hex(data)
 }
 
 func cleanAbs(file string) string {
@@ -685,36 +949,6 @@ func safeCacheBlobPath(filePath string) bool {
 		!strings.HasPrefix(clean, "../") &&
 		clean != ".." &&
 		strings.HasPrefix(clean, "blobs/sha256/")
-}
-
-func writeFileAtomic(path string, data []byte, perm os.FileMode) error {
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		return err
-	}
-	tmp, err := os.CreateTemp(filepath.Dir(path), ".goscript-cache-*")
-	if err != nil {
-		return err
-	}
-	tmpName := tmp.Name()
-	written, writeErr := tmp.Write(data)
-	closeErr := tmp.Close()
-	if writeErr != nil {
-		os.Remove(tmpName)
-		return writeErr
-	}
-	if closeErr != nil {
-		os.Remove(tmpName)
-		return closeErr
-	}
-	if written != len(data) {
-		os.Remove(tmpName)
-		return io.ErrShortWrite
-	}
-	if err := os.Chmod(tmpName, perm); err != nil {
-		os.Remove(tmpName)
-		return err
-	}
-	return os.Rename(tmpName, path)
 }
 
 func sha256Hex(data []byte) string {
@@ -770,6 +1004,25 @@ func formatCompilerCacheManifest(manifest compilerCacheManifest) []byte {
 		stream.WriteObjectEnd()
 	}
 	stream.WriteArrayEnd()
+	stream.WriteMore()
+	stream.WriteObjectField("artifacts")
+	stream.WriteArrayStart()
+	for idx, artifact := range manifest.artifacts {
+		if idx != 0 {
+			stream.WriteMore()
+		}
+		stream.WriteObjectStart()
+		stream.WriteObjectField("kind")
+		stream.WriteString(string(artifact.kind))
+		stream.WriteMore()
+		stream.WriteObjectField("packagePath")
+		stream.WriteString(artifact.packagePath)
+		stream.WriteMore()
+		stream.WriteObjectField("key")
+		stream.WriteString(artifact.key)
+		stream.WriteObjectEnd()
+	}
+	stream.WriteArrayEnd()
 	stream.WriteObjectEnd()
 	if stream.Error != nil {
 		return nil
@@ -810,6 +1063,10 @@ func parseCompilerCacheManifest(data []byte) compilerCacheManifest {
 			for iter.ReadArray() {
 				manifest.files = append(manifest.files, readManifestFile(iter))
 			}
+		case "artifacts":
+			for iter.ReadArray() {
+				manifest.artifacts = append(manifest.artifacts, readManifestArtifact(iter))
+			}
 		default:
 			iter.Skip()
 		}
@@ -847,4 +1104,21 @@ func readManifestFile(iter *jsoniter.Iterator) compilerCacheManifestFile {
 		}
 	}
 	return file
+}
+
+func readManifestArtifact(iter *jsoniter.Iterator) compilerCacheEntry {
+	var artifact compilerCacheEntry
+	for field := iter.ReadObject(); field != ""; field = iter.ReadObject() {
+		switch field {
+		case "kind":
+			artifact.kind = compilerCacheEntryKind(iter.ReadString())
+		case "packagePath":
+			artifact.packagePath = iter.ReadString()
+		case "key":
+			artifact.key = iter.ReadString()
+		default:
+			iter.Skip()
+		}
+	}
+	return artifact
 }

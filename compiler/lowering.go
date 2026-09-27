@@ -45,6 +45,8 @@ type LoweringOptions struct {
 	AdditionalBindingRoots []string
 	// TrimTypeInfo drops metadata used only by reflect from named type registration payloads.
 	TrimTypeInfo bool
+	// SkipPackages names packages whose output is already available and must not be lowered.
+	SkipPackages map[string]bool
 }
 
 // NewLoweringOwner creates the lowering owner.
@@ -89,7 +91,9 @@ func (o *LoweringOwner) Build(ctx context.Context, model *SemanticModel, opts ..
 	runtimeMethodSets := newRuntimeMethodSetCache()
 	semPkgs := make([]*semanticPackage, 0, len(model.packages))
 	for _, semPkg := range model.packages {
-		semPkgs = append(semPkgs, semPkg)
+		if !options.SkipPackages[semPkg.pkgPath] {
+			semPkgs = append(semPkgs, semPkg)
+		}
 	}
 	slices.SortFunc(semPkgs, func(a, b *semanticPackage) int {
 		return cmp.Compare(a.pkgPath, b.pkgPath)
