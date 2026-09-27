@@ -12,6 +12,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"runtime/debug"
 	"slices"
@@ -135,9 +136,7 @@ func (o *CompilerCacheOwner) Entries(
 	for _, entry := range sources.packages {
 		writeKeyField(&program, string(entry.kind)+"|"+entry.packagePath, entry.key)
 	}
-	for _, dir := range req.OverrideDirs {
-		writeKeyField(&program, "override-dir", overrideDirIdentity(dir))
-	}
+	writeKeyField(&program, "identity", keyOwner.identity)
 	sources.program = compilerCacheEntry{
 		key:  sha256String(program.String()),
 		kind: compilerCacheEntryProgram,
@@ -536,15 +535,35 @@ func (d *closureFactsDigester) digest(pkgPath string) string {
 type compilerCacheKeyOwner struct {
 	req   *CompileRequest
 	graph *PackageGraph
+	// roots name source directories in keys, longest directory first.
+	roots []compilerCacheKeyRoot
+	// identity digests the schema, compiler and request fields every key
+	// shares.
+	identity string
 	// ownDigests holds the digest of each node's own files and side inputs.
 	ownDigests map[string]string
 	// graphDigests memoizes nodeDigest.
 	graphDigests map[string]string
 }
 
+// compilerCacheKeyRoot names a source directory in cache keys.
+type compilerCacheKeyRoot struct {
+	dir  string
+	name string
+}
+
 // newCompilerCacheKeyOwner digests every node's own inputs in parallel. Each
 // module's identity files are read once and shared by its packages.
 func newCompilerCacheKeyOwner(req *CompileRequest, graph *PackageGraph) *compilerCacheKeyOwner {
+	owner := &compilerCacheKeyOwner{
+		req:          req,
+		graph:        graph,
+		roots:        compilerCacheKeyRoots(graph),
+		ownDigests:   make(map[string]string, len(graph.Nodes)),
+		graphDigests: make(map[string]string, len(graph.Nodes)),
+	}
+	owner.identity = owner.sharedIdentity()
+
 	moduleIdentities := make(map[string][]string)
 	for _, node := range graph.Nodes {
 		if _, ok := moduleIdentities[node.ModuleDir]; ok {
@@ -552,32 +571,142 @@ func newCompilerCacheKeyOwner(req *CompileRequest, graph *PackageGraph) *compile
 		}
 		var identities []string
 		for _, file := range moduleIdentityFiles(node.ModuleDir) {
-			identities = append(identities, fileIdentity(file))
+			identities = append(identities, owner.fileIdentity(file))
 		}
 		moduleIdentities[node.ModuleDir] = identities
 	}
 
 	ownDigests := make([]string, len(graph.Nodes))
 	forEachParallel(len(graph.Nodes), func(idx int) {
-		ownDigests[idx] = nodeOwnDigest(req, graph.Nodes[idx], moduleIdentities[graph.Nodes[idx].ModuleDir])
+		node := graph.Nodes[idx]
+		ownDigests[idx] = owner.nodeOwnDigest(node, moduleIdentities[node.ModuleDir])
 	})
-	owner := &compilerCacheKeyOwner{
-		req:          req,
-		graph:        graph,
-		ownDigests:   make(map[string]string, len(graph.Nodes)),
-		graphDigests: make(map[string]string, len(graph.Nodes)),
-	}
 	for idx, node := range graph.Nodes {
 		owner.ownDigests[node.PkgPath] = ownDigests[idx]
 	}
 	return owner
 }
 
-func (o *compilerCacheKeyOwner) generatedKey(node *PackageGraphNode) string {
+// compilerCacheKeyRoots names each module directory by its module path and the
+// standard library source directory by std. Keys then match across checkouts
+// and machines that hold the same sources.
+func compilerCacheKeyRoots(graph *PackageGraph) []compilerCacheKeyRoot {
+	names := make(map[string]string)
+	for _, node := range graph.Nodes {
+		switch {
+		case node.ModuleDir != "":
+			names[cleanAbs(node.ModuleDir)] = node.ModulePath
+		case len(node.GoFiles) != 0:
+			pkgDir := cleanAbs(filepath.Dir(node.GoFiles[0]))
+			if root, ok := strings.CutSuffix(pkgDir, "/"+node.PkgPath); ok {
+				names[root] = "std"
+			}
+		}
+	}
+	roots := make([]compilerCacheKeyRoot, 0, len(names))
+	for dir, name := range names {
+		roots = append(roots, compilerCacheKeyRoot{dir: dir, name: name})
+	}
+	slices.SortFunc(roots, func(a, b compilerCacheKeyRoot) int {
+		return len(b.dir) - len(a.dir)
+	})
+	return roots
+}
+
+// keyPath names file by the root that holds it, or else relative to the
+// request directory, so the checkout location never enters a key.
+func (o *compilerCacheKeyOwner) keyPath(file string) string {
+	abs := cleanAbs(file)
+	for _, root := range o.roots {
+		rel, ok := strings.CutPrefix(abs, root.dir)
+		if ok && (rel == "" || rel[0] == '/') {
+			return root.name + ":" + strings.TrimPrefix(rel, "/")
+		}
+	}
+	rel, err := filepath.Rel(cleanAbs(o.req.Dir), abs)
+	if err != nil {
+		return abs
+	}
+	return "dir:" + filepath.ToSlash(rel)
+}
+
+// fileIdentity names a file by its key path and content.
+func (o *compilerCacheKeyOwner) fileIdentity(file string) string {
+	data, err := os.ReadFile(file)
+	if err != nil {
+		return o.keyPath(file) + "|unreadable"
+	}
+	return o.keyPath(file) + "|" + sha256Hex(data)
+}
+
+// sharedIdentity digests the schema, the compiler identity and the request.
+// Override directories count by content, which decides the override facts the
+// parity check reads.
+func (o *compilerCacheKeyOwner) sharedIdentity() string {
 	var b strings.Builder
 	writeKeyField(&b, "schema", compilerCacheSchema)
 	writeCompilerIdentity(&b)
-	writeRequestIdentity(&b, o.req)
+	req := o.req
+	for _, pattern := range req.Patterns {
+		writeKeyField(&b, "pattern", pattern)
+	}
+	writeKeyField(&b, "dir", o.keyPath(req.Dir))
+	if req.ProtobufTypeScriptBinding {
+		writeKeyField(&b, "protobuf-output", o.keyPath(req.OutputPath))
+		for _, root := range req.AdditionalBindingRoots {
+			writeKeyField(&b, "protobuf-binding-root", o.keyPath(root))
+		}
+	}
+	for _, flag := range goScriptBuildFlags(req.BuildFlags) {
+		writeKeyField(&b, "build-flag", flag)
+	}
+	for _, dir := range req.OverrideDirs {
+		writeKeyField(&b, "override-dir", o.overrideDirDigest(dir))
+	}
+	for _, function := range req.DeferredFunctions {
+		writeKeyField(&b, "deferred-function", function)
+	}
+	for _, path := range req.PackageBlocklist {
+		writeKeyField(&b, "blocklist", path)
+	}
+	writeKeyField(&b, "dependency-mode", string(req.DependencyMode))
+	writeKeyField(&b, "runtime-mode", string(req.RuntimeEmissionMode))
+	writeKeyField(&b, "protobuf-ts-binding", strconv.FormatBool(req.ProtobufTypeScriptBinding))
+	writeKeyField(&b, "tests", strconv.FormatBool(req.Tests))
+	for _, key := range goLoaderEnvKeys() {
+		writeKeyField(&b, "env-"+key, os.Getenv(key))
+	}
+	return sha256String(b.String())
+}
+
+// overrideDirDigest digests the relative names and contents of every file
+// under an override directory.
+func (o *compilerCacheKeyOwner) overrideDirDigest(dir string) string {
+	var b strings.Builder
+	err := filepath.WalkDir(dir, func(path string, entry os.DirEntry, err error) error {
+		if err != nil || entry.IsDir() {
+			return err
+		}
+		rel, err := filepath.Rel(dir, path)
+		if err != nil {
+			return err
+		}
+		data, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		writeKeyField(&b, "file", filepath.ToSlash(rel)+"|"+sha256Hex(data))
+		return nil
+	})
+	if err != nil {
+		writeKeyField(&b, "unreadable", o.keyPath(dir))
+	}
+	return sha256String(b.String())
+}
+
+func (o *compilerCacheKeyOwner) generatedKey(node *PackageGraphNode) string {
+	var b strings.Builder
+	writeKeyField(&b, "identity", o.identity)
 	writeKeyField(&b, "kind", string(compilerCacheEntryGenerated))
 	writeKeyField(&b, "package-digest", o.nodeDigest(node.PkgPath))
 	return sha256String(b.String())
@@ -585,9 +714,7 @@ func (o *compilerCacheKeyOwner) generatedKey(node *PackageGraphNode) string {
 
 func (o *compilerCacheKeyOwner) copiedKey(pkg overrideCopyPackage) string {
 	var b strings.Builder
-	writeKeyField(&b, "schema", compilerCacheSchema)
-	writeCompilerIdentity(&b)
-	writeRequestIdentity(&b, o.req)
+	writeKeyField(&b, "identity", o.identity)
 	writeKeyField(&b, "kind", string(compilerCacheEntryCopied))
 	writeKeyField(&b, "package", pkg.path)
 	for _, file := range pkg.files {
@@ -620,47 +747,49 @@ func (o *compilerCacheKeyOwner) nodeDigest(pkgPath string) string {
 }
 
 // nodeOwnDigest digests a node's identity, files, side inputs and module
-// identity files.
-func nodeOwnDigest(req *CompileRequest, node *PackageGraphNode, moduleIdentities []string) string {
+// identity files. Each source file is read once, for both its identity and
+// its embed directives.
+func (o *compilerCacheKeyOwner) nodeOwnDigest(node *PackageGraphNode, moduleIdentities []string) string {
 	var b strings.Builder
 	writeKeyField(&b, "id", node.ID)
 	writeKeyField(&b, "path", node.PkgPath)
 	writeKeyField(&b, "name", node.Name)
 	writeKeyField(&b, "module-path", node.ModulePath)
-	writeKeyField(&b, "module-dir", node.ModuleDir)
 	writeKeyField(&b, "for-test", node.ForTest)
 	writeKeyField(&b, "requested", strconv.FormatBool(node.Requested))
 	writeKeyField(&b, "override-candidate", strconv.FormatBool(node.OverrideCandidate))
+
+	identities := make(map[string]string, len(node.CompiledGoFiles))
+	var inputs []string
+	for _, file := range node.CompiledGoFiles {
+		data, err := os.ReadFile(file)
+		if err != nil {
+			identities[file] = o.keyPath(file) + "|unreadable"
+			continue
+		}
+		identities[file] = o.keyPath(file) + "|" + sha256Hex(data)
+		inputs = append(inputs, o.goEmbedSideInputs(file, data)...)
+	}
 	for _, file := range node.GoFiles {
-		writeKeyField(&b, "go-file", fileIdentity(file))
+		identity, ok := identities[file]
+		if !ok {
+			identity = o.fileIdentity(file)
+		}
+		writeKeyField(&b, "go-file", identity)
 	}
 	for _, file := range node.CompiledGoFiles {
-		writeKeyField(&b, "compiled-file", fileIdentity(file))
+		writeKeyField(&b, "compiled-file", identities[file])
 	}
-	for _, input := range compilerCacheSideInputs(req, node) {
+
+	inputs = append(inputs, o.protobufSideInputs(node)...)
+	slices.Sort(inputs)
+	for _, input := range inputs {
 		writeKeyField(&b, "side-input", input)
 	}
 	for _, identity := range moduleIdentities {
 		writeKeyField(&b, "module-file", identity)
 	}
 	return sha256String(b.String())
-}
-
-// overrideDirIdentity digests every file under an override directory, which
-// decides the override facts the parity check reads.
-func overrideDirIdentity(dir string) string {
-	var b strings.Builder
-	err := filepath.WalkDir(dir, func(path string, entry os.DirEntry, err error) error {
-		if err != nil || entry.IsDir() {
-			return err
-		}
-		writeKeyField(&b, "file", fileIdentity(path))
-		return nil
-	})
-	if err != nil {
-		writeKeyField(&b, "error", err.Error())
-	}
-	return cleanAbs(dir) + "|" + sha256String(b.String())
 }
 
 // writeCompilerIdentity writes the producing-binary identity fields of a
@@ -671,74 +800,65 @@ func writeCompilerIdentity(b *strings.Builder) {
 
 // writeCompilerIdentityWithSemantics writes the identity fields with an
 // explicit semantics version so tests can pin that a bump invalidates keys.
+// A released compiler is named by its module version. A development build
+// carries no trustworthy version, so its executable's content names it.
 func writeCompilerIdentityWithSemantics(b *strings.Builder, semanticsVersion string) {
 	writeKeyField(b, "semantics-version", semanticsVersion)
 	writeKeyField(b, "go-version", runtime.Version())
-	writeKeyField(b, "executable", executableIdentity())
-	if info, ok := debug.ReadBuildInfo(); ok {
-		writeKeyField(b, "module", info.Main.Path+"@"+info.Main.Version)
-		for _, dep := range info.Deps {
-			writeKeyField(b, "dep", dep.Path+"@"+dep.Version)
-			if dep.Replace != nil {
-				writeKeyField(b, "dep-replace", dep.Replace.Path+"@"+dep.Replace.Version)
-			}
+	info, ok := debug.ReadBuildInfo()
+	if !ok || !compilerModuleVersioned(info) {
+		writeKeyField(b, "executable-sha256", executableDigest())
+	}
+	if !ok {
+		return
+	}
+	writeKeyField(b, "module", info.Main.Path+"@"+info.Main.Version)
+	for _, dep := range info.Deps {
+		writeKeyField(b, "dep", dep.Path+"@"+dep.Version)
+		if dep.Replace != nil {
+			writeKeyField(b, "dep-replace", dep.Replace.Path+"@"+dep.Replace.Version)
 		}
 	}
 }
 
-// executableIdentity names the running compiler binary. Development builds
-// report no module version, so the binary's path, size and modification time
-// keep a rebuilt compiler from replaying another binary's output.
-var executableIdentity = sync.OnceValue(func() string {
+// compilerModuleVersioned reports whether the build names a released version
+// of the module holding the compiler. Local replacements, development builds
+// and modified checkouts are unversioned.
+func compilerModuleVersioned(info *debug.BuildInfo) bool {
+	pkgPath := reflect.TypeFor[CompilerCacheOwner]().PkgPath()
+	modules := append([]*debug.Module{&info.Main}, info.Deps...)
+	for _, mod := range modules {
+		if pkgPath != mod.Path && !strings.HasPrefix(pkgPath, mod.Path+"/") {
+			continue
+		}
+		if mod.Replace != nil {
+			mod = mod.Replace
+		}
+		return mod.Version != "" &&
+			mod.Version != "(devel)" &&
+			!strings.HasSuffix(mod.Version, "+dirty")
+	}
+	return false
+}
+
+// executableDigest hashes the running compiler binary. A rebuilt binary at the
+// same path, or the same binary at another path, keys correctly.
+var executableDigest = sync.OnceValue(func() string {
 	exe, err := os.Executable()
 	if err != nil {
 		return "unknown|" + err.Error()
 	}
-	info, err := os.Stat(exe)
+	f, err := os.Open(exe)
 	if err != nil {
-		return exe + "|stat|" + err.Error()
+		return exe + "|" + err.Error()
 	}
-	return strings.Join([]string{
-		exe,
-		strconv.FormatInt(info.Size(), 10),
-		strconv.FormatInt(info.ModTime().UnixNano(), 10),
-	}, "|")
+	defer f.Close() //nolint:errcheck
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return exe + "|" + err.Error()
+	}
+	return hex.EncodeToString(h.Sum(nil))
 })
-
-func writeRequestIdentity(b *strings.Builder, req *CompileRequest) {
-	if req == nil {
-		return
-	}
-	for _, pattern := range req.Patterns {
-		writeKeyField(b, "pattern", pattern)
-	}
-	writeKeyField(b, "dir", cleanAbs(req.Dir))
-	if req.ProtobufTypeScriptBinding {
-		writeKeyField(b, "protobuf-output", cleanAbs(req.OutputPath))
-		for _, root := range req.AdditionalBindingRoots {
-			writeKeyField(b, "protobuf-binding-root", cleanAbs(root))
-		}
-	}
-	for _, flag := range goScriptBuildFlags(req.BuildFlags) {
-		writeKeyField(b, "build-flag", flag)
-	}
-	for _, dir := range req.OverrideDirs {
-		writeKeyField(b, "override-dir", cleanAbs(dir))
-	}
-	for _, function := range req.DeferredFunctions {
-		writeKeyField(b, "deferred-function", function)
-	}
-	for _, path := range req.PackageBlocklist {
-		writeKeyField(b, "blocklist", path)
-	}
-	writeKeyField(b, "dependency-mode", string(req.DependencyMode))
-	writeKeyField(b, "runtime-mode", string(req.RuntimeEmissionMode))
-	writeKeyField(b, "protobuf-ts-binding", strconv.FormatBool(req.ProtobufTypeScriptBinding))
-	writeKeyField(b, "tests", strconv.FormatBool(req.Tests))
-	for _, key := range goLoaderEnvKeys() {
-		writeKeyField(b, "env-"+key, os.Getenv(key))
-	}
-}
 
 func writeKeyField(b *strings.Builder, key, value string) {
 	b.WriteString(key)
@@ -762,42 +882,25 @@ func goLoaderEnvKeys() []string {
 	}
 }
 
-func compilerCacheSideInputs(req *CompileRequest, node *PackageGraphNode) []string {
-	if node == nil {
-		return nil
-	}
-	var inputs []string
-	for _, file := range node.CompiledGoFiles {
-		inputs = append(inputs, compilerCacheGoEmbedSideInputs(file)...)
-	}
-	inputs = append(inputs, compilerCacheProtobufSideInputs(req, node)...)
-	slices.Sort(inputs)
-	return inputs
-}
-
-func compilerCacheGoEmbedSideInputs(goFile string) []string {
-	data, err := os.ReadFile(goFile)
-	if err != nil || !bytes.Contains(data, []byte("go:embed")) {
+// goEmbedSideInputs names the files a Go source's go:embed directives embed.
+func (o *compilerCacheKeyOwner) goEmbedSideInputs(goFile string, data []byte) []string {
+	if !bytes.Contains(data, []byte("go:embed")) {
 		return nil
 	}
 	syntax, err := parser.ParseFile(token.NewFileSet(), goFile, data, parser.ParseComments)
 	if err != nil {
-		return []string{"go:embed-parse|" + cleanAbs(goFile) + "|" + err.Error()}
-	}
-	patterns := goEmbedPatterns(syntax.Comments...)
-	if len(patterns) == 0 {
-		return nil
+		return []string{"go:embed-parse|" + o.keyPath(goFile)}
 	}
 	pkgDir := filepath.Dir(goFile)
 	var inputs []string
-	for _, pattern := range patterns {
+	for _, pattern := range goEmbedPatterns(syntax.Comments...) {
 		files, err := compilerCacheGoEmbedFiles(pkgDir, pattern)
 		if err != nil {
-			inputs = append(inputs, "go:embed-error|"+cleanAbs(goFile)+"|"+pattern+"|"+err.Error())
+			inputs = append(inputs, "go:embed-error|"+o.keyPath(goFile)+"|"+pattern)
 			continue
 		}
 		for _, file := range files {
-			inputs = append(inputs, "go:embed-file|"+pattern+"|"+fileIdentity(file))
+			inputs = append(inputs, "go:embed-file|"+pattern+"|"+o.fileIdentity(file))
 		}
 	}
 	return inputs
@@ -878,20 +981,22 @@ func compilerCacheCollectGoEmbedPath(absPath string, all bool) ([]string, error)
 	return files, nil
 }
 
-func compilerCacheProtobufSideInputs(req *CompileRequest, node *PackageGraphNode) []string {
-	if req == nil || !req.ProtobufTypeScriptBinding {
+// protobufSideInputs names the TypeScript bindings the protobuf binding mode
+// reads beside a node's generated protobuf sources.
+func (o *compilerCacheKeyOwner) protobufSideInputs(node *PackageGraphNode) []string {
+	if !o.req.ProtobufTypeScriptBinding {
 		return nil
 	}
-	sourceRoot := protobufTypeScriptBindingRoot(req.Dir)
+	sourceRoot := protobufTypeScriptBindingRoot(o.req.Dir)
 	var inputs []string
 	for _, sourcePath := range node.CompiledGoFiles {
 		if !strings.HasSuffix(sourcePath, ".pb.go") ||
 			strings.HasSuffix(filepath.Base(sourcePath), "_srpc.pb.go") ||
-			!protobufTypeScriptBindingInSourceRoot(sourceRoot, sourcePath, req.AdditionalBindingRoots...) {
+			!protobufTypeScriptBindingInSourceRoot(sourceRoot, sourcePath, o.req.AdditionalBindingRoots...) {
 			continue
 		}
 		tsPath := strings.TrimSuffix(sourcePath, ".go") + ".ts"
-		inputs = append(inputs, "protobuf-ts-binding|"+fileIdentity(tsPath))
+		inputs = append(inputs, "protobuf-ts-binding|"+o.fileIdentity(tsPath))
 	}
 	return inputs
 }
@@ -908,14 +1013,6 @@ func moduleIdentityFiles(moduleDir string) []string {
 		}
 	}
 	return files
-}
-
-func fileIdentity(file string) string {
-	data, err := os.ReadFile(file)
-	if err != nil {
-		return filepath.ToSlash(file) + "|missing|" + err.Error()
-	}
-	return cleanAbs(file) + "|" + sha256Hex(data)
 }
 
 func cleanAbs(file string) string {
