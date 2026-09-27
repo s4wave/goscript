@@ -82,6 +82,10 @@ func asyncArgumentCallSites(model *SemanticModel) []asyncArgumentCallSite {
 // parameters. It reports whether one always suspends, and otherwise the
 // functions whose async marks decide whether one needs an await. The rules
 // match exprMayNeedAwait.
+//
+// Deps are function origins. Coloring resolves a generic instance and its
+// origin to the same semantic function and full name, and an origin is a
+// declared object a body summary can name.
 func asyncArgumentFacts(pkg *packages.Package, signature *types.Signature, args []ast.Expr) (bool, []*types.Func) {
 	if signature == nil || signature.Params() == nil {
 		return false, nil
@@ -97,7 +101,7 @@ func asyncArgumentFacts(pkg *packages.Package, signature *types.Signature, args 
 			continue
 		}
 		if called := calledFunction(pkg, arg); called != nil {
-			deps = append(deps, called)
+			deps = append(deps, functionOriginOrSelf(called))
 			continue
 		}
 		lit, ok := arg.(*ast.FuncLit)
@@ -117,7 +121,7 @@ func asyncArgumentFacts(pkg *packages.Package, signature *types.Signature, args 
 				if callUsesFunctionValue(pkg, typed.Fun) || callUsesFunctionIdentifier(pkg, typed.Fun) {
 					suspends = true
 				} else if called := calledFunction(pkg, typed.Fun); called != nil {
-					deps = append(deps, called)
+					deps = append(deps, functionOriginOrSelf(called))
 				}
 			}
 			return !suspends
