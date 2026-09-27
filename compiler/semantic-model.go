@@ -87,6 +87,7 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, def
 	for _, shard := range shards {
 		model.mergePackage(shard)
 	}
+	model.collectVarRefNames()
 	if diagnosticsHaveErrors(diagnostics) {
 		model.freeze()
 		return model, diagnostics
@@ -179,6 +180,7 @@ func (o *SemanticModelOwner) buildPackage(
 	for _, file := range pkg.Syntax {
 		collectFunctionFacts(shard, pkg, file, overrideFacts)
 	}
+	semPkg.lazyVars = lazyPackageVars(semPkg)
 	return shard
 }
 
@@ -215,6 +217,22 @@ func (m *SemanticModel) mergePackage(shard *SemanticModel) {
 	maps.Copy(m.needsVarRef, shard.needsVarRef)
 	maps.Copy(m.generatedImports, shard.generatedImports)
 	maps.Copy(m.generatedImportTypes, shard.generatedImportTypes)
+}
+
+// collectVarRefNames records each package's variable reference names. A mark
+// can come from any package, so this runs after every shard merged.
+func (m *SemanticModel) collectVarRefNames() {
+	for _, semPkg := range m.packages {
+		for _, value := range semPkg.values {
+			if !m.needsVarRef[value.object] {
+				continue
+			}
+			if semPkg.varRefNames == nil {
+				semPkg.varRefNames = make(map[string]bool)
+			}
+			semPkg.varRefNames[value.name] = true
+		}
+	}
 }
 
 // existingFunction returns the entry addFunction would reuse for fn.
@@ -754,6 +772,8 @@ func collectFunctionFacts(
 			switch typed := node.(type) {
 			case *ast.FuncLit:
 				return false
+			case *ast.Ident:
+				recordPackageVarUse(semFn, pkg.TypesInfo.Uses[typed])
 			case *ast.SendStmt, *ast.SelectStmt:
 				markFunctionAsync(semFn)
 			case *ast.UnaryExpr:
@@ -783,6 +803,18 @@ func collectFunctionFacts(
 			return true
 		})
 	}
+}
+
+// recordPackageVarUse adds obj to semFn's package variables when it is one.
+func recordPackageVarUse(semFn *semanticFunction, obj types.Object) {
+	v, ok := obj.(*types.Var)
+	if !ok || v.Pkg() == nil || v.Parent() != v.Pkg().Scope() {
+		return
+	}
+	if semFn.packageVars == nil {
+		semFn.packageVars = make(map[*types.Var]bool)
+	}
+	semFn.packageVars[v] = true
 }
 
 func rangeFunctionExprNeedsAwait(
@@ -845,6 +877,8 @@ func recordImmediateFuncLitAsyncFacts(
 		switch typed := node.(type) {
 		case *ast.FuncLit:
 			return false
+		case *ast.Ident:
+			recordPackageVarUse(semFn, pkg.TypesInfo.Uses[typed])
 		case *ast.SendStmt, *ast.SelectStmt:
 			markFunctionAsync(semFn)
 		case *ast.UnaryExpr:

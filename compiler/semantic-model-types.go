@@ -59,6 +59,12 @@ type semanticPackage struct {
 	functionDecls map[*types.Func]*ast.FuncDecl
 	// initOrder records package variables in declaration order.
 	initOrder []types.Object
+	// lazyVars holds the package variables initialized lazily through a
+	// getter.
+	lazyVars map[types.Object]bool
+	// varRefNames holds the names of the package's values that any package
+	// marks as needing a variable reference.
+	varRefNames map[string]bool
 	// generatedImports records implicit imports by source file.
 	generatedImports map[string]map[string]bool
 	// typeAssertions records source and target types of explicit assertions.
@@ -120,7 +126,12 @@ type semanticFunction struct {
 	hasBody         bool
 	async           bool
 	deferred        bool
-	calls           map[*types.Func]bool
+	// calls holds the origins of the functions the body calls outside
+	// function literals other than immediately invoked ones.
+	calls map[*types.Func]bool
+	// packageVars holds the package variables the body names in the same
+	// region as calls.
+	packageVars map[*types.Var]bool
 }
 
 type semanticInterfaceImplementation struct {

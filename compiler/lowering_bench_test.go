@@ -10,22 +10,20 @@ import (
 )
 
 type loweringBenchFixture struct {
-	model                *SemanticModel
-	owner                *LoweringOwner
-	semPkg               *semanticPackage
-	lazyPackageVarsByPkg *lazyPackageVarCache
-	file                 loweringBenchFile
-	genDecls             []loweringBenchGenDecl
-	stmtLists            []loweringBenchStmtList
+	model     *SemanticModel
+	owner     *LoweringOwner
+	semPkg    *semanticPackage
+	file      loweringBenchFile
+	genDecls  []loweringBenchGenDecl
+	stmtLists []loweringBenchStmtList
 }
 
 type loweringBenchFile struct {
-	file            *ast.File
-	sourcePath      string
-	associated      []*ast.FuncDecl
-	declFiles       map[types.Object]string
-	outputNames     map[string]string
-	lazyPackageVars map[types.Object]bool
+	file        *ast.File
+	sourcePath  string
+	associated  []*ast.FuncDecl
+	declFiles   map[types.Object]string
+	outputNames map[string]string
 }
 
 type loweringBenchGenDecl struct {
@@ -46,7 +44,6 @@ func BenchmarkLoweringPackage(b *testing.B) {
 		if _, diagnostics := fixture.owner.lowerPackage(
 			fixture.model,
 			fixture.semPkg,
-			newLazyPackageVarCache(0),
 			newAsyncLazyState(newAsyncLazyCache()),
 			newRuntimeMethodSetCache(),
 			LoweringOptions{},
@@ -79,17 +76,16 @@ func BenchmarkLoweringFile(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		if _, diagnostics := fixture.owner.lowerFile(lowerFileRequest{
-			model:                fixture.model,
-			semPkg:               fixture.semPkg,
-			file:                 fixture.file.file,
-			sourcePath:           fixture.file.sourcePath,
-			declFiles:            fixture.file.declFiles,
-			outputNames:          fixture.file.outputNames,
-			methodIndex:          buildPackageMethodIndex(fixture.semPkg),
-			lazyPackageVars:      fixture.file.lazyPackageVars,
-			lazyPackageVarsByPkg: fixture.lazyPackageVarsByPkg,
-			asyncLazy:            newAsyncLazyState(newAsyncLazyCache()),
-			runtimeMethodSets:    newRuntimeMethodSetCache(),
+			model:             fixture.model,
+			semPkg:            fixture.semPkg,
+			file:              fixture.file.file,
+			sourcePath:        fixture.file.sourcePath,
+			declFiles:         fixture.file.declFiles,
+			outputNames:       fixture.file.outputNames,
+			methodIndex:       buildPackageMethodIndex(fixture.semPkg),
+			lazyPackageVars:   fixture.semPkg.lazyVars,
+			asyncLazy:         newAsyncLazyState(newAsyncLazyCache()),
+			runtimeMethodSets: newRuntimeMethodSetCache(),
 		}); diagnosticsHaveErrors(diagnostics) {
 			b.Fatal(diagnostics)
 		}
@@ -136,7 +132,7 @@ func BenchmarkLoweringLazyPackageVars(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = fixture.owner.lazyPackageVars(fixture.semPkg, fixture.file.declFiles)
+		_ = lazyPackageVars(fixture.semPkg)
 	}
 }
 
@@ -173,9 +169,6 @@ func newLoweringBenchFixture(tb testing.TB) *loweringBenchFixture {
 	owner := service.LoweringOwner()
 	declFiles := packageDeclFiles(semPkg)
 	outputNames := packageOutputNames(semPkg)
-	lazyPackageVarsByPkg := newLazyPackageVarCache(0)
-	lazyPackageVars := owner.packageLazyVars(semPkg, lazyPackageVarsByPkg, declFiles)
-
 	methodIndex := buildPackageMethodIndex(semPkg)
 
 	var benchFile loweringBenchFile
@@ -186,28 +179,26 @@ func newLoweringBenchFixture(tb testing.TB) *loweringBenchFixture {
 		associated := owner.methodDeclsForFileTypes(semPkg, file, methodIndex)
 		localRefs := owner.analyzeLocalFileReferences(semPkg, file, sourcePath, associated, declFiles, outputNames, newRuntimeMethodSetCache())
 		ctx := lowerFileContext{
-			model:                model,
-			semPkg:               semPkg,
-			file:                 file,
-			importAliases:        make(map[string]string),
-			importPaths:          make(map[string]string),
-			importNames:          make(map[string]string),
-			importObjects:        make(map[*types.PkgName]string),
-			sourcePath:           sourcePath,
-			localAliases:         localRefs.aliases,
-			lazyPackageVars:      lazyPackageVars,
-			lazyPackageVarsByPkg: lazyPackageVarsByPkg,
-			tempNames:            newTempNameOwner(),
-			topLevel:             true,
+			model:           model,
+			semPkg:          semPkg,
+			file:            file,
+			importAliases:   make(map[string]string),
+			importPaths:     make(map[string]string),
+			importNames:     make(map[string]string),
+			importObjects:   make(map[*types.PkgName]string),
+			sourcePath:      sourcePath,
+			localAliases:    localRefs.aliases,
+			lazyPackageVars: semPkg.lazyVars,
+			tempNames:       newTempNameOwner(),
+			topLevel:        true,
 		}
 		if filepath.Base(sourcePath) == "bench.go" {
 			benchFile = loweringBenchFile{
-				file:            file,
-				sourcePath:      sourcePath,
-				associated:      associated,
-				declFiles:       declFiles,
-				outputNames:     outputNames,
-				lazyPackageVars: lazyPackageVars,
+				file:        file,
+				sourcePath:  sourcePath,
+				associated:  associated,
+				declFiles:   declFiles,
+				outputNames: outputNames,
 			}
 		}
 		for _, decl := range file.Decls {
@@ -231,13 +222,12 @@ func newLoweringBenchFixture(tb testing.TB) *loweringBenchFixture {
 		tb.Fatalf("incomplete lowering benchmark fixture: genDecls=%d stmtLists=%d", len(genDecls), len(stmtLists))
 	}
 	return &loweringBenchFixture{
-		model:                model,
-		owner:                owner,
-		semPkg:               semPkg,
-		lazyPackageVarsByPkg: lazyPackageVarsByPkg,
-		file:                 benchFile,
-		genDecls:             genDecls,
-		stmtLists:            stmtLists,
+		model:     model,
+		owner:     owner,
+		semPkg:    semPkg,
+		file:      benchFile,
+		genDecls:  genDecls,
+		stmtLists: stmtLists,
 	}
 }
 
