@@ -481,11 +481,14 @@ func (o *CompilerCacheOwner) replayManifest(req *CompileRequest, manifest compil
 		if !safeOutputArtifactPath(file.path) {
 			return false
 		}
+		dest := filepath.Join(req.OutputPath, filepath.FromSlash(file.path))
+		if o.outputMatches(req, dest, file) {
+			continue
+		}
 		data, ok := o.readBlob(req, file)
 		if !ok {
 			return false
 		}
-		dest := filepath.Join(req.OutputPath, filepath.FromSlash(file.path))
 		if dir := filepath.Dir(dest); dir != madeDir {
 			if err := os.MkdirAll(dir, 0o755); err != nil {
 				return false
@@ -496,6 +499,26 @@ func (o *CompilerCacheOwner) replayManifest(req *CompileRequest, manifest compil
 			return false
 		}
 	}
+	return true
+}
+
+// outputMatches reports whether dest already holds a manifest file whose blob
+// is still stored, and marks the blob used. Replay then leaves dest alone
+// without reading the blob.
+func (o *CompilerCacheOwner) outputMatches(req *CompileRequest, dest string, file compilerCacheManifestFile) bool {
+	if !safeCacheBlobPath(file.blob) {
+		return false
+	}
+	existing, err := os.ReadFile(dest)
+	if err != nil || uint64(len(existing)) != file.size || sha256Hex(existing) != file.sha256 {
+		return false
+	}
+	blobPath := filepath.Join(o.schemaRoot(req), filepath.FromSlash(file.blob))
+	info, err := os.Stat(blobPath)
+	if err != nil {
+		return false
+	}
+	markCompilerCacheUsed(blobPath, info)
 	return true
 }
 
