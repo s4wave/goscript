@@ -66,7 +66,7 @@ func BenchmarkCompilePipelineStages(b *testing.B) {
 		}
 
 		start = time.Now()
-		model, semanticDiagnostics := service.SemanticModelOwner().Build(context.Background(), graph)
+		model, semanticDiagnostics := service.SemanticModelOwner().Build(context.Background(), graph, SemanticBuildOptions{})
 		semantic += time.Since(start)
 		if diagnosticsHaveErrors(semanticDiagnostics) {
 			b.Fatalf("semantic build: %v", semanticDiagnostics)

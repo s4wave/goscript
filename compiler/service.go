@@ -107,17 +107,18 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		return result, NewCompileError(diagnostics)
 	}
 
+	overridePlan, overrideDiagnostics := s.overrideOwner.CopyPlan(ctx, req, graph)
+	diagnostics = append(diagnostics, overrideDiagnostics...)
+	if diagnosticsHaveErrors(diagnostics) {
+		result.Diagnostics = diagnostics
+		return result, NewCompileError(diagnostics)
+	}
+	sources := s.cacheOwner.Entries(req, graph, overridePlan)
+
 	// The program key covers every input of the override parity check, so a
 	// program stored after a verified compile replays without the full check.
 	var programReplayTried bool
-	if s.cacheOwner.Enabled(req) && req.DependencyMode == DependencyModeAll {
-		overridePlan, overrideDiagnostics := s.overrideOwner.CopyPlan(ctx, req, graph)
-		diagnostics = append(diagnostics, overrideDiagnostics...)
-		if diagnosticsHaveErrors(diagnostics) {
-			result.Diagnostics = diagnostics
-			return result, NewCompileError(diagnostics)
-		}
-		sources := s.cacheOwner.Entries(req, graph, overridePlan)
+	if req.DependencyMode == DependencyModeAll {
 		if cached, ok := s.cacheOwner.ReplayProgram(ctx, req, sources); ok {
 			cached.OriginalPackages = slices.Clone(result.OriginalPackages)
 			cached.Diagnostics = diagnostics
@@ -126,52 +127,89 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		programReplayTried = true
 	}
 
-	diagnostics = append(diagnostics, s.graphOwner.Check(ctx, graph)...)
-	if diagnosticsHaveErrors(diagnostics) {
-		result.Diagnostics = diagnostics
-		return result, NewCompileError(diagnostics)
-	}
-
 	overrideFacts, factsDiagnostics := s.overrideOwner.Facts(ctx)
 	diagnostics = append(diagnostics, factsDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
 		result.Diagnostics = diagnostics
 		return result, NewCompileError(diagnostics)
 	}
-	parityDiagnostics := s.parityOwner.Verify(ctx, graph, overrideFacts)
-	diagnostics = append(diagnostics, parityDiagnostics...)
-	if diagnosticsHaveErrors(diagnostics) {
-		result.Diagnostics = diagnostics
-		return result, NewCompileError(diagnostics)
-	}
 
-	overridePlan, overrideDiagnostics := s.overrideOwner.CopyPlan(ctx, req, graph)
-	diagnostics = append(diagnostics, overrideDiagnostics...)
-	if diagnosticsHaveErrors(diagnostics) {
-		result.Diagnostics = diagnostics
-		return result, NewCompileError(diagnostics)
-	}
-	sources := s.cacheOwner.Entries(req, graph, overridePlan)
-	if !programReplayTried {
-		if cached, ok := s.cacheOwner.ReplayProgram(ctx, req, sources); ok {
-			cached.OriginalPackages = slices.Clone(result.OriginalPackages)
-			cached.Diagnostics = diagnostics
-			return cached, nil
+	// A package with a stored body summary checks without bodies. When its
+	// summary does not apply, or its artifact misses so it must be lowered,
+	// the program is checked again with that package's bodies.
+	summaries := s.cacheOwner.Summaries(req, sources)
+	summarize := make(map[string]bool)
+	for _, entry := range sources.packages {
+		if entry.kind == compilerCacheEntryGenerated && summaries[entry.packagePath] == nil {
+			summarize[entry.packagePath] = true
 		}
 	}
+	checkDiagnostics := diagnostics
+	var semanticModel *SemanticModel
+	var artifactEntries []compilerCacheEntry
+	var replayed map[string]bool
+	var trimTypeInfo bool
+	for {
+		diagnostics = slices.Clone(checkDiagnostics)
+		bodiless := make(map[string]bool, len(summaries))
+		for pkgPath := range summaries {
+			bodiless[pkgPath] = true
+		}
+		diagnostics = append(diagnostics, s.graphOwner.Check(ctx, graph, bodiless)...)
+		if diagnosticsHaveErrors(diagnostics) {
+			result.Diagnostics = diagnostics
+			return result, NewCompileError(diagnostics)
+		}
+		diagnostics = append(diagnostics, s.parityOwner.Verify(ctx, graph, overrideFacts)...)
+		if diagnosticsHaveErrors(diagnostics) {
+			result.Diagnostics = diagnostics
+			return result, NewCompileError(diagnostics)
+		}
+		if !programReplayTried {
+			if cached, ok := s.cacheOwner.ReplayProgram(ctx, req, sources); ok {
+				cached.OriginalPackages = slices.Clone(result.OriginalPackages)
+				cached.Diagnostics = diagnostics
+				return cached, nil
+			}
+			programReplayTried = true
+		}
 
-	semanticModel, semanticDiagnostics := s.semanticOwner.Build(ctx, graph, req.DeferredFunctions...)
-	diagnostics = append(diagnostics, semanticDiagnostics...)
-	if diagnosticsHaveErrors(diagnostics) {
-		result.Diagnostics = diagnostics
-		return result, NewCompileError(diagnostics)
+		var semanticDiagnostics []Diagnostic
+		semanticModel, semanticDiagnostics = s.semanticOwner.Build(ctx, graph, SemanticBuildOptions{
+			DeferredFunctions: req.DeferredFunctions,
+			Summaries:         summaries,
+			Summarize:         summarize,
+		})
+		diagnostics = append(diagnostics, semanticDiagnostics...)
+		if diagnosticsHaveErrors(diagnostics) {
+			result.Diagnostics = diagnostics
+			return result, NewCompileError(diagnostics)
+		}
+		if len(semanticModel.staleSummaries) != 0 {
+			for _, pkgPath := range semanticModel.staleSummaries {
+				delete(summaries, pkgPath)
+				summarize[pkgPath] = true
+			}
+			continue
+		}
+
+		// Packages whose closure sources and closure facts are unchanged
+		// replay from the cache; only the rest are lowered and emitted.
+		trimTypeInfo = !packageGraphContainsPackage(graph, "reflect")
+		artifactEntries = s.cacheOwner.ArtifactEntries(graph, sources, semanticModel, trimTypeInfo)
+		replayed = s.cacheOwner.ReplayGenerated(ctx, req, artifactEntries)
+		var unreplayed bool
+		for pkgPath := range summaries {
+			if !replayed[pkgPath] {
+				delete(summaries, pkgPath)
+				summarize[pkgPath] = true
+				unreplayed = true
+			}
+		}
+		if !unreplayed {
+			break
+		}
 	}
-
-	// Packages whose closure sources and closure facts are unchanged replay
-	// from the cache; only the rest are lowered and emitted.
-	trimTypeInfo := !packageGraphContainsPackage(graph, "reflect")
-	artifactEntries := s.cacheOwner.ArtifactEntries(graph, sources, semanticModel, trimTypeInfo)
-	replayed := s.cacheOwner.ReplayGenerated(ctx, req, artifactEntries)
 	loweredProgram, loweringDiagnostics := s.loweringOwner.Build(ctx, semanticModel, LoweringOptions{
 		SourceRoot:                protobufTypeScriptBindingRoot(req.Dir),
 		DisplayRoot:               req.Dir,
@@ -213,6 +251,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 	}
 	s.cacheOwner.StoreCopied(req, artifactEntries, overridePlan)
 	s.cacheOwner.StoreProgram(req, sources, artifactEntries)
+	s.cacheOwner.StoreSummaries(req, sources, semanticModel.summaries)
 
 	result.Diagnostics = diagnostics
 	return result, nil

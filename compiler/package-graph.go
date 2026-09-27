@@ -23,6 +23,8 @@ type PackageGraph struct {
 	NodesByPackagePath map[string]*PackageGraphNode
 
 	packagesByPath map[string]*packages.Package
+	// checker holds the file set and parsed syntax Check shares across checks.
+	checker *packageChecker
 }
 
 // PackageGraphNode is one package in the loaded graph.
@@ -72,7 +74,7 @@ func (o *PackageGraphOwner) Load(ctx context.Context, req *CompileRequest) (*Pac
 	if diagnosticsHaveErrors(diagnostics) {
 		return graph, diagnostics
 	}
-	return graph, append(diagnostics, o.Check(ctx, graph)...)
+	return graph, append(diagnostics, o.Check(ctx, graph, nil)...)
 }
 
 // goScriptLoaderEnv returns the go command environment for loading GoScript

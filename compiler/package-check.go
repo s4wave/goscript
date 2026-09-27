@@ -23,18 +23,27 @@ import (
 // syntax and type information in place. It reports the parse and type errors
 // of lowered nodes; the graph must carry no identity load errors.
 //
+// Only lowered nodes outside bodiless have their function bodies checked.
+// Every other package contributes only its declarations: override candidates
+// and their dependencies are never lowered, and a bodiless node's body facts
+// come from its stored summary. Checking the graph again replaces every
+// package's types and reuses the parsed syntax.
+//
 // The identity load already ran go list, so the check reads sources directly
 // instead of loading the graph a second time. Each package parses as soon as
 // its goroutine starts, one goroutine per file, and type-checks once its imports
 // are complete. At most GOMAXPROCS files parse or packages check at once.
-func (o *PackageGraphOwner) Check(ctx context.Context, graph *PackageGraph) []Diagnostic {
+func (o *PackageGraphOwner) Check(ctx context.Context, graph *PackageGraph, bodiless map[string]bool) []Diagnostic {
 	pkgs := graph.reachablePackages()
-	checker := &packageChecker{
-		fset:   token.NewFileSet(),
-		sizes:  goScriptTypeSizes(),
-		work:   make(chan struct{}, runtime.GOMAXPROCS(0)),
-		parsed: make(map[string]*parsedFile),
+	if graph.checker == nil {
+		graph.checker = &packageChecker{
+			fset:   token.NewFileSet(),
+			sizes:  goScriptTypeSizes(),
+			work:   make(chan struct{}, runtime.GOMAXPROCS(0)),
+			parsed: make(map[string]*parsedFile),
+		}
 	}
+	checker := graph.checker
 	done := make(map[*packages.Package]chan struct{}, len(pkgs))
 	for _, pkg := range pkgs {
 		done[pkg] = make(chan struct{})
@@ -43,7 +52,9 @@ func (o *PackageGraphOwner) Check(ctx context.Context, graph *PackageGraph) []Di
 	for _, pkg := range pkgs {
 		wg.Go(func() {
 			defer close(done[pkg])
-			checker.check(ctx, pkg, func() {
+			node := graph.NodesByPackagePath[pkg.PkgPath]
+			bodies := node != nil && !node.OverrideCandidate && !bodiless[pkg.PkgPath]
+			checker.check(ctx, pkg, bodies, func() {
 				for _, imp := range pkg.Imports {
 					<-done[imp]
 				}
@@ -110,8 +121,10 @@ type parsedFile struct {
 }
 
 // check parses pkg, calls waitImports, and type-checks pkg against its
-// imports. Errors land in pkg.Errors as go/packages reports them.
-func (c *packageChecker) check(ctx context.Context, pkg *packages.Package, waitImports func()) {
+// imports, with function bodies when bodies is set. Errors land in pkg.Errors
+// as go/packages reports them.
+func (c *packageChecker) check(ctx context.Context, pkg *packages.Package, bodies bool, waitImports func()) {
+	pkg.Errors, pkg.TypeErrors = nil, nil
 	pkg.Fset = c.fset
 	pkg.TypesSizes = c.sizes
 	pkg.TypesInfo = &types.Info{
@@ -156,6 +169,9 @@ func (c *packageChecker) check(ctx context.Context, pkg *packages.Package, waitI
 		Importer: packageImporter(pkg),
 		Error:    func(err error) { appendPackageError(pkg, err) },
 		Sizes:    c.sizes,
+		// IgnoreFuncBodies also skips function literal bodies and the unused
+		// import check, which needs the bodies.
+		IgnoreFuncBodies: !bodies,
 	}
 	if pkg.Module != nil && pkg.Module.GoVersion != "" {
 		conf.GoVersion = "go" + pkg.Module.GoVersion

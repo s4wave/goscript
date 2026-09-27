@@ -47,6 +47,11 @@ func (m *SemanticModel) packageFactDigests() map[string]string {
 	for obj := range m.addressTaken {
 		add("address-taken", obj, "")
 	}
+	for pkgPath, semPkg := range m.packages {
+		if len(semPkg.localFacts) != 0 {
+			facts[pkgPath] = append(facts[pkgPath], semPkg.localFacts...)
+		}
+	}
 
 	digests := make(map[string]string, len(facts))
 	for pkgPath, lines := range facts {

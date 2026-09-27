@@ -988,7 +988,7 @@ func cacheFactsArtifactKeys(t *testing.T, moduleDir string) map[string]string {
 	if diagnosticsHaveErrors(diagnostics) {
 		t.Fatalf("load: %v", diagnostics)
 	}
-	model, diagnostics := service.semanticOwner.Build(ctx, graph)
+	model, diagnostics := service.semanticOwner.Build(ctx, graph, SemanticBuildOptions{})
 	if diagnosticsHaveErrors(diagnostics) {
 		t.Fatalf("semantic model: %v", diagnostics)
 	}

@@ -34,6 +34,12 @@ type SemanticModel struct {
 	interfaceImplementations []semanticInterfaceImplementation
 	asyncInterfaceMethods    map[string]bool
 	asyncInterfaceMethodObjs map[*types.Func]bool
+	// summaries holds the body summaries the build extracted, by package
+	// path.
+	summaries map[string][]byte
+	// staleSummaries lists the packages whose stored body summaries did not
+	// apply. A model with stale summaries is incomplete.
+	staleSummaries []string
 }
 
 // semanticPackage holds package facts built by one shard and read by lowering.
@@ -74,6 +80,12 @@ type semanticPackage struct {
 	typeAssertions []semanticTypeAssertion
 	// nilFacts records nil conversions and typed nil interface risks.
 	nilFacts []semanticNilFact
+	// bodyInterfaces holds the named interfaces the package's function bodies
+	// reach, applied from a body summary.
+	bodyInterfaces []*types.Named
+	// localFacts holds the fact digest lines of the marks on the package's
+	// body locals, applied from a body summary.
+	localFacts []string
 }
 
 type semanticDeclaration struct {
