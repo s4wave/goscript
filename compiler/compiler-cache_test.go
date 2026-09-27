@@ -97,6 +97,30 @@ func TestCompilePackagesCacheReplaysAcrossCheckouts(t *testing.T) {
 	}
 }
 
+// TestCompilePackagesCacheReplaysAcrossReplacedCheckouts pins that a go.mod
+// replacing a module with an absolute directory keys that directory by its
+// module, so a generated module in a second checkout still replays.
+func TestCompilePackagesCacheReplaysAcrossReplacedCheckouts(t *testing.T) {
+	cacheRoot := filepath.Join(t.TempDir(), "cache")
+	checkout := func(outputName string) {
+		root := writePackageGraphFixture(t, map[string]string{
+			"lib/go.mod":  "module example.test/lib\n\ngo 1.25.3\n",
+			"lib/lib.go":  "package lib\nconst Name = \"lib\"\n",
+			"app/main.go": "package main\n\nimport \"example.test/lib\"\n\nfunc main() { println(lib.Name) }\n",
+		})
+		appDir := filepath.Join(root, "app")
+		writeFixtureFile(t, appDir, "go.mod", "module example.test/app\n\ngo 1.25.3\n\nrequire example.test/lib v0.0.0\n\nreplace example.test/lib => "+filepath.Join(root, "lib")+"\n")
+		compileCacheFixture(t, appDir, filepath.Join(t.TempDir(), outputName), cacheRoot)
+	}
+	checkout("first")
+	manifests := countCacheManifests(t, cacheRoot)
+
+	checkout("second")
+	if got := countCacheManifests(t, cacheRoot); got != manifests {
+		t.Fatalf("cache manifests after second checkout = %d, want %d", got, manifests)
+	}
+}
+
 func TestCompilePackagesCacheReplaysEquivalentMultiPackageOutput(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod":      "module example.test/cacheequiv\n\ngo 1.25.3\n",
