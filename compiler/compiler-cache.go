@@ -21,6 +21,7 @@ import (
 	"sync"
 
 	jsoniter "github.com/aperturerobotics/json-iterator-lite"
+	"golang.org/x/mod/modfile"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -571,7 +572,7 @@ func newCompilerCacheKeyOwner(req *CompileRequest, graph *PackageGraph) *compile
 		}
 		var identities []string
 		for _, file := range moduleIdentityFiles(node.ModuleDir) {
-			identities = append(identities, owner.fileIdentity(file))
+			identities = append(identities, owner.moduleFileIdentity(file))
 		}
 		moduleIdentities[node.ModuleDir] = identities
 	}
@@ -637,6 +638,47 @@ func (o *compilerCacheKeyOwner) fileIdentity(file string) string {
 		return o.keyPath(file) + "|unreadable"
 	}
 	return o.keyPath(file) + "|" + sha256Hex(data)
+}
+
+// moduleFileIdentity names a module identity file by its key path and
+// content. A go.mod counts with its directory replacements keyed, so the
+// checkout location never enters a key; the replaced module's own sources key
+// its packages.
+func (o *compilerCacheKeyOwner) moduleFileIdentity(file string) string {
+	data, err := os.ReadFile(file)
+	if err != nil {
+		return o.keyPath(file) + "|unreadable"
+	}
+	if filepath.Base(file) == "go.mod" {
+		data = o.keyedGoMod(file, data)
+	}
+	return o.keyPath(file) + "|" + sha256Hex(data)
+}
+
+// keyedGoMod rewrites each directory replacement in a go.mod to its key path.
+// A go.mod that does not parse or format counts by its raw content.
+func (o *compilerCacheKeyOwner) keyedGoMod(file string, data []byte) []byte {
+	mod, err := modfile.Parse(file, data, nil)
+	if err != nil {
+		return data
+	}
+	for _, replace := range mod.Replace {
+		if !modfile.IsDirectoryPath(replace.New.Path) {
+			continue
+		}
+		dir := replace.New.Path
+		if !filepath.IsAbs(dir) {
+			dir = filepath.Join(filepath.Dir(file), dir)
+		}
+		if err := mod.AddReplace(replace.Old.Path, replace.Old.Version, o.keyPath(dir), ""); err != nil {
+			return data
+		}
+	}
+	keyed, err := mod.Format()
+	if err != nil {
+		return data
+	}
+	return keyed
 }
 
 // sharedIdentity digests the schema, the compiler identity and the request.
