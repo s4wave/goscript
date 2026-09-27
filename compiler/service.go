@@ -97,42 +97,36 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 	}
 	defer s.cacheOwner.Trim(req)
 
-	var programReplayTried bool
-	if s.cacheOwner.Enabled(req) {
-		graph, graphDiagnostics := s.graphOwner.LoadIdentity(ctx, req)
-		diagnostics = append(diagnostics, graphDiagnostics...)
-		if graph != nil {
-			result.OriginalPackages = slices.Clone(graph.RequestedPackagePaths)
-		}
-		if diagnosticsHaveErrors(diagnostics) {
-			result.Diagnostics = diagnostics
-			return result, NewCompileError(diagnostics)
-		}
-
-		// The program key covers every input of the override parity check, so a
-		// program stored after a verified compile replays without the full load.
-		if req.DependencyMode == DependencyModeAll {
-			overridePlan, overrideDiagnostics := s.overrideOwner.CopyPlan(ctx, req, graph)
-			diagnostics = append(diagnostics, overrideDiagnostics...)
-			if diagnosticsHaveErrors(diagnostics) {
-				result.Diagnostics = diagnostics
-				return result, NewCompileError(diagnostics)
-			}
-			sources := s.cacheOwner.Entries(req, graph, overridePlan)
-			if cached, ok := s.cacheOwner.ReplayProgram(ctx, req, sources); ok {
-				cached.OriginalPackages = slices.Clone(result.OriginalPackages)
-				cached.Diagnostics = diagnostics
-				return cached, nil
-			}
-			programReplayTried = true
-		}
-	}
-
-	graph, graphDiagnostics := s.graphOwner.Load(ctx, req)
+	graph, graphDiagnostics := s.graphOwner.LoadIdentity(ctx, req)
 	diagnostics = append(diagnostics, graphDiagnostics...)
 	if graph != nil {
 		result.OriginalPackages = slices.Clone(graph.RequestedPackagePaths)
 	}
+	if diagnosticsHaveErrors(diagnostics) {
+		result.Diagnostics = diagnostics
+		return result, NewCompileError(diagnostics)
+	}
+
+	// The program key covers every input of the override parity check, so a
+	// program stored after a verified compile replays without the full check.
+	var programReplayTried bool
+	if s.cacheOwner.Enabled(req) && req.DependencyMode == DependencyModeAll {
+		overridePlan, overrideDiagnostics := s.overrideOwner.CopyPlan(ctx, req, graph)
+		diagnostics = append(diagnostics, overrideDiagnostics...)
+		if diagnosticsHaveErrors(diagnostics) {
+			result.Diagnostics = diagnostics
+			return result, NewCompileError(diagnostics)
+		}
+		sources := s.cacheOwner.Entries(req, graph, overridePlan)
+		if cached, ok := s.cacheOwner.ReplayProgram(ctx, req, sources); ok {
+			cached.OriginalPackages = slices.Clone(result.OriginalPackages)
+			cached.Diagnostics = diagnostics
+			return cached, nil
+		}
+		programReplayTried = true
+	}
+
+	diagnostics = append(diagnostics, s.graphOwner.Check(ctx, graph)...)
 	if diagnosticsHaveErrors(diagnostics) {
 		result.Diagnostics = diagnostics
 		return result, NewCompileError(diagnostics)
