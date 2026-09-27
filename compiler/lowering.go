@@ -86,7 +86,6 @@ func (o *LoweringOwner) Build(ctx context.Context, model *SemanticModel, opts ..
 	}
 
 	program := &LoweredProgram{trimTypeInfo: options.TrimTypeInfo}
-	lazyPackageVars := newLazyPackageVarCache(len(model.packages))
 	asyncLazyCache := newAsyncLazyCache()
 	runtimeMethodSets := newRuntimeMethodSetCache()
 	semPkgs := make([]*semanticPackage, 0, len(model.packages))
@@ -123,7 +122,6 @@ func (o *LoweringOwner) Build(ctx context.Context, model *SemanticModel, opts ..
 			loweredPkg, pkgDiagnostics := o.lowerPackage(
 				model,
 				semPkg,
-				lazyPackageVars,
 				newAsyncLazyState(asyncLazyCache),
 				runtimeMethodSets,
 				options,
@@ -156,7 +154,6 @@ func (o *LoweringOwner) Build(ctx context.Context, model *SemanticModel, opts ..
 func (o *LoweringOwner) lowerPackage(
 	model *SemanticModel,
 	semPkg *semanticPackage,
-	lazyPackageVarsByPkg *lazyPackageVarCache,
 	asyncLazy *asyncLazyState,
 	runtimeMethodSets *runtimeMethodSetCache,
 	options LoweringOptions,
@@ -172,7 +169,6 @@ func (o *LoweringOwner) lowerPackage(
 		outputNames[sourcePath] = binding.outputName
 	}
 	methodIndex := buildPackageMethodIndex(semPkg)
-	lazyPackageVars := o.packageLazyVars(semPkg, lazyPackageVarsByPkg, declFiles)
 	diagnostics := slices.Clone(bindingDiagnostics)
 	for idx, file := range semPkg.source.Syntax {
 		sourcePath := sourceFilePath(semPkg, idx, file)
@@ -194,8 +190,7 @@ func (o *LoweringOwner) lowerPackage(
 				declFiles:                 declFiles,
 				outputNames:               outputNames,
 				methodIndex:               methodIndex,
-				lazyPackageVars:           lazyPackageVars,
-				lazyPackageVarsByPkg:      lazyPackageVarsByPkg,
+				lazyPackageVars:           semPkg.lazyVars,
 				asyncLazy:                 asyncLazy,
 				runtimeMethodSets:         runtimeMethodSets,
 				protobufTypeScriptAdapter: protobufAdapter,
@@ -210,19 +205,18 @@ func (o *LoweringOwner) lowerPackage(
 			continue
 		}
 		loweredFile, fileDiagnostics := o.lowerFile(lowerFileRequest{
-			model:                model,
-			semPkg:               semPkg,
-			file:                 file,
-			sourcePath:           sourcePath,
-			declFiles:            declFiles,
-			outputNames:          outputNames,
-			methodIndex:          methodIndex,
-			lazyPackageVars:      lazyPackageVars,
-			lazyPackageVarsByPkg: lazyPackageVarsByPkg,
-			asyncLazy:            asyncLazy,
-			runtimeMethodSets:    runtimeMethodSets,
-			trimTypeInfo:         options.TrimTypeInfo,
-			displayRoot:          options.DisplayRoot,
+			model:             model,
+			semPkg:            semPkg,
+			file:              file,
+			sourcePath:        sourcePath,
+			declFiles:         declFiles,
+			outputNames:       outputNames,
+			methodIndex:       methodIndex,
+			lazyPackageVars:   semPkg.lazyVars,
+			asyncLazy:         asyncLazy,
+			runtimeMethodSets: runtimeMethodSets,
+			trimTypeInfo:      options.TrimTypeInfo,
+			displayRoot:       options.DisplayRoot,
 		})
 		diagnostics = append(diagnostics, fileDiagnostics...)
 		if loweredFile != nil {
@@ -263,7 +257,6 @@ type lowerFileRequest struct {
 	outputNames               map[string]string
 	methodIndex               packageMethodIndex
 	lazyPackageVars           map[types.Object]bool
-	lazyPackageVarsByPkg      *lazyPackageVarCache
 	asyncLazy                 *asyncLazyState
 	runtimeMethodSets         *runtimeMethodSetCache
 	protobufTypeScriptAdapter bool
@@ -280,7 +273,6 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 	outputNames := req.outputNames
 	methodIndex := req.methodIndex
 	lazyPackageVars := req.lazyPackageVars
-	lazyPackageVarsByPkg := req.lazyPackageVarsByPkg
 	asyncLazy := req.asyncLazy
 	runtimeMethodSets := req.runtimeMethodSets
 	protobufTypeScriptAdapter := req.protobufTypeScriptAdapter
@@ -427,24 +419,23 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 	loweredFile.imports = append(loweredFile.imports, localImports...)
 
 	ctx := lowerFileContext{
-		model:                model,
-		semPkg:               semPkg,
-		file:                 file,
-		tokenFile:            semPkg.source.Fset.File(file.Pos()),
-		importAliases:        importAliases,
-		importPaths:          importPaths,
-		importNames:          importNames,
-		importObjects:        importObjects,
-		sourcePath:           sourcePath,
-		localAliases:         localRefs.aliases,
-		lazyPackageVars:      lazyPackageVars,
-		lazyPackageVarsByPkg: lazyPackageVarsByPkg,
-		asyncLazy:            asyncLazy,
-		tempNames:            newTempNameOwner(),
-		topLevel:             true,
-		protobufTSAdapter:    protobufTypeScriptAdapter,
-		trimTypeInfo:         trimTypeInfo,
-		displayRoot:          displayRoot,
+		model:             model,
+		semPkg:            semPkg,
+		file:              file,
+		tokenFile:         semPkg.source.Fset.File(file.Pos()),
+		importAliases:     importAliases,
+		importPaths:       importPaths,
+		importNames:       importNames,
+		importObjects:     importObjects,
+		sourcePath:        sourcePath,
+		localAliases:      localRefs.aliases,
+		lazyPackageVars:   lazyPackageVars,
+		asyncLazy:         asyncLazy,
+		tempNames:         newTempNameOwner(),
+		topLevel:          true,
+		protobufTSAdapter: protobufTypeScriptAdapter,
+		trimTypeInfo:      trimTypeInfo,
+		displayRoot:       displayRoot,
 	}
 	var packageInitCalls []string
 	appendDecls := func(decls []loweredDecl) {
@@ -1308,7 +1299,6 @@ type lowerFileContext struct {
 	sourcePath                    string
 	localAliases                  map[types.Object]string
 	lazyPackageVars               map[types.Object]bool
-	lazyPackageVarsByPkg          *lazyPackageVarCache
 	asyncLazy                     *asyncLazyState
 	identAliases                  map[types.Object]string
 	identAliasRefs                map[types.Object]bool
@@ -1824,61 +1814,11 @@ func packageOutputNames(semPkg *semanticPackage) map[string]string {
 	return outputNames
 }
 
-func (o *LoweringOwner) packageLazyVars(
-	semPkg *semanticPackage,
-	cache *lazyPackageVarCache,
-	declFiles map[types.Object]string,
-) map[types.Object]bool {
-	if semPkg == nil {
-		return nil
-	}
-	if cache == nil {
-		if declFiles == nil {
-			declFiles = packageDeclFiles(semPkg)
-		}
-		return o.lazyPackageVars(semPkg, declFiles)
-	}
-	if lazy, ok := cache.load(semPkg.pkgPath); ok {
-		return lazy
-	}
-	if declFiles == nil {
-		declFiles = packageDeclFiles(semPkg)
-	}
-	lazy := o.lazyPackageVars(semPkg, declFiles)
-	cache.store(semPkg.pkgPath, lazy)
-	return lazy
-}
-
-// lazyPackageVarCache memoizes which of a package's variables are initialized
-// lazily. The answer depends only on that package's own syntax and
-// initialization order, never on which package is being lowered, so packages
-// lowered concurrently share one cache.
-type lazyPackageVarCache struct {
-	mu    sync.Mutex
-	byPkg map[string]map[types.Object]bool
-}
-
-func newLazyPackageVarCache(size int) *lazyPackageVarCache {
-	return &lazyPackageVarCache{byPkg: make(map[string]map[types.Object]bool, size)}
-}
-
-func (c *lazyPackageVarCache) load(pkgPath string) (map[types.Object]bool, bool) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	lazy, ok := c.byPkg[pkgPath]
-	return lazy, ok
-}
-
-func (c *lazyPackageVarCache) store(pkgPath string, lazy map[types.Object]bool) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	c.byPkg[pkgPath] = lazy
-}
-
-func (o *LoweringOwner) lazyPackageVars(semPkg *semanticPackage, declFiles map[types.Object]string) map[types.Object]bool {
-	if semPkg == nil || semPkg.source == nil {
-		return nil
-	}
+// lazyPackageVars returns the package variables that initialize lazily through
+// a getter. The answer depends only on the package's own syntax and
+// initialization order.
+func lazyPackageVars(semPkg *semanticPackage) map[types.Object]bool {
+	declFiles := packageDeclFiles(semPkg)
 	varOrder := make(map[types.Object]int)
 	for idx, obj := range semPkg.initOrder {
 		varOrder[obj] = idx
@@ -2032,43 +1972,14 @@ func collectTopLevelRefs(
 	})
 }
 
-func (o *LoweringOwner) packageVarIsLazy(ctx lowerFileContext, obj *types.Var) bool {
-	if obj == nil {
-		return false
-	}
-	if ctx.lazyPackageVars[obj] {
-		return true
-	}
-	if ctx.model == nil || obj.Pkg() == nil {
+// packageVarIsLazy reports whether obj is a package variable its package
+// initializes lazily.
+func packageVarIsLazy(ctx lowerFileContext, obj types.Object) bool {
+	if obj == nil || obj.Pkg() == nil || ctx.model == nil {
 		return false
 	}
 	semPkg := ctx.model.packages[obj.Pkg().Path()]
-	if semPkg == nil {
-		return false
-	}
-	for lazyObj := range o.packageLazyVars(semPkg, ctx.lazyPackageVarsByPkg, nil) {
-		if lazyObj != nil && lazyObj.Name() == obj.Name() &&
-			lazyObj.Pkg() != nil && lazyObj.Pkg().Path() == obj.Pkg().Path() {
-			return true
-		}
-	}
-	return false
-}
-
-func (o *LoweringOwner) packageVarNameIsLazy(ctx lowerFileContext, pkgPath, name string) bool {
-	if ctx.model == nil || pkgPath == "" || name == "" {
-		return false
-	}
-	semPkg := ctx.model.packages[pkgPath]
-	if semPkg == nil {
-		return false
-	}
-	for lazyObj := range o.packageLazyVars(semPkg, ctx.lazyPackageVarsByPkg, nil) {
-		if lazyObj != nil && lazyObj.Name() == name {
-			return true
-		}
-	}
-	return false
+	return semPkg != nil && semPkg.lazyVars[obj]
 }
 
 func (o *LoweringOwner) packageVarHasAsyncLazyInit(ctx lowerFileContext, obj types.Object) bool {
@@ -2088,11 +1999,10 @@ func (o *LoweringOwner) packageVarNameHasAsyncLazyInit(ctx lowerFileContext, pkg
 		return false
 	}
 	initCtx := lowerFileContext{
-		model:                ctx.model,
-		semPkg:               semPkg,
-		lazyPackageVarsByPkg: ctx.lazyPackageVarsByPkg,
-		asyncLazy:            ctx.asyncLazy,
-		topLevel:             true,
+		model:     ctx.model,
+		semPkg:    semPkg,
+		asyncLazy: ctx.asyncLazy,
+		topLevel:  true,
 	}
 	for _, file := range semPkg.source.Syntax {
 		for _, decl := range file.Decls {
@@ -2723,7 +2633,6 @@ func (o *LoweringOwner) lowerTupleValueSpec(
 		code := keyword + " " + o.lowerIdent(ctx, name, true) + ": " + variableType + " = " + value
 		lazy := lazyTuple || ctx.topLevel && ctx.lazyPackageVars[obj]
 		if lazy {
-			keyword = "var"
 			// The lazy variable holds undefined until its getter runs the
 			// initializer; declaring it without an initializer keeps the
 			// declared type T while the runtime value starts as undefined.
@@ -3386,7 +3295,7 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 			methodSourcePath == ctx.sourcePath &&
 			!protobufTypeScriptAdapterOneofBranch(semType) &&
 			protobufTypeScriptBindingReplacesMethodName(methodDecl.Name.Name) &&
-			!(lowered.protobufPreserveJSON && protobufTypeScriptBindingJSONMethodName(methodDecl.Name.Name)) {
+			(!lowered.protobufPreserveJSON || !protobufTypeScriptBindingJSONMethodName(methodDecl.Name.Name)) {
 			bodyless := *methodDecl
 			bodyless.Body = nil
 			lowerDecl = &bodyless
@@ -5596,15 +5505,6 @@ func shortDeclNeedsTypeAnnotation(typ types.Type) bool {
 	default:
 		return false
 	}
-}
-
-func rhsIsMethodValue(ctx lowerFileContext, expr ast.Expr) bool {
-	selector, ok := expr.(*ast.SelectorExpr)
-	if !ok || ctx.semPkg == nil || ctx.semPkg.source == nil {
-		return false
-	}
-	selection := ctx.semPkg.source.TypesInfo.Selections[selector]
-	return selection != nil && selection.Kind() == types.MethodVal
 }
 
 func (o *LoweringOwner) lowerTupleTargetAssignmentStmt(
@@ -8069,10 +7969,7 @@ func (o *LoweringOwner) lowerFuncLitForTarget(
 	targetType types.Type,
 	allowAsyncOverrideCallback bool,
 ) (string, bool, []Diagnostic) {
-	allowAsyncCalls := true
-	if !allowAsyncOverrideCallback && signatureForType(targetType) != nil {
-		allowAsyncCalls = false
-	}
+	allowAsyncCalls := allowAsyncOverrideCallback || signatureForType(targetType) == nil
 	return o.lowerFuncLitWithAsyncCalls(ctx, lit, allowAsyncCalls)
 }
 
@@ -8285,8 +8182,7 @@ func (o *LoweringOwner) lowerImportedIdent(ctx lowerFileContext, obj types.Objec
 		return "", false
 	}
 	qualified := alias + "." + value
-	if varObj, ok := obj.(*types.Var); ok &&
-		(o.packageVarIsLazy(ctx, varObj) || o.packageVarNameIsLazy(ctx, obj.Pkg().Path(), obj.Name())) {
+	if packageVarIsLazy(ctx, obj) {
 		qualified = alias + "." + packageVarGetterName(value) + "()"
 		if (ctx.asyncFunction || ctx.topLevel) &&
 			o.packageVarNameHasAsyncLazyInit(ctx, obj.Pkg().Path(), obj.Name()) {
@@ -8348,15 +8244,7 @@ func objectNeedsVarRef(ctx lowerFileContext, obj types.Object) bool {
 		return false
 	}
 	semPkg := ctx.model.packages[obj.Pkg().Path()]
-	if semPkg == nil {
-		return false
-	}
-	for _, value := range semPkg.values {
-		if value.name == obj.Name() && ctx.model.needsVarRef[value.object] {
-			return true
-		}
-	}
-	return false
+	return semPkg != nil && semPkg.varRefNames[obj.Name()]
 }
 
 func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) (string, []Diagnostic) {
@@ -8901,17 +8789,6 @@ func typeParamInterfaceConstraint(typ types.Type) types.Type {
 		return nil
 	}
 	return iface
-}
-
-func (o *LoweringOwner) lowerExprList(ctx lowerFileContext, exprs []ast.Expr) ([]string, []Diagnostic) {
-	args := make([]string, 0, len(exprs))
-	var diagnostics []Diagnostic
-	for _, expr := range exprs {
-		lowered, exprDiagnostics := o.lowerExpr(ctx, expr)
-		diagnostics = append(diagnostics, exprDiagnostics...)
-		args = append(args, lowered)
-	}
-	return args, diagnostics
 }
 
 func callTargetSignature(ctx lowerFileContext, expr ast.Expr) *types.Signature {
@@ -9711,75 +9588,6 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 	return call, diagnostics, true
 }
 
-func methodAllowsNilReceiver(ctx lowerFileContext, method *types.Func) bool {
-	if method == nil || method.Pkg() == nil {
-		return false
-	}
-	semPkg := ctx.semPkg
-	if semPkg == nil || semPkg.pkgPath != method.Pkg().Path() {
-		if ctx.model == nil {
-			return false
-		}
-		semPkg = ctx.model.packages[method.Pkg().Path()]
-	}
-	if semPkg == nil || semPkg.source == nil {
-		return false
-	}
-	for _, file := range semPkg.source.Syntax {
-		for _, decl := range file.Decls {
-			fnDecl, ok := decl.(*ast.FuncDecl)
-			if !ok || fnDecl.Body == nil || semPkg.source.TypesInfo.Defs[fnDecl.Name] != method {
-				continue
-			}
-			if fnDecl.Recv == nil || len(fnDecl.Recv.List) == 0 || len(fnDecl.Recv.List[0].Names) == 0 {
-				return false
-			}
-			receiverName := fnDecl.Recv.List[0].Names[0].Name
-			checksNil := false
-			directDeref := false
-			ast.Inspect(fnDecl.Body, func(node ast.Node) bool {
-				if checksNil || directDeref {
-					return false
-				}
-				if _, ok := node.(*ast.FuncLit); ok {
-					return false
-				}
-				if star, ok := node.(*ast.StarExpr); ok && identName(star.X) == receiverName {
-					directDeref = true
-					return false
-				}
-				if selector, ok := node.(*ast.SelectorExpr); ok && identName(selector.X) == receiverName {
-					if selection := semPkg.source.TypesInfo.Selections[selector]; selection != nil &&
-						selection.Kind() == types.FieldVal {
-						directDeref = true
-						return false
-					}
-				}
-				binary, ok := node.(*ast.BinaryExpr)
-				if !ok || (binary.Op != token.EQL && binary.Op != token.NEQ) {
-					return true
-				}
-				if identName(binary.X) == receiverName && isNilExpr(binary.Y) ||
-					identName(binary.Y) == receiverName && isNilExpr(binary.X) {
-					checksNil = true
-					return false
-				}
-				return true
-			})
-			return checksNil || !directDeref
-		}
-	}
-	return false
-}
-
-func identName(expr ast.Expr) string {
-	ident, _ := ast.Unparen(expr).(*ast.Ident)
-	if ident == nil {
-		return ""
-	}
-	return ident.Name
-}
-
 func (o *LoweringOwner) lowerNamedReceiverForMethod(
 	ctx lowerFileContext,
 	expr ast.Expr,
@@ -9827,8 +9635,7 @@ func (o *LoweringOwner) lowerSelectorExpr(ctx lowerFileContext, expr *ast.Select
 					return "(async (...__args: Parameters<typeof " + value + ">) => (await import(" + source + "))." + expr.Sel.Name + "(...__args))", nil
 				}
 				obj, _ := ctx.semPkg.source.TypesInfo.Uses[expr.Sel].(*types.Var)
-				if o.packageVarIsLazy(ctx, obj) ||
-					o.packageVarNameIsLazy(ctx, pkgName.Imported().Path(), expr.Sel.Name) {
+				if packageVarIsLazy(ctx, ctx.semPkg.source.TypesInfo.Uses[expr.Sel]) {
 					value = alias + "." + packageVarGetterName(expr.Sel.Name) + "()"
 					if (ctx.asyncFunction || ctx.topLevel) &&
 						o.packageVarNameHasAsyncLazyInit(ctx, pkgName.Imported().Path(), expr.Sel.Name) {
@@ -12616,15 +12423,6 @@ func unnamedSignatureForType(typ types.Type) *types.Signature {
 	return signature
 }
 
-func exprIsAsyncCompatibleFuncLit(ctx lowerFileContext, expr ast.Expr) bool {
-	funcLit, ok := expr.(*ast.FuncLit)
-	if !ok || ctx.semPkg == nil || ctx.semPkg.source == nil {
-		return false
-	}
-	signature, _ := ctx.semPkg.source.TypesInfo.TypeOf(funcLit).(*types.Signature)
-	return funcLiteralNeedsAsyncFunctionParamCalls(signature)
-}
-
 func asyncResultType(result string, async bool) string {
 	if !async {
 		return result
@@ -13168,17 +12966,6 @@ func staticTypeParamInScope(ctx lowerFileContext, target *types.TypeParam) bool 
 	return ctx.staticTypeParams[target.Obj().Name()]
 }
 
-func typeParamConstraintIsAny(typeParam *types.TypeParam) bool {
-	if typeParam == nil {
-		return false
-	}
-	iface, ok := typeParam.Constraint().Underlying().(*types.Interface)
-	if !ok {
-		return false
-	}
-	return iface.NumMethods() == 0 && iface.NumEmbeddeds() == 0
-}
-
 func signatureTypeParamNames(signature *types.Signature) []string {
 	if signature == nil || signature.TypeParams() == nil {
 		return nil
@@ -13631,18 +13418,6 @@ func genericFunctionSignature(ctx lowerFileContext, expr ast.Expr) *types.Signat
 	return signature
 }
 
-func selectorUsesGeneratedPackage(ctx lowerFileContext, expr *ast.SelectorExpr) bool {
-	if ctx.model == nil || ctx.semPkg == nil || ctx.semPkg.source == nil {
-		return false
-	}
-	fn := calledFunction(ctx.semPkg.source, expr)
-	if fn == nil || fn.Pkg() == nil {
-		return false
-	}
-	_, ok := ctx.model.packages[fn.Pkg().Path()]
-	return ok
-}
-
 func protobufGeneratedSyncDecl(ctx lowerFileContext, decl *ast.FuncDecl) bool {
 	if decl == nil || ctx.semPkg == nil || ctx.semPkg.source == nil || !protobufTypeScriptBindingReplacesMethodName(decl.Name.Name) {
 		return false
@@ -13791,108 +13566,48 @@ func (o *LoweringOwner) walkAsyncLazyFunctionBody(
 	fn *types.Func,
 	seen map[*types.Func]bool,
 ) bool {
-	if fn.Pkg() == nil {
+	semFn := ctx.model.functions[fn]
+	if semFn == nil {
 		return false
 	}
-	semPkg := ctx.model.packages[fn.Pkg().Path()]
-	if semPkg == nil || semPkg.source == nil {
-		return false
-	}
-	decl := functionDeclForObject(semPkg, fn)
-	if decl == nil || decl.Body == nil {
-		return false
-	}
-	analysisCtx := lowerFileContext{
-		model:                ctx.model,
-		semPkg:               semPkg,
-		lazyPackageVarsByPkg: ctx.lazyPackageVarsByPkg,
-		asyncLazy:            ctx.asyncLazy,
-		topLevel:             true,
-	}
-	references := false
-	ast.Inspect(decl.Body, func(node ast.Node) bool {
-		if references {
-			return false
-		}
-		if _, ok := node.(*ast.FuncLit); ok {
-			return false
-		}
-		if ident, ok := node.(*ast.Ident); ok {
-			if o.objectIsAsyncLazyPackageVar(analysisCtx, semPkg.source.TypesInfo.Uses[ident]) {
-				references = true
-				return false
-			}
-		}
-		if selector, ok := node.(*ast.SelectorExpr); ok {
-			if o.objectIsAsyncLazyPackageVar(analysisCtx, semPkg.source.TypesInfo.Uses[selector.Sel]) {
-				references = true
-				return false
-			}
-		}
-		call, ok := node.(*ast.CallExpr)
-		if !ok {
+	for obj := range semFn.packageVars {
+		if packageVarIsLazy(ctx, obj) && o.packageVarHasAsyncLazyInit(ctx, obj) {
 			return true
 		}
-		if o.functionReferencesAsyncLazyPackageVar(ctx, calledFunction(semPkg.source, call.Fun), seen) {
-			references = true
-			return false
+	}
+	for called := range semFn.calls {
+		if o.functionReferencesAsyncLazyPackageVar(ctx, called, seen) {
+			return true
 		}
-		return true
-	})
-	return references
-}
-
-func (o *LoweringOwner) objectIsAsyncLazyPackageVar(ctx lowerFileContext, obj types.Object) bool {
-	varObj, _ := obj.(*types.Var)
-	if varObj == nil || varObj.Pkg() == nil {
-		return false
 	}
-	if !o.packageVarIsLazy(ctx, varObj) && !o.packageVarNameIsLazy(ctx, varObj.Pkg().Path(), varObj.Name()) {
-		return false
-	}
-	return o.packageVarHasAsyncLazyInit(ctx, varObj)
+	return false
 }
 
 func (o *LoweringOwner) callNeedsAwait(ctx lowerFileContext, fun ast.Expr) bool {
-	for {
-		switch typed := fun.(type) {
-		case *ast.IndexExpr:
-			if signatureForType(ctx.semPkg.source.TypesInfo.TypeOf(typed.X)) == nil {
-				break
-			}
-			fun = typed.X
-		case *ast.IndexListExpr:
-			if signatureForType(ctx.semPkg.source.TypesInfo.TypeOf(typed.X)) == nil {
-				break
-			}
-			fun = typed.X
-		default:
-			if ctx.semPkg == nil || ctx.semPkg.source == nil {
-				return false
-			}
-			called := calledFunction(ctx.semPkg.source, fun)
-			if ctx.protobufGeneratedSyncFunction && called != nil && protobufTypeScriptBindingReplacesMethodName(called.Name()) {
-				return false
-			}
-			return o.functionAsync(ctx, called) ||
-				o.overrideCallNeedsAwait(ctx, fun) ||
-				(!ctx.protobufGeneratedSyncFunction && callUsesFunctionValue(ctx.semPkg.source, fun)) ||
-				(ctx.asyncFunction && callUsesInterfaceMethod(ctx.semPkg.source, fun)) ||
-				(ctx.asyncFunction && callUsesFunctionIdentifier(ctx.semPkg.source, fun))
-		}
-		if ctx.semPkg == nil || ctx.semPkg.source == nil {
-			return false
-		}
-		called := calledFunction(ctx.semPkg.source, fun)
-		if ctx.protobufGeneratedSyncFunction && called != nil && protobufTypeScriptBindingReplacesMethodName(called.Name()) {
-			return false
-		}
-		return o.functionAsync(ctx, called) ||
-			o.overrideCallNeedsAwait(ctx, fun) ||
-			(!ctx.protobufGeneratedSyncFunction && callUsesFunctionValue(ctx.semPkg.source, fun)) ||
-			(ctx.asyncFunction && callUsesInterfaceMethod(ctx.semPkg.source, fun)) ||
-			(ctx.asyncFunction && callUsesFunctionIdentifier(ctx.semPkg.source, fun))
+	if ctx.semPkg == nil || ctx.semPkg.source == nil {
+		return false
 	}
+	pkg := ctx.semPkg.source
+	// Calling a generic function instantiation calls the function.
+	var generic ast.Expr
+	switch typed := fun.(type) {
+	case *ast.IndexExpr:
+		generic = typed.X
+	case *ast.IndexListExpr:
+		generic = typed.X
+	}
+	if generic != nil && signatureForType(pkg.TypesInfo.TypeOf(generic)) != nil {
+		fun = generic
+	}
+	called := calledFunction(pkg, fun)
+	if ctx.protobufGeneratedSyncFunction && called != nil && protobufTypeScriptBindingReplacesMethodName(called.Name()) {
+		return false
+	}
+	return o.functionAsync(ctx, called) ||
+		o.overrideCallNeedsAwait(ctx, fun) ||
+		(!ctx.protobufGeneratedSyncFunction && callUsesFunctionValue(pkg, fun)) ||
+		(ctx.asyncFunction && callUsesInterfaceMethod(pkg, fun)) ||
+		(ctx.asyncFunction && callUsesFunctionIdentifier(pkg, fun))
 }
 
 func callUsesInterfaceMethod(pkg *packages.Package, fun ast.Expr) bool {
