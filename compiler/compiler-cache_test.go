@@ -76,6 +76,27 @@ func TestCompilePackagesCacheReplaysOutput(t *testing.T) {
 	}
 }
 
+// TestCompilePackagesCacheReplaysAcrossCheckouts pins that cache keys name
+// sources by module and content, so a second checkout of the same module
+// replays the first checkout's entries.
+func TestCompilePackagesCacheReplaysAcrossCheckouts(t *testing.T) {
+	files := map[string]string{
+		"go.mod":       "module example.test/cachecheckout\n\ngo 1.25.3\n",
+		"main.go":      "package cachecheckout\n\nimport (\n\t_ \"embed\"\n\n\t\"example.test/cachecheckout/sub\"\n)\n\n//go:embed value.txt\nvar Value string\n\nconst Name = sub.Other\n",
+		"value.txt":    "value\n",
+		"sub/sub.go":   "package sub\nconst Name = \"sub\"\n",
+		"sub/other.go": "package sub\nconst Other = Name\n",
+	}
+	cacheRoot := filepath.Join(t.TempDir(), "cache")
+	compileCacheFixture(t, writePackageGraphFixture(t, files), filepath.Join(t.TempDir(), "first"), cacheRoot)
+	manifests := countCacheManifests(t, cacheRoot)
+
+	compileCacheFixture(t, writePackageGraphFixture(t, files), filepath.Join(t.TempDir(), "second"), cacheRoot)
+	if got := countCacheManifests(t, cacheRoot); got != manifests {
+		t.Fatalf("cache manifests after second checkout = %d, want %d", got, manifests)
+	}
+}
+
 func TestCompilePackagesCacheReplaysEquivalentMultiPackageOutput(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod":      "module example.test/cacheequiv\n\ngo 1.25.3\n",
