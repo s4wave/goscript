@@ -202,8 +202,9 @@ func packageGraphLoadMode(shape packageGraphLoadShape) packages.LoadMode {
 	if shape == packageGraphLoadIdentity {
 		return mode
 	}
+	// Every package is type-checked from source, so the load asks for no export
+	// data; requesting it makes go list compile the whole program first.
 	return mode |
-		packages.NeedExportFile |
 		packages.NeedTypes |
 		packages.NeedSyntax |
 		packages.NeedTypesInfo |
