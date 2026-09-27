@@ -873,8 +873,9 @@ func countCacheManifests(t *testing.T, cacheRoot string) int {
 
 // cacheFactsFixture has a dependency whose lowered output depends on facts its
 // dependent establishes: an async implementation of dep.Runner makes dep.Use
-// async, and taking the address of dep.Var makes it a variable reference.
-// decls completes the dependent package.
+// async, an async callback makes dep.Call async, and taking the address of
+// dep.Var makes it a variable reference. decls completes the dependent
+// package.
 func cacheFactsFixture(decls string) map[string]string {
 	return map[string]string{
 		"go.mod": "module example.test/cachefacts\n\ngo 1.25.3\n",
@@ -886,6 +887,7 @@ func cacheFactsFixture(decls string) map[string]string {
 			"type Runner interface { Run() }",
 			"func Use(r Runner) { r.Run() }",
 			"func Double(x int) int { return x * 2 }",
+			"func Call(f func()) { f() }",
 			"",
 		}, "\n"),
 	}
@@ -900,6 +902,9 @@ const (
 		"func Start() int { dep.Use(runner{}); return dep.Double(1) }\n"
 	cacheFactsVarRefDecls = "func (runner) Run() {}\n\n" +
 		"func Start() int { dep.Use(runner{}); p := &dep.Var; *p = 1; return dep.Double(1) }\n"
+	cacheFactsExportDecls   = cacheFactsDecls + "\nfunc Triple(x int) int { return x * 3 }\n"
+	cacheFactsCallbackDecls = "func (runner) Run() {}\n\n" +
+		"func Start() int { dep.Call(func() { ch := make(chan int, 1); ch <- 1; <-ch }); return dep.Double(1) }\n"
 )
 
 func TestCompilerCacheArtifactKeysFollowClosureFacts(t *testing.T) {
@@ -930,45 +935,49 @@ func TestCompilerCacheArtifactKeysFollowClosureFacts(t *testing.T) {
 	}
 }
 
-// TestCompilePackagesCacheDownwardFactsMatchFreshCompile edits a dependent so
-// that a fact of its dependency changes, then checks the cached compile
-// against an uncached one.
-func TestCompilePackagesCacheDownwardFactsMatchFreshCompile(t *testing.T) {
-	cases := []struct {
+// TestCompilePackagesCacheEditsMatchFreshCompile walks one cache through a
+// series of dependent edits and back, checking each cached compile against an
+// uncached one. The dependency's body summary is stored once and applied under
+// every set of facts its dependent establishes.
+func TestCompilePackagesCacheEditsMatchFreshCompile(t *testing.T) {
+	edits := []struct {
 		name  string
 		decls string
-		// depChanges is set when the fact changes the dependency's output.
-		// Interface calls outside a sealed interface are already async, so the
-		// async implementation changes only the dependency's facts.
+		// depChanges is set when the edit changes the dependency's output
+		// relative to the base fixture. Interface calls outside a sealed
+		// interface and calls of function values with unknown callees are
+		// already async, so the async edits change only the dependency's
+		// facts.
 		depChanges bool
 	}{
+		{name: "body edit", decls: cacheFactsBodyEditDecls},
+		{name: "exported function", decls: cacheFactsExportDecls},
 		{name: "async implementation", decls: cacheFactsAsyncDecls},
+		{name: "async callback", decls: cacheFactsCallbackDecls},
 		{name: "variable ref", decls: cacheFactsVarRefDecls, depChanges: true},
+		{name: "revert", decls: cacheFactsDecls},
 	}
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			config := Config{AllDependencies: true}
-			moduleDir := writePackageGraphFixture(t, cacheFactsFixture(cacheFactsDecls))
-			cacheRoot := filepath.Join(t.TempDir(), "cache")
-			firstOut := filepath.Join(t.TempDir(), "first")
-			compileCacheFixtureConfig(t, config, moduleDir, firstOut, cacheRoot)
+	config := Config{AllDependencies: true}
+	moduleDir := writePackageGraphFixture(t, cacheFactsFixture(cacheFactsDecls))
+	cacheRoot := filepath.Join(t.TempDir(), "cache")
+	baseOut := filepath.Join(t.TempDir(), "base")
+	compileCacheFixtureConfig(t, config, moduleDir, baseOut, cacheRoot)
+	depBase := readOutputFile(t, baseOut, "example.test/cachefacts/dep", "dep.gs.ts")
+	for _, edit := range edits {
+		writeFixtureFile(t, moduleDir, "main.go", cacheFactsFixture(edit.decls)["main.go"])
+		cachedOut := filepath.Join(t.TempDir(), "cached")
+		compileCacheFixtureConfig(t, config, moduleDir, cachedOut, cacheRoot)
+		freshOut := filepath.Join(t.TempDir(), "fresh")
+		compileCacheFixtureConfig(t, config, moduleDir, freshOut, "")
 
-			writeFixtureFile(t, moduleDir, "main.go", cacheFactsFixture(tc.decls)["main.go"])
-			cachedOut := filepath.Join(t.TempDir(), "cached")
-			compileCacheFixtureConfig(t, config, moduleDir, cachedOut, cacheRoot)
-			freshOut := filepath.Join(t.TempDir(), "fresh")
-			compileCacheFixtureConfig(t, config, moduleDir, freshOut, "")
-
-			cached := outputTreeSnapshot(t, cachedOut)
-			if fresh := outputTreeSnapshot(t, freshOut); cached != fresh {
-				t.Fatalf("cached output differs from fresh compile:\ncached:\n%s\nfresh:\n%s", cached, fresh)
-			}
-			depBefore := readOutputFile(t, firstOut, "example.test/cachefacts/dep", "dep.gs.ts")
-			depAfter := readOutputFile(t, cachedOut, "example.test/cachefacts/dep", "dep.gs.ts")
-			if tc.depChanges && depBefore == depAfter {
-				t.Fatalf("fixture edit did not change the dependency output:\n%s", depAfter)
-			}
-		})
+		cached := outputTreeSnapshot(t, cachedOut)
+		if fresh := outputTreeSnapshot(t, freshOut); cached != fresh {
+			t.Fatalf("%s: cached output differs from fresh compile:\ncached:\n%s\nfresh:\n%s", edit.name, cached, fresh)
+		}
+		depCached := readOutputFile(t, cachedOut, "example.test/cachefacts/dep", "dep.gs.ts")
+		if changed := depCached != depBase; changed != edit.depChanges {
+			t.Fatalf("%s: dependency output changed %v, want %v:\n%s", edit.name, changed, edit.depChanges, depCached)
+		}
 	}
 }
 
