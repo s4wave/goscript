@@ -56,13 +56,6 @@ type PackageGraphOwner struct {
 	overrideOwner *OverrideRegistryOwner
 }
 
-type packageGraphLoadShape int
-
-const (
-	packageGraphLoadFull packageGraphLoadShape = iota
-	packageGraphLoadIdentity
-)
-
 // NewPackageGraphOwner creates the package graph owner.
 func NewPackageGraphOwner(overrideOwners ...*OverrideRegistryOwner) *PackageGraphOwner {
 	overrideOwner := NewOverrideRegistryOwner()
@@ -72,14 +65,14 @@ func NewPackageGraphOwner(overrideOwners ...*OverrideRegistryOwner) *PackageGrap
 	return &PackageGraphOwner{overrideOwner: overrideOwner}
 }
 
-// Load builds the package graph for a validated request.
+// Load builds the package graph for a validated request with syntax and type
+// information for every package.
 func (o *PackageGraphOwner) Load(ctx context.Context, req *CompileRequest) (*PackageGraph, []Diagnostic) {
-	return o.load(ctx, req, packageGraphLoadFull)
-}
-
-// LoadIdentity builds the package identity graph needed for cache lookup.
-func (o *PackageGraphOwner) LoadIdentity(ctx context.Context, req *CompileRequest) (*PackageGraph, []Diagnostic) {
-	return o.load(ctx, req, packageGraphLoadIdentity)
+	graph, diagnostics := o.LoadIdentity(ctx, req)
+	if diagnosticsHaveErrors(diagnostics) {
+		return graph, diagnostics
+	}
+	return graph, append(diagnostics, o.Check(ctx, graph)...)
 }
 
 // goScriptLoaderEnv returns the go command environment for loading GoScript
@@ -89,7 +82,9 @@ func goScriptLoaderEnv() []string {
 	return append(os.Environ(), "GOOS=js", "GOARCH=wasm", "CGO_ENABLED=0")
 }
 
-func (o *PackageGraphOwner) load(ctx context.Context, req *CompileRequest, shape packageGraphLoadShape) (*PackageGraph, []Diagnostic) {
+// LoadIdentity builds the package identity graph: names, files and imports,
+// without syntax or types. Check completes it.
+func (o *PackageGraphOwner) LoadIdentity(ctx context.Context, req *CompileRequest) (*PackageGraph, []Diagnostic) {
 	if err := ctx.Err(); err != nil {
 		return nil, []Diagnostic{{
 			Severity: DiagnosticSeverityError,
@@ -104,7 +99,7 @@ func (o *PackageGraphOwner) load(ctx context.Context, req *CompileRequest, shape
 		Env:        goScriptLoaderEnv(),
 		BuildFlags: goScriptBuildFlags(req.BuildFlags),
 		Tests:      req.Tests,
-		Mode:       packageGraphLoadMode(shape),
+		Mode:       packageGraphLoadMode,
 	}
 	pkgs, err := packages.Load(cfg, req.Patterns...)
 	if err != nil {
@@ -173,10 +168,9 @@ func (o *PackageGraphOwner) load(ctx context.Context, req *CompileRequest, shape
 	// candidates ship hand-written TypeScript and never lower their Go source.
 	var diagnostics []Diagnostic
 	for _, node := range graph.Nodes {
-		if node.OverrideCandidate {
-			continue
+		if !node.OverrideCandidate {
+			diagnostics = append(diagnostics, packageDiagnostics(graph.packagesByPath[node.PkgPath])...)
 		}
-		diagnostics = append(diagnostics, packageDiagnostics(graph.packagesByPath[node.PkgPath])...)
 	}
 	if len(graph.Nodes) == 0 {
 		diagnostics = append(diagnostics, Diagnostic{
@@ -191,25 +185,16 @@ func (o *PackageGraphOwner) load(ctx context.Context, req *CompileRequest, shape
 	return graph, diagnostics
 }
 
-func packageGraphLoadMode(shape packageGraphLoadShape) packages.LoadMode {
-	mode := packages.NeedName |
-		packages.NeedFiles |
-		packages.NeedCompiledGoFiles |
-		packages.NeedImports |
-		packages.NeedDeps |
-		packages.NeedForTest |
-		packages.NeedModule
-	if shape == packageGraphLoadIdentity {
-		return mode
-	}
-	// Every package is type-checked from source, so the load asks for no export
-	// data; requesting it makes go list compile the whole program first.
-	return mode |
-		packages.NeedTypes |
-		packages.NeedSyntax |
-		packages.NeedTypesInfo |
-		packages.NeedTypesSizes
-}
+// packageGraphLoadMode asks go list for package identity only. Check parses
+// and type-checks every package itself, so no export data is requested either;
+// requesting it makes go list compile the whole program first.
+const packageGraphLoadMode = packages.NeedName |
+	packages.NeedFiles |
+	packages.NeedCompiledGoFiles |
+	packages.NeedImports |
+	packages.NeedDeps |
+	packages.NeedForTest |
+	packages.NeedModule
 
 func (o *PackageGraphOwner) collect(
 	graph *PackageGraph,
