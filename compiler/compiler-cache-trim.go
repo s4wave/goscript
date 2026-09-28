@@ -34,9 +34,10 @@ func markCompilerCacheUsed(path string, info os.FileInfo) {
 	_ = os.Chtimes(path, now, now)
 }
 
-// Trim removes entries and blobs unused for the maximum age, and the roots of
-// other cache schemas, at most once per trim interval. A removed entry or blob
-// makes a later lookup miss, and the compile that misses rebuilds it.
+// Trim removes entries, blobs and source indexes unused for the maximum age,
+// and the roots of other cache schemas, at most once per trim interval. A
+// removed entry or blob makes a later lookup miss, and the compile that misses
+// rebuilds it.
 func (o *CompilerCacheOwner) Trim(req *CompileRequest) {
 	if !o.Enabled(req) {
 		return
@@ -68,6 +69,7 @@ func (o *CompilerCacheOwner) Trim(req *CompileRequest) {
 	trimCompilerCacheFanout(filepath.Join(schemaRoot, "entries"), cutoff, manifestUsedAt)
 	trimCompilerCacheFanout(filepath.Join(schemaRoot, "blobs", "sha256"), cutoff, os.Stat)
 	trimCompilerCacheItems(filepath.Join(schemaRoot, "tmp"), cutoff, os.Stat)
+	trimCompilerCacheItems(filepath.Join(schemaRoot, "sources"), cutoff, os.Stat)
 }
 
 // trimCompilerCacheFanout trims every fan-out directory under root.
