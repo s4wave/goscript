@@ -39,12 +39,12 @@ export async function main(): globalThis.Promise<void> {
 	let und: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"big\":9007199254740993}"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	json.Decoder.prototype.UseNumber.call($.pointerValue<json.Decoder>(und))
 	let m: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null! as globalThis.Map<string, any> | null)
-	json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(und), $.interfaceValue(m, "*map[string]any", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))
+	json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(und), $.interfaceValue(m, "*map[string]interface{}", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))
 	await fmt.Println("big", $.mapGet<string, any, any>(m.value, "big", null)[0])
 
 	// A malformed document yields a *json.SyntaxError with the Go byte offset.
 	let v: $.VarRef<any> = $.varRef(null! as any)
-	let err = json.Unmarshal(new Uint8Array([91, 49, 44, 93]), $.interfaceValue(v, "*any", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] })))
+	let err = json.Unmarshal(new Uint8Array([91, 49, 44, 93]), $.interfaceValue(v, "*interface{}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] })))
 	{
 		let __goscriptTuple0: any = $.typeAssertTuple<json.SyntaxError | $.VarRef<json.SyntaxError> | null>(err, /* @__PURE__ */ $.pointerType("json.SyntaxError"))
 		let se: json.SyntaxError | $.VarRef<json.SyntaxError> | null = __goscriptTuple0[0]
