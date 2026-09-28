@@ -658,6 +658,8 @@ type compilerCacheKeyOwner struct {
 	graph *PackageGraph
 	// roots name source directories in keys, longest directory first.
 	roots []compilerCacheKeyRoot
+	// sources digests source file contents.
+	sources *sourceDigests
 	// identity digests the schema, compiler and request fields every key
 	// shares.
 	identity string
@@ -674,12 +676,14 @@ type compilerCacheKeyRoot struct {
 }
 
 // newCompilerCacheKeyOwner digests every node's own inputs in parallel. Each
-// module's identity files are read once and shared by its packages.
+// module's identity files are read once and shared by its packages, and source
+// digests come from the stat-stamped index where the stamp still matches.
 func newCompilerCacheKeyOwner(req *CompileRequest, graph *PackageGraph) *compilerCacheKeyOwner {
 	owner := &compilerCacheKeyOwner{
 		req:          req,
 		graph:        graph,
 		roots:        compilerCacheKeyRoots(graph),
+		sources:      loadSourceDigests(req),
 		ownDigests:   make(map[string]string, len(graph.Nodes)),
 		graphDigests: make(map[string]string, len(graph.Nodes)),
 	}
@@ -705,6 +709,7 @@ func newCompilerCacheKeyOwner(req *CompileRequest, graph *PackageGraph) *compile
 	for idx, node := range graph.Nodes {
 		owner.ownDigests[node.PkgPath] = ownDigests[idx]
 	}
+	owner.sources.store()
 	return owner
 }
 
@@ -753,11 +758,11 @@ func (o *compilerCacheKeyOwner) keyPath(file string) string {
 
 // fileIdentity names a file by its key path and content.
 func (o *compilerCacheKeyOwner) fileIdentity(file string) string {
-	data, err := os.ReadFile(file)
+	digest, _, err := o.sources.digest(file)
 	if err != nil {
 		return o.keyPath(file) + "|unreadable"
 	}
-	return o.keyPath(file) + "|" + sha256Hex(data)
+	return o.keyPath(file) + "|" + digest
 }
 
 // moduleFileIdentity names a module identity file by its key path and
@@ -909,8 +914,8 @@ func (o *compilerCacheKeyOwner) nodeDigest(pkgPath string) string {
 }
 
 // nodeOwnDigest digests a node's identity, files, side inputs and module
-// identity files. Each source file is read once, for both its identity and
-// its embed directives.
+// identity files. A source file that mentions go:embed is parsed for its
+// directives.
 func (o *compilerCacheKeyOwner) nodeOwnDigest(node *PackageGraphNode, moduleIdentities []string) string {
 	var b strings.Builder
 	writeKeyField(&b, "id", node.ID)
@@ -924,13 +929,15 @@ func (o *compilerCacheKeyOwner) nodeOwnDigest(node *PackageGraphNode, moduleIden
 	identities := make(map[string]string, len(node.CompiledGoFiles))
 	var inputs []string
 	for _, file := range node.CompiledGoFiles {
-		data, err := os.ReadFile(file)
+		digest, embed, err := o.sources.digest(file)
 		if err != nil {
 			identities[file] = o.keyPath(file) + "|unreadable"
 			continue
 		}
-		identities[file] = o.keyPath(file) + "|" + sha256Hex(data)
-		inputs = append(inputs, o.goEmbedSideInputs(file, data)...)
+		identities[file] = o.keyPath(file) + "|" + digest
+		if embed {
+			inputs = append(inputs, o.goEmbedSideInputs(file)...)
+		}
 	}
 	for _, file := range node.GoFiles {
 		identity, ok := identities[file]
@@ -1045,11 +1052,8 @@ func goLoaderEnvKeys() []string {
 }
 
 // goEmbedSideInputs names the files a Go source's go:embed directives embed.
-func (o *compilerCacheKeyOwner) goEmbedSideInputs(goFile string, data []byte) []string {
-	if !bytes.Contains(data, []byte("go:embed")) {
-		return nil
-	}
-	syntax, err := parser.ParseFile(token.NewFileSet(), goFile, data, parser.ParseComments|parser.SkipObjectResolution)
+func (o *compilerCacheKeyOwner) goEmbedSideInputs(goFile string) []string {
+	syntax, err := parser.ParseFile(token.NewFileSet(), goFile, nil, parser.ParseComments|parser.SkipObjectResolution)
 	if err != nil {
 		return []string{"go:embed-parse|" + o.keyPath(goFile)}
 	}
