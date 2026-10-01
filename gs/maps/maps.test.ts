@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { Clone, Values } from './index.js'
+import { Clone, DeleteFunc, Equal, EqualFunc, Values } from './index.js'
 
 describe('maps overrides', () => {
   it('accept nilable comparable keys', () => {
@@ -19,5 +19,14 @@ describe('maps overrides', () => {
       return true
     })
     expect(values.sort()).toEqual([1, 2])
+  })
+
+  it('treat a nil map as empty', () => {
+    DeleteFunc<string, number>(null, () => true)
+    expect(Equal<string, number>(null, new Map())).toBe(true)
+    expect(EqualFunc<string, number, number>(null, null, () => false)).toBe(
+      true,
+    )
+    expect(Equal<string, number>(null, new Map([['a', 1]]))).toBe(false)
   })
 })

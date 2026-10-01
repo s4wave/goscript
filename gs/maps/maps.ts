@@ -7,11 +7,11 @@ import * as _ from '@goscript/unsafe/index.js'
 export function Equal<
   K extends $.Comparable | null,
   V extends $.Comparable | null,
->(m1: Map<K, V>, m2: Map<K, V>): boolean {
+>(m1: Map<K, V> | null, m2: Map<K, V> | null): boolean {
   if ($.len(m1) != $.len(m2)) {
     return false
   }
-  for (const [k, v1] of m1.entries()) {
+  for (const [k, v1] of m1?.entries() ?? []) {
     let [v2, ok] = $.mapGet(m2, k, null as any)
     if (!ok || v1 != v2) {
       return false
@@ -23,14 +23,14 @@ export function Equal<
 // EqualFunc is like Equal, but compares values using eq.
 // Keys are still compared with ==.
 export function EqualFunc<K extends $.Comparable | null, V1, V2>(
-  m1: Map<K, V1>,
-  m2: Map<K, V2>,
+  m1: Map<K, V1> | null,
+  m2: Map<K, V2> | null,
   eq: ((p0: V1, p1: V2) => boolean) | null,
 ): boolean {
   if ($.len(m1) != $.len(m2)) {
     return false
   }
-  for (const [k, v1] of m1.entries()) {
+  for (const [k, v1] of m1?.entries() ?? []) {
     let [v2, ok] = $.mapGet(m2, k, null as any)
     if (!ok || !eq!(v1, v2)) {
       return false
@@ -80,10 +80,10 @@ export function Copy<K extends $.Comparable | null, V>(
 
 // DeleteFunc deletes any key/value pairs from m for which del returns true.
 export function DeleteFunc<K extends $.Comparable | null, V>(
-  m: Map<K, V>,
+  m: Map<K, V> | null,
   del: ((p0: K, p1: V) => boolean) | null,
 ): void {
-  for (const [k, v] of m.entries()) {
+  for (const [k, v] of m?.entries() ?? []) {
     if (del!(k, v)) {
       $.deleteMapEntry(m, k)
     }

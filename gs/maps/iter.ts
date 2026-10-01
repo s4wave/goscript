@@ -38,7 +38,7 @@ export function Values<K extends $.Comparable | null, V>(
 // Insert adds the key-value pairs from seq to m.
 // If a key in seq already exists in m, its value will be overwritten.
 export function Insert<K extends $.Comparable | null, V>(
-  m: Map<K, V>,
+  m: Map<K, V> | null,
   seq: iter.Seq2<K, V>,
 ): void {
   ;(() => {
