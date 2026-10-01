@@ -34,6 +34,13 @@ describe('I/O combinator data and scheduling contracts', () => {
     expect(reader.Read(p)).toEqual([1, io.EOF])
     expect(text(p)).toBe('x')
   })
+  it('accepts a slice of nilable readers and fails on a nil reader', () => {
+    const readers: (io.Reader | null)[] = [source('a'), null]
+    const reader = io.MultiReader(...readers)
+    const p = new Uint8Array(1)
+    expect(reader.Read(p)).toEqual([1, null])
+    expect(() => reader.Read(p)).toThrow('nil Reader')
+  })
   it('keeps LimitedReader and TeeReader synchronous under MultiReader', () => {
     const teeBytes: number[] = []
     const limit: io.Reader = io.LimitReader(source('abcd', false), 2n)

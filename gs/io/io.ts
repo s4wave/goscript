@@ -650,14 +650,15 @@ export function NopCloser(r: Reader | null): ReadCloser {
 
 // MultiReader preserves bytes returned with EOF before advancing to the next
 // input. Empty readers are skipped iteratively, including deeply nested readers.
-export function MultiReader(...readers: SyncReader[]): SyncReader
-export function MultiReader(...readers: Reader[]): Reader
-export function MultiReader(...readers: Reader[]): Reader {
+// Readers may be nil, as in Go, which fails when the nil reader is reached.
+export function MultiReader(...readers: (SyncReader | null)[]): SyncReader
+export function MultiReader(...readers: (Reader | null)[]): Reader
+export function MultiReader(...readers: (Reader | null)[]): Reader {
   return new multiReader(readers.slice())
 }
 
 class multiReader implements Reader {
-  constructor(private readers: Reader[]) {}
+  constructor(private readers: (Reader | null)[]) {}
 
   Read(p: $.Bytes): Awaitable<IOResult> {
     const finish = ([n, err]: IOResult): IOResult | null => {
@@ -672,7 +673,9 @@ class multiReader implements Reader {
         this.readers = this.readers[0].readers
         continue
       }
-      const result = this.readers[0].Read(p)
+      const reader = this.readers[0]
+      if (reader == null) throw new Error('nil Reader')
+      const result = reader.Read(p)
       if (isAsync(result)) {
         return Promise.resolve(result).then(result => finish(result) ?? this.Read(p))
       }
