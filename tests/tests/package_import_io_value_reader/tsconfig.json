@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "*": [
+        "./*"
+      ],
+      "@goscript/*": [
+        "../../../tests/tests/package_import_io_value_reader/run/output/@goscript/*",
+        "../../../gs/*",
+        "../../../tests/deps/*"
+      ],
+      "@goscript/github.com/s4wave/goscript/tests/tests/package_import_io_value_reader/*": [
+        "./*"
+      ]
+    }
+  },
+  "extends": "../../../tests/tsconfig.base.json",
+  "include": [
+    "index.ts",
+    "package_import_io_value_reader.gs.ts"
+  ]
+}

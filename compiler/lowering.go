@@ -8768,11 +8768,18 @@ func (o *LoweringOwner) lowerCallArgForTarget(
 		}
 	}
 	value = o.lowerValueForTarget(ctx, expr, targetType, value)
+	if !overrideCall || !isNonEmptyInterfaceType(targetType) {
+		return value
+	}
+
+	// Override parameters typed as a non-empty interface exclude null. A nilable
+	// source collapses a typed nil first; a converted concrete value is never nil
+	// but its interface wrapper is typed nullable, so it only needs the assertion.
 	sourceType := ctx.semPkg.source.TypesInfo.TypeOf(expr)
-	if overrideCall && isNonEmptyInterfaceType(targetType) && (isInterfaceType(sourceType) || isNilableType(sourceType)) {
+	if isInterfaceType(sourceType) || isNilableType(sourceType) {
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValueOrNil) + "(" + value + ")!"
 	}
-	return value
+	return parenthesizeAwaitedExpr(value) + "!"
 }
 
 func typeParamInterfaceConstraint(typ types.Type) types.Type {

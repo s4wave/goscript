@@ -97,5 +97,5 @@ go test -v ./compiler
 ### Specific test
 
 ```bash
-go test -timeout 30s -run ^TestCompliance/test_name$ ./compiler
+go test -timeout 30s -run '^TestCompliance/[^/]+/test_name$' ./compiler
 ```
