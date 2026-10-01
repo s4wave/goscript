@@ -121,7 +121,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("post status:", $.pointerValue<http.Response>(postResp).StatusCode)
 	await $.println("post body:", $.bytesToString(data))
 
-	let __goscriptTuple8: any = http.NewRequest(http.MethodGet, $.pointerValue<httptest.Server>(server).URL, null)
+	let __goscriptTuple8: any = http.NewRequest(http.MethodGet, $.pointerValue<httptest.Server>(server).URL, null!)
 	let transportReq: http.Request | $.VarRef<http.Request> | null = __goscriptTuple8[0]
 	err = __goscriptTuple8[1]
 	if (err != null) {

@@ -31,7 +31,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("proto:", major, minor, ok)
 	await $.println("status:", http.MethodPatch, 511, http.StatusText(511))
 
-	let __goscriptTuple0: any = http.NewRequest(http.MethodPut, "https://example.invalid/path?q=1", $.interfaceValue<io.Reader | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(http.NoBody))), "http.noBody", "http.noBody"))
+	let __goscriptTuple0: any = http.NewRequest(http.MethodPut, "https://example.invalid/path?q=1", $.interfaceValue<io.Reader | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(http.NoBody))), "http.noBody", "http.noBody")!)
 	let req: http.Request | $.VarRef<http.Request> | null = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
@@ -49,7 +49,7 @@ export async function main(): globalThis.Promise<void> {
 	await http.ServeContent($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, req, "content.txt", $.markAsStructValue(new time.Time()), $.pointerValueOrNil($.interfaceValue<io.ReadSeeker | null>(strings.NewReader("served"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	await $.println("servecontent:", $.pointerValue<httptest.ResponseRecorder>(rec).Code, bytes.Buffer.prototype.String.call($.pointerValue<bytes.Buffer>($.pointerValue<httptest.ResponseRecorder>(rec).Body)))
 
-	let __goscriptTuple1: any = http.NewRequest(http.MethodHead, "https://example.invalid/content.txt", $.interfaceValue<io.Reader | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(http.NoBody))), "http.noBody", "http.noBody"))
+	let __goscriptTuple1: any = http.NewRequest(http.MethodHead, "https://example.invalid/content.txt", $.interfaceValue<io.Reader | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(http.NoBody))), "http.noBody", "http.noBody")!)
 	let headReq: http.Request | $.VarRef<http.Request> | null = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {

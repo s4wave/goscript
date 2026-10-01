@@ -41,12 +41,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Cause error:", await $.pointerValue<Exclude<$.GoError, null>>(cause).Error())
 
 	// Test nil handling
-	let nilErr = errors.WithStack(null)
+	let nilErr = errors.WithStack(null!)
 	if (nilErr == null) {
 		await $.println("WithStack with nil returns nil")
 	}
 
-	let nilWrap = errors.Wrap(null, "message")
+	let nilWrap = errors.Wrap(null!, "message")
 	if (nilWrap == null) {
 		await $.println("Wrap with nil returns nil")
 	}

@@ -67,10 +67,10 @@ export class linkFS {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let [target, err] = fs.ReadLink($.interfaceValue<fs.FS | null>($.markAsStructValue(new linkFS()), "main.linkFS", "main.linkFS"), "link")
+	let [target, err] = fs.ReadLink($.interfaceValue<fs.FS | null>($.markAsStructValue(new linkFS()), "main.linkFS", "main.linkFS")!, "link")
 	await $.println("target:", target, err == null)
 
-	let __goscriptTuple0: any = fs.ReadLink($.interfaceValue<fs.FS | null>($.markAsStructValue(new emptyFS()), "main.emptyFS", "main.emptyFS"), "link")
+	let __goscriptTuple0: any = fs.ReadLink($.interfaceValue<fs.FS | null>($.markAsStructValue(new emptyFS()), "main.emptyFS", "main.emptyFS")!, "link")
 	err = __goscriptTuple0[1]
 	await $.println("unsupported:", err != null)
 }

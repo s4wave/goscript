@@ -112,7 +112,7 @@ export async function main(): globalThis.Promise<void> {
 		return new msg()
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.msg")] } as $.FunctionTypeInfo))))
 	let sb: $.VarRef<protobuf_go_lite.TextBuilder> = $.varRef($.markAsStructValue(new strings.Builder()))
-	protobuf_go_lite.TextWriteStringer(sb, $.namedValueInterfaceValue<any>(1, "main.state", {String: (receiver: any, ...args: any[]) => (state_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("int32", "main.state"), [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]))
+	protobuf_go_lite.TextWriteStringer(sb, $.namedValueInterfaceValue<any>(1, "main.state", {String: (receiver: any, ...args: any[]) => (state_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("int32", "main.state"), [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])!)
 	await $.println("stringer:", sb.value.String())
 }
 
