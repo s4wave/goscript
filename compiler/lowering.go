@@ -10808,7 +10808,7 @@ func (o *LoweringOwner) lowerPointerStorageExpr(ctx lowerFileContext, expr ast.E
 		return ref, diagnostics
 	}
 	base, diagnostics := o.lowerExpr(ctx, expr)
-	return base + "!.value", diagnostics
+	return parenthesizeAwaitedExpr(base) + "!.value", diagnostics
 }
 
 func (o *LoweringOwner) lowerUnsafeArrayPointerRefExpr(

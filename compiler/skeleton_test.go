@@ -2415,6 +2415,45 @@ func TestCompilePackagesRenamesCloneForPromotedCloneMethod(t *testing.T) {
 	}
 }
 
+func TestCompilePackagesAssignsThroughAwaitedPointerResult(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/awaitedstore\n\ngo 1.25.3\n",
+		"main.go": strings.Join([]string{
+			"package main",
+			"type Box struct { Value int }",
+			"func (b *Box) valuePtr() *int {",
+			"  ch := make(chan int, 1)",
+			"  ch <- 1",
+			"  <-ch",
+			"  return &b.Value",
+			"}",
+			"func main() {",
+			"  b := &Box{}",
+			"  *b.valuePtr() = 5",
+			"  println(b.Value)",
+			"}",
+			"",
+		}, "\n"),
+	})
+	outputDir := filepath.Join(t.TempDir(), "output")
+	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir}, nil, nil)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatal(err.Error())
+	}
+	content, err := os.ReadFile(filepath.Join(outputDir, "@goscript", "example.test", "awaitedstore", "main.gs.ts"))
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	text := string(content)
+	if !regexp.MustCompile(`\(await [^\n]*valuePtr[^\n]*\)!\.value = 5`).MatchString(text) {
+		t.Fatalf("store through an awaited pointer result is not parenthesized:\n%s", text)
+	}
+}
+
 func TestCompilePackagesEmitsNestedPointerStorageAssertions(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod": "module example.test/pointers\n\ngo 1.25.3\n",
