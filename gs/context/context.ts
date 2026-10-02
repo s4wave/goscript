@@ -386,37 +386,37 @@ export function Cause(ctx: Context): $.GoError {
   return c.Err()
 }
 
-// AfterFunc runs f in a separate goroutine after ctx is done.
+// AfterFunc runs f in a separate goroutine after ctx is done. Stop withdraws
+// the wait from the done channel, so a stopped AfterFunc on a long-lived ctx
+// retains neither f nor its captures.
 export function AfterFunc(ctx: Context, f: (() => void) | null): () => boolean {
   if (ctx === null) {
     throw new Error('cannot create context from nil parent')
   }
-  let stopped = false
-  let done = false
 
-  const _promise = (async () => {
-    try {
-      await ctx.Done().receive()
-    } catch {
-      // Channel closed
-    }
-    if (!stopped) {
-      done = true
-      // Run in next tick to simulate goroutine
+  // The wait commits synchronously when ctx is done, before f runs.
+  let settled = false
+  const stopWait = new AbortController()
+  void ctx
+    .Done()
+    .selectReceive(0, stopWait.signal, () => {
+      settled = true
+    })
+    .then(() => {
       queueMicrotask(() => {
         if (f === null) {
           throw new Error('context: nil AfterFunc callback')
         }
         f()
       })
-    }
-  })()
+    })
 
   return () => {
-    if (!done) {
-      stopped = true
-      return true
+    if (settled) {
+      return false
     }
-    return false
+    settled = true
+    stopWait.abort()
+    return true
   }
 }

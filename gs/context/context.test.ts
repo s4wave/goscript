@@ -60,6 +60,7 @@ describe('context override', () => {
     })
 
     expect(stop()).toBe(true)
+    expect(stop()).toBe(false)
     cancel?.()
     await nextMicrotask()
     await nextMicrotask()
