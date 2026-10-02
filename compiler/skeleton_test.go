@@ -2376,6 +2376,45 @@ func TestCompilePackagesClonesNestedStructFieldsWithCloneMethodCollision(t *test
 	}
 }
 
+func TestCompilePackagesRenamesCloneForPromotedCloneMethod(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/promotedclone\n\ngo 1.25.3\n",
+		"main.go": strings.Join([]string{
+			"package main",
+			"type common struct { Level int }",
+			"func (c *common) clone() *common {",
+			"  return &common{Level: c.Level}",
+			"}",
+			"type Handler struct { *common }",
+			"func main() {",
+			"  h := Handler{common: &common{Level: 1}}",
+			"  _ = h.clone()",
+			"}",
+			"",
+		}, "\n"),
+	})
+	outputDir := filepath.Join(t.TempDir(), "output")
+	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir}, nil, nil)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatal(err.Error())
+	}
+	content, err := os.ReadFile(filepath.Join(outputDir, "@goscript", "example.test", "promotedclone", "main.gs.ts"))
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	text := string(content)
+	if !strings.Contains(text, "public __goscriptClone(): Handler") {
+		t.Fatalf("missing renamed Handler copy method in generated output:\n%s", text)
+	}
+	if strings.Contains(text, "public clone(): Handler") {
+		t.Fatalf("Handler copy method collides with the promoted clone forwarder:\n%s", text)
+	}
+}
+
 func TestCompilePackagesEmitsNestedPointerStorageAssertions(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod": "module example.test/pointers\n\ngo 1.25.3\n",

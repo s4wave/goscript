@@ -3303,9 +3303,6 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 		method, methodDiagnostics := o.lowerFuncDecl(ctx, lowerDecl)
 		diagnostics = append(diagnostics, methodDiagnostics...)
 		if method != nil {
-			if method.name == "clone" {
-				lowered.cloneMethod = "__goscriptClone"
-			}
 			lowered.methods = append(lowered.methods, *method)
 		}
 	}
@@ -3316,6 +3313,12 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 			explicitMethods,
 		)
 		lowered.methods = append(lowered.methods, methods...)
+	}
+
+	// Rename the generated copy method when a field, a declared method or a
+	// promoted method forwarder already uses the name.
+	if explicitMethods["clone"] {
+		lowered.cloneMethod = "__goscriptClone"
 	}
 	return lowered, diagnostics
 }
