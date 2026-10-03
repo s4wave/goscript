@@ -82,6 +82,7 @@ This option deliberately delays package initialization until first use. Unconfig
     *   `for cond` loops are translated to TypeScript `while (cond)`.
     *   `for {}` loops are translated to `while (true)`.
     *   **`for range`:** Translated to indexed `for` loops or `for...of` depending on the type being ranged over.
+        *   **Functions:** The compiler calls the iterator with a yield callback. Unlabeled break and continue return false and true from that callback. A labeled branch to the iterator itself does the same. A return or labeled branch to an enclosing statement records a pending action and returns false; after the iterator call, the compiler resumes the action in the enclosing scope. Nested function ranges forward pending actions through each callback boundary until the target is reachable. Labels introduced inside a callback remain ordinary JavaScript labels.
         *   **Arrays/Slices:** Translated to indexed `for` loops using `$.len()`:
             ```typescript
             // Go: for i, v := range mySlice { ... }

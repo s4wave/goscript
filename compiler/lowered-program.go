@@ -1,5 +1,7 @@
 package compiler
 
+import "go/token"
+
 // LoweredProgram is the compiler-owned IR consumed by TypeScript emission.
 type LoweredProgram struct {
 	packages     []*loweredPackage
@@ -143,19 +145,44 @@ type loweredStmt struct {
 	typeSwitch *loweredTypeSwitch
 }
 
+// loweredRangeFunc invokes an iterator and resumes branches outside its yield.
 type loweredRangeFunc struct {
-	value        string
-	params       []string
-	body         []loweredStmt
-	async        bool
+	// value is the iterator expression evaluated at the loop entry.
+	value string
+	// params names the yielded values bound by the callback.
+	params []string
+	// body runs for each successful yield.
+	body []loweredStmt
+	// async indicates that the iterator or callback requires await.
+	async bool
+	// returnBranch carries pending control flow out of body.
 	returnBranch *loweredRangeBranch
+	// parentBranch receives function returns crossing another yield callback.
 	parentBranch *loweredRangeBranch
 }
 
+// loweredRangeBranch carries returns and labeled branches across one yield.
 type loweredRangeBranch struct {
-	hasReturn  string
-	value      string
+	// hasReturn records a pending return from the enclosing Go function.
+	hasReturn string
+	// value stores the pending function result.
+	value string
+	// resultType is the TypeScript type of value.
 	resultType string
+	// branchFlag selects a pending labeled branch after the iterator finishes.
+	branchFlag string
+	// branches records each target and its resumption statements.
+	branches []loweredRangeLabeledBranch
+}
+
+// loweredRangeLabeledBranch resumes a source branch after an iterator call.
+type loweredRangeLabeledBranch struct {
+	// tok selects break or continue in the enclosing scope.
+	tok token.Token
+	// label is the source label targeted by the branch.
+	label string
+	// body resumes the branch in the scope containing the iterator call.
+	body []loweredStmt
 }
 
 type loweredDeferState struct {

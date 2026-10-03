@@ -1324,6 +1324,11 @@ type lowerFileContext struct {
 	topLevel                      bool
 	protobufTSAdapter             bool
 	trimTypeInfo                  bool
+
+	// rangeLabels maps visible labels to their statements in the current yield.
+	rangeLabels map[string]ast.Stmt
+	// rangeLoop is the range statement whose body runs in the current yield.
+	rangeLoop *ast.RangeStmt
 	// noGoto records that an enclosing statement subtree contains no goto,
 	// including inside function literals, so nested lists need no further scan.
 	noGoto      bool
@@ -4228,6 +4233,12 @@ func (o *LoweringOwner) lowerStmtInto(ctx lowerFileContext, stmt ast.Stmt, out [
 		stmts, diagnostics := o.lowerTypeSwitchStmt(ctx, typed)
 		return append(out, stmts...), diagnostics
 	case *ast.LabeledStmt:
+		// Preserve lexical labels without sharing mutations between nested scopes.
+		labels := make(map[string]ast.Stmt, len(ctx.rangeLabels)+1)
+		maps.Copy(labels, ctx.rangeLabels)
+		labels[typed.Label.Name] = typed.Stmt
+		ctx.rangeLabels = labels
+
 		lowered, diagnostics := o.lowerStmt(ctx, typed.Stmt)
 		if len(lowered) != 0 {
 			label := safeIdentifier(typed.Label.Name)
@@ -4281,6 +4292,21 @@ func (o *LoweringOwner) lowerStmtInto(ctx lowerFileContext, stmt ast.Stmt, out [
 		if typed.Label != nil {
 			switch typed.Tok {
 			case token.BREAK, token.CONTINUE:
+				// A label outside this yield must resume after its iterator call.
+				if ctx.rangeBranch != nil && ctx.rangeLabels[typed.Label.Name] == nil {
+					if ctx.rangeBranch.branchFlag == "" {
+						ctx.rangeBranch.branchFlag = ctx.tempName("RangeBranch")
+					}
+					ctx.rangeBranch.branches = append(ctx.rangeBranch.branches, loweredRangeLabeledBranch{tok: typed.Tok, label: typed.Label.Name})
+					return append(out, loweredStmt{text: ctx.rangeBranch.branchFlag + " = " + strconv.Itoa(len(ctx.rangeBranch.branches)) + "\nreturn false"}), nil
+				}
+
+				// A branch to this iterator completes or advances its current yield.
+				if ctx.rangeBranch != nil && ctx.rangeLabels[typed.Label.Name] == ctx.rangeLoop {
+					return append(out, loweredStmt{text: "return " + strconv.FormatBool(typed.Tok == token.CONTINUE)}), nil
+				}
+
+				// Other local labels remain reachable in the current callback.
 				return append(out, loweredStmt{text: typed.Tok.String() + " " + safeIdentifier(typed.Label.Name)}), nil
 			case token.GOTO:
 				label := safeIdentifier(typed.Label.Name)
@@ -6811,12 +6837,14 @@ func (o *LoweringOwner) lowerRangeDeclShadowAliases(
 	return aliases
 }
 
+// lowerRangeFuncStmt carries control flow through the iterator's yield callback.
 func (o *LoweringOwner) lowerRangeFuncStmt(
 	ctx lowerFileContext,
 	stmt *ast.RangeStmt,
 	rangeValue string,
 	signature *types.Signature,
 ) (loweredStmt, []Diagnostic) {
+	// Derive yield parameters from the iterator's checked signature.
 	yieldSignature, ok := types.Unalias(signature.Params().At(0).Type()).Underlying().(*types.Signature)
 	if !ok {
 		return loweredStmt{}, []Diagnostic{loweringUnsupportedAt(ctx, stmt, "statement", ctx.semPkg.pkgPath, "unsupported function range yield signature")}
@@ -6831,20 +6859,42 @@ func (o *LoweringOwner) lowerRangeFuncStmt(
 	}
 	paramNames := rangeFuncParamNames(paramKeyName, paramValueName, yieldSignature.Params().Len(), ctx.tempName("Range"))
 
+	// Allocate callback state for pending returns and labeled branches.
 	parentBranch := ctx.rangeBranch
 	rangeBranch := &loweredRangeBranch{hasReturn: ctx.tempName("RangeReturn")}
 	if ctx.signature != nil && ctx.signature.Results() != nil && ctx.signature.Results().Len() != 0 {
 		rangeBranch.value = ctx.tempName("RangeReturnValue")
 		rangeBranch.resultType = o.tsSignatureResultFor(ctx, ctx.signature)
 	}
-	body, diagnostics := o.lowerBlock(ctx.withoutLoopLabel().withRangeBranch(rangeBranch), stmt.Body)
+
+	// Only the current iterator's label remains local to its yield callback.
+	bodyCtx := ctx.withoutLoopLabel().withRangeBranch(rangeBranch)
+	bodyCtx.rangeLoop = stmt
+	bodyCtx.rangeLabels = make(map[string]ast.Stmt)
+	for label, target := range ctx.rangeLabels {
+		if target == stmt {
+			bodyCtx.rangeLabels[label] = target
+		}
+	}
+	body, diagnostics := o.lowerBlock(bodyCtx, stmt.Body)
+
+	// Resume each pending branch in the enclosing scope, crossing another yield
+	// when needed. Lowering owns that decision just as it does for source branches.
+	for idx, branch := range rangeBranch.branches {
+		var branchDiagnostics []Diagnostic
+		rangeBranch.branches[idx].body, branchDiagnostics = o.lowerStmt(ctx, &ast.BranchStmt{Tok: branch.tok, Label: ast.NewIdent(branch.label)})
+		diagnostics = append(diagnostics, branchDiagnostics...)
+	}
+
+	// Bind assignment-form range values before running the source loop body.
 	if stmt.Tok != token.DEFINE {
 		assignments, assignmentDiagnostics := o.lowerRangeFuncAssignments(ctx, stmt, paramNames)
 		diagnostics = append(diagnostics, assignmentDiagnostics...)
 		body = append(assignments, body...)
 	}
-	async := ctx.asyncFunction || stmtsContainAwait(body) || o.rangeFunctionValueNeedsAwait(ctx, stmt.X)
 
+	// Preserve await requirements and the enclosing callback's return state.
+	async := ctx.asyncFunction || stmtsContainAwait(body) || o.rangeFunctionValueNeedsAwait(ctx, stmt.X)
 	return loweredStmt{rangeFunc: &loweredRangeFunc{
 		value:        rangeValue,
 		params:       paramNames,

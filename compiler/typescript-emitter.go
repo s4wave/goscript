@@ -1034,9 +1034,16 @@ func renderSwitchBody(b *strings.Builder, body []loweredStmt, fallsThrough bool,
 	b.WriteString("}\n")
 }
 
-// renderRangeFunc carries early returns through iterator callback boundaries.
+// renderRangeFunc carries returns and labeled branches through yield callbacks.
 func renderRangeFunc(b *strings.Builder, stmt *loweredRangeFunc, indent int) {
+	// Declare pending branches in the scope that resumes them.
 	if stmt.returnBranch != nil {
+		if len(stmt.returnBranch.branches) != 0 {
+			writeIndent(b, indent)
+			b.WriteString("let ")
+			b.WriteString(stmt.returnBranch.branchFlag)
+			b.WriteString(" = 0\n")
+		}
 		writeIndent(b, indent)
 		b.WriteString("let ")
 		b.WriteString(stmt.returnBranch.hasReturn)
@@ -1050,6 +1057,8 @@ func renderRangeFunc(b *strings.Builder, stmt *loweredRangeFunc, indent int) {
 			b.WriteString(" | undefined\n")
 		}
 	}
+
+	// Run the iterator with its lowered yield callback.
 	writeIndent(b, indent)
 	if stmt.async {
 		b.WriteString(";await (async () => {\n")
@@ -1075,8 +1084,21 @@ func renderRangeFunc(b *strings.Builder, stmt *loweredRangeFunc, indent int) {
 	b.WriteString("})\n")
 	writeIndent(b, indent)
 	b.WriteString("})()\n")
+
+	// Resume labeled branches before forwarding a pending function return.
 	if stmt.returnBranch == nil {
 		return
+	}
+	for idx, branch := range stmt.returnBranch.branches {
+		writeIndent(b, indent)
+		b.WriteString("if (")
+		b.WriteString(stmt.returnBranch.branchFlag)
+		b.WriteString(" === ")
+		b.WriteString(strconv.Itoa(idx + 1))
+		b.WriteString(") {\n")
+		renderStmts(b, branch.body, indent+1)
+		writeIndent(b, indent)
+		b.WriteString("}\n")
 	}
 	writeIndent(b, indent)
 	b.WriteString("if (")
