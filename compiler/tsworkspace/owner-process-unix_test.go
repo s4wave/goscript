@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -13,6 +14,34 @@ import (
 	"testing"
 	"time"
 )
+
+// TestOwnerRunToolRunsNodeScriptsWithBun runs a node-shebang tool on a PATH
+// that holds Bun but no node, as on hosts without Node installed.
+func TestOwnerRunToolRunsNodeScriptsWithBun(t *testing.T) {
+	bun, err := exec.LookPath("bun")
+	if err != nil {
+		t.Skip("bun not installed")
+	}
+	dir := t.TempDir()
+	bin := filepath.Join(dir, "bin")
+	if err := os.Mkdir(bin, 0o755); err != nil {
+		t.Fatal(err.Error())
+	}
+	if err := os.Symlink(bun, filepath.Join(bin, "bun")); err != nil {
+		t.Fatal(err.Error())
+	}
+	t.Setenv("PATH", bin)
+	tool := filepath.Join(dir, "tool.js")
+	script := "#!/usr/bin/env node\nconsole.log(process.argv.slice(2).join(' '))\n"
+	if err := os.WriteFile(tool, []byte(script), 0o755); err != nil {
+		t.Fatal(err.Error())
+	}
+
+	result := NewOwner(dir, dir).RunTool(t.Context(), PhaseTypeCheck, dir, tool, "a", "b")
+	if result.Failed() || strings.TrimSpace(result.Output) != "a b" {
+		t.Fatalf("node script result = %+v", result)
+	}
+}
 
 func TestOwnerRunToolCancelsProcessGroup(t *testing.T) {
 	dir := t.TempDir()

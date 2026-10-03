@@ -104,8 +104,14 @@ func (o *Owner) RunTool(ctx context.Context, phase Phase, dir string, name strin
 	if dir == "" {
 		dir = o.workDir
 	}
+	command := append([]string{tool}, args...)
+	if nodeScript(tool) {
+		if bun, err := exec.LookPath("bun"); err == nil {
+			command = append([]string{bun}, command...)
+		}
+	}
 	start := time.Now()
-	cmd := exec.CommandContext(ctx, tool, args...)
+	cmd := exec.CommandContext(ctx, command[0], command[1:]...)
 	configureToolCommand(cmd)
 	cmd.Cancel = func() error {
 		killToolCommand(cmd)
@@ -119,7 +125,7 @@ func (o *Owner) RunTool(ctx context.Context, phase Phase, dir string, name strin
 	err = cmd.Run()
 	result := Result{
 		Phase:   phase,
-		Command: append([]string{tool}, args...),
+		Command: command,
 		Output:  output.String(),
 		Elapsed: time.Since(start),
 	}
@@ -154,6 +160,27 @@ func (o *Owner) FindTool(name string) (string, error) {
 		return path, nil
 	}
 	return "", errors.New(name + " not found in PATH or ancestor node_modules/.bin")
+}
+
+// nodeScript reports whether the tool is a script whose shebang names node.
+// RunTool runs such scripts with Bun, which the workspace already requires, so
+// hosts without Node can type check.
+func nodeScript(tool string) bool {
+	f, err := os.Open(tool)
+	if err != nil {
+		return false
+	}
+	defer f.Close()
+	head := make([]byte, 128)
+	n, _ := f.Read(head)
+	line, _, _ := bytes.Cut(head[:n], []byte("\n"))
+	if !bytes.HasPrefix(line, []byte("#!")) {
+		return false
+	}
+	fields := strings.Fields(string(line[2:]))
+	return slices.ContainsFunc(fields, func(field string) bool {
+		return filepath.Base(field) == "node"
+	})
 }
 
 func (o *Owner) workspacePath(name string) (string, error) {
