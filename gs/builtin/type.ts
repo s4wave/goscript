@@ -1338,7 +1338,9 @@ export function arrayValue<T extends object>(
 
 /** isArrayValue reports whether value is marked as a Go array value. */
 export function isArrayValue(value: unknown): boolean {
-  return typeof value === 'object' && value !== null && ARRAY_VALUE_TYPE in value
+  return (
+    typeof value === 'object' && value !== null && ARRAY_VALUE_TYPE in value
+  )
 }
 
 // arrayValueTypeInfo returns the descriptor a marked array value carries.
@@ -2082,6 +2084,11 @@ export function interfaceValue<T = any>(
   typeInfo?: TypeInfo | string,
 ): T {
   if (value !== null && value !== undefined) {
+    if (typeof value === 'function' && typeof typeInfo === 'object') {
+      if (typeInfo.kind === TypeKind.Function) {
+        return typedFunction(value as GoFunction, typeName, typeInfo) as T
+      }
+    }
     if (typeof value === 'object') {
       Object.defineProperty(value, '__goType', {
         value: typeName,
@@ -2252,12 +2259,39 @@ export function namedFunction<T>(
   if (typeof fn !== 'function') {
     return fn
   }
-  return Object.assign(
+  return typedFunction(fn as GoFunction, typeName, typeInfo) as T
+}
+
+// GoFunction is the JavaScript form of a Go function value.
+type GoFunction = (...args: any[]) => any
+
+// typedFunction returns fn carrying the Go function type typeName. One
+// JavaScript function backs every Go value made from a declared function, so
+// a function carrying another type is wrapped rather than retagged: retagging
+// would change the dynamic type of every other value sharing it. Go function
+// values have no identity, so the wrapper is indistinguishable from fn.
+function typedFunction(
+  fn: GoFunction,
+  typeName: string,
+  typeInfo?: FunctionTypeInfo,
+): GoFunction {
+  const name = typeInfo ? typeInfo.name : typeName
+  const currentInfo: FunctionTypeInfo | undefined = Reflect.get(
     fn,
-    typeInfo ?
-      { __goTypeName: typeName, __typeInfo: typeInfo }
-    : { __goTypeName: typeName },
+    '__typeInfo',
   )
+  const currentName: string | undefined =
+    Reflect.get(fn, '__goTypeName') ?? currentInfo?.name
+  if (
+    currentName === name &&
+    (currentInfo !== undefined || typeInfo === undefined)
+  ) {
+    return fn
+  }
+  return Object.assign(fn.bind(null), {
+    __goTypeName: name,
+    __typeInfo: typeInfo,
+  })
 }
 
 export function functionValue<T extends (...args: any[]) => any>(

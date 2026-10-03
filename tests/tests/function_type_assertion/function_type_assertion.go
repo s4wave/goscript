@@ -21,6 +21,9 @@ func getAdder() any {
 	return Adder(add)
 }
 
+// AddFunc aliases the unnamed function type of add.
+type AddFunc = func(a, b int) int
+
 type FuncContainer struct {
 	myFunc any
 }
@@ -153,4 +156,31 @@ func main() {
 	} else {
 		println("Wrong function type assertion failed")
 	}
+
+	// 8. Type assertion of a declared function to its unnamed type
+	var plain any = add
+	plainFn, okPlain := plain.(func(a, b int) int)
+	if okPlain {
+		println(plainFn(4, 4))
+	} else {
+		println("Unnamed function type assertion failed")
+	}
+
+	aliasFn, okAlias := plain.(AddFunc)
+	if okAlias {
+		println(aliasFn(6, 6))
+	} else {
+		println("Alias function type assertion failed")
+	}
+
+	var typed AddFunc = add
+	var typedAny any = typed
+	_, okTyped := typedAny.(AddFunc)
+	println(okTyped) // true
+
+	_, okNamed := plain.(Adder)
+	println(okNamed) // false
+
+	_, okUnnamed := j.(func(a, b int) int)
+	println(okUnnamed) // false
 }
