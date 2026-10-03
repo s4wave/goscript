@@ -7,6 +7,8 @@ export type Greeter = ((name: string) => string | globalThis.Promise<string>) | 
 
 export type Adder = ((a: number, b: number) => number | globalThis.Promise<number>) | null
 
+export type AddFunc = ((a: number, b: number) => number | globalThis.Promise<number>) | null
+
 export class FuncContainer {
 	public declare myFunc: any
 
@@ -199,6 +201,33 @@ export async function main(): globalThis.Promise<void> {
 	} else {
 		await $.println("Wrong function type assertion failed")
 	}
+
+	// 8. Type assertion of a declared function to its unnamed type
+	let plain: any = $.interfaceValue(add, "func(a int, b int) int", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
+	let [plainFn, okPlain] = $.typeAssertTuple<((a: number, b: number) => number | globalThis.Promise<number>) | null>(plain, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
+	if (okPlain) {
+		await $.println(await plainFn!(4, 4))
+	} else {
+		await $.println("Unnamed function type assertion failed")
+	}
+
+	let [aliasFn, okAlias] = $.typeAssertTuple<((a: number, b: number) => number | globalThis.Promise<number>) | null>(plain, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
+	if (okAlias) {
+		await $.println(await aliasFn!(6, 6))
+	} else {
+		await $.println("Alias function type assertion failed")
+	}
+
+	let typed: ((a: number, b: number) => number | globalThis.Promise<number>) | null = add
+	let typedAny: any = $.interfaceValue(typed, "func(a int, b int) int", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
+	let [, okTyped] = $.typeAssertTuple<((a: number, b: number) => number | globalThis.Promise<number>) | null>(typedAny, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
+	await $.println(okTyped)
+
+	let [, okNamed] = $.typeAssertTuple<((a: number, b: number) => number | globalThis.Promise<number>) | null>(plain, ({ kind: $.TypeKind.Function, name: "main.Adder", params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
+	await $.println(okNamed)
+
+	let [, okUnnamed] = $.typeAssertTuple<((a: number, b: number) => number | globalThis.Promise<number>) | null>(j, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
+	await $.println(okUnnamed)
 }
 
 if ($.isMainScript(import.meta)) {
