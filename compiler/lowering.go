@@ -9685,15 +9685,20 @@ func (o *LoweringOwner) lowerNamedReceiverForMethod(
 	return receiver, diagnostics
 }
 
+// lowerSelectorExpr resolves package exports, methods, and field selections.
 func (o *LoweringOwner) lowerSelectorExpr(ctx lowerFileContext, expr *ast.SelectorExpr) (string, []Diagnostic) {
+	// Resolve package exports and retain deferred initialization results.
 	if ident, ok := expr.X.(*ast.Ident); ok {
 		if pkgName, _ := objectForIdent(ctx, ident).(*types.PkgName); pkgName != nil {
 			if alias := importAliasForPkgName(ctx, pkgName); alias != "" {
 				value := alias + "." + expr.Sel.Name
 				if fn, ok := ctx.semPkg.source.TypesInfo.Uses[expr.Sel].(*types.Func); ok && ctx.model.functionDeferred(fn) && !ctx.model.hasDeferredPackage(ctx.semPkg.pkgPath) {
 					source := strconvQuote("@goscript/" + pkgName.Imported().Path() + "/index.js")
-					return "(async (...__args: Parameters<typeof " + value + ">) => (await import(" + source + "))." + expr.Sel.Name + "(...__args))", nil
+					load := o.runtimeOwner.QualifiedHelper(RuntimeHelperLoadDeferredPackage) + "(" + source + ", () => import(" + source + "))"
+					return "(async (...__args: Parameters<typeof " + value + ">) => (await " + load + ")." + expr.Sel.Name + "(...__args))", nil
 				}
+
+				// Initialize lazy package variables before exposing their values.
 				obj, _ := ctx.semPkg.source.TypesInfo.Uses[expr.Sel].(*types.Var)
 				if packageVarIsLazy(ctx, ctx.semPkg.source.TypesInfo.Uses[expr.Sel]) {
 					value = alias + "." + packageVarGetterName(expr.Sel.Name) + "()"
@@ -9710,6 +9715,8 @@ func (o *LoweringOwner) lowerSelectorExpr(ctx lowerFileContext, expr *ast.Select
 			}
 		}
 	}
+
+	// Resolve receiver methods and promoted fields through semantic selections.
 	if selection := ctx.semPkg.source.TypesInfo.Selections[expr]; selection != nil {
 		switch selection.Kind() {
 		case types.MethodVal:
@@ -9733,6 +9740,8 @@ func (o *LoweringOwner) lowerSelectorExpr(ctx lowerFileContext, expr *ast.Select
 			return o.lowerFieldSelectionExpr(ctx, expr, selection, false)
 		}
 	}
+
+	// Preserve member access precedence for awaited receiver expressions.
 	left, diagnostics := o.lowerExpr(ctx, expr.X)
 	left = parenthesizeAwaitedExpr(left)
 	return left + "." + expr.Sel.Name, diagnostics

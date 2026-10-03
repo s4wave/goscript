@@ -10,6 +10,7 @@ import (
 	"github.com/s4wave/goscript/compiler/tsworkspace"
 )
 
+// TestDeferredFunctionInitializesOnFirstConcurrentUse checks lazy, shared init.
 func TestDeferredFunctionInitializesOnFirstConcurrentUse(t *testing.T) {
 	// Build a package graph whose feature package increments state during init.
 	dir := writePackageGraphFixture(t, map[string]string{
@@ -94,6 +95,7 @@ console.log('initialization passed')
 	}
 }
 
+// TestDeferredFunctionRejectsEagerReferences checks invalid deferred edges.
 func TestDeferredFunctionRejectsEagerReferences(t *testing.T) {
 	// Build a graph where an eager value reference prevents deferral.
 	dir := writePackageGraphFixture(t, map[string]string{
@@ -117,6 +119,7 @@ func Read() int { return Value }
 	requireDiagnostic(t, err, "goscript/deferred:eager-reference")
 }
 
+// TestDeferredFunctionSharesInitializationFailure checks persistent init failure.
 func TestDeferredFunctionSharesInitializationFailure(t *testing.T) {
 	// Build a graph whose deferred package fails during initialization.
 	dir := writePackageGraphFixture(t, map[string]string{
@@ -124,6 +127,11 @@ func TestDeferredFunctionSharesInitializationFailure(t *testing.T) {
 		"app.go": `package app
 import "example.test/failure/feature"
 func Load() int { return feature.Read() }
+`,
+		"other.go": `package app
+import "example.test/failure/feature"
+func OtherLoad() int { return feature.Read() }
+func Getter() func() int { return feature.Read }
 `,
 		"state/state.go": `package state
 var Count int
@@ -148,10 +156,19 @@ func Read() int { return state.Count }
 	writeTestFile(t, dir, "tsconfig.json", `{"compilerOptions":{"paths":{"@goscript/*":["./output/@goscript/*"]}}}`)
 	writeTestFile(t, dir, "runner.ts", `import * as app from './output/@goscript/example.test/failure/index.js'
 import * as state from './output/@goscript/example.test/failure/state/index.js'
+
+// Taking a deferred function value must leave initialization pending.
 if (state.Count !== 0) throw Error('feature initialized eagerly')
-const results = await Promise.allSettled([app.Load(), app.Load()])
-const later = await Promise.allSettled([app.Load()])
-if ([...results, ...later].some(r => r.status !== 'rejected')) throw Error('initialization failure was lost')
+const read = await app.Getter()
+if (!read) throw Error('missing deferred function value')
+if (state.Count !== 0) throw Error('taking function value initialized feature')
+
+// Calls from different files and function values share the first failure.
+const results = await Promise.allSettled([app.Load(), app.Load(), app.OtherLoad(), read()])
+const later = await Promise.allSettled([app.Load(), app.OtherLoad(), read()])
+const failure = results[0]
+if (failure?.status !== 'rejected' || [...results, ...later].some(r => r.status !== 'rejected')) throw Error('initialization failure was lost')
+if ([...results, ...later].some(r => r.status === 'rejected' && r.reason !== failure.reason)) throw Error('initialization failure was not shared')
 if (state.Count !== 1) throw Error('failed initialization was retried')
 `)
 	toolDir, err := filepath.Abs("..")

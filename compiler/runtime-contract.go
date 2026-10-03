@@ -29,6 +29,9 @@ const (
 type RuntimeHelper string
 
 const (
+	// RuntimeHelperLoadDeferredPackage shares a deferred package's import result.
+	RuntimeHelperLoadDeferredPackage RuntimeHelper = "builtin.loadDeferredPackage"
+
 	RuntimeHelperPrintln      RuntimeHelper = "builtin.println"
 	RuntimeHelperPrint        RuntimeHelper = "builtin.print"
 	RuntimeHelperInt          RuntimeHelper = "builtin.int"
@@ -294,6 +297,7 @@ func compareRuntimeHelperContract(a RuntimeHelperContract, b RuntimeHelperContra
 
 func runtimeHelperContracts() []RuntimeHelperContract {
 	return []RuntimeHelperContract{
+		runtimeHelper(RuntimeHelperLoadDeferredPackage, "loadDeferredPackage", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperPrintln, "println", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperPrint, "print", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperInt, "int", RuntimeHelperCategoryBuiltin),
