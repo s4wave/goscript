@@ -249,6 +249,5 @@ bun run db:studio
 
 ## Notes
 
-- GoScript is experimental - some Go features may have limited support
 - Priority constants from iota are manually defined in the router (GoScript iota support is being improved)
 - The `time` package from Go is used for timestamps in the generated code

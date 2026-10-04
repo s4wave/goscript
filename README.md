@@ -10,12 +10,8 @@
   </div>
 
   <p>
-    <a href="https://godoc.org/github.com/s4wave/goscript">
-      <img src="https://godoc.org/github.com/s4wave/goscript?status.svg" alt="GoDoc" />
-    </a>
-    <a href="https://deepwiki.com/s4wave/goscript">
-      <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" />
-    </a>
+    <a href="https://pkg.go.dev/github.com/s4wave/goscript"><img src="https://pkg.go.dev/badge/github.com/s4wave/goscript.svg" alt="Go Reference" /></a>
+    <a href="https://deepwiki.com/s4wave/goscript"><img src="https://img.shields.io/badge/DeepWiki-Ask-blue" alt="Ask DeepWiki" /></a>
   </p>
 
 </div>
@@ -295,9 +291,9 @@ are Go programs compiled, typechecked, and run against expected output.
 
 ## Contributing
 
-GoScript is experimental. To fix a missing Go behavior, add a focused compiler
-or compliance test that reproduces it, then implement the behavior in the
-compiler or runtime stage responsible for it.
+To fix a missing Go behavior, add a focused compiler or compliance test that
+reproduces it, then implement the behavior in the compiler or runtime stage
+responsible for it.
 
 Open an issue for Go code GoScript cannot compile, runtime gaps, and missing
 standard-library overrides.
