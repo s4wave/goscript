@@ -56,8 +56,6 @@ type CompileRequest struct {
 	AdditionalBindingRoots []string
 	// Tests controls whether package loading includes Go package-test variants.
 	Tests bool
-	// AllDependencies controls whether the package graph should include deps.
-	AllDependencies bool
 	// DisableEmitBuiltin controls whether runtime packages are emitted.
 	DisableEmitBuiltin bool
 }
@@ -77,9 +75,9 @@ func (o *CompileRequestOwner) NewRequest(conf Config, patterns []string) *Compil
 		dir = "."
 	}
 
-	dependencyMode := DependencyModeRequested
-	if conf.AllDependencies {
-		dependencyMode = DependencyModeAll
+	dependencyMode := DependencyModeAll
+	if conf.SkipDependencies {
+		dependencyMode = DependencyModeRequested
 	}
 	runtimeEmissionMode := RuntimeEmissionModeEmit
 	if conf.DisableEmitBuiltin {
@@ -99,7 +97,6 @@ func (o *CompileRequestOwner) NewRequest(conf Config, patterns []string) *Compil
 		RuntimeEmissionMode:       runtimeEmissionMode,
 		ProtobufTypeScriptBinding: conf.ProtobufTypeScriptBinding,
 		AdditionalBindingRoots:    slices.Clone(conf.AdditionalBindingRoots),
-		AllDependencies:           conf.AllDependencies,
 		DisableEmitBuiltin:        conf.DisableEmitBuiltin,
 	}
 }

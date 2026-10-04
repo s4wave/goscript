@@ -79,10 +79,9 @@ func compileBehaviorParityFixture(t *testing.T, behaviorTest string) (*Compilati
 	}))
 
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      filepath.Join(t.TempDir(), "out"),
-		OverrideDirs:    []string{overrideDir},
-		AllDependencies: true,
+		Dir:          moduleDir,
+		OutputPath:   filepath.Join(t.TempDir(), "out"),
+		OverrideDirs: []string{overrideDir},
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())

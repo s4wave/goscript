@@ -92,7 +92,6 @@ describe('GoScript Compiler API', () => {
         pkg: '.',
         output,
         dir,
-        allDependencies: true,
         packageBlocklist: ['example.test/apiblock/dep'],
       }),
     ).rejects.toMatchObject({

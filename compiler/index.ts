@@ -21,8 +21,8 @@ export interface CompileConfig {
   dir?: string
   /** Explicit compiler package artifact cache root. Defaults to disabled. */
   compilerCacheRoot?: string
-  /** Compile all transitive dependencies of the requested package. */
-  allDependencies?: boolean
+  /** Compile only the requested package, not the packages it imports. */
+  skipDependencies?: boolean
   /** Go import paths to reject from the compiled package graph. */
   packageBlocklist?: string[] | string
   /** Exported package functions imported on first invocation, delaying package init. */
@@ -50,8 +50,8 @@ export async function compile(config: CompileConfig): Promise<void> {
     '--dir',
     cwd,
   ]
-  if (config.allDependencies) {
-    args.push('--all-dependencies')
+  if (config.skipDependencies) {
+    args.push('--skip-dependencies')
   }
   if (config.compilerCacheRoot) {
     args.push('--compiler-cache-root', path.resolve(config.compilerCacheRoot))

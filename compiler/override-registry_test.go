@@ -301,9 +301,8 @@ func TestCompilePackagesCopiesRuntimeOverrides(t *testing.T) {
 	})
 	out := filepath.Join(t.TempDir(), "out")
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      out,
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: out,
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -346,9 +345,8 @@ func TestCompilePackagesAwaitsOverrideAsyncMethods(t *testing.T) {
 	})
 	out := filepath.Join(t.TempDir(), "out")
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      out,
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: out,
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -385,9 +383,8 @@ func TestCompilePackagesPropagatesOverrideAsyncInterfaceMethods(t *testing.T) {
 	})
 	out := filepath.Join(t.TempDir(), "out")
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      out,
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: out,
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -429,9 +426,8 @@ func TestCompilePackagesAwaitsOverrideAsyncInterfaceMethodCalls(t *testing.T) {
 	})
 	out := filepath.Join(t.TempDir(), "out")
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      out,
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: out,
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -473,9 +469,8 @@ func TestCompilePackagesAwaitsNetHTTPServeHTTPOverrideMethods(t *testing.T) {
 	})
 	out := filepath.Join(t.TempDir(), "out")
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      out,
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: out,
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -525,9 +520,8 @@ func TestCompilePackagesAwaitsOverrideAsyncFunctions(t *testing.T) {
 	})
 	out := filepath.Join(t.TempDir(), "out")
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      out,
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: out,
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -566,9 +560,8 @@ func TestCompilePackagesAwaitsIOFSStatOverride(t *testing.T) {
 	})
 	out := filepath.Join(t.TempDir(), "out")
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      out,
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: out,
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -608,9 +601,8 @@ func TestCompilePackagesAwaitsIOFSLstatOverride(t *testing.T) {
 	})
 	out := filepath.Join(t.TempDir(), "out")
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      out,
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: out,
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -649,9 +641,8 @@ func TestCompilePackagesReturnsIOFSSubOverrideTailCall(t *testing.T) {
 	})
 	out := filepath.Join(t.TempDir(), "out")
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      out,
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: out,
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -696,9 +687,8 @@ func TestCompilePackagesAwaitsAsyncSlicesSortFuncComparator(t *testing.T) {
 	})
 	out := filepath.Join(t.TempDir(), "out")
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      out,
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: out,
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -741,9 +731,8 @@ func TestCompilePackagesKeepsSyncSlicesBinarySearchFuncComparator(t *testing.T) 
 	})
 	out := filepath.Join(t.TempDir(), "out")
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      out,
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: out,
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -788,9 +777,8 @@ func TestCompilePackagesElidesReflectValueCallTailReturn(t *testing.T) {
 	})
 	out := filepath.Join(t.TempDir(), "out")
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      out,
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: out,
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -938,10 +926,9 @@ func TestOverrideParityVerifierRejectsTypeOnlyStructExport(t *testing.T) {
 	}))
 
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      filepath.Join(t.TempDir(), "out"),
-		OverrideDirs:    []string{overrideDir},
-		AllDependencies: true,
+		Dir:          moduleDir,
+		OutputPath:   filepath.Join(t.TempDir(), "out"),
+		OverrideDirs: []string{overrideDir},
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -992,10 +979,9 @@ func TestOverrideParityVerifierReportsBlockedGoUse(t *testing.T) {
 	}))
 
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      filepath.Join(t.TempDir(), "out"),
-		OverrideDirs:    []string{overrideDir},
-		AllDependencies: true,
+		Dir:          moduleDir,
+		OutputPath:   filepath.Join(t.TempDir(), "out"),
+		OverrideDirs: []string{overrideDir},
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -1085,9 +1071,8 @@ func TestOverrideParityVerifierAcceptsPhase4Ledgers(t *testing.T) {
 		}, "\n"),
 	})
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      filepath.Join(t.TempDir(), "out"),
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: filepath.Join(t.TempDir(), "out"),
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -1111,9 +1096,8 @@ func TestOverrideParityVerifierAllowsRealFuncOfUse(t *testing.T) {
 		}, "\n"),
 	})
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      filepath.Join(t.TempDir(), "out"),
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: filepath.Join(t.TempDir(), "out"),
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -1138,9 +1122,8 @@ func TestOverrideParityVerifierAllowsRealMakeFuncUse(t *testing.T) {
 		}, "\n"),
 	})
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      filepath.Join(t.TempDir(), "out"),
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: filepath.Join(t.TempDir(), "out"),
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -1164,9 +1147,8 @@ func TestOverrideParityVerifierAllowsRealStructOfUse(t *testing.T) {
 		}, "\n"),
 	})
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      filepath.Join(t.TempDir(), "out"),
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: filepath.Join(t.TempDir(), "out"),
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -1194,9 +1176,8 @@ func TestOverrideParityVerifierAllowsRealSliceAtUse(t *testing.T) {
 		}, "\n"),
 	})
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      filepath.Join(t.TempDir(), "out"),
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: filepath.Join(t.TempDir(), "out"),
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -1235,10 +1216,9 @@ func compileParityFixture(
 	writeFixtureFile(t, overrideDir, "example.test/parity/lib/parity.json", parityFixtureJSON(t, symbols))
 
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      filepath.Join(t.TempDir(), "out"),
-		OverrideDirs:    []string{overrideDir},
-		AllDependencies: true,
+		Dir:          moduleDir,
+		OutputPath:   filepath.Join(t.TempDir(), "out"),
+		OverrideDirs: []string{overrideDir},
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())

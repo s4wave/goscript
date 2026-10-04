@@ -25,8 +25,9 @@ type Config struct {
 	DeferredFunctions []string
 	// PackageBlocklist rejects package paths in the loaded dependency closure.
 	PackageBlocklist []string
-	// AllDependencies controls whether dependencies are included in the graph.
-	AllDependencies bool
+	// SkipDependencies compiles only the requested packages. By default the
+	// compiler also emits every package they import, so the output runs alone.
+	SkipDependencies bool
 	// DisableEmitBuiltin controls whether runtime packages are emitted.
 	DisableEmitBuiltin bool
 	// ProtobufTypeScriptBinding binds .pb.go files to sibling .pb.ts files.

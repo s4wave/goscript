@@ -15,9 +15,8 @@ func TestBodySummaryRoundTrip(t *testing.T) {
 	ctx := context.Background()
 	service := NewCompileService()
 	req := service.RequestOwner().NewRequest(Config{
-		Dir:             "..",
-		OutputPath:      t.TempDir(),
-		AllDependencies: true,
+		Dir:        "..",
+		OutputPath: t.TempDir(),
 	}, []string{"./compiler"})
 	graph, diagnostics := service.graphOwner.Load(ctx, req)
 	if diagnosticsHaveErrors(diagnostics) {

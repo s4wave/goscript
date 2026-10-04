@@ -155,14 +155,12 @@ func CompileGoToTypeScript(t *testing.T, parentModulePath, testDir, tempDir, out
 		t.Fatalf("failed to get absolute path for temp directory %s: %v", tempDir, err)
 	}
 
-	// Check if AllDependencies should be disabled for this test
-	allDependencies := true
-	noAllDepsPath := filepath.Join(testDir, "no-all-deps")
-	if _, err := os.Stat(noAllDepsPath); err == nil {
-		allDependencies = false
-		t.Logf("Disabling AllDependencies for %s: no-all-deps file found", filepath.Base(testDir))
+	skipDependencies := false
+	skipDependenciesPath := filepath.Join(testDir, "skip-dependencies")
+	if _, err := os.Stat(skipDependenciesPath); err == nil {
+		skipDependencies = true
 	} else if !os.IsNotExist(err) {
-		t.Fatalf("failed to check for no-all-deps file in %s: %v", testDir, err)
+		t.Fatalf("failed to check for skip-dependencies marker in %s: %v", testDir, err)
 	}
 
 	protobufTypeScriptBinding := false
@@ -176,7 +174,7 @@ func CompileGoToTypeScript(t *testing.T, parentModulePath, testDir, tempDir, out
 	conf := &compiler.Config{
 		Dir:                       testDir,
 		OutputPath:                outputDir,
-		AllDependencies:           allDependencies,
+		SkipDependencies:          skipDependencies,
 		DisableEmitBuiltin:        true, // We want to use the handwritten gs/ packages in compliance tests
 		ProtobufTypeScriptBinding: protobufTypeScriptBinding,
 	}

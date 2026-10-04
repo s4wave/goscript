@@ -37,7 +37,7 @@ func Read() int { return state.Count() }
 		t.Run(fmt.Sprintf("deferred=%v", deferred), func(t *testing.T) {
 			// Compile the fixture with the selected initialization policy.
 			out := filepath.Join(dir, "output")
-			config := &Config{Dir: dir, OutputPath: out, CacheRoot: filepath.Join(dir, "cache"), AllDependencies: true}
+			config := &Config{Dir: dir, OutputPath: out, CacheRoot: filepath.Join(dir, "cache")}
 			if deferred {
 				config.DeferredFunctions = []string{"example.test/deferred/feature.Read"}
 			}
@@ -111,7 +111,7 @@ func Read() int { return Value }
 	})
 
 	// Compile and require the eager-reference diagnostic.
-	comp, err := NewCompiler(&Config{Dir: dir, OutputPath: filepath.Join(dir, "out"), AllDependencies: true, DeferredFunctions: []string{"example.test/eager/feature.Read"}}, nil, nil)
+	comp, err := NewCompiler(&Config{Dir: dir, OutputPath: filepath.Join(dir, "out"), DeferredFunctions: []string{"example.test/eager/feature.Read"}}, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -144,7 +144,7 @@ func Read() int { return state.Count }
 	})
 
 	// Compile the graph with the failing package deferred.
-	comp, err := NewCompiler(&Config{Dir: dir, OutputPath: filepath.Join(dir, "output"), AllDependencies: true, DeferredFunctions: []string{"example.test/failure/feature.Read"}}, nil, nil)
+	comp, err := NewCompiler(&Config{Dir: dir, OutputPath: filepath.Join(dir, "output"), DeferredFunctions: []string{"example.test/failure/feature.Read"}}, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -97,12 +97,11 @@ func newCompileCommand() *cli.Command {
 				EnvVars:     []string{"GOSCRIPT_DISABLE_EMIT_BUILTIN"},
 			},
 			&cli.BoolFlag{
-				Name:        "all-dependencies",
-				Usage:       "compile all dependencies of the requested packages",
-				Aliases:     []string{"all-deps", "deps"},
-				Destination: &config.AllDependencies,
-				Value:       false,
-				EnvVars:     []string{"GOSCRIPT_ALL_DEPENDENCIES"},
+				Name:        "skip-dependencies",
+				Usage:       "compile only the requested packages, not the packages they import",
+				Aliases:     []string{"no-deps"},
+				Destination: &config.SkipDependencies,
+				EnvVars:     []string{"GOSCRIPT_SKIP_DEPENDENCIES"},
 			},
 			&cli.BoolFlag{
 				Name:        "protobuf-ts-binding",

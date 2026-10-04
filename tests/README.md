@@ -13,12 +13,12 @@ Each compliance test is a directory under `tests/tests/` containing:
 - **`actual.log`** - Actual output from TypeScript (created when tests fail)
 
 **Configuration Files (all optional):**
-- **`packages`** - List of packages to compile (one per line, supports comments with #)
-- **`skip-test`** - Skip this test entirely
-- **`expect-fail`** - Test compilation but skip execution
-- **`skip-typecheck`** - Skip TypeScript type checking
-- **`expect-typecheck-fail`** - Expect TypeScript type checking to fail
-- **`no-all-deps`** - Disable automatic dependency compilation
+- **`packages`**: List of packages to compile (one per line, supports comments with #)
+- **`skip-test`**: Skip this test entirely
+- **`expect-fail`**: Test compilation but skip execution
+- **`skip-typecheck`**: Skip TypeScript type checking
+- **`expect-typecheck-fail`**: Expect TypeScript type checking to fail
+- **`skip-dependencies`**: compile only the fixture package, not its imports
 
 **Generated Files:**
 - **`index.ts`** - Package index files (auto-generated)

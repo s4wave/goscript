@@ -43,7 +43,6 @@ func TestCompileCommandAccumulatesBindingRoots(t *testing.T) {
 		dir,
 		"--output",
 		outputDir,
-		"--all-dependencies",
 		"--protobuf-ts-binding",
 		"--binding-root",
 		firstRoot,
@@ -255,7 +254,6 @@ func TestCompileCommandForwardsPackageBlocklist(t *testing.T) {
 		outputDir,
 		"--dir",
 		dir,
-		"--all-dependencies",
 		"--package-blocklist=example.test/cli/dep,example.test/unused",
 	})
 	if err == nil {

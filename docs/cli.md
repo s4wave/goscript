@@ -7,7 +7,7 @@ environment variable shown by `goscript <command> --help`.
 ## goscript compile
 
 ```bash
-goscript compile --package ./my-go-package --output ./output --all-dependencies
+goscript compile --package ./my-go-package --output ./output
 ```
 
 | Option | Effect |
@@ -15,7 +15,7 @@ goscript compile --package ./my-go-package --output ./output --all-dependencies
 | `--package <pattern>`, `-p` | Go package pattern to compile. Repeat for more packages. |
 | `--output <dir>` | Root of the generated TypeScript tree. Default `./output`. |
 | `--dir <dir>` | Directory to load the Go module from. Default: the current directory. |
-| `--all-dependencies`, `--deps` | Also compile every package the requested packages import, and copy their overrides. Without it, GoScript emits only the requested packages and `@goscript/builtin`. |
+| `--skip-dependencies`, `--no-deps` | Compile only the requested packages and `@goscript/builtin`, not the packages they import. |
 | `--build-flags <flag>`, `-b` | Go build flag, such as `-tags=goscript`. Repeatable. |
 | `--gs-path <dir>` | Extra override root laid out like [gs/](../gs/README.md). Repeatable. |
 | `--package-blocklist <paths>` | Comma-separated import paths that fail the build if they appear in the package graph. |

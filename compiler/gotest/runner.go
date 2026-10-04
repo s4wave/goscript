@@ -645,7 +645,6 @@ func (r *Runner) compileTestImports(
 			DependencyMode:            compiler.DependencyModeAll,
 			RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
 			Tests:                     false,
-			AllDependencies:           true,
 		}
 		compileResult, compileErr := r.service.Compile(ctx, compileReq)
 		if compileResult != nil {
@@ -688,7 +687,6 @@ func (r *Runner) compilePackageBatch(ctx context.Context, req *normalizedRequest
 		DependencyMode:            compiler.DependencyModeAll,
 		RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
 		Tests:                     true,
-		AllDependencies:           true,
 	}
 	testCompileResult, testCompileErr := r.service.Compile(ctx, testCompileReq)
 	if testCompileErr != nil {
@@ -725,7 +723,6 @@ func (r *Runner) compilePackageOutputsIndividually(ctx context.Context, req *nor
 			DependencyMode:            compiler.DependencyModeAll,
 			RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
 			Tests:                     false,
-			AllDependencies:           true,
 		}
 		if compileResult, compileErr := r.service.Compile(ctx, compileReq); compileErr != nil {
 			result.Packages[idx].Action = ActionFail
@@ -753,7 +750,6 @@ func (r *Runner) compilePackageOutputsIndividually(ctx context.Context, req *nor
 			DependencyMode:            compiler.DependencyModeAll,
 			RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
 			Tests:                     true,
-			AllDependencies:           true,
 		}
 		if compileResult, compileErr := r.service.Compile(ctx, testCompileReq); compileErr != nil {
 			result.Packages[idx].Action = ActionFail

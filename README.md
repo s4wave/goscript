@@ -23,7 +23,7 @@ through in a debugger.
 
 ```bash
 go install github.com/s4wave/goscript/cmd/goscript@latest
-goscript compile --package . --output ./output --all-dependencies
+goscript compile --package . --output ./output
 ```
 
 ## Install
@@ -66,11 +66,11 @@ func main() {
 }
 ```
 
-Compile it from the module directory. `--all-dependencies` also emits the
-packages it imports, here `fmt`, so the output runs on its own:
+Compile it from the module directory. GoScript also emits the packages it
+imports, here `fmt`, so the output runs on its own:
 
 ```bash
-goscript compile --package . --output ./output --all-dependencies
+goscript compile --package . --output ./output
 ```
 
 Point `@goscript/*` imports at the output in `tsconfig.json`:
@@ -107,12 +107,13 @@ typechecking and bundling generated code.
 ### Compile packages
 
 ```bash
-goscript compile --package ./pkg/... --output ./output --all-dependencies
+goscript compile --package ./pkg/... --output ./output
 ```
 
-`--package` takes any Go package pattern and repeats. Without
-`--all-dependencies`, GoScript emits only the requested packages and the
-runtime, which suits builds that compile dependencies separately.
+`--package` takes any Go package pattern and repeats. GoScript compiles the
+requested packages and every package they import. `--skip-dependencies` emits
+only the requested packages and the runtime, for builds that compile
+dependencies separately.
 [docs/cli.md](./docs/cli.md) lists every option.
 
 ### Run Go tests

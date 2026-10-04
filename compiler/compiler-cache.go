@@ -19,6 +19,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	jsoniter "github.com/aperturerobotics/json-iterator-lite"
 	"golang.org/x/mod/modfile"
@@ -210,6 +211,14 @@ func (o *CompilerCacheOwner) ReplayProgram(
 			return nil
 		})
 	}
+	for _, entry := range sources.packages {
+		if entry.kind == compilerCacheEntryGenerated {
+			group.Go(func() error {
+				o.markSummaryUsed(req, entry)
+				return nil
+			})
+		}
+	}
 	if err := group.Wait(); err != nil {
 		return nil, false
 	}
@@ -365,6 +374,30 @@ func (o *CompilerCacheOwner) replayEntry(req *CompileRequest, entry compilerCach
 		return compilerCacheManifest{}, false
 	}
 	return manifest, true
+}
+
+// markSummaryUsed marks the body summary of a generated source entry. A
+// program replay never reads summaries, so it marks them to keep trim from
+// removing them while the program stays in use. A fresh mark costs one stat.
+func (o *CompilerCacheOwner) markSummaryUsed(req *CompileRequest, entry compilerCacheEntry) {
+	summary := summaryEntry(entry)
+	info, err := os.Stat(filepath.Join(o.entryDir(req, summary.key), "manifest.json"))
+	if err != nil || time.Since(info.ModTime()) < compilerCacheMarkInterval {
+		return
+	}
+	manifest, ok := o.readManifest(req, summary)
+	if !ok {
+		return
+	}
+	for _, file := range manifest.files {
+		if !safeCacheBlobPath(file.blob) {
+			continue
+		}
+		blobPath := filepath.Join(o.schemaRoot(req), filepath.FromSlash(file.blob))
+		if info, err := os.Stat(blobPath); err == nil {
+			markCompilerCacheUsed(blobPath, info)
+		}
+	}
 }
 
 func (o *CompilerCacheOwner) StoreGenerated(

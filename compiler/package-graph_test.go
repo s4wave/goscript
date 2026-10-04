@@ -294,7 +294,6 @@ func TestPackageBlocklistAllowsCleanFixture(t *testing.T) {
 	comp, err := NewCompiler(&Config{
 		Dir:              moduleDir,
 		OutputPath:       filepath.Join(t.TempDir(), "out"),
-		AllDependencies:  true,
 		PackageBlocklist: []string{"example.test/blockclean/other"},
 	}, nil, nil)
 	if err != nil {
@@ -316,7 +315,6 @@ func TestPackageBlocklistReportsShortestImportChain(t *testing.T) {
 	comp, err := NewCompiler(&Config{
 		Dir:              moduleDir,
 		OutputPath:       filepath.Join(t.TempDir(), "out"),
-		AllDependencies:  true,
 		PackageBlocklist: []string{"example.test/blockchain/mid/blocked"},
 	}, nil, nil)
 	if err != nil {

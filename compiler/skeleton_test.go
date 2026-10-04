@@ -1375,7 +1375,7 @@ func TestCompilePackagesUsesEmbedOverride(t *testing.T) {
 		}, "\n"),
 	})
 	outputDir := filepath.Join(t.TempDir(), "output")
-	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir, AllDependencies: true}, nil, nil)
+	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -1423,7 +1423,7 @@ func TestCompilePackagesEmbedsFS(t *testing.T) {
 		}, "\n"),
 	})
 	outputDir := filepath.Join(t.TempDir(), "output")
-	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir, AllDependencies: true}, nil, nil)
+	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -1487,9 +1487,8 @@ func TestCompilePackagesEmitsPackageLocalImport(t *testing.T) {
 	})
 	outputDir := filepath.Join(t.TempDir(), "output")
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      outputDir,
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: outputDir,
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -1557,9 +1556,8 @@ func TestCompilePackagesCallsCrossPackageUnexportedReceiverDynamically(t *testin
 	})
 	outputDir := filepath.Join(t.TempDir(), "output")
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      outputDir,
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: outputDir,
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -1719,9 +1717,8 @@ func TestCompilePackagesEmitsSideEffectImportsForInterfaceRegistry(t *testing.T)
 	})
 	outputDir := filepath.Join(t.TempDir(), "output")
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      outputDir,
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: outputDir,
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -2040,7 +2037,7 @@ func TestCompilePackagesTypeInfoTrimFollowsReflectReachability(t *testing.T) {
 			"main.go": source(true),
 		})
 		outputDir := filepath.Join(t.TempDir(), "output")
-		comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir, AllDependencies: true}, nil, nil)
+		comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir}, nil, nil)
 		if err != nil {
 			t.Fatal(err.Error())
 		}
@@ -2309,7 +2306,7 @@ func TestCompilePackagesErasesUnimportedTransitiveInterfaceField(t *testing.T) {
 		}, "\n"),
 	})
 	outputDir := filepath.Join(t.TempDir(), "output")
-	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir}, nil, nil)
+	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir, SkipDependencies: true}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -2773,7 +2770,6 @@ func TestCompilePackagesPropagatesImportedAsyncMethodsAndFunctions(t *testing.T)
 		DependencyMode:      DependencyModeAll,
 		RuntimeEmissionMode: RuntimeEmissionModeEmit,
 		Tests:               true,
-		AllDependencies:     true,
 	})
 	if err != nil {
 		t.Fatal(err.Error())
@@ -3743,7 +3739,7 @@ func TestCompilePackagesImportsSelectedExternalFieldTypes(t *testing.T) {
 		}, "\n"),
 	})
 	outputDir := filepath.Join(t.TempDir(), "output")
-	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir, AllDependencies: true}, nil, nil)
+	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -3799,10 +3795,9 @@ func TestCompilePackagesErasesUnavailableOverrideFieldTypes(t *testing.T) {
 	}, "\n"))
 	outputDir := filepath.Join(t.TempDir(), "output")
 	comp, err := NewCompiler(&Config{
-		Dir:             moduleDir,
-		OutputPath:      outputDir,
-		AllDependencies: true,
-		OverrideDirs:    []string{overrideDir},
+		Dir:          moduleDir,
+		OutputPath:   outputDir,
+		OverrideDirs: []string{overrideDir},
 	}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -4980,7 +4975,6 @@ func TestCompilePackagesPropagatesAsyncInterfaceMethodsFromTestImports(t *testin
 		DependencyMode:      DependencyModeAll,
 		RuntimeEmissionMode: RuntimeEmissionModeEmit,
 		Tests:               true,
-		AllDependencies:     true,
 	})
 	if err != nil {
 		t.Fatal(err.Error())

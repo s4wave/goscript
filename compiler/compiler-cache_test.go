@@ -153,7 +153,6 @@ func TestCompilePackagesCacheReplaysEquivalentMultiPackageOutput(t *testing.T) {
 	cacheRoot := filepath.Join(t.TempDir(), "cache")
 	outputRoot := filepath.Join(t.TempDir(), "out")
 	compileCacheFixtureConfig(t, Config{
-		AllDependencies:           true,
 		ProtobufTypeScriptBinding: true,
 	}, moduleDir, outputRoot, cacheRoot)
 	firstSnapshot := outputTreeSnapshot(t, outputRoot)
@@ -163,7 +162,6 @@ func TestCompilePackagesCacheReplaysEquivalentMultiPackageOutput(t *testing.T) {
 		t.Fatal(err)
 	}
 	compileCacheFixtureConfig(t, Config{
-		AllDependencies:           true,
 		ProtobufTypeScriptBinding: true,
 	}, moduleDir, outputRoot, cacheRoot)
 	secondSnapshot := outputTreeSnapshot(t, outputRoot)
@@ -191,15 +189,15 @@ func TestCompilePackagesCacheReplaysChangedNestedPackage(t *testing.T) {
 		"lib/child/child.go": "package child\nconst Value = 2\n",
 	})
 	cacheRoot := filepath.Join(t.TempDir(), "cache")
-	compileCacheFixtureConfig(t, Config{AllDependencies: true}, moduleDir, filepath.Join(t.TempDir(), "first"), cacheRoot)
+	compileCacheFixtureConfig(t, Config{}, moduleDir, filepath.Join(t.TempDir(), "first"), cacheRoot)
 
 	childFile := filepath.Join(moduleDir, "lib", "child", "child.go")
 	if err := os.WriteFile(childFile, []byte("package child\nconst Value = 3\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	compileCacheFixtureConfig(t, Config{AllDependencies: true}, moduleDir, filepath.Join(t.TempDir(), "second"), cacheRoot)
+	compileCacheFixtureConfig(t, Config{}, moduleDir, filepath.Join(t.TempDir(), "second"), cacheRoot)
 	replayOut := filepath.Join(t.TempDir(), "replay")
-	compileCacheFixtureConfig(t, Config{AllDependencies: true}, moduleDir, replayOut, cacheRoot)
+	compileCacheFixtureConfig(t, Config{}, moduleDir, replayOut, cacheRoot)
 	text := readOutputFile(t, replayOut, "example.test/cachenest/lib/child", "child.gs.ts")
 	if !strings.Contains(text, "Value: number = 3") {
 		t.Fatalf("replay wrote stale nested package output:\n%s", text)
@@ -306,13 +304,13 @@ func TestCompilePackagesCacheInvalidatesEmbedFileChange(t *testing.T) {
 	})
 	cacheRoot := filepath.Join(t.TempDir(), "cache")
 	firstOut := filepath.Join(t.TempDir(), "first")
-	compileCacheFixtureConfig(t, Config{AllDependencies: true}, moduleDir, firstOut, cacheRoot)
+	compileCacheFixtureConfig(t, Config{}, moduleDir, firstOut, cacheRoot)
 
 	if err := os.WriteFile(filepath.Join(moduleDir, "version.txt"), []byte("2.0.0\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	secondOut := filepath.Join(t.TempDir(), "second")
-	compileCacheFixtureConfig(t, Config{AllDependencies: true}, moduleDir, secondOut, cacheRoot)
+	compileCacheFixtureConfig(t, Config{}, moduleDir, secondOut, cacheRoot)
 	text := readOutputFile(t, secondOut, "example.test/cacheembed", "main.gs.ts")
 	if !strings.Contains(text, `Version: string = "2.0.0\n"`) {
 		t.Fatalf("embed file change was not reflected in output:\n%s", text)
@@ -343,7 +341,6 @@ func TestCompilePackagesCacheInvalidatesAdditionalBindingRoots(t *testing.T) {
 	cacheRoot := filepath.Join(t.TempDir(), "cache")
 	outputRoot := filepath.Join(t.TempDir(), "out")
 	baseConfig := Config{
-		AllDependencies:           true,
 		ProtobufTypeScriptBinding: true,
 	}
 	compileCacheFixtureConfig(t, baseConfig, moduleDir, outputRoot, cacheRoot)
@@ -506,7 +503,7 @@ func TestCompilePackagesCacheReplayRechecksChangedParityLedger(t *testing.T) {
 	writeFixtureFile(t, overrideDir, "example.test/cacheparity/lib/parity.json", parityFixtureJSON(t, map[string]overrideParityEntry{
 		"Present": {Status: overrideParityStatusReal},
 	}))
-	config := Config{OverrideDirs: []string{overrideDir}, AllDependencies: true}
+	config := Config{OverrideDirs: []string{overrideDir}}
 	cacheRoot := filepath.Join(t.TempDir(), "cache")
 	compileCacheFixtureConfig(t, config, moduleDir, filepath.Join(t.TempDir(), "first"), cacheRoot)
 
@@ -980,7 +977,7 @@ func TestCompilePackagesCacheEditsMatchFreshCompile(t *testing.T) {
 		{name: "variable ref", decls: cacheFactsVarRefDecls, depChanges: true},
 		{name: "revert", decls: cacheFactsDecls},
 	}
-	config := Config{AllDependencies: true}
+	config := Config{}
 	moduleDir := writePackageGraphFixture(t, cacheFactsFixture(cacheFactsDecls))
 	cacheRoot := filepath.Join(t.TempDir(), "cache")
 	baseOut := filepath.Join(t.TempDir(), "base")
@@ -1011,10 +1008,9 @@ func cacheFactsArtifactKeys(t *testing.T, moduleDir string) map[string]string {
 	ctx := context.Background()
 	service := NewCompileService()
 	req := service.RequestOwner().NewRequest(Config{
-		Dir:             moduleDir,
-		OutputPath:      t.TempDir(),
-		CacheRoot:       t.TempDir(),
-		AllDependencies: true,
+		Dir:        moduleDir,
+		OutputPath: t.TempDir(),
+		CacheRoot:  t.TempDir(),
 	}, []string{"."})
 	graph, diagnostics := service.graphOwner.Load(ctx, req)
 	if diagnosticsHaveErrors(diagnostics) {
