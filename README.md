@@ -5,7 +5,6 @@
     Your Go code runs anywhere TypeScript runs: Node, Bun, and the browser.
   </p>
 
-
   <div align="center">
     <img src="./docs/assets/readme-transpile-demo.svg?cachebuster=4" alt="GoScript side-by-side Go source and generated TypeScript output showing a channel send, goroutine scheduling, and awaited channel receive." />
   </div>
@@ -23,49 +22,45 @@
 
 ## Overview
 
-**GoScript** is a Go to TypeScript compiler, so Go can run anywhere TypeScript
-runs. It loads packages from a Go module, type-checks them with the Go
-toolchain, and emits deterministic TypeScript packages under
-`@goscript/<go-package>/`.
+**GoScript** compiles Go packages to TypeScript. It loads packages from a Go
+module, type-checks them with the Go toolchain, and emits deterministic
+TypeScript packages under `@goscript/<go-package>/`.
 
-GoScript compiles package graphs, generics, interfaces, pointer and value
-semantics, goroutines, channels, `select`, `defer`, async call propagation,
-package tests, and a practical standard-library override surface. The output
-stays readable enough to inspect, bundle, and debug like code you wrote.
+It handles package graphs, generics, interfaces, pointers and value copies,
+goroutines, channels, `select`, `defer`, async call propagation, and package
+tests. Handwritten TypeScript overrides cover the standard-library packages that
+do not transpile directly. You can read, bundle, and debug the output like code
+you wrote.
 
 GoScript is developed and tuned against
 [Spacewave](https://github.com/s4wave/spacewave), a large Go and TypeScript app
 framework. Spacewave compiles its browser core plugin through GoScript,
 including its go-git storage backend and the go-mysql-server SQL engine, and
-runs its core package tests through `goscript test` in CI. That dogfooding keeps
-build speed and runtime compatibility tied to complex application code instead
-of toy examples.
+runs its core package tests through `goscript test` in CI, so every change to
+build speed or runtime compatibility is measured on a large application.
 
-GoScript shares GopherJS's long-term browser goal: make ordinary Go programs
-run in JavaScript environments. The difference is the runtime strategy.
-GopherJS models a Go runtime with its own goroutine scheduler. GoScript emits
-readable TypeScript modules and maps concurrency onto JavaScript async work and
-runtime channel helpers instead of implementing a full goroutine scheduler.
+GoScript and GopherJS share a goal: run ordinary Go programs in JavaScript
+environments. They differ in runtime strategy. GopherJS models a Go runtime
+with its own goroutine scheduler. GoScript emits readable TypeScript modules and
+maps goroutines onto JavaScript async functions and runtime channel helpers.
 
 ### Why GoScript?
 
 Use GoScript when Go is the source of truth and part of the product must run
 in a TypeScript runtime. It compiles real application code: database engines,
-git implementations, cryptography, and concurrent framework code, not just
-self-contained algorithms.
+git implementations, cryptography, and concurrent framework code.
 
 Good fits today include:
 
 - Sharing validation, formatting, parsing, and business rules between Go services and TypeScript applications
 - Publishing TypeScript packages from Go data structures and algorithms
 - Running Go application and framework code in Bun, browsers, and modern bundlers
-- Moving Go framework code into browser/plugin paths without rewriting it in TypeScript
-- Building package-level test workflows that exercise generated TypeScript instead of handwritten ports
+- Running Go framework code in browser plugins without rewriting it in TypeScript
+- Testing the generated TypeScript with the package's own Go tests
 
-GoScript does not run every valid Go program: code that depends on `unsafe`
-memory operations, cgo, or standard-library packages without an override or
-clean transpilation is unsupported. See [Limitations](#limitations) for the
-precise list.
+Code that depends on `unsafe` memory operations, cgo, or a standard-library
+package that has no override and does not transpile cleanly is unsupported.
+[Limitations](#limitations) has the full list.
 
 Useful docs:
 
@@ -78,10 +73,10 @@ Useful docs:
 
 ### Works Today
 
-The compiler runs large real-world package graphs. Each claim below names its
-proof: a compliance fixture under [tests/tests](./tests/tests) (500+ fixtures,
-each a Go program compiled, typechecked, and executed against expected output),
-a runtime test under [gs/](./gs), or a consuming project.
+The compiler handles large real-world package graphs. Each item cites its
+evidence: a compliance fixture under [tests/tests](./tests/tests) (500+ Go
+programs, each compiled, typechecked, and run against expected output), a
+runtime test under [gs/](./gs), or a consuming project.
 
 - Go package loading through `go/packages` with `GOOS=js` and `GOARCH=wasm`,
   with build tags through CLI build flags (`tests/tests/*`, all fixtures)
@@ -98,7 +93,7 @@ a runtime test under [gs/](./gs), or a consuming project.
 - `goto` and labeled statements through state-machine lowering
   (`forward_goto_statement`)
 - Exact 64-bit integers: `int64` and `uint64` compile to TypeScript `bigint`
-  with Go overflow semantics (`wide_uint64_exact_arithmetic`,
+  with Go overflow behavior (`wide_uint64_exact_arithmetic`,
   `constant_shift_64`, `gs/builtin/wide-int.test.ts`)
 - 32-bit integer multiplication through `Math.imul` (`imul_32bit`), `float32`
   rounding through `Math.fround` (`float32_rounding`), and bit operations
@@ -140,14 +135,14 @@ a runtime test under [gs/](./gs), or a consuming project.
   `uintptr` arithmetic routes through the 64-bit runtime helpers to preserve
   full width, but plain `int` does not model 64-bit overflow
   (`compiler/lowering.go`, `isBigIntBackedType`).
-- Standard-library coverage is override-driven, not complete. A package
-  without a `gs/` override must transpile cleanly or it is unsupported; there
-  are no real sockets, processes, or plugin loading beyond what the JavaScript
-  host provides.
+- Standard-library support comes from `gs/` overrides and covers part of the
+  standard library. A package without an override must transpile cleanly or it
+  is unsupported. Sockets, processes, and plugin loading work only as far as
+  the JavaScript host provides them.
 - The `reflect` override is a subset; remaining parity gaps are tracked in
   `gs/reflect/parity.json`.
-- `goscript test` supports a GoScript-compatible subset of `testing`, not the
-  complete `go test` flag surface (`cmd/goscript/cmd-test_test.go`).
+- `goscript test` supports a subset of `testing` and of the `go test` flags
+  (`cmd/goscript/cmd-test_test.go`).
 - Concurrency lowers to async/await and 64-bit arithmetic uses `bigint`; both
   cost more than plain synchronous JavaScript with `number`. Benchmarks live
   under [tests/bench](./tests/bench).
@@ -190,11 +185,9 @@ can run directly in Bun or a bundler that resolves `@goscript/*` imports. See
 ## TypeScript Projects
 
 Generated package indexes re-export generated files such as `./main.gs.ts`, and
-some package-local imports also use explicit `.ts` specifiers. Your TypeScript
-project needs to allow those imports and map `@goscript/*` to the generated
-output root.
-
-Use this shape as the starting point:
+some package-local imports use explicit `.ts` specifiers. Your TypeScript
+project must allow those imports and map `@goscript/*` to the generated output
+root. Start from this configuration:
 
 ```json
 {
@@ -217,15 +210,15 @@ Use this shape as the starting point:
 }
 ```
 
-The important settings are:
+The settings GoScript output depends on:
 
-- `moduleResolution: "bundler"` so `@goscript/*` package imports resolve like a modern app build.
-- `allowImportingTsExtensions: true` because generated indexes and same-package imports can reference `.ts` files directly.
-- `rewriteRelativeImportExtensions: true` if TypeScript is emitting JavaScript instead of only typechecking.
-- `paths` pointing at the generated `@goscript/` tree.
+- `moduleResolution: "bundler"` resolves `@goscript/*` package imports the way a bundler does.
+- `allowImportingTsExtensions: true` lets generated indexes and same-package imports reference `.ts` files directly.
+- `rewriteRelativeImportExtensions: true` rewrites those specifiers when TypeScript emits JavaScript.
+- `paths` maps `@goscript/*` to the generated tree.
 
-If your bundler owns JavaScript emission and TypeScript only typechecks, adding
-`"noEmit": true` is also a good fit.
+When your bundler emits JavaScript and TypeScript only typechecks, add
+`"noEmit": true`.
 
 ## Command Line
 
@@ -246,7 +239,7 @@ Common options:
 - `--package-blocklist <paths>`: comma-separated Go import paths to reject from the compiled package graph.
 - `--compiler-cache-root <dir>`: explicit compiler package artifact cache root.
 - `--protobuf-ts-binding`: bind `.pb.go` files to sibling `.pb.ts` files instead of emitting `.pb.gs.ts`.
-- `--deferred-function`: repeat for each exported, non-generic `package/path.Function` to load on first call. This opts into late package initialization and requires eager callers to move shared concrete types and values into a separate package. Calls become asynchronous; function values remain lazy until invoked. Configure the equivalent `deferredFunctions` array through the TypeScript API.
+- `--deferred-function <package/path.Function>`: load an exported, non-generic function on first call. Repeatable. The function's package initializes late, so eager callers must move shared concrete types and values into a separate package. Calls become asynchronous, and function values stay lazy until invoked. The TypeScript API takes the same list as `deferredFunctions`.
 - `--disable-emit-builtin`: skip copying handwritten `gs/` runtime packages.
 
 Run Go package tests through GoScript:
@@ -257,7 +250,7 @@ goscript test --tags goscript ./...
 
 `goscript test` loads package test variants, compiles each selected package
 through the normal GoScript pipeline, writes a TypeScript test runner, typechecks
-the generated workspace, and runs it with Bun. Useful options:
+the generated workspace, and runs it with Bun. Options:
 
 - `--tags <tags>`: comma-separated Go build tags.
 - `--run <regexp>`: run only matching Go test names.
@@ -271,8 +264,8 @@ the generated workspace, and runs it with Bun. Useful options:
 - `--runtime-groups`: run package runtimes in grouped Bun worker processes.
 - `--incremental-typecheck`: reuse TypeScript build-info files in the test workdir.
 
-The output is shaped like `go test` where possible and classifies failures that
-occur before the generated tests run.
+The output follows `go test` where it can. Failures that occur before the
+generated tests run report the compiler stage that failed.
 
 ## APIs
 
@@ -335,9 +328,8 @@ func main() {
 }
 ```
 
-The website compiles this package into the browser build. Browser source
-compilation accepts import-free single-file demos. Package imports return a
-structured diagnostic; compile imported code with the package workflow.
+The website playground builds this package into its browser bundle. It
+compiles import-free single files only; see [Limitations](#limitations).
 
 ## Architecture
 
@@ -353,7 +345,7 @@ public adapter
   -> runtime/override package copy
 ```
 
-Each stage has a small, testable job:
+Each stage has one testable job:
 
 - Request validation normalizes CLI, Go API, Node/Bun API, and WASM inputs.
 - Package loading records Go package identities, dependency edges, build tags, and diagnostics.
@@ -363,8 +355,9 @@ Each stage has a small, testable job:
 - Runtime contracts keep generated helper names and `@goscript/builtin` imports stable.
 - Override discovery copies handwritten runtime and standard-library packages when direct transpilation is not the right runtime shape.
 
-This separation keeps type and runtime decisions out of string rendering, so
-generated output changes are easier to explain, test, and debug.
+Type and runtime decisions happen before emission, so the emitter only renders
+text. A change in generated output traces back to one stage, where a test can
+reproduce it.
 
 ## Running from Source
 
@@ -394,34 +387,25 @@ Build the static website and browser demo assets:
 bun run website:build
 ```
 
-The website playground can compile and run import-free single-file demos in the
-browser. Compliance examples and imported-package examples are precompiled by the
-website build.
+The playground compiles and runs import-free single files in the browser. The
+website build precompiles the compliance and imported-package examples.
 
 ## Examples
 
 - [example/simple](./example/simple): smallest package compile-and-run workflow.
 - [example/app](./example/app): full-stack application example using generated TypeScript.
-- [tests/tests](./tests/tests): inherited compliance fixtures and generated output snapshots.
-- [tests/deps](./tests/deps): legacy snapshot tree of compiled test-library dependencies; explicit input only, not written by test runs.
+- [tests/tests](./tests/tests): compliance fixtures and their generated output snapshots.
+- [tests/deps](./tests/deps): checked-in compiled dependencies that fixture typechecks fall back to. Test runs read this tree and never write it.
 
 ## Contributing
 
-GoScript is experimental. Small compatibility shims are usually the wrong fix;
-prefer adding focused compiler or compliance tests that name the missing Go
-behavior, then implement the behavior in the compiler or runtime stage that
-actually owns it.
+GoScript is experimental. To fix a missing Go behavior, add a focused compiler
+or compliance test that reproduces it, then implement the behavior in the
+compiler or runtime stage responsible for it. Run the checks from
+[Running from Source](#running-from-source) before sending a change.
 
-Use the repo scripts rather than direct package-manager commands:
-
-```bash
-bun run test
-bun run lint
-bun run build
-```
-
-Please open issues for unsupported Go shapes, runtime gaps, and standard-library
-override gaps.
+Open an issue for Go code GoScript cannot compile, runtime gaps, and missing
+standard-library overrides.
 
 ## License
 
