@@ -1,878 +1,395 @@
-# GoScript: A Comprehensive Architecture Explainer
+# GoScript Architecture
 
-GoScript is an experimental Go-to-TypeScript transpiler that converts Go source code into maintainable, idiomatic TypeScript while preserving Go's semantics. This document provides a deep dive into how GoScript works.
+GoScript compiles Go packages to readable TypeScript and keeps Go's behavior:
+value copies, pointers, goroutines, channels, and `defer`. This document walks
+through the compiler pipeline, the facts it computes before emitting code, and
+the TypeScript it produces for each Go construct. Every example below is
+current compiler output.
 
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [High-Level Architecture](#high-level-architecture)
-3. [Compilation Pipeline](#compilation-pipeline)
-4. [Compiler Components](#compiler-components)
-5. [Analysis Phase](#analysis-phase)
-6. [Code Generation Phase](#code-generation-phase)
-7. [Type System Translation](#type-system-translation)
-8. [Runtime System](#runtime-system)
-9. [Concurrency Model](#concurrency-model)
-10. [Value Semantics](#value-semantics)
+1. [Pipeline](#pipeline)
+2. [Compiler Components](#compiler-components)
+3. [Semantic Model](#semantic-model)
+4. [Type Translation](#type-translation)
+5. [Structs and Value Copies](#structs-and-value-copies)
+6. [Pointers and VarRef](#pointers-and-varref)
+7. [Concurrency](#concurrency)
+8. [Control Flow](#control-flow)
+9. [Runtime](#runtime)
+10. [File Layout](#file-layout)
 
----
-
-## Overview
-
-GoScript translates Go code at the AST (Abstract Syntax Tree) level, producing readable TypeScript that preserves Go's type safety and semantics. The primary use case is sharing business logic between Go backends and TypeScript frontends.
-
-### Design Philosophy
-
-1. **AST Mapping**: Close mapping between Go AST and TypeScript output
-2. **Type Preservation**: Maintain Go's static typing in TypeScript
-3. **Value Semantics**: Emulate Go's value copying behavior for structs
-4. **Idiomatic Output**: Generate TypeScript that feels natural to TS developers
-5. **Readability**: Prioritize clear, understandable generated code
-
----
-
-## High-Level Architecture
+## Pipeline
 
 ```
-┌───────────────────────────────────────────────────────────────────────┐
-│                       GoScript Compile Service                        │
-├───────────────────────────────────────────────────────────────────────┤
-│                                                                       │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐             │
-│  │ Public       │───▶│ Compile      │───▶│ Package      │             │
-│  │ Adapters     │    │ Request      │    │ Graph        │             │
-│  └──────────────┘    └──────────────┘    └──────────────┘             │
-│                                                  │                    │
-│                                                  ▼                    │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐             │
-│  │ TypeScript   │◀───│ TypeScript   │◀───│ Lowered      │             │
-│  │ Output       │    │ Emitter      │    │ Program      │             │
-│  └──────────────┘    └──────────────┘    └──────────────┘             │
-│         ▲                 ▲                    ▲                      │
-│         │                 │                    │                      │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐             │
-│  │ Override     │    │ Runtime      │    │ Semantic     │             │
-│  │ Registry     │    │ Contract     │    │ Model        │             │
-│  └──────────────┘    └──────────────┘    └──────────────┘             │
-│                                                                       │
-└───────────────────────────────────────────────────────────────────────┘
-                                  │
-                                  ▼
-┌───────────────────────────────────────────────────────────────────────┐
-│                        @goscript/builtin Runtime                      │
-├───────────────────────────────────────────────────────────────────────┤
-│  varRef.ts │ slice.ts │ channel.ts │ map.ts │ type.ts │ defer.ts      │
-└───────────────────────────────────────────────────────────────────────┘
-```
-
-The public CLI uses `github.com/aperturerobotics/cli` and constructs
-`compiler.Config` from command-local flag state. The public Go API is
-`compiler.Compiler`, which forwards package patterns into `CompileService`.
-The WASM/browser adapter parses and type-checks import-free single-file source
-strings, builds the same semantic model used by package compilation, and then
-reuses the v2 lowering and TypeScript emitter. Browser source imports still
-return a structured diagnostic; use the package workflow for imported code.
-
----
-
-## Compilation Pipeline
-
-### State Machine: Overall Compilation Flow
-
-```
-┌───────────────────────────────────────────────────────────────┐
-│                   COMPILATION STATE MACHINE                   │
-└───────────────────────────────────────────────────────────────┘
-
-    ┌─────────┐
-    │  START  │
-    └────┬────┘
-         │
+┌──────────────────┐
+│ Validate request │  package patterns, output path, module root, build flags
+└────────┬─────────┘
          ▼
-┌───────────────────┐
-│ VALIDATE REQUEST  │
-│                   │
-│ - package patterns│
-│ - output path     │
-│ - module root     │
-│ - build flags     │
-└─────────┬─────────┘
-          │
-          ▼
-┌───────────────────┐
-│ LOAD PACKAGE GRAPH│ Uses golang.org/x/tools/go/packages
-│                   │ Env: GOOS=js, GOARCH=wasm
-└─────────┬─────────┘
-          │
-          ▼
-┌───────────────────┐
-│ SEMANTIC MODEL    │
-│                   │
-│ - package facts   │
-│ - addressability  │
-│ - methods/types   │
-│ - async facts     │
-└─────────┬─────────┘
-          │
-          ▼
-┌───────────────────┐
-│ OVERRIDE COPY PLAN│ Discover handwritten gs/ packages
-│                   │ and validate dependencies before output
-└─────────┬─────────┘
-          │
-          ▼
-┌───────────────────┐
-│ LOWER PROGRAM     │ Convert Go AST + semantic facts into
-│                   │ compiler-owned IR
-└─────────┬─────────┘
-          │
-          ▼
-┌───────────────────┐
-│ EMIT TYPESCRIPT   │ Render only from lowered IR
-│                   │ and generate indexes
-└─────────┬─────────┘
-          │
-          ▼
-┌───────────────────┐
-│ COPY OVERRIDES    │ Copy @goscript/builtin and required
-│                   │ handwritten packages
-└─────────┬─────────┘
-          │
-          ▼
-    ┌─────────┐
-    │   END   │
-    └─────────┘
+┌──────────────────┐
+│ Load packages    │  golang.org/x/tools/go/packages, GOOS=js GOARCH=wasm
+└────────┬─────────┘
+         ▼
+┌──────────────────┐
+│ Semantic model   │  addressability, VarRef needs, async coloring, types
+└────────┬─────────┘
+         ▼
+┌──────────────────┐
+│ Override plan    │  find handwritten gs/ packages and check their deps
+└────────┬─────────┘
+         ▼
+┌──────────────────┐
+│ Lower            │  Go AST + semantic facts -> compiler IR
+└────────┬─────────┘
+         ▼
+┌──────────────────┐
+│ Emit TypeScript  │  render files and package indexes from the IR
+└────────┬─────────┘
+         ▼
+┌──────────────────┐
+│ Copy overrides   │  @goscript/builtin and the required gs/ packages
+└──────────────────┘
 ```
 
----
+Every stage reports structured diagnostics. When any stage reports an error,
+the compiler stops before it writes output.
+
+Three adapters feed the same pipeline. The CLI in `cmd/goscript` builds a
+`compiler.Config` from its flags. The Go API, `compiler.Compiler`, passes
+package patterns to `CompileService`. The browser adapter in `compiler/wasm`
+type-checks one import-free source file, builds the same semantic model, and
+reuses the lowering and emitter stages.
 
 ## Compiler Components
 
-GoScript v2 uses owner-level components instead of a package/file compiler
-hierarchy. Each owner hides one durable rule boundary:
+Each stage is one component in `compiler/`, and each component keeps one set
+of rules:
 
-```
-┌───────────────────────────────────────────────────────────────────┐
-│                         PUBLIC ADAPTERS                           │
-│  cmd/goscript: github.com/aperturerobotics/cli flag surface       │
-│  compiler.Compiler: Go API adapter over CompileService            │
-│  compiler/wasm: browser diagnostic adapter                        │
-└───────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌───────────────────────────────────────────────────────────────────┐
-│                         CompileService                            │
-│  - Coordinates request, graph, semantic, lowering, emit, copy      │
-│  - Accumulates structured diagnostics                             │
-│  - Stops before writing output when owner diagnostics are errors   │
-└───────────────────────────────────────────────────────────────────┘
-                                    │
-              ┌─────────────────────┼─────────────────────┐
-              ▼                     ▼                     ▼
-┌──────────────────────┐ ┌──────────────────────┐ ┌──────────────────────┐
-│ CompileRequestOwner  │ │ PackageGraphOwner    │ │ SemanticModelOwner   │
-│ Normalizes adapters  │ │ Loads packages       │ │ Computes package,    │
-│ and validates module │ │ with go/packages     │ │ type, method, async, │
-│ package requests     │ │ and build flags      │ │ and address facts    │
-└──────────────────────┘ └──────────────────────┘ └──────────────────────┘
-              ▼                     ▼                     ▼
-┌──────────────────────┐ ┌──────────────────────┐ ┌──────────────────────┐
-│ OverrideRegistryOwner│ │ LoweringOwner        │ │ TypeScriptEmitOwner  │
-│ Discovers/copies gs/ │ │ Converts semantic    │ │ Renders deterministic│
-│ packages and async   │ │ model + AST to IR    │ │ TypeScript from IR   │
-│ override metadata    │ │                      │ │ only                 │
-└──────────────────────┘ └──────────────────────┘ └──────────────────────┘
-                                    │
-                                    ▼
-┌───────────────────────────────────────────────────────────────────┐
-│                       RuntimeContractOwner                        │
-│  Owns generated helper names and @goscript/builtin import policy  │
-└───────────────────────────────────────────────────────────────────┘
-```
+| Component | Responsibility |
+|-----------|----------------|
+| `CompileService` | Runs the stages in order and collects diagnostics. |
+| `CompileRequestOwner` | Normalizes adapter input and validates the requested packages. |
+| `PackageGraphOwner` | Loads packages with `go/packages` and the build flags. |
+| `SemanticModelOwner` | Computes type, method, addressability, VarRef, and async facts. |
+| `OverrideRegistryOwner` | Reads `gs/` override metadata and plans which packages to copy. |
+| `LoweringOwner` | Turns Go syntax and semantic facts into the IR in `lowered-program.go`. |
+| `TypeScriptEmitOwner` | Renders deterministic, semicolon-free TypeScript from the IR. |
+| `RuntimeContractOwner` | Keeps generated helper names and `@goscript/builtin` imports stable. |
 
-The main design constraint is that text emission is the last step. Earlier
-owners decide package identity, imports, async coloring, pointer/value shape,
-interface descriptors, generic dictionaries, override dependencies, and runtime
-helper names before `TypeScriptEmitOwner` writes files.
+The emitter runs last and only renders text. Package identity, imports, async
+coloring, pointer shapes, interface descriptors, generic dictionaries, override
+dependencies, and runtime helper names are all decided before it starts.
 
----
+## Semantic Model
 
-## Analysis Phase
+The semantic model answers two questions the emitter cannot answer from one
+expression: which variables need a `VarRef` box, and which functions must be
+`async`.
 
-The analysis phase pre-computes all information needed for code generation. This happens **before** any TypeScript is written.
+### VarRef
 
-### Analysis State Machine
+A variable gets a `VarRef` box when Go code can reach it through a pointer:
 
-```
-┌───────────────────────────────────────────────────────────────┐
-│                    ANALYSIS STATE MACHINE                     │
-└───────────────────────────────────────────────────────────────┘
+- its address is taken with `&x`;
+- a pointer-receiver method is called on it, which takes its address
+  implicitly;
+- it holds a function and a function literal that captures it assigns to it.
 
-    ┌─────────┐
-    │  START  │
-    └────┬────┘
-         │
-         ▼
-┌─────────────────────┐
-│ PROCESS IMPORTS     │
-│                     │
-│ Collect import      │
-│ statements and      │
-│ their usage         │
-└─────────┬───────────┘
-          │
-          ▼
-┌─────────────────────┐
-│ ANALYZE FUNCTIONS   │
-│                     │
-│ For each function:  │
-│ • Track receivers   │
-│ • Named returns     │
-│ • Closure captures  │
-└─────────┬───────────┘
-          │
-          ▼
-┌─────────────────────┐     ┌─────────────────────────────────────┐
-│ VARIABLE USAGE      │     │ Rules for NeedsVarRef:              │
-│ ANALYSIS            │────▶│ • Address taken (&var)              │
-│                     │     │ • Assigned to pointer               │
-│ Determine which     │     │ • Passed to function taking pointer │
-│ vars need VarRef    │     └─────────────────────────────────────┘
-└─────────┬───────────┘
-          │
-          ▼
-┌─────────────────────┐     ┌─────────────────────────────────────┐
-│ ASYNC ANALYSIS      │     │ Async Roots (Inherently Async):     │
-│ (Function Coloring) │────▶│ • Channel receive: <-ch             │
-│                     │     │ • Channel send: ch <- val           │
-│ Propagate async     │     │ • select statements                 │
-│ status through      │     │ • go statements (goroutines)        │
-│ call graph          │     │                                     │
-└─────────┬───────────┘     │ Propagation:                        │
-          │                 │ • Calls async func → becomes async  │
-          │                 └─────────────────────────────────────┘
-          ▼
-┌─────────────────────┐
-│ DEFER ANALYSIS      │
-│                     │
-│ Mark blocks with    │
-│ defer statements    │
-│ (sync vs async)     │
-└─────────┬───────────┘
-          │
-          ▼
-┌─────────────────────┐
-│ INTERFACE IMPL      │
-│ TRACKING            │
-│                     │
-│ Map structs to      │
-│ interfaces they     │
-│ implement           │
-└─────────┬───────────┘
-          │
-          ▼
-┌─────────────────────┐
-│ BUILD ANALYSIS      │
-│ RESULT              │
-│                     │
-│ Package into        │
-│ read-only struct    │
-└─────────┬───────────┘
-          │
-          ▼
-     ┌────────┐
-     │  END   │
-     └────────┘
-```
+Every other variable stays a plain TypeScript `let`.
 
-### Analysis Data Structure
+### Async coloring
+
+A function becomes `async` when its body can suspend. The direct causes are:
+
+- a channel send or receive;
+- a `select` statement;
+- a call to `print` or `println`, which write through the async host output;
+- a call through a function value, whose target is unknown at compile time;
+- a call to an override function or method marked async in its `meta.json`,
+  such as `sync.Mutex.Lock`.
+
+`colorAsyncFunctions` in `semantic-async.go` then propagates the mark with one
+worklist until nothing changes. A function that calls an async function becomes
+async. An interface method becomes async when any implementation is. A callee
+becomes async when a caller passes it an async function argument. Every call to
+an async function is emitted with `await`.
+
+## Type Translation
+
+| Go type | TypeScript type |
+|---------|-----------------|
+| `int`, `uint`, `int32`, `uint32`, `float64`, `float32`, `rune`, `byte` | `number` |
+| `int64`, `uint64` | `bigint` |
+| `string` | `string` |
+| `bool` | `boolean` |
+| `error` | `$.GoError` |
+| `[]T` | `$.Slice<T>` |
+| `map[K]V` | `globalThis.Map<K, V> \| null` |
+| `chan T` | `$.Channel<T> \| null` |
+| `*T` | `T \| $.VarRef<T> \| null` |
+| `interface{}` | `any` |
+
+`int64` and `uint64` arithmetic goes through runtime helpers such as
+`$.int64Add` so it wraps on overflow like Go. `uint` and `uintptr` arithmetic
+uses the same helpers to keep 64-bit width. Plain `int` stays a `number` and
+does not model 64-bit overflow.
+
+## Structs and Value Copies
+
+A struct becomes a class. Field values live in `_fields`, and
+`$.bindStructFields` defines an accessor for each field on the prototype.
 
 ```go
-type Analysis struct {
-    // Variable reference tracking
-    VariableUsage           map[types.Object]*VariableUsage
-
-    // Function metadata
-    FunctionData            map[types.Object]*FunctionInfo
-    MethodAsyncStatus       map[string]bool
-
-    // Per-node metadata
-    NodeData                map[ast.Node]*NodeInfo
-
-    // Interface implementations
-    InterfaceImplementations map[InterfaceMethodKey][]ImplementationInfo
-
-    // Import management
-    SyntheticImportsPerFile map[string]map[string]*ImportInfo
-    ReferencedTypesPerFile  map[string]map[types.Type]bool
-
-    // Comment preservation
-    Cmap                    ast.CommentMap
+type Point struct {
+	X int
+	Y int
 }
 ```
 
----
+```ts
+export class Point {
+	public declare X: number
+	public declare Y: number
 
-## Code Generation Phase
+	public _fields: {
+		X: number
+		Y: number
+	}
 
-After analysis, the compiler traverses the AST and generates TypeScript.
+	constructor(init?: Partial<{X?: number, Y?: number}>) {
+		this._fields = {
+			X: init?.X ?? (0 as number),
+			Y: init?.Y ?? (0 as number)
+		}
+	}
 
-### Code Generation State Machine
+	public clone(): Point {
+		return $.markAsStructValue(new Point(this))
+	}
 
-```
-┌───────────────────────────────────────────────────────────────┐
-│                 CODE GENERATION STATE MACHINE                 │
-└───────────────────────────────────────────────────────────────┘
+	static {
+		$.bindStructFields(this.prototype, ["X", "Y"])
+	}
 
-    ┌─────────┐
-    │  START  │
-    └────┬────┘
-         │
-         ▼
-┌─────────────────────┐
-│ WRITE IMPORTS       │
-│                     │
-│ import * as $ from  │
-│ "@goscript/builtin" │
-│                     │
-│ Auto-imports from   │
-│ same package        │
-└─────────┬───────────┘
-          │
-          ▼
-┌─────────────────────┐
-│ FOR EACH DECL       │◀──────────────────────────────────┐
-│                     │                                   │
-│ • GenDecl (type,    │                                   │
-│   const, var)       │                                   │
-│ • FuncDecl          │                                   │
-└─────────┬───────────┘                                   │
-          │                                               │
-          ├─────▶ TYPE SPEC ──────▶ WriteTypeSpec         │
-          │       (struct, interface, alias)              │
-          │                                               │
-          ├─────▶ VALUE SPEC ─────▶ WriteValueSpec        │
-          │       (const, var)                            │
-          │                                               │
-          ├─────▶ FUNC DECL ──────▶ WriteFuncDecl         │
-          │       (function, method)                      │
-          │                                               │
-          └───────────────────────────────────────────────┘
-                      │
-                      │ more decls?
-                      │
-                      ▼
-                 ┌────────┐
-                 │  END   │
-                 └────────┘
+	static __typeInfo = $.registerStructType(/* name, constructor, methods, fields */)
+}
 ```
 
-### Expression Translation Flow
+Go assignment copies a struct value, so the compiler emits a clone:
 
-```
-┌───────────────────────────────────────────────────────────────┐
-│                  EXPRESSION TRANSLATION FLOW                  │
-└───────────────────────────────────────────────────────────────┘
-
-                    WriteValueExpr(expr)
-                           │
-           ┌───────────────┼───────────────┐
-           │               │               │
-           ▼               ▼               ▼
-    ┌────────────┐  ┌────────────┐  ┌────────────┐
-    │ BasicLit   │  │ Ident      │  │ CallExpr   │
-    │            │  │            │  │            │
-    │ "hello"    │  │ varName    │  │ func()     │
-    │ 42         │  │            │  │            │
-    │ true       │  │ Check if   │  │ Check if   │
-    └─────┬──────┘  │ needs      │  │ async,     │
-          │         │ .value     │  │ builtin,   │
-          │         │ access     │  │ type conv  │
-          ▼         └─────┬──────┘  └─────┬──────┘
-    ┌────────────┐        │               │
-    │ Write      │        ▼               ▼
-    │ literal    │  ┌────────────┐  ┌────────────┐
-    └────────────┘  │ WriteIdent │  │ WriteCall  │
-                    │            │  │ Expr       │
-                    │ Add .value │  │            │
-                    │ if VarRef  │  │ Add await  │
-                    └────────────┘  │ if async   │
-                                    └────────────┘
-
-           │               │               │
-           ▼               ▼               ▼
-    ┌────────────┐  ┌────────────┐  ┌────────────┐
-    │ BinaryExpr │  │ UnaryExpr  │  │ IndexExpr  │
-    │            │  │            │  │            │
-    │ a + b      │  │ &x, *p     │  │ arr[i]     │
-    │ x == y     │  │ -n, !b     │  │ map[key]   │
-    └─────┬──────┘  └─────┬──────┘  └─────┬──────┘
-          │               │               │
-          ▼               ▼               ▼
-    Write left    Handle addr/  Write collection
-    op right      deref with    with index
-                  VarRef logic
+```go
+original := Point{X: 10, Y: 20}
+c := original
+c.X = 100
+return original.X // 10
 ```
 
----
-
-## Type System Translation
-
-### Type Mapping Table
-
-| Go Type                 | TypeScript Type                      | Notes                    |
-|-------------------------|--------------------------------------|--------------------------|
-| `int`, `int32`, `int64` | `number`                             | JavaScript number        |
-| `float64`, `float32`    | `number`                             | IEEE 754 64-bit          |
-| `string`                | `string`                             | Direct mapping           |
-| `bool`                  | `boolean`                            | Direct mapping           |
-| `rune`                  | `number`                             | Unicode code point       |
-| `byte`                  | `number`                             | Byte value               |
-| `error`                 | `$.error \| null`                    | Runtime interface        |
-| `[]T`                   | `T[] \| null`                        | With `__capacity`        |
-| `map[K]V`               | `Map<K, V> \| null`                  | Standard Map             |
-| `chan T`                | `$.Channel<T>`                       | Runtime class            |
-| `*T`                    | `T \| null` or `$.VarRef<T> \| null` | Depends on addressability|
-| `interface{}`           | `any`                                | Or specific interface    |
-
-### Struct Translation
-
-```
-┌───────────────────────────────────────────────────────────────────────┐
-│                          STRUCT TRANSLATION                           │
-└───────────────────────────────────────────────────────────────────────┘
-
-Go Source:
-┌─────────────────────────────────────┐
-│ type Person struct {                │
-│     Name string                     │
-│     Age  int                        │
-│     addr *Address                   │
-│ }                                   │
-└─────────────────────────────────────┘
-
-                    │
-                    │  Translation
-                    ▼
-
-TypeScript Output:
-┌───────────────────────────────────────────────────────────────────────┐
-│ export class Person {                                                 │
-│     // Getters/setters for clean API                                  │
-│     public get Name(): string {                                       │
-│         return this._fields.Name.value                                │
-│     }                                                                 │
-│     public set Name(value: string) {                                  │
-│         this._fields.Name.value = value                               │
-│     }                                                                 │
-│     public get Age(): number {                                        │
-│         return this._fields.Age.value                                 │
-│     }                                                                 │
-│     public set Age(value: number) {                                   │
-│         this._fields.Age.value = value                                │
-│     }                                                                 │
-│     public get addr(): Address | null {                               │
-│         return this._fields.addr.value                                │
-│     }                                                                 │
-│     public set addr(value: Address | null) {                          │
-│         this._fields.addr.value = value                               │
-│     }                                                                 │
-│                                                                       │
-│     // Internal storage with VarRefs for addressability               │
-│     public _fields: {                                                 │
-│         Name: $.VarRef<string>                                        │
-│         Age: $.VarRef<number>                                         │
-│         addr: $.VarRef<Address | null>                                │
-│     }                                                                 │
-│                                                                       │
-│     constructor(init?: Partial<{Name?: string, Age?: number, ...}>) { │
-│         this._fields = {                                              │
-│             Name: $.varRef(init?.Name ?? ""),                         │
-│             Age: $.varRef(init?.Age ?? 0),                            │
-│             addr: $.varRef(init?.addr ?? null)                        │
-│         }                                                             │
-│     }                                                                 │
-│                                                                       │
-│     // Clone for value semantics                                      │
-│     public clone(): Person {                                          │
-│         const cloned = new Person()                                   │
-│         cloned._fields = {                                            │
-│             Name: $.varRef(this._fields.Name.value),                  │
-│             Age: $.varRef(this._fields.Age.value),                    │
-│             addr: $.varRef(this._fields.addr.value)                   │
-│         }                                                             │
-│         return cloned                                                 │
-│     }                                                                 │
-│ }                                                                     │
-└───────────────────────────────────────────────────────────────────────┘
+```ts
+let original = $.markAsStructValue(new Point({X: 10, Y: 20}))
+let c = $.markAsStructValue($.cloneStructValue(original))
+c.X = 100
+return original.X
 ```
 
----
+## Pointers and VarRef
 
-## Runtime System
+A `VarRef<T>` is a box with a `value` field. A pointer to a boxed variable is
+the box itself, so writes through the pointer and reads of the variable see the
+same storage.
 
-The `@goscript/builtin` runtime provides essential helpers:
-
-### Runtime Components
-
-```
-┌───────────────────────────────────────────────────────────────────────┐
-│                           @goscript/builtin                           │
-├───────────────────────────────────────────────────────────────────────┤
-│                                                                       │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │
-│  │ varRef.ts   │  │ slice.ts    │  │ channel.ts  │  │ map.ts      │  │
-│  │             │  │             │  │             │  │             │  │
-│  │ VarRef<T>   │  │ makeSlice   │  │ Channel<T>  │  │ makeMap     │  │
-│  │ varRef()    │  │ slice()     │  │ makeChannel │  │ mapSet      │  │
-│  │ unref()     │  │ append()    │  │ selectStmt  │  │ mapGet      │  │
-│  └─────────────┘  │ copy()      │  │ chanSend    │  │ deleteMap   │  │
-│                   │ len()       │  │ chanRecv    │  │ Entry       │  │
-│                   │ cap()       │  └─────────────┘  └─────────────┘  │
-│                   └─────────────┘                                    │
-│                                                                       │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │
-│  │ type.ts     │  │ defer.ts    │  │ errors.ts   │  │ builtin.ts  │  │
-│  │             │  │             │  │             │  │             │  │
-│  │ registerType│  │ Disposable  │  │ error type  │  │ println     │  │
-│  │ typeAssert  │  │ Stack       │  │ panic       │  │ print       │  │
-│  │ TypeInfo    │  │ AsyncDisp.  │  │ recover     │  │ bitwise ops │  │
-│  │ TypeKind    │  │ Stack       │  │             │  │ int(), byte │  │
-│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘  │
-│                                                                       │
-└───────────────────────────────────────────────────────────────────────┘
+```go
+x := 10
+p := &x
+*p = 20
+return x // 20
 ```
 
-### VarRef (Variable Reference) System
-
-The VarRef system enables Go's pointer semantics in TypeScript:
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                              VARREF SYSTEM                              │
-└─────────────────────────────────────────────────────────────────────────┘
-
-Go Code:
-┌──────────────────────────┐
-│ var x int = 10           │
-│ p := &x                  │
-│ *p = 20                  │
-│ println(x) // 20         │
-└──────────────────────────┘
-
-         │ Analysis determines x needs VarRef (address taken)
-         ▼
-
-TypeScript Output:
-┌──────────────────────────────────────────────────────────────────────┐
-│ let x: $.VarRef<number> = $.varRef(10)  // x is wrapped in VarRef    │
-│ let p: $.VarRef<number> | null = x       // p points to same VarRef  │
-│ p!.value = 20                            // modify through pointer   │
-│ $.println(x.value)                       // access value: 20         │
-└──────────────────────────────────────────────────────────────────────┘
-
-
-Memory Model Visualization:
-┌─────────────────────────────────────────────────────────────────────────┐
-│                                                                         │
-│   x ─────────────────┐                                                  │
-│                      │                                                  │
-│                      ▼                                                  │
-│              ┌─────────────────┐                                        │
-│              │   VarRef<number>│                                        │
-│              │   ┌───────────┐ │                                        │
-│              │   │ value: 20 │ │                                        │
-│              │   └───────────┘ │                                        │
-│              └─────────────────┘                                        │
-│                      ▲                                                  │
-│                      │                                                  │
-│   p ─────────────────┘                                                  │
-│                                                                         │
-└─────────────────────────────────────────────────────────────────────────┘
+```ts
+let x = $.varRef(10)
+let p = x
+p!.value = 20
+return x.value
 ```
 
----
-
-## Concurrency Model
-
-GoScript translates Go's concurrency to TypeScript async/await:
-
-### Function Coloring Algorithm
-
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                       FUNCTION COLORING ALGORITHM                       │
-└─────────────────────────────────────────────────────────────────────────┘
-
-Phase 1: Identify Async Roots
-─────────────────────────────
-  ┌────────────────┐
-  │ Scan all funcs │
-  └───────┬────────┘
-          │
-          ▼
-  ┌────────────────────────────────────────────────────────────────┐
-  │ Contains any of these? ────▶ Mark as ASYNC                     │
-  │                                                                │
-  │   • <-ch       (channel receive)                               │
-  │   • ch <- val  (channel send)                                  │
-  │   • select {}  (select statement)                              │
-  │   • go func()  (goroutine creation)                            │
-  └────────────────────────────────────────────────────────────────┘
-
-
-Phase 2: Propagate Async Status
-───────────────────────────────
-  ┌────────────────────────────────────────────────────────────────┐
-  │                                                                │
-  │   func A() {           func B() {         func C() {          │
-  │     <-ch  ◀── ASYNC      A()  ◀── ASYNC     B()  ◀── ASYNC   │
-  │   }                    }                   }                   │
-  │                                                                │
-  │   Async propagates through call graph                          │
-  └────────────────────────────────────────────────────────────────┘
-
-
-Phase 3: Code Generation
-────────────────────────
-  ┌────────────────────────────────────────────────────────────────┐
-  │                                                                │
-  │   // SYNC function                // ASYNC function            │
-  │   function add(a, b) {            async function recv(ch) {   │
-  │     return a + b                    return await ch.receive() │
-  │   }                               }                            │
-  │                                                                │
-  │   // Call site                    // Call site                 │
-  │   let sum = add(1, 2)             let val = await recv(ch)    │
-  │                                                                │
-  └────────────────────────────────────────────────────────────────┘
+   x ──┐
+       ▼
+   ┌────────────────┐
+   │ VarRef<number> │
+   │   value: 20    │
+   └────────────────┘
+       ▲
+   p ──┘
 ```
 
-### Channel Operations
+A pointer to a struct can be the struct object itself or a `VarRef` holding it,
+which is why `*T` translates to `T | $.VarRef<T> | null`. `$.pointerValue`
+reads through either shape.
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                           CHANNEL TRANSLATION                           │
-└─────────────────────────────────────────────────────────────────────────┘
+## Concurrency
 
-Go Code:                              TypeScript Output:
-┌────────────────────────────┐       ┌─────────────────────────────────────┐
-│ ch := make(chan int, 1)    │  ───▶ │ let ch = $.makeChannel<number>(1, 0)│
-│                            │       │                                     │
-│ ch <- 42                   │  ───▶ │ await $.chanSend(ch, 42)            │
-│                            │       │                                     │
-│ val := <-ch                │  ───▶ │ let val = await $.chanRecv(ch)      │
-│                            │       │                                     │
-│ val, ok := <-ch            │  ───▶ │ let {value: val, ok} =              │
-│                            │       │     await $.chanRecvWithOk(ch)      │
-│                            │       │                                     │
-│ close(ch)                  │  ───▶ │ ch.close()                          │
-└────────────────────────────┘       └─────────────────────────────────────┘
+Async functions use `async`/`await`. Channels, `select`, and goroutines map
+onto runtime helpers.
 
+```go
+func Add(a, b int) int { return a + b }
 
-Select Statement:
-┌────────────────────────────┐       ┌─────────────────────────────────────┐
-│ select {                   │       │ await $.selectStatement([           │
-│ case val := <-ch1:         │  ───▶ │   {                                 │
-│   process(val)             │       │     id: 0, isSend: false,           │
-│ case ch2 <- data:          │       │     channel: ch1,                   │
-│   sent()                   │       │     onSelected: async (r) => {      │
-│ default:                   │       │       let val = r.value             │
-│   nothing()                │       │       process(val)                  │
-│ }                          │       │     }                               │
-│                            │       │   },                                │
-│                            │       │   {                                 │
-│                            │       │     id: 1, isSend: true,            │
-│                            │       │     channel: ch2, value: data,      │
-│                            │       │     onSelected: async () => sent()  │
-│                            │       │   }                                 │
-│                            │       │ ], true)                            │
-└────────────────────────────┘       └─────────────────────────────────────┘
+func Recv(ch chan int) int { return <-ch }
 ```
 
-### Goroutine Translation
+```ts
+export function Add(a: number, b: number): number {
+	return a + b
+}
 
-```
-Go Code:                              TypeScript Output:
-┌────────────────────────────┐       ┌─────────────────────────────────────┐
-│ go func() {                │       │ queueMicrotask(async () => {        │
-│   doWork()                 │  ───▶ │   {                                 │
-│ }()                        │       │     doWork()                        │
-│                            │       │   }                                 │
-│                            │       │ })                                  │
-└────────────────────────────┘       └─────────────────────────────────────┘
+export async function Recv(ch: $.Channel<number> | null): globalThis.Promise<number> {
+	return await $.chanRecv(ch)
+}
 ```
 
----
+### Channels
 
-## Value Semantics
+| Go | TypeScript |
+|----|------------|
+| `ch := make(chan int, 1)` | `let ch = $.makeChannel<number>(1, 0, "both")` |
+| `ch <- 42` | `await $.chanSend(ch, 42)` |
+| `v := <-ch` | `let v = await $.chanRecv(ch)` |
+| `v, ok := <-ch` | `let r = await $.chanRecvWithOk(ch)`, then `r.value` and `r.ok` |
+| `close(ch)` | `ch!.close()` |
 
-GoScript preserves Go's value semantics for structs:
+### Select
 
-### Clone on Assignment
+Each case becomes an entry passed to `$.selectStatement`. A receive case
+handles its result in `onSelected`, and `default` is the entry with `id: -1`.
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                       VALUE SEMANTICS TRANSLATION                       │
-└─────────────────────────────────────────────────────────────────────────┘
-
-Go Code:
-┌────────────────────────────────────┐
-│ original := Point{X: 10, Y: 20}    │
-│ copy := original                   │  // Creates independent copy
-│ copy.X = 100                       │
-│ println(original.X)                │  // Still 10
-└────────────────────────────────────┘
-
-                    │
-                    ▼
-
-TypeScript Output:
-┌────────────────────────────────────────────────────────────────────────┐
-│ let original = new Point({X: 10, Y: 20})                               │
-│ let copy = original.clone()         // .clone() creates deep copy      │
-│ copy.X = 100                                                           │
-│ $.println(original.X)               // Still 10                        │
-└────────────────────────────────────────────────────────────────────────┘
-
-
-Clone Implementation:
-┌────────────────────────────────────────────────────────────────────────┐
-│ public clone(): Point {                                                │
-│     const cloned = new Point()                                         │
-│     cloned._fields = {                                                 │
-│         X: $.varRef(this._fields.X.value),   // Copy value             │
-│         Y: $.varRef(this._fields.Y.value)    // Copy value             │
-│     }                                                                  │
-│     return cloned                                                      │
-│ }                                                                      │
-└────────────────────────────────────────────────────────────────────────┘
+```go
+select {
+case v := <-ch1:
+	use(v)
+case ch2 <- data:
+default:
+}
 ```
 
----
-
-## Control Flow Translation
-
-### For Loop Variants
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                          FOR LOOP TRANSLATION                           │
-└─────────────────────────────────────────────────────────────────────────┘
-
-Standard For:
-  Go:    for i := 0; i < 10; i++ { }
-  TS:    for (let i = 0; i < 10; i++) { }
-
-While Loop:
-  Go:    for condition { }
-  TS:    while (condition) { }
-
-Infinite Loop:
-  Go:    for { }
-  TS:    for (;;) { }
-
-For-Range (Slice):
-  Go:    for i, v := range slice { }
-  TS:    for (const [i, v] of $.rangeSlice(slice)) { }
-         // rangeSlice captures slice state before iteration
-
-For-Range (Map):
-  Go:    for k, v := range m { }
-  TS:    for (const [k, v] of m.entries()) { }
-
-For-Range (String):
-  Go:    for i, r := range str { }
-  TS:    for (const [i, r] of $.rangeString(str)) { }
-         // Iterates over runes, not bytes
+```ts
+const [hasReturn, value] = await $.selectStatement<any, void>([
+	{
+		id: 0,
+		isSend: false,
+		channel: ch1,
+		onSelected: async (result) => {
+			let v = result.value
+			use(v)
+		}
+	},
+	{ id: 1, isSend: true, channel: ch2, value: data },
+	{ id: -1, isSend: false, channel: null }
+], true)
+if (hasReturn) {
+	return value
+}
 ```
 
-### Defer Translation
+The emitter prefixes the temporaries it introduces with `__goscript`; the names
+above are shortened.
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                           DEFER TRANSLATION                             │
-└─────────────────────────────────────────────────────────────────────────┘
+### Goroutines
 
-Sync Defer:
-┌────────────────────────────┐       ┌─────────────────────────────────────┐
-│ func process() {           │       │ function process() {                │
-│   f := open("file")        │       │   const $defer = new $.DisposableStack()
-│   defer f.Close()          │  ───▶ │   try {                             │
-│   // work with f           │       │     let f = open("file")            │
-│ }                          │       │     $defer.defer(() => f.Close())   │
-│                            │       │     // work with f                  │
-│                            │       │   } finally {                       │
-│                            │       │     $defer.dispose()                │
-│                            │       │   }                                 │
-│                            │       │ }                                   │
-└────────────────────────────┘       └─────────────────────────────────────┘
+A `go` statement queues the call as a microtask and does not wait for it:
 
-Async Defer:
-┌────────────────────────────┐       ┌─────────────────────────────────────┐
-│ func process() {           │       │ async function process() {          │
-│   ch := make(chan int)     │       │   await using $defer =              │
-│   defer close(ch)          │  ───▶ │     new $.AsyncDisposableStack()    │
-│   // use channel           │       │   let ch = $.makeChannel(...)       │
-│ }                          │       │   $defer.defer(() => ch.close())    │
-│                            │       │   // use channel                    │
-│                            │       │ }                                   │
-└────────────────────────────┘       └─────────────────────────────────────┘
+```go
+go func() {
+	ch <- 1
+}()
 ```
 
----
+```ts
+queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
+	await $.chanSend(ch, 1)
+})() })
+```
 
-## File Organization
+### Defer
+
+A function with `defer` opens a disposable stack with `using`, so deferred
+calls run in reverse order when the function returns or throws. A synchronous
+function uses `DisposableStack`:
+
+```go
+func Process() int {
+	f := open()
+	defer f.Close()
+	return f.n
+}
+```
+
+```ts
+export function Process(): number {
+	using __defer = new $.DisposableStack()
+	let f: file | $.VarRef<file> | null = open()
+	__defer.defer(() => { file.prototype.Close.call(f) })
+	return $.pointerValue<file>(f).n
+}
+```
+
+An async function uses `await using` with `AsyncDisposableStack`, and its
+deferred calls are awaited.
+
+## Control Flow
+
+| Go | TypeScript |
+|----|------------|
+| `for i := 0; i < 3; i++ {}` | `for (let i = 0; i < 3; i++) {}` |
+| `for n < 100 {}` | `while (n < 100) {}` |
+| `for i, v := range s {}` | an index loop over a captured copy of `s`, reading `s[i]` |
+| `for k, v := range m {}` | `for (const [k, v] of m?.entries() ?? []) {}` |
+| `for i, r := range str {}` | `for (const [i, r] of $.rangeString(str)) {}`, yielding runes |
+| `goto` and labels | a lowered state machine |
+
+## Runtime
+
+`@goscript/builtin` lives in `gs/builtin/` and holds the helpers generated code
+imports as `$`:
+
+| File | Provides |
+|------|----------|
+| `varRef.ts` | `VarRef<T>`, `varRef`, `unref` |
+| `slice.ts` | `Slice<T>`, `makeSlice`, `append`, `copy`, `len`, `cap`, `rangeString` |
+| `map.ts` | `makeMap`, `mapGet`, `mapSet`, `deleteMapEntry` |
+| `channel.ts` | `Channel<T>`, `makeChannel`, `chanSend`, `chanRecv`, `chanRecvWithOk`, `selectStatement` |
+| `type.ts` | `TypeInfo`, `TypeKind`, `registerStructType`, `typeAssert`, `cloneStructValue`, `markAsStructValue` |
+| `defer.ts` | `DisposableStack`, `AsyncDisposableStack` |
+| `panic.ts` | `panic`, `recover` |
+| `errors.ts` | `GoError`, `newError` |
+| `builtin.ts` | `print`, `println`, `pointerValue`, integer conversions, 64-bit arithmetic |
+| `scheduler.ts` | `queueTask`, which yields one full event-loop turn |
+| `hostio.ts` | host standard output and input |
+| `deferred-package.ts` | late package initialization for `--deferred-function` |
+
+Handwritten overrides for standard-library and third-party packages live
+beside it under `gs/`; [gs/README.md](../gs/README.md) describes their layout.
+
+## File Layout
 
 ```
 goscript/
-├── cmd/goscript/          # CLI entry point
-├── compiler/              # Core v2 compiler owners
-│   ├── compiler.go        # Public Go adapter over CompileService
-│   ├── service.go         # Pipeline coordinator
-│   ├── compile-request.go # Adapter normalization and request validation
-│   ├── package-graph.go   # go/packages loading and package graph facts
-│   ├── semantic-model.go  # Semantic/package/type/method/async facts
-│   ├── lowering.go        # Go AST + semantic facts to compiler IR
-│   ├── lowered-model.go   # Lowered IR structs
-│   ├── typescript-emitter.go # Deterministic TypeScript rendering
-│   ├── runtime-contract.go   # Generated helper/import contract
-│   ├── override-registry.go  # Handwritten gs/ package metadata/copy plans
-│   └── wasm-api.go       # Browser source-compilation adapter
-├── gs/                    # Runtime & handwritten packages
-│   ├── builtin/           # @goscript/builtin runtime
-│   │   ├── index.ts       # Main exports
-│   │   ├── varRef.ts      # VarRef type
-│   │   ├── slice.ts       # Slice helpers
-│   │   ├── channel.ts     # Channel implementation
-│   │   ├── map.ts         # Map helpers
-│   │   ├── type.ts        # Runtime type info
-│   │   ├── defer.ts       # Defer support
-│   │   └── errors.ts      # Error handling
-│   └── [std packages]/    # Handwritten std library
-├── design/                # Design documentation
-│   ├── DESIGN.md          # Main design doc
-│   ├── ASYNC.md           # Async design
-│   ├── VAR_REFS.md        # VarRef design
-│   └── ...
-├── tests/                 # Compliance test suite
-│   └── tests/             # 260+ test cases
-└── docs/
-    └── explainer.md       # This file
+├── cmd/goscript/            CLI
+├── compiler/                compiler components
+│   ├── compiler.go          Go API over CompileService
+│   ├── service.go           runs the pipeline
+│   ├── compile-request.go   adapter input and request validation
+│   ├── package-graph.go     package loading
+│   ├── semantic-model.go    semantic facts
+│   ├── semantic-async.go    async coloring
+│   ├── lowering.go          Go AST + facts -> IR
+│   ├── lowered-program.go   IR types
+│   ├── typescript-emitter.go
+│   ├── runtime-contract.go  helper names and runtime imports
+│   ├── override-registry.go gs/ metadata and copy plans
+│   └── wasm/                browser source compilation
+├── gs/                      runtime and handwritten overrides
+│   └── builtin/             @goscript/builtin
+├── design/                  older design notes; check against source
+├── tests/tests/             560+ compliance fixtures
+└── docs/explainer.md        this file
 ```
-
----
-
-## Summary
-
-GoScript achieves Go-to-TypeScript translation through:
-
-1. **Owner-Separated Pipeline**: Request, graph, semantic, lowering, runtime, override, and emit owners keep durable rules in one place
-2. **VarRef System**: Enables pointer semantics in TypeScript
-3. **Function Coloring**: Automatically determines async/sync boundaries
-4. **Runtime Helpers**: Provide Go-like semantics for slices, channels, maps
-5. **Value Semantics**: Clone methods preserve Go's copy behavior
-6. **Structured Diagnostics**: Unsupported requests or syntax fail before output is written
-7. **Comprehensive Type Mapping**: Go types become idiomatic TypeScript
-
-The result is maintainable TypeScript that preserves Go's behavior while feeling natural to TypeScript developers.
