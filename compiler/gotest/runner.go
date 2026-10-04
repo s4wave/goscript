@@ -14,7 +14,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/s4wave/goscript/compiler"
-
 	"github.com/s4wave/goscript/compiler/tsworkspace"
 	"golang.org/x/sync/errgroup"
 )
@@ -24,6 +23,9 @@ const combinedRuntimeResultPrefix = "__GOSCRIPT_PACKAGE_RESULT__"
 const browserAmbientTypesFile = "goscript-browser.d.ts"
 
 const browserAmbientTypes = "declare module \"vitest\" {\n\texport function test(name: string, fn: () => void | Promise<void>): void\n}\n"
+
+// runtimeStylePattern matches terminal styles added by runtime reporters.
+var runtimeStylePattern = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
 // Runner owns GoScript package-test loading, compilation, typecheck, and execution.
 type Runner struct {
@@ -1187,18 +1189,24 @@ type combinedRuntimeRecord struct {
 }
 
 func parseCombinedRuntimeRecords(output string) ([]combinedRuntimeRecord, bool) {
+	// Read the line protocol without the reporter's terminal formatting.
 	var records []combinedRuntimeRecord
 	for line := range strings.SplitSeq(output, "\n") {
+		line = runtimeStylePattern.ReplaceAllString(line, "")
 		line = strings.TrimSuffix(line, "\r")
 		if !strings.HasPrefix(line, combinedRuntimeResultPrefix) {
 			continue
 		}
+
+		// Reject incomplete records rather than guessing a package's result.
 		record, ok := parseCombinedRuntimeRecord(strings.TrimPrefix(line, combinedRuntimeResultPrefix))
 		if !ok {
 			return nil, false
 		}
 		records = append(records, record)
 	}
+
+	// A runtime must publish at least one package result.
 	return records, len(records) != 0
 }
 

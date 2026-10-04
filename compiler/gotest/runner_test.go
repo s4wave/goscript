@@ -1090,6 +1090,7 @@ func TestRunnerRunsCombinedRuntimeChunks(t *testing.T) {
 }
 
 func TestRunnerRunsBrowserRuntimeBackend(t *testing.T) {
+	// Report browser results with the terminal styles emitted by Vitest.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/browser\n\ngo 1.25.3\n",
 		"value_test.go": strings.Join([]string{
@@ -1104,11 +1105,12 @@ func TestRunnerRunsBrowserRuntimeBackend(t *testing.T) {
 	workDir := filepath.Join(moduleDir, ".tmp", "browser-runtime")
 	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "vitest"), strings.Join([]string{
 		"#!/bin/sh",
-		"printf '" + combinedRuntimeResultPrefix + "example.test%%2Fbrowser\\t1\\t7\\tbrowser%%20ok\\n'",
+		"printf '\\033[22m\\033[39m" + combinedRuntimeResultPrefix + "example.test%%2Fbrowser\\t1\\t7\\tbrowser%%20ok\\n'",
 		"exit 0",
 		"",
 	}, "\n"))
 
+	// Run through the production runner and verify its package result.
 	result, err := NewRunner().Run(context.Background(), &Request{
 		Dir:            moduleDir,
 		Patterns:       []string{"."},
@@ -1135,6 +1137,7 @@ func TestRunnerRunsBrowserRuntimeBackend(t *testing.T) {
 }
 
 func TestRunnerReportsBrowserRuntimeFailureRecord(t *testing.T) {
+	// Report browser results with the terminal styles emitted by Vitest.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/browserfail\n\ngo 1.25.3\n",
 		"value_test.go": strings.Join([]string{
@@ -1149,11 +1152,12 @@ func TestRunnerReportsBrowserRuntimeFailureRecord(t *testing.T) {
 	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "tsgo"), "#!/bin/sh\nexit 0\n")
 	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "vitest"), strings.Join([]string{
 		"#!/bin/sh",
-		"printf '" + combinedRuntimeResultPrefix + "example.test%%2Fbrowserfail\\t0\\t3\\tpage%%20exploded\\n'",
+		"printf '\\033[22m\\033[39m" + combinedRuntimeResultPrefix + "example.test%%2Fbrowserfail\\t0\\t3\\tpage%%20exploded\\n'",
 		"exit 1",
 		"",
 	}, "\n"))
 
+	// Run through the production runner and verify its package result.
 	result, err := NewRunner().Run(context.Background(), &Request{
 		Dir:            moduleDir,
 		Patterns:       []string{"."},
