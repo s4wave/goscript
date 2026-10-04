@@ -161,31 +161,16 @@ ts, err := wasm.CompileSource(src, "main")
 
 ## Features
 
-- **The Go language:** structs, methods, interfaces, type assertions,
-  generics, closures, arrays, slices, maps, strings, and complex numbers, with
-  Go's value-copy behavior for structs and arrays.
-- **Pointers:** `&x`, pointers to pointers, and pointer-receiver methods behave
-  as in Go.
-- **Concurrency:** goroutines, buffered and unbuffered channels, `select`,
-  `sync` primitives, and `defer`, `panic`, and `recover`. Functions that can
-  block become `async`, and their callers `await` them.
-- **Exact integers:** `int64` and `uint64` compile to `bigint` and wrap on
-  overflow like Go. 32-bit math and `float32` rounding match Go.
-- **Control flow:** `goto`, labels, `switch`, type switches, and `range` over
-  slices, maps, strings, channels, integers, and iterator functions.
-- **Standard library:** `fmt`, `strings`, `strconv`, `bytes`, `sort`,
-  `slices`, `maps`, `errors`, `time`, `sync`, `context`, `io`, `os`,
-  `encoding/json`, `encoding/binary`, `crypto` (AES, Ed25519, ECDH, SHA-1,
-  SHA-2), `compress/gzip`, `compress/zlib`, `net/http`, `database/sql/driver`,
-  `reflect`, `testing`, and more.
-- **Third-party packages:** go-git and go-billy, klauspost/compress,
-  zeebo/blake3, mr-tron/base58, pkg/errors, and protobuf-go-lite.
-- **Go tests:** `goscript test` runs a package's own Go tests against the
-  generated TypeScript, in Bun or in Chromium.
-- **Large programs:** GoScript compiles Spacewave's browser core, including
-  go-git and the go-mysql-server SQL engine.
-- **In the browser:** the compiler itself runs in the page through
-  WebAssembly, for single files without imports.
+- **Go language:** structs, interfaces, generics, closures, slices, maps, and value copies.
+- **Pointers:** `&x`, pointers to pointers, and pointer receivers behave as in Go.
+- **Concurrency:** goroutines, channels, `select`, `sync`, `defer`, `panic`, and `recover`.
+- **Exact integers:** `int64` and `uint64` compile to `bigint` and wrap like Go.
+- **Control flow:** `goto`, labels, type switches, and `range` over iterator functions.
+- **Standard library:** `fmt`, `strings`, `sync`, `time`, `encoding/json`, `crypto`, and more.
+- **Third-party packages:** go-git, klauspost/compress, blake3, protobuf-go-lite, and more.
+- **Go tests:** `goscript test` runs your Go tests on the output in Bun or Chromium.
+- **Large programs:** GoScript compiles Spacewave's browser core, including go-git.
+- **In the browser:** the compiler runs in the page through WebAssembly.
 
 ## How It Works
 
