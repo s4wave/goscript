@@ -45,6 +45,11 @@ const GS_DIR = path.join(import.meta.dirname, '..', 'gs')
 // Format: [testDirName, displayTitle, description]
 const CURATED_EXAMPLES: [string, string, string][] = [
   [
+    'the_works',
+    'The Works',
+    'A stack machine using generics, goroutines, channels, select, and recover',
+  ],
+  [
     'basic_arithmetic',
     'Arithmetic',
     'Arithmetic, precedence, and numeric operators',

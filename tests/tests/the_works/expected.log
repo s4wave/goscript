@@ -1,0 +1,16 @@
+listing of 20!
+  0 push 1
+  1 push 20
+  2 swap
+  3 over
+  4 mul
+  5 swap
+  6 dec
+  7 dup
+  8 jnz 2
+  9 drop
+  10 halt
+20! = 2432902008176640000 in 144 steps
+21! = -4249290049419214848 in 151 steps
+broken crashed: stack underflow
+total steps: 295
