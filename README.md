@@ -20,58 +20,150 @@
 
 </div>
 
-## Overview
+GoScript compiles Go packages into readable TypeScript modules. Goroutines,
+channels, `select`, `defer`, pointers, and struct copies behave as they do in
+Go, and the output is ordinary TypeScript you can import, bundle, and step
+through in a debugger.
 
-**GoScript** compiles Go packages to TypeScript. It loads packages from a Go
-module, type-checks them with the Go toolchain, and emits deterministic
-TypeScript packages under `@goscript/<go-package>/`.
+```bash
+go install github.com/s4wave/goscript/cmd/goscript@latest
+goscript compile --package . --output ./output --all-dependencies
+```
 
-It handles package graphs, generics, interfaces, pointers and value copies,
-goroutines, channels, `select`, `defer`, async call propagation, and package
-tests. Handwritten TypeScript overrides cover the standard-library packages that
-do not transpile directly. You can read, bundle, and debug the output like code
-you wrote.
+## Install
 
-GoScript is developed and tuned against
-[Spacewave](https://github.com/s4wave/spacewave), a large Go and TypeScript app
-framework. Spacewave compiles its browser core plugin through GoScript,
-including its go-git storage backend and the go-mysql-server SQL engine, and
-runs its core package tests through `goscript test` in CI, so every change to
-build speed or runtime compatibility is measured on a large application.
+GoScript needs the Go toolchain. Install the CLI with Go:
 
-GoScript and GopherJS share a goal: run ordinary Go programs in JavaScript
-environments. They differ in runtime strategy. GopherJS models a Go runtime
-with its own goroutine scheduler. GoScript emits readable TypeScript modules and
-maps goroutines onto JavaScript async functions and runtime channel helpers.
+```bash
+go install github.com/s4wave/goscript/cmd/goscript@latest
+```
 
-### Why GoScript?
+Or add it to a JavaScript project. The npm package runs the same compiler
+through your local Go toolchain and adds the TypeScript API:
 
-Use GoScript when Go is the source of truth and part of the product must run
-in a TypeScript runtime. It compiles real application code: database engines,
-git implementations, cryptography, and concurrent framework code.
+```bash
+bun add -d goscript
+```
 
-Good fits today include:
+[Bun](https://bun.sh) runs generated code directly. For Node and browsers,
+bundle it with a bundler that resolves `tsconfig.json` paths, such as Bun,
+Vite, or esbuild.
 
-- Sharing validation, formatting, parsing, and business rules between Go services and TypeScript applications
-- Publishing TypeScript packages from Go data structures and algorithms
-- Running Go application and framework code in Bun, browsers, and modern bundlers
-- Running Go framework code in browser plugins without rewriting it in TypeScript
-- Testing the generated TypeScript with the package's own Go tests
+## Quick Start
 
-Code that depends on `unsafe` memory operations, cgo, or a standard-library
-package that has no override and does not transpile cleanly is unsupported.
-[Limitations](#limitations) has the full list.
+Write a Go program:
 
-Useful docs:
+```go
+// main.go
+package main
 
-- [Architecture explainer](./docs/explainer.md)
-- [Compiler design](./design/DESIGN.md)
-- [Compliance tests](./tests/README.md)
-- [Runtime packages](./gs/README.md)
+import "fmt"
 
-## Current Surface
+type Greeter struct{ Name string }
 
-### Works Today
+func (g Greeter) Greet() string { return "Hello, " + g.Name + "!" }
+
+func main() {
+	ch := make(chan string)
+	go func() { ch <- Greeter{Name: "GoScript"}.Greet() }()
+	fmt.Println(<-ch)
+}
+```
+
+Compile it from the module directory. `--all-dependencies` also emits the
+packages it imports, here `fmt`, so the output runs on its own:
+
+```bash
+goscript compile --package . --output ./output --all-dependencies
+```
+
+Point `@goscript/*` imports at the output in `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "paths": { "@goscript/*": ["./output/@goscript/*"] }
+  }
+}
+```
+
+Run it:
+
+```bash
+$ bun run output/@goscript/example.com/hello/main.gs.ts
+Hello, GoScript!
+```
+
+Each Go package becomes a directory under `output/@goscript/`, named by its
+import path, with one `.gs.ts` file per Go file and an `index.ts` that exports
+the package. A `package main` runs directly; any other package is a module you
+import:
+
+```ts
+import { NewUser } from '@goscript/example.com/my/module/index.js'
+```
+
+[docs/typescript.md](./docs/typescript.md) has the full `tsconfig.json` for
+typechecking and bundling generated code.
+
+## Usage
+
+### Compile packages
+
+```bash
+goscript compile --package ./pkg/... --output ./output --all-dependencies
+```
+
+`--package` takes any Go package pattern and repeats. Without
+`--all-dependencies`, GoScript emits only the requested packages and the
+runtime, which suits builds that compile dependencies separately.
+[docs/cli.md](./docs/cli.md) lists every option.
+
+### Run Go tests
+
+`goscript test` compiles a package's Go tests to TypeScript and runs them with
+Bun, or in Chromium with `--browser`. The output follows `go test`:
+
+```bash
+goscript test --tags goscript ./...
+```
+
+### Compile from TypeScript
+
+```ts
+import { compile } from 'goscript'
+
+await compile({
+  pkg: '.',
+  output: './output',
+  dir: process.cwd(),
+})
+```
+
+### Compile from Go
+
+```go
+comp, err := compiler.NewCompiler(&compiler.Config{
+	Dir:        ".",
+	OutputPath: "./output",
+}, nil, nil)
+if err != nil {
+	return err
+}
+_, err = comp.CompilePackages(ctx, ".")
+```
+
+### Compile in the browser
+
+`github.com/s4wave/goscript/compiler/wasm` builds to WebAssembly and compiles a
+single Go source file to TypeScript in the page. It accepts files without
+imports; the [website playground](./website) uses it.
+
+```go
+ts, err := wasm.CompileSource(src, "main")
+```
+
+## Features
 
 The compiler handles large real-world package graphs. Each item cites its
 evidence: a compliance fixture under [tests/tests](./tests/tests) (500+ Go
@@ -120,7 +212,28 @@ runtime test under [gs/](./gs), or a consuming project.
 - Browser/WASM compilation for import-free single-file demos
   (`compiler/wasm/compile_test.go`, the website playground)
 
-### Limitations
+## How It Works
+
+```text
+Go packages -> type check -> semantic model -> lowered IR -> TypeScript
+                                                         + runtime + overrides
+```
+
+GoScript loads packages with the Go toolchain and type-checks them. It then
+decides which variables need a pointer box, which functions must become
+`async`, and how each type maps to TypeScript, before it writes any text. The
+emitter renders the result, and the compiler copies the
+[`@goscript/builtin`](./gs/builtin) runtime and any handwritten
+[overrides](./gs/README.md) for packages such as `sync`, `os`, and `reflect`.
+
+A function that can block on a channel, `select`, or a lock becomes `async`,
+and so does every function that calls it. Goroutines run as async tasks on the
+JavaScript event loop, and no WebAssembly runtime ships with your code.
+
+[docs/explainer.md](./docs/explainer.md) walks through each stage with
+generated output for structs, pointers, channels, and `defer`.
+
+## Limitations
 
 - CLI, Go API, and Node API inputs are package patterns, not direct `main.go`
   files.
@@ -147,262 +260,44 @@ runtime test under [gs/](./gs), or a consuming project.
   cost more than plain synchronous JavaScript with `number`. Benchmarks live
   under [tests/bench](./tests/bench).
 
-## Getting Started
+## Why GoScript
 
-Install Bun for TypeScript tests, examples, and website builds:
+Use GoScript when Go is the source of truth and part of your product runs in a
+TypeScript runtime: shared validation and business rules, TypeScript packages
+published from Go code, or Go framework code running in the browser without a
+rewrite.
 
-```bash
-curl -fsSL https://bun.sh/install | bash
-```
+GoScript is built against [Spacewave](https://github.com/s4wave/spacewave), a
+large Go and TypeScript application framework. Spacewave compiles its browser
+core plugin through GoScript, including go-git and the go-mysql-server SQL
+engine, and runs its core package tests through `goscript test` in CI.
 
-Install the CLI:
+[GopherJS](https://github.com/gopherjs/gopherjs) shares the goal of running Go
+in JavaScript and ships its own goroutine scheduler. GoScript emits readable
+TypeScript modules and maps goroutines onto JavaScript async functions.
 
-```bash
-go install github.com/s4wave/goscript/cmd/goscript@latest
-```
-
-Compile a Go package from a module directory:
-
-```bash
-goscript compile --package . --output ./output
-```
-
-The output tree looks like this:
-
-```text
-output/
-└── @goscript/
-    ├── builtin/
-    └── example.com/my/module/
-        ├── index.ts
-        └── main.gs.ts
-```
-
-For a generated `package main`, GoScript emits a main-script guard so the module
-can run directly in Bun or a bundler that resolves `@goscript/*` imports. See
-[example/simple](./example/simple) for the smallest compile-and-run workflow.
-
-## TypeScript Projects
-
-Generated package indexes re-export generated files such as `./main.gs.ts`, and
-some package-local imports use explicit `.ts` specifiers. Your TypeScript
-project must allow those imports and map `@goscript/*` to the generated output
-root. Start from this configuration:
-
-```json
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "lib": ["ES2022", "esnext.disposable", "DOM"],
-    "baseUrl": ".",
-    "paths": {
-      "@goscript/*": ["./output/@goscript/*"]
-    },
-    "allowImportingTsExtensions": true,
-    "rewriteRelativeImportExtensions": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "strict": true
-  }
-}
-```
-
-The settings GoScript output depends on:
-
-- `moduleResolution: "bundler"` resolves `@goscript/*` package imports the way a bundler does.
-- `allowImportingTsExtensions: true` lets generated indexes and same-package imports reference `.ts` files directly.
-- `rewriteRelativeImportExtensions: true` rewrites those specifiers when TypeScript emits JavaScript.
-- `paths` maps `@goscript/*` to the generated tree.
-
-When your bundler emits JavaScript and TypeScript only typechecks, add
-`"noEmit": true`.
-
-## Command Line
-
-```bash
-goscript compile \
-  --package ./my-go-package \
-  --output ./output
-```
-
-Common options:
-
-- `--package <pattern>`: Go package pattern to compile. Repeat for multiple packages.
-- `--output <dir>`: output directory for the generated TypeScript tree.
-- `--dir <dir>`: working directory for module/package loading.
-- `--build-flags <flag>`: Go build flag, repeatable.
-- `--all-dependencies`: compile dependency packages instead of only requested packages.
-- `--gs-path <dir>`: additional GoScript override root containing package-path directories.
-- `--package-blocklist <paths>`: comma-separated Go import paths to reject from the compiled package graph.
-- `--compiler-cache-root <dir>`: explicit compiler package artifact cache root.
-- `--protobuf-ts-binding`: bind `.pb.go` files to sibling `.pb.ts` files instead of emitting `.pb.gs.ts`.
-- `--deferred-function <package/path.Function>`: load an exported, non-generic function on first call. Repeatable. The function's package initializes late, so eager callers must move shared concrete types and values into a separate package. Calls become asynchronous, and function values stay lazy until invoked. The TypeScript API takes the same list as `deferredFunctions`.
-- `--disable-emit-builtin`: skip copying handwritten `gs/` runtime packages.
-
-Run Go package tests through GoScript:
-
-```bash
-goscript test --tags goscript ./...
-```
-
-`goscript test` loads package test variants, compiles each selected package
-through the normal GoScript pipeline, writes a TypeScript test runner, typechecks
-the generated workspace, and runs it with Bun. Options:
-
-- `--tags <tags>`: comma-separated Go build tags.
-- `--run <regexp>`: run only matching Go test names.
-- `--count <n>`: run selected tests multiple times.
-- `--short`: report true from `testing.Short`.
-- `--timeout <duration>`: maximum package-test runtime.
-- `--workdir <dir>`: generated test workspace directory.
-- `--output <dir>`: generated TypeScript output root.
-- `-p <n>`: maximum package typecheck/runtime commands to run concurrently.
-- `--browser`: run package runtimes in a Chromium browser instead of Bun.
-- `--runtime-groups`: run package runtimes in grouped Bun worker processes.
-- `--incremental-typecheck`: reuse TypeScript build-info files in the test workdir.
-
-The output follows `go test` where it can. Failures that occur before the
-generated tests run report the compiler stage that failed.
-
-## APIs
-
-Go API:
-
-```go
-package main
-
-import (
-	"context"
-
-	"github.com/s4wave/goscript/compiler"
-)
-
-func main() {
-	comp, err := compiler.NewCompiler(&compiler.Config{
-		Dir:        ".",
-		OutputPath: "./output",
-	}, nil, nil)
-	if err != nil {
-		panic(err)
-	}
-	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
-		panic(err)
-	}
-}
-```
-
-Node/Bun API:
-
-```ts
-import { compile } from 'goscript'
-
-await compile({
-  pkg: '.',
-  output: './output',
-  dir: process.cwd(),
-})
-```
-
-WASM adapter package:
-
-```go
-package main
-
-import "github.com/s4wave/goscript/compiler/wasm"
-
-func main() {
-	ts, err := wasm.CompileSource(`
-package main
-
-func main() {
-	println("hello from GoScript")
-}
-`, "main")
-	if err != nil {
-		panic(err)
-	}
-	_ = ts
-}
-```
-
-The website playground builds this package into its browser bundle. It
-compiles import-free single files only; see [Limitations](#limitations).
-
-## Architecture
-
-GoScript uses a linear compiler pipeline:
-
-```text
-public adapter
-  -> compile request
-  -> package graph
-  -> semantic model
-  -> lowered program
-  -> TypeScript emitter
-  -> runtime/override package copy
-```
-
-Each stage has one testable job:
-
-- Request validation normalizes CLI, Go API, Node/Bun API, and WASM inputs.
-- Package loading records Go package identities, dependency edges, build tags, and diagnostics.
-- Semantic modeling computes type, value, import, addressability, interface, and async facts.
-- Lowering turns Go syntax plus semantic facts into a compiler IR.
-- TypeScript emission renders deterministic, semicolon-free TypeScript from that IR.
-- Runtime contracts keep generated helper names and `@goscript/builtin` imports stable.
-- Override discovery copies handwritten runtime and standard-library packages when direct transpilation is not the right runtime shape.
-
-Type and runtime decisions happen before emission, so the emitter only renders
-text. A change in generated output traces back to one stage, where a test can
-reproduce it.
-
-## Running from Source
-
-Install dependencies:
+## Development
 
 ```bash
 bun install
-```
-
-Run the core checks:
-
-```bash
 bun run test
 bun run lint
 bun run build
 ```
 
-Run the simple package example:
+`bun run example` compiles and runs [example/simple](./example/simple).
+`bun run website:build` builds the website and playground.
+[example/app](./example/app) is a full-stack application built on generated
+TypeScript.
 
-```bash
-bun run example
-```
-
-Build the static website and browser demo assets:
-
-```bash
-bun run website:build
-```
-
-The playground compiles and runs import-free single files in the browser. The
-website build precompiles the compliance and imported-package examples.
-
-## Examples
-
-- [example/simple](./example/simple): smallest package compile-and-run workflow.
-- [example/app](./example/app): full-stack application example using generated TypeScript.
-- [tests/tests](./tests/tests): compliance fixtures and their generated output snapshots.
-- [tests/deps](./tests/deps): checked-in compiled dependencies that fixture typechecks fall back to. Test runs read this tree and never write it.
+The [compliance tests](./tests/README.md) under [tests/tests](./tests/tests)
+are Go programs compiled, typechecked, and run against expected output.
 
 ## Contributing
 
 GoScript is experimental. To fix a missing Go behavior, add a focused compiler
 or compliance test that reproduces it, then implement the behavior in the
-compiler or runtime stage responsible for it. Run the checks from
-[Running from Source](#running-from-source) before sending a change.
+compiler or runtime stage responsible for it.
 
 Open an issue for Go code GoScript cannot compile, runtime gaps, and missing
 standard-library overrides.
