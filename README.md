@@ -161,52 +161,31 @@ ts, err := wasm.CompileSource(src, "main")
 
 ## Features
 
-The compiler handles large real-world package graphs. Each item cites its
-evidence: a compliance fixture under [tests/tests](./tests/tests) (500+ Go
-programs, each compiled, typechecked, and run against expected output), a
-runtime test under [gs/](./gs), or a consuming project.
-
-- Go package loading through `go/packages` with `GOOS=js` and `GOARCH=wasm`,
-  with build tags through CLI build flags (`tests/tests/*`, all fixtures)
-- Structs, methods, interfaces, type assertions, typed nils, and value copying
-  (`struct_*`, `interface_*` fixtures)
-- Pointers and address-taken variables through the `VarRef` runtime model
-  (`address_of_pointer_deref`, `gs/builtin/varRef.ts`)
-- Arrays, slices, maps, strings, named types, complex values, and builtins
-  (`array_*`, `slice_*`, `map_*` fixtures)
-- Generics through generated type-argument dictionaries (`generic_*` fixtures)
-- Goroutines, channels, `select`, `defer`, and async call propagation, mapped
-  onto JavaScript async/await plus the runtime scheduler
-  (`goroutines*`, `channel_*`, `select_*` fixtures; `gs/builtin/scheduler.ts`)
-- `goto` and labeled statements through state-machine lowering
-  (`forward_goto_statement`)
-- Exact 64-bit integers: `int64` and `uint64` compile to TypeScript `bigint`
-  with Go overflow behavior (`wide_uint64_exact_arithmetic`,
-  `constant_shift_64`, `gs/builtin/wide-int.test.ts`)
-- 32-bit integer multiplication through `Math.imul` (`imul_32bit`), `float32`
-  rounding through `Math.fround` (`float32_rounding`), and bit operations
-  through `Math.clz32` (`gs/math/bits`)
-- A working `reflect` subset covering types, values, struct fields, maps,
-  `MakeFunc`, `FuncOf`, and `DeepEqual` (`reflect_*` fixtures, `gs/reflect/`)
-- Handwritten standard-library overrides under [gs/](./gs), including `crypto`
-  (aes, cipher, ecdh, ed25519, rand, sha1, sha256, sha512), `compress`
-  (gzip, zlib), `encoding` (binary, json), `os` and `syscall/js` filesystem
-  support, `net/http`, `database/sql/driver`, `go/token`, `go/scanner`,
-  `time`, `sync`, `reflect`, and `testing`
-- Third-party package overrides under `gs/github.com/`, including
-  go-git/go-billy, klauspost/compress, zeebo/blake3, mr-tron/base58,
-  pkg/errors, hack-pad/safejs, and protobuf-go-lite
-- `goscript test`, which compiles Go package tests to TypeScript, typechecks
-  the generated workspace, and runs it with Bun or in a Chromium browser
-  (`--browser`), reporting failures with compiler-stage classifications
-- Real application graphs: Spacewave's browser core plugin compiles and boots
-  through GoScript in its end-to-end WASM harness, a package graph that
-  includes go-git and the go-mysql-server SQL engine; Spacewave also runs its
-  core package tests through `goscript test`
-  ([spacewave/package.json](https://github.com/s4wave/spacewave/blob/master/package.json),
-  scripts `test:go:goscript` and `test:go:e2e:wasm:goscript`)
-- Browser/WASM compilation for import-free single-file demos
-  (`compiler/wasm/compile_test.go`, the website playground)
+- **The Go language:** structs, methods, interfaces, type assertions,
+  generics, closures, arrays, slices, maps, strings, and complex numbers, with
+  Go's value-copy behavior for structs and arrays.
+- **Pointers:** `&x`, pointers to pointers, and pointer-receiver methods behave
+  as in Go.
+- **Concurrency:** goroutines, buffered and unbuffered channels, `select`,
+  `sync` primitives, and `defer`, `panic`, and `recover`. Functions that can
+  block become `async`, and their callers `await` them.
+- **Exact integers:** `int64` and `uint64` compile to `bigint` and wrap on
+  overflow like Go. 32-bit math and `float32` rounding match Go.
+- **Control flow:** `goto`, labels, `switch`, type switches, and `range` over
+  slices, maps, strings, channels, integers, and iterator functions.
+- **Standard library:** `fmt`, `strings`, `strconv`, `bytes`, `sort`,
+  `slices`, `maps`, `errors`, `time`, `sync`, `context`, `io`, `os`,
+  `encoding/json`, `encoding/binary`, `crypto` (AES, Ed25519, ECDH, SHA-1,
+  SHA-2), `compress/gzip`, `compress/zlib`, `net/http`, `database/sql/driver`,
+  `reflect`, `testing`, and more.
+- **Third-party packages:** go-git and go-billy, klauspost/compress,
+  zeebo/blake3, mr-tron/base58, pkg/errors, and protobuf-go-lite.
+- **Go tests:** `goscript test` runs a package's own Go tests against the
+  generated TypeScript, in Bun or in Chromium.
+- **Large programs:** GoScript compiles Spacewave's browser core, including
+  go-git and the go-mysql-server SQL engine.
+- **In the browser:** the compiler itself runs in the page through
+  WebAssembly, for single files without imports.
 
 ## How It Works
 
@@ -231,30 +210,22 @@ generated output for structs, pointers, channels, and `defer`.
 
 ## Limitations
 
-- CLI, Go API, and Node API inputs are package patterns, not direct `main.go`
-  files.
-- Browser source compilation is import-free only; package imports return a
-  structured `goscript/wasm:imports-unsupported` diagnostic
-  (`compiler/wasm/compile_test.go`). Imported code uses the package workflow.
-- `unsafe` type-checks, but most operations (`Alignof`, `Offsetof`, `Sizeof`,
-  pointer conversion) throw at runtime (`gs/unsafe/unsafe.ts`). Pointer
-  arithmetic and cgo are unsupported.
-- Plain `int`, `uint`, `uintptr`, and integers narrower than 64 bits compile
-  to JavaScript `number`; only `int64` and `uint64` are `bigint`. `uint` and
-  `uintptr` arithmetic routes through the 64-bit runtime helpers to preserve
-  full width, but plain `int` does not model 64-bit overflow
-  (`compiler/lowering.go`, `isBigIntBackedType`).
-- Standard-library support comes from `gs/` overrides and covers part of the
-  standard library. A package without an override must transpile cleanly or it
-  is unsupported. Sockets, processes, and plugin loading work only as far as
-  the JavaScript host provides them.
-- The `reflect` override is a subset; remaining parity gaps are tracked in
-  `gs/reflect/parity.json`.
-- `goscript test` supports a subset of `testing` and of the `go test` flags
-  (`cmd/goscript/cmd-test_test.go`).
-- Concurrency lowers to async/await and 64-bit arithmetic uses `bigint`; both
-  cost more than plain synchronous JavaScript with `number`. Benchmarks live
-  under [tests/bench](./tests/bench).
+- The CLI and APIs take package patterns, not individual `.go` files.
+- Browser compilation accepts single files without imports. Compile code with
+  imports through the CLI or API.
+- `unsafe` type-checks, but `Sizeof`, `Alignof`, `Offsetof`, and pointer
+  conversions throw at runtime. Pointer arithmetic and cgo are unsupported.
+- `int`, `uint`, and integers narrower than 64 bits are JavaScript numbers.
+  `uint` and `uintptr` keep full 64-bit width, but `int` does not wrap on
+  64-bit overflow.
+- A standard-library package works when GoScript ships an override for it or
+  it compiles cleanly from Go. Sockets, processes, and plugin loading work only
+  as far as the JavaScript host supports them.
+- `reflect` covers types, values, struct fields, maps, `MakeFunc`, `FuncOf`,
+  and `DeepEqual`, but not all of the package.
+- `goscript test` supports a subset of `testing` and of the `go test` flags.
+- Async calls and `bigint` arithmetic cost more than synchronous JavaScript on
+  plain numbers.
 
 ## Why GoScript
 
