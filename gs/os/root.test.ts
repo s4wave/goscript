@@ -39,6 +39,13 @@ describe('os.Root path operations', () => {
     const mtime = time.Unix(1577934245n, 0n)
     expect(root!.Chtimes('a.txt', mtime, mtime)).toBeNull()
     expect(statSync(join(dir, 'a.txt')).mtime.getTime()).toBe(1577934245000)
+
+    // A zero time leaves that file time unchanged.
+    const atime = time.Unix(1609470245n, 0n)
+    expect(root!.Chtimes('a.txt', atime, new time.Time())).toBeNull()
+    const st = statSync(join(dir, 'a.txt'))
+    expect(st.atime.getTime()).toBe(1609470245000)
+    expect(st.mtime.getTime()).toBe(1577934245000)
   })
 
   it('writes, renames and reads files inside the root', () => {

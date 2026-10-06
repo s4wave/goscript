@@ -72,26 +72,34 @@ export function Lchown(name: string, uid: number, gid: number): $.GoError {
 	return ErrUnimplemented
 }
 
+// Chtimes changes the access and modification times of the named file.
+// A zero time.Time leaves that file time unchanged, so the host's current
+// time is read back and passed through.
 export function Chtimes(name: string, atime: time.Time, mtime: time.Time): $.GoError {
-	const at = new Date(Number(atime.UnixMilli()))
-	const mt = new Date(Number(mtime.UnixMilli()))
 	const denoObj = getDeno()
-	if (denoObj?.utimeSync) {
-		try {
-			denoObj.utimeSync(name, at, mt)
-			return null
-		} catch (err) {
-			return newHostError(err)
-		}
-	}
 	const nodeFS = getNodeFS()
-	if (nodeFS?.utimesSync) {
-		try {
-			nodeFS.utimesSync(name, at, mt)
-			return null
-		} catch (err) {
-			return newHostError(err)
-		}
+	let stat: () => any
+	let utimes: (at: Date, mt: Date) => void
+	if (denoObj?.utimeSync) {
+		stat = () => denoObj.statSync(name)
+		utimes = (at, mt) => denoObj.utimeSync(name, at, mt)
+	} else if (nodeFS?.utimesSync && nodeFS.statSync) {
+		const { statSync, utimesSync } = nodeFS
+		stat = () => statSync(name)
+		utimes = (at, mt) => utimesSync(name, at, mt)
+	} else {
+		return ErrUnimplemented
 	}
-	return ErrUnimplemented
+	try {
+		const current = atime.IsZero() || mtime.IsZero() ? stat() : null
+		utimes(fileTime(atime, current?.atime), fileTime(mtime, current?.mtime))
+		return null
+	} catch (err) {
+		return newHostError(err)
+	}
+}
+
+// fileTime converts t to a host Date, keeping current when t is zero.
+function fileTime(t: time.Time, current: Date | null | undefined): Date {
+	return t.IsZero() && current ? current : new Date(Number(t.UnixMilli()))
 }
