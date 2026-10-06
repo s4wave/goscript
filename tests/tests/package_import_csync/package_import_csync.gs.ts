@@ -49,7 +49,7 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo))
 
 	// Start worker goroutines
-	for (let i = 0; i < numWorkers; i++) {
+	for (let __goscriptRangeCount0 = numWorkers, i = 0; i < __goscriptRangeCount0; i++) {
 		queueMicrotask(async () => { await worker!(i) })
 	}
 

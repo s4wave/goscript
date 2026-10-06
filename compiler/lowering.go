@@ -6707,9 +6707,21 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		if keyName == "" {
 			keyName = "__rangeIndex"
 		}
+
+		// The counter takes the range type's representation. Go evaluates
+		// the count once, so a count that is not constant is held in a temp.
+		init := keyName + " = 0"
+		if isBigIntBackedType(rangeType) {
+			init += "n"
+		}
+		bound := rangeValue
+		if ctx.semPkg.source.TypesInfo.Types[stmt.X].Value == nil {
+			bound = ctx.tempName("RangeCount")
+			init = bound + " = " + rangeValue + ", " + init
+		}
 		return loweredStmt{
 			hasBlock: true,
-			text:     loopPrefix + "for (let " + keyName + " = 0; " + keyName + " < " + rangeValue + "; " + keyName + "++)",
+			text:     loopPrefix + "for (let " + init + "; " + keyName + " < " + bound + "; " + keyName + "++)",
 			children: body,
 		}, diagnostics
 	}
