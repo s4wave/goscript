@@ -791,6 +791,34 @@ function timeoutMilliseconds(d: Duration): number {
   return ms
 }
 
+// monotonicMilliseconds reads the host's monotonic clock in milliseconds, the
+// clock behind the monotonic reading of Now.
+function monotonicMilliseconds(): number {
+  if (typeof performance !== 'undefined' && performance.now) {
+    return performance.now()
+  }
+  return globalThis.Date.now()
+}
+
+// startTimer calls f once d has elapsed on the monotonic clock and returns a
+// function that cancels the call. Hosts may run a setTimeout callback a
+// fraction of a millisecond early, so an early callback waits out the rest:
+// a Go timer never fires before its duration.
+function startTimer(d: Duration, f: () => void): () => void {
+  const ms = timeoutMilliseconds(d)
+  const deadline = monotonicMilliseconds() + ms
+  const fire = () => {
+    const remaining = deadline - monotonicMilliseconds()
+    if (remaining > 0) {
+      handle = setTimeout(fire, remaining)
+      return
+    }
+    f()
+  }
+  let handle = setTimeout(fire, ms)
+  return () => clearTimeout(handle)
+}
+
 // Duration_lt Duration comparison function.
 export function Duration_lt(receiver: Duration, other: Duration): boolean {
   return receiver < other
@@ -1044,75 +1072,60 @@ export class ParseError extends Error {
 
 // Timer represents a single event timer.
 export class Timer {
-  private _timeout: ReturnType<typeof setTimeout>
-  private _duration: Duration
+  private _cancel: () => void
   private _callback?: () => void
   private _channel = makeChannel(1, new Time(), 'both')
   public C: ChannelRef<Time> = makeChannelRef(this._channel, 'receive')
 
   constructor(duration: Duration, callback?: () => void) {
-    this._duration = duration
     this._callback = callback
-    this._timeout = this.start(duration)
+    this._cancel = this.start(duration)
   }
 
   // Stop prevents the Timer from firing
   public Stop(): boolean {
-    if (typeof this._timeout === 'number') {
-      clearTimeout(this._timeout)
-    } else {
-      clearTimeout(this._timeout)
-    }
+    this._cancel()
     return true
   }
 
   // Reset changes the timer to expire after duration d
   public Reset(d: Duration): boolean {
     this.Stop()
-    this._duration = d
-    this._timeout = this.start(d)
+    this._cancel = this.start(d)
     return true
   }
 
-  private start(d: Duration): ReturnType<typeof setTimeout> {
-    const ms = timeoutMilliseconds(d)
+  private start(d: Duration): () => void {
     if (this._callback) {
-      return setTimeout(this._callback, ms)
+      return startTimer(d, this._callback)
     }
-    return setTimeout(() => {
+    return startTimer(d, () => {
       this._channel.send(Now()).catch(() => {})
-    }, ms)
+    })
   }
 }
 
 // Ticker holds a channel that delivers ticks at intervals.
 export class Ticker {
   private _interval: ReturnType<typeof setInterval>
-  private _duration: Duration
   private _stopped: boolean = false
   private _channel = makeChannel(1, new Time(), 'both')
   public C: ChannelRef<Time> = makeChannelRef(this._channel, 'receive')
 
   constructor(duration: Duration) {
-    this._duration = duration
     this._interval = this.start(duration)
   }
 
   // Stop turns off a ticker
   public Stop(): void {
     this._stopped = true
-    if (typeof this._interval === 'number') {
-      clearInterval(this._interval)
-    } else {
-      clearInterval(this._interval)
-    }
+    clearInterval(this._interval)
   }
 
   // Reset stops a ticker and resets its period to the specified duration
   public Reset(d: Duration): void {
     this.Stop()
     this._stopped = false
-    this._duration = d
     this._interval = this.start(d)
   }
 
@@ -1233,8 +1246,7 @@ export function Until(t: Time): Duration {
 
 // Sleep pauses the current execution for at least the duration d
 export async function Sleep(d: Duration): Promise<void> {
-  const ms = timeoutMilliseconds(d)
-  return new Promise((resolve) => setTimeout(resolve, ms))
+  return new Promise((resolve) => startTimer(d, resolve))
 }
 
 // January Export month constants.
@@ -1590,15 +1602,13 @@ export function ParseInLocation(
 
 // After waits for the duration to elapse and then sends the current time on the returned channel.
 export function After(d: Duration): ChannelRef<Time> {
-  const ms = timeoutMilliseconds(d)
-
   // Create a buffered channel with capacity 1
   const channel = makeChannel(1, new Time(), 'both')
 
   // Start a timer that will send the current time after the duration
-  setTimeout(async () => {
+  startTimer(d, () => {
     channel.send(Now()).catch(() => {})
-  }, ms)
+  })
 
   return makeChannelRef(channel, 'receive')
 }

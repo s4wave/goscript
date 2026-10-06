@@ -201,6 +201,29 @@ describe('time constants and timers', () => {
     await slept
     expect(resolved).toBe(true)
   })
+
+  it('Sleep waits out a host timer that fires early', async () => {
+    // The host timer fires on time, but the monotonic clock reads 0.05 ms
+    // short of the deadline, as when Node fires setTimeout early.
+    let clock = 0
+    const now = vi.spyOn(performance, 'now').mockImplementation(() => clock)
+    try {
+      let resolved = false
+      const slept = Sleep(Millisecond).then(() => {
+        resolved = true
+      })
+
+      clock = 0.95
+      await new Promise((resolve) => setTimeout(resolve, 5))
+      expect(resolved).toBe(false)
+
+      clock = 1
+      await slept
+      expect(resolved).toBe(true)
+    } finally {
+      now.mockRestore()
+    }
+  })
 })
 
 describe('time.Time.In', () => {
