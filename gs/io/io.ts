@@ -82,9 +82,12 @@ export interface WriteSeeker extends Writer, Seeker {}
 export interface ReadWriteSeeker extends Reader, Writer, Seeker {}
 
 export function isAsync<T>(value: Awaitable<T>): value is PromiseLike<T> {
-  return value != null &&
+  return (
+    value != null &&
     (typeof value === 'object' || typeof value === 'function') &&
-    'then' in value && typeof value.then === 'function'
+    'then' in value &&
+    typeof value.then === 'function'
+  )
 }
 
 // Map a delegated result without introducing a microtask on synchronous paths.
@@ -92,7 +95,9 @@ export function mapResult<T, U>(
   value: Awaitable<T>,
   transform: (value: T) => Awaitable<U>,
 ): Awaitable<U> {
-  return isAsync(value) ? Promise.resolve(value).then(transform) : transform(value)
+  return isAsync(value) ?
+      Promise.resolve(value).then(transform)
+    : transform(value)
 }
 
 // Drive sequential delegated I/O without changing synchronous completion into
@@ -107,8 +112,14 @@ export function runIO<T>(
       const value = step.value
       if (isAsync(value)) {
         return Promise.resolve(value).then(
-          value => { step = operation.next(value); return pump() },
-          error => { step = operation.throw(error); return pump() },
+          (value) => {
+            step = operation.next(value)
+            return pump()
+          },
+          (error) => {
+            step = operation.throw(error)
+            return pump()
+          },
         )
       }
       step = operation.next(value)
@@ -138,7 +149,7 @@ class pipeState {
       return Promise.resolve([0, this.readCloseError()])
     }
     // Even a zero-length read must rendezvous with a writer, like io.Pipe.
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       this.pendingReads.push({ data: p, resolve })
       this.drain()
     })
@@ -149,7 +160,7 @@ class pipeState {
       return Promise.resolve([0, this.writeCloseError()])
     }
     const data = new Uint8Array($.bytesToUint8Array(p))
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       this.pendingWrites.push({ data, offset: 0, resolve })
       this.drain()
     })
@@ -174,11 +185,15 @@ class pipeState {
   }
 
   private readCloseError(): $.GoError {
-    return !this.readerClosed && this.writerClosed ? this.writerErr : ErrClosedPipe
+    return !this.readerClosed && this.writerClosed ?
+        this.writerErr
+      : ErrClosedPipe
   }
 
   private writeCloseError(): $.GoError {
-    return !this.writerClosed && this.readerClosed ? this.readerErr : ErrClosedPipe
+    return !this.writerClosed && this.readerClosed ?
+        this.readerErr
+      : ErrClosedPipe
   }
 
   private drain(): void {
@@ -296,6 +311,59 @@ export interface ReaderFrom {
   ReadFrom(r: Reader): Awaitable<[bigint, $.GoError]>
 }
 
+// ioMethod describes one method of an io interface for the runtime type system.
+function ioMethod(
+  name: string,
+  args: string[],
+  returns: string[],
+): $.MethodSignature {
+  const typeInfo = (name: string): $.TypeInfo | string =>
+    name === 'error' || name.startsWith('io.') ?
+      name
+    : { kind: $.TypeKind.Basic, name }
+  return {
+    name,
+    args: args.map((arg) => ({ type: typeInfo(arg) })),
+    returns: returns.map((ret) => ({ type: typeInfo(ret) })),
+  }
+}
+
+const ioRead = ioMethod('Read', ['[]byte'], ['int', 'error'])
+const ioWrite = ioMethod('Write', ['[]byte'], ['int', 'error'])
+const ioClose = ioMethod('Close', [], ['error'])
+const ioSeek = ioMethod('Seek', ['int64', 'int'], ['int64', 'error'])
+const ioReadByte = ioMethod('ReadByte', [], ['byte', 'error'])
+const ioReadRune = ioMethod('ReadRune', [], ['rune', 'int', 'error'])
+
+// Register the io interfaces under the names the compiler emits for them, so
+// type assertions such as x.(io.ReaderAt) check the method set.
+for (const [name, methods] of [
+  ['Reader', [ioRead]],
+  ['Writer', [ioWrite]],
+  ['Closer', [ioClose]],
+  ['Seeker', [ioSeek]],
+  ['ReadWriter', [ioRead, ioWrite]],
+  ['ReadCloser', [ioRead, ioClose]],
+  ['WriteCloser', [ioWrite, ioClose]],
+  ['ReadWriteCloser', [ioRead, ioWrite, ioClose]],
+  ['ReadSeeker', [ioRead, ioSeek]],
+  ['ReadSeekCloser', [ioRead, ioSeek, ioClose]],
+  ['WriteSeeker', [ioWrite, ioSeek]],
+  ['ReadWriteSeeker', [ioRead, ioWrite, ioSeek]],
+  ['ReaderAt', [ioMethod('ReadAt', ['[]byte', 'int64'], ['int', 'error'])]],
+  ['WriterAt', [ioMethod('WriteAt', ['[]byte', 'int64'], ['int', 'error'])]],
+  ['ByteReader', [ioReadByte]],
+  ['ByteWriter', [ioMethod('WriteByte', ['byte'], ['error'])]],
+  ['ByteScanner', [ioReadByte, ioMethod('UnreadByte', [], ['error'])]],
+  ['RuneReader', [ioReadRune]],
+  ['RuneScanner', [ioReadRune, ioMethod('UnreadRune', [], ['error'])]],
+  ['StringWriter', [ioMethod('WriteString', ['string'], ['int', 'error'])]],
+  ['WriterTo', [ioMethod('WriteTo', ['io.Writer'], ['int64', 'error'])]],
+  ['ReaderFrom', [ioMethod('ReadFrom', ['io.Reader'], ['int64', 'error'])]],
+] as const) {
+  $.registerInterfaceType('io.' + name, null, [...methods])
+}
+
 // DiscardWriter accepts every byte without retaining it.
 class DiscardWriter implements Writer {
   Write(p: $.Bytes): [number, $.GoError] {
@@ -362,10 +430,16 @@ export class SectionReader implements Reader, Seeker, ReaderAt {
   private off: bigint
   private readonly limit: bigint
 
-  constructor(private r: ReaderAt, private base: bigint, private n: bigint) {
+  constructor(
+    private r: ReaderAt,
+    private base: bigint,
+    private n: bigint,
+  ) {
     this.off = base
-    this.limit = base <= BigInt.asIntN(64, maxInt64 - n) ?
-      BigInt.asIntN(64, base + n) : maxInt64
+    this.limit =
+      base <= BigInt.asIntN(64, maxInt64 - n) ?
+        BigInt.asIntN(64, base + n)
+      : maxInt64
   }
 
   Read(p: $.Bytes): Awaitable<IOResult> {
@@ -381,12 +455,20 @@ export class SectionReader implements Reader, Seeker, ReaderAt {
   Seek(offset: bigint, whence: number): [bigint, $.GoError] {
     let absolute: bigint
     switch (whence) {
-      case SeekStart: absolute = BigInt.asIntN(64, this.base + offset); break
-      case SeekCurrent: absolute = BigInt.asIntN(64, this.off + offset); break
-      case SeekEnd: absolute = BigInt.asIntN(64, this.limit + offset); break
-      default: return [0n, newError('io.SectionReader.Seek: invalid whence')]
+      case SeekStart:
+        absolute = BigInt.asIntN(64, this.base + offset)
+        break
+      case SeekCurrent:
+        absolute = BigInt.asIntN(64, this.off + offset)
+        break
+      case SeekEnd:
+        absolute = BigInt.asIntN(64, this.limit + offset)
+        break
+      default:
+        return [0n, newError('io.SectionReader.Seek: invalid whence')]
     }
-    if (absolute < this.base) return [0n, newError('io.SectionReader.Seek: negative position')]
+    if (absolute < this.base)
+      return [0n, newError('io.SectionReader.Seek: negative position')]
     this.off = absolute
     return [BigInt.asIntN(64, absolute - this.base), null]
   }
@@ -397,23 +479,37 @@ export class SectionReader implements Reader, Seeker, ReaderAt {
     const remaining = this.limit - absolute
     if (BigInt($.len(p)) > remaining) {
       p = $.goSlice(p, 0, Number(remaining))
-      return mapResult(this.r.ReadAt(p, absolute), ([n, err]) => [n, err ?? EOF])
+      return mapResult(this.r.ReadAt(p, absolute), ([n, err]) => [
+        n,
+        err ?? EOF,
+      ])
     }
     return this.r.ReadAt(p, absolute)
   }
 
-  Size(): bigint { return BigInt.asIntN(64, this.limit - this.base) }
-  Outer(): [ReaderAt, bigint, bigint] { return [this.r, this.base, this.n] }
+  Size(): bigint {
+    return BigInt.asIntN(64, this.limit - this.base)
+  }
+  Outer(): [ReaderAt, bigint, bigint] {
+    return [this.r, this.base, this.n]
+  }
 }
 
-export function NewSectionReader(r: ReaderAt, off: bigint, n: bigint): SectionReader {
+export function NewSectionReader(
+  r: ReaderAt,
+  off: bigint,
+  n: bigint,
+): SectionReader {
   return new SectionReader(r, off, n)
 }
 
 export class OffsetWriter implements Writer, WriterAt, Seeker {
   private off: bigint
 
-  constructor(private w: WriterAt, private base: bigint) {
+  constructor(
+    private w: WriterAt,
+    private base: bigint,
+  ) {
     this.off = base
   }
 
@@ -425,18 +521,25 @@ export class OffsetWriter implements Writer, WriterAt, Seeker {
   }
 
   WriteAt(p: $.Bytes, off: bigint): Awaitable<IOResult> {
-    if (off < 0n) return [0, newError('io.OffsetWriter.WriteAt: negative offset')]
+    if (off < 0n)
+      return [0, newError('io.OffsetWriter.WriteAt: negative offset')]
     return this.w.WriteAt(p, BigInt.asIntN(64, this.base + off))
   }
 
   Seek(offset: bigint, whence: number): [bigint, $.GoError] {
     let absolute: bigint
     switch (whence) {
-      case SeekStart: absolute = BigInt.asIntN(64, this.base + offset); break
-      case SeekCurrent: absolute = BigInt.asIntN(64, this.off + offset); break
-      default: return [0n, newError('io.OffsetWriter.Seek: invalid whence')]
+      case SeekStart:
+        absolute = BigInt.asIntN(64, this.base + offset)
+        break
+      case SeekCurrent:
+        absolute = BigInt.asIntN(64, this.off + offset)
+        break
+      default:
+        return [0n, newError('io.OffsetWriter.Seek: invalid whence')]
     }
-    if (absolute < this.base) return [0n, newError('io.OffsetWriter.Seek: negative position')]
+    if (absolute < this.base)
+      return [0n, newError('io.OffsetWriter.Seek: negative position')]
     this.off = absolute
     return [BigInt.asIntN(64, absolute - this.base), null]
   }
@@ -591,9 +694,7 @@ export async function ReadFull(
 
 // ReadAll reads until EOF or an error, preserving bytes returned with an error.
 // EOF is reported as a nil error; other errors accompany the partial result.
-export async function ReadAll(
-  r: Reader,
-): Promise<[$.Bytes, $.GoError]> {
+export async function ReadAll(r: Reader): Promise<[$.Bytes, $.GoError]> {
   const chunks: $.Bytes[] = []
   let totalLength = 0
   let buf = $.makeSlice<number>(512, undefined, 'byte')
@@ -677,7 +778,9 @@ class multiReader implements Reader {
       if (reader == null) throw new Error('nil Reader')
       const result = reader.Read(p)
       if (isAsync(result)) {
-        return Promise.resolve(result).then(result => finish(result) ?? this.Read(p))
+        return Promise.resolve(result).then(
+          (result) => finish(result) ?? this.Read(p),
+        )
       }
       const out = finish(result)
       if (out != null) return out
@@ -706,7 +809,9 @@ class multiWriter implements Writer {
         if (w == null) throw new Error('io.MultiWriter: nil writer')
         const result = w.Write(p)
         if (isAsync(result)) {
-          return Promise.resolve(result).then(result => finish(result) ?? run(index + 1))
+          return Promise.resolve(result).then(
+            (result) => finish(result) ?? run(index + 1),
+          )
         }
         const out = finish(result)
         if (out != null) return out
@@ -717,14 +822,20 @@ class multiWriter implements Writer {
   }
 }
 
-export function TeeReader(r: SyncReader | null, w: SyncWriter | null): SyncReader
+export function TeeReader(
+  r: SyncReader | null,
+  w: SyncWriter | null,
+): SyncReader
 export function TeeReader(r: Reader | null, w: Writer | null): Reader
 export function TeeReader(r: Reader | null, w: Writer | null): Reader {
   return new teeReader(r, w)
 }
 
 class teeReader implements Reader {
-  constructor(private r: Reader | null, private w: Writer | null) {}
+  constructor(
+    private r: Reader | null,
+    private w: Writer | null,
+  ) {}
 
   Read(p: $.Bytes): Awaitable<IOResult> {
     if (this.r == null) throw new Error('io.TeeReader: nil reader')

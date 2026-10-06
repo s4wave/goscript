@@ -15,7 +15,7 @@ export type GlobFS =
     } & FS)
 
 $.registerInterfaceType(
-  'GlobFS',
+  'fs.GlobFS',
   null, // Zero value for interface is null
   [
     {
@@ -81,7 +81,7 @@ export async function globWithLimit(
       return [null, path.ErrBadPattern]
     }
     {
-      let { value: fsysTyped, ok: ok } = $.typeAssert<GlobFS>(fsys, 'GlobFS')
+      let { value: fsysTyped, ok: ok } = $.typeAssert<GlobFS>(fsys, 'fs.GlobFS')
       if (ok) {
         return fsysTyped!.Glob(pattern)
       }

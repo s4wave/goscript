@@ -16,14 +16,14 @@ export type SubFS =
     } & FS)
 
 $.registerInterfaceType(
-  'SubFS',
+  'fs.SubFS',
   null, // Zero value for interface is null
   [
     {
       name: 'Sub',
       args: [{ name: 'dir', type: { kind: $.TypeKind.Basic, name: 'string' } }],
       returns: [
-        { type: 'FS' },
+        { type: 'fs.FS' },
         {
           type: {
             kind: $.TypeKind.Interface,
@@ -64,7 +64,7 @@ export async function Sub(fsys: FS, dir: string): Promise<[FS, $.GoError]> {
     return [fsys, null]
   }
   {
-    let { value: fsysTyped, ok: ok } = $.typeAssert<SubFS>(fsys, 'SubFS')
+    let { value: fsysTyped, ok: ok } = $.typeAssert<SubFS>(fsys, 'fs.SubFS')
     if (ok) {
       return await fsysTyped!.Sub(dir)
     }
@@ -323,7 +323,7 @@ class subFS {
           { name: 'name', type: { kind: $.TypeKind.Basic, name: 'string' } },
         ],
         returns: [
-          { type: 'File' },
+          { type: 'fs.File' },
           {
             type: {
               kind: $.TypeKind.Interface,
@@ -347,7 +347,7 @@ class subFS {
           { name: 'name', type: { kind: $.TypeKind.Basic, name: 'string' } },
         ],
         returns: [
-          { type: { kind: $.TypeKind.Slice, elemType: 'DirEntry' } },
+          { type: { kind: $.TypeKind.Slice, elemType: 'fs.DirEntry' } },
           {
             type: {
               kind: $.TypeKind.Interface,
@@ -429,7 +429,7 @@ class subFS {
           { name: 'dir', type: { kind: $.TypeKind.Basic, name: 'string' } },
         ],
         returns: [
-          { type: 'FS' },
+          { type: 'fs.FS' },
           {
             type: {
               kind: $.TypeKind.Interface,
@@ -450,7 +450,7 @@ class subFS {
     ],
     subFS,
     [
-      { name: 'fsys', key: 'fsys', type: 'FS' },
+      { name: 'fsys', key: 'fsys', type: 'fs.FS' },
       {
         name: 'dir',
         key: 'dir',

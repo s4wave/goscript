@@ -31,7 +31,7 @@ export type FS = null | {
 }
 
 $.registerInterfaceType(
-  'FS',
+  'fs.FS',
   null, // Zero value for interface is null
   [
     {
@@ -40,7 +40,7 @@ $.registerInterfaceType(
         { name: 'name', type: { kind: $.TypeKind.Basic, name: 'string' } },
       ],
       returns: [
-        { type: 'File' },
+        { type: 'fs.File' },
         {
           type: {
             kind: $.TypeKind.Interface,
@@ -111,7 +111,7 @@ export type File = null | {
 }
 
 $.registerInterfaceType(
-  'File',
+  'fs.File',
   null, // Zero value for interface is null
   [
     {
@@ -165,7 +165,7 @@ $.registerInterfaceType(
       name: 'Stat',
       args: [],
       returns: [
-        { type: 'FileInfo' },
+        { type: 'fs.FileInfo' },
         {
           type: {
             kind: $.TypeKind.Interface,
@@ -204,14 +204,14 @@ export type DirEntry = null | {
 }
 
 $.registerInterfaceType(
-  'DirEntry',
+  'fs.DirEntry',
   null, // Zero value for interface is null
   [
     {
       name: 'Info',
       args: [],
       returns: [
-        { type: 'FileInfo' },
+        { type: 'fs.FileInfo' },
         {
           type: {
             kind: $.TypeKind.Interface,
@@ -263,14 +263,14 @@ export type ReadDirFile =
     } & File)
 
 $.registerInterfaceType(
-  'ReadDirFile',
+  'fs.ReadDirFile',
   null, // Zero value for interface is null
   [
     {
       name: 'ReadDir',
       args: [{ name: 'n', type: { kind: $.TypeKind.Basic, name: 'number' } }],
       returns: [
-        { type: { kind: $.TypeKind.Slice, elemType: 'DirEntry' } },
+        { type: { kind: $.TypeKind.Slice, elemType: 'fs.DirEntry' } },
         {
           type: {
             kind: $.TypeKind.Interface,
@@ -340,7 +340,7 @@ export type FileInfo = null | {
 }
 
 $.registerInterfaceType(
-  'FileInfo',
+  'fs.FileInfo',
   null, // Zero value for interface is null
   [
     {

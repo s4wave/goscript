@@ -9,7 +9,7 @@ export type ReadLinkFS =
       Lstat(name: string): [FileInfo, $.GoError]
     } & FS)
 
-$.registerInterfaceType('ReadLinkFS', null, [
+$.registerInterfaceType('fs.ReadLinkFS', null, [
   {
     name: 'ReadLink',
     args: [{ name: 'name', type: { kind: $.TypeKind.Basic, name: 'string' } }],
@@ -34,7 +34,7 @@ $.registerInterfaceType('ReadLinkFS', null, [
     name: 'Lstat',
     args: [{ name: 'name', type: { kind: $.TypeKind.Basic, name: 'string' } }],
     returns: [
-      { type: 'FileInfo' },
+      { type: 'fs.FileInfo' },
       {
         type: {
           kind: $.TypeKind.Interface,
@@ -53,7 +53,7 @@ $.registerInterfaceType('ReadLinkFS', null, [
 ])
 
 export function ReadLink(fsys: FS, name: string): [string, $.GoError] {
-  const { value: sym, ok } = $.typeAssert<ReadLinkFS>(fsys, 'ReadLinkFS')
+  const { value: sym, ok } = $.typeAssert<ReadLinkFS>(fsys, 'fs.ReadLinkFS')
   if (!ok) {
     return ['', new PathError({ Err: ErrInvalid, Op: 'readlink', Path: name })]
   }
@@ -64,7 +64,7 @@ export async function Lstat(
   fsys: FS,
   name: string,
 ): Promise<[FileInfo, $.GoError]> {
-  const { value: sym, ok } = $.typeAssert<ReadLinkFS>(fsys, 'ReadLinkFS')
+  const { value: sym, ok } = $.typeAssert<ReadLinkFS>(fsys, 'fs.ReadLinkFS')
   if (!ok) {
     return await Stat(fsys, name)
   }

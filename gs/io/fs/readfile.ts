@@ -17,7 +17,7 @@ export type ReadFileFS =
     } & FS)
 
 $.registerInterfaceType(
-  'ReadFileFS',
+  'fs.ReadFileFS',
   null, // Zero value for interface is null
   [
     {
@@ -63,7 +63,7 @@ export function ReadFile(fsys: FS, name: string): [Uint8Array, $.GoError] {
   {
     let { value: fsysTyped, ok: ok } = $.typeAssert<ReadFileFS>(
       fsys,
-      'ReadFileFS',
+      'fs.ReadFileFS',
     )
     if (ok) {
       return fsysTyped!.ReadFile(name)

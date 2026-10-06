@@ -25,7 +25,7 @@ export type ReadDirFS =
     } & FS)
 
 $.registerInterfaceType(
-  'ReadDirFS',
+  'fs.ReadDirFS',
   null, // Zero value for interface is null
   [
     {
@@ -34,7 +34,7 @@ $.registerInterfaceType(
         { name: 'name', type: { kind: $.TypeKind.Basic, name: 'string' } },
       ],
       returns: [
-        { type: { kind: $.TypeKind.Slice, elemType: 'DirEntry' } },
+        { type: { kind: $.TypeKind.Slice, elemType: 'fs.DirEntry' } },
         {
           type: {
             kind: $.TypeKind.Interface,
@@ -66,7 +66,7 @@ export async function ReadDir(
   {
     let { value: fsysTyped, ok: ok } = $.typeAssert<ReadDirFS>(
       fsys,
-      'ReadDirFS',
+      'fs.ReadDirFS',
     )
     if (ok) {
       return await fsysTyped!.ReadDir(name)
@@ -78,7 +78,10 @@ export async function ReadDir(
     return [null, err]
   }
   try {
-    let { value: dir, ok: ok } = $.typeAssert<ReadDirFile>(file, 'ReadDirFile')
+    let { value: dir, ok: ok } = $.typeAssert<ReadDirFile>(
+      file,
+      'fs.ReadDirFile',
+    )
     if (!ok) {
       return [
         null,
@@ -171,7 +174,7 @@ class dirInfo {
         name: 'Info',
         args: [],
         returns: [
-          { type: 'FileInfo' },
+          { type: 'fs.FileInfo' },
           {
             type: {
               kind: $.TypeKind.Interface,
@@ -201,7 +204,7 @@ class dirInfo {
       },
     ],
     dirInfo,
-    [{ name: 'fileInfo', key: 'fileInfo', type: 'FileInfo' }],
+    [{ name: 'fileInfo', key: 'fileInfo', type: 'fs.FileInfo' }],
   )
 }
 

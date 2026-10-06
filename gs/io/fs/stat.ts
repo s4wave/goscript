@@ -21,7 +21,7 @@ type asyncFile = null | {
 }
 
 $.registerInterfaceType(
-  'StatFS',
+  'fs.StatFS',
   null, // Zero value for interface is null
   [
     {
@@ -30,7 +30,7 @@ $.registerInterfaceType(
         { name: 'name', type: { kind: $.TypeKind.Basic, name: 'string' } },
       ],
       returns: [
-        { type: 'FileInfo' },
+        { type: 'fs.FileInfo' },
         {
           type: {
             kind: $.TypeKind.Interface,
@@ -58,7 +58,7 @@ export async function Stat(
   name: string,
 ): Promise<[FileInfo, $.GoError]> {
   {
-    let { value: fsysTyped, ok: ok } = $.typeAssert<StatFS>(fsys, 'StatFS')
+    let { value: fsysTyped, ok: ok } = $.typeAssert<StatFS>(fsys, 'fs.StatFS')
     if (ok) {
       return await fsysTyped!.Stat(name)
     }
