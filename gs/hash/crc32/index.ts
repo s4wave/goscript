@@ -9,11 +9,14 @@ export const Koopman = 0xeb31d82e
 export type Table = number[]
 
 type TablePointer = $.VarRef<Table> | null
-type SlicingTable = readonly Table[]
+
+// SlicingTable holds the eight slicing-by-8 tables of a polynomial back to
+// back. Its signed words keep the update loop in int32 arithmetic, which
+// JavaScript engines run far faster than the doubles a uint32 can become.
+type SlicingTable = Int32Array
 
 const magic = new Uint8Array([0x63, 0x72, 0x63, 0x01])
 const marshaledSize = 12
-const slicing8Cutoff = 16
 
 export let IEEETable: TablePointer = $.varRef(makeSimpleTable(IEEE))
 const castagnoliTable = $.varRef(makeSimpleTable(Castagnoli))
@@ -154,17 +157,16 @@ function makeSimpleTable(poly: number): Table {
   return table
 }
 
+// makeSlicingTable builds the slicing-by-8 tables of poly. Table k maps a
+// byte to its CRC after k more zero bytes.
 function makeSlicingTable(poly: number): SlicingTable {
-  const tables: Table[] = [makeSimpleTable(poly)]
-  for (let tableIndex = 1; tableIndex < 8; tableIndex++) {
-    tables.push(new Array<number>(256))
-  }
-  const first = tables[0]
+  const tables = new Int32Array(8 * 256)
+  tables.set(makeSimpleTable(poly))
   for (let i = 0; i < 256; i++) {
-    let crc = first[i]
-    for (let tableIndex = 1; tableIndex < tables.length; tableIndex++) {
-      crc = (first[crc & 0xff] ^ (crc >>> 8)) >>> 0
-      tables[tableIndex][i] = crc
+    let crc = tables[i]
+    for (let k = 1; k < 8; k++) {
+      crc = tables[crc & 0xff] ^ (crc >>> 8)
+      tables[k * 256 + i] = crc
     }
   }
   return tables
@@ -182,61 +184,56 @@ function updateBytes(
   if (table === castagnoliTable) {
     return slicingUpdateBytes(crc, castagnoliTable8, bytes)
   }
-  return simpleUpdateBytes(crc, table, bytes, 0)
+  return simpleUpdateBytes(crc, table, bytes)
 }
 
+// simpleUpdateBytes folds bytes into crc one byte per step. Like Go, it reads
+// the table only when there are bytes to fold.
 function simpleUpdateBytes(
   crc: number,
-  table: TablePointer | Table,
+  table: TablePointer,
   bytes: Uint8Array,
-  offset: number,
 ): number {
-  crc = ~crc >>> 0
-  if (offset === bytes.length) {
-    return ~crc >>> 0
+  if (bytes.length === 0) {
+    return crc
   }
   const words = $.pointerValue(table)
-  for (; offset < bytes.length; offset++) {
-    crc = (words[(crc & 0xff) ^ bytes[offset]] ^ (crc >>> 8)) >>> 0
+  crc = ~crc >>> 0
+  for (const b of bytes) {
+    crc = (words[(crc & 0xff) ^ b] ^ (crc >>> 8)) >>> 0
   }
   return ~crc >>> 0
 }
 
+// slicingUpdateBytes folds bytes into crc eight bytes per step.
 function slicingUpdateBytes(
   crc: number,
   tables: SlicingTable,
   bytes: Uint8Array,
 ): number {
-  crc >>>= 0
-  let offset = 0
-  if (bytes.length >= slicing8Cutoff) {
-    crc = ~crc >>> 0
-    while (bytes.length - offset > 8) {
-      const word =
-        (bytes[offset] |
-          (bytes[offset + 1] << 8) |
-          (bytes[offset + 2] << 16) |
-          (bytes[offset + 3] << 24)) >>>
-        0
-      crc = (crc ^ word) >>> 0
-      crc =
-        (tables[0][bytes[offset + 7]] ^
-          tables[1][bytes[offset + 6]] ^
-          tables[2][bytes[offset + 5]] ^
-          tables[3][bytes[offset + 4]] ^
-          tables[4][crc >>> 24] ^
-          tables[5][(crc >>> 16) & 0xff] ^
-          tables[6][(crc >>> 8) & 0xff] ^
-          tables[7][crc & 0xff]) >>>
-        0
-      offset += 8
-    }
-    crc = ~crc >>> 0
+  let c = ~crc
+  let i = 0
+  const n = bytes.length
+  for (const end = n - (n & 7); i < end; i += 8) {
+    c ^=
+      bytes[i] |
+      (bytes[i + 1] << 8) |
+      (bytes[i + 2] << 16) |
+      (bytes[i + 3] << 24)
+    c =
+      tables[1792 + (c & 0xff)] ^
+      tables[1536 + ((c >>> 8) & 0xff)] ^
+      tables[1280 + ((c >>> 16) & 0xff)] ^
+      tables[1024 + (c >>> 24)] ^
+      tables[768 + bytes[i + 4]] ^
+      tables[512 + bytes[i + 5]] ^
+      tables[256 + bytes[i + 6]] ^
+      tables[bytes[i + 7]]
   }
-  if (offset === bytes.length) {
-    return crc
+  for (; i < n; i++) {
+    c = tables[(c ^ bytes[i]) & 0xff] ^ (c >>> 8)
   }
-  return simpleUpdateBytes(crc, tables[0], bytes, offset)
+  return ~c >>> 0
 }
 
 function tableSum(table: TablePointer): number {
