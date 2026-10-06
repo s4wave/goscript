@@ -64,7 +64,7 @@ export class repeatReader {
 			return [0, io.EOF]
 		}
 		let n = $.min($.len(p), $.pointerValue<repeatReader>(r).remaining)
-		for (let i = 0; i < n; i++) {
+		for (let __goscriptRangeCount0 = n, i = 0; i < __goscriptRangeCount0; i++) {
 			p![i] = $.uint($.uint(i, 8), 8)
 		}
 		$.pointerValue<repeatReader>(r).remaining = $.pointerValue<repeatReader>(r).remaining - (n)

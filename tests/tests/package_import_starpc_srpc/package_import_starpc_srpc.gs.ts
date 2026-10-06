@@ -499,7 +499,7 @@ export function newMemoryRpcStreamPair(): [memoryRpcStream | $.VarRef<memoryRpcS
 
 export async function openHeldStreams(ctx: context.Context | null, client: srpc.Client | null, count: number): globalThis.Promise<[$.Slice<srpc.Stream | null>, boolean]> {
 	let resultCh: $.Channel<streamOpenResult> | null = $.makeChannel<streamOpenResult>(count, $.markAsStructValue(new streamOpenResult()), "both")
-	for (let i = 0; i < count; i++) {
+	for (let __goscriptRangeCount0 = count, i = 0; i < __goscriptRangeCount0; i++) {
 		queueMicrotask(async () => { await (async (idx: number): globalThis.Promise<void> => {
 			let [strm, err] = await $.pointerValue<Exclude<srpc.Client, null>>(client).NewStream(ctx, "svc", "hold", null)
 			if (err == null) {
@@ -510,7 +510,7 @@ export async function openHeldStreams(ctx: context.Context | null, client: srpc.
 	}
 
 	let streams: $.Slice<srpc.Stream | null> = $.makeSlice<srpc.Stream | null>(0, count)
-	for (let __rangeIndex = 0; __rangeIndex < count; __rangeIndex++) {
+	for (let __goscriptRangeCount1 = count, __rangeIndex = 0; __rangeIndex < __goscriptRangeCount1; __rangeIndex++) {
 		const [__goscriptSelect3HasReturn, __goscriptSelect3Value] = await $.selectStatement<any, [$.Slice<srpc.Stream | null>, boolean]>([
 			{
 				id: 0,
@@ -571,7 +571,7 @@ export async function closeHeldStreams(streams: $.Slice<srpc.Stream | null>): gl
 
 export async function probeConcurrentStreams(ctx: context.Context | null, client: srpc.Client | null, count: number): globalThis.Promise<boolean> {
 	let resultCh: $.Channel<streamProbeResult> | null = $.makeChannel<streamProbeResult>(count, $.markAsStructValue(new streamProbeResult()), "both")
-	for (let i = 0; i < count; i++) {
+	for (let __goscriptRangeCount2 = count, i = 0; i < __goscriptRangeCount2; i++) {
 		queueMicrotask(async () => { await (async (idx: number): globalThis.Promise<void> => {
 			let [total, err] = await probeStream(ctx, client, $.uint($.uint(idx + 1, 8), 8), $.uint($.uint(idx + 2, 8), 8))
 			if (err != null) {
@@ -582,7 +582,7 @@ export async function probeConcurrentStreams(ctx: context.Context | null, client
 		})(i) })
 	}
 
-	for (let i = 0; i < count; i++) {
+	for (let __goscriptRangeCount3 = count, i = 0; i < __goscriptRangeCount3; i++) {
 		const [__goscriptSelect4HasReturn, __goscriptSelect4Value] = await $.selectStatement<any, boolean>([
 			{
 				id: 0,
