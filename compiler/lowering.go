@@ -3479,12 +3479,21 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 	if !field.embedded {
 		return nil
 	}
+
+	// Methods of a named non-struct type lower to free functions taking the
+	// receiver value, so its forwarders pass the field value instead of
+	// selecting a method on it. Only value methods are promoted this way.
+	var valueReceiver *types.Named
 	methodSetType := field.typ
 	if named := namedStructType(field.typ); named != nil {
 		methodSetType = types.NewPointer(field.typ)
 	} else if pointerToNamedStructType(field.typ) != nil {
 		methodSetType = field.typ
-	} else if _, ok := types.Unalias(field.typ).Underlying().(*types.Interface); !ok {
+	} else if _, ok := types.Unalias(field.typ).Underlying().(*types.Interface); ok {
+		methodSetType = field.typ
+	} else if named, ok := types.Unalias(field.typ).(*types.Named); ok {
+		valueReceiver = named.Origin()
+	} else {
 		return nil
 	}
 	methodSet := types.NewMethodSet(methodSetType)
@@ -3505,7 +3514,6 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 			continue
 		}
 		async := o.functionAsync(ctx, method)
-		targetType := o.tsEmbeddedForwarderTargetType(ctx, field.typ)
 		lowered := loweredFunction{
 			async:                   async,
 			sourcePath:              ctx.sourcePath,
@@ -3516,7 +3524,10 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 			result:                  asyncResultType("any", async),
 			deferState:              &loweredDeferState{},
 		}
-		genericArgs := o.genericReceiverTypeArgsExpr(ctx, selection)
+		var genericArgs string
+		if valueReceiver == nil {
+			genericArgs = o.genericReceiverTypeArgsExpr(ctx, selection)
+		}
 		if strings.Contains(genericArgs, "__typeArgs") {
 			lowered.params = append(lowered.params, loweredParam{
 				name: "__typeArgs",
@@ -3530,12 +3541,19 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 			args = append(args, name)
 			lowered.params = append(lowered.params, loweredParam{name: name, typ: "any"})
 		}
-		callArgs := args
-		if genericArgs != "" {
-			callArgs = append([]string{genericArgs}, callArgs...)
+		var call string
+		if valueReceiver != nil {
+			callArgs := append([]string{"this." + tsStructFieldName(field.name, 0)}, args...)
+			call = o.methodFunctionExpr(ctx, valueReceiver, method, method.Name()) + "(" + strings.Join(callArgs, ", ") + ")"
+		} else {
+			callArgs := args
+			if genericArgs != "" {
+				callArgs = append([]string{genericArgs}, callArgs...)
+			}
+			targetType := o.tsEmbeddedForwarderTargetType(ctx, field.typ)
+			target := o.embeddedForwarderTargetExpr(ctx, field, selection, targetType)
+			call = target + "." + method.Name() + "(" + strings.Join(callArgs, ", ") + ")"
 		}
-		target := o.embeddedForwarderTargetExpr(ctx, field, selection, targetType)
-		call := target + "." + method.Name() + "(" + strings.Join(callArgs, ", ") + ")"
 		if async {
 			call = "await " + call
 		}
