@@ -8,6 +8,7 @@ import { Lstat as lstatPath, Stat as statPath } from "./stat_js.gs.js";
 import { File } from "./types_js.gs.js";
 
 import * as fs from "@goscript/io/fs/index.js"
+import * as time from "@goscript/time/index.js"
 import { ValidPath } from "@goscript/io/fs/index.js"
 
 function isValidRootName(name: string): boolean {
@@ -192,7 +193,7 @@ export class Root {
 		return Lchown(path, uid, gid)
 	}
 
-	public Chtimes(name: string, atime: any, mtime: any): $.GoError {
+	public Chtimes(name: string, atime: time.Time, mtime: time.Time): $.GoError {
 		const [path, err] = joinRootPath(this.name, name)
 		if (err !== null) {
 			return err

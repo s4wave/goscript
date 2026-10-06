@@ -10,6 +10,7 @@ import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import * as $ from '@goscript/builtin/index.js'
+import * as time from '@goscript/time/index.js'
 
 import { ErrInvalid } from './error.gs.js'
 import { OpenRoot } from './root_js.gs.js'
@@ -35,9 +36,9 @@ describe('os.Root path operations', () => {
     const [root, openErr] = OpenRoot(dir)
     expect(openErr).toBeNull()
 
-    const mtime = new Date(Date.UTC(2020, 0, 2, 3, 4, 5))
+    const mtime = time.Unix(1577934245n, 0n)
     expect(root!.Chtimes('a.txt', mtime, mtime)).toBeNull()
-    expect(statSync(join(dir, 'a.txt')).mtime.getTime()).toBe(mtime.getTime())
+    expect(statSync(join(dir, 'a.txt')).mtime.getTime()).toBe(1577934245000)
   })
 
   it('writes, renames and reads files inside the root', () => {
@@ -59,7 +60,8 @@ describe('os.Root path operations', () => {
   it('rejects names that leave the root', () => {
     const [root] = OpenRoot(makeTempRoot())
 
-    expect(root!.Chtimes('../a.txt', new Date(), new Date())).toBe(ErrInvalid)
+    const now = time.Now()
+    expect(root!.Chtimes('../a.txt', now, now)).toBe(ErrInvalid)
     expect(root!.Rename('a.txt', '/tmp/a.txt')).toBe(ErrInvalid)
   })
 })

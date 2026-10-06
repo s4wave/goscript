@@ -1,4 +1,5 @@
 import * as $ from "@goscript/builtin/index.js";
+import * as time from "@goscript/time/index.js"
 import { ErrUnimplemented } from "./error.gs.js";
 import { getDeno, getNodeFS, newHostError } from "./types_js.gs.js";
 
@@ -71,9 +72,9 @@ export function Lchown(name: string, uid: number, gid: number): $.GoError {
 	return ErrUnimplemented
 }
 
-export function Chtimes(name: string, atime: any, mtime: any): $.GoError {
-	const at = typeof atime?.UnixMilli === "function" ? new Date(atime.UnixMilli()) : new Date(atime)
-	const mt = typeof mtime?.UnixMilli === "function" ? new Date(mtime.UnixMilli()) : new Date(mtime)
+export function Chtimes(name: string, atime: time.Time, mtime: time.Time): $.GoError {
+	const at = new Date(Number(atime.UnixMilli()))
+	const mt = new Date(Number(mtime.UnixMilli()))
 	const denoObj = getDeno()
 	if (denoObj?.utimeSync) {
 		try {
