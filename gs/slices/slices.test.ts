@@ -11,6 +11,7 @@ import {
   BinarySearch,
   Chunk,
   Clip,
+  Clone,
   Collect,
   Compact,
   CompactFunc,
@@ -79,6 +80,24 @@ describe('slices Go comparable equality and lower-bound search', () => {
     expect(BinarySearch($.arrayToSlice([1, 2, 2, 2, 3]), 2)).toEqual([1, true])
     expect(BinarySearch($.arrayToSlice([1, 2, 2, 2, 3]), 4)).toEqual([5, false])
     expect(BinarySearch($.arrayToSlice([1, 3, 5]), 0)).toEqual([0, false])
+  })
+})
+
+describe('slices byte results', () => {
+  it('allocates byte slices as Uint8Array', () => {
+    const src = new Uint8Array([1, 2, 3]) as $.Slice<number>
+    const results = [
+      Clone(src),
+      Clip(src),
+      Concat(src, src),
+      Grow(src, 4),
+      Insert(src, 1, 9),
+      Repeat(src, 2),
+      Replace(src, 0, 1, 9),
+    ]
+    for (const out of results) {
+      expect(out).toBeInstanceOf(Uint8Array)
+    }
   })
 })
 

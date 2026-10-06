@@ -78,6 +78,20 @@ export function CompareFunc<T, U>(
 }
 
 /**
+ * makeLike allocates a slice of the same representation as s, so a byte
+ * slice stays a Uint8Array of zero bytes.
+ */
+function makeLike<T>(
+  s: $.Slice<T>,
+  length: number,
+  capacity?: number,
+  zeroFactory?: () => T,
+): $.Slice<T> {
+  const hint = s instanceof Uint8Array ? 'byte' : undefined
+  return $.makeSlice<T>(length, capacity, hint, zeroFactory)
+}
+
+/**
  * Clone returns a shallow copy of s while preserving nilness.
  * @param s The slice to clone
  * @returns A new slice with the same elements, or null for a nil slice
@@ -87,7 +101,7 @@ export function Clone<T>(s: $.Slice<T>): $.Slice<T> {
     return null
   }
   const length = $.len(s)
-  const out = $.makeSlice<T>(length)
+  const out = makeLike(s, length)
   $.copySliceElements(out, 0, s, 0, length)
   return out
 }
@@ -102,18 +116,7 @@ export function Concat<T>(...slices: $.Slice<T>[]): $.Slice<T> {
   if (size === 0) {
     return null
   }
-  if (byteSlice) {
-    const out = new Uint8Array(size)
-    let pos = 0
-    for (const slice of slices) {
-      const length = $.len(slice)
-      for (let i = 0; i < length; i++) {
-        out[pos++] = (slice as any)[i] as number
-      }
-    }
-    return out as $.Slice<T>
-  }
-  const out = $.makeSlice<T>(size)
+  const out = $.makeSlice<T>(size, undefined, byteSlice ? 'byte' : undefined)
   let pos = 0
   for (const slice of slices) {
     const length = $.len(slice)
@@ -138,16 +141,7 @@ export function Repeat<T>(x: $.Slice<T>, count: number): $.Slice<T> {
   if (total >= 2 ** 63) {
     $.panic('the result of (len(x) * count) overflows')
   }
-  if (x instanceof Uint8Array) {
-    const out = new Uint8Array(total)
-    if (length > 0) {
-      for (let offset = 0; offset < total; offset += length) {
-        out.set(x.subarray(0, length), offset)
-      }
-    }
-    return out as $.Slice<T>
-  }
-  const out = $.makeSlice<T>(total)
+  const out = makeLike(x, total)
   if (length > 0) {
     for (let offset = 0; offset < total; offset += length) {
       $.copySliceElements(out, offset, x, 0, length)
@@ -522,7 +516,7 @@ export function Replace<T>(
       `slice bounds out of range [${i}:${j}] with length ${length}`,
     )
   }
-  const out = $.makeSlice<T>(length - (j - i) + v.length)
+  const out = makeLike(s, length - (j - i) + v.length)
   $.copySliceElements(out, 0, s, 0, i)
   $.copySliceElements(out, i, v, 0, v.length)
   $.copySliceElements(out, i + v.length, s, j, length - j)
@@ -573,10 +567,9 @@ export function Clip<T>(s: $.Slice<T>): $.Slice<T> {
   if (s == null) {
     return null
   }
-  const out = $.makeSlice<T>($.len(s), $.len(s))
-  for (let i = 0; i < $.len(s); i++) {
-    ;(out as any)[i] = (s as any)[i]
-  }
+  const length = $.len(s)
+  const out = makeLike(s, length)
+  $.copySliceElements(out, 0, s, 0, length)
   return out
 }
 
@@ -655,7 +648,7 @@ export function Insert<T>(s: $.Slice<T>, i: number, ...v: T[]): $.Slice<T> {
   if (v.length === 0) {
     return s
   }
-  const out = $.makeSlice<T>(length + v.length)
+  const out = makeLike(s, length + v.length)
   $.copySliceElements(out, 0, s, 0, i)
   $.copySliceElements(out, i, v, 0, v.length)
   $.copySliceElements(out, i + v.length, s, i, length - i)
@@ -704,7 +697,7 @@ export function Grow<T>(
     newCap = neededCap
   }
 
-  const newSlice = $.makeSlice<T>(currentLen, newCap, undefined, zeroFactory)
+  const newSlice = makeLike(s, currentLen, newCap, zeroFactory)
   $.copySliceElements(newSlice, 0, s, 0, currentLen)
 
   return newSlice

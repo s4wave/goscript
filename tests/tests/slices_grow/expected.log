@@ -1,3 +1,4 @@
 Before Grow: len= 3 cap= 3
 After Grow: len= 3 cap= 8
+byte Grow: zero tail= true kept= abc
 slices.Grow test finished

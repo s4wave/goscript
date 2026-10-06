@@ -47,4 +47,6 @@ interface struct: 1 1 1 1
 interface struct: 2 2 2 2
 append seq struct: 1 9
 sorted func struct: 2 1 9 2
+byte clone: xac abc 97
+byte results: ab aybc qc abcabc abcde
 test finished

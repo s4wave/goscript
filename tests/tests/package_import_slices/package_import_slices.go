@@ -206,5 +206,15 @@ func main() {
 	sortedFuncResult[0].n = 9
 	println("sorted func struct:", sortedFuncSource[0].n, sortedFuncSource[1].n, sortedFuncResult[0].n, sortedFuncResult[1].n)
 
+	// Byte slice results hold bytes and feed byte operations.
+	src := []byte("abc")
+	byteClone := slices.Clone(src)
+	byteClone[0] = 'x'
+	byteClone[1] += 255
+	println("byte clone:", string(byteClone), string(src), byteClone[1])
+	println("byte results:", string(slices.Clip(src[:2])), string(slices.Insert(src, 1, 'y')),
+		string(slices.Replace(slices.Clone(src), 0, 2, 'q')), string(slices.Repeat(src, 2)),
+		string(slices.Concat(src, []byte("de"))))
+
 	println("test finished")
 }
