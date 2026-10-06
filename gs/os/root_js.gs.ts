@@ -1,6 +1,9 @@
 import * as $ from "@goscript/builtin/index.js";
 import { ErrInvalid } from "./error.gs.js";
-import { Create, Mkdir, Open, OpenFile, Remove } from "./file_js.gs.js";
+import { Chmod, Create, Mkdir, MkdirAll, Open, OpenFile, ReadFile, Remove, RemoveAll, Rename, WriteFile } from "./file_js.gs.js";
+import { Readlink } from "./file_constants_js.gs.js";
+import { Chown, Chtimes, Lchown } from "./file_posix_js.gs.js";
+import { Link, Symlink } from "./file_unix_js.gs.js";
 import { Lstat as lstatPath, Stat as statPath } from "./stat_js.gs.js";
 import { File } from "./types_js.gs.js";
 
@@ -89,6 +92,112 @@ export class Root {
 			return err
 		}
 		return Remove(path)
+	}
+
+	public MkdirAll(name: string, perm: number): $.GoError {
+		const [path, err] = joinRootPath(this.name, name)
+		if (err !== null) {
+			return err
+		}
+		return MkdirAll(path, perm)
+	}
+
+	public RemoveAll(name: string): $.GoError {
+		const [path, err] = joinRootPath(this.name, name)
+		if (err !== null) {
+			return err
+		}
+		return RemoveAll(path)
+	}
+
+	public Rename(oldname: string, newname: string): $.GoError {
+		const [oldpath, oldErr] = joinRootPath(this.name, oldname)
+		if (oldErr !== null) {
+			return oldErr
+		}
+		const [newpath, newErr] = joinRootPath(this.name, newname)
+		if (newErr !== null) {
+			return newErr
+		}
+		return Rename(oldpath, newpath)
+	}
+
+	public Link(oldname: string, newname: string): $.GoError {
+		const [oldpath, oldErr] = joinRootPath(this.name, oldname)
+		if (oldErr !== null) {
+			return oldErr
+		}
+		const [newpath, newErr] = joinRootPath(this.name, newname)
+		if (newErr !== null) {
+			return newErr
+		}
+		return Link(oldpath, newpath)
+	}
+
+	// Symlink creates newname in the root as a link to oldname, which is the
+	// link's text and is not resolved against the root.
+	public Symlink(oldname: string, newname: string): $.GoError {
+		const [path, err] = joinRootPath(this.name, newname)
+		if (err !== null) {
+			return err
+		}
+		return Symlink(oldname, path)
+	}
+
+	public Readlink(name: string): [string, $.GoError] {
+		const [path, err] = joinRootPath(this.name, name)
+		if (err !== null) {
+			return ["", err]
+		}
+		return Readlink(path)
+	}
+
+	public ReadFile(name: string): [$.Bytes, $.GoError] {
+		const [path, err] = joinRootPath(this.name, name)
+		if (err !== null) {
+			return [null, err]
+		}
+		return ReadFile(path)
+	}
+
+	public WriteFile(name: string, data: $.Bytes, perm: number): $.GoError {
+		const [path, err] = joinRootPath(this.name, name)
+		if (err !== null) {
+			return err
+		}
+		return WriteFile(path, data, perm)
+	}
+
+	public Chmod(name: string, mode: number): $.GoError {
+		const [path, err] = joinRootPath(this.name, name)
+		if (err !== null) {
+			return err
+		}
+		return Chmod(path, mode)
+	}
+
+	public Chown(name: string, uid: number, gid: number): $.GoError {
+		const [path, err] = joinRootPath(this.name, name)
+		if (err !== null) {
+			return err
+		}
+		return Chown(path, uid, gid)
+	}
+
+	public Lchown(name: string, uid: number, gid: number): $.GoError {
+		const [path, err] = joinRootPath(this.name, name)
+		if (err !== null) {
+			return err
+		}
+		return Lchown(path, uid, gid)
+	}
+
+	public Chtimes(name: string, atime: any, mtime: any): $.GoError {
+		const [path, err] = joinRootPath(this.name, name)
+		if (err !== null) {
+			return err
+		}
+		return Chtimes(path, atime, mtime)
 	}
 
 	public Stat(name: string): [fs.FileInfo | null, $.GoError] {
