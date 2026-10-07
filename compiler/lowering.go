@@ -9656,9 +9656,13 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 			methodMemberName(selector.Sel.Name) + "(" + strings.Join(args, ", ") + ")"
 		return call, diagnostics, true
 	}
+	// An absent receiver package has no class to import. A field of an
+	// override type holds the override's own class, not the Go type's, so the
+	// Go type's prototype would run the wrong implementation.
 	if receiver != nil && receiver.Obj() != nil && receiver.Obj().Pkg() != nil {
 		pkgPath := receiver.Obj().Pkg().Path()
-		if ctx.importPaths[pkgPath] == "" && !o.hasGeneratedImportPackage(ctx.model, pkgPath) {
+		absent := ctx.importPaths[pkgPath] == "" && !o.hasGeneratedImportPackage(ctx.model, pkgPath)
+		if absent || o.isOverrideFieldValue(ctx, selector.X) {
 			call := receiverExpr + "." + methodMemberName(selector.Sel.Name) + "(" + strings.Join(args, ", ") + ")"
 			return call, diagnostics, true
 		}
@@ -10193,6 +10197,17 @@ func (o *LoweringOwner) lowerMethodReceiverExpr(
 			"<" + o.tsNonNilTypeFor(ctx, receiverType) + ">(" + receiver + ")", diagnostics
 	}
 	return receiver, diagnostics
+}
+
+// isOverrideFieldValue reports whether expr selects a struct field declared by
+// an override package type.
+func (o *LoweringOwner) isOverrideFieldValue(ctx lowerFileContext, expr ast.Expr) bool {
+	selector, _ := ast.Unparen(expr).(*ast.SelectorExpr)
+	if selector == nil {
+		return false
+	}
+	selection := ctx.semPkg.source.TypesInfo.Selections[selector]
+	return selection != nil && selection.Kind() == types.FieldVal && o.receiverUsesOverridePackage(selection.Recv())
 }
 
 func (o *LoweringOwner) receiverUsesOverridePackage(typ types.Type) bool {
