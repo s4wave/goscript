@@ -1,0 +1,4 @@
+/mux -> 202 mux hello /mux
+/missing -> 404  404 page not found
+
+/default -> 200 default hello /default

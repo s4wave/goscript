@@ -16,6 +16,10 @@
     "Header_write": true,
     "Header_writeSubset": true
   },
+  "asyncCallbacks": {
+    "HandleFunc": ["handler"],
+    "ServeMux.HandleFunc": ["handler"]
+  },
   "asyncMethods": {
     "Client.Do": true,
     "Client.Get": true,

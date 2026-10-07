@@ -21,6 +21,11 @@ type OverrideMetadata struct {
 	AsyncFunctions map[string]bool
 	// AsyncMethods maps Type.Method keys to async status.
 	AsyncMethods map[string]bool
+	// AsyncCallbacks maps a function name or Type.Method key to the names of
+	// its function-typed parameters the runtime stores and awaits. A function
+	// literal passed for one lowers as an async function, so its interface
+	// calls await.
+	AsyncCallbacks map[string][]string
 }
 
 // OverrideRegistryOwner owns GoScript override package metadata and copy plans.

@@ -8613,7 +8613,7 @@ func (o *LoweringOwner) lowerCallArgs(
 	if signature != nil && signature.Variadic() && overrideCall && !isBuiltinCallTarget(ctx, expr.Fun) {
 		params := signature.Params()
 		if params == nil || params.Len() == 0 {
-			return o.lowerFixedCallArgs(ctx, expr.Args, signature, overrideCall, allowAsyncOverrideCallback)
+			return o.lowerFixedCallArgs(ctx, expr, signature, overrideCall, allowAsyncOverrideCallback)
 		}
 		fixedCount := params.Len() - 1
 		targetType := params.At(fixedCount).Type()
@@ -8640,11 +8640,11 @@ func (o *LoweringOwner) lowerCallArgs(
 	if signature == nil || !signature.Variadic() ||
 		isBuiltinCallTarget(ctx, expr.Fun) ||
 		overrideCall {
-		return o.lowerFixedCallArgs(ctx, expr.Args, signature, overrideCall, allowAsyncOverrideCallback)
+		return o.lowerFixedCallArgs(ctx, expr, signature, overrideCall, allowAsyncOverrideCallback)
 	}
 	params := signature.Params()
 	if params == nil || params.Len() == 0 {
-		return o.lowerFixedCallArgs(ctx, expr.Args, signature, overrideCall, allowAsyncOverrideCallback)
+		return o.lowerFixedCallArgs(ctx, expr, signature, overrideCall, allowAsyncOverrideCallback)
 	}
 
 	fixedCount := params.Len() - 1
@@ -8799,7 +8799,7 @@ func isProtobufTextWriteStringerCall(ctx lowerFileContext, fun ast.Expr) bool {
 
 func (o *LoweringOwner) lowerFixedCallArgs(
 	ctx lowerFileContext,
-	exprs []ast.Expr,
+	call *ast.CallExpr,
 	signature *types.Signature,
 	overrideCall bool,
 	allowAsyncOverrideCallback bool,
@@ -8808,14 +8808,16 @@ func (o *LoweringOwner) lowerFixedCallArgs(
 	if signature != nil {
 		params = signature.Params()
 	}
-	args := make([]string, 0, len(exprs))
+	args := make([]string, 0, len(call.Args))
 	var diagnostics []Diagnostic
-	for idx, expr := range exprs {
+	for idx, expr := range call.Args {
 		var targetType types.Type
+		allowAsyncCallback := allowAsyncOverrideCallback
 		if params != nil && idx < params.Len() {
 			targetType = params.At(idx).Type()
+			allowAsyncCallback = allowAsyncCallback || o.overrideAwaitsCallback(ctx, call.Fun, params.At(idx).Name())
 		}
-		lowered, exprDiagnostics := o.lowerCallArgExpr(ctx, expr, targetType, allowAsyncOverrideCallback)
+		lowered, exprDiagnostics := o.lowerCallArgExpr(ctx, expr, targetType, allowAsyncCallback)
 		diagnostics = append(diagnostics, exprDiagnostics...)
 		if params != nil && idx < params.Len() {
 			lowered = o.lowerCallArgForTarget(ctx, expr, params.At(idx).Type(), lowered, overrideCall)
@@ -13774,6 +13776,18 @@ func (o *LoweringOwner) overrideCallNeedsAwait(ctx lowerFileContext, fun ast.Exp
 		named.Obj().Pkg().Path(),
 		named.Obj().Name()+"."+method.Name(),
 	)
+}
+
+// overrideAwaitsCallback reports whether override metadata names param of the
+// called function or method as a callback its runtime awaits.
+func (o *LoweringOwner) overrideAwaitsCallback(ctx lowerFileContext, fun ast.Expr, param string) bool {
+	if ctx.semPkg == nil || ctx.semPkg.source == nil {
+		return false
+	}
+	pkg := ctx.semPkg.source
+	facts := o.overrideFacts()
+	return facts.AwaitsCallback(overrideCallPackage(pkg, fun), overrideCallMethod(pkg, fun), param) ||
+		facts.AwaitsCallback(overrideFunctionCallPackage(pkg, fun), overrideFunctionCallName(pkg, fun), param)
 }
 
 func (o *LoweringOwner) awaitCallIfNeeded(ctx lowerFileContext, fun ast.Expr, call string) string {
