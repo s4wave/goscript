@@ -12,11 +12,14 @@ import * as io from "@goscript/io/index.js"
 import * as http from "@goscript/net/http/index.js"
 
 import * as strings from "@goscript/strings/index.js"
+
+import * as url from "@goscript/net/url/index.js"
 import "@goscript/bufio/index.js"
 import "@goscript/fmt/index.js"
 import "@goscript/io/index.js"
 import "@goscript/net/http/index.js"
 import "@goscript/strings/index.js"
+import "@goscript/net/url/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let requestWire = ((((("POST /chunk HTTP/1.1\r\n" + "Host: example.com\r\n") + "Transfer-Encoding: chunked\r\n") + "X-Test: one\r\n") + "X-Test: two\r\n") + "\r\n") + "5\r\nhello\r\n0\r\n\r\n"
@@ -30,7 +33,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple1: any = await io.ReadAll($.pointerValueOrNil(($.pointerValue<http.Request>(req).Body as io.Reader | null))!)
 	let reqBody: $.Slice<number> = __goscriptTuple1[0]
 	let reqBodyErr = __goscriptTuple1[1]
-	await fmt.Printf("request %s %s %s %s %d %d %s %d %d %t %d %q %v\n", $.pointerValue<http.Request>(req).Method, $.pointerValue<http.Request>(req).Host, $.pointerValue<any>($.pointerValue<http.Request>(req).URL).Path, $.pointerValue<any>($.pointerValue<http.Request>(req).URL).RawQuery, $.basicInterfaceValue($.pointerValue<http.Request>(req).ProtoMajor, "int"), $.basicInterfaceValue($.pointerValue<http.Request>(req).ProtoMinor, "int"), http.Request.prototype.UserAgent.call($.pointerValue<http.Request>(req)), $.basicInterfaceValue($.len(http.Header_Values($.pointerValue<http.Request>(req).Header, "X-Test")), "int"), $.basicInterfaceValue($.pointerValue<http.Request>(req).ContentLength, "int64"), $.pointerValue<http.Request>(req).Close, $.basicInterfaceValue($.len($.pointerValue<http.Request>(req).TransferEncoding), "int"), $.bytesToString(reqBody), (reqBodyErr as any))
+	await fmt.Printf("request %s %s %s %s %d %d %s %d %d %t %d %q %v\n", $.pointerValue<http.Request>(req).Method, $.pointerValue<http.Request>(req).Host, $.pointerValue<url.URL>($.pointerValue<http.Request>(req).URL).Path, $.pointerValue<url.URL>($.pointerValue<http.Request>(req).URL).RawQuery, $.basicInterfaceValue($.pointerValue<http.Request>(req).ProtoMajor, "int"), $.basicInterfaceValue($.pointerValue<http.Request>(req).ProtoMinor, "int"), http.Request.prototype.UserAgent.call($.pointerValue<http.Request>(req)), $.basicInterfaceValue($.len(http.Header_Values($.pointerValue<http.Request>(req).Header, "X-Test")), "int"), $.basicInterfaceValue($.pointerValue<http.Request>(req).ContentLength, "int64"), $.pointerValue<http.Request>(req).Close, $.basicInterfaceValue($.len($.pointerValue<http.Request>(req).TransferEncoding), "int"), $.bytesToString(reqBody), (reqBodyErr as any))
 
 	let responseWire = ((("HTTP/1.1 201 Created\r\n" + "Content-Type: text/plain\r\n") + "Content-Length: 5\r\n") + "\r\n") + "hello"
 	let __goscriptTuple2: any = await http.ReadResponse(bufio.NewReader($.interfaceValue<io.Reader | null>(strings.NewReader(responseWire), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader"))), req)

@@ -1,4 +1,5 @@
 {
+  "nativeDependencies": ["net/url"],
   "asyncFunctions": {
     "Get": true,
     "Head": true,

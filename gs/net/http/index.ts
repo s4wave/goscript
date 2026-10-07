@@ -9,6 +9,16 @@ import * as path from '@goscript/path/index.js'
 import * as strings from '@goscript/strings/index.js'
 import * as time from '@goscript/time/index.js'
 
+import {
+  cleanPath,
+  exactMatch,
+  parsePattern,
+  pathUnescape,
+  RoutingTree,
+  type Leaf,
+  type Pattern,
+} from './pattern.js'
+
 export const StatusContinue = 100
 export const StatusSwitchingProtocols = 101
 export const StatusProcessing = 102
@@ -448,6 +458,7 @@ class RequestURL {
   public Scheme: string
   public Host: string
   public Path: string
+  public RawPath = ''
   public RawQuery: string
 
   constructor(path: string, rawQuery: string, scheme = '', host = '') {
@@ -455,6 +466,17 @@ class RequestURL {
     this.Host = host
     this.Path = path
     this.RawQuery = rawQuery
+  }
+
+  /**
+   * EscapedPath returns RawPath when it is a valid encoding of Path, and the
+   * default encoding of Path otherwise.
+   */
+  public EscapedPath(): string {
+    if (this.RawPath !== '' && pathUnescape(this.RawPath) === this.Path) {
+      return this.RawPath
+    }
+    return escapePath(this.Path)
   }
 
   public Query(): QueryValues {
@@ -465,17 +487,40 @@ class RequestURL {
   }
 
   public clone(): RequestURL {
-    return new RequestURL(this.Path, this.RawQuery, this.Scheme, this.Host)
+    const url = new RequestURL(this.Path, this.RawQuery, this.Scheme, this.Host)
+    url.RawPath = this.RawPath
+    return url
   }
 
   public String(): string {
     const query = this.RawQuery === '' ? '' : `?${this.RawQuery}`
-    const path = this.Path === '' ? '/' : this.Path
+    const path = this.Path === '' ? '/' : this.EscapedPath()
     if (this.Scheme === '' || this.Host === '') {
       return `${path}${query}`
     }
     return `${this.Scheme}://${this.Host}${path}${query}`
   }
+}
+
+// escapePath encodes a URL path as Go does: it keeps the unreserved characters
+// and "$&+,/:;=@", and percent-encodes everything else.
+function escapePath(p: string): string {
+  return encodeURIComponent(p)
+    .replace(
+      /[!'()*]/g,
+      (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
+    )
+    .replace(/%(24|26|2B|2C|2F|3A|3B|3D|40)/g, (_, hex: string) =>
+      String.fromCharCode(parseInt(hex, 16)),
+    )
+}
+
+// urlFromEscaped returns the URL for an escaped path and raw query, keeping
+// the escaped form in RawPath so that encoded slashes survive.
+function urlFromEscaped(escaped: string, rawQuery: string): RequestURL {
+  const url = new RequestURL(pathUnescape(escaped), rawQuery)
+  url.RawPath = escaped
+  return url
 }
 
 function parseRequestURL(rawURL: string): [RequestURL | null, $.GoError] {
@@ -486,15 +531,14 @@ function parseRequestURL(rawURL: string): [RequestURL | null, $.GoError] {
     const parsed = new URL(rawURL, 'http://goscript.invalid')
     const path = decodeURIComponent(parsed.pathname)
     const hasHost = /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(rawURL)
-    return [
-      new RequestURL(
-        path,
-        parsed.search.startsWith('?') ? parsed.search.slice(1) : parsed.search,
-        hasHost ? parsed.protocol.replace(/:$/, '') : '',
-        hasHost ? parsed.host : '',
-      ),
-      null,
-    ]
+    const url = new RequestURL(
+      path,
+      parsed.search.startsWith('?') ? parsed.search.slice(1) : parsed.search,
+      hasHost ? parsed.protocol.replace(/:$/, '') : '',
+      hasHost ? parsed.host : '',
+    )
+    url.RawPath = escapePath(path) === parsed.pathname ? '' : parsed.pathname
+    return [url, null]
   } catch {
     return [null, errors.New(`parse "${rawURL}": invalid URL`)]
   }
@@ -774,6 +818,7 @@ function inProcessServerRequest(request: Request): Request {
   const query = rawQuery === '' ? '' : `?${rawQuery}`
   req.RequestURI = `${request.URL?.Path ?? '/'}${query}`
   req.Host = request.Host === '' ? (request.URL?.Host ?? '') : request.Host
+  req.Body = request.Body ?? NoBody
   if (req.URL?.clone != null) {
     req.URL = req.URL.clone()
     req.URL.Scheme = ''
@@ -810,6 +855,12 @@ export class Request {
   public Cancel: any
   public Response: Response | $.VarRef<Response> | null
   public Pattern: string
+  // pat, matches, and otherValues hold the routing state ServeMux records for
+  // PathValue: the matched pattern, the values of its named wildcards in
+  // pattern order, and the values set by SetPathValue for other names.
+  public pat: Pattern | null
+  public matches: string[]
+  public otherValues: Map<string, string> | null
   private ctx: context.Context
 
   constructor(init?: Partial<Request> & { ctx?: context.Context }) {
@@ -834,6 +885,9 @@ export class Request {
     this.Cancel = init?.Cancel ?? null
     this.Response = init?.Response ?? null
     this.Pattern = init?.Pattern ?? ''
+    this.pat = init?.pat ?? null
+    this.matches = init?.matches ?? []
+    this.otherValues = init?.otherValues ?? null
     this.ctx =
       (init as { ctx?: context.Context } | undefined)?.ctx ??
       context.Background()
@@ -873,8 +927,36 @@ export class Request {
       Cancel: this.Cancel,
       Response: this.Response,
       Pattern: this.Pattern,
+      pat: this.pat,
+      matches: [...this.matches],
+      otherValues: this.otherValues == null ? null : new Map(this.otherValues),
       ctx,
     })
+  }
+
+  /**
+   * PathValue returns the value of the named path wildcard of the pattern that
+   * matched the request, or the value set for the name by SetPathValue. It
+   * returns the empty string when there is neither.
+   */
+  public PathValue(name: string): string {
+    const i = this.pat?.wildcardIndex(name) ?? -1
+    return i >= 0 ?
+        (this.matches[i] ?? '')
+      : (this.otherValues?.get(name) ?? '')
+  }
+
+  /**
+   * SetPathValue sets the value that PathValue returns for name. It does not
+   * unescape value.
+   */
+  public SetPathValue(name: string, value: string): void {
+    const i = this.pat?.wildcardIndex(name) ?? -1
+    if (i >= 0) {
+      this.matches[i] = value
+      return
+    }
+    ;(this.otherValues ??= new Map()).set(name, value)
   }
 
   public UserAgent(): string {
@@ -2317,39 +2399,221 @@ export function MaxBytesReader(
   return new maxBytesReader(r ?? NoBody, n)
 }
 
+/**
+ * ServeMux routes requests to the handler of the most specific registered
+ * pattern. A pattern is "[METHOD] [HOST]/[PATH]", where PATH segments are
+ * literals or the wildcards "{name}", "{name...}", and "{$}". A path ending in
+ * "/" matches its whole subtree. Registering a pattern that is invalid or that
+ * conflicts with a registered pattern panics.
+ */
 export class ServeMux implements Handler {
-  private handlers = new Map<string, Handler>()
+  private tree = new RoutingTree<Handler>()
+  private patterns: Pattern[] = []
 
   public Handle(pattern: string, handler: Handler | null): void {
-    if (handler != null) {
-      this.handlers.set(pattern, handler)
-    }
+    this.register(pattern, handler)
   }
 
-  public HandleFunc(pattern: string, handler: HandlerFunc): void {
-    this.Handle(pattern, { ServeHTTP: handler })
+  public HandleFunc(pattern: string, handler: HandlerFunc | null): void {
+    this.register(pattern, handler == null ? null : { ServeHTTP: handler })
   }
 
-  public Handler(
-    r: Request | $.VarRef<Request> | null,
-  ): [Handler | null, string] {
-    const req = $.pointerValue<Request | null>(r)
-    const path = req?.URL?.Path ?? ''
-    const handler = this.handlers.get(path) ?? null
-    return [handler, handler == null ? '' : path]
+  /**
+   * Handler returns the handler for the request and the pattern that matched
+   * it. For a request that needs a redirect, it returns the redirect handler
+   * and the path that will match after the redirect. For an unmatched request
+   * it returns the not found or method not allowed handler and no pattern.
+   */
+  public Handler(r: Request | $.VarRef<Request> | null): [Handler, string] {
+    const [handler, pattern] = this.findHandler(
+      $.pointerValue<Request>(r) as Request,
+    )
+    return [handler, pattern]
   }
 
-  public ServeHTTP(
+  public async ServeHTTP(
     w: ResponseWriter | null,
     r: Request | $.VarRef<Request> | null,
-  ): void | Promise<void> {
-    const [handler] = this.Handler(r)
-    if (handler == null) {
-      NotFound(w, r)
+  ): Promise<void> {
+    // Reject the server-wide OPTIONS target, which no pattern routes.
+    const req = $.pointerValue<Request>(r) as Request
+    if (req.RequestURI === '*') {
+      if (req.ProtoAtLeast(1, 1)) {
+        Header_Set((await w?.Header()) as Header, 'Connection', 'close')
+      }
+      await w?.WriteHeader(StatusBadRequest)
       return
     }
-    return handler.ServeHTTP(w, r)
+
+    // Record the match on the request for Pattern and PathValue, then dispatch.
+    const [handler, pattern, pat, matches] = this.findHandler(req)
+    req.Pattern = pattern
+    req.pat = pat
+    req.matches = matches
+    await handler.ServeHTTP(w, r)
   }
+
+  // register adds the handler for the pattern, panicking when the pattern is
+  // invalid or conflicts with a registered pattern.
+  private register(patstr: string, handler: Handler | null): void {
+    // Reject an empty pattern and a missing handler.
+    if (patstr === '') {
+      $.panic(errors.New('http: invalid pattern'))
+    }
+    if (handler == null) {
+      $.panic(errors.New('http: nil handler'))
+    }
+
+    // Reject a pattern that is invalid or that matches some request as
+    // specifically as a registered pattern.
+    const pat = parsePattern(patstr)
+    for (const other of this.patterns) {
+      if (pat.conflictsWith(other)) {
+        $.panic(
+          errors.New(
+            `pattern "${pat.str}" conflicts with pattern "${other.str}":\n${pat.describeConflict(other)}`,
+          ),
+        )
+      }
+    }
+
+    // Route requests to the handler from now on.
+    this.tree.addPattern(pat, handler)
+    this.patterns.push(pat)
+  }
+
+  // findHandler finds the handler for the request, the pattern string and
+  // pattern that matched, and the values of the pattern's wildcards.
+  private findHandler(r: Request): [Handler, string, Pattern | null, string[]] {
+    // Take the path as sent, which keeps encoded slashes distinct.
+    const escaped: string = r.URL.EscapedPath()
+
+    // CONNECT requests are not canonicalized, but a missing trailing slash
+    // still redirects.
+    if (r.Method === MethodConnect) {
+      const [, , redirect] = this.matchOrRedirect(
+        r.URL.Host,
+        r.Method,
+        escaped,
+        r.URL,
+      )
+      if (redirect != null) {
+        return [
+          RedirectHandler(redirect.String(), StatusTemporaryRedirect),
+          redirect.Path,
+          null,
+          [],
+        ]
+      }
+      const [leaf, matches] = this.matchOrRedirect(
+        r.Host,
+        r.Method,
+        escaped,
+        null,
+      )
+      return this.matchedHandler(leaf, matches, r.URL.Host, escaped)
+    }
+
+    // Match the cleaned path against the host without its port, redirecting
+    // to the trailing-slash form of a subtree root or to the cleaned path.
+    const host = stripHostPort(r.Host)
+    const cleaned = cleanPath(escaped)
+    const [leaf, matches, redirect] = this.matchOrRedirect(
+      host,
+      r.Method,
+      cleaned,
+      r.URL,
+    )
+    const target =
+      redirect ??
+      (cleaned === escaped ? null : urlFromEscaped(cleaned, r.URL.RawQuery))
+    if (target != null) {
+      return [
+        RedirectHandler(target.String(), StatusTemporaryRedirect),
+        leaf?.pattern.str ?? '',
+        null,
+        [],
+      ]
+    }
+    return this.matchedHandler(leaf, matches, host, cleaned)
+  }
+
+  // matchedHandler returns the handler of the matched leaf, or, for a request
+  // that matched nothing, the method not allowed handler when a pattern would
+  // match the path with another method and the not found handler otherwise.
+  private matchedHandler(
+    leaf: Leaf<Handler> | null,
+    matches: string[],
+    host: string,
+    reqPath: string,
+  ): [Handler, string, Pattern | null, string[]] {
+    // Dispatch to the handler of the matched pattern.
+    if (leaf != null) {
+      return [leaf.handler, leaf.pattern.str, leaf.pattern, matches]
+    }
+
+    // Collect the methods that would match the path, or its trailing-slash
+    // form, which a redirect could reach.
+    const methods = new Set<string>()
+    this.tree.matchingMethods(host, reqPath, methods)
+    if (!reqPath.endsWith('/')) {
+      this.tree.matchingMethods(host, reqPath + '/', methods)
+    }
+
+    // Answer Not Found when no method matches, and Method Not Allowed otherwise.
+    if (methods.size === 0) {
+      return [NotFoundHandler(), '', null, []]
+    }
+    return [methodNotAllowedHandler([...methods].sort()), '', null, []]
+  }
+
+  // matchOrRedirect matches the host, method, and escaped path. When url is
+  // not null and the path has no exact match, it retries with a trailing
+  // slash and returns the URL to redirect to if that matches exactly.
+  private matchOrRedirect(
+    host: string,
+    method: string,
+    reqPath: string,
+    url: RequestURL | null,
+  ): [Leaf<Handler> | null, string[], RequestURL | null] {
+    // Stop at an exact match, or when no trailing-slash redirect applies.
+    const [leaf, matches] = this.tree.match(host, method, reqPath)
+    if (
+      exactMatch(leaf, reqPath) ||
+      url == null ||
+      reqPath === '' ||
+      reqPath.endsWith('/')
+    ) {
+      return [leaf, matches, null]
+    }
+
+    // Redirect a subtree root to its trailing-slash form.
+    const slashed = reqPath + '/'
+    const [slashedLeaf] = this.tree.match(host, method, slashed)
+    if (exactMatch(slashedLeaf, slashed)) {
+      return [slashedLeaf, [], urlFromEscaped(slashed, url.RawQuery)]
+    }
+    return [leaf, matches, null]
+  }
+}
+
+// methodNotAllowedHandler responds 405 and lists the allowed methods.
+function methodNotAllowedHandler(allowed: string[]): Handler {
+  return {
+    async ServeHTTP(w) {
+      const header = await w?.Header()
+      if (header != null) {
+        Header_Set(header, 'Allow', allowed.join(', '))
+      }
+      Error(w, StatusText(StatusMethodNotAllowed), StatusMethodNotAllowed)
+    },
+  }
+}
+
+// stripHostPort returns the host without its ":port" suffix.
+function stripHostPort(hostport: string): string {
+  const match = /^(?:\[([^\]]*)\]|([^:[\]]*)):\d*$/.exec(hostport)
+  return match == null ? hostport : (match[1] ?? match[2] ?? hostport)
 }
 
 export const DefaultServeMux = new ServeMux()
@@ -2372,6 +2636,7 @@ export function StripPrefix(prefix: string, handler: Handler | null): Handler {
   }
   return {
     ServeHTTP(w, r) {
+      // Strip the prefix from the path and the escaped path of a request copy.
       const req = $.pointerValue<Request | null>(r)
       const urlPath = req?.URL?.Path
       const rawPath = req?.URL?.RawPath ?? ''
@@ -2391,11 +2656,8 @@ export function StripPrefix(prefix: string, handler: Handler | null): Handler {
         (rawPath === '' || strippedRawPath.length < rawPath.length)
       ) {
         const reqCopy = req.Clone(req.Context())
-        reqCopy.URL = {
-          ...reqCopy.URL,
-          Path: strippedPath,
-          RawPath: strippedRawPath,
-        }
+        reqCopy.URL.Path = strippedPath
+        reqCopy.URL.RawPath = strippedRawPath
         return handler?.ServeHTTP(w, reqCopy)
       }
       NotFound(w, req)
@@ -2410,10 +2672,7 @@ export function AllowQuerySemicolons(handler: Handler | null): Handler {
       const req = $.pointerValue<Request | null>(r)
       if (req?.URL?.RawQuery?.includes(';') === true) {
         const reqCopy = req.Clone(req.Context())
-        reqCopy.URL = {
-          ...reqCopy.URL,
-          RawQuery: req.URL.RawQuery.replaceAll(';', '&'),
-        }
+        reqCopy.URL.RawQuery = req.URL.RawQuery.replaceAll(';', '&')
         return target.ServeHTTP(w, reqCopy)
       }
       return target.ServeHTTP(w, r)

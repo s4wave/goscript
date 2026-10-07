@@ -251,6 +251,10 @@ func loadOverrideMetadata(root overridePackageRoot) (OverrideMetadata, error) {
 			for iter.ReadArray() {
 				metadata.Dependencies = append(metadata.Dependencies, iter.ReadString())
 			}
+		case "nativeDependencies":
+			for iter.ReadArray() {
+				metadata.NativeDependencies = append(metadata.NativeDependencies, iter.ReadString())
+			}
 		case "asyncMethods":
 			for method := iter.ReadObject(); method != ""; method = iter.ReadObject() {
 				metadata.AsyncMethods[method] = iter.ReadBool()
@@ -646,9 +650,10 @@ func newOverrideMetadata() OverrideMetadata {
 
 func cloneOverrideMetadata(metadata OverrideMetadata) OverrideMetadata {
 	return OverrideMetadata{
-		Dependencies:   slices.Clone(metadata.Dependencies),
-		AsyncFunctions: cloneBoolMap(metadata.AsyncFunctions),
-		AsyncMethods:   cloneBoolMap(metadata.AsyncMethods),
+		Dependencies:       slices.Clone(metadata.Dependencies),
+		NativeDependencies: slices.Clone(metadata.NativeDependencies),
+		AsyncFunctions:     cloneBoolMap(metadata.AsyncFunctions),
+		AsyncMethods:       cloneBoolMap(metadata.AsyncMethods),
 	}
 }
 

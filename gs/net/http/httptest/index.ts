@@ -98,6 +98,7 @@ export function NewRequestWithContext(
       err ?? errors.New('net/http/httptest: NewRequest returned nil request')
     )
   }
+  req.Body ??= http.NoBody
   req.ContentLength = requestBodyContentLength(body)
   req.RemoteAddr = '192.0.2.1:1234'
   req.RequestURI = target

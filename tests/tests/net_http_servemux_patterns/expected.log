@@ -1,0 +1,49 @@
+GET example.com / -> 200 home id= path= pattern=/{$}  
+GET example.com /missing -> 404 404 page not found
+  
+GET example.com /items/42 -> 200 get id=42 path= pattern=GET /items/{id}  
+HEAD example.com /items/42 -> 200 get id=42 path= pattern=GET /items/{id}  
+DELETE example.com /items/7 -> 200 delete id=7 path= pattern=DELETE /items/{id}  
+POST example.com /items/7 -> 405 Method Not Allowed
+ DELETE, GET, HEAD 
+GET example.com /items/new -> 200 new id= path= pattern=GET /items/new  
+POST example.com /items -> 200 create id= path= pattern=POST /items  
+GET example.com /items -> 405 Method Not Allowed
+ POST 
+GET example.com /items/a/b -> 200 get id=a/b path= pattern=GET /items/{id}  
+GET example.com /items/a b -> 200 get id=a b path= pattern=GET /items/{id}  
+PUT example.com /items/42/files/a/b/c -> 200 files id=42 path=a/b/c pattern=/items/{id}/files/{path...}  
+PUT example.com /items/42/files/ -> 200 files id=42 path= pattern=/items/{id}/files/{path...}  
+PUT example.com /items/42/files -> 307   /items/42/files/
+GET example.com /static/css/app.css -> 200 static id= path= pattern=/static/  
+GET example.com /static/special -> 200 special id= path= pattern=/static/special  
+GET example.com /static/special/more -> 200 static id= path= pattern=/static/  
+GET example.com /static -> 307 <a href="/static/">Temporary Redirect</a>.
+
+  /static/
+GET example.com /exact/ -> 200 exact id= path= pattern=/exact/{$}  
+GET example.com /exact -> 307 <a href="/exact/">Temporary Redirect</a>.
+
+  /exact/
+GET example.com /exact/x -> 404 404 page not found
+  
+GET example.com /items//42 -> 307 <a href="/items/42">Temporary Redirect</a>.
+
+  /items/42
+GET example.com /hosted -> 200 host id= path= pattern=example.com/hosted  
+GET other.org:8080 /hosted -> 200 any-host id= path= pattern=/hosted  
+handler: true GET /items/{id}
+unset: true
+set: set set
+register GET /items/{name} panics: true
+register /items/new panics: true
+register /items/{id}/files/{path...} panics: true
+register /a/{x}/{x} panics: true
+register /a/{x panics: true
+register /a/{$}/b panics: true
+register /a/{x...}/b panics: true
+register BAD(METHOD /a panics: true
+register a panics: true
+register  panics: true
+register /nil panics: true
+register /ok/{id} panics: false

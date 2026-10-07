@@ -14,11 +14,14 @@ import * as time from "@goscript/time/index.js"
 import * as bytes from "@goscript/bytes/index.js"
 
 import type * as io from "@goscript/io/index.js"
+
+import * as url from "@goscript/net/url/index.js"
 import "@goscript/net/http/index.js"
 import "@goscript/net/http/httptest/index.js"
 import "@goscript/strings/index.js"
 import "@goscript/time/index.js"
 import "@goscript/bytes/index.js"
+import "@goscript/net/url/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
@@ -39,7 +42,7 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 	http.Header_Set($.pointerValue<http.Request>(req).Header, "Cookie", "space=wave")
-	await $.println("request:", $.pointerValue<http.Request>(req).Method, $.pointerValue<any>($.pointerValue<http.Request>(req).URL).Path, http.Request.prototype.ProtoAtLeast.call($.pointerValue<http.Request>(req), 1, 1), $.len(http.Request.prototype.Cookies.call($.pointerValue<http.Request>(req))))
+	await $.println("request:", $.pointerValue<http.Request>(req).Method, $.pointerValue<url.URL>($.pointerValue<http.Request>(req).URL).Path, http.Request.prototype.ProtoAtLeast.call($.pointerValue<http.Request>(req), 1, 1), $.len(http.Request.prototype.Cookies.call($.pointerValue<http.Request>(req))))
 
 	let rec: httptest.ResponseRecorder | $.VarRef<httptest.ResponseRecorder> | null = httptest.NewRecorder()
 	http.Error($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, http.ProtocolError.prototype.Error.call($.pointerValue<http.ProtocolError>(http.ErrNotSupported)), 403)

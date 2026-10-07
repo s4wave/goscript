@@ -235,12 +235,19 @@ func (o *PackageGraphOwner) collect(
 	graph.NodesByPackagePath[path] = node
 	graph.packagesByPath[path] = pkg
 
-	if mode != DependencyModeAll || node.OverrideCandidate {
+	if mode != DependencyModeAll {
 		return
 	}
-	imports := make([]string, 0, len(pkg.Imports))
-	for importPath := range pkg.Imports {
-		imports = append(imports, importPath)
+	// An override ships hand-written TypeScript, so only the packages whose
+	// types it exposes join the graph.
+	var imports []string
+	if node.OverrideCandidate {
+		imports = overrideFacts.Metadata(path).NativeDependencies
+	} else {
+		imports = make([]string, 0, len(pkg.Imports))
+		for importPath := range pkg.Imports {
+			imports = append(imports, importPath)
+		}
 	}
 	slices.Sort(imports)
 	for _, importPath := range imports {

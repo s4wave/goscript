@@ -417,7 +417,11 @@ func TestPackageGraphDetectsOverrideCandidates(t *testing.T) {
 	}
 }
 
-func TestPackageGraphDetectsExternalOverrideCandidates(t *testing.T) {
+// loadExternalOverrideGraph loads the graph of a module whose dependency lib
+// is overridden by hand-written TypeScript and imports the heavy package. The
+// override's meta.json holds meta, or is omitted when meta is empty.
+func loadExternalOverrideGraph(t *testing.T, meta string) *PackageGraph {
+	t.Helper()
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod": strings.Join([]string{
 			"module example.test/externaloverride",
@@ -425,7 +429,9 @@ func TestPackageGraphDetectsExternalOverrideCandidates(t *testing.T) {
 			"go 1.25.3",
 			"",
 			"require example.test/lib v0.0.0",
+			"require example.test/heavy v0.0.0",
 			"replace example.test/lib => ./lib",
+			"replace example.test/heavy => ./heavy",
 			"",
 		}, "\n"),
 		"main.go": "package main\nimport \"example.test/lib\"\nfunc main() { lib.Run() }\n",
@@ -444,8 +450,10 @@ func TestPackageGraphDetectsExternalOverrideCandidates(t *testing.T) {
 	})
 	overrideDir := filepath.Join(t.TempDir(), "gs")
 	writeFixtureFile(t, overrideDir, "example.test/lib/index.ts", "export function Run(): void {}\n")
+	if meta != "" {
+		writeFixtureFile(t, overrideDir, "example.test/lib/meta.json", meta)
+	}
 
-	overrideOwner := NewOverrideRegistryOwner(overrideDir)
 	req := &CompileRequest{
 		Patterns:            []string{"."},
 		Dir:                 moduleDir,
@@ -453,16 +461,31 @@ func TestPackageGraphDetectsExternalOverrideCandidates(t *testing.T) {
 		DependencyMode:      DependencyModeAll,
 		RuntimeEmissionMode: RuntimeEmissionModeEmit,
 	}
-	graph, diagnostics := NewPackageGraphOwner(overrideOwner).Load(context.Background(), req)
+	graph, diagnostics := NewPackageGraphOwner(NewOverrideRegistryOwner(overrideDir)).Load(context.Background(), req)
 	if diagnosticsHaveErrors(diagnostics) {
 		t.Fatalf("package graph failed: %#v", diagnostics)
 	}
+	return graph
+}
+
+func TestPackageGraphDetectsExternalOverrideCandidates(t *testing.T) {
+	graph := loadExternalOverrideGraph(t, "")
+
 	lib := graph.NodesByPackagePath["example.test/lib"]
 	if lib == nil || !lib.OverrideCandidate {
 		t.Fatalf("expected external override candidate for lib")
 	}
 	if graph.NodesByPackagePath["example.test/heavy"] != nil {
 		t.Fatalf("external override dependency should not be collected")
+	}
+}
+
+func TestPackageGraphCollectsOverrideNativeDependencies(t *testing.T) {
+	graph := loadExternalOverrideGraph(t, "{\"nativeDependencies\": [\"example.test/heavy\"]}\n")
+
+	heavy := graph.NodesByPackagePath["example.test/heavy"]
+	if heavy == nil || heavy.OverrideCandidate {
+		t.Fatalf("expected the native dependency of the override to be collected from Go source")
 	}
 }
 

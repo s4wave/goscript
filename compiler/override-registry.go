@@ -12,6 +12,11 @@ import (
 type OverrideMetadata struct {
 	// Dependencies are override package dependencies.
 	Dependencies []string
+	// NativeDependencies are Go packages whose types the override exposes
+	// through its API. The graph lowers them from their Go source, so code
+	// that reaches them through the override, such as a method call on a
+	// result, can import them.
+	NativeDependencies []string
 	// AsyncFunctions maps package-level function names to async status.
 	AsyncFunctions map[string]bool
 	// AsyncMethods maps Type.Method keys to async status.
