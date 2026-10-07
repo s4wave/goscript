@@ -21,7 +21,7 @@ export async function main(): globalThis.Promise<void> {
 		let __goscriptTuple0: any = await io.ReadAll($.pointerValueOrNil(($.pointerValue<http.Request>(r).Body as io.Reader | null))!)
 		let data: $.Slice<number> = __goscriptTuple0[0]
 		let err = __goscriptTuple0[1]
-		await $.println("server:", $.pointerValue<http.Request>(r).Method, $.comparableEqual($.pointerValue<http.Request>(r).Body, $.pointerValue<any>(http.NoBody)), $.len(data), err == null, url.Values_Get(url.URL.prototype.Query.call($.pointerValue<http.Request>(r).URL), "x"))
+		await $.println("server:", $.pointerValue<http.Request>(r).Method, $.comparableEqual($.pointerValue<http.Request>(r).Body, $.pointerValue<any>(http.NoBody)), $.len(data), err == null, url.Values_Get($.pointerValue<http.Request>(r).URL.Query(), "x"))
 		{
 			let [, __goscriptShadow0] = await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Write(new Uint8Array([111, 107]))
 			if (__goscriptShadow0 != null) {
@@ -42,7 +42,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("get status:", $.pointerValue<http.Response>(resp).StatusCode)
 
 	let req: http.Request | $.VarRef<http.Request> | null = httptest.NewRequest(http.MethodGet, "/?y=2", null!)
-	await $.println("recorded:", $.pointerValue<http.Request>(req).Body != null, url.Values_Get(url.URL.prototype.Query.call($.pointerValue<http.Request>(req).URL), "y"), url.Values_Has(url.URL.prototype.Query.call($.pointerValue<http.Request>(req).URL), "z"))
+	await $.println("recorded:", $.pointerValue<http.Request>(req).Body != null, url.Values_Get($.pointerValue<http.Request>(req).URL.Query(), "y"), url.Values_Has($.pointerValue<http.Request>(req).URL.Query(), "z"))
 }
 
 if ($.isMainScript(import.meta)) {
