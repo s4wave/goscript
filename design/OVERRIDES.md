@@ -68,6 +68,9 @@ An override package may include a `meta.json` file that defines metadata:
   "asyncMethods": {
     "TypeName.MethodName": true,
     "OtherType.Method": false
+  },
+  "asyncCallbacks": {
+    "TypeName.MethodName": ["handler"]
   }
 }
 ```
@@ -76,6 +79,7 @@ An override package may include a `meta.json` file that defines metadata:
 
 - **dependencies**: Array of package paths this package depends on (relative to `gs/` directory)
 - **asyncMethods**: Object mapping `TypeName.MethodName` to boolean indicating if async
+- **asyncCallbacks**: Object mapping a function name or `TypeName.MethodName` to the names of its function-typed parameters that the runtime stores and awaits. A function literal passed for one lowers as an async function, so its interface calls are awaited. A named parameter is needed because Go often declares such a parameter with an unnamed function type, which carries no async metadata.
 
 ### Example: sync package metadata
 

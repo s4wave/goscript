@@ -92,6 +92,18 @@ func TestOverrideRegistryFactsAreImmutable(t *testing.T) {
 		t.Fatalf("override dependency mutation leaked back into facts: %v", metadata.Dependencies)
 	}
 
+	if !facts.AwaitsCallback("net/http", "ServeMux.HandleFunc", "handler") {
+		t.Fatalf("expected net/http ServeMux.HandleFunc to await its handler")
+	}
+	if facts.AwaitsCallback("net/http", "ServeMux.HandleFunc", "pattern") {
+		t.Fatalf("pattern is not a callback")
+	}
+	callbacks := facts.Metadata("net/http").AsyncCallbacks
+	callbacks["ServeMux.HandleFunc"][0] = "mutated"
+	if !facts.AwaitsCallback("net/http", "ServeMux.HandleFunc", "handler") {
+		t.Fatalf("callback metadata mutation leaked back into facts")
+	}
+
 	pkg, dependencies, ok := facts.copyPackage("fmt")
 	if !ok {
 		t.Fatalf("missing fmt copy package facts")

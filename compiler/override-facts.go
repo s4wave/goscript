@@ -89,6 +89,16 @@ func (f *OverrideFacts) IsMethodAsync(pkgPath, method string) bool {
 	return pkg.metadata.AsyncMethods[method]
 }
 
+// AwaitsCallback returns true when override metadata names param of the
+// package-level function or Type.Method callee as a callback the runtime awaits.
+func (f *OverrideFacts) AwaitsCallback(pkgPath, callee, param string) bool {
+	if f == nil {
+		return false
+	}
+	pkg := f.packages[pkgPath]
+	return slices.Contains(pkg.metadata.AsyncCallbacks[callee], param)
+}
+
 // IsFunctionAsync returns true when override metadata marks a package-level function async.
 func (f *OverrideFacts) IsFunctionAsync(pkgPath, function string) bool {
 	if f == nil {
@@ -262,6 +272,12 @@ func loadOverrideMetadata(root overridePackageRoot) (OverrideMetadata, error) {
 		case "asyncFunctions":
 			for function := iter.ReadObject(); function != ""; function = iter.ReadObject() {
 				metadata.AsyncFunctions[function] = iter.ReadBool()
+			}
+		case "asyncCallbacks":
+			for callee := iter.ReadObject(); callee != ""; callee = iter.ReadObject() {
+				for iter.ReadArray() {
+					metadata.AsyncCallbacks[callee] = append(metadata.AsyncCallbacks[callee], iter.ReadString())
+				}
 			}
 		default:
 			iter.Skip()
@@ -645,6 +661,7 @@ func newOverrideMetadata() OverrideMetadata {
 	return OverrideMetadata{
 		AsyncFunctions: make(map[string]bool),
 		AsyncMethods:   make(map[string]bool),
+		AsyncCallbacks: make(map[string][]string),
 	}
 }
 
@@ -654,12 +671,21 @@ func cloneOverrideMetadata(metadata OverrideMetadata) OverrideMetadata {
 		NativeDependencies: slices.Clone(metadata.NativeDependencies),
 		AsyncFunctions:     cloneBoolMap(metadata.AsyncFunctions),
 		AsyncMethods:       cloneBoolMap(metadata.AsyncMethods),
+		AsyncCallbacks:     cloneStringSlicesMap(metadata.AsyncCallbacks),
 	}
 }
 
 func cloneBoolMap(values map[string]bool) map[string]bool {
 	cloned := make(map[string]bool, len(values))
 	maps.Copy(cloned, values)
+	return cloned
+}
+
+func cloneStringSlicesMap(values map[string][]string) map[string][]string {
+	cloned := make(map[string][]string, len(values))
+	for key, value := range values {
+		cloned[key] = slices.Clone(value)
+	}
 	return cloned
 }
 
