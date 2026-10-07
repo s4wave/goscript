@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"go/types"
+	"slices"
 
 	"golang.org/x/tools/go/packages"
 )
@@ -18,11 +19,16 @@ type asyncArgumentCallSite struct {
 	deps     []*types.Func
 }
 
-// interfaceAsyncMark is one interface method waiting on its implementation to
-// become async.
-type interfaceAsyncMark struct {
-	ifaceMethod *types.Func
-	implFn      *semanticFunction
+// interfaceAsyncEdges lists the distinct interface methods that each
+// implementation colors. An interface method waits on its implementations and
+// becomes async when any of them does.
+type interfaceAsyncEdges map[*semanticFunction][]*types.Func
+
+// add records that ifaceMethod waits on implFn, once.
+func (e interfaceAsyncEdges) add(implFn *semanticFunction, ifaceMethod *types.Func) {
+	if !slices.Contains(e[implFn], ifaceMethod) {
+		e[implFn] = append(e[implFn], ifaceMethod)
+	}
 }
 
 // asyncArgumentCall is a call in one package that passes function arguments
@@ -146,15 +152,13 @@ type asyncColoring struct {
 	keysBySemFn map[*semanticFunction][]*types.Func
 	// keysByFullName lists the named-receiver interface method keys by full
 	// name, which SemanticModel.interfaceMethodAsync also consults.
-	keysByFullName map[string][]*types.Func
-	registered     map[*types.Func]bool
-	// ifaceMethodsByImpl lists the interface methods colored by each
-	// implementation.
-	ifaceMethodsByImpl map[*semanticFunction][]*types.Func
-	anonMethodsByImpl  map[*types.Func][]*types.Func
-	sitesByDep         map[*types.Func][]*semanticFunction
-	visited            map[*types.Func]bool
-	queue              []*types.Func
+	keysByFullName    map[string][]*types.Func
+	registered        map[*types.Func]bool
+	ifaceEdges        interfaceAsyncEdges
+	anonMethodsByImpl map[*types.Func][]*types.Func
+	sitesByDep        map[*types.Func][]*semanticFunction
+	visited           map[*types.Func]bool
+	queue             []*types.Func
 }
 
 // colorAsyncFunctions marks every function and interface method that can
@@ -163,21 +167,21 @@ func colorAsyncFunctions(
 	ctx context.Context,
 	model *SemanticModel,
 	sites []asyncArgumentCallSite,
-	marks []interfaceAsyncMark,
+	ifaceEdges interfaceAsyncEdges,
 	anonymousInterfaceGraph []semanticAnonymousInterfaceImplementation,
 ) []Diagnostic {
 	if err := ctx.Err(); err != nil {
 		return []Diagnostic{contextCanceledDiagnostic(err)}
 	}
 	c := &asyncColoring{
-		model:              model,
-		keysBySemFn:        make(map[*semanticFunction][]*types.Func),
-		keysByFullName:     make(map[string][]*types.Func),
-		registered:         make(map[*types.Func]bool),
-		ifaceMethodsByImpl: make(map[*semanticFunction][]*types.Func),
-		anonMethodsByImpl:  make(map[*types.Func][]*types.Func),
-		sitesByDep:         make(map[*types.Func][]*semanticFunction),
-		visited:            make(map[*types.Func]bool),
+		model:             model,
+		keysBySemFn:       make(map[*semanticFunction][]*types.Func),
+		keysByFullName:    make(map[string][]*types.Func),
+		registered:        make(map[*types.Func]bool),
+		ifaceEdges:        ifaceEdges,
+		anonMethodsByImpl: make(map[*types.Func][]*types.Func),
+		sitesByDep:        make(map[*types.Func][]*semanticFunction),
+		visited:           make(map[*types.Func]bool),
 	}
 	for called := range model.functionCallers {
 		c.register(called)
@@ -195,18 +199,18 @@ func colorAsyncFunctions(
 			c.sitesByDep[dep] = append(c.sitesByDep[dep], site.semFn)
 		}
 	}
-	for _, mark := range marks {
-		c.ifaceMethodsByImpl[mark.implFn] = append(c.ifaceMethodsByImpl[mark.implFn], mark.ifaceMethod)
-	}
 
 	for key := range c.registered {
 		if model.functionAsync(key) {
 			c.visit(key)
 		}
 	}
-	for _, mark := range marks {
-		if mark.implFn.async {
-			c.markInterfaceMethod(mark.ifaceMethod)
+	for implFn, ifaceMethods := range ifaceEdges {
+		if !implFn.async {
+			continue
+		}
+		for _, ifaceMethod := range ifaceMethods {
+			c.markInterfaceMethod(ifaceMethod)
 		}
 	}
 	for _, site := range sites {
@@ -269,7 +273,7 @@ func (c *asyncColoring) markFunction(semFn *semanticFunction) {
 	for _, key := range c.keysBySemFn[semFn] {
 		c.visit(key)
 	}
-	for _, ifaceMethod := range c.ifaceMethodsByImpl[semFn] {
+	for _, ifaceMethod := range c.ifaceEdges[semFn] {
 		c.markInterfaceMethod(ifaceMethod)
 	}
 }

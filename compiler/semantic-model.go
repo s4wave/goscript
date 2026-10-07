@@ -160,13 +160,13 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 		return model, diagnostics
 	}
 	o.applyUnknownInterfaceAsyncMethods(model, interfaceGraph, anonymousInterfaceGraph)
-	interfaceAsyncMarks, markDiagnostics := o.buildInterfaceAsyncMarks(ctx, model, interfaceGraph)
+	interfaceAsyncEdges, markDiagnostics := o.buildInterfaceAsyncEdges(ctx, model, interfaceGraph)
 	diagnostics = append(diagnostics, markDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
 		model.freeze()
 		return model, diagnostics
 	}
-	diagnostics = append(diagnostics, colorAsyncFunctions(ctx, model, asyncArgumentSites, interfaceAsyncMarks, anonymousInterfaceGraph)...)
+	diagnostics = append(diagnostics, colorAsyncFunctions(ctx, model, asyncArgumentSites, interfaceAsyncEdges, anonymousInterfaceGraph)...)
 	model.freeze()
 	return model, diagnostics
 }
@@ -1590,19 +1590,16 @@ func (o *SemanticModelOwner) applyUnknownInterfaceAsyncMethods(
 	}
 }
 
-// buildInterfaceAsyncMarks records the implementation graph on the model and
-// returns the interface methods whose async coloring is still undecided.
-func (o *SemanticModelOwner) buildInterfaceAsyncMarks(
+// buildInterfaceAsyncEdges records the implementation graph on the model and
+// returns the distinct edges from each implementation to the interface methods
+// whose async coloring is still undecided.
+func (o *SemanticModelOwner) buildInterfaceAsyncEdges(
 	ctx context.Context,
 	model *SemanticModel,
 	interfaceGraph []semanticInterfaceImplementationGraphEntry,
-) ([]interfaceAsyncMark, []Diagnostic) {
+) (interfaceAsyncEdges, []Diagnostic) {
 	model.interfaceImplementations = make([]semanticInterfaceImplementation, 0, len(interfaceGraph))
-	var markCount int
-	for _, graphEntry := range interfaceGraph {
-		markCount += len(graphEntry.ifaceMethods)
-	}
-	marks := make([]interfaceAsyncMark, 0, markCount)
+	edges := make(interfaceAsyncEdges)
 	for _, graphEntry := range interfaceGraph {
 		if err := ctx.Err(); err != nil {
 			return nil, []Diagnostic{contextCanceledDiagnostic(err)}
@@ -1612,7 +1609,7 @@ func (o *SemanticModelOwner) buildInterfaceAsyncMarks(
 			// A pair with no semantic implementation can never fire, so it is
 			// dropped here rather than resolved again on every pass.
 			if implFn := semanticFunctionFor(model, implMethod); implFn != nil {
-				marks = append(marks, interfaceAsyncMark{ifaceMethod: ifaceMethod, implFn: implFn})
+				edges.add(implFn, ifaceMethod)
 			}
 		}
 		model.interfaceImplementations = append(model.interfaceImplementations, semanticInterfaceImplementation{
@@ -1621,7 +1618,7 @@ func (o *SemanticModelOwner) buildInterfaceAsyncMarks(
 			pointer: graphEntry.pointer,
 		})
 	}
-	return marks, nil
+	return edges, nil
 }
 
 func (m *SemanticModel) functionAsync(fn *types.Func) bool {
