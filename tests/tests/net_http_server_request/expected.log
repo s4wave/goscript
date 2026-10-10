@@ -1,3 +1,6 @@
-server: GET true 0 true 1
+server: GET true 0 true 1 /?x=1
 get status: 200
 recorded: true 2 false
+request uri: /a%2Fb/c?q=a/../b&n=5
+request uri: /a/b
+request uri: /

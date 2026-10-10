@@ -479,6 +479,15 @@ class RequestURL {
     return escapePath(this.Path)
   }
 
+  /**
+   * RequestURI returns the escaped path and query as sent in a request line,
+   * with "/" for an empty path.
+   */
+  public RequestURI(): string {
+    const path = this.EscapedPath() || '/'
+    return this.RawQuery === '' ? path : `${path}?${this.RawQuery}`
+  }
+
   public Query(): QueryValues {
     const values = new QueryValues()
     const params = new URLSearchParams(this.RawQuery)
