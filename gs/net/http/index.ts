@@ -770,7 +770,12 @@ export class Request {
     this.target = $.pointerValueOrNil(value)!
   }
 
-  constructor(init?: Partial<Request> & { ctx?: context.Context }) {
+  constructor(
+    init?: Partial<Omit<Request, 'URL'>> & {
+      URL?: url.URL | $.VarRef<url.URL> | null
+      ctx?: context.Context
+    },
+  ) {
     this.Method = init?.Method ?? ''
     this.URL = init?.URL ?? null!
     this.Proto = init?.Proto ?? 'HTTP/1.1'

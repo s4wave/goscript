@@ -11,6 +11,7 @@ server marshal: /?x=1 true
 get status: 200
 recorded: true 2 false
 assigned: 1 example.com 8443 /x?y=1
+literal: POST example.com:8443 /x?y=1
 request uri: /a%2Fb/c?q=a/../b&n=5
 request string: /a%2Fb/c?q=a/../b&n=5
 request fields:   true  /a/b/c /a%2Fb/c q=a/../b&n=5   false

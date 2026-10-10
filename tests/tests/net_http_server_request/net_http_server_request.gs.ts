@@ -84,6 +84,10 @@ export async function main(): globalThis.Promise<void> {
 	$.pointerValue<http.Request>(req).URL = parsed
 	await $.println("assigned:", url.Values_Get($.pointerValue<http.Request>(req).URL.Query(), "y"), $.pointerValue<http.Request>(req).URL.Hostname(), $.pointerValue<http.Request>(req).URL.Port(), $.pointerValue<http.Request>(req).URL.RequestURI())
 
+	// A composite literal takes a *url.URL field directly.
+	let literal: http.Request | $.VarRef<http.Request> | null = new http.Request({Method: http.MethodPost, URL: parsed})
+	await $.println("literal:", $.pointerValue<http.Request>(literal).Method, $.pointerValue<url.URL>($.pointerValue<http.Request>(literal).URL).Host, $.pointerValue<http.Request>(literal).URL.RequestURI())
+
 	// RequestURI keeps the escaped path and the query unchanged.
 	let targets: $.Slice<string> = $.arrayToSlice<string>(["/a%2Fb/c?q=a/../b&n=5", "/a/b", "http://example.com", "https://user:secret@example.com:8443/p/q%20r?a=1&b=2#frag%20x", "mailto:joe@example.com?subject=hi", "http://example.com/p?"])
 	for (let __goscriptRangeTarget0 = targets, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {

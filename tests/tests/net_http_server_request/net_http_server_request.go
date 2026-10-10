@@ -61,6 +61,10 @@ func main() {
 	req.URL = parsed
 	println("assigned:", req.URL.Query().Get("y"), req.URL.Hostname(), req.URL.Port(), req.URL.RequestURI())
 
+	// A composite literal takes a *url.URL field directly.
+	literal := &http.Request{Method: http.MethodPost, URL: parsed}
+	println("literal:", literal.Method, literal.URL.Host, literal.URL.RequestURI())
+
 	// RequestURI keeps the escaped path and the query unchanged.
 	targets := []string{
 		"/a%2Fb/c?q=a/../b&n=5",
