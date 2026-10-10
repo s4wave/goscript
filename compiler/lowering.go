@@ -22,6 +22,7 @@ import (
 
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
+	"golang.org/x/tools/go/ast/astutil"
 	"golang.org/x/tools/go/packages"
 )
 
@@ -5527,10 +5528,65 @@ func (o *LoweringOwner) shortDeclTypeAnnotation(ctx lowerFileContext, lhs ast.Ex
 	if rhs != nil && isIdentLikeExpr(rhs) && isInterfaceType(obj.Type()) {
 		return ": " + o.tsVariableTypeFor(ctx, obj.Type(), ctx.model.needsVarRef[obj])
 	}
-	if !shortDeclNeedsTypeAnnotation(obj.Type()) {
+	if !shortDeclNeedsTypeAnnotation(obj.Type()) && !(rhs != nil && shortDeclFeedsOwnInit(ctx, obj, rhs)) {
 		return ""
 	}
 	return ": " + o.tsVariableTypeFor(ctx, obj.Type(), ctx.model.needsVarRef[obj])
+}
+
+// shortDeclFeedsOwnInit reports whether obj, declared as obj := init, is read by
+// an assignment to a local variable that init also reads. TypeScript infers the
+// declared type of obj from init, and init reads the assigned variable at its
+// narrowed type, which depends on the assigned expression and so on obj. The
+// cycle is an implicit any unless obj has an annotation.
+func shortDeclFeedsOwnInit(ctx lowerFileContext, obj types.Object, init ast.Expr) bool {
+	info := ctx.semPkg.source.TypesInfo
+	reads := make(map[types.Object]bool)
+	ast.Inspect(init, func(node ast.Node) bool {
+		if ident, ok := node.(*ast.Ident); ok {
+			if local, ok := info.Uses[ident].(*types.Var); ok && !local.IsField() && local.Parent() != local.Pkg().Scope() {
+				reads[local] = true
+			}
+		}
+		return true
+	})
+	if len(reads) == 0 {
+		return false
+	}
+
+	path, _ := astutil.PathEnclosingInterval(ctx.file, obj.Pos(), obj.Pos())
+	var scope ast.Node
+	for _, node := range path {
+		if _, ok := node.(*ast.BlockStmt); ok {
+			scope = node
+			break
+		}
+	}
+	if scope == nil {
+		return false
+	}
+
+	feeds := false
+	ast.Inspect(scope, func(node ast.Node) bool {
+		assign, ok := node.(*ast.AssignStmt)
+		if !ok || assign.Tok != token.ASSIGN || len(assign.Lhs) != len(assign.Rhs) {
+			return !feeds
+		}
+		for idx, lhs := range assign.Lhs {
+			ident, ok := lhs.(*ast.Ident)
+			if !ok || !reads[info.Uses[ident]] {
+				continue
+			}
+			ast.Inspect(assign.Rhs[idx], func(node ast.Node) bool {
+				if ident, ok := node.(*ast.Ident); ok && info.Uses[ident] == obj {
+					feeds = true
+				}
+				return !feeds
+			})
+		}
+		return !feeds
+	})
+	return feeds
 }
 
 func isIdentLikeExpr(expr ast.Expr) bool {
@@ -13790,9 +13846,16 @@ func (o *LoweringOwner) overrideAwaitsCallback(ctx lowerFileContext, fun ast.Exp
 		facts.AwaitsCallback(overrideFunctionCallPackage(pkg, fun), overrideFunctionCallName(pkg, fun), param)
 }
 
+// awaitCallIfNeeded awaits a call that may suspend. A call through a function
+// variable in a synchronous literal cannot await, so it unwraps the result of
+// a function value that returned synchronously.
 func (o *LoweringOwner) awaitCallIfNeeded(ctx lowerFileContext, fun ast.Expr, call string) string {
 	if o.callNeedsAwait(ctx, fun) {
 		return "await " + call
+	}
+	pkg := ctx.semPkg.source
+	if callUsesFunctionIdentifier(pkg, fun) && signatureForType(pkg.TypesInfo.TypeOf(fun)).Results().Len() > 0 {
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperSyncResult) + "(" + call + ")"
 	}
 	return call
 }

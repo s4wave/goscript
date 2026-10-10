@@ -2306,6 +2306,17 @@ export function functionValue<T extends (...args: any[]) => any>(
   )
 }
 
+// syncResult returns the result of a function value called where the caller
+// cannot suspend, such as a callback that a synchronous runtime override
+// invokes. A function value that suspends returns a promise, which that caller
+// cannot wait for.
+export function syncResult<T>(result: T | globalThis.Promise<T>): T {
+  if (result instanceof Promise) {
+    throw new Error('function value suspended in a synchronous context')
+  }
+  return result
+}
+
 export interface GenericTypeDescriptor<T = any> {
   type?: TypeInfo | string
   zero?: () => T

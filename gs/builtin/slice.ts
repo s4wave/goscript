@@ -1221,7 +1221,13 @@ export function appendSlice<T>(
     const oldLength = meta.length
     const newLength = oldLength + count
     if (newLength <= meta.capacity) {
-      copySliceElements(meta.backing, meta.offset + oldLength, source as Slice<T>, 0, count)
+      copySliceElements(
+        meta.backing,
+        meta.offset + oldLength,
+        source as Slice<T>,
+        0,
+        count,
+      )
       if (meta.target !== undefined) {
         for (let i = 0; i < count; i++) {
           meta.target[oldLength + i] = meta.backing[meta.offset + oldLength + i]
@@ -1564,6 +1570,11 @@ export function arrayIndex<
 /**
  * indexRef returns an addressable reference to a slice or array element.
  */
+export function indexRef(collection: Uint8Array, index: number): VarRef<number>
+export function indexRef<T>(
+  collection: Slice<T> | T[],
+  index: number,
+): VarRef<T>
 export function indexRef<T>(
   collection: Slice<T> | T[] | Uint8Array,
   index: number,

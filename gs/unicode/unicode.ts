@@ -1,4 +1,8 @@
-import type { Slice } from '@goscript/builtin/index.js'
+import {
+  pointerValue,
+  type Slice,
+  type VarRef,
+} from '@goscript/builtin/index.js'
 
 import {
   categoryData,
@@ -359,14 +363,19 @@ function searchRanges(ranges: Array<Range16 | Range32>, r: number): boolean {
   return false
 }
 
+// RangeTablePointer is the representation of a Go *RangeTable, which generated
+// code produces for a package variable or composite literal address.
+type RangeTablePointer = RangeTable | VarRef<RangeTable> | null
+
 // Is reports whether the rune is in the specified table of ranges.
-export function Is(rangeTab: RangeTable, r: number): boolean {
-  const r16 = rangeTab.R16
+export function Is(rangeTab: RangeTablePointer, r: number): boolean {
+  const table = pointerValue(rangeTab)
+  const r16 = table.R16
   // Compare as unsigned to correctly reject negative runes.
   if (r16.length > 0 && r >>> 0 <= r16[r16.length - 1].Hi >>> 0) {
     return searchRanges(r16, r & 0xffff)
   }
-  const r32 = rangeTab.R32
+  const r32 = table.R32
   if (r32.length > 0 && r >= r32[0].Lo) {
     return searchRanges(r32, r)
   }
@@ -374,7 +383,7 @@ export function Is(rangeTab: RangeTable, r: number): boolean {
 }
 
 // In reports whether the rune is a member of one of the ranges.
-export function In(r: number, ...ranges: RangeTable[]): boolean {
+export function In(r: number, ...ranges: RangeTablePointer[]): boolean {
   for (const rangeTab of ranges) {
     if (Is(rangeTab, r)) {
       return true
@@ -384,8 +393,8 @@ export function In(r: number, ...ranges: RangeTable[]): boolean {
 }
 
 // IsOneOf reports whether the rune is a member of one of the ranges.
-export function IsOneOf(ranges: RangeTable[], r: number): boolean {
-  for (const rangeTab of ranges) {
+export function IsOneOf(ranges: Slice<RangeTablePointer>, r: number): boolean {
+  for (const rangeTab of sliceToArray(ranges)) {
     if (Is(rangeTab, r)) {
       return true
     }

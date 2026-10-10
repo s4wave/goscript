@@ -43,7 +43,7 @@ export async function main(): globalThis.Promise<void> {
 
 		// Critical section
 		// println("worker", id, "entered critical section") - non-deterministic, leave commented out
-		let current = counter
+		let current: number = counter
 		await time.Sleep(100000000n)
 		counter = current + 1
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo))
