@@ -17,6 +17,8 @@
     "sourceMap": true,
     "paths": {
       "@goscript/crypto/index.js": ["./tests/deps/crypto/index.ts"],
+      "@goscript/net/netip/index.js": ["./tests/deps/net/netip/index.ts"],
+      "@goscript/net/url/index.js": ["./tests/deps/net/url/index.ts"],
       "@goscript/*": ["./gs/*"]
     }
   },

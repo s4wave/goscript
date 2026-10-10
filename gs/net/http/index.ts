@@ -5,6 +5,7 @@ import * as errors from '@goscript/errors/index.js'
 import * as fs from '@goscript/io/fs/fs.js'
 import * as io from '@goscript/io/index.js'
 import * as mime from '@goscript/mime/index.js'
+import * as url from '@goscript/net/url/index.js'
 import * as path from '@goscript/path/index.js'
 import * as strings from '@goscript/strings/index.js'
 import * as time from '@goscript/time/index.js'
@@ -431,126 +432,14 @@ function canonicalMIMEHeaderKey(key: string): string {
   return out
 }
 
-class QueryValues extends Map<string, $.Slice<string>> {
-  public Add(key: string, value: string): void {
-    const values = Array.from(this.get(key) ?? [])
-    values.push(value)
-    this.set(key, $.arrayToSlice(values))
-  }
-
-  public Get(key: string): string {
-    const values = this.get(key)
-    return values == null || values.length === 0 ? '' : String(values[0])
-  }
-
-  public Encode(): string {
-    const params = new URLSearchParams()
-    for (const [key, values] of this.entries()) {
-      for (const value of Array.from(values ?? [])) {
-        params.append(key, String(value))
-      }
-    }
-    return params.toString()
-  }
-}
-
-class RequestURL {
-  public Scheme: string
-  public Host: string
-  public Path: string
-  public RawPath = ''
-  public RawQuery: string
-
-  constructor(path: string, rawQuery: string, scheme = '', host = '') {
-    this.Scheme = scheme
-    this.Host = host
-    this.Path = path
-    this.RawQuery = rawQuery
-  }
-
-  /**
-   * EscapedPath returns RawPath when it is a valid encoding of Path, and the
-   * default encoding of Path otherwise.
-   */
-  public EscapedPath(): string {
-    if (this.RawPath !== '' && pathUnescape(this.RawPath) === this.Path) {
-      return this.RawPath
-    }
-    return escapePath(this.Path)
-  }
-
-  /**
-   * RequestURI returns the escaped path and query as sent in a request line,
-   * with "/" for an empty path.
-   */
-  public RequestURI(): string {
-    const path = this.EscapedPath() || '/'
-    return this.RawQuery === '' ? path : `${path}?${this.RawQuery}`
-  }
-
-  public Query(): QueryValues {
-    const values = new QueryValues()
-    const params = new URLSearchParams(this.RawQuery)
-    params.forEach((value, key) => values.Add(key, value))
-    return values
-  }
-
-  public clone(): RequestURL {
-    const url = new RequestURL(this.Path, this.RawQuery, this.Scheme, this.Host)
-    url.RawPath = this.RawPath
-    return url
-  }
-
-  public String(): string {
-    const query = this.RawQuery === '' ? '' : `?${this.RawQuery}`
-    const path = this.Path === '' ? '/' : this.EscapedPath()
-    if (this.Scheme === '' || this.Host === '') {
-      return `${path}${query}`
-    }
-    return `${this.Scheme}://${this.Host}${path}${query}`
-  }
-}
-
-// escapePath encodes a URL path as Go does: it keeps the unreserved characters
-// and "$&+,/:;=@", and percent-encodes everything else.
-function escapePath(p: string): string {
-  return encodeURIComponent(p)
-    .replace(
-      /[!'()*]/g,
-      (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
-    )
-    .replace(/%(24|26|2B|2C|2F|3A|3B|3D|40)/g, (_, hex: string) =>
-      String.fromCharCode(parseInt(hex, 16)),
-    )
-}
-
 // urlFromEscaped returns the URL for an escaped path and raw query, keeping
 // the escaped form in RawPath so that encoded slashes survive.
-function urlFromEscaped(escaped: string, rawQuery: string): RequestURL {
-  const url = new RequestURL(pathUnescape(escaped), rawQuery)
-  url.RawPath = escaped
-  return url
-}
-
-function parseRequestURL(rawURL: string): [RequestURL | null, $.GoError] {
-  try {
-    if (/%(?![0-9A-Fa-f]{2})/.test(rawURL)) {
-      return [null, errors.New(`parse "${rawURL}": invalid URL escape`)]
-    }
-    const parsed = new URL(rawURL, 'http://goscript.invalid')
-    const path = decodeURIComponent(parsed.pathname)
-    const hasHost = /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(rawURL)
-    const url = new RequestURL(
-      path,
-      parsed.search.startsWith('?') ? parsed.search.slice(1) : parsed.search,
-      hasHost ? parsed.protocol.replace(/:$/, '') : '',
-      hasHost ? parsed.host : '',
-    )
-    url.RawPath = escapePath(path) === parsed.pathname ? '' : parsed.pathname
-    return [url, null]
-  } catch {
-    return [null, errors.New(`parse "${rawURL}": invalid URL`)]
-  }
+function urlFromEscaped(escaped: string, rawQuery: string): url.URL {
+  return new url.URL({
+    Path: pathUnescape(escaped),
+    RawPath: escaped,
+    RawQuery: rawQuery,
+  })
 }
 
 class responseBody implements io.ReadCloser {
@@ -812,9 +701,10 @@ export function RegisterInProcessServer(handler: Handler | null): string {
 }
 
 export function UnregisterInProcessServer(rawURL: string): void {
-  const [parsed] = parseRequestURL(rawURL)
-  if (parsed != null && parsed.Host !== '') {
-    inProcessServers.delete(parsed.Host)
+  const [parsed] = url.Parse(rawURL)
+  const host = $.pointerValueOrNil(parsed)?.Host ?? ''
+  if (host !== '') {
+    inProcessServers.delete(host)
   }
 }
 
@@ -823,13 +713,11 @@ function inProcessServerRequest(request: Request): Request {
     Object.create(Object.getPrototypeOf(request)),
     request,
   ) as Request
-  const rawQuery = request.URL?.RawQuery ?? ''
-  const query = rawQuery === '' ? '' : `?${rawQuery}`
-  req.RequestURI = `${request.URL?.Path ?? '/'}${query}`
+  req.RequestURI = request.URL?.RequestURI() ?? '/'
   req.Host = request.Host === '' ? (request.URL?.Host ?? '') : request.Host
   req.Body = request.Body ?? NoBody
-  if (req.URL?.clone != null) {
-    req.URL = req.URL.clone()
+  if (request.URL != null) {
+    req.URL = request.URL.clone()
     req.URL.Scheme = ''
     req.URL.Host = ''
   }
@@ -844,7 +732,6 @@ export interface ResponseWriter {
 
 export class Request {
   public Method: string
-  public URL: any
   public Proto: string
   public ProtoMajor: number
   public ProtoMinor: number
@@ -871,10 +758,21 @@ export class Request {
   public matches: string[]
   public otherValues: Map<string, string> | null
   private ctx: context.Context
+  private target: url.URL = null!
+
+  /** URL is the request target, nil for a zero Request. */
+  get URL(): url.URL {
+    return this.target
+  }
+
+  /** The setter accepts any *url.URL, including one boxed in a VarRef. */
+  set URL(value: url.URL | $.VarRef<url.URL> | null) {
+    this.target = $.pointerValueOrNil(value)!
+  }
 
   constructor(init?: Partial<Request> & { ctx?: context.Context }) {
     this.Method = init?.Method ?? ''
-    this.URL = init?.URL ?? null
+    this.URL = init?.URL ?? null!
     this.Proto = init?.Proto ?? 'HTTP/1.1'
     this.ProtoMajor = init?.ProtoMajor ?? 1
     this.ProtoMinor = init?.ProtoMinor ?? 1
@@ -913,10 +811,7 @@ export class Request {
   public Clone(ctx: context.Context): Request {
     return new Request({
       Method: this.Method,
-      URL:
-        this.URL?.clone != null ? this.URL.clone()
-        : this.URL == null ? null
-        : { ...this.URL },
+      URL: this.URL?.clone() ?? null,
       Proto: this.Proto,
       ProtoMajor: this.ProtoMajor,
       ProtoMinor: this.ProtoMinor,
@@ -1027,8 +922,8 @@ export class Request {
   }
 
   public FormValue(key: string): string {
-    const query = this.URL?.Query
-    return typeof query === 'function' ? query.call(this.URL).Get(key) : ''
+    const values = this.URL?.Query()?.get(key)
+    return values == null || values.length === 0 ? '' : String(values[0])
   }
 }
 
@@ -1561,7 +1456,7 @@ async function fetchRoundTrip(
   try {
     const bodyInit = body == null ? undefined : Uint8Array.from(body).buffer
     const [fetched, fetchErr] = await fetchContext.wait(
-      globalThis.fetch(request.URL?.String?.() ?? '', {
+      globalThis.fetch(request.URL?.String() ?? '', {
         method: request.Method || MethodGet,
         headers,
         body: bodyInit,
@@ -2495,16 +2390,17 @@ export class ServeMux implements Handler {
   // pattern that matched, and the values of the pattern's wildcards.
   private findHandler(r: Request): [Handler, string, Pattern | null, string[]] {
     // Take the path as sent, which keeps encoded slashes distinct.
-    const escaped: string = r.URL.EscapedPath()
+    const reqURL = r.URL
+    const escaped = reqURL.EscapedPath()
 
     // CONNECT requests are not canonicalized, but a missing trailing slash
     // still redirects.
     if (r.Method === MethodConnect) {
       const [, , redirect] = this.matchOrRedirect(
-        r.URL.Host,
+        reqURL.Host,
         r.Method,
         escaped,
-        r.URL,
+        reqURL,
       )
       if (redirect != null) {
         return [
@@ -2520,7 +2416,7 @@ export class ServeMux implements Handler {
         escaped,
         null,
       )
-      return this.matchedHandler(leaf, matches, r.URL.Host, escaped)
+      return this.matchedHandler(leaf, matches, reqURL.Host, escaped)
     }
 
     // Match the cleaned path against the host without its port, redirecting
@@ -2531,11 +2427,11 @@ export class ServeMux implements Handler {
       host,
       r.Method,
       cleaned,
-      r.URL,
+      reqURL,
     )
     const target =
       redirect ??
-      (cleaned === escaped ? null : urlFromEscaped(cleaned, r.URL.RawQuery))
+      (cleaned === escaped ? null : urlFromEscaped(cleaned, reqURL.RawQuery))
     if (target != null) {
       return [
         RedirectHandler(target.String(), StatusTemporaryRedirect),
@@ -2583,13 +2479,13 @@ export class ServeMux implements Handler {
     host: string,
     method: string,
     reqPath: string,
-    url: RequestURL | null,
-  ): [Leaf<Handler> | null, string[], RequestURL | null] {
+    target: url.URL | null,
+  ): [Leaf<Handler> | null, string[], url.URL | null] {
     // Stop at an exact match, or when no trailing-slash redirect applies.
     const [leaf, matches] = this.tree.match(host, method, reqPath)
     if (
       exactMatch(leaf, reqPath) ||
-      url == null ||
+      target == null ||
       reqPath === '' ||
       reqPath.endsWith('/')
     ) {
@@ -2600,7 +2496,7 @@ export class ServeMux implements Handler {
     const slashed = reqPath + '/'
     const [slashedLeaf] = this.tree.match(host, method, slashed)
     if (exactMatch(slashedLeaf, slashed)) {
-      return [slashedLeaf, [], urlFromEscaped(slashed, url.RawQuery)]
+      return [slashedLeaf, [], urlFromEscaped(slashed, target.RawQuery)]
     }
     return [leaf, matches, null]
   }
@@ -2647,26 +2543,16 @@ export function StripPrefix(prefix: string, handler: Handler | null): Handler {
     ServeHTTP(w, r) {
       // Strip the prefix from the path and the escaped path of a request copy.
       const req = $.pointerValue<Request | null>(r)
-      const urlPath = req?.URL?.Path
-      const rawPath = req?.URL?.RawPath ?? ''
-      const strippedPath =
-        typeof urlPath === 'string' && urlPath.startsWith(prefix) ?
-          urlPath.slice(prefix.length)
-        : urlPath
-      const strippedRawPath =
-        rawPath !== '' && rawPath.startsWith(prefix) ?
-          rawPath.slice(prefix.length)
-        : rawPath
+      const target = req?.URL
       if (
         req != null &&
-        req.URL != null &&
-        typeof urlPath === 'string' &&
-        strippedPath.length < urlPath.length &&
-        (rawPath === '' || strippedRawPath.length < rawPath.length)
+        target != null &&
+        target.Path.startsWith(prefix) &&
+        (target.RawPath === '' || target.RawPath.startsWith(prefix))
       ) {
         const reqCopy = req.Clone(req.Context())
-        reqCopy.URL.Path = strippedPath
-        reqCopy.URL.RawPath = strippedRawPath
+        reqCopy.URL.Path = target.Path.slice(prefix.length)
+        reqCopy.URL.RawPath = target.RawPath.slice(prefix.length)
         return handler?.ServeHTTP(w, reqCopy)
       }
       NotFound(w, req)
@@ -2679,7 +2565,7 @@ export function AllowQuerySemicolons(handler: Handler | null): Handler {
   return {
     ServeHTTP(w, r) {
       const req = $.pointerValue<Request | null>(r)
-      if (req?.URL?.RawQuery?.includes(';') === true) {
+      if (req?.URL?.RawQuery.includes(';') === true) {
         const reqCopy = req.Clone(req.Context())
         reqCopy.URL.RawQuery = req.URL.RawQuery.replaceAll(';', '&')
         return target.ServeHTTP(w, reqCopy)
@@ -3222,16 +3108,16 @@ export function ParseSetCookie(line: string): [Cookie | null, $.GoError] {
 
 export function NewRequest(
   method: string,
-  url: string,
+  rawURL: string,
   body: io.Reader | null,
 ): [Request | null, $.GoError] {
-  return NewRequestWithContext(context.Background(), method, url, body)
+  return NewRequestWithContext(context.Background(), method, rawURL, body)
 }
 
 export function NewRequestWithContext(
   ctx: context.Context,
   method: string,
-  url: string,
+  rawURL: string,
   body: io.Reader | null,
 ): [Request | null, $.GoError] {
   if (method === '') {
@@ -3246,10 +3132,11 @@ export function NewRequestWithContext(
   if (ctx == null) {
     return [null, errors.New('net/http: nil Context')]
   }
-  const [parsedURL, err] = parseRequestURL(url)
-  if (err != null || parsedURL == null) {
+  const [parsed, err] = url.Parse(rawURL)
+  if (err != null) {
     return [null, err]
   }
+  const parsedURL = $.pointerValue(parsed)
   const bodyInfo = requestBodyInfo(body, 0n)
   return [
     new Request({
@@ -3336,8 +3223,8 @@ export async function ReadRequest(
   if (!protoOK) {
     return [null, badHTTPMessageError(`malformed HTTP version ${proto}`)]
   }
-  const [url, urlErr] = parseRequestURL(requestURI)
-  if (urlErr != null || url == null) {
+  const [requestURL, urlErr] = url.ParseRequestURI(requestURI)
+  if (urlErr != null) {
     return [null, urlErr]
   }
   const host = Header_Get(parsed.header, 'Host')
@@ -3349,7 +3236,7 @@ export async function ReadRequest(
   return [
     new Request({
       Method: method,
-      URL: url,
+      URL: $.pointerValue(requestURL),
       Proto: proto,
       ProtoMajor: protoMajor,
       ProtoMinor: protoMinor,

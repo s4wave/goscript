@@ -1,6 +1,74 @@
 server: GET true 0 true 1 /?x=1
+server string: /?x=1
+server fields:   true  /  x=1   false
+server host:   false
+server redacted: /?x=1
+server escaped: /  /?x=1
+server parse: /d/e?k=v#top
+server resolve: /x/y
+server join: /z?x=1
+server marshal: /?x=1 true
 get status: 200
 recorded: true 2 false
+assigned: 1 example.com 8443 /x?y=1
 request uri: /a%2Fb/c?q=a/../b&n=5
+request string: /a%2Fb/c?q=a/../b&n=5
+request fields:   true  /a/b/c /a%2Fb/c q=a/../b&n=5   false
+request host:   false
+request redacted: /a%2Fb/c?q=a/../b&n=5
+request escaped: /a%2Fb/c  /a%2Fb/c?q=a/../b&n=5
+request parse: /d/e?k=v#top
+request resolve: /a%2Fb/x/y
+request join: /a%2Fb/c/z?q=a/../b&n=5
+request marshal: /a%2Fb/c?q=a/../b&n=5 true
 request uri: /a/b
+request string: /a/b
+request fields:   true  /a/b     false
+request host:   false
+request redacted: /a/b
+request escaped: /a/b  /a/b
+request parse: /d/e?k=v#top
+request resolve: /a/x/y
+request join: /a/b/z
+request marshal: /a/b true
 request uri: /
+request string: http://example.com
+request fields: http  true example.com      false
+request host: example.com  true
+request redacted: http://example.com
+request escaped:   /
+request parse: http://example.com/d/e?k=v#top
+request resolve: http://example.com/x/y
+request join: http://example.com/z
+request marshal: http://example.com true
+request uri: /p/q%20r?a=1&b=2
+request string: https://user:secret@example.com:8443/p/q%20r?a=1&b=2#frag%20x
+request fields: https  false example.com:8443 /p/q r  a=1&b=2 frag x  false
+request host: example.com 8443 true
+request redacted: https://user:xxxxx@example.com:8443/p/q%20r?a=1&b=2#frag%20x
+request escaped: /p/q%20r frag%20x /p/q%20r?a=1&b=2
+request parse: https://user:secret@example.com:8443/d/e?k=v#top
+request resolve: https://user:secret@example.com:8443/p/x/y
+request join: https://user:secret@example.com:8443/p/q%20r/z?a=1&b=2#frag%20x
+request marshal: https://user:secret@example.com:8443/p/q%20r?a=1&b=2#frag%20x true
+request uri: joe@example.com?subject=hi
+request string: mailto:joe@example.com?subject=hi
+request fields: mailto joe@example.com true    subject=hi   false
+request host:   true
+request redacted: mailto:joe@example.com?subject=hi
+request escaped:   joe@example.com?subject=hi
+request parse: mailto:///d/e?k=v#top
+request resolve: mailto:///x/y
+request join: mailto:joe@example.com?subject=hi
+request marshal: mailto:joe@example.com?subject=hi true
+request uri: /p?
+request string: http://example.com/p?
+request fields: http  true example.com /p     true
+request host: example.com  true
+request redacted: http://example.com/p?
+request escaped: /p  /p?
+request parse: http://example.com/d/e?k=v#top
+request resolve: http://example.com/x/y
+request join: http://example.com/p/z?
+request marshal: http://example.com/p? true
+bad target: true parse http://example.com/%zz invalid URL escape "%zz"

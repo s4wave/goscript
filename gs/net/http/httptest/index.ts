@@ -204,12 +204,10 @@ function serverRequest(request: http.Request): http.Request {
     Object.create(Object.getPrototypeOf(request)),
     request,
   ) as http.Request
-  const rawQuery = request.URL?.RawQuery ?? ''
-  const query = rawQuery === '' ? '' : `?${rawQuery}`
-  req.RequestURI = `${request.URL?.Path ?? '/'}${query}`
+  req.RequestURI = request.URL?.RequestURI() ?? '/'
   req.Host = request.Host === '' ? (request.URL?.Host ?? '') : request.Host
-  if (req.URL?.clone != null) {
-    req.URL = req.URL.clone()
+  if (request.URL != null) {
+    req.URL = request.URL.clone()
     req.URL.Scheme = ''
     req.URL.Host = ''
   }

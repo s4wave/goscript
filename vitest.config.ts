@@ -23,6 +23,20 @@ export default defineConfig({
           'tests/deps/crypto/index.ts',
         ),
       },
+      {
+        find: '@goscript/net/netip/index.js',
+        replacement: resolve(
+          fileURLToPath(new URL('.', import.meta.url)),
+          'tests/deps/net/netip/index.ts',
+        ),
+      },
+      {
+        find: '@goscript/net/url/index.js',
+        replacement: resolve(
+          fileURLToPath(new URL('.', import.meta.url)),
+          'tests/deps/net/url/index.ts',
+        ),
+      },
       // Map @goscript/*.js to gs/*.ts for existing handwritten sources
       {
         find: /^@goscript\/(.*)\.js$/,

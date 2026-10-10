@@ -916,7 +916,7 @@ describe('net/http override', () => {
       null,
     )
     expect(reqErr).toBeNull()
-    expect((req!.URL as any).Path).toBe('/')
+    expect(req!.URL.Path).toBe('')
     expect(req!.Host).toBe('example.invalid')
     expect(req!.RequestURI).toBe('')
 
