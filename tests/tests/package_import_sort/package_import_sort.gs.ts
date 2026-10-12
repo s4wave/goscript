@@ -171,6 +171,16 @@ export async function main(): globalThis.Promise<void> {
 	sort2.IntSlice_Swap(intSlice, 0, 2)
 	await $.println("IntSlice reverse and swap:", $.arrayIndex(intSlice!, 0), $.arrayIndex(intSlice!, 1), $.arrayIndex(intSlice!, 2))
 
+	// The slice passed to sort.Slice is a Go any, as from reflect.
+	let anySlice: any = $.interfaceValue($.arrayToSlice<number>([5, 4, 6]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))
+	let anyInts: $.Slice<number> = $.mustTypeAssert<$.Slice<number>>(anySlice, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))
+	await sort2.Slice(anySlice, $.functionValue((i: number, j: number): boolean => {
+		return $.arrayIndex(anyInts!, i) < $.arrayIndex(anyInts!, j)
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
+	await $.println("any slice sort:", $.arrayIndex(anyInts!, 0), $.arrayIndex(anyInts!, 1), $.arrayIndex(anyInts!, 2), await sort2.SliceIsSorted(anySlice, $.functionValue((i: number, j: number): boolean => {
+		return $.arrayIndex(anyInts!, i) < $.arrayIndex(anyInts!, j)
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))))
+
 	await $.println("test finished")
 }
 

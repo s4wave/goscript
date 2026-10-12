@@ -131,5 +131,11 @@ func main() {
 	intSlice.Swap(0, 2)
 	println("IntSlice reverse and swap:", intSlice[0], intSlice[1], intSlice[2])
 
+	// The slice passed to sort.Slice is a Go any, as from reflect.
+	var anySlice any = []int{5, 4, 6}
+	anyInts := anySlice.([]int)
+	sort.Slice(anySlice, func(i, j int) bool { return anyInts[i] < anyInts[j] })
+	println("any slice sort:", anyInts[0], anyInts[1], anyInts[2], sort.SliceIsSorted(anySlice, func(i, j int) bool { return anyInts[i] < anyInts[j] }))
+
 	println("test finished")
 }

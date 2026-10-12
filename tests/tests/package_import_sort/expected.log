@@ -20,4 +20,5 @@ StringSlice sort: a b c 1
 Float64Slice sort: 2 true 1
 IntSlice interface sort: 1 2 3 3
 IntSlice reverse and swap: 1 2 3
+any slice sort: 4 5 6 true
 test finished
