@@ -1,0 +1,23 @@
+slice index 0
+slice index 1
+slice 0 a
+slice 1 b
+int 0
+int 1
+int 2
+string 0 104
+string 1 233
+string 3 33
+map x 1
+chan 5
+chan 6
+recv 8 true
+recv closed 0 false
+true <-chan
+true false true false
+true false
+func 7
+func 9
+slice3 1 2 2
+nil embedded true
+embedded 9 true

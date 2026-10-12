@@ -2,6 +2,7 @@
   "dependencies": ["iter"],
   "asyncMethods": {
     "Value.Call": true,
-    "Value.CallSlice": true
+    "Value.CallSlice": true,
+    "Value.Recv": true
   }
 }

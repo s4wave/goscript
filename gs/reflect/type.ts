@@ -14,6 +14,8 @@ import {
   structFieldRuntimeKey,
 } from '../builtin/type.js'
 import { Zero } from './value.js'
+import { valueSeq, valueSeq2 } from './iter.js'
+import type * as iter from '@goscript/iter/index.js'
 import { DeepEqual } from './deepequal.js'
 import * as $ from '../builtin/index.js'
 
@@ -138,13 +140,13 @@ export const BothDir: ChanDir = 3
 export function ChanDir_String(d: ChanDir): string {
   switch (d) {
     case RecvDir:
-      return 'RecvDir'
+      return '<-chan'
     case SendDir:
-      return 'SendDir'
+      return 'chan<-'
     case BothDir:
-      return 'BothDir'
+      return 'chan'
     default:
-      return 'ChanDir(' + d + ')'
+      return 'ChanDir' + d
   }
 }
 
@@ -412,6 +414,82 @@ export interface Type {
 
   // Comparable reports whether values of this type are comparable.
   Comparable(): boolean
+
+  // ChanDir returns a channel type's direction.
+  // Panics if the type's Kind is not Chan.
+  ChanDir(): ChanDir
+
+  // CanSeq reports whether a Value with this type can be iterated over
+  // using Value.Seq.
+  CanSeq(): boolean
+
+  // CanSeq2 reports whether a Value with this type can be iterated over
+  // using Value.Seq2.
+  CanSeq2(): boolean
+}
+
+// nonChanTypePanic panics for ChanDir on a type that is not a channel.
+function nonChanTypePanic(t: Type): never {
+  throw new Error(`reflect: ChanDir of non-chan type ${t.String()}`)
+}
+
+// canRangeFunc reports whether t is a func(yield func(...) bool) type
+// whose yield function takes n arguments, as used by range over func.
+function canRangeFunc(t: Type, n: number): boolean {
+  if (t.Kind() !== Func || t.NumIn() !== 1 || t.NumOut() !== 0) {
+    return false
+  }
+  const y = t.In(0)
+  return (
+    y.Kind() === Func &&
+    y.NumIn() === n &&
+    y.NumOut() === 1 &&
+    y.Out(0).Kind() === Bool
+  )
+}
+
+// typeCanSeq implements Type.CanSeq.
+function typeCanSeq(t: Type): boolean {
+  switch (t.Kind()) {
+    case Int:
+    case Int8:
+    case Int16:
+    case Int32:
+    case Int64:
+    case Uint:
+    case Uint8:
+    case Uint16:
+    case Uint32:
+    case Uint64:
+    case Uintptr:
+    case Array:
+    case Slice:
+    case Chan:
+    case String:
+    case Map:
+      return true
+    case Func:
+      return canRangeFunc(t, 1)
+    case Ptr:
+      return t.Elem().Kind() === Array
+  }
+  return false
+}
+
+// typeCanSeq2 implements Type.CanSeq2.
+function typeCanSeq2(t: Type): boolean {
+  switch (t.Kind()) {
+    case Array:
+    case Slice:
+    case String:
+    case Map:
+      return true
+    case Func:
+      return canRangeFunc(t, 2)
+    case Ptr:
+      return t.Elem().Kind() === Array
+  }
+  return false
 }
 
 function nonFunctionTypePanic(method: string, t: Type): never {
@@ -501,6 +579,18 @@ class InvalidTypeClass implements Type {
   }
   Bits(): number {
     throw new Error('reflect: Bits of invalid type')
+  }
+
+  public ChanDir(): ChanDir {
+    return nonChanTypePanic(this)
+  }
+
+  public CanSeq(): boolean {
+    return typeCanSeq(this)
+  }
+
+  public CanSeq2(): boolean {
+    return typeCanSeq2(this)
   }
 }
 const invalidTypeInstance = new InvalidTypeClass()
@@ -797,6 +887,56 @@ export class Value {
     throw new ValueError({ Kind: this.Kind(), Method: 'Slice' })
   }
 
+  // Slice3 is the 3-index form of the slice operation: it returns v[i:j:k].
+  public Slice3(i: number, j: number, k: number): Value {
+    const value = this.currentValue()
+    if (
+      (this.Kind() !== Slice && this.Kind() !== Array) ||
+      (value !== null && typeof value !== 'object')
+    ) {
+      throw new ValueError({ Kind: this.Kind(), Method: 'Slice3' })
+    }
+    const capacity = $.cap(value as $.Slice<unknown>)
+    if (i < 0 || j < i || k < j || k > capacity) {
+      throw new Error(
+        `reflect.Value.Slice3: slice index out of bounds [${i}:${j}:${k}] with capacity ${capacity}`,
+      )
+    }
+    const typ = this.Kind() === Array ? SliceOf(this._type.Elem()) : this._type
+    return new Value($.goSlice(value as $.Slice<unknown>, i, j, k), typ)
+  }
+
+  // Recv receives and returns a value from the channel v. It blocks until a
+  // value is ready. The boolean is false if the value is the zero value
+  // received because the channel is closed.
+  public async Recv(): Promise<[Value, boolean]> {
+    if (this.Kind() !== Chan) {
+      throw new ValueError({ Kind: this.Kind(), Method: 'Recv' })
+    }
+    if (this._type.ChanDir() === SendDir) {
+      throw new Error('reflect: recv on send-only channel')
+    }
+    const result = await $.chanRecvWithOk(
+      this.currentValue() as $.Channel<ReflectValue> | null,
+    )
+    if (!result.ok) {
+      return [Zero(this._type.Elem()), false]
+    }
+    return [new Value(result.value, this._type.Elem()), true]
+  }
+
+  // Seq returns an iter.Seq[Value] that loops over the elements of v, as a
+  // range loop would.
+  public Seq(): iter.Seq<Value> {
+    return valueSeq(this)
+  }
+
+  // Seq2 returns an iter.Seq2[Value, Value] that loops over the elements of
+  // v, as a range loop with two variables would.
+  public Seq2(): iter.Seq2<Value, Value> {
+    return valueSeq2(this)
+  }
+
   public Bytes(): $.Slice<number> {
     const value = this.currentValue()
     if (
@@ -840,6 +980,13 @@ export class Value {
     if (this._type.Kind() === Interface) {
       return ValueOf(this._value)
     }
+    if (this._type.Kind() === Ptr) {
+      // A pointer to a struct is the struct object itself.
+      if (this._value === null || this._value === undefined) {
+        return new Value()
+      }
+      return new Value(this._value, this._type.Elem())
+    }
     return new Value(this._value, this._type, this._parentVarRef)
   }
 
@@ -874,6 +1021,35 @@ export class Value {
       current = current.Field(fieldIndex)
     }
     return current
+  }
+
+  // FieldByIndexErr returns the nested field corresponding to index, or an
+  // error if evaluation requires stepping through a nil pointer to an
+  // embedded struct.
+  public FieldByIndexErr(index: $.Slice<number>): [Value, $.GoError] {
+    let current: Value = this
+    let i = 0
+    for (const fieldIndex of $.asArray(index)) {
+      if (
+        i > 0 &&
+        current.Kind() === Ptr &&
+        current.Type().Elem().Kind() === Struct
+      ) {
+        if (current.IsNil()) {
+          return [
+            new Value(),
+            $.newError(
+              'reflect: indirection through nil pointer to embedded struct field ' +
+                current.Type().Elem().Name(),
+            ),
+          ]
+        }
+        current = current.Elem()
+      }
+      current = current.Field(fieldIndex)
+      i++
+    }
+    return [current, null]
   }
 
   public FieldByName(name: string): Value {
@@ -1771,6 +1947,18 @@ export class BasicType implements Type {
         )
     }
   }
+
+  public ChanDir(): ChanDir {
+    return nonChanTypePanic(this)
+  }
+
+  public CanSeq(): boolean {
+    return typeCanSeq(this)
+  }
+
+  public CanSeq2(): boolean {
+    return typeCanSeq2(this)
+  }
 }
 
 // Slice type implementation
@@ -1900,6 +2088,18 @@ class SliceType implements Type {
   public Bits(): number {
     throw new Error('reflect: call of reflect.Type.Bits on slice Type')
   }
+
+  public ChanDir(): ChanDir {
+    return nonChanTypePanic(this)
+  }
+
+  public CanSeq(): boolean {
+    return typeCanSeq(this)
+  }
+
+  public CanSeq2(): boolean {
+    return typeCanSeq2(this)
+  }
 }
 
 // Array type implementation
@@ -2027,6 +2227,18 @@ class ArrayType implements Type {
 
   public Bits(): number {
     throw new Error('reflect: call of reflect.Type.Bits on array Type')
+  }
+
+  public ChanDir(): ChanDir {
+    return nonChanTypePanic(this)
+  }
+
+  public CanSeq(): boolean {
+    return typeCanSeq(this)
+  }
+
+  public CanSeq2(): boolean {
+    return typeCanSeq2(this)
   }
 }
 
@@ -2167,6 +2379,18 @@ class PointerType implements Type {
 
   public Bits(): number {
     throw new Error('reflect: call of reflect.Type.Bits on pointer Type')
+  }
+
+  public ChanDir(): ChanDir {
+    return nonChanTypePanic(this)
+  }
+
+  public CanSeq(): boolean {
+    return typeCanSeq(this)
+  }
+
+  public CanSeq2(): boolean {
+    return typeCanSeq2(this)
   }
 }
 
@@ -2377,6 +2601,18 @@ class FunctionType implements Type {
 
   public Bits(): number {
     throw new Error('reflect: call of reflect.Type.Bits on func Type')
+  }
+
+  public ChanDir(): ChanDir {
+    return nonChanTypePanic(this)
+  }
+
+  public CanSeq(): boolean {
+    return typeCanSeq(this)
+  }
+
+  public CanSeq2(): boolean {
+    return typeCanSeq2(this)
   }
 }
 
@@ -2742,6 +2978,18 @@ class MapType implements Type {
 
   public Bits(): number {
     throw new Error('reflect: call of reflect.Type.Bits on map Type')
+  }
+
+  public ChanDir(): ChanDir {
+    return nonChanTypePanic(this)
+  }
+
+  public CanSeq(): boolean {
+    return typeCanSeq(this)
+  }
+
+  public CanSeq2(): boolean {
+    return typeCanSeq2(this)
   }
 }
 
@@ -3571,6 +3819,18 @@ class StructType implements Type {
     }
     return new BasicType(Invalid, 'unknown', 8)
   }
+
+  public ChanDir(): ChanDir {
+    return nonChanTypePanic(this)
+  }
+
+  public CanSeq(): boolean {
+    return typeCanSeq(this)
+  }
+
+  public CanSeq2(): boolean {
+    return typeCanSeq2(this)
+  }
 }
 
 function basicTypeFromName(name: string, typeName = ''): BasicType {
@@ -3838,6 +4098,14 @@ class ChannelType implements Type {
   public Bits(): number {
     throw new Error('reflect: call of reflect.Type.Bits on chan Type')
   }
+
+  public CanSeq(): boolean {
+    return typeCanSeq(this)
+  }
+
+  public CanSeq2(): boolean {
+    return typeCanSeq2(this)
+  }
 }
 
 // Interface type implementation
@@ -3994,6 +4262,18 @@ class InterfaceType implements Type {
 
   public methodSignatures(): $.MethodSignature[] {
     return this._methods
+  }
+
+  public ChanDir(): ChanDir {
+    return nonChanTypePanic(this)
+  }
+
+  public CanSeq(): boolean {
+    return typeCanSeq(this)
+  }
+
+  public CanSeq2(): boolean {
+    return typeCanSeq2(this)
   }
 }
 
@@ -4976,17 +5256,6 @@ export function getInterfaceLiteralTypeByName(name: string): Type {
     return interfaceTypeFromInfo(typeInfo)
   }
   return new InterfaceType('interface{}')
-}
-
-// canRangeFunc Additional functions from merged files.
-export function canRangeFunc(t: Type): boolean {
-  const kind = t.Kind()
-  return kind === Slice || kind === Array || kind === String
-}
-
-export function canRangeFunc2(t: Type): boolean {
-  const kind = t.Kind()
-  return kind === Map
 }
 
 export function funcLayout(
