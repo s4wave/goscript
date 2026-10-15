@@ -587,11 +587,14 @@ export function sliceToArrayPointer<T>(
  * isComplexSlice identifies slices with explicit backing-window metadata.
  */
 function isComplexSlice<T>(slice: unknown): slice is SliceProxy<T> {
-  // sliceMeta reads the window of a proxy without its has trap.
+  // A window object is one, tested first without reading __meta__ (see
+  // sliceLen), and sliceMeta reads the window of a proxy without its has
+  // trap.
   return (
-    slice !== null &&
-    typeof slice === 'object' &&
-    sliceMeta(slice) !== undefined
+    slice instanceof GoSlice ||
+    (slice !== null &&
+      typeof slice === 'object' &&
+      sliceMeta(slice) !== undefined)
   )
 }
 
@@ -1234,7 +1237,24 @@ export function appendOne<T>(
   value: unknown,
   zeroHint?: unknown,
 ): Slice<T> {
-  if (slice !== null && slice !== undefined) {
+  // A window object with spare capacity takes the value in place, tested
+  // first without reading __meta__ (see sliceLen); a plain array has none.
+  if (slice instanceof GoSlice) {
+    if (slice.length < slice.capacity) {
+      slice.backing[slice.offset + slice.length] = value as T
+      return sliceProxyFromBacking(
+        slice.backing,
+        slice.offset,
+        slice.length + 1,
+        slice.capacity,
+      )
+    }
+  } else if (
+    slice !== null &&
+    slice !== undefined &&
+    !(Array.isArray(slice) && (slice as any).__meta__ === undefined)
+  ) {
+    // Another slice with a window, such as a slice proxy.
     const meta = sliceMeta(slice)
     if (meta !== undefined && meta.length < meta.capacity) {
       meta.backing[meta.offset + meta.length] = value as T
@@ -1246,6 +1266,8 @@ export function appendOne<T>(
       )
     }
   }
+
+  // Otherwise append grows the slice.
   if (zeroHint === undefined) {
     return append(slice, value)
   }
@@ -1833,13 +1855,35 @@ export function indexRef<T>(
   if (collection === null || collection === undefined) {
     runtimePanic('runtime error: index on nil or undefined collection')
   }
+
+  // A window object and a plain array are the common cases, tested first
+  // without reading __meta__ (see sliceLen).
+  if (collection instanceof GoSlice) {
+    if (index < 0 || index >= collection.length) {
+      outOfRangeIndex(index, collection.length)
+    }
+    return new SliceIndexReference(
+      collection,
+      index,
+      collection.backing,
+      collection.offset + index,
+    )
+  }
+  if (Array.isArray(collection) && (collection as any).__meta__ === undefined) {
+    if (index < 0 || index >= collection.length) {
+      outOfRangeIndex(index, collection.length)
+    }
+    return new ArrayIndexReference(collection, index)
+  }
+
+  // A byte array, a slice proxy or another array.
   if (collection instanceof Uint8Array) {
     if (index < 0 || index >= collection.length) {
       outOfRangeIndex(index, collection.length)
     }
     return new ArrayIndexReference(collection as unknown as T[], index)
   }
-  if (isComplexSlice(collection)) {
+  if (isComplexSlice<T>(collection)) {
     if (index < 0 || index >= collection.__meta__.length) {
       outOfRangeIndex(index, collection.__meta__.length)
     }
