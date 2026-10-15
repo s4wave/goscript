@@ -98,6 +98,23 @@ func main() {
 		v[0] = 9
 	}
 	println("array copy", boxedArray.([2]int)[0])
+
+	// A nil case matches only a nil interface, not a typed nil.
+	var nilPtr *RawValue
+	for _, v := range []any{nil, nilPtr, 5} {
+		switch v.(type) {
+		case nil:
+			println("nil case")
+		case *RawValue:
+			println("typed nil case")
+		default:
+			println("non-nil case")
+		}
+		switch v := v.(type) {
+		case nil, int:
+			println("nil or int", v == nil)
+		}
+	}
 }
 
 func getInterface() any {

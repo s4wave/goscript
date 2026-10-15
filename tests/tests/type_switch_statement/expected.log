@@ -13,3 +13,8 @@ oid 3 1 true
 raw 9 true
 struct copy 1
 array copy 1
+nil case
+nil or int true
+typed nil case
+non-nil case
+nil or int false

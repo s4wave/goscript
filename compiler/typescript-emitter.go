@@ -1542,20 +1542,20 @@ func renderTypeSwitchCase(b *strings.Builder, varName string, varRef bool, switc
 	}
 	writeIndent(b, indent)
 	b.WriteString("case ")
-	if len(switchCase.types) == 1 {
-		b.WriteString("$.typeAssert<")
-		b.WriteString(typeSwitchAssertType(switchCase, 0))
-		b.WriteString(">(" + typeSwitchValueName + ", ")
-		b.WriteString(switchCase.types[0])
-		b.WriteString(").ok")
-	} else {
-		for idx, typ := range switchCase.types {
-			if idx != 0 {
-				b.WriteString(" || ")
-			}
-			b.WriteString("$.is(" + typeSwitchValueName + ", ")
-			b.WriteString(typ)
-			b.WriteString(")")
+	for idx, typ := range switchCase.types {
+		if idx != 0 {
+			b.WriteString(" || ")
+		}
+		switch {
+		case typ == typeSwitchNilCase:
+			// A typed nil is boxed as an object, so only a nil interface is null.
+			b.WriteString(typeSwitchValueName + " == null")
+		case len(switchCase.types) == 1:
+			b.WriteString("$.typeAssert<")
+			b.WriteString(typeSwitchAssertType(switchCase, 0))
+			b.WriteString(">(" + typeSwitchValueName + ", " + typ + ").ok")
+		default:
+			b.WriteString("$.is(" + typeSwitchValueName + ", " + typ + ")")
 		}
 	}
 	b.WriteString(":\n")

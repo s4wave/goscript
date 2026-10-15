@@ -8476,6 +8476,11 @@ func (o *LoweringOwner) lowerTypeSwitchStmt(ctx lowerFileContext, stmt *ast.Type
 		tsTypes := make([]string, 0, len(clause.List))
 		for _, expr := range clause.List {
 			typ := ctx.semPkg.source.TypesInfo.TypeOf(expr)
+			if isUntypedNilType(typ) {
+				types = append(types, typeSwitchNilCase)
+				tsTypes = append(tsTypes, "any")
+				continue
+			}
 			types = append(types, o.runtimeTypeAssertInfoExpr(ctx, typ))
 			if typ == nil {
 				tsTypes = append(tsTypes, "any")
@@ -8484,7 +8489,7 @@ func (o *LoweringOwner) lowerTypeSwitchStmt(ctx lowerFileContext, stmt *ast.Type
 			}
 		}
 		binding := typeSwitchValueName
-		if len(clause.List) == 1 {
+		if len(clause.List) == 1 && types[0] != typeSwitchNilCase {
 			typ := ctx.semPkg.source.TypesInfo.TypeOf(clause.List[0])
 			binding = o.lowerTypeSwitchBinding(typ, tsTypes[0], types[0])
 		}

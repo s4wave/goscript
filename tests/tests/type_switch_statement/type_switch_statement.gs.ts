@@ -251,6 +251,43 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	await $.println("array copy", $.arrayIndex($.mustTypeAssert<number[]>(boxedArray, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), 0))
+
+	// A nil case matches only a nil interface, not a typed nil.
+	let nilPtr: RawValue | $.VarRef<RawValue> | null = null! as RawValue | $.VarRef<RawValue> | null
+	for (let __goscriptRangeTarget2 = $.arrayToSlice<any>([null, $.interfaceValue(nilPtr, "*main.RawValue", /* @__PURE__ */ $.pointerType("main.RawValue")), $.basicInterfaceValue(5, "int")]), __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
+		let v = (__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as any)
+		{
+			const __goscriptTypeSwitchValue = v
+			switch (true) {
+				case __goscriptTypeSwitchValue == null:
+					{
+						await $.println("nil case")
+					}
+					break
+				case $.typeAssert<RawValue | $.VarRef<RawValue> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.RawValue")).ok:
+					{
+						await $.println("typed nil case")
+					}
+					break
+				default:
+					{
+						await $.println("non-nil case")
+					}
+					break
+			}
+		}
+		{
+			const __goscriptTypeSwitchValue = v
+			switch (true) {
+				case __goscriptTypeSwitchValue == null || $.is(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int")):
+					{
+						let v = __goscriptTypeSwitchValue
+						await $.println("nil or int", v == null)
+					}
+					break
+			}
+		}
+	}
 }
 
 export function getInterface(): any {

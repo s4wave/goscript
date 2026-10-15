@@ -291,9 +291,14 @@ type loweredTypeSwitch struct {
 // typeSwitchValueName holds a type switch operand, evaluated once.
 const typeSwitchValueName = "__goscriptTypeSwitchValue"
 
-// loweredTypeSwitchCase is one clause of a type switch. binding is the value
-// the case variable takes: the narrowed copy for a one-type case, or the operand
-// itself when the clause lists several types.
+// typeSwitchNilCase stands in a case's types for the nil alternative, which
+// matches only a nil interface operand.
+const typeSwitchNilCase = "null"
+
+// loweredTypeSwitchCase is one clause of a type switch. types holds the runtime
+// type info of each alternative, or typeSwitchNilCase for nil. binding is the
+// value the case variable takes: the narrowed copy for a one-type case, or the
+// operand itself when the clause lists several types or nil.
 type loweredTypeSwitchCase struct {
 	types   []string
 	tsTypes []string
