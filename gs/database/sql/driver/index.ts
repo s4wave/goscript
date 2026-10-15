@@ -499,8 +499,21 @@ function parseBoolValue(value: string, quoted: string): [Value, $.GoError] {
   }
 }
 
+// byteSliceType is the dynamic type of a []byte boxed in an interface.
+const byteSliceType = $.sliceType($.basicType('uint8'))
+
+// isBytes reports whether v is a []byte: a byte array, or a slice boxed as
+// []byte, whose backing may be a number array.
 function isBytes(v: any): v is $.Bytes {
-  return v instanceof Uint8Array
+  if (v instanceof Uint8Array) {
+    return true
+  }
+  return (
+    v !== null &&
+    typeof v === 'object' &&
+    typeof v.__goType === 'string' &&
+    $.typeAssert(v, byteSliceType).ok
+  )
 }
 
 function isIntegerLike(v: any): boolean {
@@ -554,6 +567,9 @@ function isReflectPointer(v: any): boolean {
 }
 
 function guardReflectValue(fn: string, v: any): void {
+  if (isBytes(v)) {
+    return
+  }
   if (isReflectPointer(v)) {
     unsupportedReflect(fn, 'pointer')
   }

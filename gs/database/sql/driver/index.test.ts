@@ -17,7 +17,10 @@ import {
   RowsColumnScanner,
   String,
 } from './index.js'
-import { NewScanContext, ScanContextValue } from '@goscript/database/sql/internal/index.js'
+import {
+  NewScanContext,
+  ScanContextValue,
+} from '@goscript/database/sql/internal/index.js'
 import { ScanContext } from './index.js'
 
 function expectGoErrorThrow(fn: () => unknown, message: string): void {
@@ -43,6 +46,24 @@ describe('database/sql/driver override', () => {
     expect(IsValue(new time.Time())).toBe(true)
     expect(IsScanValue('scan')).toBe(true)
     expect(IsValue({ unsupported: true })).toBe(false)
+  })
+
+  it('accepts a []byte window boxed as an argument', () => {
+    const window = $.goSlice([1, 2, 3, 4], 1, 3)
+    const arg = $.interfaceValue(
+      window,
+      '[]byte',
+      $.sliceType($.basicType('uint8')),
+    )
+    expect(IsValue(arg)).toBe(true)
+    expect(DefaultParameterConverter.ConvertValue(arg)).toEqual([arg, null])
+    expect(String.ConvertValue(arg)).toEqual([arg, null])
+    const one = $.interfaceValue(
+      $.goSlice([0x31]),
+      '[]byte',
+      $.sliceType($.basicType('uint8')),
+    )
+    expect(Bool.ConvertValue(one)).toEqual([true, null])
   })
 
   it('converts supported Bool, String, and Int32 inputs', () => {
