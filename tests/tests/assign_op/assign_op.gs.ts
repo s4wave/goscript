@@ -60,6 +60,21 @@ export async function main(): globalThis.Promise<void> {
 	let m = 10
 	m -= 3
 	await $.println(m)
+
+	// Bitwise assignments to a uint32 with its high bit set keep it unsigned.
+	let n = 1
+	n = (n ^ (0x80000000)) >>> 0
+	await $.println(n)
+	n = (n | (2)) >>> 0
+	await $.println(n)
+	n = (n & (0xfffffffe)) >>> 0
+	await $.println(n)
+	n = (n & ~((2))) >>> 0
+	await $.println(n)
+	let flags: {"bits": number} = $.anonymousStructValue({"bits": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("bits", /* @__PURE__ */ $.basicType("uint32"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/assign_op" })] })
+	flags.bits = 0xf0000000
+	flags.bits = (flags.bits | (1)) >>> 0
+	await $.println(flags.bits)
 }
 
 if ($.isMainScript(import.meta)) {

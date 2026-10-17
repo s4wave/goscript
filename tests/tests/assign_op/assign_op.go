@@ -57,4 +57,19 @@ func main() {
 	var m int = 10
 	m -= 1 + 2
 	println(m) // Expected output: 7
+
+	// Bitwise assignments to a uint32 with its high bit set keep it unsigned.
+	var n uint32 = 1
+	n ^= 0x80000000
+	println(n) // Expected output: 2147483649
+	n |= 2
+	println(n) // Expected output: 2147483651
+	n &= 0xfffffffe
+	println(n) // Expected output: 2147483650
+	n &^= 2
+	println(n) // Expected output: 2147483648
+	var flags struct{ bits uint32 }
+	flags.bits = 0xf0000000
+	flags.bits |= 1
+	println(flags.bits) // Expected output: 4026531841
 }
