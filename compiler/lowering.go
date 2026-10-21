@@ -6062,6 +6062,13 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 		// field, so a value of the same type is not copied first.
 		uncopied := right
 		right = o.lowerValueForTarget(ctx, stmt.Rhs[idx], targetType, right)
+
+		// A number shifted by a 64-bit count, a bigint, takes the count as a
+		// number, since JavaScript does not mix the two in a shift.
+		if (stmt.Tok == token.SHL_ASSIGN || stmt.Tok == token.SHR_ASSIGN) && !isRuntimeWideIntegerType(targetType) &&
+			isBigIntBackedType(ctx.semPkg.source.TypesInfo.TypeOf(stmt.Rhs[idx])) {
+			right = "globalThis.Number(" + right + ")"
+		}
 		if targetType != nil && genericCallResultUsesTypeParam(ctx, stmt.Rhs[idx]) {
 			right = "(" + right + " as " + o.tsTypeFor(ctx, targetType) + ")"
 			uncopied = "(" + uncopied + " as " + o.tsTypeFor(ctx, targetType) + ")"
@@ -11774,9 +11781,15 @@ func (o *LoweringOwner) lowerWideShiftExpr(ctx lowerFileContext, expr *ast.Binar
 		}
 	}
 
+	// A constant count is a number, which the helpers take as a shared
+	// bigint count or power of two from a table.
+	amount, constantAmount := constantShiftAmount(ctx, expr.Y)
+	if constantAmount {
+		right = strconv.Itoa(amount)
+	}
+
 	// One shifted left by a variable count, as a bit flag mask 1<<f, is a
 	// single bit, which the runtime takes from a table of bigints.
-	amount, constantAmount := constantShiftAmount(ctx, expr.Y)
 	if !constantAmount && expr.Op == token.SHL && isOneIntegerExpr(ctx, expr.X) {
 		bit := wideIntegerHelper(signed, RuntimeHelperUint64Bit, RuntimeHelperInt64Bit)
 		return wrap(o.runtimeOwner.QualifiedHelper(bit) + "(" + right + ")")

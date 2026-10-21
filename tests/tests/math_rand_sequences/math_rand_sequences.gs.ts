@@ -26,7 +26,7 @@ export class lcg {
 		const l: lcg | $.VarRef<lcg> | null = this;
 		const l$: lcg = l == null ? $.pointerTarget<lcg>(l) : (l as any).__isVarRef === true ? (l as any).value : (l as any).__goValue === undefined ? (l as any) : $.pointerTarget<lcg>(l);
 		;(l$ as lcg).x = $.uint64Add(($.uint64Mul((l$ as lcg).x, 6364136223846793005n)), 1442695040888963407n)
-		return $.int64($.uint64Shr((l$ as lcg).x, 1n))
+		return $.int64($.uint64Shr((l$ as lcg).x, 1))
 	}
 
 	public Seed(seed: bigint): void {

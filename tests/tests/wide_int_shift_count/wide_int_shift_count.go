@@ -20,4 +20,20 @@ func main() {
 	var w uint16 = 1
 	w <<= uint16(s) // compound shift-assign: count coerces via $.uint
 	println("uint16-shlassign", w)
+
+	// A compound shift of a number by a 64-bit count takes the count as a
+	// number as well.
+	var k int64 = 2
+	x := 5
+	x <<= k
+	x >>= s
+	var u32 uint32 = 0x80000000
+	u32 >>= k
+	println("number-shiftassign-by-int64", x, u32)
+
+	// 64-bit values shift by constant counts.
+	var wide uint64 = 0xfedcba9876543210
+	var signed int64 = -0x123456789abcdef
+	println("uint64-const", wide>>1, wide>>12, wide>>63, wide<<4, wide<<63)
+	println("int64-const", signed>>1, signed>>12, signed>>63, signed<<4)
 }
