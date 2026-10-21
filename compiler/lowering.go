@@ -6263,8 +6263,14 @@ func lowerCompoundAssignValue(
 	case token.XOR_ASSIGN:
 		return wrapUint32(left + " ^ " + right)
 	case token.SHL_ASSIGN:
+		if value, ok := lowerNarrowShiftAssignValue(runtimeOwner, targetType, left, right, tok, wrapNarrow); ok {
+			return value
+		}
 		return wrapNarrow(left + " << " + right)
 	case token.SHR_ASSIGN:
+		if value, ok := lowerNarrowShiftAssignValue(runtimeOwner, targetType, left, right, tok, wrapNarrow); ok {
+			return value
+		}
 		if bits, ok := unsignedIntegerBits(targetType); ok && bits <= 32 {
 			return "(" + left + " >>> " + right + ") >>> 0"
 		}
@@ -9788,6 +9794,10 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 			// uintShr paths above already ran, so the base here is number-backed:
 			// coerce the bigint count to Number to match Go's count semantics.
 			right = "globalThis.Number(" + right + ")"
+		}
+		// Narrow integers shifted by counts that may be 32 or more shift all bits out.
+		if value, ok := o.lowerNarrowShiftExpr(ctx, typed, left, right); ok {
+			return value, append(leftDiagnostics, rightDiagnostics...)
 		}
 		if typed.Op == token.ADD || typed.Op == token.SUB || typed.Op == token.SHL {
 			if value, ok := wrapNarrowIntegerValue(ctx.semPkg.source.TypesInfo.TypeOf(typed), left+" "+typed.Op.String()+" "+right, typed.Op); ok {
