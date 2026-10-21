@@ -78,7 +78,7 @@ export function __goscript_set_pt(__goscriptValue: T): void {
 
 export function fieldValue(obj: any, fld: reflect.StructField): reflect.Value {
 	let ov = $.markAsStructValue($.cloneStructValue(reflect.ValueOf(obj)))
-	let f = ($.uint($.uint64Add($.markAsStructValue($.cloneStructValue(ov)).Pointer(), fld.Offset), 64) as any)
+	let f = ($.wideUintAdd($.markAsStructValue($.cloneStructValue(ov)).Pointer(), fld.Offset) as any)
 	return $.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(fld.Type)!, f)))
 }
 
@@ -96,7 +96,7 @@ export async function newAtOffsets(): globalThis.Promise<void> {
 	let [sf, ] = await (typ !== null && (typ as any).__isVarRef !== true && ((typ as any).__goValue === undefined || (typ as any).__goType?.charCodeAt(0) !== 42) ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).FieldByName("S")
 	let [yf, ] = await $.pointerValue<Exclude<reflect.Type, null>>(sf.Type).FieldByName("Y")
 	let ov = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(pt, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(yf.Type)!, ($.uint($.uint64Add(($.uint($.uint64Add($.markAsStructValue($.cloneStructValue(ov)).Pointer(), sf.Offset), 64)), yf.Offset), 64) as any)))).Elem())).SetString("sub")
+	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(yf.Type)!, ($.wideUintAdd(($.wideUintAdd($.markAsStructValue($.cloneStructValue(ov)).Pointer(), sf.Offset)), yf.Offset) as any)))).Elem())).SetString("sub")
 	await $.println("newat-offset:", pt.value.S.Y)
 
 	let local = new T()

@@ -1323,6 +1323,138 @@ export function int64Xor(
   return int64Result(int64Value(left) ^ int64Value(right))
 }
 
+// The wideUint helpers compute the operations of uint and uintptr, which are
+// numbers up to 2^53 - 1 and bigints above (see uint). Operands that are both
+// numbers, with a result that is too, are computed as numbers, without
+// converting them to bigints and back, which the uint64 helpers need.
+const twoTo32 = 4294967296
+
+export function wideUintAdd(left: number | bigint, right: number | bigint): number {
+  // A sum of two numbers is exact up to 2^53 - 1, and a sum above rounds to at
+  // least 2^53.
+  if (typeof left === 'number' && typeof right === 'number') {
+    const sum = left + right
+    if (sum <= Number.MAX_SAFE_INTEGER) {
+      return sum
+    }
+  }
+  return uint(uint64Add(left, right), 64)
+}
+
+export function wideUintSub(left: number | bigint, right: number | bigint): number {
+  // A difference of two numbers that is not negative is exact; a negative one
+  // wraps around 2^64.
+  if (typeof left === 'number' && typeof right === 'number' && left >= right) {
+    return left - right
+  }
+  return uint(uint64Sub(left, right), 64)
+}
+
+export function wideUintMul(left: number | bigint, right: number | bigint): number {
+  // A product of two numbers is exact up to 2^53 - 1, and a product above
+  // rounds to at least 2^53.
+  if (typeof left === 'number' && typeof right === 'number') {
+    const product = left * right
+    if (product <= Number.MAX_SAFE_INTEGER) {
+      return product
+    }
+  }
+  return uint(uint64Mul(left, right), 64)
+}
+
+export function wideUintDiv(left: number | bigint, right: number | bigint): number {
+  // The remainder is exact, so left less it is a multiple of right whose
+  // quotient is exact. Division by zero panics in uint64Div.
+  if (typeof left === 'number' && typeof right === 'number' && right !== 0) {
+    return (left - (left % right)) / right
+  }
+  return uint(uint64Div(left, right), 64)
+}
+
+export function wideUintMod(left: number | bigint, right: number | bigint): number {
+  // The remainder of two numbers is exact.
+  if (typeof left === 'number' && typeof right === 'number' && right !== 0) {
+    return left % right
+  }
+  return uint(uint64Mod(left, right), 64)
+}
+
+export function wideUintAnd(left: number | bigint, right: number | bigint): number {
+  // Numbers combine their low 32 bits with the bitwise operator, and their
+  // high bits, below 2^21, by dividing.
+  if (typeof left === 'number' && typeof right === 'number') {
+    if (left <= 0xffffffff && right <= 0xffffffff) {
+      return (left & right) >>> 0
+    }
+    const high = Math.floor(left / twoTo32) & Math.floor(right / twoTo32)
+    return high * twoTo32 + ((left & right) >>> 0)
+  }
+  return uint(uint64And(left, right), 64)
+}
+
+export function wideUintAndNot(left: number | bigint, right: number | bigint): number {
+  // Numbers combine their low and high bits as for wideUintAnd.
+  if (typeof left === 'number' && typeof right === 'number') {
+    if (left <= 0xffffffff && right <= 0xffffffff) {
+      return (left & ~right) >>> 0
+    }
+    const high = Math.floor(left / twoTo32) & ~Math.floor(right / twoTo32)
+    return high * twoTo32 + ((left & ~right) >>> 0)
+  }
+  return uint(uint64AndNot(left, right), 64)
+}
+
+export function wideUintOr(left: number | bigint, right: number | bigint): number {
+  // Numbers combine their low and high bits as for wideUintAnd.
+  if (typeof left === 'number' && typeof right === 'number') {
+    if (left <= 0xffffffff && right <= 0xffffffff) {
+      return (left | right) >>> 0
+    }
+    const high = Math.floor(left / twoTo32) | Math.floor(right / twoTo32)
+    return high * twoTo32 + ((left | right) >>> 0)
+  }
+  return uint(uint64Or(left, right), 64)
+}
+
+export function wideUintXor(left: number | bigint, right: number | bigint): number {
+  // Numbers combine their low and high bits as for wideUintAnd.
+  if (typeof left === 'number' && typeof right === 'number') {
+    if (left <= 0xffffffff && right <= 0xffffffff) {
+      return (left ^ right) >>> 0
+    }
+    const high = Math.floor(left / twoTo32) ^ Math.floor(right / twoTo32)
+    return high * twoTo32 + ((left ^ right) >>> 0)
+  }
+  return uint(uint64Xor(left, right), 64)
+}
+
+export function wideUintShl(value: number | bigint, shift: number | bigint): number {
+  // A number shifted by a count below 53 multiplies by a power of two, which
+  // is exact up to 2^53 - 1, and rounds to at least 2^53 above.
+  if (typeof value === 'number' && typeof shift === 'number' && shift >= 0 && shift < 53) {
+    const shifted = value * 2 ** shift
+    if (shifted <= Number.MAX_SAFE_INTEGER) {
+      return shifted
+    }
+  }
+  return uint(uint64Shl(value, shift), 64)
+}
+
+export function wideUintShr(value: number | bigint, shift: number | bigint): number {
+  // A number below 2^53 shifted right by 53 or more is zero, a 32-bit number
+  // shifts with the operator, and a larger one divides by a power of two.
+  if (typeof value === 'number' && typeof shift === 'number' && shift >= 0) {
+    if (shift >= 53) {
+      return 0
+    }
+    if (value <= 0xffffffff && shift < 32) {
+      return value >>> shift
+    }
+    return Math.floor(value / 2 ** shift)
+  }
+  return uint(uint64Shr(value, shift), 64)
+}
+
 function int64Value(value: number | bigint): bigint {
   if (typeof value === 'bigint') {
     if (value >= -0x8000000000000000n && value <= 0x7fffffffffffffffn) {

@@ -15,7 +15,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("magic len:", 2)
 	await $.println("magic zero:", linkinfo.Magic[0])
 	await $.println("sects len:", 1)
-	await $.println("pointer diff:", $.uint($.uint($.uint64Sub((linkinfo.Sects[0].End as any), (linkinfo.Sects[0].Start as any)), 64), 64))
+	await $.println("pointer diff:", $.uint($.wideUintSub((linkinfo.Sects[0].End as any), (linkinfo.Sects[0].Start as any)), 64))
 	await $.println("start nil:", linkinfo.Sects[0].Start == null)
 }
 

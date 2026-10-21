@@ -9,7 +9,7 @@ export function slowMul(a: big.Int | $.VarRef<big.Int> | null, b: big.Int | $.Va
 	let mask = big.NewInt(4294967295n)
 	let rest = big.Int.prototype.Set.call($.pointerValue<big.Int>(new big.Int()), b)
 	let digit = new big.Int()
-	for (let shift = 0; (rest !== null && (rest as any).__isVarRef !== true && (rest as any).__goValue === undefined ? ((rest as any) as big.Int).Sign() : big.Int.prototype.Sign.call($.pointerValue<big.Int>(rest))) != 0; shift = $.uint($.uint64Add(shift, 32), 64)) {
+	for (let shift = 0; (rest !== null && (rest as any).__isVarRef !== true && (rest as any).__goValue === undefined ? ((rest as any) as big.Int).Sign() : big.Int.prototype.Sign.call($.pointerValue<big.Int>(rest))) != 0; shift = $.wideUintAdd(shift, 32)) {
 		void (digit !== null && (digit as any).__isVarRef !== true && (digit as any).__goValue === undefined ? ((digit as any) as big.Int).And(rest, mask) : big.Int.prototype.And.call($.pointerValue<big.Int>(digit), rest, mask))
 		let term = big.Int.prototype.Mul.call($.pointerValue<big.Int>(new big.Int()), a, digit)
 		big.Int.prototype.Add.call($.pointerValue<big.Int>(sum), sum, (term !== null && (term as any).__isVarRef !== true && (term as any).__goValue === undefined ? ((term as any) as big.Int).Lsh(term, shift) : big.Int.prototype.Lsh.call($.pointerValue<big.Int>(term), term, shift)))

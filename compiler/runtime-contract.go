@@ -80,6 +80,17 @@ const (
 	RuntimeHelperInt64AndNot    RuntimeHelper = "builtin.int64AndNot"
 	RuntimeHelperInt64Or        RuntimeHelper = "builtin.int64Or"
 	RuntimeHelperInt64Xor       RuntimeHelper = "builtin.int64Xor"
+	RuntimeHelperWideUintAdd    RuntimeHelper = "builtin.wideUintAdd"
+	RuntimeHelperWideUintSub    RuntimeHelper = "builtin.wideUintSub"
+	RuntimeHelperWideUintMul    RuntimeHelper = "builtin.wideUintMul"
+	RuntimeHelperWideUintDiv    RuntimeHelper = "builtin.wideUintDiv"
+	RuntimeHelperWideUintMod    RuntimeHelper = "builtin.wideUintMod"
+	RuntimeHelperWideUintAnd    RuntimeHelper = "builtin.wideUintAnd"
+	RuntimeHelperWideUintAndNot RuntimeHelper = "builtin.wideUintAndNot"
+	RuntimeHelperWideUintOr     RuntimeHelper = "builtin.wideUintOr"
+	RuntimeHelperWideUintXor    RuntimeHelper = "builtin.wideUintXor"
+	RuntimeHelperWideUintShl    RuntimeHelper = "builtin.wideUintShl"
+	RuntimeHelperWideUintShr    RuntimeHelper = "builtin.wideUintShr"
 
 	RuntimeHelperAssignStruct          RuntimeHelper = "value.assignStruct"
 	RuntimeHelperAssignFieldValue      RuntimeHelper = "value.assignFieldValue"
@@ -390,6 +401,17 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperInt64AndNot, "int64AndNot", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperInt64Or, "int64Or", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperInt64Xor, "int64Xor", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperWideUintAdd, "wideUintAdd", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperWideUintSub, "wideUintSub", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperWideUintMul, "wideUintMul", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperWideUintDiv, "wideUintDiv", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperWideUintMod, "wideUintMod", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperWideUintAnd, "wideUintAnd", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperWideUintAndNot, "wideUintAndNot", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperWideUintOr, "wideUintOr", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperWideUintXor, "wideUintXor", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperWideUintShl, "wideUintShl", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperWideUintShr, "wideUintShr", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperAssignStruct, "assignStruct", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperAssignFieldValue, "assignFieldValue", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperGenericPointerRef, "genericPointerRef", RuntimeHelperCategoryValue),

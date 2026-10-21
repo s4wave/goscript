@@ -84,8 +84,8 @@ export async function main(): globalThis.Promise<void> {
 	let n = 10
 	await $.println("data size:", 16, 16)
 	await $.println("bytes for 10:", 160)
-	await $.println("bytes for n:", n * $.int(16), $.uint($.uint($.uint64Mul($.uint(n, 64), 20n), 64), 64))
-	await $.println("offset sum:", $.int(8) + n, $.uint($.uint($.uint64Add(4n, $.uint(n, 64)), 64), 64))
+	await $.println("bytes for n:", n * $.int(16), $.uint($.wideUintMul($.uint(n, 64), 20), 64))
+	await $.println("offset sum:", $.int(8) + n, $.uint($.wideUintAdd(4, $.uint(n, 64)), 64))
 	await $.println("float32 size:", 4, 4)
 	await $.println("mixed size:", 20, 4)
 	await $.println("mixed offsets:", 4, 8)

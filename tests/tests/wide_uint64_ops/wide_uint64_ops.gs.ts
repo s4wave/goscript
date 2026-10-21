@@ -7,7 +7,7 @@ import "@goscript/math/index.js"
 
 export function hash6(u: bigint, h: number): number {
 	const prime6bytes: number = 227718039650203
-	return $.uintFromWide($.uint64Shr(($.uint64Mul(($.uint64Shl(u, 16n)), 227718039650203n)), ($.uint($.uint64And(($.uint($.uint64Sub(64n, h), 64)), 63n), 64))), 32)
+	return $.uintFromWide($.uint64Shr(($.uint64Mul(($.uint64Shl(u, 16n)), 227718039650203n)), ($.wideUintAnd(($.wideUintSub(64, h)), 63))), 32)
 }
 
 export function mix(a: bigint, b: bigint): bigint {
@@ -40,13 +40,13 @@ export function uintBitLen(n: number): number {
 	let len = 0
 	while (n != 0) {
 		len++
-		n = $.uint($.uint64Shr(n, 1n), 64)
+		n = $.wideUintShr(n, 1)
 	}
 	return len
 }
 
 export function uintShiftAssign(n: number): number {
-	n = $.uint($.uint64Shr(n, 40), 64)
+	n = $.wideUintShr(n, 40)
 	return n
 }
 

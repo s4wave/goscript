@@ -6119,7 +6119,7 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 			continue
 		}
 		if helper, ok := wideIntegerAssignHelper(targetType, stmt.Tok); ok {
-			call := coerceWideHelperResult(o.runtimeOwner, targetType, o.runtimeOwner.QualifiedHelper(helper)+"("+left+", "+right+")")
+			call := wideIntegerHelperCall(o.runtimeOwner, targetType, helper, left, right)
 			stmts = append(stmts, loweredStmt{text: left + " = " + call})
 			continue
 		}
@@ -6194,7 +6194,7 @@ func lowerCompoundAssignValue(
 ) string {
 	// Wide integers, 32-bit products and integer quotients have helpers.
 	if helper, ok := wideIntegerAssignHelper(targetType, tok); ok {
-		return coerceWideHelperResult(runtimeOwner, targetType, runtimeOwner.QualifiedHelper(helper)+"("+left+", "+right+")")
+		return wideIntegerHelperCall(runtimeOwner, targetType, helper, left, right)
 	}
 	if tok == token.MUL_ASSIGN {
 		if value, ok := lower32BitIntegerMultiplicationValue(targetType, left, right); ok {
@@ -11704,11 +11704,12 @@ func (o *LoweringOwner) lowerWideIntegerBinaryExpr(ctx lowerFileContext, expr *a
 	}
 
 	// The signedness picks the helper family, and constant operands are
-	// bigint literals.
+	// bigint literals, or numbers for uint and uintptr when they fit.
 	signed := isFixedSignedWideIntegerType(resultType) ||
 		isFixedSignedWideIntegerType(ctx.semPkg.source.TypesInfo.TypeOf(expr.X))
-	left = lowerWideIntegerOperand(ctx, expr.X, left)
-	right = lowerWideIntegerOperand(ctx, expr.Y, right)
+	numberConstants := isWideUintType(resultType)
+	left = lowerWideIntegerOperand(ctx, expr.X, left, numberConstants)
+	right = lowerWideIntegerOperand(ctx, expr.Y, right, numberConstants)
 
 	// Wide helpers coerce both operands before using JS bigint operators. Even
 	// int64/uint64 results route through them because overrides and generated
@@ -11717,7 +11718,7 @@ func (o *LoweringOwner) lowerWideIntegerBinaryExpr(ctx lowerFileContext, expr *a
 		return coerceWideHelperResult(o.runtimeOwner, resultType, call)
 	}
 	helperCall := func(helper RuntimeHelper) string {
-		return wrap(o.runtimeOwner.QualifiedHelper(helper) + "(" + left + ", " + right + ")")
+		return wideIntegerHelperCall(o.runtimeOwner, resultType, helper, left, right)
 	}
 
 	// Each operator has its helper, with simpler forms for some operands.
@@ -11790,15 +11791,59 @@ func (o *LoweringOwner) lowerWideShiftExpr(ctx lowerFileContext, expr *ast.Binar
 	}
 
 	// Other shifts call the helper.
-	return wrap(o.runtimeOwner.QualifiedHelper(helper) + "(" + left + ", " + right + ")")
+	return wideIntegerHelperCall(o.runtimeOwner, ctx.semPkg.source.TypesInfo.TypeOf(expr), helper, left, right)
 }
 
-func lowerWideIntegerOperand(ctx lowerFileContext, expr ast.Expr, fallback string) string {
+// lowerWideIntegerOperand returns a constant operand of a wide integer
+// operation as a bigint literal, or as a number literal when numbers is set
+// and it fits in one, or fallback for other operands.
+func lowerWideIntegerOperand(ctx lowerFileContext, expr ast.Expr, fallback string, numbers bool) string {
 	value := ctx.semPkg.source.TypesInfo.Types[unwrapParenExpr(expr)].Value
 	if value == nil || value.Kind() != constant.Int {
 		return fallback
 	}
+	if exact, ok := constant.Uint64Val(value); numbers && ok && exact <= maxSafeInteger {
+		return value.ExactString()
+	}
 	return value.ExactString() + "n"
+}
+
+// maxSafeInteger is the largest integer that every smaller integer and it
+// are exact numbers in JavaScript, 2^53 - 1.
+const maxSafeInteger = 1<<53 - 1
+
+// isWideUintType reports whether typ is uint or uintptr: 64 bits wide, and a
+// number up to 2^53 - 1 and a bigint above at run time (see uint).
+func isWideUintType(typ types.Type) bool {
+	bits, ok := unsignedIntegerBits(typ)
+	return ok && bits == 64 && !isBigIntBackedType(typ)
+}
+
+// wideUintHelpers are the helpers of the operations of uint and uintptr, by
+// the uint64 helpers of the operations.
+var wideUintHelpers = map[RuntimeHelper]RuntimeHelper{
+	RuntimeHelperUint64Add:    RuntimeHelperWideUintAdd,
+	RuntimeHelperUint64Sub:    RuntimeHelperWideUintSub,
+	RuntimeHelperUint64Mul:    RuntimeHelperWideUintMul,
+	RuntimeHelperUint64Div:    RuntimeHelperWideUintDiv,
+	RuntimeHelperUint64Mod:    RuntimeHelperWideUintMod,
+	RuntimeHelperUint64And:    RuntimeHelperWideUintAnd,
+	RuntimeHelperUint64AndNot: RuntimeHelperWideUintAndNot,
+	RuntimeHelperUint64Or:     RuntimeHelperWideUintOr,
+	RuntimeHelperUint64Xor:    RuntimeHelperWideUintXor,
+	RuntimeHelperUint64Shl:    RuntimeHelperWideUintShl,
+	RuntimeHelperUint64Shr:    RuntimeHelperWideUintShr,
+}
+
+// wideIntegerHelperCall calls helper, an int64 or uint64 helper, with left
+// and right, converting its result to resultType. A uint or uintptr result
+// calls the wideUint helper of the operation instead, which computes numbers
+// as numbers rather than converting them to bigints and back.
+func wideIntegerHelperCall(runtimeOwner *RuntimeContractOwner, resultType types.Type, helper RuntimeHelper, left string, right string) string {
+	if wide, ok := wideUintHelpers[helper]; ok && isWideUintType(resultType) {
+		return runtimeOwner.QualifiedHelper(wide) + "(" + left + ", " + right + ")"
+	}
+	return coerceWideHelperResult(runtimeOwner, resultType, runtimeOwner.QualifiedHelper(helper)+"("+left+", "+right+")")
 }
 
 func wideIntegerHelper(signed bool, unsigned RuntimeHelper, signedHelper RuntimeHelper) RuntimeHelper {
@@ -12381,7 +12426,7 @@ func (o *LoweringOwner) packageVarAssignmentValue(
 		return "", false
 	}
 	if helper, ok := wideIntegerAssignHelper(targetType, tok); ok {
-		return coerceWideHelperResult(o.runtimeOwner, targetType, o.runtimeOwner.QualifiedHelper(helper)+"("+left+", "+right+")"), true
+		return wideIntegerHelperCall(o.runtimeOwner, targetType, helper, left, right), true
 	}
 	if tok == token.AND_NOT_ASSIGN {
 		return left + " & ~(" + right + ")", true
