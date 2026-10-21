@@ -18262,11 +18262,15 @@ func (o *LoweringOwner) genericMethodDescriptorsForType(
 			continue
 		}
 		// A promoted method is called through the embedding type's
-		// forwarder, which takes that type's own type arguments, if any,
+		// forwarder, which takes that type's own type arguments when the
+		// embedded type's method needs them (see promotedForwarderTakesTypeArgs),
 		// and supplies the embedded type's itself.
 		var genericArgs string
 		if len(selection.Index()) > 1 {
-			genericArgs = o.genericTypeArgsExprForNamed(ctx, receiverNamedType(methodSetType), seen)
+			outer := receiverNamedType(methodSetType)
+			if promotedForwarderTakesTypeArgs(outer, selection.Index()) {
+				genericArgs = o.genericTypeArgsExprForNamed(ctx, outer, seen)
+			}
 		} else {
 			genericArgs = o.genericReceiverTypeArgsExprForMethod(ctx, method, methodSetType, seen)
 		}
@@ -18348,6 +18352,42 @@ func (o *LoweringOwner) genericMethodSignatureDescriptors(typ types.Type) string
 		return ""
 	}
 	return "[" + strings.Join(methods, ", ") + "]"
+}
+
+// promotedForwarderTakesTypeArgs reports whether the forwarder that the class
+// of outer, a struct type, declares for the method promoted along index (the
+// index of a method selection) takes outer's type arguments, as
+// lowerEmbeddedMethodForwarders declares it: when the type that declares the
+// method is generic in outer's type parameters, such as Base[T] embedded in
+// Number[T], and not for a plain or fixed instance embedded type, such as a
+// struct without type parameters or Inner[int].
+func promotedForwarderTakesTypeArgs(outer *types.Named, index []int) bool {
+	// Only a generic struct's forwarders can take type arguments.
+	if outer == nil || len(index) < 2 {
+		return false
+	}
+	structType, ok := outer.Origin().Underlying().(*types.Struct)
+	if !ok || index[0] >= structType.NumFields() {
+		return false
+	}
+
+	// A field of a named non-struct type has free method functions, which
+	// its forwarders call without type arguments.
+	typ := structType.Field(index[0]).Type()
+	if namedStructType(typ) == nil && pointerToNamedStructType(typ) == nil && !isInterfaceType(typ) {
+		return false
+	}
+
+	// Follow the embedded fields to the type that declares the method, as
+	// instantiated in outer's own type parameters.
+	for _, idx := range index[1 : len(index)-1] {
+		embedded, ok := derefPointerType(typ).Underlying().(*types.Struct)
+		if !ok || idx >= embedded.NumFields() {
+			return false
+		}
+		typ = embedded.Field(idx).Type()
+	}
+	return len(genericReceiverTypeParams(typ)) != 0 && typeContainsTypeParam(typ)
 }
 
 func genericMethodSetDescriptorTarget(typ types.Type) (*types.Named, types.Type) {
