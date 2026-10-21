@@ -45,4 +45,15 @@ describe('os process control', () => {
       ;(globalThis as { process?: unknown }).process = originalProcess
     }
   })
+
+  it('names the program "js" in a browser, as Go does', () => {
+    const originalProcess = (globalThis as { process?: unknown }).process
+    try {
+      ;(globalThis as { process?: unknown }).process = undefined
+
+      expect(Array.from(runtime_args() ?? [])).toEqual(['js'])
+    } finally {
+      ;(globalThis as { process?: unknown }).process = originalProcess
+    }
+  })
 })

@@ -1434,6 +1434,7 @@ export class Value {
   }
 
   public Set(x: Value): void {
+    // Only a settable Value is set, to a value of an assignable type.
     if (!this.CanSet()) {
       throw new Error('reflect: assign to invalid value')
     }
@@ -1442,7 +1443,10 @@ export class Value {
     if (!xType.AssignableTo(thisType)) {
       throw new Error('reflect: assign to wrong type')
     }
-    this.storeValue(x.value)
+
+    // An interface variable holds the value boxed with its type, as the
+    // compiler boxes a value assigned to an interface.
+    this.storeValue(interfaceStoreValue(x, thisType))
   }
 
   // Interface returns v's current value as an interface value, boxed with its
@@ -1471,6 +1475,20 @@ export class Value {
       elemType !== null &&
       elemType.Name() !== '' &&
       (elemType.PkgPath() !== '' || runtimeTypeString(elemType).includes('.'))
+
+    // An instance of a generic struct type is boxed with the methods of its
+    // instantiated type, as the compiler boxes it, since its methods take
+    // the type arguments that its class does not have.
+    const generic = genericInstanceMethodSet(this._type, current)
+    if (generic !== undefined) {
+      return $.namedValueInterfaceValue<ReflectValue>(
+        $.isVarRef(current) ? current.value : current,
+        runtimeTypeString(this._type),
+        generic.methods,
+        typeInfo,
+        generic.signatures,
+      )
+    }
 
     // A pointer to a struct is the struct object itself, whose methods
     // satisfy interfaces, so it is tagged with its type but not boxed.
@@ -1512,13 +1530,14 @@ export class Value {
       )
     }
 
-    // A number of a sized kind, such as float32 or int8, is boxed with its
-    // kind, as the compiler boxes it, so that it keeps its type; int and
-    // float64 are the kinds of a raw number.
+    // A number is boxed with its kind, as the compiler boxes it, so that it
+    // keeps its type: a raw number in an interface is taken for an int by
+    // reflect and %T, a float64 with an integer value too, and for a float32
+    // by type assertions and switches.
     const kind = this._type.Kind()
     if (
-      kind >= Int8 &&
-      kind <= Float32 &&
+      kind >= Int &&
+      kind <= Float64 &&
       kind !== Int64 &&
       kind !== Uint64 &&
       kind !== Uintptr
@@ -1572,6 +1591,16 @@ export class Value {
     const receiver = $.isVarRef(current) ? current.value : current
     if (receiver === null || receiver === undefined) {
       return undefined
+    }
+
+    // An instance of a generic struct type has the methods of its
+    // instantiated type, which pass its type arguments.
+    const set = genericInstanceMethodSet(this.Type(), current)
+    const generic = set?.methods[name]
+    if (generic !== undefined) {
+      const [declared] = methodSignatureByName(this.Type(), name)
+      const instance = set!.signatures.find((sig) => sig.name === name)
+      return genericMethodCall(generic, current, declared, instance)
     }
     const method =
       typeof receiver === 'object' || typeof receiver === 'function' ?
@@ -2000,13 +2029,15 @@ export class Value {
     if (!(mapObj instanceof globalThis.Map)) {
       throw new Error('reflect: assignment to entry in nil map')
     }
+
+    // A zero element deletes the key; another element is stored, boxed
+    // with its type for a map of interface elements.
     const keyVal = (key as { value: ReflectValue }).value
-    const elemVal = (elem as { value: ReflectValue }).value
     if (!elem.IsValid()) {
       mapObj.delete(keyVal)
       return
     }
-    mapObj.set(keyVal, elemVal)
+    mapObj.set(keyVal, interfaceStoreValue(elem, this.Type().Elem()))
   }
 
   // Grow increases the slice's capacity, if necessary, to guarantee space
@@ -2264,11 +2295,7 @@ export class BasicType implements Type {
 
   public Name(): string {
     if (this._typeName) {
-      const dotIndex = this._typeName.lastIndexOf('.')
-      if (dotIndex >= 0) {
-        return this._typeName.substring(dotIndex + 1)
-      }
-      return this._typeName
+      return typeNameName(this._typeName)
     }
     // Basic types have names like 'int', 'string', etc.
     return this._name
@@ -2511,10 +2538,7 @@ class SliceType implements Type {
 
   public Name(): string {
     if (!this._typeName) return ''
-    const dotIndex = this._typeName.lastIndexOf('.')
-    return dotIndex >= 0 ?
-        this._typeName.substring(dotIndex + 1)
-      : this._typeName
+    return typeNameName(this._typeName)
   }
 
   public Field(_i: number): StructField {
@@ -3025,11 +3049,7 @@ class FunctionType implements Type {
 
   public Name(): string {
     if (this._name !== '') {
-      const dotIndex = this._name.lastIndexOf('.')
-      if (dotIndex >= 0) {
-        return this._name.substring(dotIndex + 1)
-      }
-      return this._name
+      return typeNameName(this._name)
     }
     return ''
   }
@@ -3367,6 +3387,16 @@ function validateMakeFuncResults(typ: Type, resultValues: Value[]): void {
   }
 }
 
+// interfaceStoreValue returns the value of x to store in a variable of type
+// target: boxed with its type when target is an interface, as the compiler
+// boxes a value assigned to an interface, else x's value.
+export function interfaceStoreValue(x: Value, target: Type): ReflectValue {
+  if (target.Kind() === Interface && x.Kind() !== Interface) {
+    return x.Interface()
+  }
+  return x.value
+}
+
 // valueForTarget returns the value v holds as passed to or returned from a
 // function as the target type: boxed with its type for an interface target,
 // and the raw value otherwise.
@@ -3388,6 +3418,93 @@ function unwrapGoInterfaceBox(value: unknown): unknown {
     return (value as { __goValue: unknown }).__goValue
   }
   return value
+}
+
+// genericMethodCall returns a function that calls method, a method of an
+// instance of a generic struct type in its method table, on receiver. In the
+// method's type in reflect, declared, which the generic type's class has, a
+// parameter or result of a type parameter type is an interface, but the
+// method takes and returns values of the type argument, as instance, the
+// signature of the instantiated type, has them: such an argument is unboxed,
+// and such a result is boxed with its type, as an interface holds it.
+function genericMethodCall(
+  method: (receiver: any, ...args: any[]) => any,
+  receiver: unknown,
+  declared: $.MethodSignature | undefined,
+  instance: $.MethodSignature | undefined,
+): (...args: any[]) => any {
+  // Find the parameters, before any variadic one, and the results that are
+  // type parameters.
+  const fixedArgs = (declared?.args.length ?? 0) - (declared?.variadic ? 1 : 0)
+  const params: (Type | undefined)[] = []
+  for (let i = 0; i < fixedArgs; i++) {
+    params.push(typeArgumentType(declared?.args[i], instance?.args[i]))
+  }
+  const results = (declared?.returns ?? []).map((result, i) =>
+    typeArgumentType(result, instance?.returns[i]),
+  )
+
+  // Without such parameters and results, the method is called as it is.
+  if (!params.some(Boolean) && !results.some(Boolean)) {
+    return (...args: any[]) => method(receiver, ...args)
+  }
+
+  // Otherwise its arguments are unboxed and its results boxed.
+  const box = (value: unknown, i: number): unknown =>
+    results[i] ?
+      new Value(value as ReflectValue, results[i]!).Interface()
+    : value
+  const boxResults = (out: unknown): unknown =>
+    results.length > 1 ?
+      (out as unknown[]).map((value, i) => box(value, i))
+    : box(out, 0)
+  return (...args: any[]) => {
+    const unboxed = args.map((arg, i) =>
+      params[i] ? unwrapGoInterfaceBox(arg) : arg,
+    )
+    const out = method(receiver, ...unboxed)
+    return out instanceof Promise ? out.then(boxResults) : boxResults(out)
+  }
+}
+
+// typeArgumentType returns the type of instance, a parameter or result of a
+// method of an instantiated generic type, when declared, the same in the
+// generic type's method, is of a type parameter type, which reflect takes
+// for an interface, else undefined.
+function typeArgumentType(
+  declared: $.MethodArg | undefined,
+  instance: $.MethodArg | undefined,
+): Type | undefined {
+  if (declared === undefined || instance === undefined) {
+    return undefined
+  }
+  const t = typeFromTypeInfo(instance.type)
+  if (typeFromTypeInfo(declared.type).Kind() !== Interface) {
+    return undefined
+  }
+  return t.Kind() !== Interface ? t : undefined
+}
+
+// genericInstanceMethodSet returns the method set of typ, a struct type or a
+// pointer to one, when value, a value of typ, is an instance of a generic
+// struct type, else undefined.
+function genericInstanceMethodSet(
+  typ: Type,
+  value: unknown,
+): $.NamedValueMethods | undefined {
+  // Only a struct or a pointer to one is an instance.
+  const kind = typ.Kind()
+  if (kind !== Struct && (kind !== Ptr || typ.Elem().Kind() !== Struct)) {
+    return undefined
+  }
+
+  // A pointer has the methods of the pointer's method set.
+  const target = $.isVarRef(value) ? value.value : value
+  const sets = $.genericInstanceMethods(target)
+  if (sets === undefined) {
+    return undefined
+  }
+  return kind === Ptr ? sets.pointer : sets.value
 }
 
 // Map type implementation
@@ -3848,11 +3965,12 @@ function typeNamePkgPath(typeName: string): string {
   return dotIndex > 0 ? typeName.substring(0, dotIndex) : ''
 }
 
-// typeNameName returns the name of a qualified type name such as "pkg.Name",
-// or '' for an unnamed type.
+// typeNameName returns the Go name of a named type from its runtime name:
+// the part after the package qualifier, without the hash that the runtime
+// name of a local type has when another type of its package has its name.
 function typeNameName(typeName: string): string {
   const dotIndex = typeName.lastIndexOf('.')
-  return dotIndex >= 0 ? typeName.substring(dotIndex + 1) : typeName
+  return $.goTypeString(dotIndex >= 0 ? typeName.substring(dotIndex + 1) : typeName)
 }
 
 // typeMethods returns the method set of t. A type that is not a pointer has
@@ -4253,11 +4371,7 @@ class StructType implements Type {
       return ''
     }
     // Extract type name from full type name (e.g., "main.Person" -> "Person")
-    const dotIndex = this._name.lastIndexOf('.')
-    if (dotIndex >= 0) {
-      return this._name.substring(dotIndex + 1)
-    }
-    return this._name
+    return typeNameName(this._name)
   }
 
   public Field(i: number): StructField {
@@ -4815,11 +4929,7 @@ class InterfaceType implements Type {
     if (isInterfaceLiteral(this._name)) {
       return ''
     }
-    const dotIndex = this._name.lastIndexOf('.')
-    if (dotIndex >= 0) {
-      return this._name.substring(dotIndex + 1)
-    }
-    return this._name
+    return typeNameName(this._name)
   }
 
   public Field(_i: number): StructField {

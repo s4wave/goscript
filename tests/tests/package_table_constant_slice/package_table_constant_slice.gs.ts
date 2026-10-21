@@ -19,21 +19,21 @@ export function __goscript_get_nibbles(): Uint8Array {
 }
 
 export function __goscript_set_nibbles(__goscriptValue: Uint8Array): void {
-	nibbles = __goscriptValue
+	nibbles = $.assignFieldValue(nibbles, __goscriptValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 300))
 }
 
 export function bits4(a: $.Slice<number>, i: number): number {
-	return $.uint(($.uintShr($.arrayIndex(a!, i >> 1), ((i & 1) << 2), 8)) & 0b1111, 8)
+	return $.uint(($.uintShr($.arrayIndex(a!, $.intShr(i, 1)), ($.intShl((i & 1), 2)), 8)) & 0b1111, 8)
 }
 
 export function lookup(u: number): number {
-	return bits4(__goscriptStatic0(), (bits4(__goscriptStatic1(), u & 63) << 2) + (u & 3))
+	return bits4(__goscriptStatic0(), ($.intShl(bits4(__goscriptStatic1(), u & 63), 2)) + (u & 3))
 }
 
 export let small: number[] = $.arrayValue([10, 20, 30, 40, 50, 60])
 
 export function __goscript_set_small(__goscriptValue: number[]): void {
-	small = __goscriptValue
+	small = $.assignFieldValue(small, __goscriptValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 6))
 }
 
 export function sum(a: $.Slice<number>): number {
@@ -88,7 +88,7 @@ export function replace(): void {
 export let written: number[] = $.arrayValue([1, 2, 3, 4])
 
 export function __goscript_set_written(__goscriptValue: number[]): void {
-	written = __goscriptValue
+	written = $.assignFieldValue(written, __goscriptValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 4))
 }
 
 export function clobber(a: $.Slice<number>): void {

@@ -52,7 +52,7 @@ export class box {
 	}
 
 	public clone(): box {
-		return new box(true, $.copyElement(this.v))
+		return $.copyGenericInstance(this, new box(true, $.copyElement(this.v)))
 	}
 
 	public __goscriptAssign(source: box): this {
@@ -160,7 +160,7 @@ export async function funcValueNames(): globalThis.Promise<void> {
 	await $.println("FuncForPC pointer method:", funcName($.interfaceValue($.functionValue(((__receiver) => () => __receiver.PtrMethod())($.pointerValue<counter>(c)), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*counter).PtrMethod-fm"), "func() int", ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))
 	await $.println("FuncForPC value method:", funcName($.interfaceValue($.functionValue(((__receiver) => () => __receiver.ValMethod())($.markAsStructValue($.cloneStructValue($.pointerValue<counter>(c)))), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.counter.ValMethod-fm"), "func() int", ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))
 
-	let b = new box(false, 2)
+	let b = $.genericInstance(new box(false, 2), __goscriptStatic1)
 	await $.println("FuncForPC generic method:", funcName($.interfaceValue($.functionValue(((__receiver) => () => __receiver.Get(__goscriptStatic0()))($.pointerValue<box>(b)), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*box[...]).Get-fm"), "func() int", ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))
 }
 
@@ -181,6 +181,11 @@ export async function lockOSThread(): globalThis.Promise<void> {
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
 	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ([{Get: (receiver: any) => $.pointerValue(receiver).Get(__goscriptStatic0())}, [$.methodSignature("Get", [], [/* @__PURE__ */ $.basicType("int")], true, false)]])
 }
 
 __goscriptInit0()

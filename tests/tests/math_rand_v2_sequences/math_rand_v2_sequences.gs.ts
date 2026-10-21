@@ -29,9 +29,9 @@ export class splitmix {
 		const s$: splitmix = s == null ? $.pointerTarget<splitmix>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<splitmix>(s);
 		;(s$ as splitmix).x = $.uint64Add((s$ as splitmix).x, 11400714819323198485n)
 		let z = (s$ as splitmix).x
-		z = $.uint64Mul(($.uint64Xor(z, ($.uint64Shr(z, 30n)))), 13787848793156543929n)
-		z = $.uint64Mul(($.uint64Xor(z, ($.uint64Shr(z, 27n)))), 10723151780598845931n)
-		return $.uint64Xor(z, ($.uint64Shr(z, 31n)))
+		z = $.uint64Mul(($.uint64Xor(z, ($.uint64Shr(z, 30)))), 13787848793156543929n)
+		z = $.uint64Mul(($.uint64Xor(z, ($.uint64Shr(z, 27)))), 10723151780598845931n)
+		return $.uint64Xor(z, ($.uint64Shr(z, 31)))
 	}
 
 	static __typeInfo = $.registerStructType(

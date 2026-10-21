@@ -10,7 +10,7 @@ export async function main(): globalThis.Promise<void> {
 	// Mixed repeated and distinct bytes exercise dynamic Huffman blocks.
 	let input = $.makeSlice<number>(4096, undefined, "byte")
 	for (let __goscriptRangeTarget0 = input, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
-		;(__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] = $.uint((i * 31) ^ (i >> 5), 8)
+		;(__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] = $.uint($.intXor((i * 31), ($.intShr(i, 5))), 8)
 	}
 	for (let __goscriptRangeTarget1 = $.arrayToSlice<number>([1, -1, 9]), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
 		let level = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number)

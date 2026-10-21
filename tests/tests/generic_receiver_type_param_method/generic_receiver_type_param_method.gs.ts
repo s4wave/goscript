@@ -19,7 +19,7 @@ export class nistCurve {
 	}
 
 	public clone(): nistCurve {
-		return new nistCurve(true)
+		return $.copyGenericInstance(this, new nistCurve(true))
 	}
 
 	public __goscriptAssign(source: nistCurve): this {
@@ -77,7 +77,7 @@ export class point {
 	)
 }
 
-export let curve: nistCurve | $.VarRef<nistCurve> | null = new nistCurve()
+export let curve: nistCurve | $.VarRef<nistCurve> | null = $.genericInstance(new nistCurve(), __goscriptStatic1)
 
 export function __goscript_set_curve(__goscriptValue: nistCurve | $.VarRef<nistCurve> | null): void {
 	curve = __goscriptValue
@@ -94,6 +94,11 @@ export async function main(): globalThis.Promise<void> {
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
 	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, Point: { type: /* @__PURE__ */ $.pointerType("main.point"), zero: () => null, methods: {Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(...$.stripGenericTypeArgs(args))} }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ([{Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(__goscriptStatic0(), ...$.stripGenericTypeArgs(args)), Zero: (receiver: any) => $.pointerValue(receiver).Zero(__goscriptStatic0())}, [$.methodSignature("Add", [/* @__PURE__ */ $.pointerType("main.point"), /* @__PURE__ */ $.pointerType("main.point")], [/* @__PURE__ */ $.pointerType("main.point")], true, false), $.methodSignature("Zero", [], [/* @__PURE__ */ $.pointerType("main.point")], true, false)]])
 }
 
 var __goscriptAwait: any

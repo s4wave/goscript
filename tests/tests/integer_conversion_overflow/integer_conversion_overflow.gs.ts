@@ -43,6 +43,14 @@ export async function main(): globalThis.Promise<void> {
 
 	let i8 = 127
 	await $.println("int8:", ($.int(((i8 + 1) << 24 >> 24), 8)), ($.int(i8 * 2, 8)))
+
+	// A 64-bit integer converts to the nearest float64, and int of a uint64
+	// keeps the signed value of its 64 bits.
+	let top = 9223372036854775807n
+	let odd = 9007199254740993n
+	let bottom = -9223372036854775808n
+	await $.println("float64 of int64:", $.int64ToNumber(top) == (9.223372036854776e+18), $.int64($.int64ToNumber(odd)), $.int64($.int64ToNumber(bottom)), $.int64($.int64ToNumber(neg)), $.int64ToNumber(neg))
+	await $.println("float64 of uint64:", $.uint64ToNumber(u) == (1.8446744073709552e+19), $.uint64($.uint64ToNumber(w)), $.int64ToNumber(u), $.int64ToNumber($.uint64Shr(w, 12)), globalThis.Math.fround($.uint64ToNumber(w)) == (9.223372036854776e+18))
 }
 
 if ($.isMainScript(import.meta)) {

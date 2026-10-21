@@ -155,7 +155,7 @@ export class Base {
 	}
 
 	public clone(): Base {
-		return new Base(true, this.Windows, $.copyElement(this.Active))
+		return $.copyGenericInstance(this, new Base(true, this.Windows, $.copyElement(this.Active)))
 	}
 
 	public __goscriptAssign(source: Base): this {

@@ -33,7 +33,7 @@ export class AppBase {
 	}
 
 	public clone(): AppBase {
-		return new AppBase(true, this.Windows)
+		return $.copyGenericInstance(this, new AppBase(true, this.Windows))
 	}
 
 	public __goscriptAssign(source: AppBase): this {
@@ -80,7 +80,7 @@ export class WindowBase {
 	}
 
 	public clone(): WindowBase {
-		return new WindowBase(true, $.copyElement(this.App), this.name)
+		return $.copyGenericInstance(this, new WindowBase(true, $.copyElement(this.App), this.name))
 	}
 
 	public __goscriptAssign(source: WindowBase): this {
@@ -113,7 +113,7 @@ export class MyApp {
 	public declare AppBase: AppBase
 
 	constructor(__goscriptValue?: boolean, AppBase$?: AppBase) {
-		this.AppBase = AppBase$ ?? new AppBase(true)
+		this.AppBase = AppBase$ ?? $.genericInstance(new AppBase(true), __goscriptStatic1)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -147,7 +147,7 @@ export class MyWindow {
 	public declare WindowBase: WindowBase
 
 	constructor(__goscriptValue?: boolean, WindowBase$?: WindowBase) {
-		this.WindowBase = WindowBase$ ?? new WindowBase(true, null! as MyApp | $.VarRef<MyApp> | null)
+		this.WindowBase = WindowBase$ ?? $.genericInstance(new WindowBase(true, null! as MyApp | $.VarRef<MyApp> | null), __goscriptStatic3)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -161,11 +161,11 @@ export class MyWindow {
 	}
 
 	public AppWindowName(): any {
-		return $.pointerValue<WindowBase>(this.WindowBase).AppWindowName(__goscriptStatic1())
+		return $.pointerValue<WindowBase>(this.WindowBase).AppWindowName(__goscriptStatic2())
 	}
 
 	public Name(): any {
-		return $.pointerValue<WindowBase>(this.WindowBase).Name(__goscriptStatic1())
+		return $.pointerValue<WindowBase>(this.WindowBase).Name(__goscriptStatic2())
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -185,10 +185,10 @@ export async function main(): globalThis.Promise<void> {
 	;(w$ as MyWindow).WindowBase.name = "main";
 	;(w$ as MyWindow).WindowBase.App = a;
 	;(a$ as MyApp).AppBase.Windows = $.appendOne((a$ as MyApp).AppBase.Windows, w, $.appendZeros.nil)
-	let app: App | null = $.namedValueInterfaceValue<App | null>(a, "*main.MyApp", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())
+	let app: App | null = $.namedValueInterfaceValue<App | null>(a, "*main.MyApp", __goscriptStatic4(), __goscriptStatic5(), __goscriptStatic6())
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<Window, null>>((__goscriptAwait = (app !== null && (app as any).__isVarRef !== true && ((app as any).__goValue === undefined || (app as any).__goType?.charCodeAt(0) !== 42) ? (app as Exclude<App, null>) : $.pointerValue<Exclude<App, null>>(app)).Window(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<Window, null>>($.pointerValue<MyApp>((w$ as MyWindow).WindowBase.App).AppBase.Window(__goscriptStatic0())).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println((w$ as MyWindow).WindowBase.AppWindowName(__goscriptStatic1()))
+	await $.println((w$ as MyWindow).WindowBase.AppWindowName(__goscriptStatic2()))
 	await $.println((a$ as MyApp).AppBase.FirstName(__goscriptStatic0()))
 }
 
@@ -199,22 +199,32 @@ function __goscriptStatic0(): any {
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.pointerType("main.MyApp"), zero: () => null, methods: {FirstName: (receiver: any) => $.pointerValue(receiver).FirstName(), Window: (receiver: any) => $.pointerValue(receiver).Window()} }})
+	return __goscriptStatic1$value ??= ([{FirstName: (receiver: any) => $.pointerValue(receiver).FirstName(__goscriptStatic0()), Window: (receiver: any) => $.pointerValue(receiver).Window(__goscriptStatic0())}, [$.methodSignature("FirstName", [], [/* @__PURE__ */ $.basicType("string")], true, false), $.methodSignature("Window", [], ["main.Window"], true, false)]])
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ({FirstName: (receiver: any) => $.pointerValue(receiver).FirstName(), Window: (receiver: any) => $.pointerValue(receiver).Window()})
+	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.pointerType("main.MyApp"), zero: () => null, methods: {FirstName: (receiver: any) => $.pointerValue(receiver).FirstName(), Window: (receiver: any) => $.pointerValue(receiver).Window()} }})
 }
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType("main.MyApp"))
+	return __goscriptStatic3$value ??= ([{AppWindowName: (receiver: any) => $.pointerValue(receiver).AppWindowName(__goscriptStatic2()), Name: (receiver: any) => $.pointerValue(receiver).Name(__goscriptStatic2())}, [$.methodSignature("AppWindowName", [], [/* @__PURE__ */ $.basicType("string")], true, false), $.methodSignature("Name", [], [/* @__PURE__ */ $.basicType("string")], true, false)]])
 }
 
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= ([$.methodSignature("FirstName", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Window", [], ["main.Window"])])
+	return __goscriptStatic4$value ??= ({FirstName: (receiver: any) => $.pointerValue(receiver).FirstName(), Window: (receiver: any) => $.pointerValue(receiver).Window()})
+}
+
+var __goscriptStatic5$value: any
+function __goscriptStatic5(): any {
+	return __goscriptStatic5$value ??= (/* @__PURE__ */ $.pointerType("main.MyApp"))
+}
+
+var __goscriptStatic6$value: any
+function __goscriptStatic6(): any {
+	return __goscriptStatic6$value ??= ([$.methodSignature("FirstName", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Window", [], ["main.Window"])])
 }
 
 var __goscriptAwait: any

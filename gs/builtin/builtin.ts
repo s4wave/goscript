@@ -26,7 +26,7 @@ import {
 import { writeHostStdoutText } from './hostio.js'
 import { notImplemented, runtimePanic } from './panic.js'
 import { formatPrintedArgs } from './print.js'
-import { isSliceProxy, runeToString, sliceRange } from './slice.js'
+import { isSliceProxy, runeToString, sliceRange, zeroLike } from './slice.js'
 import { isVarRef, type VarRef } from './varRef.js'
 
 /**
@@ -82,40 +82,27 @@ export function clear<T>(
     return
   }
 
-  // A window zeroes its part of the backing array.
-  if (isSliceProxy(v)) {
-    const meta = v.__meta__
-    const zero = clearZeroValue(meta.backing as T[])
-    for (let i = 0; i < meta.length; i++) {
-      meta.backing[meta.offset + i] = zero
+  // Without a factory, each element gets the zero value of the type of a
+  // sample element, so that a struct element is a new zero struct.
+  if (isSliceProxy(v) || Array.isArray(v)) {
+    const { backing, offset, length } = sliceRange(v as Slice<T>)
+    const sample = clearSample(backing as T[], offset, length)
+    for (let i = 0; i < length; i++) {
+      ;(backing as T[])[offset + i] = zeroLike(sample) as T
     }
-    return
-  }
-
-  // An array is zeroed in place.
-  if (Array.isArray(v)) {
-    v.fill(clearZeroValue(v))
-    return
   }
 }
 
-function clearZeroValue<T>(v: T[]): T {
-  for (const item of v) {
+// clearSample returns the first element of the window of backing that is
+// not nil, which shows the element type, or null.
+function clearSample<T>(backing: T[], offset: number, length: number): T | null {
+  for (let i = 0; i < length; i++) {
+    const item = backing[offset + i]
     if (item !== null && item !== undefined) {
-      switch (typeof item) {
-        case 'number':
-          return 0 as T
-        case 'bigint':
-          return 0n as T
-        case 'string':
-          return '' as T
-        case 'boolean':
-          return false as T
-      }
-      break
+      return item
     }
   }
-  return null as T
+  return null
 }
 
 /**
@@ -194,6 +181,11 @@ export function assignFieldValue(
     return target
   }
   if (info?.kind === TypeKind.Array) {
+    // An array is copied into the existing one in place, or copied anew
+    // when there is none yet.
+    if (target === null || target === undefined) {
+      return cloneArrayValue(source, info)
+    }
     for (let i = 0; i < info.length; i++) {
       target[i] = assignFieldValue(target[i], source[i], info.elemType)
     }
@@ -721,6 +713,35 @@ export function uintFromWide(value: number | bigint, bits: number): number {
     : uint(value, bits)
 }
 
+// int64ToNumber converts an int64 to the nearest number, as float64(x) and
+// int(x) do. It adds the two words of the value, which V8 compiles to
+// machine operations, where it does not compile Number of a bigint. The sum
+// of the exact high part and the low word is rounded once, so it is the
+// nearest number, as Number gives.
+export function int64ToNumber(value: number | bigint): number {
+  // A number is already one.
+  if (typeof value === 'number') {
+    return value
+  }
+
+  // A bigint is read as its signed high word and unsigned low word.
+  wideValue[0] = value
+  return wideWords[1] * 4294967296 + (wideWords[0] >>> 0)
+}
+
+// uint64ToNumber converts a uint64 to the nearest number, as float64(x)
+// does, through its words as int64ToNumber does.
+export function uint64ToNumber(value: number | bigint): number {
+  // A number is already one.
+  if (typeof value === 'number') {
+    return value
+  }
+
+  // A bigint is read as two unsigned words.
+  wideValue[0] = value
+  return (wideWords[1] >>> 0) * 4294967296 + (wideWords[0] >>> 0)
+}
+
 // wideValue holds a 64-bit value whose two 32-bit words, low word first on
 // the little-endian hosts that run GoScript, are wideWords. Conversions
 // between bigints and numbers through them avoid the BigInt and Number calls,
@@ -1042,6 +1063,124 @@ export function uintShr(
     return 0
   }
   return Number(uint(value, width)) >>> amount
+}
+
+// intAnd returns left & right for Go ints, which are numbers exact to 2^53.
+// The JavaScript & keeps only 32 bits, so it applies only to two int32s.
+export function intAnd(left: number, right: number): number {
+  // Two int32s have the bits of the JavaScript operator.
+  if ((left | 0) === left && (right | 0) === right) {
+    return left & right
+  }
+
+  // Other ints combine their high and low words separately.
+  const leftHigh = intHighWord(left)
+  const rightHigh = intHighWord(right)
+  const low = (left - leftHigh * 4294967296) & (right - rightHigh * 4294967296)
+  return (leftHigh & rightHigh) * 4294967296 + (low >>> 0)
+}
+
+// intOr returns left | right for Go ints, as intAnd does for &.
+export function intOr(left: number, right: number): number {
+  // Two int32s have the bits of the JavaScript operator.
+  if ((left | 0) === left && (right | 0) === right) {
+    return left | right
+  }
+
+  // Other ints combine their high and low words separately.
+  const leftHigh = intHighWord(left)
+  const rightHigh = intHighWord(right)
+  const low = (left - leftHigh * 4294967296) | (right - rightHigh * 4294967296)
+  return (leftHigh | rightHigh) * 4294967296 + (low >>> 0)
+}
+
+// intXor returns left ^ right for Go ints, as intAnd does for &.
+export function intXor(left: number, right: number): number {
+  // Two int32s have the bits of the JavaScript operator.
+  if ((left | 0) === left && (right | 0) === right) {
+    return left ^ right
+  }
+
+  // Other ints combine their high and low words separately.
+  const leftHigh = intHighWord(left)
+  const rightHigh = intHighWord(right)
+  const low = (left - leftHigh * 4294967296) ^ (right - rightHigh * 4294967296)
+  return (leftHigh ^ rightHigh) * 4294967296 + (low >>> 0)
+}
+
+// intAndNot returns left &^ right for Go ints. The complement of an int is
+// -right - 1, which is exact.
+export function intAndNot(left: number, right: number): number {
+  return intAnd(left, -right - 1)
+}
+
+// intHighWord returns the high 32-bit word of an int, the floor of the int
+// over 2^32, whose low word is the int minus the high word times 2^32.
+function intHighWord(value: number): number {
+  return Math.floor(value / 4294967296)
+}
+
+// intShl returns value << count for Go ints. JavaScript's << keeps 32 bits and
+// takes the count modulo 32, so it applies only to an int32 shifted by less
+// than 32 that keeps all its bits.
+export function intShl(value: number, count: number): number {
+  // An int32 whose shift loses no bits is the JavaScript shift.
+  if (count >= 0 && count < 32) {
+    const shifted = value << count
+    if (shifted >> count === value) {
+      return shifted
+    }
+  }
+  return intShlWide(value, count)
+}
+
+// intShlWide returns value << count for the ints and counts that intShl
+// does not shift with the JavaScript operator.
+function intShlWide(value: number, count: number): number {
+  // A negative count panics, and a count of 64 or more shifts out all bits.
+  if (count < 0) {
+    runtimePanic('runtime error: negative shift amount')
+  }
+  if (count >= 64) {
+    return 0
+  }
+
+  // The product is exact while it is a safe integer; past that the shift
+  // wraps to 64 bits, as Go's does.
+  const shifted = value * 2 ** count
+  if (Number.isSafeInteger(shifted)) {
+    return shifted
+  }
+  return Number(BigInt.asIntN(64, BigInt(value) << BigInt(count)))
+}
+
+// intShr returns value >> count for Go ints, as intShl does for <<.
+export function intShr(value: number, count: number): number {
+  // An int32 shifted by less than 32 is the JavaScript shift.
+  if ((value | 0) === value && count >= 0 && count < 32) {
+    return value >> count
+  }
+
+  // A negative count panics. Other shifts are the floor of the quotient by
+  // 2^count, which is exact, and a count over 63 shifts as 63 does.
+  if (count < 0) {
+    runtimePanic('runtime error: negative shift amount')
+  }
+  return Math.floor(value / 2 ** Math.min(count, 63))
+}
+
+// narrowShl returns value << shift for Go integers of 32 bits or fewer, as
+// an int32 that the caller wraps to the width of its type. Go shifts all bits
+// out for a count of 32 or more, which the JavaScript operator takes modulo 32.
+export function narrowShl(value: number, shift: number): number {
+  return shift < 32 ? value << shift : 0
+}
+
+// narrowShr returns value >> shift for signed Go integers of 32 bits or
+// fewer. A count of 32 or more fills the value with its sign bit, as a shift
+// by 31 does, where the JavaScript operator takes the count modulo 32.
+export function narrowShr(value: number, shift: number): number {
+  return value >> (shift < 32 ? shift : 31)
 }
 
 export function uint64Mul(

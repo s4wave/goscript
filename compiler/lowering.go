@@ -94,6 +94,7 @@ func (o *LoweringOwner) Build(ctx context.Context, model *SemanticModel, opts ..
 
 	program := &LoweredProgram{trimTypeInfo: options.TrimTypeInfo}
 	defer setRuntimePackageNames(model)()
+	defer setLocalTypeNames(model)()
 	asyncLazyCache := newAsyncLazyCache()
 	runtimeMethodSets := newRuntimeMethodSetCache()
 	semPkgs := make([]*semanticPackage, 0, len(model.packages))
@@ -237,8 +238,40 @@ func (o *LoweringOwner) lowerPackage(
 	slices.SortFunc(loweredPkg.files, func(a, b *loweredFile) int {
 		return cmp.Compare(a.outputName, b.outputName)
 	})
+	importMainFileSideEffects(loweredPkg)
 	lowerPackageInit(semPkg, loweredPkg)
 	return loweredPkg, diagnostics
+}
+
+// importMainFileSideEffects makes the file with the main function of package
+// main import each other file of the package that the package index imports
+// for its side effects, such as package variables initialized when its module
+// is evaluated. Runners import the file with the main function directly, not
+// the package index, so without these imports a file that the main file does
+// not otherwise import would never be evaluated: var _ = register() in it
+// would not run.
+func importMainFileSideEffects(pkg *loweredPackage) {
+	if pkg.name != "main" || len(pkg.files) < 2 {
+		return
+	}
+
+	// Each file with a main function imports the other side effect files
+	// that it does not already import.
+	for _, file := range pkg.files {
+		if !slices.ContainsFunc(file.decls, isMainFunctionDecl) {
+			continue
+		}
+		for _, other := range pkg.files {
+			source := "./" + other.outputName
+			imported := slices.ContainsFunc(file.imports, func(imp loweredImport) bool {
+				return imp.source == source
+			})
+			if other == file || !other.sideEffect || imported {
+				continue
+			}
+			file.imports = append(file.imports, loweredImport{source: source, bare: true})
+		}
+	}
 }
 
 // packageInitModule is the output name of the module that initializes a
@@ -2016,7 +2049,12 @@ func (o *LoweringOwner) lowerGenDecl(ctx lowerFileContext, decl *ast.GenDecl) ([
 						indexExport = name.Name
 					}
 				}
-				decls = append(decls, loweredDecl{code: code, indexExport: indexExport})
+				// An initializer that may have effects, such as a call,
+				// makes the package index import the file even when the
+				// variable is unexported or blank.
+				effects := ctx.topLevel && keyword != "const" && idx < len(typed.Values) &&
+					initializerMayHaveRuntimeEffects(ctx, typed.Values[idx])
+				decls = append(decls, loweredDecl{code: code, indexExport: indexExport, sideEffect: effects})
 				if lazy {
 					getterName := packageVarGetterName(name.Name)
 					initName := packageVarInitName(name.Name)
@@ -2068,6 +2106,9 @@ func (o *LoweringOwner) lowerGenDecl(ctx lowerFileContext, decl *ast.GenDecl) ([
 					assignment := setterTarget + " = " + setterValue
 					if isStructValueType(obj.Type()) {
 						assignment = o.lowerStructAssignment(setterTarget, setterValue)
+					}
+					if isArrayValueType(obj.Type()) {
+						assignment = setterTarget + " = " + o.lowerArrayAssignment(setterTarget, setterValue, obj.Type())
 					}
 					setterCode := "export function " + setterName + "(" + setterValue + ": " + setterType + "): void {\n\t" + assignment + "\n}"
 					setterIndexExport := ""
@@ -3758,6 +3799,7 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 		name:                 safeIdentifier(semType.name),
 		typeName:             runtimeNamedTypeName(semType.named),
 		cloneMethod:          "clone",
+		generic:              semType.named.TypeParams().Len() != 0,
 		fields:               make([]loweredStructField, 0, len(semType.fields)),
 	}
 	for idx, field := range semType.fields {
@@ -4116,6 +4158,7 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 			}
 		}
 		var call string
+		var body []loweredStmt
 		if receiver != nil {
 			callArgs := append([]string{target}, args...)
 			call = o.methodFunctionExpr(ctx, receiver, method, method.Name()) + "(" + strings.Join(callArgs, ", ") + ")"
@@ -4125,11 +4168,19 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 				callArgs = append([]string{genericArgs}, callArgs...)
 			}
 			call = target + "." + method.Name() + "(" + strings.Join(callArgs, ", ") + ")"
+
+			// A method that observes its receiver gets the reference to the
+			// embedded field.
+			if ref, ok := o.embeddedForwarderIdentityReceiver(ctx, field, selection, method); ok {
+				body = append(body, loweredStmt{text: "const __receiver = " + ref})
+				callArgs = append([]string{"__receiver"}, callArgs...)
+				call = identityReceiverCallee("__receiver", method.Name()) + "(" + strings.Join(callArgs, ", ") + ")"
+			}
 		}
 		if async {
 			call = "await " + call
 		}
-		lowered.body = []loweredStmt{{text: "return " + call}}
+		lowered.body = append(body, loweredStmt{text: "return " + call})
 		methods = append(methods, lowered)
 		explicitMethods[method.Name()] = true
 	}
@@ -5071,7 +5122,7 @@ func (o *LoweringOwner) lowerStmtInto(ctx lowerFileContext, stmt ast.Stmt, out [
 			if typed.Tok == token.DEC {
 				tok = token.SUB_ASSIGN
 			}
-			stmts, diagnostics := o.lowerMapIndexUpdateStmts(ctx, index, tok, oneLiteral, ctx.semPkg.source.TypesInfo.TypeOf(typed.X))
+			stmts, diagnostics := o.lowerMapIndexUpdateStmts(ctx, index, tok, oneLiteral, ctx.semPkg.source.TypesInfo.TypeOf(typed.X), false)
 			return append(out, stmts...), diagnostics
 		}
 		if setter, ok := o.packageVarSetterForAssignment(ctx, typed.X); ok {
@@ -6058,10 +6109,18 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 		right, rightDiagnostics := o.lowerExpr(ctx, stmt.Rhs[idx])
 		diagnostics = append(diagnostics, rightDiagnostics...)
 		targetType := assignmentTargetType(ctx, lhs)
+		mask := isInt32Mask(ctx, stmt.Rhs[idx])
 		// A struct assigned to existing storage is copied into it field by
 		// field, so a value of the same type is not copied first.
 		uncopied := right
 		right = o.lowerValueForTarget(ctx, stmt.Rhs[idx], targetType, right)
+
+		// A number shifted by a 64-bit count, a bigint, takes the count as a
+		// number, since JavaScript does not mix the two in a shift.
+		if (stmt.Tok == token.SHL_ASSIGN || stmt.Tok == token.SHR_ASSIGN) && !isRuntimeWideIntegerType(targetType) &&
+			isBigIntBackedType(ctx.semPkg.source.TypesInfo.TypeOf(stmt.Rhs[idx])) {
+			right = wideToNumber(o.runtimeOwner, ctx.semPkg.source.TypesInfo.TypeOf(stmt.Rhs[idx]), right)
+		}
 		if targetType != nil && genericCallResultUsesTypeParam(ctx, stmt.Rhs[idx]) {
 			right = "(" + right + " as " + o.tsTypeFor(ctx, targetType) + ")"
 			uncopied = "(" + uncopied + " as " + o.tsTypeFor(ctx, targetType) + ")"
@@ -6079,7 +6138,7 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 			continue
 		}
 		if index, ok := lhs.(*ast.IndexExpr); ok && isMapType(ctx.semPkg.source.TypesInfo.TypeOf(index.X)) && stmt.Tok != token.DEFINE {
-			update, updateDiagnostics := o.lowerMapIndexUpdateStmts(ctx, index, stmt.Tok, right, targetType)
+			update, updateDiagnostics := o.lowerMapIndexUpdateStmts(ctx, index, stmt.Tok, right, targetType, mask)
 			diagnostics = append(diagnostics, updateDiagnostics...)
 			stmts = append(stmts, update...)
 			continue
@@ -6089,6 +6148,10 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 		star, starTarget := unwrapParenExpr(lhs).(*ast.StarExpr)
 		if !isShortDecl && isStructValueType(targetType) {
 			stmts = append(stmts, loweredStmt{text: o.lowerStructAssignmentTo(ctx, lhs, left, uncopied)})
+			continue
+		}
+		if !isShortDecl && isArrayValueType(targetType) {
+			stmts = append(stmts, loweredStmt{text: o.lowerArrayAssignmentTo(ctx, lhs, left, uncopied, targetType)})
 			continue
 		}
 		if starTarget && stmt.Tok == token.ASSIGN {
@@ -6104,7 +6167,7 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 				stmts = append(stmts, loweredStmt{text: value})
 				continue
 			}
-			stmts = append(stmts, loweredStmt{text: lowerCompoundAssignStmt(o.runtimeOwner, targetType, pointer, right, stmt.Tok)})
+			stmts = append(stmts, loweredStmt{text: lowerCompoundAssignStmt(o.runtimeOwner, targetType, pointer, right, stmt.Tok, mask)})
 			continue
 		}
 		if isShortDecl {
@@ -6132,7 +6195,7 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 			op = "="
 		}
 		if stmt.Tok != token.ASSIGN && stmt.Tok != token.DEFINE {
-			stmts = append(stmts, loweredStmt{text: lowerCompoundAssignStmt(o.runtimeOwner, targetType, left, right, stmt.Tok)})
+			stmts = append(stmts, loweredStmt{text: lowerCompoundAssignStmt(o.runtimeOwner, targetType, left, right, stmt.Tok, mask)})
 			continue
 		}
 		stmts = append(stmts, loweredStmt{text: left + " " + op + " " + right})
@@ -6146,6 +6209,7 @@ func (o *LoweringOwner) lowerMapIndexUpdateStmts(
 	tok token.Token,
 	right string,
 	targetType types.Type,
+	mask bool,
 ) ([]loweredStmt, []Diagnostic) {
 	mapExpr, mapDiagnostics := o.lowerExpr(ctx, index.X)
 	keyExpr, keyDiagnostics := o.lowerExpr(ctx, index.Index)
@@ -6159,7 +6223,7 @@ func (o *LoweringOwner) lowerMapIndexUpdateStmts(
 	mapTemp := ctx.tempName("Map")
 	keyTemp := ctx.tempName("MapKey")
 	current := o.lowerMapGetValue(ctx, index, mapTemp, keyTemp)
-	value := lowerCompoundAssignValue(o.runtimeOwner, targetType, current, right, tok)
+	value := lowerCompoundAssignValue(o.runtimeOwner, targetType, current, right, tok, mask)
 	return []loweredStmt{
 		{text: "const " + mapTemp + " = " + mapExpr},
 		{text: "const " + keyTemp + " = " + keyExpr},
@@ -6169,14 +6233,16 @@ func (o *LoweringOwner) lowerMapIndexUpdateStmts(
 
 // lowerCompoundAssignStmt lowers the compound assignment left op= right. An
 // operation that JavaScript computes as Go does keeps its compound operator.
+// mask reports whether right is a constant in [0, 2^31).
 func lowerCompoundAssignStmt(
 	runtimeOwner *RuntimeContractOwner,
 	targetType types.Type,
 	left string,
 	right string,
 	tok token.Token,
+	mask bool,
 ) string {
-	value := lowerCompoundAssignValue(runtimeOwner, targetType, left, right, tok)
+	value := lowerCompoundAssignValue(runtimeOwner, targetType, left, right, tok, mask)
 	if value == left+" "+strings.TrimSuffix(tok.String(), "=")+" ("+right+")" {
 		return left + " " + tok.String() + " " + right
 	}
@@ -6184,17 +6250,22 @@ func lowerCompoundAssignStmt(
 }
 
 // lowerCompoundAssignValue returns the value that left op= right assigns to
-// left.
+// left. mask reports whether right is a constant in [0, 2^31).
 func lowerCompoundAssignValue(
 	runtimeOwner *RuntimeContractOwner,
 	targetType types.Type,
 	left string,
 	right string,
 	tok token.Token,
+	mask bool,
 ) string {
-	// Wide integers, 32-bit products and integer quotients have helpers.
+	// Wide integers, int bitwise operations, 32-bit products and integer
+	// quotients have helpers.
 	if helper, ok := wideIntegerAssignHelper(targetType, tok); ok {
 		return wideIntegerHelperCall(runtimeOwner, targetType, helper, left, right)
+	}
+	if value, ok := lowerIntBitwiseValue(runtimeOwner, targetType, tok, left, right, mask); ok {
+		return value
 	}
 	if tok == token.MUL_ASSIGN {
 		if value, ok := lower32BitIntegerMultiplicationValue(targetType, left, right); ok {
@@ -6263,8 +6334,14 @@ func lowerCompoundAssignValue(
 	case token.XOR_ASSIGN:
 		return wrapUint32(left + " ^ " + right)
 	case token.SHL_ASSIGN:
+		if value, ok := lowerNarrowShiftAssignValue(runtimeOwner, targetType, left, right, tok, wrapNarrow); ok {
+			return value
+		}
 		return wrapNarrow(left + " << " + right)
 	case token.SHR_ASSIGN:
+		if value, ok := lowerNarrowShiftAssignValue(runtimeOwner, targetType, left, right, tok, wrapNarrow); ok {
+			return value
+		}
 		if bits, ok := unsignedIntegerBits(targetType); ok && bits <= 32 {
 			return "(" + left + " >>> " + right + ") >>> 0"
 		}
@@ -6325,6 +6402,64 @@ func (o *LoweringOwner) lowerIncDecTarget(ctx lowerFileContext, target ast.Expr)
 		return o.lowerAssignmentTarget(ctx, typed, false)
 	}
 	return o.lowerExpr(ctx, target)
+}
+
+// intBitwiseHelper returns the runtime helper for the bitwise operator op,
+// or its assignment form, on values of the type typ, and whether typ is int.
+// An int is a number exact to 2^53, and the JavaScript bitwise operators keep
+// only its low 32 bits, so the helpers apply them to its high and low words.
+func intBitwiseHelper(typ types.Type, op token.Token) (RuntimeHelper, bool) {
+	// Only int and the untyped integers that default to it are such numbers.
+	if !basicKind(typ, types.Int) && !basicKind(typ, types.UntypedInt) {
+		return "", false
+	}
+	switch op {
+	case token.AND, token.AND_ASSIGN:
+		return RuntimeHelperIntAnd, true
+	case token.OR, token.OR_ASSIGN:
+		return RuntimeHelperIntOr, true
+	case token.XOR, token.XOR_ASSIGN:
+		return RuntimeHelperIntXor, true
+	case token.AND_NOT, token.AND_NOT_ASSIGN:
+		return RuntimeHelperIntAndNot, true
+	case token.SHL, token.SHL_ASSIGN:
+		return RuntimeHelperIntShl, true
+	case token.SHR, token.SHR_ASSIGN:
+		return RuntimeHelperIntShr, true
+	default:
+		return "", false
+	}
+}
+
+// lowerIntBitwiseValue returns left op right for the bitwise operator op, or
+// its assignment form, on values of the type typ, and whether typ is int. An
+// & with a mask, a constant in [0, 2^31), keeps the JavaScript operator,
+// which computes the same low bits.
+func lowerIntBitwiseValue(
+	runtimeOwner *RuntimeContractOwner,
+	typ types.Type,
+	op token.Token,
+	left string,
+	right string,
+	mask bool,
+) (string, bool) {
+	// Other types, and the masks, keep the JavaScript operators.
+	helper, ok := intBitwiseHelper(typ, op)
+	if !ok || mask && helper == RuntimeHelperIntAnd {
+		return "", false
+	}
+	return runtimeOwner.QualifiedHelper(helper) + "(" + left + ", " + right + ")", true
+}
+
+// isInt32Mask reports whether expr is an integer constant in [0, 2^31), whose
+// JavaScript & with any int keeps the low bits of the int as Go's & does.
+func isInt32Mask(ctx lowerFileContext, expr ast.Expr) bool {
+	value := ctx.semPkg.source.TypesInfo.Types[unwrapParenExpr(expr)].Value
+	if value == nil || value.Kind() != constant.Int {
+		return false
+	}
+	bits, exact := constant.Int64Val(value)
+	return exact && bits >= 0 && bits <= math.MaxInt32
 }
 
 // wrapNarrowIntegerValue wraps the result of an addition, subtraction or
@@ -6763,7 +6898,7 @@ func (o *LoweringOwner) lowerTupleTargetAssignmentStmt(
 		if index, ok := unwrapParenExpr(lhs).(*ast.IndexExpr); ok && isMapType(ctx.semPkg.source.TypesInfo.TypeOf(index.X)) {
 			targetType := assignmentTargetType(ctx, lhs)
 			value = o.lowerValueForTarget(ctx, lhs, targetType, value)
-			stmts, diagnostics := o.lowerMapIndexUpdateStmts(ctx, index, token.ASSIGN, value, targetType)
+			stmts, diagnostics := o.lowerMapIndexUpdateStmts(ctx, index, token.ASSIGN, value, targetType, false)
 			if len(stmts) != 0 {
 				return stmts[0], diagnostics
 			}
@@ -6779,6 +6914,9 @@ func (o *LoweringOwner) lowerTupleTargetAssignmentStmt(
 	left, diagnostics := o.lowerAssignmentTarget(ctx, lhs, declare)
 	if !declare && isStructValueType(assignmentTargetType(ctx, lhs)) {
 		return loweredStmt{text: o.lowerStructAssignmentTo(ctx, lhs, left, value)}, diagnostics
+	}
+	if targetType := assignmentTargetType(ctx, lhs); !declare && isArrayValueType(targetType) {
+		return loweredStmt{text: o.lowerArrayAssignmentTo(ctx, lhs, left, value, targetType)}, diagnostics
 	}
 	prefix := ""
 	if declare {
@@ -6804,6 +6942,10 @@ func (o *LoweringOwner) lowerStarTargetAssignmentStmt(
 	if isStructValueType(ctx.semPkg.source.TypesInfo.TypeOf(lhs)) {
 		pointer, diagnostics := o.lowerPointerValueExpr(ctx, star.X)
 		return loweredStmt{text: o.lowerStructAssignment(pointer, right)}, diagnostics, true
+	}
+	if targetType := ctx.semPkg.source.TypesInfo.TypeOf(lhs); isArrayValueType(targetType) {
+		pointer, diagnostics := o.lowerPointerValueExpr(ctx, star.X)
+		return loweredStmt{text: o.lowerArrayAssignment(pointer, right, targetType)}, diagnostics, true
 	}
 	pointer, diagnostics := o.lowerPointerStorageExpr(ctx, star.X)
 	return loweredStmt{text: pointer + " = " + right}, diagnostics, true
@@ -6855,6 +6997,42 @@ func (o *LoweringOwner) lowerStructAssignmentTo(ctx lowerFileContext, lhs ast.Ex
 	if o.isGeneratedStructClass(namedStructType(assignmentTargetType(ctx, lhs))) {
 		assignment = parenthesizeAwaitedExpr(left) + ".__goscriptAssign(" + value + ")"
 	}
+
+	// A local variable is assigned the result.
+	ident, ok := unwrapParenExpr(lhs).(*ast.Ident)
+	if !ok {
+		return assignment
+	}
+	obj, ok := ctx.semPkg.source.TypesInfo.Uses[ident].(*types.Var)
+	if !ok || obj.Pkg() == nil || obj.Parent() == obj.Pkg().Scope() {
+		return assignment
+	}
+	return left + " = " + assignment
+}
+
+// isArrayValueType reports whether typ is an array type with elements, whose
+// assignment copies into the existing array.
+func isArrayValueType(typ types.Type) bool {
+	if typ == nil || isTypeParamType(typ) {
+		return false
+	}
+	array, ok := types.Unalias(typ).Underlying().(*types.Array)
+	return ok && array.Len() > 0
+}
+
+// lowerArrayAssignment copies the array value into the existing array
+// target element by element, assigning struct and array elements in place,
+// as Go assigns an array, so that pointers to its elements stay valid.
+func (o *LoweringOwner) lowerArrayAssignment(target, value string, typ types.Type) string {
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperAssignFieldValue) + "(" + target + ", " + value + ", " + o.runtimeTypeInfoExpr(typ) + ")"
+}
+
+// lowerArrayAssignmentTo copies value into the existing array that lhs
+// names. A local variable is also assigned the result, which is the same
+// array.
+func (o *LoweringOwner) lowerArrayAssignmentTo(ctx lowerFileContext, lhs ast.Expr, left, value string, typ types.Type) string {
+	// The array is copied into its storage.
+	assignment := o.lowerArrayAssignment(left, value, typ)
 
 	// A local variable is assigned the result.
 	ident, ok := unwrapParenExpr(lhs).(*ast.Ident)
@@ -8110,8 +8288,26 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	keyName := rangeKeyNameFor(ctx, stmt.Key, aliases)
 	valueName := rangeKeyNameFor(ctx, stmt.Value, aliases)
 	rangeType := typeParamCoreType(ctx.semPkg.source.TypesInfo.TypeOf(stmt.X))
+
+	// A range that assigns existing variables, fields or elements instead of
+	// declaring its key and value loops over temporaries of its own, which
+	// each iteration assigns to them first, as Go does.
+	var assigns []loweredStmt
+	if stmt.Tok == token.ASSIGN && !isMapType(rangeType) && !isFunctionType(rangeType) {
+		var keyAssigns, valueAssigns []loweredStmt
+		var keyDiagnostics, valueDiagnostics []Diagnostic
+		keyName, keyAssigns, keyDiagnostics = o.lowerRangeAssignment(ctx, stmt.Key, "RangeKey")
+		valueName, valueAssigns, valueDiagnostics = o.lowerRangeAssignment(ctx, stmt.Value, "RangeValue")
+		assigns = append(keyAssigns, valueAssigns...)
+		diagnostics = append(append(diagnostics, keyDiagnostics...), valueDiagnostics...)
+	}
+	lowerBody := func(bodyCtx lowerFileContext) ([]loweredStmt, []Diagnostic) {
+		body, bodyDiagnostics := o.lowerBlock(bodyCtx, stmt.Body)
+		return append(slices.Clone(assigns), body...), bodyDiagnostics
+	}
+
 	if isChannelType(rangeType) {
-		body, bodyDiagnostics := o.lowerBlock(bodyCtx.withoutRangeLoopBranches(), stmt.Body)
+		body, bodyDiagnostics := lowerBody(bodyCtx.withoutRangeLoopBranches())
 		diagnostics = append(diagnostics, bodyDiagnostics...)
 		tempName := ctx.tempName("Range")
 		children := []loweredStmt{
@@ -8119,11 +8315,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 			{text: "if (!" + tempName + ".ok)", children: []loweredStmt{{text: "break"}}},
 		}
 		if keyName != "" {
-			prefix := ""
-			if stmt.Tok == token.DEFINE {
-				prefix = "let "
-			}
-			children = append(children, loweredStmt{text: prefix + keyName + " = " + tempName + ".value"})
+			children = append(children, loweredStmt{text: "let " + keyName + " = " + tempName + ".value"})
 		}
 		children = append(children, body...)
 		return loweredStmt{
@@ -8137,7 +8329,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		// loopSliceWindows).
 		windows, windowDecls := o.loopSliceWindows(ctx, stmt, nil, "", stmt.Key, stmt.Value, stmt.Body)
 		intCtx := bodyCtx.withoutRangeLoopBranches().withLoopSliceWindows(windows)
-		body, bodyDiagnostics := o.lowerBlock(intCtx, stmt.Body)
+		body, bodyDiagnostics := lowerBody(intCtx)
 		diagnostics = append(diagnostics, bodyDiagnostics...)
 		if keyName == "" {
 			keyName = "__rangeIndex"
@@ -8188,7 +8380,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	}
 	if isStringType(rangeType) {
 		// The body is lowered first, and the key and value get names.
-		body, bodyDiagnostics := o.lowerBlock(bodyCtx.withoutRangeLoopBranches(), stmt.Body)
+		body, bodyDiagnostics := lowerBody(bodyCtx.withoutRangeLoopBranches())
 		diagnostics = append(diagnostics, bodyDiagnostics...)
 		key := keyName
 		if key == "" {
@@ -8257,7 +8449,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	loopCtx = loopCtx.withLoopSliceWindows(windows)
 
 	// The body reads the elements through the range target's window.
-	body, bodyDiagnostics := o.lowerBlock(loopCtx, stmt.Body)
+	body, bodyDiagnostics := lowerBody(loopCtx)
 	diagnostics = append(diagnostics, bodyDiagnostics...)
 	rangeTarget := ctx.tempName("RangeTarget")
 	rangeTargetValue := o.lowerArrayPointerTarget(ctx, rangeValue, rangeType)
@@ -8284,6 +8476,28 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 			strings.Join(append(windowDecls, counter+" = 0"), ", ") + "; " + counter + " < " + rangeWindow + ".length; " + counter + "++)",
 		children: children,
 	}, diagnostics
+}
+
+// lowerRangeAssignment returns the temporary that a range loop binds in place
+// of expr, a key or value that the range statement assigns, and the statement
+// that assigns the temporary to expr; a missing or blank expr has neither.
+func (o *LoweringOwner) lowerRangeAssignment(ctx lowerFileContext, expr ast.Expr, tempPrefix string) (string, []loweredStmt, []Diagnostic) {
+	// Nothing is assigned to a missing or blank expression.
+	if expr == nil {
+		return "", nil, nil
+	}
+	if ident, ok := expr.(*ast.Ident); ok && ident.Name == "_" {
+		return "", nil, nil
+	}
+
+	// Struct and array values are copied, as Go assigns them.
+	temp := ctx.tempName(tempPrefix)
+	value := temp
+	if typ := ctx.semPkg.source.TypesInfo.TypeOf(expr); typ != nil && isValueCopyType(typ) {
+		value = o.lowerValueForTargetTypes(ctx, typ, typ, temp, true)
+	}
+	assign, diagnostics := o.lowerTupleTargetAssignmentStmt(ctx, expr, value, false)
+	return temp, []loweredStmt{assign}, diagnostics
 }
 
 // rangeCounter returns the counter of a range loop over an integer, slice or
@@ -9753,6 +9967,9 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 			if value, ok := o.lowerWideIntegerBinaryExpr(ctx, typed, left, right); ok {
 				return value, append(leftDiagnostics, rightDiagnostics...)
 			}
+			if value, ok := lowerIntBitwiseValue(o.runtimeOwner, ctx.semPkg.source.TypesInfo.TypeOf(typed), typed.Op, left, right, false); ok {
+				return value, append(leftDiagnostics, rightDiagnostics...)
+			}
 			return left + " & ~(" + right + ")", append(leftDiagnostics, rightDiagnostics...)
 		}
 		if isEqualityOperator(typed.Op) {
@@ -9786,8 +10003,19 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 			// bigint while the base stays a number, and a raw JS << / >> on the
 			// pair throws "Cannot mix BigInt and other types". The wide-result and
 			// uintShr paths above already ran, so the base here is number-backed:
-			// coerce the bigint count to Number to match Go's count semantics.
-			right = "globalThis.Number(" + right + ")"
+			// coerce the bigint count to a number to match Go's count semantics.
+			right = wideToNumber(o.runtimeOwner, ctx.semPkg.source.TypesInfo.TypeOf(typed.Y), right)
+		}
+
+		// The bitwise operators on ints keep their bits above 32, except for
+		// an & with a mask.
+		mask := isInt32Mask(ctx, typed.X) || isInt32Mask(ctx, typed.Y)
+		if value, ok := lowerIntBitwiseValue(o.runtimeOwner, ctx.semPkg.source.TypesInfo.TypeOf(typed), typed.Op, left, right, mask); ok {
+			return value, append(leftDiagnostics, rightDiagnostics...)
+		}
+		// Narrow integers shifted by counts that may be 32 or more shift all bits out.
+		if value, ok := o.lowerNarrowShiftExpr(ctx, typed, left, right); ok {
+			return value, append(leftDiagnostics, rightDiagnostics...)
 		}
 		if typed.Op == token.ADD || typed.Op == token.SUB || typed.Op == token.SHL {
 			if value, ok := wrapNarrowIntegerValue(ctx.semPkg.source.TypesInfo.TypeOf(typed), left+" "+typed.Op.String()+" "+right, typed.Op); ok {
@@ -9835,8 +10063,14 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 				}
 				return wideComplement(RuntimeHelperUint64Xor), diagnostics
 			}
-			if bits, ok := signedIntegerBits(resultType); ok && bits > 32 {
+			if isBigIntBackedType(resultType) {
 				return wideComplement(RuntimeHelperInt64Xor), diagnostics
+			}
+
+			// The complement of an int, a number exact to 2^53, is -x - 1,
+			// which keeps its bits above 32, where ~ keeps only 32.
+			if bits, ok := signedIntegerBits(resultType); ok && bits > 32 {
+				return "(-(" + value + ") - 1)", diagnostics
 			}
 			return "~" + value, diagnostics
 		}
@@ -10499,6 +10733,11 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 			if call, callDiagnostics, ok := o.lowerPointerReceiverMethodCall(ctx, fun, selection, args); ok {
 				return o.awaitCallIfNeeded(ctx, expr, call), append(diagnostics, callDiagnostics...)
 			}
+			// A method that observes its receiver takes the address of a
+			// struct value.
+			if call, callDiagnostics, ok := o.lowerIdentityReceiverMethodCall(ctx, fun, selection, args); ok {
+				return o.awaitCallIfNeeded(ctx, expr, call), append(diagnostics, callDiagnostics...)
+			}
 			receiverExpr, receiverDiagnostics := o.lowerMethodReceiverExpr(ctx, fun.X, selection)
 			diagnostics = append(diagnostics, receiverDiagnostics...)
 			call := receiverExpr + "." + fun.Sel.Name + "(" + strings.Join(args, ", ") + ")"
@@ -11029,6 +11268,12 @@ func fieldSelectionOperand(ctx lowerFileContext, expr ast.Expr) (*ast.SelectorEx
 // lowerTransientFieldAddress lowers the address of the field of selector,
 // passed to a transient pointer parameter, as a new reference to the field.
 func (o *LoweringOwner) lowerTransientFieldAddress(ctx lowerFileContext, selector *ast.SelectorExpr, selection *types.Selection) (string, []Diagnostic) {
+	// A struct field is its own struct object, which needs no reference.
+	if isStructValueType(ctx.semPkg.source.TypesInfo.TypeOf(selector)) {
+		return o.lowerFieldSelectionExpr(ctx, selector, selection, false)
+	}
+
+	// Any other field takes a new reference.
 	ctx.transientAddress = true
 	return o.lowerFieldSelectionExpr(ctx, selector, selection, true)
 }
@@ -11261,9 +11506,23 @@ func (o *LoweringOwner) callUsesSlicesOverride(ctx lowerFileContext, expr ast.Ex
 	return fn != nil && fn.Pkg() != nil && fn.Pkg().Path() == "slices"
 }
 
+// slicesZeroFactoryFunctions are the functions of the slices override that
+// take the zero value factory of the element type as their last argument:
+// Grow for the elements it exposes, and the others for the elements they
+// free at the end of the slice, which Go zeroes.
+var slicesZeroFactoryFunctions = map[string]bool{
+	"Compact":     true,
+	"CompactFunc": true,
+	"Delete":      true,
+	"DeleteFunc":  true,
+	"Grow":        true,
+}
+
 // appendSlicesGrowZeroFactory appends the zero value factory that slices.Grow
-// needs to fill the capacity it adds: Go zeroes that capacity, and a slice
-// resliced into it must read zeros, not the absent value of an untyped array.
+// needs to fill the capacity it adds, and that Delete, Compact and their Func
+// variants need to zero the elements they free: Go zeroes them, and a slice
+// resliced into them must read zeros, not nil or the absent value of an
+// untyped array.
 func (o *LoweringOwner) appendSlicesGrowZeroFactory(
 	ctx lowerFileContext,
 	callee ast.Expr,
@@ -11271,7 +11530,7 @@ func (o *LoweringOwner) appendSlicesGrowZeroFactory(
 	args []string,
 ) []string {
 	selector, ok := callee.(*ast.SelectorExpr)
-	if !ok || selector.Sel.Name != "Grow" || !o.callUsesSlicesOverride(ctx, selector) {
+	if !ok || !slicesZeroFactoryFunctions[selector.Sel.Name] || !o.callUsesSlicesOverride(ctx, selector) {
 		return args
 	}
 	typ := ctx.semPkg.source.TypesInfo.TypeOf(expr)
@@ -11631,7 +11890,7 @@ func (o *LoweringOwner) lowerConversionExpr(
 		if isFloatType(targetType) {
 			converted := grouped
 			if isBigIntBackedType(sourceType) {
-				converted = "globalThis.Number(" + value + ")"
+				converted = wideToNumber(o.runtimeOwner, sourceType, value)
 			}
 			// A float32 value is already rounded.
 			if isFloat32Type(targetType) && !isFloat32Type(sourceType) {
@@ -11663,6 +11922,12 @@ func (o *LoweringOwner) lowerConversionExpr(
 			return o.runtimeOwner.QualifiedHelper(RuntimeHelperInt) +
 				"(" + value + ", " + strconv.Itoa(bits) + ")", diagnostics
 		}
+
+		// An int of a 64-bit integer is the number of its signed 64 bits, as
+		// int(x) of a uint64 is negative from 1<<63.
+		if isBigIntBackedType(sourceType) {
+			return o.runtimeOwner.QualifiedHelper(RuntimeHelperInt64ToNumber) + "(" + value + ")", diagnostics
+		}
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperInt) + "(" + value + ")", diagnostics
 	}
 
@@ -11681,9 +11946,10 @@ func (o *LoweringOwner) lowerConversionExpr(
 // Unsigned number-typed wide results (uint, uintptr) flow through $.uint(_, 64),
 // which keeps values above 2^53 as a runtime bigint so full 64-bit width
 // survives; a precision-losing Number() wrap would truncate values like
-// ^uint(0). Signed platform int coerces with Number (accepted precision loss
-// above 2^53, matching Model A's int->number mapping): $.uint on a signed value
-// would reinterpret its sign bit as magnitude.
+// ^uint(0). Signed platform int converts to the nearest number through the
+// words of its 64 bits (accepted precision loss above 2^53, matching Model A's
+// int->number mapping): $.uint on a signed value would reinterpret its sign bit
+// as magnitude.
 func coerceWideHelperResult(runtimeOwner *RuntimeContractOwner, resultType types.Type, call string) string {
 	if isBigIntBackedType(resultType) {
 		return call
@@ -11691,7 +11957,19 @@ func coerceWideHelperResult(runtimeOwner *RuntimeContractOwner, resultType types
 	if _, ok := unsignedIntegerBits(resultType); ok {
 		return runtimeOwner.QualifiedHelper(RuntimeHelperUint) + "(" + call + ", 64)"
 	}
-	return "globalThis.Number(" + call + ")"
+	return runtimeOwner.QualifiedHelper(RuntimeHelperInt64ToNumber) + "(" + call + ")"
+}
+
+// wideToNumber converts a value of the bigint-backed type typ to the nearest
+// number, through the words of its 64 bits, which V8 compiles to machine
+// operations where it does not compile Number of a bigint.
+func wideToNumber(runtimeOwner *RuntimeContractOwner, typ types.Type, value string) string {
+	// The words are read as signed or unsigned as the type is.
+	helper := RuntimeHelperInt64ToNumber
+	if _, unsigned := unsignedIntegerBits(typ); unsigned {
+		helper = RuntimeHelperUint64ToNumber
+	}
+	return runtimeOwner.QualifiedHelper(helper) + "(" + value + ")"
 }
 
 func (o *LoweringOwner) lowerWideIntegerBinaryExpr(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, bool) {
@@ -11775,9 +12053,15 @@ func (o *LoweringOwner) lowerWideShiftExpr(ctx lowerFileContext, expr *ast.Binar
 		}
 	}
 
+	// A constant count is a number, which the helpers take as a shared
+	// bigint count or power of two from a table.
+	amount, constantAmount := constantShiftAmount(ctx, expr.Y)
+	if constantAmount {
+		right = strconv.Itoa(amount)
+	}
+
 	// One shifted left by a variable count, as a bit flag mask 1<<f, is a
 	// single bit, which the runtime takes from a table of bigints.
-	amount, constantAmount := constantShiftAmount(ctx, expr.Y)
 	if !constantAmount && expr.Op == token.SHL && isOneIntegerExpr(ctx, expr.X) {
 		bit := wideIntegerHelper(signed, RuntimeHelperUint64Bit, RuntimeHelperInt64Bit)
 		return wrap(o.runtimeOwner.QualifiedHelper(bit) + "(" + right + ")")
@@ -12320,6 +12604,11 @@ func (o *LoweringOwner) lowerSelectorExpr(ctx lowerFileContext, expr *ast.Select
 				methodExpr := o.methodFunctionExpr(ctx, namedReceiver, selection.Obj(), expr.Sel.Name)
 				return o.lowerMethodValueClosure(ctx, selection, receiverExpr, methodExpr, true), diagnostics
 			}
+			// A method that observes its receiver is bound to the address
+			// of a struct value.
+			if value, diagnostics, ok := o.lowerIdentityReceiverMethodValue(ctx, expr, selection); ok {
+				return value, diagnostics
+			}
 			// The method value is called later, so it gets a copy of a value
 			// receiver even for a method that only reads it.
 			receiverCtx := ctx
@@ -12427,6 +12716,9 @@ func (o *LoweringOwner) packageVarAssignmentValue(
 	}
 	if helper, ok := wideIntegerAssignHelper(targetType, tok); ok {
 		return wideIntegerHelperCall(o.runtimeOwner, targetType, helper, left, right), true
+	}
+	if value, ok := lowerIntBitwiseValue(o.runtimeOwner, targetType, tok, left, right, false); ok {
+		return value, true
 	}
 	if tok == token.AND_NOT_ASSIGN {
 		return left + " & ~(" + right + ")", true
@@ -14161,8 +14453,8 @@ func (o *LoweringOwner) lowerNumberIndexValue(ctx lowerFileContext, expr ast.Exp
 	if expr == nil {
 		return value
 	}
-	if isBigIntBackedType(ctx.semPkg.source.TypesInfo.TypeOf(expr)) {
-		return "globalThis.Number(" + value + ")"
+	if typ := ctx.semPkg.source.TypesInfo.TypeOf(expr); isBigIntBackedType(typ) {
+		return wideToNumber(o.runtimeOwner, typ, value)
 	}
 	return value
 }
@@ -14471,6 +14763,7 @@ func (o *LoweringOwner) lowerStructCompositeLit(
 	if len(fields) != 0 {
 		expr = "new " + o.namedTypeExpr(ctx, named) + "({" + strings.Join(fields, ", ") + "})"
 	}
+	expr = o.lowerGenericInstance(ctx, named, expr)
 	if markStruct {
 		expr = o.runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue) + "(" + expr + ")"
 	}
@@ -14537,7 +14830,7 @@ func (o *LoweringOwner) lowerPositionalStructExpr(ctx lowerFileContext, named *t
 	if !value && last == 0 {
 		args = args[:0]
 	}
-	return "new " + o.namedTypeExpr(ctx, named) + "(" + strings.Join(args, ", ") + ")"
+	return o.lowerGenericInstance(ctx, named, "new "+o.namedTypeExpr(ctx, named)+"("+strings.Join(args, ", ")+")")
 }
 
 func compositeLiteralFieldNeedsPreEval(ctx lowerFileContext, expr ast.Expr) bool {
@@ -14981,7 +15274,13 @@ func (o *LoweringOwner) lowerValueForTarget(
 	if sameIntegerRepresentation(targetType, sourceType) && isNormalizedIntegerExpr(ctx, expr) {
 		return value
 	}
-	if adapted, ok := o.lowerOverrideFunctionValue(ctx, expr, targetType, value); ok {
+
+	// A function of an override package is adapted to the calls of function
+	// values: a variadic one takes a slice, and another one converts its
+	// interface arguments.
+	if adapted, ok := o.lowerOverrideVariadicFunctionValue(ctx, expr, value); ok {
+		value = adapted
+	} else if adapted, ok := o.lowerOverrideFunctionValue(ctx, expr, targetType, value); ok {
 		return adapted
 	}
 	if isInterfaceType(targetType) {
@@ -15086,6 +15385,42 @@ func goRuntimePackageName(pkg *types.Package) string {
 		return "main"
 	}
 	return pkg.Path()
+}
+
+// lowerOverrideVariadicFunctionValue returns value, the value of a variadic
+// function of an override package, as a function that takes its variadic
+// arguments as a slice, as the values of Go functions do, and passes them to
+// the function as the rest arguments that its TypeScript signature takes. It
+// reports false for any other value.
+func (o *LoweringOwner) lowerOverrideVariadicFunctionValue(ctx lowerFileContext, expr ast.Expr, value string) (string, bool) {
+	// Only a reference to a plain variadic function of an override package
+	// takes rest arguments.
+	expr = unwrapParenExpr(expr)
+	switch expr.(type) {
+	case *ast.Ident, *ast.SelectorExpr:
+	default:
+		return "", false
+	}
+	fn := calledFunction(ctx.semPkg.source, expr)
+	if fn == nil || !o.callUsesOverridePackage(ctx, expr) {
+		return "", false
+	}
+	signature := fn.Signature()
+	if !signature.Variadic() || signature.Recv() != nil || signature.TypeParams().Len() > 0 {
+		return "", false
+	}
+
+	// The wrapper spreads the slice of variadic arguments after the others.
+	params := make([]string, 0, signature.Params().Len())
+	args := make([]string, 0, signature.Params().Len())
+	for idx := range signature.Params().Len() {
+		name := "__goscriptArg" + strconv.Itoa(idx)
+		params = append(params, name+": "+o.tsTypeFor(ctx, signature.Params().At(idx).Type()))
+		args = append(args, name)
+	}
+	args[len(args)-1] = "...(" + args[len(args)-1] + " ?? [])"
+	return "((__goscriptFn: typeof " + value + ") => (" + strings.Join(params, ", ") + ") => __goscriptFn(" +
+		strings.Join(args, ", ") + "))(" + value + ")", true
 }
 
 // lowerOverrideFunctionValue adapts a function of an override package with a
@@ -15523,6 +15858,82 @@ func isBasicFixedWideIntegerType(typ types.Type) bool {
 	}
 }
 
+// lowerGenericInstance returns expr, which makes a new instance of named,
+// marked with the methods of its type (see genericInstanceMethodsExpr) when
+// named is an instantiated generic struct type, so that reflect can call
+// them, or expr itself otherwise.
+func (o *LoweringOwner) lowerGenericInstance(ctx lowerFileContext, named *types.Named, expr string) string {
+	methods := o.genericInstanceMethodsExpr(ctx, named)
+	if methods == "" {
+		return expr
+	}
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericInstance) + "(" + expr + ", " + methods + ")"
+}
+
+// genericInstanceMethodsExpr returns a function that describes the methods
+// of a pointer to named, an instantiated generic struct type, as the method
+// table that boxes it in an interface and the signatures of its methods, or
+// "" if named has no methods that take type arguments.
+func (o *LoweringOwner) genericInstanceMethodsExpr(ctx lowerFileContext, named *types.Named) string {
+	// Only an instance of a compiled generic struct type with such methods
+	// has them: the classes of override packages are written by hand.
+	if named == nil || named.TypeArgs().Len() == 0 || namedStructType(named) == nil || o.typeUsesOverride(named.Origin()) {
+		return ""
+	}
+
+	// The method table is the one that boxes a pointer to the instance in an
+	// interface.
+	pointer := types.NewPointer(named)
+	if !genericMethodSetHasReceiverTypeParams(pointer) {
+		return ""
+	}
+	methods := o.genericMethodDescriptorsForType(ctx, named, pointer, make(map[types.Type]bool))
+	if methods == "" {
+		return ""
+	}
+
+	// The signatures mark the methods that only a pointer has.
+	valueMethods := types.NewMethodSet(named)
+	var signatures []string
+	for selection := range types.NewMethodSet(pointer).Methods() {
+		if method, _ := selection.Obj().(*types.Func); method != nil {
+			pointerOnly := valueMethods.Lookup(method.Pkg(), method.Name()) == nil
+			signatures = append(signatures, o.genericInstanceMethodSignature(ctx, method, pointerOnly))
+		}
+	}
+	describe := "[" + methods + ", [" + strings.Join(signatures, ", ") + "]]"
+
+	// Without type parameters, the description is the same each time, so it
+	// is made once, by the getter of a static.
+	if typeIsHoistable(pointer) {
+		if getter, ok := strings.CutSuffix(o.hoistStatic(ctx, describe), "()"); ok {
+			return getter
+		}
+	}
+	return "() => " + describe
+}
+
+// genericInstanceMethodSignature describes method, a method of the method
+// set of a pointer to an instantiated generic struct type, as
+// runtimeReceiverMethodSignature does, with the types of its parameters and
+// results that are type parameters given by their type arguments.
+func (o *LoweringOwner) genericInstanceMethodSignature(ctx lowerFileContext, method *types.Func, pointerOnly bool) string {
+	// Each parameter and result is described in the context of the code.
+	signature, _ := method.Type().(*types.Signature)
+	describe := func(tuple *types.Tuple) string {
+		var infos []string
+		for v := range tuple.Variables() {
+			infos = append(infos, o.runtimeTypeAssertInfoExprWithSeen(ctx, v.Type(), make(map[types.Type]bool)))
+		}
+		return "[" + strings.Join(infos, ", ") + "]"
+	}
+
+	// The flags are positional, as for methodSignature.
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperMethodSignature) + "(" + strconv.Quote(method.Name()) + ", " +
+		describe(signature.Params()) + ", " + describe(signature.Results()) + ", " +
+		strconv.FormatBool(pointerOnly) + ", " + strconv.FormatBool(signature.Variadic()) + ")"
+}
+
 func (o *LoweringOwner) lowerNamedValueInterfaceWrapper(
 	ctx lowerFileContext,
 	targetType types.Type,
@@ -15689,7 +16100,7 @@ func (o *LoweringOwner) lowerUnnamedToNamedStruct(
 	}
 
 	// The class constructor copies the fields of its init value.
-	return "new " + o.namedTypeExpr(ctx, target) + "(" + value + ", true)", true
+	return o.lowerGenericInstance(ctx, target, "new "+o.namedTypeExpr(ctx, target)+"("+value+", true)"), true
 }
 
 func (o *LoweringOwner) lowerStructClone(value string) string {
@@ -15768,7 +16179,7 @@ func (o *LoweringOwner) hasGeneratedClassShape(named *types.Named) bool {
 // lowerNewStructValue returns the zero struct value of a generated struct
 // class.
 func (o *LoweringOwner) lowerNewStructValue(ctx lowerFileContext, named *types.Named) string {
-	return "new " + o.namedTypeExpr(ctx, named) + "(true)"
+	return o.lowerGenericInstance(ctx, named, "new "+o.namedTypeExpr(ctx, named)+"(true)")
 }
 
 func (o *LoweringOwner) lowerNamedStructZeroValueExpr(
@@ -15808,12 +16219,12 @@ func (o *LoweringOwner) lowerNamedStructZeroValueExpr(
 
 	// A struct without such fields has its zero values already.
 	if len(fields) == 0 {
-		return "new " + name + "()"
+		return o.lowerGenericInstance(ctx, named, "new "+name+"()")
 	}
 	if fresh {
-		return "new " + name + "({" + strings.Join(fields, ", ") + "}, undefined, true)"
+		return o.lowerGenericInstance(ctx, named, "new "+name+"({"+strings.Join(fields, ", ")+"}, undefined, true)")
 	}
-	return "new " + name + "({" + strings.Join(fields, ", ") + "})"
+	return o.lowerGenericInstance(ctx, named, "new "+name+"({"+strings.Join(fields, ", ")+"})")
 }
 
 // genericStructFieldZeros returns the zero value of each field of named, an
@@ -18307,11 +18718,15 @@ func (o *LoweringOwner) genericMethodDescriptorsForType(
 			continue
 		}
 		// A promoted method is called through the embedding type's
-		// forwarder, which takes that type's own type arguments, if any,
+		// forwarder, which takes that type's own type arguments when the
+		// embedded type's method needs them (see promotedForwarderTakesTypeArgs),
 		// and supplies the embedded type's itself.
 		var genericArgs string
 		if len(selection.Index()) > 1 {
-			genericArgs = o.genericTypeArgsExprForNamed(ctx, receiverNamedType(methodSetType), seen)
+			outer := receiverNamedType(methodSetType)
+			if promotedForwarderTakesTypeArgs(outer, selection.Index()) {
+				genericArgs = o.genericTypeArgsExprForNamed(ctx, outer, seen)
+			}
 		} else {
 			genericArgs = o.genericReceiverTypeArgsExprForMethod(ctx, method, methodSetType, seen)
 		}
@@ -18393,6 +18808,42 @@ func (o *LoweringOwner) genericMethodSignatureDescriptors(typ types.Type) string
 		return ""
 	}
 	return "[" + strings.Join(methods, ", ") + "]"
+}
+
+// promotedForwarderTakesTypeArgs reports whether the forwarder that the class
+// of outer, a struct type, declares for the method promoted along index (the
+// index of a method selection) takes outer's type arguments, as
+// lowerEmbeddedMethodForwarders declares it: when the type that declares the
+// method is generic in outer's type parameters, such as Base[T] embedded in
+// Number[T], and not for a plain or fixed instance embedded type, such as a
+// struct without type parameters or Inner[int].
+func promotedForwarderTakesTypeArgs(outer *types.Named, index []int) bool {
+	// Only a generic struct's forwarders can take type arguments.
+	if outer == nil || len(index) < 2 {
+		return false
+	}
+	structType, ok := outer.Origin().Underlying().(*types.Struct)
+	if !ok || index[0] >= structType.NumFields() {
+		return false
+	}
+
+	// A field of a named non-struct type has free method functions, which
+	// its forwarders call without type arguments.
+	typ := structType.Field(index[0]).Type()
+	if namedStructType(typ) == nil && pointerToNamedStructType(typ) == nil && !isInterfaceType(typ) {
+		return false
+	}
+
+	// Follow the embedded fields to the type that declares the method, as
+	// instantiated in outer's own type parameters.
+	for _, idx := range index[1 : len(index)-1] {
+		embedded, ok := derefPointerType(typ).Underlying().(*types.Struct)
+		if !ok || idx >= embedded.NumFields() {
+			return false
+		}
+		typ = embedded.Field(idx).Type()
+	}
+	return len(genericReceiverTypeParams(typ)) != 0 && typeContainsTypeParam(typ)
 }
 
 func genericMethodSetDescriptorTarget(typ types.Type) (*types.Named, types.Type) {
@@ -18587,7 +19038,7 @@ func runtimeNamedTypeName(named *types.Named) string {
 	if named.Obj().Pkg() == nil {
 		return named.Obj().Name()
 	}
-	return runtimePackageName(named.Obj().Pkg()) + "." + named.Obj().Name()
+	return runtimePackageName(named.Obj().Pkg()) + "." + runtimeTypeObjectName(named.Obj())
 }
 
 func goRuntimeTypeString(typ types.Type) string {

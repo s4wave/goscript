@@ -1,0 +1,10 @@
+mask 0..31 4294967295
+mask 4..31 4294967280
+mask 0..3 15
+uint32 << 32 0 int32 << 32 0 uint16 << 32 0 uint8 << 32 0
+int32 >> 32 0 negative int32 >> 32 -1 int8 >> 32 -1
+uint32 << 31 2147483648 int32 << 31 -2147483648
+uint32 << call 0 int32 >> call -1
+assign 0 0 -1 0
+assign call 0 -1
+bit 1 2 2147483648

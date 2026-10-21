@@ -56,7 +56,7 @@ export class content {
 			l = $.int64Sub($.int64($.sliceLen((c$ as content).bytes)), off)
 		}
 
-		let btr = $.goSlice((c$ as content).bytes, globalThis.Number(off), globalThis.Number($.int64Add(off, l)))
+		let btr = $.goSlice((c$ as content).bytes, $.int64ToNumber(off), $.int64ToNumber($.int64Add(off, l)))
 		n = $.copy(b, btr)
 		return [n, err]
 	}

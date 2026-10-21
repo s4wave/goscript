@@ -6,7 +6,7 @@ import * as $ from "@goscript/builtin/index.js"
 export async function main(): globalThis.Promise<void> {
 	let acc = 1n
 	acc = $.uint64Add(($.uint64Mul(acc, 6364136223846793005n)), 1442695040888963407n)
-	acc = $.uint64Xor(acc, $.uint64Shr(acc, 33n))
+	acc = $.uint64Xor(acc, $.uint64Shr(acc, 33))
 	await $.println("lcg-xor:", acc)
 
 	let large = 9007199254740993n

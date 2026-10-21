@@ -80,7 +80,7 @@ export function algorithm(data: $.Slice<number>, n: number, g: $.Slice<bigint>, 
 	let fp = 0n
 	let i = minSize
 	for (let __goscriptSliceWindow0 = $.sliceRange(g), __goscriptSliceWindow1 = $.sliceRange(data); i < n; ) {
-		fp = $.uint64Add(($.uint64Shl(fp, 1n)), ((__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, ((__goscriptSliceWindow1.backing as any[])[$.windowSlot(__goscriptSliceWindow1, i)] as number) % uint64Len(g))] as bigint))
+		fp = $.uint64Add(($.uint64Shl(fp, 1)), ((__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, ((__goscriptSliceWindow1.backing as any[])[$.windowSlot(__goscriptSliceWindow1, i)] as number) % uint64Len(g))] as bigint))
 		if (($.uint64And(fp, maskJ)) == 0n) {
 			if (($.uint64And(fp, maskC)) == 0n) {
 				return i

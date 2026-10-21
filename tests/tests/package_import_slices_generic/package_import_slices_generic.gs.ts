@@ -10,7 +10,7 @@ export function grow<T>(__typeArgs: $.GenericTypeArgs | undefined, n: number): $
 
 export function siblings<T>(__typeArgs: $.GenericTypeArgs | undefined, value: any): $.Slice<T> {
 	let values: $.Slice<T> = (slices.Insert(null, 0, $.copyElement(value)) as $.Slice<T>)
-	values = (slices.Delete(values, 0, 1) as $.Slice<T>)
+	values = (slices.Delete(values, 0, 1, () => ($.genericZero(__typeArgs, "T", null) as T)) as $.Slice<T>)
 	return (slices.Concat(values, $.arrayToSlice<T>([$.copyElement(value)])) as $.Slice<T>)
 }
 

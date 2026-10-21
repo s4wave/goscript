@@ -4,54 +4,27 @@
 
 import type { MessageType } from "@aptre/protobuf-es-lite/message";
 import { createMessageType } from "@aptre/protobuf-es-lite/message";
-import { ScalarType } from "@aptre/protobuf-es-lite/scalar";
-import type { PartialFieldInfo } from "@aptre/protobuf-es-lite/field";
 
-export const protobufPackage = "protobuf_lite_ts";
 
 /**
  * @generated from message protobuf_lite_ts.ExampleMsg
  */
 export interface ExampleMsg {
-  /**
-   * @generated from field: bytes example_field = 1;
-   */
   exampleField?: Uint8Array;
-  /**
-   * @generated from field: string example_text = 2;
-   */
   exampleText?: string;
-
   /**
    * @generated from oneof protobuf_lite_ts.ExampleMsg.choice
    */
-  choice?: {
-    value?: undefined,
-    case: undefined
-  } | {
-    /**
-     * @generated from field: string choice_text = 3;
-     */
-    value: string;
-    case: "choiceText";
-  } | {
-    /**
-     * @generated from field: bytes choice_data = 4;
-     */
-    value: Uint8Array;
-    case: "choiceData";
-  };
+  choice?:
+    | { value?: undefined; case: undefined }
+    | { value: string; case: "choiceText" }
+    | { value: Uint8Array; case: "choiceData" };
+}
 
-};
-
-export const ExampleMsg: MessageType<ExampleMsg> = /* @__PURE__ */ createMessageType({
-    typeName: "protobuf_lite_ts.ExampleMsg",
-    fields: [
-        { no: 1, name: "example_field", kind: "scalar", T: ScalarType.BYTES },
-        { no: 2, name: "example_text", kind: "scalar", T: ScalarType.STRING },
-        { no: 3, name: "choice_text", kind: "scalar", T: ScalarType.STRING, oneof: "choice" },
-        { no: 4, name: "choice_data", kind: "scalar", T: ScalarType.BYTES, oneof: "choice" },
-    ] satisfies readonly PartialFieldInfo[],
-    packedByDefault: true,
-});
+export const ExampleMsg: MessageType<ExampleMsg> = /* @__PURE__ */ createMessageType<ExampleMsg>("protobuf_lite_ts.ExampleMsg", () => [
+  [1, "example_field", 12],
+  [2, "example_text", 9],
+  [3, "choice_text", 9, 0, 0, "choice"],
+  [4, "choice_data", 12, 0, 0, "choice"],
+]);
 

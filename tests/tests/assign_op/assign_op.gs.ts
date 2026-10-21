@@ -37,11 +37,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(f)
 
 	let g = 5
-	g |= 3
+	g = $.intOr(g, 3)
 	await $.println(g)
 
 	let h = 5
-	h ^= 3
+	h = $.intXor(h, 3)
 	await $.println(h)
 
 	// This operation is not yet supported.
@@ -50,11 +50,11 @@ export async function main(): globalThis.Promise<void> {
 	// println(i) // Expected output: 4
 
 	let j = 5
-	j <<= 1
+	j = $.intShl(j, 1)
 	await $.println(j)
 
 	let k = 5
-	k >>= 1
+	k = $.intShr(k, 1)
 	await $.println(k)
 
 	let m = 10

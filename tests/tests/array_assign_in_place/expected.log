@@ -1,0 +1,14 @@
+local: 1
+copy: 3 3
+swap: 4 3 4
+field: 6 9
+through pointer: 11
+global: 12
+deref: 15
+slice element: 16
+nested: 18
+nested whole: 19
+tuple: 20
+receive: 21
+map: 24 23
+basic: 2.5 b

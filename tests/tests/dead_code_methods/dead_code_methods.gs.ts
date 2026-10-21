@@ -277,7 +277,7 @@ export class Box {
 	}
 
 	public clone(): Box {
-		return new Box(true, $.copyElement(this.v))
+		return $.copyGenericInstance(this, new Box(true, $.copyElement(this.v)))
 	}
 
 	public __goscriptAssign(source: Box): this {
@@ -390,12 +390,12 @@ export async function main(): globalThis.Promise<void> {
 
 	fmt.Println($.interfaceValue(names(__goscriptStatic4(), $.arrayToSlice<Cat>([new Cat(true), new Cat(true)])), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))))
 
-	let b = new Box(false, 7)
+	let b = $.genericInstance(new Box(false, 7), __goscriptStatic6)
 	fmt.Println($.basicInterfaceValue((b !== null && (b as any).__isVarRef !== true && (b as any).__goValue === undefined ? ((b as any) as Box).Get(__goscriptStatic5()) : Box.prototype.Get.call(b, __goscriptStatic5())), "int"))
 
 	let words = ($.arrayToSlice<string>(["ccc", "a", "bb"]) as byLen)
-	sort.Sort($.pointerValueOrNil($.namedValueInterfaceValue<sort.Interface | null>(words, "main.byLen", __goscriptStatic6(), __goscriptStatic7(), __goscriptStatic8()))!)
-	fmt.Println($.namedValueInterfaceValue<any>(words, "main.byLen", __goscriptStatic6(), __goscriptStatic7(), __goscriptStatic8()))
+	sort.Sort($.pointerValueOrNil($.namedValueInterfaceValue<sort.Interface | null>(words, "main.byLen", __goscriptStatic7(), __goscriptStatic8(), __goscriptStatic9()))!)
+	fmt.Println($.namedValueInterfaceValue<any>(words, "main.byLen", __goscriptStatic7(), __goscriptStatic8(), __goscriptStatic9()))
 
 	let err: $.GoError = $.interfaceValue<$.GoError>(new myErr(false, 3), "*main.myErr", /* @__PURE__ */ $.pointerType("main.myErr"))
 	fmt.Println((err as any))
@@ -435,17 +435,22 @@ function __goscriptStatic5(): any {
 
 var __goscriptStatic6$value: any
 function __goscriptStatic6(): any {
-	return __goscriptStatic6$value ??= ({Len: (receiver: any) => (byLen_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Less: (receiver: any, ...args: any[]) => (byLen_Less as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byLen_Swap as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic6$value ??= ([{Get: (receiver: any) => $.pointerValue(receiver).Get(__goscriptStatic5())}, [$.methodSignature("Drop", [], [/* @__PURE__ */ $.basicType("int")], true, false), $.methodSignature("Get", [], [/* @__PURE__ */ $.basicType("int")], true, false)]])
 }
 
 var __goscriptStatic7$value: any
 function __goscriptStatic7(): any {
-	return __goscriptStatic7$value ??= (/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"), "main.byLen"))
+	return __goscriptStatic7$value ??= ({Len: (receiver: any) => (byLen_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Less: (receiver: any, ...args: any[]) => (byLen_Less as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byLen_Swap as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
 }
 
 var __goscriptStatic8$value: any
 function __goscriptStatic8(): any {
-	return __goscriptStatic8$value ??= ([$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Less", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Swap", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]])])
+	return __goscriptStatic8$value ??= (/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"), "main.byLen"))
+}
+
+var __goscriptStatic9$value: any
+function __goscriptStatic9(): any {
+	return __goscriptStatic9$value ??= ([$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Less", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Swap", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]])])
 }
 
 var __goscriptAwait: any

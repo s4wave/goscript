@@ -94,7 +94,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let filtered = (slices.DeleteFunc($.arrayToSlice<number>([1, 2, 3, 4, 5]), $.functionValue((v: number): boolean => {
 		return (v % 2) == 0
-	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))) as $.Slice<number>)
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)), () => (0 as number)) as $.Slice<number>)
 	await $.println("delete func:", $.arrayIndex(filtered!, 0), $.arrayIndex(filtered!, 1), $.arrayIndex(filtered!, 2), $.sliceLen(filtered))
 
 	let sortedKeys = (slices.Sorted(maps.Keys($.makeMap<string, number>([["c", 3], ["a", 1], ["b", 2]]))) as $.Slice<string>)

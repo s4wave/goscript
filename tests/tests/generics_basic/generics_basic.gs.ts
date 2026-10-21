@@ -34,7 +34,7 @@ export class Stack {
 	}
 
 	public clone(): Stack {
-		return new Stack(true, this.items)
+		return $.copyGenericInstance(this, new Stack(true, this.items))
 	}
 
 	public __goscriptAssign(source: Stack): this {
@@ -117,7 +117,7 @@ export class Mapper {
 	}
 
 	public clone(): Mapper {
-		return new Mapper(true, this.values)
+		return $.copyGenericInstance(this, new Mapper(true, this.values))
 	}
 
 	public __goscriptAssign(source: Mapper): this {
@@ -157,7 +157,7 @@ export class Pair {
 	}
 
 	public clone(): Pair {
-		return new Pair(true, $.copyElement(this.First), $.copyElement(this.Second))
+		return $.copyGenericInstance(this, new Pair(true, $.copyElement(this.First), $.copyElement(this.Second)))
 	}
 
 	public __goscriptAssign(source: Pair): this {
@@ -168,7 +168,7 @@ export class Pair {
 
 	public Swap(__typeArgs: $.GenericTypeArgs | undefined): Pair {
 		const p = this;
-		return new Pair(true, $.copyElement(p.Second), $.copyElement(p.First))
+		return $.genericInstance(new Pair(true, $.copyElement(p.Second), $.copyElement(p.First)), () => [{Swap: (receiver: any) => $.pointerValue(receiver).Swap({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})}, [$.methodSignature("Swap", [], ["main.Pair"], false, false)]])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -215,7 +215,7 @@ export async function CloneAll<T>(__typeArgs: $.GenericTypeArgs | undefined, ite
 }
 
 export function NewMapper(__typeArgs: $.GenericTypeArgs | undefined): Mapper | $.VarRef<Mapper> | null {
-	return new Mapper(false, $.makeMap<any, any>(undefined, __typeArgs?.["K"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }))
+	return $.genericInstance(new Mapper(false, $.makeMap<any, any>(undefined, __typeArgs?.["K"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })), () => [{Get: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Get({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: __typeArgs?.["K"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }, V: __typeArgs?.["V"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, ...$.stripGenericTypeArgs(args)), Put: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Put({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: __typeArgs?.["K"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }, V: __typeArgs?.["V"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Get", [__typeArgs?.["K"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }], [__typeArgs?.["V"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }, /* @__PURE__ */ $.basicType("bool")], true, false), $.methodSignature("Put", [__typeArgs?.["K"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }, __typeArgs?.["V"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }], [], true, false)]])
 }
 
 export function Apply(__typeArgs: $.GenericTypeArgs | undefined, value: any, fn: ((_p0: any) => any | globalThis.Promise<any>) | null): any {
@@ -227,7 +227,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("min:", min(__goscriptStatic0(), 8, 3), min(__goscriptStatic1(), 9, 4), min(__goscriptStatic2(), "go", "ts"))
 
 	await $.println("=== Generic stack ===")
-	let stack: $.VarRef<Stack> = $.varRef(new Stack(true))
+	let stack: $.VarRef<Stack> = $.varRef($.genericInstance(new Stack(true), __goscriptStatic3))
 	stack.value.Push(__goscriptStatic0(), 10)
 	stack.value.Push(__goscriptStatic0(), 20)
 	let __goscriptTuple0: any = stack.value.Pop(__goscriptStatic0())
@@ -246,13 +246,13 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("=== Interface constraint ===")
 	let items = $.arrayToSlice<Item | $.VarRef<Item> | null>([new Item(false, "alpha"), new Item(false, "beta")])
-	let clones = (await CloneAll(__goscriptStatic3(), items) as $.Slice<Item | $.VarRef<Item> | null>)
+	let clones = (await CloneAll(__goscriptStatic4(), items) as $.Slice<Item | $.VarRef<Item> | null>)
 	await $.println("clone:", $.pointerValue<Item>($.arrayIndex(clones!, 0)).Name, $.pointerValue<Item>($.arrayIndex(clones!, 1)).Name, ($.arrayIndex(clones!, 0) === $.arrayIndex(items!, 0) || ($.pointerAliasesMade || ($.arrayIndex(clones!, 0) as any)?.__goElementBacking !== undefined) && $.pointerEqual($.arrayIndex(clones!, 0), $.arrayIndex(items!, 0))))
 
 	await $.println("=== Generic struct with map field ===")
-	let mapper = (NewMapper(__goscriptStatic4()) as Mapper | $.VarRef<Mapper> | null)
-	void (mapper !== null && (mapper as any).__isVarRef !== true && (mapper as any).__goValue === undefined ? ((mapper as any) as Mapper).Put(__goscriptStatic4(), "answer", 42) : Mapper.prototype.Put.call(mapper, __goscriptStatic4(), "answer", 42))
-	let __goscriptTuple2: any = (mapper !== null && (mapper as any).__isVarRef !== true && (mapper as any).__goValue === undefined ? ((mapper as any) as Mapper).Get(__goscriptStatic4(), "answer") : Mapper.prototype.Get.call(mapper, __goscriptStatic4(), "answer"))
+	let mapper = (NewMapper(__goscriptStatic5()) as Mapper | $.VarRef<Mapper> | null)
+	void (mapper !== null && (mapper as any).__isVarRef !== true && (mapper as any).__goValue === undefined ? ((mapper as any) as Mapper).Put(__goscriptStatic5(), "answer", 42) : Mapper.prototype.Put.call(mapper, __goscriptStatic5(), "answer", 42))
+	let __goscriptTuple2: any = (mapper !== null && (mapper as any).__isVarRef !== true && (mapper as any).__goValue === undefined ? ((mapper as any) as Mapper).Get(__goscriptStatic5(), "answer") : Mapper.prototype.Get.call(mapper, __goscriptStatic5(), "answer"))
 	let answer: number = (__goscriptTuple2[0] as number)
 	let found: boolean = __goscriptTuple2[1]
 	await $.println("mapper:", answer, found)
@@ -264,7 +264,7 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))) as number))
 
 	await $.println("=== Generic pair method ===")
-	let pair = new Pair(true, "left", "right")
+	let pair = $.genericInstance(new Pair(true, "left", "right"), __goscriptStatic6)
 	let swapped = (pair.Swap(__goscriptStatic2()) as Pair)
 	await $.println("pair:", swapped.First, swapped.Second)
 }
@@ -286,12 +286,22 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.Item"), zero: () => null, methods: {Clone: (receiver: any) => $.pointerValue(receiver).Clone()} }})
+	return __goscriptStatic3$value ??= ([{Len: (receiver: any) => $.pointerValue(receiver).Len(__goscriptStatic0()), Pop: (receiver: any) => $.pointerValue(receiver).Pop(__goscriptStatic0()), Push: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Push(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")], true, false), $.methodSignature("Pop", [], [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("bool")], true, false), $.methodSignature("Push", [/* @__PURE__ */ $.basicType("int")], [], true, false)]])
 }
 
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }, V: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.Item"), zero: () => null, methods: {Clone: (receiver: any) => $.pointerValue(receiver).Clone()} }})
+}
+
+var __goscriptStatic5$value: any
+function __goscriptStatic5(): any {
+	return __goscriptStatic5$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }, V: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+}
+
+var __goscriptStatic6$value: any
+function __goscriptStatic6(): any {
+	return __goscriptStatic6$value ??= ([{Swap: (receiver: any) => $.pointerValue(receiver).Swap(__goscriptStatic2())}, [$.methodSignature("Swap", [], ["main.Pair"], false, false)]])
 }
 
 var __goscriptAwait: any

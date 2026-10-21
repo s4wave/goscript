@@ -258,7 +258,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("reflect", $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(p, "*main.T", /* @__PURE__ */ $.pointerType("main.T"))))).Pointer() == $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(_in!, 0), "*main.T", /* @__PURE__ */ $.pointerType("main.T"))))).Pointer(), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(ip, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))))).Pointer() == $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(ints!, 0), "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))))).Pointer())
 
 	// Pointers compared by the standard library.
-	await $.println("slices", slices.Index(dst, $.indexRef(_in!, 1)), slices.Contains(ips, $.indexRef(ints!, 0)), $.sliceLen(slices.Compact($.arrayToSlice<T | $.VarRef<T> | null>([$.indexRef(_in!, 0), $.indexRef(_in!, 0), $.indexRef(_in!, 1)]))))
+	await $.println("slices", slices.Index(dst, $.indexRef(_in!, 1)), slices.Contains(ips, $.indexRef(ints!, 0)), $.sliceLen(slices.Compact($.arrayToSlice<T | $.VarRef<T> | null>([$.indexRef(_in!, 0), $.indexRef(_in!, 0), $.indexRef(_in!, 1)]), () => (null! as T | $.VarRef<T> | null as T | $.VarRef<T> | null))))
 	let atom: $.VarRef<atomic.Pointer<T>> = $.varRef($.markAsStructValue(new atomic.Pointer<T>()))
 	atom.value.Store($.indexRef(_in!, 0))
 	await $.println("atomic", atom.value.CompareAndSwap($.indexRef(_in!, 0), $.indexRef(_in!, 1)), $.pointerEqual(atom.value.Load(), $.indexRef(_in!, 1)))

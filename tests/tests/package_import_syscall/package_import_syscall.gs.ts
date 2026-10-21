@@ -75,11 +75,11 @@ export async function main(): globalThis.Promise<void> {
 
 	let sa4 = $.markAsStructValue(new syscall.SockaddrInet4())
 	let addr4 = netip.AddrFrom4($.cloneArrayValue(sa4.Addr, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)))
-	sa4.Addr = addr4.As4()
+	$.assignFieldValue(sa4.Addr, addr4.As4(), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
 
 	let sa6 = $.markAsStructValue(new syscall.SockaddrInet6())
 	let addr6 = netip.AddrFrom16($.cloneArrayValue(sa6.Addr, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 16)))
-	sa6.Addr = addr6.As16()
+	$.assignFieldValue(sa6.Addr, addr6.As16(), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 16))
 
 	fmt.Println("set nonblock ok")
 }

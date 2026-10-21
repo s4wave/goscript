@@ -97,9 +97,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("array:", points[1].x, points[0].y)
 
 	let big = 1099511627776n
-	let f: number = globalThis.Number(big)
+	let f: number = $.int64ToNumber(big)
 	await $.println("int64 to float:", f == 1099511627776)
-	let n: number = $.int($.int64Shr(big, 20n))
+	let n: number = $.int64ToNumber($.int64Shr(big, 20))
 	await $.println("int64 to int:", n)
 }
 

@@ -32,7 +32,7 @@ export class genericBox {
 	}
 
 	public clone(): genericBox {
-		return new genericBox(true)
+		return $.copyGenericInstance(this, new genericBox(true))
 	}
 
 	public __goscriptAssign(source: genericBox): this {
@@ -98,13 +98,13 @@ export async function main(): globalThis.Promise<void> {
 	let [ctx, cancel] = context.WithCancel($.pointerValueOrNil(context.Background())!)
 	cancel!()
 
-	let genericGeneric: GenericWaiter | null = $.namedValueInterfaceValue<GenericWaiter | null>(new genericBox(), "*main.genericBox", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())
+	let genericGeneric: GenericWaiter | null = $.namedValueInterfaceValue<GenericWaiter | null>($.genericInstance(new genericBox(), __goscriptStatic1), "*main.genericBox", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())
 	await $.println("generic-generic", (__goscriptAwait = $.callInterfaceMethod((genericGeneric !== null && (genericGeneric as any).__isVarRef !== true && ((genericGeneric as any).__goValue === undefined || (genericGeneric as any).__goType?.charCodeAt(0) !== 42) ? (genericGeneric as Exclude<GenericWaiter, null>) : $.pointerValue<Exclude<GenericWaiter, null>>(genericGeneric)), "Wait", __goscriptStatic0(), ctx, 7), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.callInterfaceMethod((genericGeneric !== null && (genericGeneric as any).__isVarRef !== true && ((genericGeneric as any).__goValue === undefined || (genericGeneric as any).__goType?.charCodeAt(0) !== 42) ? (genericGeneric as Exclude<GenericWaiter, null>) : $.pointerValue<Exclude<GenericWaiter, null>>(genericGeneric)), "Count", __goscriptStatic0(), ctx, $.arrayToSlice<number>([1, 2])), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
-	let genericPlain: IntWaiter | null = $.namedValueInterfaceValue<IntWaiter | null>(new genericBox(), "*main.genericBox", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())
+	let genericPlain: IntWaiter | null = $.namedValueInterfaceValue<IntWaiter | null>($.genericInstance(new genericBox(), __goscriptStatic1), "*main.genericBox", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())
 	await $.println("generic-plain", (__goscriptAwait = (genericPlain !== null && (genericPlain as any).__isVarRef !== true && ((genericPlain as any).__goValue === undefined || (genericPlain as any).__goType?.charCodeAt(0) !== 42) ? (genericPlain as Exclude<IntWaiter, null>) : $.pointerValue<Exclude<IntWaiter, null>>(genericPlain)).Wait(ctx, 8), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (genericPlain !== null && (genericPlain as any).__isVarRef !== true && ((genericPlain as any).__goValue === undefined || (genericPlain as any).__goType?.charCodeAt(0) !== 42) ? (genericPlain as Exclude<IntWaiter, null>) : $.pointerValue<Exclude<IntWaiter, null>>(genericPlain)).Count(ctx, $.arrayToSlice<number>([1, 2, 3])), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
-	let plainGeneric: GenericWaiter | null = $.namedValueInterfaceValue<GenericWaiter | null>(new intBox(), "*main.intBox", __goscriptStatic4(), __goscriptStatic5(), __goscriptStatic3())
+	let plainGeneric: GenericWaiter | null = $.namedValueInterfaceValue<GenericWaiter | null>(new intBox(), "*main.intBox", __goscriptStatic5(), __goscriptStatic6(), __goscriptStatic4())
 	await $.println("plain-generic", (__goscriptAwait = $.callInterfaceMethod((plainGeneric !== null && (plainGeneric as any).__isVarRef !== true && ((plainGeneric as any).__goValue === undefined || (plainGeneric as any).__goType?.charCodeAt(0) !== 42) ? (plainGeneric as Exclude<GenericWaiter, null>) : $.pointerValue<Exclude<GenericWaiter, null>>(plainGeneric)), "Wait", __goscriptStatic0(), ctx, 9), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.callInterfaceMethod((plainGeneric !== null && (plainGeneric as any).__isVarRef !== true && ((plainGeneric as any).__goValue === undefined || (plainGeneric as any).__goType?.charCodeAt(0) !== 42) ? (plainGeneric as Exclude<GenericWaiter, null>) : $.pointerValue<Exclude<GenericWaiter, null>>(plainGeneric)), "Count", __goscriptStatic0(), ctx, $.arrayToSlice<number>([1, 2, 3, 4])), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	let plainPlain: IntWaiter | null = $.interfaceValue<IntWaiter | null>(new intBox(), "*main.intBox", /* @__PURE__ */ $.pointerType("main.intBox"))
 	let retypedPlainGeneric: GenericWaiter | null = (plainPlain as GenericWaiter | null)
@@ -139,27 +139,32 @@ function __goscriptStatic0(): any {
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({Count: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Count(__goscriptStatic0(), ...$.stripGenericTypeArgs(args)), Wait: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Wait(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic1$value ??= ([{Count: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Count(__goscriptStatic0(), ...$.stripGenericTypeArgs(args)), Wait: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Wait(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Count", ["context.Context", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))], [/* @__PURE__ */ $.basicType("int")], true, true), $.methodSignature("Wait", ["context.Context", /* @__PURE__ */ $.basicType("int")], [/* @__PURE__ */ $.basicType("int")], true, false)]])
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= (/* @__PURE__ */ $.pointerType("main.genericBox"))
+	return __goscriptStatic2$value ??= ({Count: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Count(__goscriptStatic0(), ...$.stripGenericTypeArgs(args)), Wait: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Wait(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))})
 }
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ([$.methodSignature("Count", [["ctx", "context.Context"], ["values", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))]], [/* @__PURE__ */ $.basicType("int")], false, true), $.methodSignature("Wait", [["ctx", "context.Context"], ["old", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])])
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType("main.genericBox"))
 }
 
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= ({Count: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Count(...$.stripGenericTypeArgs(args)), Wait: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Wait(...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic4$value ??= ([$.methodSignature("Count", [["ctx", "context.Context"], ["values", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))]], [/* @__PURE__ */ $.basicType("int")], false, true), $.methodSignature("Wait", [["ctx", "context.Context"], ["old", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])])
 }
 
 var __goscriptStatic5$value: any
 function __goscriptStatic5(): any {
-	return __goscriptStatic5$value ??= (/* @__PURE__ */ $.pointerType("main.intBox"))
+	return __goscriptStatic5$value ??= ({Count: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Count(...$.stripGenericTypeArgs(args)), Wait: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Wait(...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic6$value: any
+function __goscriptStatic6(): any {
+	return __goscriptStatic6$value ??= (/* @__PURE__ */ $.pointerType("main.intBox"))
 }
 
 var __goscriptAwait: any

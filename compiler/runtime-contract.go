@@ -38,6 +38,8 @@ const (
 	RuntimeHelperUint           RuntimeHelper = "builtin.uint"
 	RuntimeHelperIntFromWide    RuntimeHelper = "builtin.intFromWide"
 	RuntimeHelperUintFromWide   RuntimeHelper = "builtin.uintFromWide"
+	RuntimeHelperInt64ToNumber  RuntimeHelper = "builtin.int64ToNumber"
+	RuntimeHelperUint64ToNumber RuntimeHelper = "builtin.uint64ToNumber"
 	RuntimeHelperInt64          RuntimeHelper = "builtin.int64"
 	RuntimeHelperUint64         RuntimeHelper = "builtin.uint64"
 	RuntimeHelperByte           RuntimeHelper = "builtin.byte"
@@ -62,6 +64,14 @@ const (
 	RuntimeHelperUint64Bit      RuntimeHelper = "builtin.uint64Bit"
 	RuntimeHelperInt64Bit       RuntimeHelper = "builtin.int64Bit"
 	RuntimeHelperUintShr        RuntimeHelper = "builtin.uintShr"
+	RuntimeHelperIntAnd         RuntimeHelper = "builtin.intAnd"
+	RuntimeHelperIntOr          RuntimeHelper = "builtin.intOr"
+	RuntimeHelperIntXor         RuntimeHelper = "builtin.intXor"
+	RuntimeHelperIntAndNot      RuntimeHelper = "builtin.intAndNot"
+	RuntimeHelperIntShl         RuntimeHelper = "builtin.intShl"
+	RuntimeHelperIntShr         RuntimeHelper = "builtin.intShr"
+	RuntimeHelperNarrowShl      RuntimeHelper = "builtin.narrowShl"
+	RuntimeHelperNarrowShr      RuntimeHelper = "builtin.narrowShr"
 	RuntimeHelperUint64Div      RuntimeHelper = "builtin.uint64Div"
 	RuntimeHelperUint64Mod      RuntimeHelper = "builtin.uint64Mod"
 	RuntimeHelperUint64Mul      RuntimeHelper = "builtin.uint64Mul"
@@ -116,6 +126,7 @@ const (
 	RuntimeHelperVarRef                RuntimeHelper = "varref.varRef"
 	RuntimeHelperFieldRef              RuntimeHelper = "varref.fieldRef"
 	RuntimeHelperTransientFieldRef     RuntimeHelper = "varref.transientFieldRef"
+	RuntimeHelperCallPointerMethod     RuntimeHelper = "varref.callPointerMethod"
 	RuntimeHelperUnref                 RuntimeHelper = "varref.unref"
 	RuntimeHelperIsVarRef              RuntimeHelper = "varref.isVarRef"
 	RuntimeHelperUnsupportedPointerRef RuntimeHelper = "varref.unsupportedPointerRef"
@@ -223,6 +234,8 @@ const (
 	RuntimeHelperGenericTypeArgsMarker          RuntimeHelper = "type.genericTypeArgsMarker"
 	RuntimeHelperGenericTypeArgsBrand           RuntimeHelper = "type.genericTypeArgsBrand"
 	RuntimeHelperStripGenericTypeArgs           RuntimeHelper = "type.stripGenericTypeArgs"
+	RuntimeHelperGenericInstance                RuntimeHelper = "type.genericInstance"
+	RuntimeHelperCopyGenericInstance            RuntimeHelper = "type.copyGenericInstance"
 	RuntimeHelperCallGenericMethod              RuntimeHelper = "type.callGenericMethod"
 
 	RuntimeHelperMakeChannel     RuntimeHelper = "channel.makeChannel"
@@ -359,6 +372,8 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperUint, "uint", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperIntFromWide, "intFromWide", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperUintFromWide, "uintFromWide", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperInt64ToNumber, "int64ToNumber", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperUint64ToNumber, "uint64ToNumber", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperInt64, "int64", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperUint64, "uint64", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperByte, "byte", RuntimeHelperCategoryBuiltin),
@@ -383,6 +398,14 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperUint64Bit, "uint64Bit", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperInt64Bit, "int64Bit", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperUintShr, "uintShr", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperIntAnd, "intAnd", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperIntOr, "intOr", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperIntXor, "intXor", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperIntAndNot, "intAndNot", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperIntShl, "intShl", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperIntShr, "intShr", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperNarrowShl, "narrowShl", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperNarrowShr, "narrowShr", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperUint64Div, "uint64Div", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperUint64Mod, "uint64Mod", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperUint64Mul, "uint64Mul", RuntimeHelperCategoryBuiltin),
@@ -435,6 +458,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperVarRef, "varRef", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperFieldRef, "fieldRef", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperTransientFieldRef, "transientFieldRef", RuntimeHelperCategoryVarRef),
+		runtimeHelper(RuntimeHelperCallPointerMethod, "callPointerMethod", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperUnref, "unref", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperIsVarRef, "isVarRef", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperUnsupportedPointerRef, "unsupportedPointerRef", RuntimeHelperCategoryVarRef),
@@ -538,6 +562,8 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperGenericTypeArgsMarker, "genericTypeArgsMarker", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGenericTypeArgsBrand, "genericTypeArgsBrand", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperStripGenericTypeArgs, "stripGenericTypeArgs", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperGenericInstance, "genericInstance", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperCopyGenericInstance, "copyGenericInstance", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperCallGenericMethod, "callGenericMethod", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperMakeChannel, "makeChannel", RuntimeHelperCategoryChannel),
 		runtimeHelper(RuntimeHelperMakeChannelRef, "makeChannelRef", RuntimeHelperCategoryChannel),

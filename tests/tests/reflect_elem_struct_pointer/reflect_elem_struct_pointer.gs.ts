@@ -177,7 +177,8 @@ export class widget {
 	}
 
 	public AsBase(): any {
-		return $.pointerValue<base>(this.base).AsBase()
+		const __receiver = $.fieldRef(this, "base")
+		return __receiver.value.AsBase.call(__receiver)
 	}
 
 	public NewInstance(): any {
@@ -215,7 +216,8 @@ export class body {
 	}
 
 	public AsBase(): any {
-		return $.pointerValue<widget>(this.widget).base.AsBase()
+		const __receiver = $.fieldRef(this.widget, "base")
+		return __receiver.value.AsBase.call(__receiver)
 	}
 
 	public NewInstance(): any {
@@ -265,7 +267,7 @@ export async function structPointers(): globalThis.Promise<void> {
 	let __goscriptTuple1: any = $.typeAssertTuple<body | $.VarRef<body> | null>($.pointerValue<body>(b).widget.base.NewInstance(), /* @__PURE__ */ $.pointerType("main.body"))
 	let nb: body | $.VarRef<body> | null = __goscriptTuple1[0]
 	ok = __goscriptTuple1[1]
-	await $.println("new:", ok, (nb !== b && !(($.pointerAliasesMade || (nb as any)?.__goElementBacking !== undefined) && $.pointerEqual(nb, b))), $.stringEqual($.pointerValue<body>(nb).Title, ""), $.pointerValue<body>(nb).widget.base.AsBase() != null)
+	await $.println("new:", ok, (nb !== b && !(($.pointerAliasesMade || (nb as any)?.__goElementBacking !== undefined) && $.pointerEqual(nb, b))), $.stringEqual($.pointerValue<body>(nb).Title, ""), $.callPointerMethod($.fieldRef($.pointerValue<body>(nb).widget, "base"), "AsBase") != null)
 	let nv = $.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeOf($.structInterfaceValue(new widget(true), "main.widget", "main.widget")))!)))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(nv)).Elem())).FieldByName("X"))).SetInt(7n)
 	await $.println("new widget:", $.pointerValue<widget>($.mustTypeAssert<widget | $.VarRef<widget> | null>($.markAsStructValue($.cloneStructValue(nv)).Interface(), /* @__PURE__ */ $.pointerType("main.widget"))).X)

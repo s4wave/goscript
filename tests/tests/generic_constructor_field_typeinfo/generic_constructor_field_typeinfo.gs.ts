@@ -26,7 +26,7 @@ export class blockType {
 	}
 
 	public clone(): blockType {
-		return new blockType(true, this.typeID, this._constructor)
+		return $.copyGenericInstance(this, new blockType(true, this.typeID, this._constructor))
 	}
 
 	public __goscriptAssign(source: blockType): this {
@@ -85,7 +85,7 @@ export class sampleBlock {
 }
 
 export function NewBlockType(__typeArgs: $.GenericTypeArgs | undefined, typeID: string, _constructor: (() => any | globalThis.Promise<any>) | null): blockType | $.VarRef<blockType> | null {
-	return new blockType(false, typeID, _constructor)
+	return $.genericInstance(new blockType(false, typeID, _constructor), () => [{Constructor: (receiver: any) => $.pointerValue(receiver).Constructor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("MarshalBlock", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("UnmarshalBlock", [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["error"])] }, zero: () => null }}), GetBlockTypeID: (receiver: any) => $.pointerValue(receiver).GetBlockTypeID({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("MarshalBlock", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("UnmarshalBlock", [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["error"])] }, zero: () => null }})}, [$.methodSignature("Constructor", [], ["main.Block"], true, false), $.methodSignature("GetBlockTypeID", [], [/* @__PURE__ */ $.basicType("string")], true, false)]])
 }
 
 export async function main(): globalThis.Promise<void> {

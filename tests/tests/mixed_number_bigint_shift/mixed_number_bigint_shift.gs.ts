@@ -7,12 +7,12 @@ import "@goscript/encoding/binary/index.js"
 
 export function nonZero(buf: Uint8Array): number {
 	let ret = $.uint64Or(($.uint64Or(($.uint64Or($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))).Uint64($.goSlice(buf, 0, 8)), $.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))).Uint64($.goSlice(buf, 8, 16)))), $.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))).Uint64($.goSlice(buf, 16, 24)))), $.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))).Uint64($.goSlice(buf, 24, 32)))
-	ret = $.uint64Or(ret, $.uint64Shr(ret, 32n))
-	ret = $.uint64Or(ret, $.uint64Shr(ret, 16n))
-	ret = $.uint64Or(ret, $.uint64Shr(ret, 8n))
-	ret = $.uint64Or(ret, $.uint64Shr(ret, 4n))
-	ret = $.uint64Or(ret, $.uint64Shr(ret, 2n))
-	ret = $.uint64Or(ret, $.uint64Shr(ret, 1n))
+	ret = $.uint64Or(ret, $.uint64Shr(ret, 32))
+	ret = $.uint64Or(ret, $.uint64Shr(ret, 16))
+	ret = $.uint64Or(ret, $.uint64Shr(ret, 8))
+	ret = $.uint64Or(ret, $.uint64Shr(ret, 4))
+	ret = $.uint64Or(ret, $.uint64Shr(ret, 2))
+	ret = $.uint64Or(ret, $.uint64Shr(ret, 1))
 	return $.intFromWide($.uint64And(ret, 1n), 32)
 }
 

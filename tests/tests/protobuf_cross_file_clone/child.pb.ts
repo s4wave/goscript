@@ -4,27 +4,16 @@
 
 import type { MessageType } from "@aptre/protobuf-es-lite/message";
 import { createMessageType } from "@aptre/protobuf-es-lite/message";
-import { ScalarType } from "@aptre/protobuf-es-lite/scalar";
-import type { PartialFieldInfo } from "@aptre/protobuf-es-lite/field";
 
-export const protobufPackage = "protobuf_cross_file_clone";
 
 /**
  * @generated from message protobuf_cross_file_clone.Child
  */
 export interface Child {
-  /**
-   * @generated from field: string name = 1;
-   */
   name?: string;
+}
 
-};
-
-export const Child: MessageType<Child> = /* @__PURE__ */ createMessageType({
-    typeName: "protobuf_cross_file_clone.Child",
-    fields: [
-        { no: 1, name: "name", kind: "scalar", T: ScalarType.STRING },
-    ] satisfies readonly PartialFieldInfo[],
-    packedByDefault: true,
-});
+export const Child: MessageType<Child> = /* @__PURE__ */ createMessageType<Child>("protobuf_cross_file_clone.Child", () => [
+  [1, "name", 9],
+]);
 

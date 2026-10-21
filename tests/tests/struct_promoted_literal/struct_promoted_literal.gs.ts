@@ -183,7 +183,7 @@ export class LiteralValue {
 	}
 
 	public clone(): LiteralValue {
-		return new LiteralValue(true, $.copyElement(this.Value), $.copyElement(this.Zero))
+		return $.copyGenericInstance(this, new LiteralValue(true, $.copyElement(this.Value), $.copyElement(this.Zero)))
 	}
 
 	public __goscriptAssign(source: LiteralValue): this {
@@ -210,7 +210,7 @@ export class LiteralContainer {
 	}
 
 	public clone(): LiteralContainer {
-		return new LiteralContainer(true, this.LiteralValue.clone())
+		return $.copyGenericInstance(this, new LiteralContainer(true, this.LiteralValue.clone()))
 	}
 
 	public __goscriptAssign(source: LiteralContainer): this {

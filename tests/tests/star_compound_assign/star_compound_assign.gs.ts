@@ -46,17 +46,17 @@ export async function main(): globalThis.Promise<void> {
 	p!.value += 3
 	await $.println(x.value)
 
-	p!.value = p!.value & ~((1))
+	p!.value = $.intAndNot(p!.value, 1)
 	// 5 (0101) &^ 1 (0001) = 4 (0100)
 	await $.println(x.value)
 
-	p!.value <<= 2
+	p!.value = $.intShl(p!.value, 2)
 	await $.println(x.value)
 
-	p!.value >>= 1
+	p!.value = $.intShr(p!.value, 1)
 	await $.println(x.value)
 
-	p!.value |= 3
+	p!.value = $.intOr(p!.value, 3)
 	await $.println(x.value)
 
 	p!.value++

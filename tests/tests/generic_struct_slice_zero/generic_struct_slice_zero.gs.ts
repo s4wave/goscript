@@ -39,7 +39,7 @@ export class arena {
 	}
 
 	public clone(): arena {
-		return new arena(true, this.data)
+		return $.copyGenericInstance(this, new arena(true, this.data))
 	}
 
 	public __goscriptAssign(source: arena): this {
@@ -69,7 +69,7 @@ export class arena {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a: $.VarRef<arena> = $.varRef(new arena(true))
+	let a: $.VarRef<arena> = $.varRef($.genericInstance(new arena(true), __goscriptStatic1))
 	let value = (a.value.New(__goscriptStatic0()) as item | $.VarRef<item> | null)
 	let value$: item = value == null ? $.pointerTarget<item>(value) : (value as any).__isVarRef === true ? (value as any).value : (value as any).__goValue === undefined ? (value as any) : $.pointerTarget<item>(value);
 	;(value$ as item).Text = "ok"
@@ -79,6 +79,11 @@ export async function main(): globalThis.Promise<void> {
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
 	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.item", zero: () => new item(true) }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ([{New: (receiver: any) => $.pointerValue(receiver).New(__goscriptStatic0())}, [$.methodSignature("New", [], [/* @__PURE__ */ $.pointerType("main.item")], true, false)]])
 }
 
 if ($.isMainScript(import.meta)) {

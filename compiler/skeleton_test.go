@@ -825,7 +825,7 @@ func TestCompilePackagesRoutesUint64BinaryOpsThroughHelpers(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		`return $.uint64Add(s.heap, s.stack)`,
-		`ret = $.uint64Or(ret, $.uint64Shr(ret, 32n))`,
+		`ret = $.uint64Or(ret, $.uint64Shr(ret, 32))`,
 		`return $.intFromWide($.uint64And(ret, 1n), 32)`,
 		`return $.uint64Sub(yVal, xVal)`,
 	} {
@@ -1832,7 +1832,7 @@ func TestCompilePackagesLowersUnsafeBytePointerArithmetic(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	text := string(content)
-	if !strings.Contains(text, "$.indexByteAddress(bits!, globalThis.Number($.uint64Shr(idx, 6n)), 8)") {
+	if !strings.Contains(text, "$.indexByteAddress(bits!, $.uint64ToNumber($.uint64Shr(idx, 6)), 8)") {
 		t.Fatalf("missing byte-addressed unsafe pointer root:\n%s", text)
 	}
 	if !strings.Contains(text, "$.unsafePointerRef<number>(ptr).value |=") {
@@ -1844,7 +1844,7 @@ func TestCompilePackagesLowersUnsafeBytePointerArithmetic(t *testing.T) {
 	if !strings.Contains(text, "$.arrayPointerFromIndexRef<number>($.indexRef($.pointerValue<number[]>(words), 0), 64, 4, 1)") {
 		t.Fatalf("missing byte-view array pointer conversion:\n%s", text)
 	}
-	if !strings.Contains(text, "$.unsafePointerCast<$.VarRef<Uint8Array> | null>($.arrayPointerFromIndexRef<number>($.indexRef(dst!, 0), 64, 1, 1))!.value =") {
+	if !strings.Contains(text, "$.assignFieldValue($.unsafePointerCast<$.VarRef<Uint8Array> | null>($.arrayPointerFromIndexRef<number>($.indexRef(dst!, 0), 64, 1, 1))!.value, ") {
 		t.Fatalf("missing non-null byte-view array pointer storage:\n%s", text)
 	}
 }
@@ -5924,8 +5924,8 @@ func TestCompilePackagesLowersUnaryBitwiseComplement(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"return $.uint64Xor(crc, -1n)",
-		"mask = mask & ~((3))",
-		"$.println(globalThis.Number($.int64Xor(value, -1n)), $.uint64Xor(wide, -1n), $.int64Xor(signed, -1n), invert(wide), value & ~(3), mask, 0o700)",
+		"mask = $.intAndNot(mask, 3)",
+		"$.println((-(value) - 1), $.uint64Xor(wide, -1n), $.int64Xor(signed, -1n), invert(wide), $.intAndNot(value, 3), mask, 0o700)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)

@@ -12,7 +12,7 @@ export class queue {
 	}
 
 	public clone(): queue {
-		return new queue(true, this.buf)
+		return $.copyGenericInstance(this, new queue(true, this.buf))
 	}
 
 	public __goscriptAssign(source: queue): this {

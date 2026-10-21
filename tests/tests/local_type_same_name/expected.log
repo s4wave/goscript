@@ -1,0 +1,11 @@
+person 2
+Name Go
+Age 35
+*main.person
+person 1
+Title Dr
+*main.person
+person 1
+ID 7
+*main.person
+false false true

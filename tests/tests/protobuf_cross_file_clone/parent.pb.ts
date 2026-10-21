@@ -5,31 +5,18 @@
 import { Child } from "./child.pb.js";
 import type { MessageType } from "@aptre/protobuf-es-lite/message";
 import { createMessageType } from "@aptre/protobuf-es-lite/message";
-import type { PartialFieldInfo } from "@aptre/protobuf-es-lite/field";
 
-export const protobufPackage = "protobuf_cross_file_clone";
 
 /**
  * @generated from message protobuf_cross_file_clone.Parent
  */
 export interface Parent {
-  /**
-   * @generated from field: protobuf_cross_file_clone.Child child = 1;
-   */
   child?: Child;
-  /**
-   * @generated from field: repeated protobuf_cross_file_clone.Child children = 2;
-   */
   children?: Child[];
+}
 
-};
-
-export const Parent: MessageType<Parent> = /* @__PURE__ */ createMessageType({
-    typeName: "protobuf_cross_file_clone.Parent",
-    fields: [
-        { no: 1, name: "child", kind: "message", T: () => Child },
-        { no: 2, name: "children", kind: "message", T: () => Child, repeated: true },
-    ] satisfies readonly PartialFieldInfo[],
-    packedByDefault: true,
-});
+export const Parent: MessageType<Parent> = /* @__PURE__ */ createMessageType<Parent>("protobuf_cross_file_clone.Parent", () => [
+  [1, "child", 11, 0, Child.codec],
+  [2, "children", 11, 1, Child.codec],
+]);
 

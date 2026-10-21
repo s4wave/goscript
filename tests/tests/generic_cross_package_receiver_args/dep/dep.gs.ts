@@ -24,7 +24,7 @@ export class Impl {
 	}
 
 	public clone(): Impl {
-		return new Impl(true, $.copyElement(this.Item))
+		return $.copyGenericInstance(this, new Impl(true, $.copyElement(this.Item)))
 	}
 
 	public __goscriptAssign(source: Impl): this {
@@ -52,7 +52,7 @@ export class Keyed {
 	}
 
 	public clone(): Keyed {
-		return new Keyed(true)
+		return $.copyGenericInstance(this, new Keyed(true))
 	}
 
 	public __goscriptAssign(source: Keyed): this {
@@ -83,7 +83,7 @@ export class Wrapper {
 	}
 
 	public clone(): Wrapper {
-		return new Wrapper(true, this.Keyed)
+		return $.copyGenericInstance(this, new Wrapper(true, this.Keyed))
 	}
 
 	public __goscriptAssign(source: Wrapper): this {

@@ -154,8 +154,11 @@ type semanticPackage struct {
 	lazyInits map[types.Object]*semanticFunction
 	// funcValues holds the function values the package takes.
 	funcValues []funcValue
-	// assertedFuncShapes holds the shapes of the func types the package
-	// asserts from interface values.
+	// assertedFuncShapes holds the shapes of the func types through which
+	// values that reflection made can reach the package's code: the func
+	// types it asserts from interface values, and those of the parameters of
+	// its exported functions and methods, to which reflect.Value.Call passes
+	// such values.
 	assertedFuncShapes map[string]bool
 	// topValueCalls holds the shapes of the function values called outside
 	// function bodies, by package initialization.

@@ -15,7 +15,7 @@ export class pooledElement {
 	}
 
 	public clone(): pooledElement {
-		return new pooledElement(true, $.copyElement(this.Value))
+		return $.copyGenericInstance(this, new pooledElement(true, $.copyElement(this.Value)))
 	}
 
 	public __goscriptAssign(source: pooledElement): this {

@@ -149,6 +149,21 @@ export function transientFieldRef<T extends object, K extends keyof T>(
   return new FieldReference(target, key)
 }
 
+/**
+ * callPointerMethod calls the pointer method member of the struct that ref
+ * refers to, with ref as its receiver: a method that may keep or compare its
+ * receiver gets the same reference to a variable, field or element that
+ * taking its address gives.
+ */
+export function callPointerMethod(
+  ref: VarRef<unknown>,
+  member: PropertyKey,
+  ...args: unknown[]
+): any {
+  const target = ref.value as Record<PropertyKey, (...args: unknown[]) => any>
+  return target[member].apply(ref, args)
+}
+
 /** isVarRef reports whether a value carries the variable-reference marker. */
 export function isVarRef(v: unknown): v is VarRef<unknown> {
   return v !== null && typeof v === 'object' && (v as any).__isVarRef === true

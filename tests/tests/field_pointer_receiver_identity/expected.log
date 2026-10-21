@@ -1,0 +1,12 @@
+field: true true true
+embedded: true true
+interface: true true
+nested: true
+through pointer: true child
+slice element: true true
+array element: true
+local: true true
+registry: true 1 1 6
+any: true
+method value: true
+generic: boxed+cloned true

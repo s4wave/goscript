@@ -12,11 +12,11 @@ export async function main(): globalThis.Promise<void> {
 	let ch = $.makeChannel<number>(1, 0, "both")
 	await $.chanSend(ch, 17)
 	let value = 0
-	pprof.Do($.pointerValueOrNil(ctx)!, labels, $.functionValue(async (ctx: context.Context | null) => {
+	await pprof.Do($.pointerValueOrNil(ctx)!, labels, $.functionValue(async (ctx: context.Context | null) => {
 		value = await $.chanRecv(ch)
 		let [rpc, ok] = pprof.Label($.pointerValueOrNil(ctx)!, "rpc")
 		await $.println("rpc", rpc, ok)
-		pprof.ForLabels($.pointerValueOrNil(ctx)!, $.functionValue(async (key: string, value: string): globalThis.Promise<boolean> => {
+		await pprof.ForLabels($.pointerValueOrNil(ctx)!, $.functionValue(async (key: string, value: string): globalThis.Promise<boolean> => {
 			await $.println("label", key, value)
 			return !$.stringEqual(key, "pid")
 		}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))

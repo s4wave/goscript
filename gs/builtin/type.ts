@@ -3257,6 +3257,100 @@ export function namedValueMethods(
   return namedValueMethodRegistry.get(typeName)
 }
 
+// genericInstanceKey is the property of an instance of a generic struct type
+// that describes the methods of its instantiated type. The methods of a
+// generic type take its type arguments, which compiled calls pass, but which
+// reflect, calling the methods of a value it was given, cannot know.
+export const genericInstanceKey = Symbol('genericInstance')
+
+// GenericInstanceMethods returns the method table of a pointer to an
+// instantiated generic struct type, as namedValueInterfaceValue takes it, and
+// the signatures of its methods, marking those only in the pointer's method
+// set. A table that does not depend on type parameters is created once.
+export type GenericInstanceMethods = () => [
+  Record<string, (receiver: any, ...args: any[]) => any>,
+  MethodSignature[],
+]
+
+// genericInstance marks value, a new instance of a generic struct type, with
+// the methods of its instantiated type, and returns it.
+export function genericInstance<T>(
+  value: T,
+  methods: GenericInstanceMethods,
+): T {
+  ;(value as any)[genericInstanceKey] = methods
+  return value
+}
+
+// copyGenericInstance gives target, a copy of source, the methods of the
+// instantiated type of source, and returns it.
+export function copyGenericInstance<T>(source: object, target: T): T {
+  ;(target as any)[genericInstanceKey] = (source as any)[genericInstanceKey]
+  return target
+}
+
+// GenericInstanceMethodSets are the method sets of an instantiated generic
+// struct type, for boxing a pointer to it or a value of it.
+export interface GenericInstanceMethodSets {
+  pointer: NamedValueMethods
+  value: NamedValueMethods
+}
+
+// genericInstanceMethodSets holds the method sets made from each method
+// description, so that each box of an instance shares them.
+const genericInstanceMethodSets = new WeakMap<
+  GenericInstanceMethods,
+  GenericInstanceMethodSets
+>()
+
+// genericInstanceMethods returns the method sets of the instantiated generic
+// struct type of value, or undefined if value is not an instance of a generic
+// struct type marked by genericInstance.
+export function genericInstanceMethods(
+  value: unknown,
+): GenericInstanceMethodSets | undefined {
+  // Only a marked instance has them.
+  if (value === null || typeof value !== 'object') {
+    return undefined
+  }
+  const describe = (value as any)[genericInstanceKey] as
+    | GenericInstanceMethods
+    | undefined
+  if (describe === undefined) {
+    return undefined
+  }
+
+  // The method sets of a description are made once.
+  let sets = genericInstanceMethodSets.get(describe)
+  if (sets === undefined) {
+    const [methods, signatures] = describe()
+    sets = {
+      pointer: { methods, signatures },
+      value: valueMethodSet(methods, signatures),
+    }
+    genericInstanceMethodSets.set(describe, sets)
+  }
+  return sets
+}
+
+// valueMethodSet returns the methods of methods and signatures, a pointer
+// type's method set, that are in the method set of the type it points to.
+function valueMethodSet(
+  methods: Record<string, (receiver: any, ...args: any[]) => any>,
+  signatures: MethodSignature[],
+): NamedValueMethods {
+  // Methods that only a pointer has are left out.
+  const valueMethods: Record<string, (receiver: any, ...args: any[]) => any> =
+    {}
+  const valueSignatures = signatures.filter((sig) => !sig.pointerReceiver)
+  for (const sig of valueSignatures) {
+    if (methods[sig.name] !== undefined) {
+      valueMethods[sig.name] = methods[sig.name]
+    }
+  }
+  return { methods: valueMethods, signatures: valueSignatures }
+}
+
 /**
  * typeParamPointerInterfaceValue converts a pointer to a value of a type
  * parameter to an interface value. When the type argument is a named
@@ -3455,8 +3549,9 @@ function namedValueMethodEntries(
  * typeParamInterfaceValue converts a value of a type parameter to an
  * interface value. A primitive of a named basic type, or with methods, is
  * boxed with the methods of the type argument, as namedValueInterfaceValue
- * boxes a value of a concrete named basic type. Other values are returned
- * unchanged.
+ * boxes a value of a concrete named basic type, and a number of an unnamed
+ * numeric type is boxed with its type, as basicInterfaceValue boxes a
+ * number converted to an interface. Other values are returned unchanged.
  */
 export function typeParamInterfaceValue<T = any>(
   value: unknown,
@@ -3479,10 +3574,19 @@ export function typeParamInterfaceValue<T = any>(
   }
   const info = normalizeTypeInfo(descriptor.type)
   const methods = descriptor.methods ?? {}
-  if (
-    info.kind !== TypeKind.Basic ||
-    (!info.typeName && Object.keys(methods).length === 0)
-  ) {
+  if (info.kind !== TypeKind.Basic) {
+    return value as T
+  }
+  if (!info.typeName && Object.keys(methods).length === 0) {
+    // A number does not tell its type (float64 or int), so it is boxed
+    // with the type argument, as a value of a numeric type converted to an
+    // interface is.
+    if (
+      info.name !== undefined &&
+      (typeof value === 'number' || typeof value === 'bigint')
+    ) {
+      return basicInterfaceValue<T>(value, info.name)
+    }
     return value as T
   }
   return namedValueInterfaceValue<T>(

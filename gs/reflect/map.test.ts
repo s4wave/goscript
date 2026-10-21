@@ -20,7 +20,10 @@ describe('MapIter', () => {
 
     expect(iter.Next()).toBe(true)
     expect(iter.Key().Interface()).toBe('one')
-    expect(iter.Value().Interface()).toBe(1)
+    expect(iter.Value().Interface()).toMatchObject({
+      __goType: 'int',
+      __goValue: 1,
+    })
 
     expect(iter.Next()).toBe(true)
     expect(iter.Key().Kind()).toBe(24) // String kind
@@ -35,7 +38,10 @@ describe('MapIter', () => {
 
     expect(iter.Next()).toBe(true)
     expect(iter.Key().Interface()).toBe('reset')
-    expect(iter.Value().Interface()).toBe(100)
+    expect(iter.Value().Interface()).toMatchObject({
+      __goType: 'int',
+      __goValue: 100,
+    })
     expect(iter.Next()).toBe(false)
   })
 })
@@ -59,7 +65,10 @@ describe('Value.MapKeys', () => {
 
     expect(holder.Items?.get('alpha')).toBe(1)
     expect(field.Len()).toBe(1)
-    expect(field.MapIndex(ValueOf('alpha')).Interface()).toBe(1)
+    expect(field.MapIndex(ValueOf('alpha')).Interface()).toMatchObject({
+      __goType: 'int',
+      __goValue: 1,
+    })
   })
 
   it('deletes map entries when SetMapIndex receives a zero value', () => {
@@ -116,7 +125,10 @@ describe('reflect compatibility surface', () => {
 
     expect(iter?.Next()).toBe(true)
     expect(iter?.Key().Interface()).toBe('alpha')
-    expect(mapValue.MapIndex(ValueOf('alpha')).Interface()).toBe(1)
+    expect(mapValue.MapIndex(ValueOf('alpha')).Interface()).toMatchObject({
+      __goType: 'int',
+      __goValue: 1,
+    })
     expect(mapValue.Type().Comparable()).toBe(false)
     expect(TypeOf('alpha').Comparable()).toBe(true)
   })

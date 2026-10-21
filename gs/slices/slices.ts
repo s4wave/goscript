@@ -480,7 +480,12 @@ async function collectAsync<T>(
  * @param j The end index (exclusive)
  * @returns The modified slice
  */
-export function Delete<T>(s: $.Slice<T>, i: number, j: number): $.Slice<T> {
+export function Delete<T>(
+  s: $.Slice<T>,
+  i: number,
+  j: number,
+  zeroFactory?: () => T,
+): $.Slice<T> {
   const length = $.len(s)
   if (j > length || i < 0 || j < i) {
     throw new Error(
@@ -496,9 +501,7 @@ export function Delete<T>(s: $.Slice<T>, i: number, j: number): $.Slice<T> {
     $.sliceElems(s)[$.sliceSlot(s, k - deleteCount)] = $.arrayIndex(s as any, k)
   }
   // Zero out the elements at the end
-  for (let k = length - deleteCount; k < length; k++) {
-    $.sliceElems(s)[$.sliceSlot(s, k)] = null
-  }
+  clearTail(s, length - deleteCount, length, zeroFactory)
   // Update the slice length
   return $.goSlice(s, 0, length - deleteCount) as $.Slice<T>
 }
@@ -506,6 +509,7 @@ export function Delete<T>(s: $.Slice<T>, i: number, j: number): $.Slice<T> {
 export function DeleteFunc<T, R extends $.MaybePromise<boolean>>(
   s: $.Slice<T>,
   del: PredicateCallback<T, R>,
+  zeroFactory?: () => T,
 ): $.CallbackResult<R, $.Slice<T>> {
   if (del == null) {
     throw new Error('slices.DeleteFunc: nil delete function')
@@ -523,9 +527,7 @@ export function DeleteFunc<T, R extends $.MaybePromise<boolean>>(
           w++
         }
       }
-      for (let i = w; i < s.length; i++) {
-        $.sliceElems(s)[$.sliceSlot(s, i)] = clearValue(s) as T
-      }
+      clearTail(s, w, $.len(s), zeroFactory)
       return $.goSlice(s, 0, w) as $.Slice<T>
     })(),
   )
@@ -543,14 +545,37 @@ export function Replace<T>(
       `slice bounds out of range [${i}:${j}] with length ${length}`,
     )
   }
-  const out = makeLike(s, length - (j - i) + v.length)
-  $.copySliceElements(out, 0, s, 0, i)
-  $.copySliceElements(out, i, v, 0, v.length)
-  $.copySliceElements(out, i + v.length, s, j, length - j)
+  // A result longer than the capacity of s is a new slice.
+  const total = length - (j - i) + v.length
+  if (total > $.cap(s)) {
+    const out = makeLike(s, total)
+    $.copySliceElements(out, 0, s, 0, i)
+    $.copySliceElements(out, i, v, 0, v.length)
+    $.copySliceElements(out, i + v.length, s, j, length - j)
+    return out
+  }
+
+  // Otherwise s holds the result: the elements after j move behind copies
+  // of v, and the elements that the result no longer covers are zeroed.
+  const tail: T[] = []
+  for (let k = j; k < length; k++) {
+    tail.push($.arrayIndex(s as any, k) as T)
+  }
+  const out = $.goSlice(s, 0, total) as $.Slice<T>
+  for (let k = 0; k < v.length; k++) {
+    $.sliceElems(out)[$.sliceSlot(out, i + k)] = $.copyElement(v[k])
+  }
+  for (let k = 0; k < tail.length; k++) {
+    $.sliceElems(out)[$.sliceSlot(out, i + v.length + k)] = tail[k]
+  }
+  clearTail(s, total, length)
   return out
 }
 
-export function Compact<T>(s: $.Slice<T>): $.Slice<T> {
+export function Compact<T>(
+  s: $.Slice<T>,
+  zeroFactory?: () => T,
+): $.Slice<T> {
   if (s === null || s === undefined || $.len(s) < 2) {
     return s
   }
@@ -566,15 +591,14 @@ export function Compact<T>(s: $.Slice<T>): $.Slice<T> {
       w++
     }
   }
-  for (let i = w; i < $.len(s); i++) {
-    $.sliceElems(s)[$.sliceSlot(s, i)] = clearValue(s)
-  }
+  clearTail(s, w, $.len(s), zeroFactory)
   return $.goSlice(s, 0, w) as $.Slice<T>
 }
 
 export function CompactFunc<T, R extends $.MaybePromise<boolean>>(
   s: $.Slice<T>,
   eq: EqualCallback<T, T, R>,
+  zeroFactory?: () => T,
 ): $.CallbackResult<R, $.Slice<T>> {
   if (eq == null) {
     throw new Error('slices.CompactFunc: nil equality function')
@@ -596,9 +620,7 @@ export function CompactFunc<T, R extends $.MaybePromise<boolean>>(
           w++
         }
       }
-      for (let i = w; i < $.len(s); i++) {
-        $.sliceElems(s)[$.sliceSlot(s, i)] = clearValue(s)
-      }
+      clearTail(s, w, $.len(s), zeroFactory)
       return $.goSlice(s, 0, w) as $.Slice<T>
     })(),
   )
@@ -863,24 +885,44 @@ export function SortStableFunc<T, R extends $.MaybePromise<number>>(
   return SortFunc(s, cmp)
 }
 
-function clearValue<T>(s: $.Slice<T>): T | null {
-  if ($.isTypedSlice(s)) {
-    return 0 as T
+// clearTail sets the elements of s from start to end to the zero value of
+// the element type: a new value from zeroFactory, which the compiler passes,
+// or else the zero of the type of an element of s, so that a struct element
+// becomes a new zero struct rather than nil.
+function clearTail<T>(
+  s: $.Slice<T>,
+  start: number,
+  end: number,
+  zeroFactory?: () => T,
+): void {
+  // A typed slice holds numbers.
+  if (start >= end) {
+    return
   }
-  for (const value of s ?? []) {
+  if ($.isTypedSlice(s)) {
+    for (let k = start; k < end; k++) {
+      $.sliceElems(s)[$.sliceSlot(s, k)] = 0 as T
+    }
+    return
+  }
+
+  // The zero comes from the factory or a sample element.
+  const zero = zeroFactory ?? sampleZeroFactory(s, end)
+  for (let k = start; k < end; k++) {
+    $.sliceElems(s)[$.sliceSlot(s, k)] = zero()
+  }
+}
+
+// sampleZeroFactory returns a function that makes the zero value of the type
+// of the first element of s[:end] that is not nil.
+function sampleZeroFactory<T>(s: $.Slice<T>, end: number): () => T {
+  for (let k = 0; k < end; k++) {
+    const value = $.arrayIndex(s as any, k)
     if (value !== null && value !== undefined) {
-      switch (typeof value) {
-        case 'number':
-          return 0 as T
-        case 'string':
-          return '' as T
-        case 'boolean':
-          return false as T
-      }
-      break
+      return () => $.zeroLike(value) as T
     }
   }
-  return null
+  return () => null as T
 }
 
 /**

@@ -7,11 +7,11 @@ import "@goscript/math/index.js"
 
 export function hash6(u: bigint, h: number): number {
 	const prime6bytes: number = 227718039650203
-	return $.uintFromWide($.uint64Shr(($.uint64Mul(($.uint64Shl(u, 16n)), 227718039650203n)), ($.wideUintAnd(($.wideUintSub(64, h)), 63))), 32)
+	return $.uintFromWide($.uint64Shr(($.uint64Mul(($.uint64Shl(u, 16)), 227718039650203n)), ($.wideUintAnd(($.wideUintSub(64, h)), 63))), 32)
 }
 
 export function mix(a: bigint, b: bigint): bigint {
-	return $.uint64Shr(($.uint64Xor(($.uint64And(a, b)), ($.uint64Or(a, 1n)))), 60n)
+	return $.uint64Shr(($.uint64Xor(($.uint64And(a, b)), ($.uint64Or(a, 1n)))), 60)
 }
 
 export function highAfterMask(v: bigint): bigint {
@@ -32,7 +32,7 @@ export function maxUint64Remainder(d: bigint): bigint {
 
 export function setHighBit(idx: bigint): boolean {
 	let words = $.arrayToSlice<bigint>([0n, 0n])
-	$.sliceElems(words!)[$.sliceSlot(words!, globalThis.Number($.uint64Div(idx, 64n)))] = $.uint64Or($.sliceElems(words!)[$.sliceSlot(words!, globalThis.Number($.uint64Div(idx, 64n)))], $.uint64Bit(($.uint64Mod(idx, 64n))))
+	$.sliceElems(words!)[$.sliceSlot(words!, $.uint64ToNumber($.uint64Div(idx, 64n)))] = $.uint64Or($.sliceElems(words!)[$.sliceSlot(words!, $.uint64ToNumber($.uint64Div(idx, 64n)))], $.uint64Bit(($.uint64Mod(idx, 64n))))
 	return $.arrayIndex(words!, 1) != 0n
 }
 
@@ -56,8 +56,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(wide, signed, (wide))
 	await $.println(hash6(4328719365n, 14))
 	await $.println(mix(17361641481138401520n, 1085102592571150095n))
-	await $.println($.uintFromWide($.uint64Shr(highAfterMask(4660n), 48n), 32))
-	await $.println($.uintFromWide($.uint64Shr(combineHighLow(4660n, 48879n), 48n), 32))
+	await $.println($.uintFromWide($.uint64Shr(highAfterMask(4660n), 48), 32))
+	await $.println($.uintFromWide($.uint64Shr(combineHighLow(4660n, 48879n), 48), 32))
 	await $.println($.uintFromWide($.uint64And(combineHighLow(4660n, 48879n), 65535n), 32))
 	await $.println(maxUint64Divisor(4114n))
 	await $.println(maxUint64Remainder(4114n))
