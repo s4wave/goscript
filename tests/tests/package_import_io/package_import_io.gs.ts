@@ -168,7 +168,7 @@ export class asyncReaderAt {
 		if (off >= $.int64($.sliceLen((r$ as asyncReaderAt).data))) {
 			return [0, io.EOF]
 		}
-		let n = $.copy(p, $.goSlice((r$ as asyncReaderAt).data, globalThis.Number(off), undefined))
+		let n = $.copy(p, $.goSlice((r$ as asyncReaderAt).data, $.int64ToNumber(off), undefined))
 		if (n < $.sliceLen(p)) {
 			return [n, io.EOF]
 		}

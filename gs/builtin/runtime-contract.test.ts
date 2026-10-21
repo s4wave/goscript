@@ -41,6 +41,7 @@ import {
   int64Mod,
   int64Or,
   int64AndNot,
+  int64ToNumber,
   interfaceValue,
   intFromWide,
   comparableEqual,
@@ -86,6 +87,7 @@ import {
   uint64Shl,
   uint64Shr,
   uint64Sub,
+  uint64ToNumber,
   uint64Xor,
   uintShr,
   unref,
@@ -226,6 +228,20 @@ describe('builtin runtime contract helpers', () => {
     expect(intFromWide(0x8000000180008081n, 8)).toBe(-127)
     expect(intFromWide(0xffffffffn, 32)).toBe(-1)
     expect(uintFromWide(-1, 8)).toBe(255)
+    // A 64-bit integer converts to the nearest number through its words.
+    expect(int64ToNumber(-1n)).toBe(-1)
+    expect(int64ToNumber(-0x8000000000000000n)).toBe(-(2 ** 63))
+    expect(int64ToNumber(0x7fffffffffffffffn)).toBe(2 ** 63)
+    expect(int64ToNumber(0x20000000000001n)).toBe(Number(0x20000000000001n))
+    expect(int64ToNumber(-0x123456789abcdefn)).toBe(-0x123456789abcdef)
+    expect(int64ToNumber(5)).toBe(5)
+    expect(uint64ToNumber(0xffffffffffffffffn)).toBe(2 ** 64)
+    expect(uint64ToNumber(0x8000000000000801n)).toBe(
+      Number(0x8000000000000801n),
+    )
+    expect(uint64ToNumber(0xfedcba9876543210n)).toBe(
+      Number(0xfedcba9876543210n),
+    )
     expect(uint(uint64Shl(1n, 63), 32)).toBe(0)
     expect(uint(uint64Shr(uint64Shl(1n, 63), 60), 32)).toBe(8)
     expect(uint(uint64Mul(0xffffffffffffffffn, 3), 32)).toBe(0xfffffffd)

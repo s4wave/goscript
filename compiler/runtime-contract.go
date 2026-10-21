@@ -38,6 +38,8 @@ const (
 	RuntimeHelperUint           RuntimeHelper = "builtin.uint"
 	RuntimeHelperIntFromWide    RuntimeHelper = "builtin.intFromWide"
 	RuntimeHelperUintFromWide   RuntimeHelper = "builtin.uintFromWide"
+	RuntimeHelperInt64ToNumber  RuntimeHelper = "builtin.int64ToNumber"
+	RuntimeHelperUint64ToNumber RuntimeHelper = "builtin.uint64ToNumber"
 	RuntimeHelperInt64          RuntimeHelper = "builtin.int64"
 	RuntimeHelperUint64         RuntimeHelper = "builtin.uint64"
 	RuntimeHelperByte           RuntimeHelper = "builtin.byte"
@@ -348,6 +350,8 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperUint, "uint", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperIntFromWide, "intFromWide", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperUintFromWide, "uintFromWide", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperInt64ToNumber, "int64ToNumber", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperUint64ToNumber, "uint64ToNumber", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperInt64, "int64", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperUint64, "uint64", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperByte, "byte", RuntimeHelperCategoryBuiltin),

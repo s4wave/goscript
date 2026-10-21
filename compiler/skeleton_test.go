@@ -1832,7 +1832,7 @@ func TestCompilePackagesLowersUnsafeBytePointerArithmetic(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	text := string(content)
-	if !strings.Contains(text, "$.indexByteAddress(bits!, globalThis.Number($.uint64Shr(idx, 6n)), 8)") {
+	if !strings.Contains(text, "$.indexByteAddress(bits!, $.uint64ToNumber($.uint64Shr(idx, 6n)), 8)") {
 		t.Fatalf("missing byte-addressed unsafe pointer root:\n%s", text)
 	}
 	if !strings.Contains(text, "$.unsafePointerRef<number>(ptr).value |=") {
@@ -5925,7 +5925,7 @@ func TestCompilePackagesLowersUnaryBitwiseComplement(t *testing.T) {
 	for _, want := range []string{
 		"return $.uint64Xor(crc, -1n)",
 		"mask = mask & ~((3))",
-		"$.println(globalThis.Number($.int64Xor(value, -1n)), $.uint64Xor(wide, -1n), $.int64Xor(signed, -1n), invert(wide), value & ~(3), mask, 0o700)",
+		"$.println($.int64ToNumber($.int64Xor(value, -1n)), $.uint64Xor(wide, -1n), $.int64Xor(signed, -1n), invert(wide), value & ~(3), mask, 0o700)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)

@@ -9786,8 +9786,8 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 			// bigint while the base stays a number, and a raw JS << / >> on the
 			// pair throws "Cannot mix BigInt and other types". The wide-result and
 			// uintShr paths above already ran, so the base here is number-backed:
-			// coerce the bigint count to Number to match Go's count semantics.
-			right = "globalThis.Number(" + right + ")"
+			// coerce the bigint count to a number to match Go's count semantics.
+			right = wideToNumber(o.runtimeOwner, ctx.semPkg.source.TypesInfo.TypeOf(typed.Y), right)
 		}
 		if typed.Op == token.ADD || typed.Op == token.SUB || typed.Op == token.SHL {
 			if value, ok := wrapNarrowIntegerValue(ctx.semPkg.source.TypesInfo.TypeOf(typed), left+" "+typed.Op.String()+" "+right, typed.Op); ok {
@@ -11631,7 +11631,7 @@ func (o *LoweringOwner) lowerConversionExpr(
 		if isFloatType(targetType) {
 			converted := grouped
 			if isBigIntBackedType(sourceType) {
-				converted = "globalThis.Number(" + value + ")"
+				converted = wideToNumber(o.runtimeOwner, sourceType, value)
 			}
 			// A float32 value is already rounded.
 			if isFloat32Type(targetType) && !isFloat32Type(sourceType) {
@@ -11663,6 +11663,12 @@ func (o *LoweringOwner) lowerConversionExpr(
 			return o.runtimeOwner.QualifiedHelper(RuntimeHelperInt) +
 				"(" + value + ", " + strconv.Itoa(bits) + ")", diagnostics
 		}
+
+		// An int of a 64-bit integer is the number of its signed 64 bits, as
+		// int(x) of a uint64 is negative from 1<<63.
+		if isBigIntBackedType(sourceType) {
+			return o.runtimeOwner.QualifiedHelper(RuntimeHelperInt64ToNumber) + "(" + value + ")", diagnostics
+		}
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperInt) + "(" + value + ")", diagnostics
 	}
 
@@ -11681,9 +11687,10 @@ func (o *LoweringOwner) lowerConversionExpr(
 // Unsigned number-typed wide results (uint, uintptr) flow through $.uint(_, 64),
 // which keeps values above 2^53 as a runtime bigint so full 64-bit width
 // survives; a precision-losing Number() wrap would truncate values like
-// ^uint(0). Signed platform int coerces with Number (accepted precision loss
-// above 2^53, matching Model A's int->number mapping): $.uint on a signed value
-// would reinterpret its sign bit as magnitude.
+// ^uint(0). Signed platform int converts to the nearest number through the
+// words of its 64 bits (accepted precision loss above 2^53, matching Model A's
+// int->number mapping): $.uint on a signed value would reinterpret its sign bit
+// as magnitude.
 func coerceWideHelperResult(runtimeOwner *RuntimeContractOwner, resultType types.Type, call string) string {
 	if isBigIntBackedType(resultType) {
 		return call
@@ -11691,7 +11698,19 @@ func coerceWideHelperResult(runtimeOwner *RuntimeContractOwner, resultType types
 	if _, ok := unsignedIntegerBits(resultType); ok {
 		return runtimeOwner.QualifiedHelper(RuntimeHelperUint) + "(" + call + ", 64)"
 	}
-	return "globalThis.Number(" + call + ")"
+	return runtimeOwner.QualifiedHelper(RuntimeHelperInt64ToNumber) + "(" + call + ")"
+}
+
+// wideToNumber converts a value of the bigint-backed type typ to the nearest
+// number, through the words of its 64 bits, which V8 compiles to machine
+// operations where it does not compile Number of a bigint.
+func wideToNumber(runtimeOwner *RuntimeContractOwner, typ types.Type, value string) string {
+	// The words are read as signed or unsigned as the type is.
+	helper := RuntimeHelperInt64ToNumber
+	if _, unsigned := unsignedIntegerBits(typ); unsigned {
+		helper = RuntimeHelperUint64ToNumber
+	}
+	return runtimeOwner.QualifiedHelper(helper) + "(" + value + ")"
 }
 
 func (o *LoweringOwner) lowerWideIntegerBinaryExpr(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, bool) {
@@ -14116,8 +14135,8 @@ func (o *LoweringOwner) lowerNumberIndexValue(ctx lowerFileContext, expr ast.Exp
 	if expr == nil {
 		return value
 	}
-	if isBigIntBackedType(ctx.semPkg.source.TypesInfo.TypeOf(expr)) {
-		return "globalThis.Number(" + value + ")"
+	if typ := ctx.semPkg.source.TypesInfo.TypeOf(expr); isBigIntBackedType(typ) {
+		return wideToNumber(o.runtimeOwner, typ, value)
 	}
 	return value
 }

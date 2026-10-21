@@ -227,7 +227,7 @@ export class VM {
 			case 8:
 			{
 				if ((s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Pop(__goscriptStatic0()) : Stack.prototype.Pop.call(s, __goscriptStatic0())) != 0n) {
-					;(vm$ as VM).pc = $.int(_in.Arg)
+					;(vm$ as VM).pc = $.int64ToNumber(_in.Arg)
 				}
 				break
 			}

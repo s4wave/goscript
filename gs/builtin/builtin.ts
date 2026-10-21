@@ -721,6 +721,35 @@ export function uintFromWide(value: number | bigint, bits: number): number {
     : uint(value, bits)
 }
 
+// int64ToNumber converts an int64 to the nearest number, as float64(x) and
+// int(x) do. It adds the two words of the value, which V8 compiles to
+// machine operations, where it does not compile Number of a bigint. The sum
+// of the exact high part and the low word is rounded once, so it is the
+// nearest number, as Number gives.
+export function int64ToNumber(value: number | bigint): number {
+  // A number is already one.
+  if (typeof value === 'number') {
+    return value
+  }
+
+  // A bigint is read as its signed high word and unsigned low word.
+  wideValue[0] = value
+  return wideWords[1] * 4294967296 + (wideWords[0] >>> 0)
+}
+
+// uint64ToNumber converts a uint64 to the nearest number, as float64(x)
+// does, through its words as int64ToNumber does.
+export function uint64ToNumber(value: number | bigint): number {
+  // A number is already one.
+  if (typeof value === 'number') {
+    return value
+  }
+
+  // A bigint is read as two unsigned words.
+  wideValue[0] = value
+  return (wideWords[1] >>> 0) * 4294967296 + (wideWords[0] >>> 0)
+}
+
 // wideValue holds a 64-bit value whose two 32-bit words, low word first on
 // the little-endian hosts that run GoScript, are wideWords. Conversions
 // between bigints and numbers through them avoid the BigInt and Number calls,

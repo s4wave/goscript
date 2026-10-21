@@ -43,4 +43,12 @@ func main() {
 
 	var i8 int8 = 127
 	println("int8:", int(i8+1), float64(i8*2))
+
+	// A 64-bit integer converts to the nearest float64, and int of a uint64
+	// keeps the signed value of its 64 bits.
+	var top int64 = 1<<63 - 1
+	var odd int64 = 1<<53 + 1
+	var bottom int64 = -1 << 63
+	println("float64 of int64:", float64(top) == 1<<63, int64(float64(odd)), int64(float64(bottom)), int64(float64(neg)), int(neg))
+	println("float64 of uint64:", float64(u) == 1<<64, uint64(float64(w)), int(u), int(w>>12), float32(w) == 1<<63)
 }
