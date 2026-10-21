@@ -2264,11 +2264,7 @@ export class BasicType implements Type {
 
   public Name(): string {
     if (this._typeName) {
-      const dotIndex = this._typeName.lastIndexOf('.')
-      if (dotIndex >= 0) {
-        return this._typeName.substring(dotIndex + 1)
-      }
-      return this._typeName
+      return typeNameName(this._typeName)
     }
     // Basic types have names like 'int', 'string', etc.
     return this._name
@@ -2511,10 +2507,7 @@ class SliceType implements Type {
 
   public Name(): string {
     if (!this._typeName) return ''
-    const dotIndex = this._typeName.lastIndexOf('.')
-    return dotIndex >= 0 ?
-        this._typeName.substring(dotIndex + 1)
-      : this._typeName
+    return typeNameName(this._typeName)
   }
 
   public Field(_i: number): StructField {
@@ -3025,11 +3018,7 @@ class FunctionType implements Type {
 
   public Name(): string {
     if (this._name !== '') {
-      const dotIndex = this._name.lastIndexOf('.')
-      if (dotIndex >= 0) {
-        return this._name.substring(dotIndex + 1)
-      }
-      return this._name
+      return typeNameName(this._name)
     }
     return ''
   }
@@ -3848,11 +3837,12 @@ function typeNamePkgPath(typeName: string): string {
   return dotIndex > 0 ? typeName.substring(0, dotIndex) : ''
 }
 
-// typeNameName returns the name of a qualified type name such as "pkg.Name",
-// or '' for an unnamed type.
+// typeNameName returns the Go name of a named type from its runtime name:
+// the part after the package qualifier, without the hash that the runtime
+// name of a local type has when another type of its package has its name.
 function typeNameName(typeName: string): string {
   const dotIndex = typeName.lastIndexOf('.')
-  return dotIndex >= 0 ? typeName.substring(dotIndex + 1) : typeName
+  return $.goTypeString(dotIndex >= 0 ? typeName.substring(dotIndex + 1) : typeName)
 }
 
 // typeMethods returns the method set of t. A type that is not a pointer has
@@ -4253,11 +4243,7 @@ class StructType implements Type {
       return ''
     }
     // Extract type name from full type name (e.g., "main.Person" -> "Person")
-    const dotIndex = this._name.lastIndexOf('.')
-    if (dotIndex >= 0) {
-      return this._name.substring(dotIndex + 1)
-    }
-    return this._name
+    return typeNameName(this._name)
   }
 
   public Field(i: number): StructField {
@@ -4815,11 +4801,7 @@ class InterfaceType implements Type {
     if (isInterfaceLiteral(this._name)) {
       return ''
     }
-    const dotIndex = this._name.lastIndexOf('.')
-    if (dotIndex >= 0) {
-      return this._name.substring(dotIndex + 1)
-    }
-    return this._name
+    return typeNameName(this._name)
   }
 
   public Field(_i: number): StructField {

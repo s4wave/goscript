@@ -81,12 +81,12 @@ export function Celsius_Name(c: Celsius): string {
 
 export function localA(): any {
 	type T = number
-	return $.namedValueInterfaceValue<any>(1, "main.T", {}, /* @__PURE__ */ $.basicType("int", "main.T"))
+	return $.namedValueInterfaceValue<any>(1, "main.T·mr81g", {}, /* @__PURE__ */ $.basicType("int", "main.T·mr81g"))
 }
 
 export function localB(): any {
 	type T = string
-	return $.namedValueInterfaceValue<any>("b", "main.T", {}, /* @__PURE__ */ $.basicType("string", "main.T"))
+	return $.namedValueInterfaceValue<any>("b", "main.T·vp3w4o", {}, /* @__PURE__ */ $.basicType("string", "main.T·vp3w4o"))
 }
 
 export function classify(v: any): string {

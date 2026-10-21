@@ -94,6 +94,7 @@ func (o *LoweringOwner) Build(ctx context.Context, model *SemanticModel, opts ..
 
 	program := &LoweredProgram{trimTypeInfo: options.TrimTypeInfo}
 	defer setRuntimePackageNames(model)()
+	defer setLocalTypeNames(model)()
 	asyncLazyCache := newAsyncLazyCache()
 	runtimeMethodSets := newRuntimeMethodSetCache()
 	semPkgs := make([]*semanticPackage, 0, len(model.packages))
@@ -18542,7 +18543,7 @@ func runtimeNamedTypeName(named *types.Named) string {
 	if named.Obj().Pkg() == nil {
 		return named.Obj().Name()
 	}
-	return runtimePackageName(named.Obj().Pkg()) + "." + named.Obj().Name()
+	return runtimePackageName(named.Obj().Pkg()) + "." + runtimeTypeObjectName(named.Obj())
 }
 
 func goRuntimeTypeString(typ types.Type) string {

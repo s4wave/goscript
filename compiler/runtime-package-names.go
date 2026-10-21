@@ -4,6 +4,7 @@ import (
 	"go/types"
 	"hash/fnv"
 	"maps"
+	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -94,6 +95,69 @@ func setRuntimePackageNames(model *SemanticModel) func() {
 			runtimePackageNames.Delete(pkg)
 		}
 	}
+}
+
+// localTypeNames maps each local type (declared in a function) being
+// lowered that shares its name with another type of its package to its
+// distinct runtime name (see setLocalTypeNames).
+var localTypeNames sync.Map
+
+// setLocalTypeNames records the runtime names of the local types of the
+// packages of model that share a name with another type of their package,
+// and returns a function that forgets them. The runtime names a named type
+// by its package name and type name, so that two functions that each declare
+// a type person would have one type to the type registry, type assertions
+// and reflection. Each such local type gets its name, the separator and a
+// hash of its position, which the runtime takes out for display, as for
+// packages (see sharedPackageNames).
+func setLocalTypeNames(model *SemanticModel) func() {
+	// Record the hashed local types of each package to forget them later.
+	var recorded []*types.TypeName
+	for _, semPkg := range model.packages {
+		if semPkg == nil || semPkg.source == nil || semPkg.source.Types == nil || semPkg.source.TypesInfo == nil {
+			continue
+		}
+		// Count the declared types of the package by name.
+		pkgScope := semPkg.source.Types.Scope()
+		counts := make(map[string]int)
+		var locals []*types.TypeName
+		for _, obj := range semPkg.source.TypesInfo.Defs {
+			tn, ok := obj.(*types.TypeName)
+			if !ok || tn.IsAlias() || tn.Parent() == nil {
+				continue
+			}
+			counts[tn.Name()]++
+			if tn.Parent() != pkgScope {
+				locals = append(locals, tn)
+			}
+		}
+		// Each local type of a shared name gets a hashed name.
+		for _, tn := range locals {
+			if counts[tn.Name()] < 2 {
+				continue
+			}
+			pos := semPkg.source.Fset.Position(tn.Pos())
+			key := filepath.Base(pos.Filename) + ":" + strconv.Itoa(pos.Offset)
+			localTypeNames.Store(tn, tn.Name()+runtimePackageNameSeparator+packagePathHash(key))
+			recorded = append(recorded, tn)
+		}
+	}
+
+	// Forget the recorded names when the lowering is done.
+	return func() {
+		for _, tn := range recorded {
+			localTypeNames.Delete(tn)
+		}
+	}
+}
+
+// runtimeTypeObjectName returns the name by which the runtime names the
+// type of obj within its package.
+func runtimeTypeObjectName(obj *types.TypeName) string {
+	if name, ok := localTypeNames.Load(obj); ok {
+		return name.(string)
+	}
+	return obj.Name()
 }
 
 // runtimePackageName returns the name by which the runtime names the types
