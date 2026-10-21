@@ -1776,6 +1776,8 @@ export function append<T>(
   }
   const newLength = oldLength + numAdded
 
+  // Spare capacity takes the elements in place, each copied as the slice
+  // holds its elements: struct and array values copied, references kept.
   const copyValue = elementCopy(zeroFactory)
   if (isOriginalComplex && newLength <= oldCapacity && originalBacking) {
     for (let i = 0; i < numAdded; i++) {
