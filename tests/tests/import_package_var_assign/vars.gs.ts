@@ -2,6 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
+import "@goscript/github.com/s4wave/goscript/tests/tests/import_package_var_assign/dep/index.js"
 
 export let userLevel: $.VarRef<number> = $.varRef(await defaultLevel())
 

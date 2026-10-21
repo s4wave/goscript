@@ -234,6 +234,8 @@ func (o *LoweringOwner) lowerPackage(
 			loweredPkg.files = append(loweredPkg.files, loweredFile)
 		}
 	}
+	importPackageDependencies(semPkg, loweredPkg.files)
+
 	slices.SortFunc(loweredPkg.files, func(a, b *loweredFile) int {
 		return cmp.Compare(a.outputName, b.outputName)
 	})
@@ -300,7 +302,7 @@ func lowerPackageInit(semPkg *semanticPackage, pkg *loweredPackage) {
 
 	// The package init module imports each file that declares a call, and
 	// runs the calls once.
-	initModule := &loweredFile{outputName: packageInitModule}
+	initModule := &loweredFile{outputName: packageInitModule, imports: packageDependencyImports(pkg.files)}
 	aliases := make(map[*loweredFile]string)
 	body := []string{"if (initialized) {\n\t\treturn\n\t}", "initialized = true"}
 	for _, c := range calls {
@@ -346,6 +348,83 @@ func lowerPackageInit(semPkg *semanticPackage, pkg *loweredPackage) {
 // isMainFunctionDecl reports whether decl declares the main function.
 func isMainFunctionDecl(decl loweredDecl) bool {
 	return decl.function != nil && decl.function.name == "main"
+}
+
+// importPackageDependencies makes each file of a package that initializes
+// package variables import every package that a file of the package imports.
+// Go initializes the imported packages before any variable of the package.
+// A module with top-level await is evaluated asynchronously, and a module that
+// does not import it may be evaluated while it waits, so a file that did not
+// import such a package could run its initializers in the middle of the
+// package's initialization. A module waits for all of its imports.
+func importPackageDependencies(semPkg *semanticPackage, files []*loweredFile) {
+	// Only packages of more than one file have imports that a file may lack.
+	if len(files) < 2 {
+		return
+	}
+	deps := packageDependencyImports(files)
+	initializing := filesWithVarInitializers(semPkg)
+
+	// Each file with initializers imports the packages that it lacks.
+	for _, file := range files {
+		if !initializing[file.sourcePath] {
+			continue
+		}
+		for _, dep := range deps {
+			imported := slices.ContainsFunc(file.imports, func(imp loweredImport) bool {
+				return imp.source == dep.source
+			})
+			if !imported {
+				file.imports = append(file.imports, dep)
+			}
+		}
+	}
+}
+
+// packageDependencyImports returns a bare import of each package that a file
+// of files imports at runtime, in the order of their first imports. Packages
+// imported only for types, such as deferred packages, are left out.
+func packageDependencyImports(files []*loweredFile) []loweredImport {
+	// A package import is bare, or binds a namespace and is kept for its
+	// side effects.
+	var deps []loweredImport
+	seen := make(map[string]bool)
+	for _, file := range files {
+		for _, imp := range file.imports {
+			runtimeImport := imp.bare || (imp.sideEffect && !imp.typeOnly)
+			if !runtimeImport || !strings.HasPrefix(imp.source, "@goscript/") || seen[imp.source] {
+				continue
+			}
+			seen[imp.source] = true
+			deps = append(deps, loweredImport{source: imp.source, bare: true})
+		}
+	}
+	return deps
+}
+
+// filesWithVarInitializers returns the source paths of the files of semPkg
+// that declare a package variable initialized by an expression that is not
+// constant, which runs when the package is initialized.
+func filesWithVarInitializers(semPkg *semanticPackage) map[string]bool {
+	// Each value of a var declaration is checked for a constant value.
+	files := make(map[string]bool)
+	for idx, file := range semPkg.source.Syntax {
+		for _, decl := range file.Decls {
+			genDecl, ok := decl.(*ast.GenDecl)
+			if !ok || genDecl.Tok != token.VAR {
+				continue
+			}
+			for _, spec := range genDecl.Specs {
+				valueSpec, _ := spec.(*ast.ValueSpec)
+				if valueSpec != nil && slices.ContainsFunc(valueSpec.Values, func(value ast.Expr) bool {
+					return semPkg.source.TypesInfo.Types[value].Value == nil
+				}) {
+					files[sourceFilePath(semPkg, idx, file)] = true
+				}
+			}
+		}
+	}
+	return files
 }
 
 func sourceFilePath(semPkg *semanticPackage, idx int, file *ast.File) string {

@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "*": [
+        "./*"
+      ],
+      "@goscript/*": [
+        "../../../tests/tests/package_init_dependency_order/run/output/@goscript/*",
+        "../../../gs/*",
+        "../../../tests/deps/*"
+      ],
+      "@goscript/github.com/s4wave/goscript/tests/tests/package_init_dependency_order/*": [
+        "./*"
+      ]
+    }
+  },
+  "extends": "../../../tests/tsconfig.base.json",
+  "include": [
+    "index.ts",
+    "lib/count.gs.ts",
+    "lib/index.ts",
+    "lib/lib.gs.ts",
+    "other.gs.ts",
+    "package_init_dependency_order.gs.ts",
+    "q/index.ts",
+    "q/q.gs.ts",
+    "reg/index.ts",
+    "reg/reg.gs.ts"
+  ]
+}
