@@ -85,7 +85,7 @@ export class Pair {
 	}
 
 	public clone(): Pair {
-		return new Pair(true, this.Key, $.copyElement(this.Val))
+		return $.copyGenericInstance(this, new Pair(true, this.Key, $.copyElement(this.Val)))
 	}
 
 	public __goscriptAssign(source: Pair): this {
@@ -112,7 +112,7 @@ export class Holder {
 	}
 
 	public clone(): Holder {
-		return new Holder(true, this.P.clone())
+		return $.copyGenericInstance(this, new Holder(true, this.P.clone()))
 	}
 
 	public __goscriptAssign(source: Holder): this {

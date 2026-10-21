@@ -53,7 +53,7 @@ export class Box {
 	}
 
 	public clone(): Box {
-		return new Box(true, $.copyElement(this.Value))
+		return $.copyGenericInstance(this, new Box(true, $.copyElement(this.Value)))
 	}
 
 	public __goscriptAssign(source: Box): this {

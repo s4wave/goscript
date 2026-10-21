@@ -56,7 +56,7 @@ export class Sides {
 	}
 
 	public clone(): Sides {
-		return new Sides(true, $.copyElement(this.Top), $.copyElement(this.Right), $.copyElement(this.Bottom), $.copyElement(this.Left))
+		return $.copyGenericInstance(this, new Sides(true, $.copyElement(this.Top), $.copyElement(this.Right), $.copyElement(this.Bottom), $.copyElement(this.Left)))
 	}
 
 	public __goscriptAssign(source: Sides): this {
@@ -104,7 +104,7 @@ export class box {
 	}
 
 	public clone(): box {
-		return new box(true, $.copyElement(this.A), $.copyElement(this.B))
+		return $.copyGenericInstance(this, new box(true, $.copyElement(this.A), $.copyElement(this.B)))
 	}
 
 	public __goscriptAssign(source: box): this {
@@ -163,7 +163,7 @@ export function makeBox(__typeArgs: $.GenericTypeArgs | undefined, v: any): box 
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s: $.VarRef<Sides> = $.varRef(new Sides(true, new Value(true), new Value(true), new Value(true), new Value(true)))
+	let s: $.VarRef<Sides> = $.varRef($.genericInstance(new Sides(true, new Value(true), new Value(true), new Value(true), new Value(true)), __goscriptStatic1))
 	s.value.SetHorizontal(__goscriptStatic0(), new Value(true, 24))
 	s.value.Left.Set(16)
 	await $.println("horizontal:", s.value.Left.V, s.value.Right.V)
@@ -214,18 +214,18 @@ export async function main(): globalThis.Promise<void> {
 
 	// Copying a generic struct copies its struct-typed fields, so assigning
 	// to a field of the original leaves the copy unchanged.
-	let orig = new Sides(true, new Value(true), new Value(true), new Value(true, 1), new Value(true))
+	let orig = $.genericInstance(new Sides(true, new Value(true), new Value(true), new Value(true, 1), new Value(true)), __goscriptStatic1)
 	let cp = (orig).clone()
 	cp.Bottom.__goscriptAssign(new Value(true, 2))
 	orig.Bottom.__goscriptAssign(new Value(true, 3))
 	await $.println("struct copy:", orig.Bottom.V, cp.Bottom.V)
-	let orig2 = new Sides(true, new Value(true, 4), new Value(true), new Value(true), new Value(true))
+	let orig2 = $.genericInstance(new Sides(true, new Value(true, 4), new Value(true), new Value(true), new Value(true)), __goscriptStatic1)
 	let cp2 = (orig2).clone()
 	orig2.Top.Set(5)
 	await $.println("struct copy method:", orig2.Top.V, cp2.Top.V)
 
-	let si: $.VarRef<Sides> = $.varRef(new Sides(true, 0, 0, 0, 0))
-	si.value.SetAll(__goscriptStatic1(), 4)
+	let si: $.VarRef<Sides> = $.varRef($.genericInstance(new Sides(true, 0, 0, 0, 0), __goscriptStatic3))
+	si.value.SetAll(__goscriptStatic2(), 4)
 	si.value.Left = 5
 	await $.println("ints:", si.value.Top, si.value.Left)
 }
@@ -237,7 +237,17 @@ function __goscriptStatic0(): any {
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+	return __goscriptStatic1$value ??= ([{SetAll: (receiver: any, ...args: any[]) => $.pointerValue(receiver).SetAll(__goscriptStatic0(), ...$.stripGenericTypeArgs(args)), SetHorizontal: (receiver: any, ...args: any[]) => $.pointerValue(receiver).SetHorizontal(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("SetAll", ["main.Value"], [], true, false), $.methodSignature("SetHorizontal", ["main.Value"], [], true, false)]])
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ([{SetAll: (receiver: any, ...args: any[]) => $.pointerValue(receiver).SetAll(__goscriptStatic2(), ...$.stripGenericTypeArgs(args)), SetHorizontal: (receiver: any, ...args: any[]) => $.pointerValue(receiver).SetHorizontal(__goscriptStatic2(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("SetAll", [/* @__PURE__ */ $.basicType("int")], [], true, false), $.methodSignature("SetHorizontal", [/* @__PURE__ */ $.basicType("int")], [], true, false)]])
 }
 
 if ($.isMainScript(import.meta)) {

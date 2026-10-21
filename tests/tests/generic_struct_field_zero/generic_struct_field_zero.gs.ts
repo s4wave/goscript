@@ -12,7 +12,7 @@ export class box {
 	}
 
 	public clone(): box {
-		return new box(true, $.copyElement(this.Value))
+		return $.copyGenericInstance(this, new box(true, $.copyElement(this.Value)))
 	}
 
 	public __goscriptAssign(source: box): this {

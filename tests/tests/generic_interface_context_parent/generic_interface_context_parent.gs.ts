@@ -65,7 +65,7 @@ export class genericResolver {
 	}
 
 	public clone(): genericResolver {
-		return new genericResolver(true)
+		return $.copyGenericInstance(this, new genericResolver(true))
 	}
 
 	public __goscriptAssign(source: genericResolver): this {
@@ -98,7 +98,7 @@ export class genericValue {
 	}
 
 	public clone(): genericValue {
-		return new genericValue(true, this.value)
+		return $.copyGenericInstance(this, new genericValue(true, this.value))
 	}
 
 	public __goscriptAssign(source: genericValue): this {
@@ -121,7 +121,7 @@ export class genericValue {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let resolver: Resolver | null = $.namedValueInterfaceValue<Resolver | null>(new genericResolver(), "*main.genericResolver", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())
+	let resolver: Resolver | null = $.namedValueInterfaceValue<Resolver | null>($.genericInstance(new genericResolver(), __goscriptStatic1), "*main.genericResolver", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())
 	{
 		let err = (__goscriptAwait = (resolver !== null && (resolver as any).__isVarRef !== true && ((resolver as any).__goValue === undefined || (resolver as any).__goType?.charCodeAt(0) !== 42) ? (resolver as Exclude<Resolver, null>) : $.pointerValue<Exclude<Resolver, null>>(resolver)).Resolve(context.Background(), $.structInterfaceValue<Handler | null>(new handler(true), "main.handler", "main.handler")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		if (err != null) {
@@ -130,8 +130,8 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	await $.println("resolve ok")
-	let g = new genericValue(true, 7)
-	let reader: ValueReader | null = $.namedValueInterfaceValue<ValueReader | null>((g).clone(), "main.genericValue", __goscriptStatic4(), __goscriptStatic5(), __goscriptStatic6())
+	let g = $.genericInstance(new genericValue(true, 7), __goscriptStatic5)
+	let reader: ValueReader | null = $.namedValueInterfaceValue<ValueReader | null>((g).clone(), "main.genericValue", __goscriptStatic6(), __goscriptStatic7(), __goscriptStatic8())
 	g.value = 9
 	if ((__goscriptAwait = (reader !== null && (reader as any).__isVarRef !== true && ((reader as any).__goValue === undefined || (reader as any).__goType?.charCodeAt(0) !== 42) ? (reader as Exclude<ValueReader, null>) : $.pointerValue<Exclude<ValueReader, null>>(reader)).Get(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) != 7) {
 		await $.println("value copy failed")
@@ -146,32 +146,42 @@ function __goscriptStatic0(): any {
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({Resolve: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Resolve(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic1$value ??= ([{Resolve: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Resolve(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Resolve", ["context.Context", "main.Handler"], ["error"], true, false)]])
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= (/* @__PURE__ */ $.pointerType("main.genericResolver"))
+	return __goscriptStatic2$value ??= ({Resolve: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Resolve(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))})
 }
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ([$.methodSignature("Resolve", [["ctx", "context.Context"], ["handler", "main.Handler"]], ["error"])])
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType("main.genericResolver"))
 }
 
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= ({Get: (receiver: any) => $.pointerValue(receiver).Get(__goscriptStatic0())})
+	return __goscriptStatic4$value ??= ([$.methodSignature("Resolve", [["ctx", "context.Context"], ["handler", "main.Handler"]], ["error"])])
 }
 
 var __goscriptStatic5$value: any
 function __goscriptStatic5(): any {
-	return __goscriptStatic5$value ??= ("main.genericValue")
+	return __goscriptStatic5$value ??= ([{Get: (receiver: any) => $.pointerValue(receiver).Get(__goscriptStatic0())}, [$.methodSignature("Get", [], [/* @__PURE__ */ $.basicType("int")], false, false)]])
 }
 
 var __goscriptStatic6$value: any
 function __goscriptStatic6(): any {
-	return __goscriptStatic6$value ??= ([$.methodSignature("Get", [], [/* @__PURE__ */ $.basicType("int")])])
+	return __goscriptStatic6$value ??= ({Get: (receiver: any) => $.pointerValue(receiver).Get(__goscriptStatic0())})
+}
+
+var __goscriptStatic7$value: any
+function __goscriptStatic7(): any {
+	return __goscriptStatic7$value ??= ("main.genericValue")
+}
+
+var __goscriptStatic8$value: any
+function __goscriptStatic8(): any {
+	return __goscriptStatic8$value ??= ([$.methodSignature("Get", [], [/* @__PURE__ */ $.basicType("int")])])
 }
 
 var __goscriptAwait: any

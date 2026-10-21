@@ -22,7 +22,7 @@ export class box {
 	}
 
 	public clone(): box {
-		return new box(true, $.copyElement(this.value))
+		return $.copyGenericInstance(this, new box(true, $.copyElement(this.value)))
 	}
 
 	public __goscriptAssign(source: box): this {
@@ -48,12 +48,12 @@ export class holder {
 	public declare box: box
 
 	constructor(__goscriptValue?: boolean, box$?: box) {
-		this.box = box$ ?? new box(true, null)
+		this.box = box$ ?? $.genericInstance(new box(true, null), () => [{Value: (receiver: any) => $.pointerValue(receiver).Value({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})}, [$.methodSignature("Value", [], [{ kind: $.TypeKind.Interface, methods: [] }], true, false)]])
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): holder {
-		return new holder(true, this.box.clone())
+		return $.copyGenericInstance(this, new holder(true, this.box.clone()))
 	}
 
 	public __goscriptAssign(source: holder): this {
@@ -92,10 +92,10 @@ export function methodExpression(__typeArgs: $.GenericTypeArgs | undefined, b: b
 }
 
 export async function main(): globalThis.Promise<void> {
-	let b = new box(false, 7)
+	let b = $.genericInstance(new box(false, 7), __goscriptStatic1)
 	await $.println("direct:", direct(__goscriptStatic0(), b))
-	await $.println("interface:", await throughInterface(__goscriptStatic0(), $.namedValueInterfaceValue<reader | null>(b, "*main.box", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())))
-	await $.println("promoted:", promoted(__goscriptStatic0(), new holder(false, ($.pointerValue<box>(b)).clone())))
+	await $.println("interface:", await throughInterface(__goscriptStatic0(), $.namedValueInterfaceValue<reader | null>(b, "*main.box", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())))
+	await $.println("promoted:", promoted(__goscriptStatic0(), $.genericInstance(new holder(false, ($.pointerValue<box>(b)).clone()), __goscriptStatic1)))
 	await $.println("expression:", methodExpression(__goscriptStatic0(), b))
 }
 
@@ -106,17 +106,22 @@ function __goscriptStatic0(): any {
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({Value: (receiver: any) => $.pointerValue(receiver).Value(__goscriptStatic0())})
+	return __goscriptStatic1$value ??= ([{Value: (receiver: any) => $.pointerValue(receiver).Value(__goscriptStatic0())}, [$.methodSignature("Value", [], [/* @__PURE__ */ $.basicType("int")], true, false)]])
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= (/* @__PURE__ */ $.pointerType("main.box"))
+	return __goscriptStatic2$value ??= ({Value: (receiver: any) => $.pointerValue(receiver).Value(__goscriptStatic0())})
 }
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ([$.methodSignature("Value", [], [/* @__PURE__ */ $.basicType("int")])])
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType("main.box"))
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= ([$.methodSignature("Value", [], [/* @__PURE__ */ $.basicType("int")])])
 }
 
 var __goscriptAwait: any

@@ -655,11 +655,31 @@ func renderPositionalStructConstructor(b *strings.Builder, structType *loweredSt
 // class, which passes a copy of each field to the constructor.
 func renderPositionalStructClone(b *strings.Builder, structType *loweredStruct, runtimeOwner *RuntimeContractOwner) {
 	b.WriteString("\tpublic " + structType.cloneMethod + "(): " + structType.name + " {\n")
-	b.WriteString("\t\treturn new " + structType.name + "(true")
+	b.WriteString("\t\treturn " + genericCloneStart(structType, runtimeOwner) + "new " + structType.name + "(true")
 	for _, field := range structType.fields {
 		b.WriteString(", " + positionalFieldCopy(field, "this."+field.name, runtimeOwner))
 	}
-	b.WriteString(")\n\t}\n")
+	b.WriteString(")" + genericCloneEnd(structType) + "\n\t}\n")
+}
+
+// genericCloneStart returns the start of the expression of the clone method
+// of structType that gives the copy the methods of the instantiated type of
+// the original, for a generic struct type (see lowerGenericInstance), and
+// genericCloneEnd its end.
+func genericCloneStart(structType *loweredStruct, runtimeOwner *RuntimeContractOwner) string {
+	if !structType.generic {
+		return ""
+	}
+	return runtimeOwner.QualifiedHelper(RuntimeHelperCopyGenericInstance) + "(this, "
+}
+
+// genericCloneEnd returns the end of the expression started by
+// genericCloneStart.
+func genericCloneEnd(structType *loweredStruct) string {
+	if !structType.generic {
+		return ""
+	}
+	return ")"
 }
 
 // positionalFieldCopy returns the expression that copies value, the value of
@@ -821,9 +841,13 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	b.WriteString(structType.cloneMethod)
 	b.WriteString("(): ")
 	b.WriteString(structType.name)
-	b.WriteString(" {\n\t\treturn new ")
+	b.WriteString(" {\n\t\treturn ")
+	b.WriteString(genericCloneStart(structType, runtimeOwner))
+	b.WriteString("new ")
 	b.WriteString(structType.name)
-	b.WriteString("(this, true)\n\t}\n")
+	b.WriteString("(this, true)")
+	b.WriteString(genericCloneEnd(structType))
+	b.WriteString("\n\t}\n")
 	renderStructBody(b, structType, runtimeOwner, trimTypeInfo)
 }
 

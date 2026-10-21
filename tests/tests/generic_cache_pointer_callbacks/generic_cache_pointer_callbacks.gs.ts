@@ -12,7 +12,7 @@ export class cache {
 	}
 
 	public clone(): cache {
-		return new cache(true, this.stored)
+		return $.copyGenericInstance(this, new cache(true, this.stored))
 	}
 
 	public __goscriptAssign(source: cache): this {
@@ -95,7 +95,7 @@ export class privateKey {
 	)
 }
 
-export let privateKeyCache: $.VarRef<cache> = $.varRef(new cache(true))
+export let privateKeyCache: $.VarRef<cache> = $.varRef($.genericInstance(new cache(true), __goscriptStatic1))
 
 export function __goscript_set_privateKeyCache(__goscriptValue: cache): void {
 	$.assignStruct(privateKeyCache.value, __goscriptValue)
@@ -126,6 +126,11 @@ export async function main(): globalThis.Promise<void> {
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
 	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: "main.key", zero: () => new key(true) }, V: { type: "main.privateKey", zero: () => new privateKey(true) }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ([{Get: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Get(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Get", [/* @__PURE__ */ $.pointerType("main.key"), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.privateKey"), "error"] } as $.FunctionTypeInfo), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.privateKey")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], [/* @__PURE__ */ $.pointerType("main.privateKey"), "error"], true, false)]])
 }
 
 if ($.isMainScript(import.meta)) {

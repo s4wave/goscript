@@ -130,8 +130,12 @@ type loweredStruct struct {
 	// positional reports that the constructor takes the value marker and
 	// then each field value in field order (see isPositionalStructClass).
 	positional bool
-	fields     []loweredStructField
-	methods    []loweredFunction
+	// generic reports that the struct type has type parameters, so that its
+	// instances carry the methods of their instantiated types (see
+	// lowerGenericInstance), which its clone method copies.
+	generic bool
+	fields  []loweredStructField
+	methods []loweredFunction
 }
 
 type loweredStructField struct {

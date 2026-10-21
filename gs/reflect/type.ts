@@ -1472,6 +1472,20 @@ export class Value {
       elemType.Name() !== '' &&
       (elemType.PkgPath() !== '' || runtimeTypeString(elemType).includes('.'))
 
+    // An instance of a generic struct type is boxed with the methods of its
+    // instantiated type, as the compiler boxes it, since its methods take
+    // the type arguments that its class does not have.
+    const generic = genericInstanceMethodSet(this._type, current)
+    if (generic !== undefined) {
+      return $.namedValueInterfaceValue<ReflectValue>(
+        $.isVarRef(current) ? current.value : current,
+        runtimeTypeString(this._type),
+        generic.methods,
+        typeInfo,
+        generic.signatures,
+      )
+    }
+
     // A pointer to a struct is the struct object itself, whose methods
     // satisfy interfaces, so it is tagged with its type but not boxed.
     if (elemType !== null && elemType.Kind() === Struct) {
@@ -1572,6 +1586,16 @@ export class Value {
     const receiver = $.isVarRef(current) ? current.value : current
     if (receiver === null || receiver === undefined) {
       return undefined
+    }
+
+    // An instance of a generic struct type has the methods of its
+    // instantiated type, which pass its type arguments.
+    const set = genericInstanceMethodSet(this.Type(), current)
+    const generic = set?.methods[name]
+    if (generic !== undefined) {
+      const [declared] = methodSignatureByName(this.Type(), name)
+      const instance = set!.signatures.find((sig) => sig.name === name)
+      return genericMethodCall(generic, current, declared, instance)
     }
     const method =
       typeof receiver === 'object' || typeof receiver === 'function' ?
@@ -3388,6 +3412,93 @@ function unwrapGoInterfaceBox(value: unknown): unknown {
     return (value as { __goValue: unknown }).__goValue
   }
   return value
+}
+
+// genericMethodCall returns a function that calls method, a method of an
+// instance of a generic struct type in its method table, on receiver. In the
+// method's type in reflect, declared, which the generic type's class has, a
+// parameter or result of a type parameter type is an interface, but the
+// method takes and returns values of the type argument, as instance, the
+// signature of the instantiated type, has them: such an argument is unboxed,
+// and such a result is boxed with its type, as an interface holds it.
+function genericMethodCall(
+  method: (receiver: any, ...args: any[]) => any,
+  receiver: unknown,
+  declared: $.MethodSignature | undefined,
+  instance: $.MethodSignature | undefined,
+): (...args: any[]) => any {
+  // Find the parameters, before any variadic one, and the results that are
+  // type parameters.
+  const fixedArgs = (declared?.args.length ?? 0) - (declared?.variadic ? 1 : 0)
+  const params: (Type | undefined)[] = []
+  for (let i = 0; i < fixedArgs; i++) {
+    params.push(typeArgumentType(declared?.args[i], instance?.args[i]))
+  }
+  const results = (declared?.returns ?? []).map((result, i) =>
+    typeArgumentType(result, instance?.returns[i]),
+  )
+
+  // Without such parameters and results, the method is called as it is.
+  if (!params.some(Boolean) && !results.some(Boolean)) {
+    return (...args: any[]) => method(receiver, ...args)
+  }
+
+  // Otherwise its arguments are unboxed and its results boxed.
+  const box = (value: unknown, i: number): unknown =>
+    results[i] ?
+      new Value(value as ReflectValue, results[i]!).Interface()
+    : value
+  const boxResults = (out: unknown): unknown =>
+    results.length > 1 ?
+      (out as unknown[]).map((value, i) => box(value, i))
+    : box(out, 0)
+  return (...args: any[]) => {
+    const unboxed = args.map((arg, i) =>
+      params[i] ? unwrapGoInterfaceBox(arg) : arg,
+    )
+    const out = method(receiver, ...unboxed)
+    return out instanceof Promise ? out.then(boxResults) : boxResults(out)
+  }
+}
+
+// typeArgumentType returns the type of instance, a parameter or result of a
+// method of an instantiated generic type, when declared, the same in the
+// generic type's method, is of a type parameter type, which reflect takes
+// for an interface, else undefined.
+function typeArgumentType(
+  declared: $.MethodArg | undefined,
+  instance: $.MethodArg | undefined,
+): Type | undefined {
+  if (declared === undefined || instance === undefined) {
+    return undefined
+  }
+  const t = typeFromTypeInfo(instance.type)
+  if (typeFromTypeInfo(declared.type).Kind() !== Interface) {
+    return undefined
+  }
+  return t.Kind() !== Interface ? t : undefined
+}
+
+// genericInstanceMethodSet returns the method set of typ, a struct type or a
+// pointer to one, when value, a value of typ, is an instance of a generic
+// struct type, else undefined.
+function genericInstanceMethodSet(
+  typ: Type,
+  value: unknown,
+): $.NamedValueMethods | undefined {
+  // Only a struct or a pointer to one is an instance.
+  const kind = typ.Kind()
+  if (kind !== Struct && (kind !== Ptr || typ.Elem().Kind() !== Struct)) {
+    return undefined
+  }
+
+  // A pointer has the methods of the pointer's method set.
+  const target = $.isVarRef(value) ? value.value : value
+  const sets = $.genericInstanceMethods(target)
+  if (sets === undefined) {
+    return undefined
+  }
+  return kind === Ptr ? sets.pointer : sets.value
 }
 
 // Map type implementation

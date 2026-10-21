@@ -3758,6 +3758,7 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 		name:                 safeIdentifier(semType.name),
 		typeName:             runtimeNamedTypeName(semType.named),
 		cloneMethod:          "clone",
+		generic:              semType.named.TypeParams().Len() != 0,
 		fields:               make([]loweredStructField, 0, len(semType.fields)),
 	}
 	for idx, field := range semType.fields {
@@ -14426,6 +14427,7 @@ func (o *LoweringOwner) lowerStructCompositeLit(
 	if len(fields) != 0 {
 		expr = "new " + o.namedTypeExpr(ctx, named) + "({" + strings.Join(fields, ", ") + "})"
 	}
+	expr = o.lowerGenericInstance(ctx, named, expr)
 	if markStruct {
 		expr = o.runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue) + "(" + expr + ")"
 	}
@@ -14492,7 +14494,7 @@ func (o *LoweringOwner) lowerPositionalStructExpr(ctx lowerFileContext, named *t
 	if !value && last == 0 {
 		args = args[:0]
 	}
-	return "new " + o.namedTypeExpr(ctx, named) + "(" + strings.Join(args, ", ") + ")"
+	return o.lowerGenericInstance(ctx, named, "new "+o.namedTypeExpr(ctx, named)+"("+strings.Join(args, ", ")+")")
 }
 
 func compositeLiteralFieldNeedsPreEval(ctx lowerFileContext, expr ast.Expr) bool {
@@ -15478,6 +15480,82 @@ func isBasicFixedWideIntegerType(typ types.Type) bool {
 	}
 }
 
+// lowerGenericInstance returns expr, which makes a new instance of named,
+// marked with the methods of its type (see genericInstanceMethodsExpr) when
+// named is an instantiated generic struct type, so that reflect can call
+// them, or expr itself otherwise.
+func (o *LoweringOwner) lowerGenericInstance(ctx lowerFileContext, named *types.Named, expr string) string {
+	methods := o.genericInstanceMethodsExpr(ctx, named)
+	if methods == "" {
+		return expr
+	}
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericInstance) + "(" + expr + ", " + methods + ")"
+}
+
+// genericInstanceMethodsExpr returns a function that describes the methods
+// of a pointer to named, an instantiated generic struct type, as the method
+// table that boxes it in an interface and the signatures of its methods, or
+// "" if named has no methods that take type arguments.
+func (o *LoweringOwner) genericInstanceMethodsExpr(ctx lowerFileContext, named *types.Named) string {
+	// Only an instance of a compiled generic struct type with such methods
+	// has them: the classes of override packages are written by hand.
+	if named == nil || named.TypeArgs().Len() == 0 || namedStructType(named) == nil || o.typeUsesOverride(named.Origin()) {
+		return ""
+	}
+
+	// The method table is the one that boxes a pointer to the instance in an
+	// interface.
+	pointer := types.NewPointer(named)
+	if !genericMethodSetHasReceiverTypeParams(pointer) {
+		return ""
+	}
+	methods := o.genericMethodDescriptorsForType(ctx, named, pointer, make(map[types.Type]bool))
+	if methods == "" {
+		return ""
+	}
+
+	// The signatures mark the methods that only a pointer has.
+	valueMethods := types.NewMethodSet(named)
+	var signatures []string
+	for selection := range types.NewMethodSet(pointer).Methods() {
+		if method, _ := selection.Obj().(*types.Func); method != nil {
+			pointerOnly := valueMethods.Lookup(method.Pkg(), method.Name()) == nil
+			signatures = append(signatures, o.genericInstanceMethodSignature(ctx, method, pointerOnly))
+		}
+	}
+	describe := "[" + methods + ", [" + strings.Join(signatures, ", ") + "]]"
+
+	// Without type parameters, the description is the same each time, so it
+	// is made once, by the getter of a static.
+	if typeIsHoistable(pointer) {
+		if getter, ok := strings.CutSuffix(o.hoistStatic(ctx, describe), "()"); ok {
+			return getter
+		}
+	}
+	return "() => " + describe
+}
+
+// genericInstanceMethodSignature describes method, a method of the method
+// set of a pointer to an instantiated generic struct type, as
+// runtimeReceiverMethodSignature does, with the types of its parameters and
+// results that are type parameters given by their type arguments.
+func (o *LoweringOwner) genericInstanceMethodSignature(ctx lowerFileContext, method *types.Func, pointerOnly bool) string {
+	// Each parameter and result is described in the context of the code.
+	signature, _ := method.Type().(*types.Signature)
+	describe := func(tuple *types.Tuple) string {
+		var infos []string
+		for v := range tuple.Variables() {
+			infos = append(infos, o.runtimeTypeAssertInfoExprWithSeen(ctx, v.Type(), make(map[types.Type]bool)))
+		}
+		return "[" + strings.Join(infos, ", ") + "]"
+	}
+
+	// The flags are positional, as for methodSignature.
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperMethodSignature) + "(" + strconv.Quote(method.Name()) + ", " +
+		describe(signature.Params()) + ", " + describe(signature.Results()) + ", " +
+		strconv.FormatBool(pointerOnly) + ", " + strconv.FormatBool(signature.Variadic()) + ")"
+}
+
 func (o *LoweringOwner) lowerNamedValueInterfaceWrapper(
 	ctx lowerFileContext,
 	targetType types.Type,
@@ -15644,7 +15722,7 @@ func (o *LoweringOwner) lowerUnnamedToNamedStruct(
 	}
 
 	// The class constructor copies the fields of its init value.
-	return "new " + o.namedTypeExpr(ctx, target) + "(" + value + ", true)", true
+	return o.lowerGenericInstance(ctx, target, "new "+o.namedTypeExpr(ctx, target)+"("+value+", true)"), true
 }
 
 func (o *LoweringOwner) lowerStructClone(value string) string {
@@ -15723,7 +15801,7 @@ func (o *LoweringOwner) hasGeneratedClassShape(named *types.Named) bool {
 // lowerNewStructValue returns the zero struct value of a generated struct
 // class.
 func (o *LoweringOwner) lowerNewStructValue(ctx lowerFileContext, named *types.Named) string {
-	return "new " + o.namedTypeExpr(ctx, named) + "(true)"
+	return o.lowerGenericInstance(ctx, named, "new "+o.namedTypeExpr(ctx, named)+"(true)")
 }
 
 func (o *LoweringOwner) lowerNamedStructZeroValueExpr(
@@ -15763,12 +15841,12 @@ func (o *LoweringOwner) lowerNamedStructZeroValueExpr(
 
 	// A struct without such fields has its zero values already.
 	if len(fields) == 0 {
-		return "new " + name + "()"
+		return o.lowerGenericInstance(ctx, named, "new "+name+"()")
 	}
 	if fresh {
-		return "new " + name + "({" + strings.Join(fields, ", ") + "}, undefined, true)"
+		return o.lowerGenericInstance(ctx, named, "new "+name+"({"+strings.Join(fields, ", ")+"}, undefined, true)")
 	}
-	return "new " + name + "({" + strings.Join(fields, ", ") + "})"
+	return o.lowerGenericInstance(ctx, named, "new "+name+"({"+strings.Join(fields, ", ")+"})")
 }
 
 // genericStructFieldZeros returns the zero value of each field of named, an

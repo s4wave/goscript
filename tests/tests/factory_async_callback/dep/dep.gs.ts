@@ -43,7 +43,7 @@ export class factory {
 	}
 
 	public clone(): factory {
-		return new factory(true)
+		return $.copyGenericInstance(this, new factory(true))
 	}
 
 	public __goscriptAssign(source: factory): this {
@@ -68,7 +68,7 @@ export async function NewFactory(b: Bus): globalThis.Promise<Factory | null> {
 	let ch = $.makeChannel<{}>(1, {}, "both")
 	await $.chanSend(ch, {})
 	await $.chanRecv(ch)
-	return $.namedValueInterfaceValue<Factory | null>(new factory(), "*dep.factory", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())
+	return $.namedValueInterfaceValue<Factory | null>($.genericInstance(new factory(), __goscriptStatic1), "*dep.factory", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())
 }
 
 var __goscriptStatic0$value: any
@@ -78,15 +78,20 @@ function __goscriptStatic0(): any {
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({GetConfigID: (receiver: any) => $.pointerValue(receiver).GetConfigID(__goscriptStatic0())})
+	return __goscriptStatic1$value ??= ([{GetConfigID: (receiver: any) => $.pointerValue(receiver).GetConfigID(__goscriptStatic0())}, [$.methodSignature("GetConfigID", [], [/* @__PURE__ */ $.basicType("string")], true, false)]])
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= (/* @__PURE__ */ $.pointerType("dep.factory"))
+	return __goscriptStatic2$value ??= ({GetConfigID: (receiver: any) => $.pointerValue(receiver).GetConfigID(__goscriptStatic0())})
 }
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ([$.methodSignature("GetConfigID", [], [/* @__PURE__ */ $.basicType("string")])])
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType("dep.factory"))
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= ([$.methodSignature("GetConfigID", [], [/* @__PURE__ */ $.basicType("string")])])
 }

@@ -108,7 +108,7 @@ export class Stack {
 	}
 
 	public clone(): Stack {
-		return new Stack(true, this.items)
+		return $.copyGenericInstance(this, new Stack(true, this.items))
 	}
 
 	public __goscriptAssign(source: Stack): this {
@@ -152,7 +152,7 @@ export class VM {
 	constructor(__goscriptValue?: boolean, pc$?: number, steps$?: number, stack$?: Stack) {
 		this.pc = pc$ ?? 0
 		this.steps = steps$ ?? 0
-		this.stack = stack$ ?? new Stack(true)
+		this.stack = stack$ ?? $.genericInstance(new Stack(true), __goscriptStatic1)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -443,7 +443,7 @@ export async function main(): globalThis.Promise<void> {
 		let p = ((__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as Program)).clone()
 		{
 			const __goscriptTypeSwitchValue = $.mapGet<string, Report | null, Report | null>(reports, p.Name, null)[0]
-			switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic1())) {
+			switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic2())) {
 				case 0:
 					{
 						let r: Answer = $.markAsStructValue($.cloneStructValue($.typeAssert<Answer>(__goscriptTypeSwitchValue, "main.Answer").value))
@@ -470,7 +470,12 @@ function __goscriptStatic0(): any {
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ($.typeSwitchSite(["main.Answer", /* @__PURE__ */ $.pointerType("main.Fault")]))
+	return __goscriptStatic1$value ??= ([{Pop: (receiver: any) => $.pointerValue(receiver).Pop(__goscriptStatic0()), Push: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Push(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Pop", [], [/* @__PURE__ */ $.basicType("int64")], true, false), $.methodSignature("Push", [/* @__PURE__ */ $.basicType("int64")], [], true, false)]])
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ($.typeSwitchSite(["main.Answer", /* @__PURE__ */ $.pointerType("main.Fault")]))
 }
 
 var __goscriptAwait: any

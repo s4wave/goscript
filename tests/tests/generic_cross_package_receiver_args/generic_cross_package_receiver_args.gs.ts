@@ -24,7 +24,7 @@ export class wrapper {
 	}
 
 	public clone(): wrapper {
-		return new wrapper(true, this.Impl)
+		return $.copyGenericInstance(this, new wrapper(true, this.Impl))
 	}
 
 	public __goscriptAssign(source: wrapper): this {
@@ -64,9 +64,9 @@ export function setConcrete(w: dep.Wrapper | $.VarRef<dep.Wrapper> | null): stri
 }
 
 export async function main(): globalThis.Promise<void> {
-	let impl = new wrapper(false, new dep.Impl(false, 7))
-	await $.println("interface:", await read(__goscriptStatic1(), $.namedValueInterfaceValue<Derived | null>(impl, "*main.wrapper", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())))
-	let keyed = new dep.Wrapper(false, new dep.Keyed())
+	let impl = $.genericInstance(new wrapper(false, $.genericInstance(new dep.Impl(false, 7), __goscriptStatic2)), __goscriptStatic4)
+	await $.println("interface:", await read(__goscriptStatic3(), $.namedValueInterfaceValue<Derived | null>(impl, "*main.wrapper", __goscriptStatic5(), __goscriptStatic6(), __goscriptStatic7())))
+	let keyed = $.genericInstance(new dep.Wrapper(false, $.genericInstance(new dep.Keyed(), __goscriptStatic8)), __goscriptStatic9)
 	await $.println("generic empty:", $.stringEqual(setGeneric(__goscriptStatic0(), keyed, 7), ""))
 	await $.println("concrete empty:", $.stringEqual(setConcrete(keyed), ""))
 }
@@ -78,22 +78,47 @@ function __goscriptStatic0(): any {
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }, E: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ({Other: (receiver: any) => $.pointerValue(receiver).Other(__goscriptStatic1()), Value: (receiver: any) => $.pointerValue(receiver).Value(__goscriptStatic1())})
+	return __goscriptStatic2$value ??= ([{Value: (receiver: any) => $.pointerValue(receiver).Value(__goscriptStatic1())}, [$.methodSignature("Value", [], [/* @__PURE__ */ $.basicType("int")], true, false)]])
 }
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType("main.wrapper"))
+	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }, E: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
 }
 
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= ([$.methodSignature("Other", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Value", [], [/* @__PURE__ */ $.basicType("int")])])
+	return __goscriptStatic4$value ??= ([{Other: (receiver: any) => $.pointerValue(receiver).Other(__goscriptStatic3()), Value: (receiver: any) => $.pointerValue(receiver).Value(__goscriptStatic3())}, [$.methodSignature("Other", [], [/* @__PURE__ */ $.basicType("string")], true, false), $.methodSignature("Value", [], [/* @__PURE__ */ $.basicType("int")], false, false)]])
+}
+
+var __goscriptStatic5$value: any
+function __goscriptStatic5(): any {
+	return __goscriptStatic5$value ??= ({Other: (receiver: any) => $.pointerValue(receiver).Other(__goscriptStatic3()), Value: (receiver: any) => $.pointerValue(receiver).Value(__goscriptStatic3())})
+}
+
+var __goscriptStatic6$value: any
+function __goscriptStatic6(): any {
+	return __goscriptStatic6$value ??= (/* @__PURE__ */ $.pointerType("main.wrapper"))
+}
+
+var __goscriptStatic7$value: any
+function __goscriptStatic7(): any {
+	return __goscriptStatic7$value ??= ([$.methodSignature("Other", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Value", [], [/* @__PURE__ */ $.basicType("int")])])
+}
+
+var __goscriptStatic8$value: any
+function __goscriptStatic8(): any {
+	return __goscriptStatic8$value ??= ([{SetValues: (receiver: any, ...args: any[]) => $.pointerValue(receiver).SetValues(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("SetValues", [/* @__PURE__ */ $.basicType("int")], [/* @__PURE__ */ $.basicType("string")], true, false)]])
+}
+
+var __goscriptStatic9$value: any
+function __goscriptStatic9(): any {
+	return __goscriptStatic9$value ??= ([{SetValues: (receiver: any, ...args: any[]) => $.pointerValue(receiver).SetValues(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("SetValues", [/* @__PURE__ */ $.basicType("int")], [/* @__PURE__ */ $.basicType("string")], false, false)]])
 }
 
 var __goscriptAwait: any

@@ -51,7 +51,7 @@ export class sides {
 	}
 
 	public clone(): sides {
-		return new sides(true, $.copyElement(this.Top), $.copyElement(this.Right), $.copyElement(this.Bottom), $.copyElement(this.Left))
+		return $.copyGenericInstance(this, new sides(true, $.copyElement(this.Top), $.copyElement(this.Right), $.copyElement(this.Bottom), $.copyElement(this.Left)))
 	}
 
 	public __goscriptAssign(source: sides): this {
@@ -90,7 +90,7 @@ export class values {
 	public declare Name: string
 
 	constructor(__goscriptValue?: boolean, sides$?: sides, Name$?: string) {
-		this.sides = sides$ ?? new sides(true, new unit(true), new unit(true), new unit(true), new unit(true))
+		this.sides = sides$ ?? $.genericInstance(new sides(true, new unit(true), new unit(true), new unit(true), new unit(true)), __goscriptStatic1)
 		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
@@ -130,7 +130,7 @@ export class pair {
 	}
 
 	public clone(): pair {
-		return new pair(true, this.Key, $.copyElement(this.Val))
+		return $.copyGenericInstance(this, new pair(true, this.Key, $.copyElement(this.Val)))
 	}
 
 	public __goscriptAssign(source: pair): this {
@@ -163,7 +163,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("copy:", a.value.sides.Top.V, a.value.sides.Left.U, b.sides.Top.V, b.sides.Left.U)
 
 	// Instances are copied when assigned, passed and returned.
-	let s = new sides(true, new unit(true, 2, "dp"), new unit(true), new unit(true), new unit(true))
+	let s = $.genericInstance(new sides(true, new unit(true, 2, "dp"), new unit(true), new unit(true), new unit(true)), __goscriptStatic1)
 	let t = (copySides(__goscriptStatic0(), s) as sides)
 	t.Top.V = 9
 	let u = (s).clone()
@@ -171,7 +171,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("instance:", s.Top.V, t.Top.V, $.stringEqual(s.Right.U, ""), u.Right.U)
 
 	// Instances with type arguments of other kinds.
-	let p = new pair(true, "k", new sides(true, 1, 2, 3, 4))
+	let p = new pair(true, "k", $.genericInstance(new sides(true, 1, 2, 3, 4), __goscriptStatic3))
 	let q = (p).clone()
 	q.Val.Left = 40
 	let ps = $.arrayToSlice<pair>([(p).clone(), (q).clone()])
@@ -182,6 +182,21 @@ export async function main(): globalThis.Promise<void> {
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
 	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.unit", zero: () => new unit(true) }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ([{setAll: (receiver: any, ...args: any[]) => $.pointerValue(receiver).setAll(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("setAll", ["main.unit"], [], true, false)]])
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ([{setAll: (receiver: any, ...args: any[]) => $.pointerValue(receiver).setAll(__goscriptStatic2(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("setAll", [/* @__PURE__ */ $.basicType("int")], [], true, false)]])
 }
 
 if ($.isMainScript(import.meta)) {

@@ -75,7 +75,7 @@ export class pair {
 	}
 
 	public clone(): pair {
-		return new pair(true, $.copyElement(this.A), $.copyElement(this.B))
+		return $.copyGenericInstance(this, new pair(true, $.copyElement(this.A), $.copyElement(this.B)))
 	}
 
 	public __goscriptAssign(source: pair): this {

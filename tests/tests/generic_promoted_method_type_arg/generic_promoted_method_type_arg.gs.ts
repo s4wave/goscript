@@ -28,7 +28,7 @@ export class Base {
 	}
 
 	public clone(): Base {
-		return new Base(true, $.copyElement(this.App), this.flags)
+		return $.copyGenericInstance(this, new Base(true, $.copyElement(this.App), this.flags))
 	}
 
 	public __goscriptAssign(source: Base): this {
@@ -89,7 +89,7 @@ export class Window {
 	public declare Title: string
 
 	constructor(__goscriptValue?: boolean, Base$?: Base, Title$?: string) {
-		this.Base = Base$ ?? new Base(true, null! as App | $.VarRef<App> | null)
+		this.Base = Base$ ?? $.genericInstance(new Base(true, null! as App | $.VarRef<App> | null), __goscriptStatic1)
 		this.Title = Title$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
@@ -127,13 +127,13 @@ export class Single {
 	public declare Count: number
 
 	constructor(__goscriptValue?: boolean, Base$?: Base, Count$?: number) {
-		this.Base = Base$ ?? new Base(true, null)
+		this.Base = Base$ ?? $.genericInstance(new Base(true, null), () => [{Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Is", [/* @__PURE__ */ $.basicType("int64", "main.Flags")], [/* @__PURE__ */ $.basicType("bool")], true, false), $.methodSignature("Set", [/* @__PURE__ */ $.basicType("int64", "main.Flags")], [], true, false)]])
 		this.Count = Count$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Single {
-		return new Single(true, this.Base.clone(), this.Count)
+		return $.copyGenericInstance(this, new Single(true, this.Base.clone(), this.Count))
 	}
 
 	public __goscriptAssign(source: Single): this {
@@ -170,14 +170,14 @@ export function asFlagger(__typeArgs: $.GenericTypeArgs | undefined, w: any): Fl
 
 export async function main(): globalThis.Promise<void> {
 	let w = new Window(false, undefined, "main")
-	await $.println("check:", check(__goscriptStatic1(), w))
-	let f = asFlagger(__goscriptStatic1(), new Window())
+	await $.println("check:", check(__goscriptStatic2(), w))
+	let f = asFlagger(__goscriptStatic2(), new Window())
 	void (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && ((f as any).__goValue === undefined || (f as any).__goType?.charCodeAt(0) !== 42) ? (f as Exclude<Flagger, null>) : $.pointerValue<Exclude<Flagger, null>>(f)).Set(3n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	await $.println("interface:", (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && ((f as any).__goValue === undefined || (f as any).__goType?.charCodeAt(0) !== 42) ? (f as Exclude<Flagger, null>) : $.pointerValue<Exclude<Flagger, null>>(f)).Is(3n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && ((f as any).__goValue === undefined || (f as any).__goType?.charCodeAt(0) !== 42) ? (f as Exclude<Flagger, null>) : $.pointerValue<Exclude<Flagger, null>>(f)).Is(6n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
-	let s = new Single()
-	await $.println("generic outer:", check(__goscriptStatic2(), s))
-	await $.println("generic outer string:", check(__goscriptStatic4(), new Single()))
+	let s = $.genericInstance(new Single(), __goscriptStatic1)
+	await $.println("generic outer:", check(__goscriptStatic3(), s))
+	await $.println("generic outer string:", check(__goscriptStatic6(), $.genericInstance(new Single(), __goscriptStatic5)))
 }
 
 var __goscriptStatic0$value: any
@@ -187,22 +187,32 @@ function __goscriptStatic0(): any {
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.Window"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic1$value ??= ([{Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(__goscriptStatic0(), ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Is", [/* @__PURE__ */ $.basicType("int64", "main.Flags")], [/* @__PURE__ */ $.basicType("bool")], true, false), $.methodSignature("Set", [/* @__PURE__ */ $.basicType("int64", "main.Flags")], [], true, false)]])
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.Single"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(__goscriptStatic0(), ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.Window"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set(...$.stripGenericTypeArgs(args))} }})
 }
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
+	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.Single"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(__goscriptStatic0(), ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))} }})
 }
 
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.Single"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(__goscriptStatic3(), ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set(__goscriptStatic3(), ...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
+}
+
+var __goscriptStatic5$value: any
+function __goscriptStatic5(): any {
+	return __goscriptStatic5$value ??= ([{Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(__goscriptStatic4(), ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set(__goscriptStatic4(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Is", [/* @__PURE__ */ $.basicType("int64", "main.Flags")], [/* @__PURE__ */ $.basicType("bool")], true, false), $.methodSignature("Set", [/* @__PURE__ */ $.basicType("int64", "main.Flags")], [], true, false)]])
+}
+
+var __goscriptStatic6$value: any
+function __goscriptStatic6(): any {
+	return __goscriptStatic6$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.Single"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(__goscriptStatic4(), ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set(__goscriptStatic4(), ...$.stripGenericTypeArgs(args))} }})
 }
 
 var __goscriptAwait: any

@@ -114,7 +114,7 @@ export class GenericChannelStore {
 	}
 
 	public clone(): GenericChannelStore {
-		return new GenericChannelStore(true, this.ch, $.copyElement(this.value))
+		return $.copyGenericInstance(this, new GenericChannelStore(true, this.ch, $.copyElement(this.value)))
 	}
 
 	public __goscriptAssign(source: GenericChannelStore): this {
@@ -150,7 +150,7 @@ export async function processViaInterface(processor: AsyncProcessor | null, inpu
 }
 
 export function newGenericStore(__typeArgs: $.GenericTypeArgs | undefined, value: any): GenericStore | null {
-	return $.namedValueInterfaceValue<GenericStore | null>(new GenericChannelStore(false, $.makeChannel<any>(1, $.genericZero(__typeArgs, "V", null), "both"), $.copyElement(value)), "*main.GenericChannelStore", {Load: (receiver: any) => $.pointerValue(receiver).Load({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, V: __typeArgs?.["V"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})}, /* @__PURE__ */ $.pointerType("main.GenericChannelStore"), [$.methodSignature("Load", [], [{ kind: $.TypeKind.Interface, methods: [] }])])
+	return $.namedValueInterfaceValue<GenericStore | null>($.genericInstance(new GenericChannelStore(false, $.makeChannel<any>(1, $.genericZero(__typeArgs, "V", null), "both"), $.copyElement(value)), () => [{Load: (receiver: any) => $.pointerValue(receiver).Load({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, V: __typeArgs?.["V"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})}, [$.methodSignature("Load", [], [__typeArgs?.["V"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }], true, false)]]), "*main.GenericChannelStore", {Load: (receiver: any) => $.pointerValue(receiver).Load({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, V: __typeArgs?.["V"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})}, /* @__PURE__ */ $.pointerType("main.GenericChannelStore"), [$.methodSignature("Load", [], [{ kind: $.TypeKind.Interface, methods: [] }])])
 }
 
 export async function loadGenericStore(store: GenericStore | null): globalThis.Promise<number> {

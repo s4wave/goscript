@@ -48,7 +48,7 @@ export class tree {
 	}
 
 	public clone(): tree {
-		return new tree(true, this.less, $.copyElement(this.empty), this.count)
+		return $.copyGenericInstance(this, new tree(true, this.less, $.copyElement(this.empty), this.count))
 	}
 
 	public __goscriptAssign(source: tree): this {
@@ -73,17 +73,17 @@ export class tree {
 }
 
 export function newTree(__typeArgs: $.GenericTypeArgs | undefined, less: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null): tree | $.VarRef<tree> | null {
-	let tr = new tree(false, undefined, $.genericZero(__typeArgs, "T", null))
+	let tr = $.genericInstance(new tree(false, undefined, $.genericZero(__typeArgs, "T", null)), () => [{get: (receiver: any) => $.pointerValue(receiver).get({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})}, [$.methodSignature("get", [], [__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }], true, false)]])
 	$.pointerValue<tree>(tr).less = less
 	return tr
 }
 
 export function literalTree(__typeArgs: $.GenericTypeArgs | undefined): tree {
-	return new tree(true, undefined, $.genericZero(__typeArgs, "T", null), 1)
+	return $.genericInstance(new tree(true, undefined, $.genericZero(__typeArgs, "T", null), 1), () => [{get: (receiver: any) => $.pointerValue(receiver).get({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})}, [$.methodSignature("get", [], [__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }], true, false)]])
 }
 
 export function varTree(__typeArgs: $.GenericTypeArgs | undefined): tree {
-	let tr: tree = new tree(true, undefined, $.genericZero(__typeArgs, "T", null))
+	let tr: tree = $.genericInstance(new tree(true, undefined, $.genericZero(__typeArgs, "T", null)), () => [{get: (receiver: any) => $.pointerValue(receiver).get({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})}, [$.methodSignature("get", [], [__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }], true, false)]])
 	return tr
 }
 

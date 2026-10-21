@@ -51,7 +51,7 @@ export class Sides {
 	}
 
 	public clone(): Sides {
-		return new Sides(true, $.copyElement(this.Top), $.copyElement(this.Right), $.copyElement(this.Bottom), $.copyElement(this.Left))
+		return $.copyGenericInstance(this, new Sides(true, $.copyElement(this.Top), $.copyElement(this.Right), $.copyElement(this.Bottom), $.copyElement(this.Left)))
 	}
 
 	public __goscriptAssign(source: Sides): this {
@@ -109,7 +109,7 @@ export class Pair {
 	}
 
 	public clone(): Pair {
-		return new Pair(true, this.Key, $.copyElement(this.Val))
+		return $.copyGenericInstance(this, new Pair(true, this.Key, $.copyElement(this.Val)))
 	}
 
 	public __goscriptAssign(source: Pair): this {
