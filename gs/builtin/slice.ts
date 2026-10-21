@@ -1469,12 +1469,30 @@ export function appendZero<T>(factory: () => T): object {
   return { [appendZeroValueMarker]: factory }
 }
 
+// nilZero is the zero of the element types whose zero is nil: pointers,
+// interfaces, maps, channels, functions and slices.
+const nilZero = (): null => null
+
 // appendZeros reuses immutable hints for static zeros that dynamic values
 // cannot reveal.
 export const appendZeros = Object.freeze({
   complex: appendZero(() => ({ real: 0, imag: 0 })),
-  nil: appendZero(() => null),
+  nil: appendZero(nilZero),
 })
+
+// keepReference returns an element of a type whose zero is nil as it is: it
+// is a reference, even when its object is also a struct value, as the
+// receiver of a pointer method called on a struct field is, which a copy
+// would detach from the field it points to.
+function keepReference<T>(value: T): T {
+  return value
+}
+
+// elementCopy returns the function that copies the elements of a slice whose
+// element zero factory is zeroFactory.
+function elementCopy<T>(zeroFactory: (() => T) | undefined): (value: T) => T {
+  return zeroFactory === nilZero ? keepReference : copyElement
+}
 
 function appendZeroValueFactory<T>(value: unknown): (() => T) | undefined {
   if (
@@ -1758,9 +1776,10 @@ export function append<T>(
   }
   const newLength = oldLength + numAdded
 
+  const copyValue = elementCopy(zeroFactory)
   if (isOriginalComplex && newLength <= oldCapacity && originalBacking) {
     for (let i = 0; i < numAdded; i++) {
-      const value = copyElement(elements[i] as T)
+      const value = copyValue(elements[i] as T)
       originalBacking[originalOffset + oldLength + i] = value
     }
     return sliceProxyFromBacking(
@@ -1777,10 +1796,10 @@ export function append<T>(
   // gets its zero values when a slice extends into it.
   const newBacking = new Array<T>(newCapacity)
   if (oldLength > 0) {
-    copyGrownElements(newBacking, slice as Slice<T>, oldLength)
+    copyGrownElements(newBacking, slice as Slice<T>, oldLength, zeroFactory)
   }
   for (let i = 0; i < numAdded; i++) {
-    newBacking[oldLength + i] = copyElement(elements[i] as T)
+    newBacking[oldLength + i] = copyValue(elements[i] as T)
   }
   const sample: unknown = elements[0]
   setSpareZero(
@@ -1826,14 +1845,21 @@ function fillSpareCapacity<T>(backing: T[], start: number, end: number): void {
 // backing array of its grown copy. The elements of a slice of one generated
 // struct type, the common case, are cloned directly, which is much faster
 // than copyElement's checks for every kind of value.
-function copyGrownElements<T>(dst: T[], slice: Slice<T>, count: number): void {
-  // Without a struct class, each element is copied as copyElement copies it.
+function copyGrownElements<T>(
+  dst: T[],
+  slice: Slice<T>,
+  count: number,
+  zeroFactory?: () => T,
+): void {
+  // References are kept, and without a struct class, each element is copied
+  // as copyElement copies it.
   const window = sliceRange(slice)
   const backing = window.backing as any[]
   const offset = window.offset
-  const cls = generatedStructClass(backing[offset])
+  const cls =
+    zeroFactory === nilZero ? undefined : generatedStructClass(backing[offset])
   if (cls === undefined) {
-    copySliceElements(dst, 0, slice, 0, count)
+    copySliceElements(dst, 0, slice, 0, count, false, elementCopy(zeroFactory))
     return
   }
 
@@ -1899,6 +1925,9 @@ export function appendSlice<T>(
     return slice as any
   }
 
+  // Elements are copied into spare capacity in place, keeping references.
+  const elementZero = appendZeroValueFactory<T>(elementHint)
+  const copyValue = elementCopy(elementZero)
   let result = append(slice as Slice<T> | null)
   if (isComplexSlice(result)) {
     const meta = result.__meta__
@@ -1911,6 +1940,8 @@ export function appendSlice<T>(
         source as Slice<T>,
         0,
         count,
+        false,
+        copyValue,
       )
       return sliceProxyFromBacking(
         meta.backing,
@@ -1929,12 +1960,18 @@ export function appendSlice<T>(
     newLength,
   )
   const next = new Array<T>(newCapacity)
-  copySliceElements(next, 0, result as Slice<T>, 0, baseLen)
-  copySliceElements(next, baseLen, source as Slice<T>, 0, count)
+  copySliceElements(next, 0, result as Slice<T>, 0, baseLen, false, copyValue)
+  copySliceElements(
+    next,
+    baseLen,
+    source as Slice<T>,
+    0,
+    count,
+    false,
+    copyValue,
+  )
   const sample: unknown = arrayIndex(source as any, 0)
-  const zeroFactory =
-    appendZeroValueFactory<T>(elementHint) ??
-    (() => appendZeroValue(sample) as T)
+  const zeroFactory = elementZero ?? (() => appendZeroValue(sample) as T)
   setSpareZero(next, newLength, zeroFactory)
   return sliceProxyFromBacking(next, 0, newLength, newCapacity)
 }
@@ -2160,7 +2197,7 @@ function copyFromString<T>(dst: Slice<T> | TypedSlice, src: string): number {
  * copySliceElements copies each value and traverses overlapping backing in
  * the safe direction. With structs, a struct value is assigned into the
  * destination element of its class in place, as Go copies memory; any other
- * element, such as a hole, is replaced by a copy.
+ * element, such as a hole, is replaced by a copy, made by copyValue.
  */
 export function copySliceElements<T>(
   dst: Slice<T> | TypedSlice | null,
@@ -2169,6 +2206,7 @@ export function copySliceElements<T>(
   srcIndex: number,
   count: number,
   structs = false,
+  copyValue: (value: T) => T = copyElement,
 ): void {
   if (dst == null || src == null || count <= 0) {
     return
@@ -2196,7 +2234,7 @@ export function copySliceElements<T>(
     if (structs && assignStructInPlace(target, source)) {
       continue
     }
-    ;(dstBacking as T[])[dstStart + i] = copyElement(source)
+    ;(dstBacking as T[])[dstStart + i] = copyValue(source)
   }
 }
 
