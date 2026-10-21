@@ -13,7 +13,9 @@ export function runtime_args(): $.Slice<string> {
 	if ($.isArrayOrGoSlice(processObj?.argv)) {
 		return $.arrayToSlice<string>(processObj.argv.slice(1))
 	}
-	return $.arrayToSlice<string>([])
+	// A browser has no command line: Go's js/wasm runtime names the program
+	// "js" there, and programs index os.Args[0] and slice os.Args[1:].
+	return $.arrayToSlice<string>(["js"])
 }
 
 export function runtime_beforeExit(exitCode: number): void {
