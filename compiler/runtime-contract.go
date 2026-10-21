@@ -105,6 +105,7 @@ const (
 	RuntimeHelperVarRef                RuntimeHelper = "varref.varRef"
 	RuntimeHelperFieldRef              RuntimeHelper = "varref.fieldRef"
 	RuntimeHelperTransientFieldRef     RuntimeHelper = "varref.transientFieldRef"
+	RuntimeHelperCallPointerMethod     RuntimeHelper = "varref.callPointerMethod"
 	RuntimeHelperUnref                 RuntimeHelper = "varref.unref"
 	RuntimeHelperIsVarRef              RuntimeHelper = "varref.isVarRef"
 	RuntimeHelperUnsupportedPointerRef RuntimeHelper = "varref.unsupportedPointerRef"
@@ -413,6 +414,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperVarRef, "varRef", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperFieldRef, "fieldRef", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperTransientFieldRef, "transientFieldRef", RuntimeHelperCategoryVarRef),
+		runtimeHelper(RuntimeHelperCallPointerMethod, "callPointerMethod", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperUnref, "unref", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperIsVarRef, "isVarRef", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperUnsupportedPointerRef, "unsupportedPointerRef", RuntimeHelperCategoryVarRef),

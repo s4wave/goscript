@@ -27,7 +27,7 @@ export async function main(): globalThis.Promise<void> {
 		__defer.defer(() => { wg.value.Done() })
 
 		// Try to acquire the lock
-		let [relLock, err] = await mtx.value.Lock(ctx)
+		let [relLock, err] = await $.callPointerMethod(mtx, "Lock", ctx)
 		if (err != null) {
 			await $.println("worker", id, "failed to acquire lock:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return

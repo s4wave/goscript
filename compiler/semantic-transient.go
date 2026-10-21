@@ -124,13 +124,17 @@ func transientCandidates(pkg *packages.Package, fn *types.Func, decl *ast.FuncDe
 }
 
 // isTransientPointerType reports whether typ is a pointer to a boolean,
-// number or string type. A pointer to a struct, array or other composite is
-// its object, not a reference made by fieldRef, so only these can be
-// transient.
+// number, string or struct type. A pointer to a struct is transient when the
+// function never observes its identity, and so may be either the struct
+// object or a reference to the variable or field that holds it.
 func isTransientPointerType(typ types.Type) bool {
+	// Only a pointer to a basic value or a struct.
 	pointer, ok := types.Unalias(typ).Underlying().(*types.Pointer)
 	if !ok {
 		return false
+	}
+	if isStructValueType(pointer.Elem()) {
+		return true
 	}
 	basic, ok := types.Unalias(pointer.Elem()).Underlying().(*types.Basic)
 	return ok && basic.Kind() != types.UnsafePointer && basic.Kind() != types.Invalid
@@ -192,6 +196,9 @@ func transientUse(pkg *packages.Package, stack []ast.Node, overrideFacts *Overri
 		case *ast.BinaryExpr:
 			return nil, transientNilCompare(pkg, typed)
 		case *ast.SelectorExpr:
+			if transientFieldSelection(pkg, typed) {
+				return nil, true
+			}
 			return transientMethodCall(pkg, stack, parentAt, typed, overrideFacts)
 		case *ast.CallExpr:
 			if transientPointerConversion(pkg, typed) {
@@ -256,12 +263,22 @@ func transientPointerConversion(pkg *packages.Package, call *ast.CallExpr) bool 
 	return ok
 }
 
+// transientFieldSelection reports whether selector selects a field of the
+// struct that a pointer points to, which reads or addresses that struct's
+// storage, whatever reference to it the pointer is.
+func transientFieldSelection(pkg *packages.Package, selector *ast.SelectorExpr) bool {
+	selection := pkg.TypesInfo.Selections[selector]
+	return selection != nil && selection.Kind() == types.FieldVal
+}
+
 // transientMethodCall judges p.M at stack[at]: a call of a value method reads
-// *p, and a call of a pointer method passes p as its receiver.
+// *p, and a call of a pointer method passes p as its receiver. A method
+// promoted from an embedded field takes that field or the pointer it holds,
+// not p.
 func transientMethodCall(pkg *packages.Package, stack []ast.Node, at int, selector *ast.SelectorExpr, overrideFacts *OverrideFacts) (*transientSlot, bool) {
 	// Only a direct call of a method, not a method value.
 	selection := pkg.TypesInfo.Selections[selector]
-	if selection == nil || selection.Kind() != types.MethodVal || len(selection.Index()) != 1 {
+	if selection == nil || selection.Kind() != types.MethodVal {
 		return nil, false
 	}
 	call, callAt := transientParent(stack, at)
@@ -270,13 +287,13 @@ func transientMethodCall(pkg *packages.Package, stack []ast.Node, at int, select
 		return nil, false
 	}
 
-	// A value method reads *p, and a pointer method's receiver must be
-	// transient.
+	// A value method or a promoted method reads *p, and a pointer method's
+	// receiver must be transient.
 	method, _ := selection.Obj().(*types.Func)
 	if method == nil {
 		return nil, false
 	}
-	if !methodHasPointerReceiver(method) {
+	if !methodHasPointerReceiver(method) || len(selection.Index()) != 1 {
 		return nil, true
 	}
 	return transientCallee(method, -1, overrideFacts)

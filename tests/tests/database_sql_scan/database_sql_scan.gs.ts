@@ -178,11 +178,13 @@ export class columnRows {
 	}
 
 	public Close(): any {
-		return $.pointerValue<rows>(this.rows).Close()
+		const __receiver = $.fieldRef(this, "rows")
+		return __receiver.value.Close.call(__receiver)
 	}
 
 	public Columns(): any {
-		return $.pointerValue<rows>(this.rows).Columns()
+		const __receiver = $.fieldRef(this, "rows")
+		return __receiver.value.Columns.call(__receiver)
 	}
 
 	static __typeInfo = $.registerStructType(

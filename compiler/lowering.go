@@ -4116,6 +4116,7 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 			}
 		}
 		var call string
+		var body []loweredStmt
 		if receiver != nil {
 			callArgs := append([]string{target}, args...)
 			call = o.methodFunctionExpr(ctx, receiver, method, method.Name()) + "(" + strings.Join(callArgs, ", ") + ")"
@@ -4125,11 +4126,19 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 				callArgs = append([]string{genericArgs}, callArgs...)
 			}
 			call = target + "." + method.Name() + "(" + strings.Join(callArgs, ", ") + ")"
+
+			// A method that observes its receiver gets the reference to the
+			// embedded field.
+			if ref, ok := o.embeddedForwarderIdentityReceiver(ctx, field, selection, method); ok {
+				body = append(body, loweredStmt{text: "const __receiver = " + ref})
+				callArgs = append([]string{"__receiver"}, callArgs...)
+				call = identityReceiverCallee("__receiver", method.Name()) + "(" + strings.Join(callArgs, ", ") + ")"
+			}
 		}
 		if async {
 			call = "await " + call
 		}
-		lowered.body = []loweredStmt{{text: "return " + call}}
+		lowered.body = append(body, loweredStmt{text: "return " + call})
 		methods = append(methods, lowered)
 		explicitMethods[method.Name()] = true
 	}
@@ -10499,6 +10508,11 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 			if call, callDiagnostics, ok := o.lowerPointerReceiverMethodCall(ctx, fun, selection, args); ok {
 				return o.awaitCallIfNeeded(ctx, expr, call), append(diagnostics, callDiagnostics...)
 			}
+			// A method that observes its receiver takes the address of a
+			// struct value.
+			if call, callDiagnostics, ok := o.lowerIdentityReceiverMethodCall(ctx, fun, selection, args); ok {
+				return o.awaitCallIfNeeded(ctx, expr, call), append(diagnostics, callDiagnostics...)
+			}
 			receiverExpr, receiverDiagnostics := o.lowerMethodReceiverExpr(ctx, fun.X, selection)
 			diagnostics = append(diagnostics, receiverDiagnostics...)
 			call := receiverExpr + "." + fun.Sel.Name + "(" + strings.Join(args, ", ") + ")"
@@ -11029,6 +11043,12 @@ func fieldSelectionOperand(ctx lowerFileContext, expr ast.Expr) (*ast.SelectorEx
 // lowerTransientFieldAddress lowers the address of the field of selector,
 // passed to a transient pointer parameter, as a new reference to the field.
 func (o *LoweringOwner) lowerTransientFieldAddress(ctx lowerFileContext, selector *ast.SelectorExpr, selection *types.Selection) (string, []Diagnostic) {
+	// A struct field is its own struct object, which needs no reference.
+	if isStructValueType(ctx.semPkg.source.TypesInfo.TypeOf(selector)) {
+		return o.lowerFieldSelectionExpr(ctx, selector, selection, false)
+	}
+
+	// Any other field takes a new reference.
 	ctx.transientAddress = true
 	return o.lowerFieldSelectionExpr(ctx, selector, selection, true)
 }
@@ -12274,6 +12294,11 @@ func (o *LoweringOwner) lowerSelectorExpr(ctx lowerFileContext, expr *ast.Select
 				receiverExpr, diagnostics := o.lowerNamedReceiverForMethod(ctx, expr.X, selection)
 				methodExpr := o.methodFunctionExpr(ctx, namedReceiver, selection.Obj(), expr.Sel.Name)
 				return o.lowerMethodValueClosure(ctx, selection, receiverExpr, methodExpr, true), diagnostics
+			}
+			// A method that observes its receiver is bound to the address
+			// of a struct value.
+			if value, diagnostics, ok := o.lowerIdentityReceiverMethodValue(ctx, expr, selection); ok {
+				return value, diagnostics
 			}
 			// The method value is called later, so it gets a copy of a value
 			// receiver even for a method that only reads it.
