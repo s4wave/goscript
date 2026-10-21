@@ -338,14 +338,15 @@ export function typeIdentityKey(t: Type, seen = new Set<Type>()): string {
     return t.identityKey(seen)
   }
   switch (t.Kind()) {
+    // A named array or map differs from its underlying type by its name.
     case Array:
-      return `${t.Kind()}:${t.Len()}:${typeIdentityKey(t.Elem(), seen)}`
+      return `${t.Kind()}:${runtimeTypeString(t)}:${t.Len()}:${typeIdentityKey(t.Elem(), seen)}`
     case Chan:
     case Ptr:
     case Slice:
       return `${t.Kind()}:${runtimeTypeString(t)}:${typeIdentityKey(t.Elem(), seen)}`
     case Map:
-      return `${t.Kind()}:${typeIdentityKey(t.Key(), seen)}:${typeIdentityKey(t.Elem(), seen)}`
+      return `${t.Kind()}:${runtimeTypeString(t)}:${typeIdentityKey(t.Key(), seen)}:${typeIdentityKey(t.Elem(), seen)}`
     case Func: {
       if (t.Name() !== '') {
         return `${t.Kind()}:named:${t.PkgPath()}:${t.Name()}`

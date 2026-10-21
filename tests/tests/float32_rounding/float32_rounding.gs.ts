@@ -82,7 +82,7 @@ export async function main(): globalThis.Promise<void> {
 	fmt.Println($.basicInterfaceValue(e, "float32"), $.basicInterfaceValue(e, "float64"))
 	let m = globalThis.Math.fround(f * 3)
 	fmt.Println($.basicInterfaceValue(m, "float32"), $.basicInterfaceValue(globalThis.Math.fround(m / 7), "float32"))
-	fmt.Printf("%v %v\n", $.interfaceValue($.typedSliceOf(Float32Array, [1.100000023841858, 2.200000047683716]) as $.Slice<number>, "[]float32", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float32"))), $.arrayValue([3.299999952316284, 4.400000095367432], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 2)))
+	fmt.Printf("%v %v\n", $.interfaceValue($.typedSliceOf(Float32Array, [1.100000023841858, 2.200000047683716]) as $.Slice<number>, "[]float32", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float32"))), $.interfaceValue($.arrayValue([3.299999952316284, 4.400000095367432], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 2)), "[2]float32", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 2)))
 
 	// float64 values use Go's %v format
 	fmt.Println($.basicInterfaceValue(1e6, "float64"), $.basicInterfaceValue(123456.0, "float64"), $.basicInterfaceValue(0.00001, "float64"), $.basicInterfaceValue(2.5, "float64"))

@@ -15272,6 +15272,14 @@ func (o *LoweringOwner) lowerValueForTargetTypes(
 	if wrapper := o.lowerNamedBasicInterfaceBox(ctx, targetType, sourceType, value); wrapper != "" {
 		return wrapper
 	}
+	// An array is copied into the interface, which carries its type, so that
+	// reflection sees its length, element type and name.
+	if isInterfaceType(targetType) && !isInterfaceType(sourceType) && isArrayType(sourceType) {
+		if cloneStructValue {
+			value = o.runtimeOwner.QualifiedHelper(RuntimeHelperCloneArrayValue) + "(" + value + ", " + o.runtimeTypeInfoExpr(sourceType) + ")"
+		}
+		return o.lowerInterfaceValueExpr(ctx, targetType, sourceType, value)
+	}
 	if isInterfaceType(targetType) && !isInterfaceType(sourceType) && isNilableType(sourceType) {
 		return o.lowerInterfaceValueExpr(ctx, targetType, sourceType, value)
 	}

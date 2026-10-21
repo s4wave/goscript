@@ -207,7 +207,7 @@ export async function main(): globalThis.Promise<void> {
 	let be: $.Slice<number> = __goscriptTuple1[0]
 	let arr: vec4[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new vec4(true)), /* @__PURE__ */ $.arrayType("main.vec4", 2))
 	arr[1].W = 3
-	let __goscriptTuple2: any = binary.Append(null, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic1())!, arr)
+	let __goscriptTuple2: any = binary.Append(null, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic1())!, $.interfaceValue(arr, "[2]main.vec4", /* @__PURE__ */ $.arrayType("main.vec4", 2)))
 	let ab: $.Slice<number> = __goscriptTuple2[0]
 	let arr2: $.VarRef<vec4[]> = $.varRef($.arrayValue(globalThis.Array.from({ length: 2 }, () => new vec4(true)), /* @__PURE__ */ $.arrayType("main.vec4", 2)))
 	let __goscriptTuple3: any = binary.Decode(ab, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic1())!, $.interfaceValue(arr2, "*[2]main.vec4", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.arrayType("main.vec4", 2))))

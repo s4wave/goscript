@@ -146,7 +146,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(s.A.X, (t$ as pair).A.X)
 
 	// An array held by an interface field is not shared.
-	let a = new holder(true, $.arrayValue([7, 8]))
+	let a = new holder(true, $.interfaceValue($.arrayValue([7, 8]), "[2]int", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)))
 	let b: $.VarRef<holder> = $.varRef(new holder(true))
 	let pb = b
 	$.pointerValue<holder>(pb).__goscriptAssign(a)

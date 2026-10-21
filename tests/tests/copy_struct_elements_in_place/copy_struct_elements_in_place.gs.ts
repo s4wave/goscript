@@ -75,12 +75,12 @@ export async function main(): globalThis.Promise<void> {
 	let p$: item = p == null ? $.pointerTarget<item>(p) : (p as any).__isVarRef === true ? (p as any).value : (p as any).__goValue === undefined ? (p as any) : $.pointerTarget<item>(p)
 	let src = $.arrayToSlice<item>([new item(true, 1, 2, new inner(true, $.arrayValue([3, 4]))), new item(true, 5, 6, new inner(true, $.arrayValue([7, 8]))), new item(true, 9, 10, new inner(true))])
 	let n = $.copy(dst, src, true)
-	fmt.Println($.basicInterfaceValue(n, "int"), $.basicInterfaceValue((p$ as item).X, "int"), $.basicInterfaceValue((p$ as item).Y, "int"), (p$ as item).In.N)
+	fmt.Println($.basicInterfaceValue(n, "int"), $.basicInterfaceValue((p$ as item).X, "int"), $.basicInterfaceValue((p$ as item).Y, "int"), $.interfaceValue($.cloneArrayValue((p$ as item).In.N, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), "[2]int", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)))
 
 	// The copies are values: changing the source leaves dst alone.
 	$.arrayIndex(src!, 1).X = 50
 	$.arrayIndex(src!, 1).In.N[0] = 70
-	fmt.Println($.basicInterfaceValue($.arrayIndex(dst!, 1).X, "int"), $.arrayIndex(dst!, 1).In.N, $.basicInterfaceValue((p$ as item).X, "int"))
+	fmt.Println($.basicInterfaceValue($.arrayIndex(dst!, 1).X, "int"), $.interfaceValue($.cloneArrayValue($.arrayIndex(dst!, 1).In.N, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), "[2]int", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), $.basicInterfaceValue((p$ as item).X, "int"))
 
 	// Overlapping copies within one backing array, forward and backward.
 	let all = $.arrayToSlice<item>([new item(true, 1), new item(true, 2), new item(true, 3), new item(true, 4)])
