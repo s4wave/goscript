@@ -5924,8 +5924,8 @@ func TestCompilePackagesLowersUnaryBitwiseComplement(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"return $.uint64Xor(crc, -1n)",
-		"mask = mask & ~((3))",
-		"$.println(globalThis.Number($.int64Xor(value, -1n)), $.uint64Xor(wide, -1n), $.int64Xor(signed, -1n), invert(wide), value & ~(3), mask, 0o700)",
+		"mask = $.intAndNot(mask, 3)",
+		"$.println((-(value) - 1), $.uint64Xor(wide, -1n), $.int64Xor(signed, -1n), invert(wide), $.intAndNot(value, 3), mask, 0o700)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)

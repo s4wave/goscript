@@ -62,6 +62,12 @@ const (
 	RuntimeHelperUint64Bit      RuntimeHelper = "builtin.uint64Bit"
 	RuntimeHelperInt64Bit       RuntimeHelper = "builtin.int64Bit"
 	RuntimeHelperUintShr        RuntimeHelper = "builtin.uintShr"
+	RuntimeHelperIntAnd         RuntimeHelper = "builtin.intAnd"
+	RuntimeHelperIntOr          RuntimeHelper = "builtin.intOr"
+	RuntimeHelperIntXor         RuntimeHelper = "builtin.intXor"
+	RuntimeHelperIntAndNot      RuntimeHelper = "builtin.intAndNot"
+	RuntimeHelperIntShl         RuntimeHelper = "builtin.intShl"
+	RuntimeHelperIntShr         RuntimeHelper = "builtin.intShr"
 	RuntimeHelperUint64Div      RuntimeHelper = "builtin.uint64Div"
 	RuntimeHelperUint64Mod      RuntimeHelper = "builtin.uint64Mod"
 	RuntimeHelperUint64Mul      RuntimeHelper = "builtin.uint64Mul"
@@ -372,6 +378,12 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperUint64Bit, "uint64Bit", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperInt64Bit, "int64Bit", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperUintShr, "uintShr", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperIntAnd, "intAnd", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperIntOr, "intOr", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperIntXor, "intXor", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperIntAndNot, "intAndNot", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperIntShl, "intShl", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperIntShr, "intShr", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperUint64Div, "uint64Div", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperUint64Mod, "uint64Mod", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperUint64Mul, "uint64Mul", RuntimeHelperCategoryBuiltin),

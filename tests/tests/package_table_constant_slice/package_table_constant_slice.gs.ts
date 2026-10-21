@@ -23,11 +23,11 @@ export function __goscript_set_nibbles(__goscriptValue: Uint8Array): void {
 }
 
 export function bits4(a: $.Slice<number>, i: number): number {
-	return $.uint(($.uintShr($.arrayIndex(a!, i >> 1), ((i & 1) << 2), 8)) & 0b1111, 8)
+	return $.uint(($.uintShr($.arrayIndex(a!, $.intShr(i, 1)), ($.intShl((i & 1), 2)), 8)) & 0b1111, 8)
 }
 
 export function lookup(u: number): number {
-	return bits4(__goscriptStatic0(), (bits4(__goscriptStatic1(), u & 63) << 2) + (u & 3))
+	return bits4(__goscriptStatic0(), ($.intShl(bits4(__goscriptStatic1(), u & 63), 2)) + (u & 3))
 }
 
 export let small: number[] = $.arrayValue([10, 20, 30, 40, 50, 60])

@@ -150,7 +150,7 @@ export async function main(): globalThis.Promise<void> {
 
 	calls = 0
 	const __goscriptOperand1 = idx()
-	$.sliceElems(s!)[$.sliceSlot(s!, __goscriptOperand1)] <<= 1
+	$.sliceElems(s!)[$.sliceSlot(s!, __goscriptOperand1)] = $.intShl($.sliceElems(s!)[$.sliceSlot(s!, __goscriptOperand1)], 1)
 	await $.println("slice <<=", $.arrayIndex(s!, 0), $.arrayIndex(s!, 1), $.arrayIndex(s!, 2), calls)
 
 	// Array index from a call.

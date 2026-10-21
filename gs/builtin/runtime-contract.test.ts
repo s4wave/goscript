@@ -88,6 +88,12 @@ import {
   uint64Sub,
   uint64Xor,
   uintShr,
+  intAnd,
+  intAndNot,
+  intOr,
+  intShl,
+  intShr,
+  intXor,
   unref,
   unsupportedPointerRef,
   unsafePointerRef,
@@ -259,6 +265,30 @@ describe('builtin runtime contract helpers', () => {
     expect(uintShr(0x80000000, 31, 32)).toBe(1)
     expect(uintShr(0x80000000, 32, 32)).toBe(0)
     expect(uintShr(0xff, 4, 8)).toBe(15)
+
+    // Int bitwise operations keep the bits above 32 of their numbers.
+    const wide = 2 ** 40
+    expect(intAnd(wide + 0xff, wide + 0xf0f)).toBe(wide + 0xf)
+    expect(intAnd(-wide, 2 ** 48 - 1)).toBe(2 ** 48 - wide)
+    expect(intOr(wide, 5)).toBe(wide + 5)
+    expect(intOr(-wide, 1)).toBe(-wide + 1)
+    expect(intXor(wide, 3)).toBe(wide + 3)
+    expect(intXor(-wide, -1)).toBe(wide - 1)
+    expect(intAndNot(wide + 0xff, 0xf)).toBe(wide + 0xf0)
+    expect(intAndNot(-1, wide)).toBe(-wide - 1)
+    expect(intAnd(0x7fffffff, -0x80000000)).toBe(0)
+    expect(intOr(-1, 0x7fffffff)).toBe(-1)
+    expect(intShl(1, 35)).toBe(2 ** 35)
+    expect(intShl(0x7fffffff, 1)).toBe(0xfffffffe)
+    expect(intShl(-1, 31)).toBe(-(2 ** 31))
+    expect(intShl(wide, 23)).toBe(-(2 ** 63))
+    expect(intShl(3, 64)).toBe(0)
+    expect(intShr(wide, 3)).toBe(2 ** 37)
+    expect(intShr(-wide - 1, 40)).toBe(-2)
+    expect(intShr(-5, 100)).toBe(-1)
+    expect(intShr(-0x80000000, 31)).toBe(-1)
+    expect(() => intShl(1, -1)).toThrow('negative shift amount')
+    expect(() => intShr(wide, -1)).toThrow('negative shift amount')
 
     const value = varRef(4)
     value.value = 8

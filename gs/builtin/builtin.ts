@@ -1044,6 +1044,110 @@ export function uintShr(
   return Number(uint(value, width)) >>> amount
 }
 
+// intAnd returns left & right for Go ints, which are numbers exact to 2^53.
+// The JavaScript & keeps only 32 bits, so it applies only to two int32s.
+export function intAnd(left: number, right: number): number {
+  // Two int32s have the bits of the JavaScript operator.
+  if ((left | 0) === left && (right | 0) === right) {
+    return left & right
+  }
+
+  // Other ints combine their high and low words separately.
+  const leftHigh = intHighWord(left)
+  const rightHigh = intHighWord(right)
+  const low = (left - leftHigh * 4294967296) & (right - rightHigh * 4294967296)
+  return (leftHigh & rightHigh) * 4294967296 + (low >>> 0)
+}
+
+// intOr returns left | right for Go ints, as intAnd does for &.
+export function intOr(left: number, right: number): number {
+  // Two int32s have the bits of the JavaScript operator.
+  if ((left | 0) === left && (right | 0) === right) {
+    return left | right
+  }
+
+  // Other ints combine their high and low words separately.
+  const leftHigh = intHighWord(left)
+  const rightHigh = intHighWord(right)
+  const low = (left - leftHigh * 4294967296) | (right - rightHigh * 4294967296)
+  return (leftHigh | rightHigh) * 4294967296 + (low >>> 0)
+}
+
+// intXor returns left ^ right for Go ints, as intAnd does for &.
+export function intXor(left: number, right: number): number {
+  // Two int32s have the bits of the JavaScript operator.
+  if ((left | 0) === left && (right | 0) === right) {
+    return left ^ right
+  }
+
+  // Other ints combine their high and low words separately.
+  const leftHigh = intHighWord(left)
+  const rightHigh = intHighWord(right)
+  const low = (left - leftHigh * 4294967296) ^ (right - rightHigh * 4294967296)
+  return (leftHigh ^ rightHigh) * 4294967296 + (low >>> 0)
+}
+
+// intAndNot returns left &^ right for Go ints. The complement of an int is
+// -right - 1, which is exact.
+export function intAndNot(left: number, right: number): number {
+  return intAnd(left, -right - 1)
+}
+
+// intHighWord returns the high 32-bit word of an int, the floor of the int
+// over 2^32, whose low word is the int minus the high word times 2^32.
+function intHighWord(value: number): number {
+  return Math.floor(value / 4294967296)
+}
+
+// intShl returns value << count for Go ints. JavaScript's << keeps 32 bits and
+// takes the count modulo 32, so it applies only to an int32 shifted by less
+// than 32 that keeps all its bits.
+export function intShl(value: number, count: number): number {
+  // An int32 whose shift loses no bits is the JavaScript shift.
+  if (count >= 0 && count < 32) {
+    const shifted = value << count
+    if (shifted >> count === value) {
+      return shifted
+    }
+  }
+  return intShlWide(value, count)
+}
+
+// intShlWide returns value << count for the ints and counts that intShl
+// does not shift with the JavaScript operator.
+function intShlWide(value: number, count: number): number {
+  // A negative count panics, and a count of 64 or more shifts out all bits.
+  if (count < 0) {
+    runtimePanic('runtime error: negative shift amount')
+  }
+  if (count >= 64) {
+    return 0
+  }
+
+  // The product is exact while it is a safe integer; past that the shift
+  // wraps to 64 bits, as Go's does.
+  const shifted = value * 2 ** count
+  if (Number.isSafeInteger(shifted)) {
+    return shifted
+  }
+  return Number(BigInt.asIntN(64, BigInt(value) << BigInt(count)))
+}
+
+// intShr returns value >> count for Go ints, as intShl does for <<.
+export function intShr(value: number, count: number): number {
+  // An int32 shifted by less than 32 is the JavaScript shift.
+  if ((value | 0) === value && count >= 0 && count < 32) {
+    return value >> count
+  }
+
+  // A negative count panics. Other shifts are the floor of the quotient by
+  // 2^count, which is exact, and a count over 63 shifts as 63 does.
+  if (count < 0) {
+    runtimePanic('runtime error: negative shift amount')
+  }
+  return Math.floor(value / 2 ** Math.min(count, 63))
+}
+
 export function uint64Mul(
   left: number | bigint,
   right: number | bigint,
