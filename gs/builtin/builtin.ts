@@ -194,6 +194,11 @@ export function assignFieldValue(
     return target
   }
   if (info?.kind === TypeKind.Array) {
+    // An array is copied into the existing one in place, or copied anew
+    // when there is none yet.
+    if (target === null || target === undefined) {
+      return cloneArrayValue(source, info)
+    }
     for (let i = 0; i < info.length; i++) {
       target[i] = assignFieldValue(target[i], source[i], info.elemType)
     }

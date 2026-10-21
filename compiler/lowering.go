@@ -2069,6 +2069,9 @@ func (o *LoweringOwner) lowerGenDecl(ctx lowerFileContext, decl *ast.GenDecl) ([
 					if isStructValueType(obj.Type()) {
 						assignment = o.lowerStructAssignment(setterTarget, setterValue)
 					}
+					if isArrayValueType(obj.Type()) {
+						assignment = setterTarget + " = " + o.lowerArrayAssignment(setterTarget, setterValue, obj.Type())
+					}
 					setterCode := "export function " + setterName + "(" + setterValue + ": " + setterType + "): void {\n\t" + assignment + "\n}"
 					setterIndexExport := ""
 					if ast.IsExported(name.Name) {
@@ -6091,6 +6094,10 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 			stmts = append(stmts, loweredStmt{text: o.lowerStructAssignmentTo(ctx, lhs, left, uncopied)})
 			continue
 		}
+		if !isShortDecl && isArrayValueType(targetType) {
+			stmts = append(stmts, loweredStmt{text: o.lowerArrayAssignmentTo(ctx, lhs, left, uncopied, targetType)})
+			continue
+		}
 		if starTarget && stmt.Tok == token.ASSIGN {
 			pointer, pointerDiagnostics := o.lowerPointerStorageExpr(ctx, star.X)
 			diagnostics = append(diagnostics, pointerDiagnostics...)
@@ -6780,6 +6787,9 @@ func (o *LoweringOwner) lowerTupleTargetAssignmentStmt(
 	if !declare && isStructValueType(assignmentTargetType(ctx, lhs)) {
 		return loweredStmt{text: o.lowerStructAssignmentTo(ctx, lhs, left, value)}, diagnostics
 	}
+	if targetType := assignmentTargetType(ctx, lhs); !declare && isArrayValueType(targetType) {
+		return loweredStmt{text: o.lowerArrayAssignmentTo(ctx, lhs, left, value, targetType)}, diagnostics
+	}
 	prefix := ""
 	if declare {
 		value = o.lowerDeclaredValue(ctx, lhs, value)
@@ -6804,6 +6814,10 @@ func (o *LoweringOwner) lowerStarTargetAssignmentStmt(
 	if isStructValueType(ctx.semPkg.source.TypesInfo.TypeOf(lhs)) {
 		pointer, diagnostics := o.lowerPointerValueExpr(ctx, star.X)
 		return loweredStmt{text: o.lowerStructAssignment(pointer, right)}, diagnostics, true
+	}
+	if targetType := ctx.semPkg.source.TypesInfo.TypeOf(lhs); isArrayValueType(targetType) {
+		pointer, diagnostics := o.lowerPointerValueExpr(ctx, star.X)
+		return loweredStmt{text: o.lowerArrayAssignment(pointer, right, targetType)}, diagnostics, true
 	}
 	pointer, diagnostics := o.lowerPointerStorageExpr(ctx, star.X)
 	return loweredStmt{text: pointer + " = " + right}, diagnostics, true
@@ -6855,6 +6869,42 @@ func (o *LoweringOwner) lowerStructAssignmentTo(ctx lowerFileContext, lhs ast.Ex
 	if o.isGeneratedStructClass(namedStructType(assignmentTargetType(ctx, lhs))) {
 		assignment = parenthesizeAwaitedExpr(left) + ".__goscriptAssign(" + value + ")"
 	}
+
+	// A local variable is assigned the result.
+	ident, ok := unwrapParenExpr(lhs).(*ast.Ident)
+	if !ok {
+		return assignment
+	}
+	obj, ok := ctx.semPkg.source.TypesInfo.Uses[ident].(*types.Var)
+	if !ok || obj.Pkg() == nil || obj.Parent() == obj.Pkg().Scope() {
+		return assignment
+	}
+	return left + " = " + assignment
+}
+
+// isArrayValueType reports whether typ is an array type with elements, whose
+// assignment copies into the existing array.
+func isArrayValueType(typ types.Type) bool {
+	if typ == nil || isTypeParamType(typ) {
+		return false
+	}
+	array, ok := types.Unalias(typ).Underlying().(*types.Array)
+	return ok && array.Len() > 0
+}
+
+// lowerArrayAssignment copies the array value into the existing array
+// target element by element, assigning struct and array elements in place,
+// as Go assigns an array, so that pointers to its elements stay valid.
+func (o *LoweringOwner) lowerArrayAssignment(target, value string, typ types.Type) string {
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperAssignFieldValue) + "(" + target + ", " + value + ", " + o.runtimeTypeInfoExpr(typ) + ")"
+}
+
+// lowerArrayAssignmentTo copies value into the existing array that lhs
+// names. A local variable is also assigned the result, which is the same
+// array.
+func (o *LoweringOwner) lowerArrayAssignmentTo(ctx lowerFileContext, lhs ast.Expr, left, value string, typ types.Type) string {
+	// The array is copied into its storage.
+	assignment := o.lowerArrayAssignment(left, value, typ)
 
 	// A local variable is assigned the result.
 	ident, ok := unwrapParenExpr(lhs).(*ast.Ident)

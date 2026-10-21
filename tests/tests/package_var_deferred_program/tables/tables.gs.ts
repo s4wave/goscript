@@ -259,7 +259,7 @@ export function __goscript_set_WithCount(__goscriptValue: $.Slice<any>): void {
 export let masks: string[][] = $.arrayValue([$.arrayValue(globalThis.Array.from({ length: 4 }, () => "")), $.arrayValue(["zero", "one", "two", "three"])], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("string"), 4), 2))
 
 export function __goscript_set_masks(__goscriptValue: string[][]): void {
-	masks = __goscriptValue
+	masks = $.assignFieldValue(masks, __goscriptValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("string"), 4), 2))
 }
 
 export function name(s: string, n: number): string {

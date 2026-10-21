@@ -66,13 +66,13 @@ export class holder {
 export let table: Uint8Array = $.arrayValue(new Uint8Array([10, 11, 12, 13, 14, 15, 16, 17]))
 
 export function __goscript_set_table(__goscriptValue: Uint8Array): void {
-	table = __goscriptValue
+	table = $.assignFieldValue(table, __goscriptValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 8))
 }
 
 export let grid: number[][] = $.arrayValue([$.arrayValue([1, 2, 3]), $.arrayValue([4, 5, 6])], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), 2))
 
 export function __goscript_set_grid(__goscriptValue: number[][]): void {
-	grid = __goscriptValue
+	grid = $.assignFieldValue(grid, __goscriptValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), 2))
 }
 
 export function lookup(i: number): number {

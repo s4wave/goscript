@@ -40,7 +40,7 @@ export class Pose {
 
 export async function main(): globalThis.Promise<void> {
 	let a = $.varRef(new Pose(true, $.arrayValue([1, 2, 3, 4], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)), $.arrayValue([5, 6])))
-	a.value.Inner.B = $.arrayValue([7, 8])
+	$.assignFieldValue(a.value.Inner.B, $.arrayValue([7, 8]), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
 	let b: $.VarRef<Pose> = $.varRef(new Pose(true))
 	let c: $.VarRef<Pose> = $.varRef(new Pose(true))
 	let d: $.VarRef<Pose> = $.varRef(new Pose(true))

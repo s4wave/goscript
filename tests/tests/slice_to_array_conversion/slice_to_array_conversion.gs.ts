@@ -13,7 +13,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Whole-array writes through converted pointers preserve the slice backing.
 	let bytePointer = ($.sliceToArrayPointer<number>($.goSlice(values, 1, undefined), 2, "byte") as $.VarRef<Uint8Array> | null)
-	bytePointer!.value = $.arrayValue(new Uint8Array([7, 8]))
+	$.assignFieldValue($.pointerValue<Uint8Array>(bytePointer), $.arrayValue(new Uint8Array([7, 8])), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2))
 	await $.println("byte write:", $.arrayIndex(values!, 0), $.arrayIndex(values!, 1), $.arrayIndex(values!, 2))
 	$.pointerValue<Uint8Array>(bytePointer)[0] = 6
 	await $.println("byte alias:", $.arrayIndex(values!, 1))
@@ -21,7 +21,7 @@ export async function main(): globalThis.Promise<void> {
 	let words = $.typedSliceOf(Uint16Array, [1, 2, 3, 4]) as $.Slice<number>
 	let wordPointer = $.sliceToArrayPointer<number>($.goSlice(words, 1, undefined), 2)
 	let replacement = $.arrayValue([20, 30])
-	wordPointer!.value = $.cloneArrayValue(replacement, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint16"), 2))
+	$.assignFieldValue($.pointerValue<number[]>(wordPointer), replacement, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint16"), 2))
 	replacement[0] = 99
 	await $.println("word write:", $.arrayIndex(words!, 0), $.arrayIndex(words!, 1), $.arrayIndex(words!, 2), $.arrayIndex(words!, 3))
 	$.pointerValue<number[]>(wordPointer)[1] = 40

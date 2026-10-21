@@ -108,7 +108,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Assigning an array element copies its value instead of aliasing the row.
 	let rows = $.arrayValue([$.arrayValue([1, 2]), $.arrayValue([3, 4])], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int32"), 2), 2))
-	rows[1] = $.cloneArrayValue(rows[0], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int32"), 2))
+	$.assignFieldValue(rows[1], rows[0], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int32"), 2))
 	rows[1][0] = 9
 	await $.println("row copy:", (rows[0])[0], (rows[0])[1], (rows[1])[0], (rows[1])[1])
 

@@ -18,7 +18,7 @@ export const IV2: number = 3
 export let DigestIV: number[] = $.arrayValue([1, 2, 3])
 
 export function __goscript_set_DigestIV(__goscriptValue: number[]): void {
-	DigestIV = __goscriptValue
+	DigestIV = $.assignFieldValue(DigestIV, __goscriptValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint32"), 3))
 }
 
 export let Nothing: any = null

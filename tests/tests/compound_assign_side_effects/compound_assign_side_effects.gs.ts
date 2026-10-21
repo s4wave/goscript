@@ -126,7 +126,7 @@ export function arr(): $.VarRef<number[]> | null {
 export let backing: $.VarRef<number[]> = $.varRef($.arrayValue(globalThis.Array.from({ length: 3 }, () => 0)))
 
 export function __goscript_set_backing(__goscriptValue: number[]): void {
-	backing.value = __goscriptValue
+	backing.value = $.assignFieldValue(backing.value, __goscriptValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3))
 }
 
 export async function fill(ch: $.Channel<number> | null): globalThis.Promise<void> {
