@@ -3455,8 +3455,9 @@ function namedValueMethodEntries(
  * typeParamInterfaceValue converts a value of a type parameter to an
  * interface value. A primitive of a named basic type, or with methods, is
  * boxed with the methods of the type argument, as namedValueInterfaceValue
- * boxes a value of a concrete named basic type. Other values are returned
- * unchanged.
+ * boxes a value of a concrete named basic type, and a number of an unnamed
+ * numeric type is boxed with its type, as basicInterfaceValue boxes a
+ * number converted to an interface. Other values are returned unchanged.
  */
 export function typeParamInterfaceValue<T = any>(
   value: unknown,
@@ -3479,10 +3480,19 @@ export function typeParamInterfaceValue<T = any>(
   }
   const info = normalizeTypeInfo(descriptor.type)
   const methods = descriptor.methods ?? {}
-  if (
-    info.kind !== TypeKind.Basic ||
-    (!info.typeName && Object.keys(methods).length === 0)
-  ) {
+  if (info.kind !== TypeKind.Basic) {
+    return value as T
+  }
+  if (!info.typeName && Object.keys(methods).length === 0) {
+    // A number does not tell its type (float64 or int), so it is boxed
+    // with the type argument, as a value of a numeric type converted to an
+    // interface is.
+    if (
+      info.name !== undefined &&
+      (typeof value === 'number' || typeof value === 'bigint')
+    ) {
+      return basicInterfaceValue<T>(value, info.name)
+    }
     return value as T
   }
   return namedValueInterfaceValue<T>(
