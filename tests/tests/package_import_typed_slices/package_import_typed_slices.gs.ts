@@ -117,7 +117,7 @@ export async function main(): globalThis.Promise<void> {
 	$.sliceElems(cl!)[$.sliceSlot(cl!, 0)] = 50
 	await $.println("clone:", $.arrayIndex(us!, 0), $.arrayIndex(cl!, 0), $.sliceLen(cl), slices.Index(cl, 4), slices.Contains(cl, 3), slices.Max(cl))
 	cl = (slices.Insert(cl, 1, 7, 8) as $.Slice<number>)
-	cl = (slices.Delete(cl, 0, 1) as $.Slice<number>)
+	cl = (slices.Delete(cl, 0, 1, () => (0 as number)) as $.Slice<number>)
 	await $.println("insert delete:", $.sliceLen(cl), $.arrayIndex(cl!, 0), $.arrayIndex(cl!, 1), $.arrayIndex(cl!, 2))
 	slices.Reverse(cl)
 	await $.println("reverse:", $.arrayIndex(cl!, 0), slices.Equal(cl, $.typedSliceOf(Uint32Array, [3, 4, 2, 8, 7]) as $.Slice<number>))

@@ -11261,9 +11261,23 @@ func (o *LoweringOwner) callUsesSlicesOverride(ctx lowerFileContext, expr ast.Ex
 	return fn != nil && fn.Pkg() != nil && fn.Pkg().Path() == "slices"
 }
 
+// slicesZeroFactoryFunctions are the functions of the slices override that
+// take the zero value factory of the element type as their last argument:
+// Grow for the elements it exposes, and the others for the elements they
+// free at the end of the slice, which Go zeroes.
+var slicesZeroFactoryFunctions = map[string]bool{
+	"Compact":     true,
+	"CompactFunc": true,
+	"Delete":      true,
+	"DeleteFunc":  true,
+	"Grow":        true,
+}
+
 // appendSlicesGrowZeroFactory appends the zero value factory that slices.Grow
-// needs to fill the capacity it adds: Go zeroes that capacity, and a slice
-// resliced into it must read zeros, not the absent value of an untyped array.
+// needs to fill the capacity it adds, and that Delete, Compact and their Func
+// variants need to zero the elements they free: Go zeroes them, and a slice
+// resliced into them must read zeros, not nil or the absent value of an
+// untyped array.
 func (o *LoweringOwner) appendSlicesGrowZeroFactory(
 	ctx lowerFileContext,
 	callee ast.Expr,
@@ -11271,7 +11285,7 @@ func (o *LoweringOwner) appendSlicesGrowZeroFactory(
 	args []string,
 ) []string {
 	selector, ok := callee.(*ast.SelectorExpr)
-	if !ok || selector.Sel.Name != "Grow" || !o.callUsesSlicesOverride(ctx, selector) {
+	if !ok || !slicesZeroFactoryFunctions[selector.Sel.Name] || !o.callUsesSlicesOverride(ctx, selector) {
 		return args
 	}
 	typ := ctx.semPkg.source.TypesInfo.TypeOf(expr)

@@ -1,0 +1,10 @@
+Delete: 20 20 34 00
+DeleteFunc: 10 34 00 00
+Compact: 10 20 34 00
+CompactFunc: 10 20 34 00
+generic Delete: 20 20 34 00
+Replace: 90 34
+Replace source: 90 34 00 00
+clear generic: 00 00 00 00
+clear window: 10 00 00 34
+others: true true 0

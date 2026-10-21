@@ -91,7 +91,7 @@ export async function main(): globalThis.Promise<void> {
 			for (let __goscriptRangeTarget0 = (cert$ as x509.Certificate).UnhandledCriticalExtensions, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget0), idx = 0; idx < __goscriptRangeWindow1.length; idx++) {
 				let unhandled = ((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + idx] as asn1.ObjectIdentifier) as asn1.ObjectIdentifier)
 				if (asn1.ObjectIdentifier_Equal(unhandled, (extensionID as asn1.ObjectIdentifier))) {
-					;(cert$ as x509.Certificate).UnhandledCriticalExtensions = (slices.Delete((cert$ as x509.Certificate).UnhandledCriticalExtensions, idx, idx + 1) as $.Slice<asn1.ObjectIdentifier>)
+					;(cert$ as x509.Certificate).UnhandledCriticalExtensions = (slices.Delete((cert$ as x509.Certificate).UnhandledCriticalExtensions, idx, idx + 1, () => (null! as asn1.ObjectIdentifier as asn1.ObjectIdentifier)) as $.Slice<asn1.ObjectIdentifier>)
 					break
 				}
 			}

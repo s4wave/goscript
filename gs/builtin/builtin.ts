@@ -26,7 +26,7 @@ import {
 import { writeHostStdoutText } from './hostio.js'
 import { notImplemented, runtimePanic } from './panic.js'
 import { formatPrintedArgs } from './print.js'
-import { isSliceProxy, runeToString, sliceRange } from './slice.js'
+import { isSliceProxy, runeToString, sliceRange, zeroLike } from './slice.js'
 import { isVarRef, type VarRef } from './varRef.js'
 
 /**
@@ -82,40 +82,27 @@ export function clear<T>(
     return
   }
 
-  // A window zeroes its part of the backing array.
-  if (isSliceProxy(v)) {
-    const meta = v.__meta__
-    const zero = clearZeroValue(meta.backing as T[])
-    for (let i = 0; i < meta.length; i++) {
-      meta.backing[meta.offset + i] = zero
+  // Without a factory, each element gets the zero value of the type of a
+  // sample element, so that a struct element is a new zero struct.
+  if (isSliceProxy(v) || Array.isArray(v)) {
+    const { backing, offset, length } = sliceRange(v as Slice<T>)
+    const sample = clearSample(backing as T[], offset, length)
+    for (let i = 0; i < length; i++) {
+      ;(backing as T[])[offset + i] = zeroLike(sample) as T
     }
-    return
-  }
-
-  // An array is zeroed in place.
-  if (Array.isArray(v)) {
-    v.fill(clearZeroValue(v))
-    return
   }
 }
 
-function clearZeroValue<T>(v: T[]): T {
-  for (const item of v) {
+// clearSample returns the first element of the window of backing that is
+// not nil, which shows the element type, or null.
+function clearSample<T>(backing: T[], offset: number, length: number): T | null {
+  for (let i = 0; i < length; i++) {
+    const item = backing[offset + i]
     if (item !== null && item !== undefined) {
-      switch (typeof item) {
-        case 'number':
-          return 0 as T
-        case 'bigint':
-          return 0n as T
-        case 'string':
-          return '' as T
-        case 'boolean':
-          return false as T
-      }
-      break
+      return item
     }
   }
-  return null as T
+  return null
 }
 
 /**

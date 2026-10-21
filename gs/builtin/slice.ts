@@ -1572,6 +1572,15 @@ function typedAppendConstructor(
   return undefined
 }
 
+/**
+ * zeroLike returns the zero value of the type of sample, an element of a
+ * slice whose element type is not known: a new struct of its class, an array
+ * of zeros, or the zero of a basic value; any other value's zero is nil.
+ */
+export function zeroLike(sample: unknown): unknown {
+  return appendZeroValue(sample)
+}
+
 function appendZeroValue(sample: unknown): unknown {
   switch (typeof sample) {
     case 'bigint':
