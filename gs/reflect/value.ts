@@ -27,6 +27,7 @@ import {
   Chan,
   structFieldStorageKey,
   sliceAppendHint,
+  interfaceStoreValue,
   sliceTypeHint,
   TypeOf,
   typeIdentityKey,
@@ -350,9 +351,11 @@ export function Append(s: Value, x: Value): Value {
   if (s.Kind() !== Slice) {
     throw new Error('reflect.Append of non-slice')
   }
-  // The hint keeps a slice of typed array elements in its typed array.
+  // The hint keeps a slice of typed array elements in its typed array, and
+  // an element of an interface type is boxed with its type.
   const hint = sliceAppendHint(s.Type().Elem())
-  const elements = hint === undefined ? [x.value] : [x.value, hint]
+  const elem = interfaceStoreValue(x, s.Type().Elem())
+  const elements = hint === undefined ? [elem] : [elem, hint]
   return new Value(
     $.append(s.value as $.Slice<unknown>, ...elements) as ReflectValue,
     s.Type(),

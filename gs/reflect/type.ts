@@ -1434,6 +1434,7 @@ export class Value {
   }
 
   public Set(x: Value): void {
+    // Only a settable Value is set, to a value of an assignable type.
     if (!this.CanSet()) {
       throw new Error('reflect: assign to invalid value')
     }
@@ -1442,7 +1443,10 @@ export class Value {
     if (!xType.AssignableTo(thisType)) {
       throw new Error('reflect: assign to wrong type')
     }
-    this.storeValue(x.value)
+
+    // An interface variable holds the value boxed with its type, as the
+    // compiler boxes a value assigned to an interface.
+    this.storeValue(interfaceStoreValue(x, thisType))
   }
 
   // Interface returns v's current value as an interface value, boxed with its
@@ -1512,13 +1516,14 @@ export class Value {
       )
     }
 
-    // A number of a sized kind, such as float32 or int8, is boxed with its
-    // kind, as the compiler boxes it, so that it keeps its type; int and
-    // float64 are the kinds of a raw number.
+    // A number is boxed with its kind, as the compiler boxes it, so that it
+    // keeps its type: a raw number in an interface is taken for an int by
+    // reflect and %T, a float64 with an integer value too, and for a float32
+    // by type assertions and switches.
     const kind = this._type.Kind()
     if (
-      kind >= Int8 &&
-      kind <= Float32 &&
+      kind >= Int &&
+      kind <= Float64 &&
       kind !== Int64 &&
       kind !== Uint64 &&
       kind !== Uintptr
@@ -2000,13 +2005,15 @@ export class Value {
     if (!(mapObj instanceof globalThis.Map)) {
       throw new Error('reflect: assignment to entry in nil map')
     }
+
+    // A zero element deletes the key; another element is stored, boxed
+    // with its type for a map of interface elements.
     const keyVal = (key as { value: ReflectValue }).value
-    const elemVal = (elem as { value: ReflectValue }).value
     if (!elem.IsValid()) {
       mapObj.delete(keyVal)
       return
     }
-    mapObj.set(keyVal, elemVal)
+    mapObj.set(keyVal, interfaceStoreValue(elem, this.Type().Elem()))
   }
 
   // Grow increases the slice's capacity, if necessary, to guarantee space
@@ -3365,6 +3372,16 @@ function validateMakeFuncResults(typ: Type, resultValues: Value[]): void {
       )
     }
   }
+}
+
+// interfaceStoreValue returns the value of x to store in a variable of type
+// target: boxed with its type when target is an interface, as the compiler
+// boxes a value assigned to an interface, else x's value.
+export function interfaceStoreValue(x: Value, target: Type): ReflectValue {
+  if (target.Kind() === Interface && x.Kind() !== Interface) {
+    return x.Interface()
+  }
+  return x.value
 }
 
 // valueForTarget returns the value v holds as passed to or returned from a
