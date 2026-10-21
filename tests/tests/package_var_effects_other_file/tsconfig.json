@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "*": [
+        "./*"
+      ],
+      "@goscript/*": [
+        "../../../tests/tests/package_var_effects_other_file/run/output/@goscript/*",
+        "../../../gs/*",
+        "../../../tests/deps/*"
+      ],
+      "@goscript/github.com/s4wave/goscript/tests/tests/package_var_effects_other_file/*": [
+        "./*"
+      ]
+    }
+  },
+  "extends": "../../../tests/tsconfig.base.json",
+  "include": [
+    "blocks.gs.ts",
+    "index.ts",
+    "main.gs.ts",
+    "plugin/index.ts",
+    "plugin/plugin.gs.ts",
+    "plugin/register.gs.ts",
+    "reg/index.ts",
+    "reg/reg.gs.ts"
+  ]
+}

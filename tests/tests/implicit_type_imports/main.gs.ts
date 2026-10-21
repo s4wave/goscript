@@ -4,6 +4,9 @@
 import * as $ from "@goscript/builtin/index.js"
 import type * as io from "@goscript/io/index.js"
 import * as __goscript_server from "./server.gs.ts"
+import "./handler.gs.ts"
+import "./invoker.gs.ts"
+import "./stream.gs.ts"
 
 export class localReadWriteCloser {
 	constructor(__goscriptValue?: boolean) {

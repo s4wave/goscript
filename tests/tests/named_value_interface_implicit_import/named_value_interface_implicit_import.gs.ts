@@ -7,6 +7,7 @@ import * as errno from "@goscript/github.com/s4wave/goscript/tests/tests/named_v
 import * as __goscript_local_lookup from "./local_lookup.gs.ts"
 import * as __goscript_multi_assign from "./multi_assign.gs.ts"
 import * as __goscript_multi_return from "./multi_return.gs.ts"
+import "./layers.gs.ts"
 import "@goscript/github.com/s4wave/goscript/tests/tests/named_value_interface_implicit_import/dep/index.js"
 import "@goscript/github.com/s4wave/goscript/tests/tests/named_value_interface_implicit_import/errno/index.js"
 

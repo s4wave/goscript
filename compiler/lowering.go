@@ -237,8 +237,40 @@ func (o *LoweringOwner) lowerPackage(
 	slices.SortFunc(loweredPkg.files, func(a, b *loweredFile) int {
 		return cmp.Compare(a.outputName, b.outputName)
 	})
+	importMainFileSideEffects(loweredPkg)
 	lowerPackageInit(semPkg, loweredPkg)
 	return loweredPkg, diagnostics
+}
+
+// importMainFileSideEffects makes the file with the main function of package
+// main import each other file of the package that the package index imports
+// for its side effects, such as package variables initialized when its module
+// is evaluated. Runners import the file with the main function directly, not
+// the package index, so without these imports a file that the main file does
+// not otherwise import would never be evaluated: var _ = register() in it
+// would not run.
+func importMainFileSideEffects(pkg *loweredPackage) {
+	if pkg.name != "main" || len(pkg.files) < 2 {
+		return
+	}
+
+	// Each file with a main function imports the other side effect files
+	// that it does not already import.
+	for _, file := range pkg.files {
+		if !slices.ContainsFunc(file.decls, isMainFunctionDecl) {
+			continue
+		}
+		for _, other := range pkg.files {
+			source := "./" + other.outputName
+			imported := slices.ContainsFunc(file.imports, func(imp loweredImport) bool {
+				return imp.source == source
+			})
+			if other == file || !other.sideEffect || imported {
+				continue
+			}
+			file.imports = append(file.imports, loweredImport{source: source, bare: true})
+		}
+	}
 }
 
 // packageInitModule is the output name of the module that initializes a
@@ -2016,7 +2048,12 @@ func (o *LoweringOwner) lowerGenDecl(ctx lowerFileContext, decl *ast.GenDecl) ([
 						indexExport = name.Name
 					}
 				}
-				decls = append(decls, loweredDecl{code: code, indexExport: indexExport})
+				// An initializer that may have effects, such as a call,
+				// makes the package index import the file even when the
+				// variable is unexported or blank.
+				effects := ctx.topLevel && keyword != "const" && idx < len(typed.Values) &&
+					initializerMayHaveRuntimeEffects(ctx, typed.Values[idx])
+				decls = append(decls, loweredDecl{code: code, indexExport: indexExport, sideEffect: effects})
 				if lazy {
 					getterName := packageVarGetterName(name.Name)
 					initName := packageVarInitName(name.Name)
