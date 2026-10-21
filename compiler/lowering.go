@@ -8110,8 +8110,26 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	keyName := rangeKeyNameFor(ctx, stmt.Key, aliases)
 	valueName := rangeKeyNameFor(ctx, stmt.Value, aliases)
 	rangeType := typeParamCoreType(ctx.semPkg.source.TypesInfo.TypeOf(stmt.X))
+
+	// A range that assigns existing variables, fields or elements instead of
+	// declaring its key and value loops over temporaries of its own, which
+	// each iteration assigns to them first, as Go does.
+	var assigns []loweredStmt
+	if stmt.Tok == token.ASSIGN && !isMapType(rangeType) && !isFunctionType(rangeType) {
+		var keyAssigns, valueAssigns []loweredStmt
+		var keyDiagnostics, valueDiagnostics []Diagnostic
+		keyName, keyAssigns, keyDiagnostics = o.lowerRangeAssignment(ctx, stmt.Key, "RangeKey")
+		valueName, valueAssigns, valueDiagnostics = o.lowerRangeAssignment(ctx, stmt.Value, "RangeValue")
+		assigns = append(keyAssigns, valueAssigns...)
+		diagnostics = append(append(diagnostics, keyDiagnostics...), valueDiagnostics...)
+	}
+	lowerBody := func(bodyCtx lowerFileContext) ([]loweredStmt, []Diagnostic) {
+		body, bodyDiagnostics := o.lowerBlock(bodyCtx, stmt.Body)
+		return append(slices.Clone(assigns), body...), bodyDiagnostics
+	}
+
 	if isChannelType(rangeType) {
-		body, bodyDiagnostics := o.lowerBlock(bodyCtx.withoutRangeLoopBranches(), stmt.Body)
+		body, bodyDiagnostics := lowerBody(bodyCtx.withoutRangeLoopBranches())
 		diagnostics = append(diagnostics, bodyDiagnostics...)
 		tempName := ctx.tempName("Range")
 		children := []loweredStmt{
@@ -8119,11 +8137,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 			{text: "if (!" + tempName + ".ok)", children: []loweredStmt{{text: "break"}}},
 		}
 		if keyName != "" {
-			prefix := ""
-			if stmt.Tok == token.DEFINE {
-				prefix = "let "
-			}
-			children = append(children, loweredStmt{text: prefix + keyName + " = " + tempName + ".value"})
+			children = append(children, loweredStmt{text: "let " + keyName + " = " + tempName + ".value"})
 		}
 		children = append(children, body...)
 		return loweredStmt{
@@ -8137,7 +8151,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		// loopSliceWindows).
 		windows, windowDecls := o.loopSliceWindows(ctx, stmt, nil, "", stmt.Key, stmt.Value, stmt.Body)
 		intCtx := bodyCtx.withoutRangeLoopBranches().withLoopSliceWindows(windows)
-		body, bodyDiagnostics := o.lowerBlock(intCtx, stmt.Body)
+		body, bodyDiagnostics := lowerBody(intCtx)
 		diagnostics = append(diagnostics, bodyDiagnostics...)
 		if keyName == "" {
 			keyName = "__rangeIndex"
@@ -8188,7 +8202,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	}
 	if isStringType(rangeType) {
 		// The body is lowered first, and the key and value get names.
-		body, bodyDiagnostics := o.lowerBlock(bodyCtx.withoutRangeLoopBranches(), stmt.Body)
+		body, bodyDiagnostics := lowerBody(bodyCtx.withoutRangeLoopBranches())
 		diagnostics = append(diagnostics, bodyDiagnostics...)
 		key := keyName
 		if key == "" {
@@ -8257,7 +8271,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	loopCtx = loopCtx.withLoopSliceWindows(windows)
 
 	// The body reads the elements through the range target's window.
-	body, bodyDiagnostics := o.lowerBlock(loopCtx, stmt.Body)
+	body, bodyDiagnostics := lowerBody(loopCtx)
 	diagnostics = append(diagnostics, bodyDiagnostics...)
 	rangeTarget := ctx.tempName("RangeTarget")
 	rangeTargetValue := o.lowerArrayPointerTarget(ctx, rangeValue, rangeType)
@@ -8284,6 +8298,28 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 			strings.Join(append(windowDecls, counter+" = 0"), ", ") + "; " + counter + " < " + rangeWindow + ".length; " + counter + "++)",
 		children: children,
 	}, diagnostics
+}
+
+// lowerRangeAssignment returns the temporary that a range loop binds in place
+// of expr, a key or value that the range statement assigns, and the statement
+// that assigns the temporary to expr; a missing or blank expr has neither.
+func (o *LoweringOwner) lowerRangeAssignment(ctx lowerFileContext, expr ast.Expr, tempPrefix string) (string, []loweredStmt, []Diagnostic) {
+	// Nothing is assigned to a missing or blank expression.
+	if expr == nil {
+		return "", nil, nil
+	}
+	if ident, ok := expr.(*ast.Ident); ok && ident.Name == "_" {
+		return "", nil, nil
+	}
+
+	// Struct and array values are copied, as Go assigns them.
+	temp := ctx.tempName(tempPrefix)
+	value := temp
+	if typ := ctx.semPkg.source.TypesInfo.TypeOf(expr); typ != nil && isValueCopyType(typ) {
+		value = o.lowerValueForTargetTypes(ctx, typ, typ, temp, true)
+	}
+	assign, diagnostics := o.lowerTupleTargetAssignmentStmt(ctx, expr, value, false)
+	return temp, []loweredStmt{assign}, diagnostics
 }
 
 // rangeCounter returns the counter of a range loop over an integer, slice or

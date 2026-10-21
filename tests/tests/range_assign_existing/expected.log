@@ -1,0 +1,9 @@
+fields: 672 2 1 1
+element: 6 3
+pointer target: 0
+pointer target: 1
+pointer target: 2
+variables: 4 4 3
+slice: 1 2 9 0
+string: 1 233
+channel: 6

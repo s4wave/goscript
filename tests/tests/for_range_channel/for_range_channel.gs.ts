@@ -28,7 +28,8 @@ export async function main(): globalThis.Promise<void> {
 		if (!__goscriptRange1.ok) {
 			break
 		}
-		y = __goscriptRange1.value
+		let __goscriptRangeKey0 = __goscriptRange1.value
+		y = __goscriptRangeKey0
 		await $.println(y)
 	}
 }
