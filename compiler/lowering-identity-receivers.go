@@ -96,7 +96,13 @@ func (o *LoweringOwner) lowerIdentityReceiverMethodCall(
 		return "", nil, false
 	}
 
-	// The method of the struct is called with the address as its receiver.
+	// The method of the struct's class is called with the address as its
+	// receiver.
+	if prototype, ok := o.pointerMethodPrototype(ctx, method); ok {
+		return prototype + ".call(" + strings.Join(append([]string{address}, args...), ", ") + ")", diagnostics, true
+	}
+
+	// A class the file cannot name is found from the struct.
 	callArgs := append([]string{address, strconv.Quote(method.Name())}, args...)
 	call := o.runtimeOwner.QualifiedHelper(RuntimeHelperCallPointerMethod) + "(" + strings.Join(callArgs, ", ") + ")"
 	return call, diagnostics, true
@@ -116,9 +122,50 @@ func (o *LoweringOwner) lowerIdentityReceiverMethodValue(ctx lowerFileContext, e
 		return "", nil, false
 	}
 
-	// The bound address is the receiver of the struct's method.
+	// The bound address is the receiver of the method of the struct's
+	// class.
 	callee := identityReceiverCallee("__receiver", method.Name())
+	if prototype, ok := o.pointerMethodPrototype(ctx, method); ok {
+		callee = prototype + ".call"
+	}
 	return o.lowerMethodValueClosure(ctx, selection, address, callee, true), diagnostics, true
+}
+
+// pointerMethodPrototype returns the pointer method of a struct type read
+// from the prototype of the struct's class, as in T.prototype.M, through
+// which a call with a reference to the struct as its receiver finds the
+// method directly rather than on the struct that the reference refers to.
+// It reports false when the file cannot name the class at run time: an
+// override, a type of a package that the file does not import as a value
+// or defers, or an unexported type of another package.
+func (o *LoweringOwner) pointerMethodPrototype(ctx lowerFileContext, method *types.Func) (string, bool) {
+	// The struct type that declares the method, of no override.
+	receiver := methodReceiverNamedType(method)
+	if receiver == nil || receiver.Obj() == nil || receiver.Obj().Pkg() == nil || o.receiverUsesOverridePackage(receiver) {
+		return "", false
+	}
+
+	// A type of this package is declared in this file or in one that the
+	// file imports as a value.
+	pkgPath := receiver.Obj().Pkg().Path()
+	local := pkgPath == ctx.semPkg.pkgPath
+	if alias := ctx.localAliases[receiver.Obj()]; local && alias != "" && !ctx.runtimeAliases[alias] {
+		return "", false
+	}
+
+	// Another package's type is exported by a package that the file
+	// imports and does not defer.
+	deferred := ctx.model.hasDeferredPackage(pkgPath) && !ctx.model.hasDeferredPackage(ctx.semPkg.pkgPath)
+	if !local && (ctx.importPaths[pkgPath] == "" || deferred || crossPackageUnexportedNamedType(ctx, receiver)) {
+		return "", false
+	}
+
+	// The prototype of its class holds the method.
+	member := methodMemberName(method.Name())
+	if !strings.HasPrefix(member, "[") {
+		member = "." + member
+	}
+	return namedValueExpr(ctx, receiver) + ".prototype" + member, true
 }
 
 // identityReceiverCallee returns the call method of the method name of the

@@ -21,7 +21,7 @@ export async function main(): globalThis.Promise<void> {
 				sum += i * (id + 1)
 			}
 			sum
-			await $.callPointerMethod(bcast, "HoldLock", $.functionValue((broadcastFn: (() => void) | null, _p1: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null) => {
+			await broadcast.Broadcast.prototype.HoldLock.call(bcast, $.functionValue((broadcastFn: (() => void) | null, _p1: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null) => {
 				completed++
 				broadcastFn!()
 			}, ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.channelType({ kind: $.TypeKind.Struct, methods: [], fields: [] }, "receive")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo)))
@@ -35,7 +35,7 @@ export async function main(): globalThis.Promise<void> {
 	while (true) {
 		let done = false
 		let waitCh: $.Channel<{}> | null = null! as $.Channel<{}> | null
-		await $.callPointerMethod(bcast, "HoldLock", $.functionValue((_p0: (() => void) | null, getWaitCh: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null) => {
+		await broadcast.Broadcast.prototype.HoldLock.call(bcast, $.functionValue((_p0: (() => void) | null, getWaitCh: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null) => {
 			done = completed == 16
 			if (!done) {
 				waitCh = (getWaitCh!() as $.Channel<{}> | null)

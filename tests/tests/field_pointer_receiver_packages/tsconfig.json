@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "*": [
+        "./*"
+      ],
+      "@goscript/*": [
+        "../../../tests/tests/field_pointer_receiver_packages/run/output/@goscript/*",
+        "../../../gs/*",
+        "../../../tests/deps/*"
+      ],
+      "@goscript/github.com/s4wave/goscript/tests/tests/field_pointer_receiver_packages/*": [
+        "./*"
+      ]
+    }
+  },
+  "extends": "../../../tests/tsconfig.base.json",
+  "include": [
+    "field_pointer_receiver_packages.gs.ts",
+    "index.ts",
+    "inner/index.ts",
+    "inner/inner.gs.ts",
+    "methods.gs.ts",
+    "types.gs.ts",
+    "widget.gs.ts"
+  ]
+}

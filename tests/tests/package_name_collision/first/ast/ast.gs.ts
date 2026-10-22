@@ -72,8 +72,7 @@ export class List {
 	}
 
 	public AsContainer(): any {
-		const __receiver = $.fieldRef(this, "Container")
-		return __receiver.value.AsContainer.call(__receiver)
+		return Container.prototype.AsContainer.call($.fieldRef(this, "Container"))
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -103,8 +102,7 @@ export class ListItem {
 	}
 
 	public AsContainer(): any {
-		const __receiver = $.fieldRef(this, "Container")
-		return __receiver.value.AsContainer.call(__receiver)
+		return Container.prototype.AsContainer.call($.fieldRef(this, "Container"))
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -134,8 +132,7 @@ export class Paragraph {
 	}
 
 	public AsContainer(): any {
-		const __receiver = $.fieldRef(this, "Container")
-		return __receiver.value.AsContainer.call(__receiver)
+		return Container.prototype.AsContainer.call($.fieldRef(this, "Container"))
 	}
 
 	static __typeInfo = $.registerStructType(

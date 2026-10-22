@@ -25,6 +25,13 @@ func (n *Node) Rename(name string) {
 	n.name = name
 }
 
+// Wait receives from ch before it keeps the receiver, so it is async.
+func (n *Node) Wait(ch chan bool) bool {
+	<-ch
+	n.self = n
+	return n.self == n
+}
+
 // Item embeds a Node and holds others in fields, a slice and an array.
 type Item struct {
 	Node
@@ -32,6 +39,23 @@ type Item struct {
 	Group struct{ Leaf Node }
 	List  []Node
 	Pair  [2]Node
+}
+
+// Outer embeds an Item, whose Node's methods it promotes from two levels down.
+type Outer struct {
+	Item
+}
+
+// Self is a generic struct whose method keeps its receiver.
+type Self[T any] struct {
+	self *Self[T]
+	v    T
+}
+
+// Keep keeps the receiver and v.
+func (s *Self[T]) Keep(v T) {
+	s.self = s
+	s.v = v
 }
 
 // Namer is the interface of a node's promoted methods.
@@ -111,4 +135,20 @@ func main() {
 	clone := slices.Clone(registry)
 	clone[0].name += "+cloned"
 	println("generic:", item.Child.name, box.Get(0) == &item.Child)
+
+	// Methods promoted from two levels down, called directly and as a value.
+	var outer Outer
+	outer.Register()
+	println("two levels:", outer.self == &outer.Item.Node, registry[len(registry)-1] == &outer.Node)
+	register := outer.Register
+	register()
+	println("promoted method value:", registry[len(registry)-1] == &outer.Node, counts[&outer.Node])
+
+	// A generic struct field and an async method keep the field's address.
+	var holder struct{ B Self[int] }
+	holder.B.Keep(5)
+	println("generic field:", holder.B.self == &holder.B, holder.B.v)
+	ch := make(chan bool, 1)
+	ch <- true
+	println("async:", item.Child.Wait(ch), item.Child.self == &item.Child)
 }

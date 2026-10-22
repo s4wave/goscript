@@ -672,6 +672,7 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 		importObjects:     importObjects,
 		sourcePath:        sourcePath,
 		localAliases:      localRefs.aliases,
+		runtimeAliases:    localRefs.runtimeAliases,
 		lazyPackageVars:   lazyPackageVars,
 		asyncLazy:         asyncLazy,
 		tempNames:         newTempNameOwner(),
@@ -1819,6 +1820,9 @@ type lowerFileContext struct {
 	lazyPackageVars map[types.Object]bool
 	asyncLazy       *asyncLazyState
 	identAliases    map[types.Object]string
+	// runtimeAliases holds the local aliases that the file imports as
+	// values, not only as types.
+	runtimeAliases map[string]bool
 	// pointerTargets names the locals that hold the struct that a pointer
 	// receiver, parameter or local points to (see pointerTargetLocals).
 	pointerTargets map[types.Object]string
@@ -4249,11 +4253,16 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 			call = target + "." + method.Name() + "(" + strings.Join(callArgs, ", ") + ")"
 
 			// A method that observes its receiver gets the reference to the
-			// embedded field.
+			// embedded field, through the prototype of its class when the
+			// file can name it.
 			if ref, ok := o.embeddedForwarderIdentityReceiver(ctx, field, selection, method); ok {
-				body = append(body, loweredStmt{text: "const __receiver = " + ref})
-				callArgs = append([]string{"__receiver"}, callArgs...)
-				call = identityReceiverCallee("__receiver", method.Name()) + "(" + strings.Join(callArgs, ", ") + ")"
+				if prototype, ok := o.pointerMethodPrototype(ctx, method); ok {
+					call = prototype + ".call(" + strings.Join(append([]string{ref}, callArgs...), ", ") + ")"
+				} else {
+					body = append(body, loweredStmt{text: "const __receiver = " + ref})
+					callArgs = append([]string{"__receiver"}, callArgs...)
+					call = identityReceiverCallee("__receiver", method.Name()) + "(" + strings.Join(callArgs, ", ") + ")"
+				}
 			}
 		}
 		if async {

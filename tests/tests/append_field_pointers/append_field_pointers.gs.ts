@@ -76,8 +76,7 @@ export class Outer {
 	}
 
 	public Register(): any {
-		const __receiver = $.fieldRef(this, "T")
-		return __receiver.value.Register.call(__receiver)
+		return T.prototype.Register.call($.fieldRef(this, "T"))
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -134,13 +133,13 @@ export function __goscript_set_ptrs(__goscriptValue: $.Slice<T | $.VarRef<T> | n
 export async function main(): globalThis.Promise<void> {
 	// Appends that grow the slices keep the pointers to the fields.
 	let out = new Outer()
-	$.callPointerMethod($.fieldRef($.pointerValue<Outer>(out), "T"), "Register")
+	T.prototype.Register.call($.fieldRef($.pointerValue<Outer>(out), "T"))
 	let p = new Pair()
 	let p$: Pair = p == null ? $.pointerTarget<Pair>(p) : (p as any).__isVarRef === true ? (p as any).value : (p as any).__goValue === undefined ? (p as any) : $.pointerTarget<Pair>(p)
-	$.callPointerMethod($.fieldRef((p$ as Pair), "A"), "Register")
-	$.callPointerMethod($.fieldRef((p$ as Pair), "B"), "Register")
+	T.prototype.Register.call($.fieldRef((p$ as Pair), "A"))
+	T.prototype.Register.call($.fieldRef((p$ as Pair), "B"))
 	let local: $.VarRef<Outer> = $.varRef(new Outer(true))
-	$.callPointerMethod($.fieldRef(local.value, "T"), "Register")
+	T.prototype.Register.call($.fieldRef(local.value, "T"))
 
 	// Appending the slices to others keeps them too.
 	let all = $.appendSlice<Getter | null>(null, registry, $.appendZeros.nil)

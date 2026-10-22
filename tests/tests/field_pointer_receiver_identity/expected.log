@@ -10,3 +10,7 @@ registry: true 1 1 6
 any: true
 method value: true
 generic: boxed+cloned true
+two levels: true true
+promoted method value: true 2
+generic field: true 5
+async: true true
