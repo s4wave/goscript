@@ -1,0 +1,15 @@
+new struct: true
+new struct var: true true
+set struct var: true
+var ptr elems: true true
+new int: true
+fields: true true
+addr field: true
+slice: true
+map: true
+int ptrs: true
+differ: false false
+pointer vs value: false false false false
+in interfaces: true false
+reflect map: true
+nil: false

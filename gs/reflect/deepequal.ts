@@ -49,7 +49,7 @@
 // values that have been compared before, it treats the values as
 // equal rather than examining the values to which they point.
 // This ensures that DeepEqual terminates.
-import { isNamedValueBox, isStructObject } from '../builtin/index.js'
+import { isNamedValueBox, isStructObject, isVarRef } from '../builtin/index.js'
 import { ReflectValue } from './types.js'
 
 export function DeepEqual(
@@ -80,6 +80,28 @@ export function DeepEqual(
   }
   if (isNamedValueBox(y)) {
     return DeepEqual(x as ReflectValue, y.__goValue as ReflectValue)
+  }
+
+  // A pointer to a struct is either the struct object itself, as &T{} and
+  // reflect.New make it, or a reference to a struct variable, as &v makes
+  // it; both point to the struct, so the reference compares as its struct.
+  // A struct object is also a struct value, so the types that interface
+  // values were boxed with tell a pointer from a value, which are unequal.
+  const xp = structPointee(x)
+  const yp = structPointee(y)
+  if (xp !== null || yp !== null || isStructObject(x)) {
+    const xPointer = boxedAsPointer(x)
+    const yPointer = boxedAsPointer(y)
+    if (
+      xPointer !== undefined &&
+      yPointer !== undefined &&
+      xPointer !== yPointer
+    ) {
+      return false
+    }
+  }
+  if ((xp !== null) !== (yp !== null)) {
+    return DeepEqual(xp ?? x, yp ?? y)
   }
 
   // Check for identical references first
@@ -195,4 +217,23 @@ function sliceWindow(
 
   // Any other value is not a slice.
   return null
+}
+
+// structPointee returns the struct that a reference to a struct variable
+// points to, or null for any other value.
+function structPointee(value: unknown): ReflectValue | null {
+  if (isVarRef(value) && isStructObject(value.value)) {
+    return value.value as ReflectValue
+  }
+  return null
+}
+
+// boxedAsPointer reports whether value was boxed in an interface as a
+// pointer, as a value, or neither (undefined).
+function boxedAsPointer(value: unknown): boolean | undefined {
+  if (typeof value !== 'object' || value === null) {
+    return undefined
+  }
+  const name = (value as { __goType?: unknown }).__goType
+  return typeof name === 'string' ? name.startsWith('*') : undefined
 }
