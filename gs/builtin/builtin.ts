@@ -1904,6 +1904,32 @@ function byteViewMatches(h: ByteView, pos: number, n: ByteView): boolean {
 }
 
 /**
+ * bytesHasPrefix reports whether bytes begins with prefix.
+ */
+export function bytesHasPrefix(
+  bytes: Bytes | null,
+  prefix: Bytes | null,
+): boolean {
+  // Only the prefix length of bytes is read, in place.
+  const h = byteView(bytes)
+  const n = byteView(prefix)
+  return n.len <= h.len && byteViewMatches(h, 0, n)
+}
+
+/**
+ * bytesHasSuffix reports whether bytes ends with suffix.
+ */
+export function bytesHasSuffix(
+  bytes: Bytes | null,
+  suffix: Bytes | null,
+): boolean {
+  // Only the suffix length of bytes is read, in place.
+  const h = byteView(bytes)
+  const n = byteView(suffix)
+  return n.len <= h.len && byteViewMatches(h, h.len - n.len, n)
+}
+
+/**
  * bytesIndexOf finds the first occurrence of subslice in bytes.
  * Returns -1 if not found.
  */

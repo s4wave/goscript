@@ -24,4 +24,12 @@ Reader ReadAt 3 bytes: ade err: true
 Reader Seek 2 err: true
 Reader Size 6
 Reader WriteTo 4 bytes: ader err: true
+HasPrefix window: true false
+HasSuffix window: true false
+HasPrefix longer: false false
+HasPrefix nil: true false true
+HasSuffix nil: true false true
+CutPrefix window: </p><p> true
+CutSuffix window: one</p> true
+TrimPrefix/TrimSuffix window: </p>
 test finished

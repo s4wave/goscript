@@ -121,5 +121,21 @@ func main() {
 	n64, err := reader.WriteTo(&writeDst)
 	println("Reader WriteTo", n64, "bytes:", writeDst.String(), "err:", err == nil)
 
+	// Test HasPrefix and HasSuffix on windows into a larger slice, which
+	// compare only the prefix or suffix bytes of the window.
+	doc := []byte("<p>one</p><p>two</p>")
+	win := doc[3:13]
+	println("HasPrefix window:", bytes.HasPrefix(win, []byte("one</p>")), bytes.HasPrefix(win, []byte("<p>")))
+	println("HasSuffix window:", bytes.HasSuffix(win, []byte("<p>")), bytes.HasSuffix(win, []byte("two")))
+	println("HasPrefix longer:", bytes.HasPrefix(win[:2], []byte("one")), bytes.HasSuffix(win[8:], []byte("</p><p>")))
+	var nilBytes []byte
+	println("HasPrefix nil:", bytes.HasPrefix(nilBytes, nil), bytes.HasPrefix(nilBytes, []byte("a")), bytes.HasPrefix(win, nil))
+	println("HasSuffix nil:", bytes.HasSuffix(nilBytes, nil), bytes.HasSuffix(nilBytes, []byte("a")), bytes.HasSuffix(win, []byte{}))
+	rest, ok := bytes.CutPrefix(win, []byte("one"))
+	println("CutPrefix window:", string(rest), ok)
+	rest, ok = bytes.CutSuffix(win, []byte("<p>"))
+	println("CutSuffix window:", string(rest), ok)
+	println("TrimPrefix/TrimSuffix window:", string(bytes.TrimSuffix(bytes.TrimPrefix(win, []byte("one")), []byte("<p>"))))
+
 	println("test finished")
 }

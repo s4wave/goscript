@@ -103,9 +103,7 @@ export function IndexByte(b: $.Bytes, c: number): number {
 }
 
 export function indexBytePortable(s: $.Bytes, c: number): number {
-	if (s === null) return -1
-	const arr = $.bytesToArray(s)
-	return arr.indexOf(c)
+	return $.bytesIndexByte(s, c)
 }
 
 // LastIndex returns the index of the last instance of sep in s, or -1 if sep is not present in s.
@@ -451,37 +449,12 @@ export function Join(s: $.Slice<$.Bytes>, sep: $.Bytes): $.Bytes {
 
 // HasPrefix reports whether the byte slice s begins with prefix.
 export function HasPrefix(s: $.Bytes, prefix: $.Bytes): boolean {
-	if (s === null) s = new Uint8Array(0)
-	if (prefix === null) prefix = new Uint8Array(0)
-	
-	if ($.len(s) < $.len(prefix)) return false
-	
-	const sArr = $.bytesToArray(s)
-	const prefixArr = $.bytesToArray(prefix)
-	
-	for (let i = 0; i < prefixArr.length; i++) {
-		if (sArr[i] !== prefixArr[i]) return false
-	}
-	
-	return true
+	return $.bytesHasPrefix(s, prefix)
 }
 
 // HasSuffix reports whether the byte slice s ends with suffix.
 export function HasSuffix(s: $.Bytes, suffix: $.Bytes): boolean {
-	if (s === null) s = new Uint8Array(0)
-	if (suffix === null) suffix = new Uint8Array(0)
-	
-	if ($.len(s) < $.len(suffix)) return false
-	
-	const sArr = $.bytesToArray(s)
-	const suffixArr = $.bytesToArray(suffix)
-	const offset = sArr.length - suffixArr.length
-	
-	for (let i = 0; i < suffixArr.length; i++) {
-		if (sArr[offset + i] !== suffixArr[i]) return false
-	}
-	
-	return true
+	return $.bytesHasSuffix(s, suffix)
 }
 
 // Map returns a copy of the byte slice s with all its characters modified

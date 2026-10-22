@@ -128,6 +128,26 @@ export async function main(): globalThis.Promise<void> {
 	err = __goscriptTuple3[1]
 	await $.println("Reader WriteTo", n64, "bytes:", writeDst.value.String(), "err:", err == null)
 
+	// Test HasPrefix and HasSuffix on windows into a larger slice, which
+	// compare only the prefix or suffix bytes of the window.
+	let doc = new Uint8Array([60, 112, 62, 111, 110, 101, 60, 47, 112, 62, 60, 112, 62, 116, 119, 111, 60, 47, 112, 62])
+	let win = $.goSlice(doc, 3, 13)
+	await $.println("HasPrefix window:", bytes.HasPrefix(win, new Uint8Array([111, 110, 101, 60, 47, 112, 62])), bytes.HasPrefix(win, new Uint8Array([60, 112, 62])))
+	await $.println("HasSuffix window:", bytes.HasSuffix(win, new Uint8Array([60, 112, 62])), bytes.HasSuffix(win, new Uint8Array([116, 119, 111])))
+	await $.println("HasPrefix longer:", bytes.HasPrefix($.goSlice(win, undefined, 2), new Uint8Array([111, 110, 101])), bytes.HasSuffix($.goSlice(win, 8, undefined), new Uint8Array([60, 47, 112, 62, 60, 112, 62])))
+	let nilBytes: $.Slice<number> = null! as $.Slice<number>
+	await $.println("HasPrefix nil:", bytes.HasPrefix(nilBytes, null), bytes.HasPrefix(nilBytes, new Uint8Array([97])), bytes.HasPrefix(win, null))
+	await $.println("HasSuffix nil:", bytes.HasSuffix(nilBytes, null), bytes.HasSuffix(nilBytes, new Uint8Array([97])), bytes.HasSuffix(win, new Uint8Array([]) as $.Slice<number>))
+	let __goscriptTuple4: any = bytes.CutPrefix(win, new Uint8Array([111, 110, 101]))
+	let rest: $.Slice<number> = __goscriptTuple4[0]
+	let ok: boolean = __goscriptTuple4[1]
+	await $.println("CutPrefix window:", $.bytesToString(rest), ok)
+	let __goscriptTuple5: any = bytes.CutSuffix(win, new Uint8Array([60, 112, 62]))
+	rest = __goscriptTuple5[0]
+	ok = __goscriptTuple5[1]
+	await $.println("CutSuffix window:", $.bytesToString(rest), ok)
+	await $.println("TrimPrefix/TrimSuffix window:", $.bytesToString(bytes.TrimSuffix(bytes.TrimPrefix(win, new Uint8Array([111, 110, 101])), new Uint8Array([60, 112, 62]))))
+
 	await $.println("test finished")
 }
 
