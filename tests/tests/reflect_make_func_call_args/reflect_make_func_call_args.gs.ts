@@ -21,11 +21,23 @@ export class Values {
 		return this
 	}
 
-	public async Count(keep: ((v: number) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<number> {
+	public Count(keep: ((v: number) => boolean | globalThis.Promise<boolean>) | null): number {
 		const v: Values | $.VarRef<Values> | null = this;
 		let n = 0
 		for (let __goscriptRangeTarget0 = $.pointerValue<Values>(v).vals, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 			let x = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as number)
+			if ((keep!(x) as boolean)) {
+				n++
+			}
+		}
+		return n
+	}
+
+	public async Count$reflect(keep: ((v: number) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<number> {
+		const v: Values | $.VarRef<Values> | null = this;
+		let n = 0
+		for (let __goscriptRangeTarget1 = $.pointerValue<Values>(v).vals, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+			let x = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number)
 			if ((__goscriptAwait = keep!(x), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
 				n++
 			}
@@ -42,14 +54,24 @@ export class Values {
 	)
 }
 
-export async function Sum(vals: $.Slice<number>, f: ((v: number) => number | globalThis.Promise<number>) | null): globalThis.Promise<number> {
+export function Sum(vals: $.Slice<number>, f: ((v: number) => number | globalThis.Promise<number>) | null): number {
 	let s = 0
-	for (let __goscriptRangeTarget1 = vals, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
-		let x = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number)
+	for (let __goscriptRangeTarget2 = vals, __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
+		let x = (__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as number)
+		s += (f!(x) as number)
+	}
+	return s
+}
+
+export async function Sum$reflect(vals: $.Slice<number>, f: ((v: number) => number | globalThis.Promise<number>) | null): globalThis.Promise<number> {
+	let s = 0
+	for (let __goscriptRangeTarget3 = vals, __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget3), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow3.length; __rangeIndex++) {
+		let x = (__goscriptRangeWindow3.backing[__goscriptRangeWindow3.offset + __rangeIndex] as number)
 		s += (__goscriptAwait = f!(x), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}
 	return s
 }
+$.setReflectTwin(Sum, Sum$reflect)
 
 export async function main(): globalThis.Promise<void> {
 	// A function that reflection made, as an interpreter such as yaegi
@@ -67,9 +89,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.markAsStructValue($.cloneStructValue($.arrayIndex((await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.goFunc(Sum, "main.Sum"), "func(vals []int, f func(v int) int) int", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((values$ as Values).vals, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))), double])))!, 0))).Int())
 
 	// Compiled calls are unchanged.
-	await $.println(await Values.prototype.Count.call(values, $.functionValue((v: number): boolean => {
+	await $.println(Values.prototype.Count.call(values, $.functionValue((v: number): boolean => {
 		return v < 4
-	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))), await Sum((values$ as Values).vals, $.functionValue((v: number): number => {
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))), Sum((values$ as Values).vals, $.functionValue((v: number): number => {
 		return v
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))
 }

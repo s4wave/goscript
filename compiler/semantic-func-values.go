@@ -148,30 +148,6 @@ func (w *funcFactsWalker) walkFuncDecl(decl *ast.FuncDecl) {
 	if semFn := w.model.functions[fn]; semFn != nil && decl.Body != nil {
 		w.walk(semFn, decl.Body)
 	}
-	w.visitExportedFuncParams(fn)
-}
-
-// visitExportedFuncParams records the func types of the parameters of fn, an
-// exported function or method. An interpreter calls such functions through
-// reflect.Value.Call, which passes the function values that reflection made
-// for it, of any func type, as their arguments, so calls of the types stay
-// open, as calls of an asserted func type do.
-func (w *funcFactsWalker) visitExportedFuncParams(fn *types.Func) {
-	// Only an exported function or method is called that way.
-	if fn == nil || !fn.Exported() {
-		return
-	}
-	signature, _ := fn.Type().(*types.Signature)
-	if signature == nil {
-		return
-	}
-
-	// Each parameter of a func type opens its calls.
-	for param := range signature.Params().Variables() {
-		if _, ok := param.Type().Underlying().(*types.Signature); ok {
-			w.recordAssertedShape(funcValueShape(param.Type()))
-		}
-	}
 }
 
 // walkVarDecl walks the initializers of package variables. A lazily

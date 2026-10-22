@@ -228,6 +228,8 @@ const (
 	RuntimeHelperSyncFunction                   RuntimeHelper = "type.syncFunction"
 	RuntimeHelperNamedFunction                  RuntimeHelper = "type.namedFunction"
 	RuntimeHelperGoFunc                         RuntimeHelper = "type.goFunc"
+	RuntimeHelperSetReflectTwin                 RuntimeHelper = "type.setReflectTwin"
+	RuntimeHelperCallReflectTwin                RuntimeHelper = "type.callReflectTwin"
 	RuntimeHelperGenericZero                    RuntimeHelper = "type.genericZero"
 	RuntimeHelperGenericSliceTypeHint           RuntimeHelper = "type.genericSliceTypeHint"
 	RuntimeHelperGenericNew                     RuntimeHelper = "type.genericNew"
@@ -556,6 +558,8 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperSyncFunction, "syncFunction", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperNamedFunction, "namedFunction", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGoFunc, "goFunc", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperSetReflectTwin, "setReflectTwin", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperCallReflectTwin, "callReflectTwin", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGenericZero, "genericZero", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGenericSliceTypeHint, "genericSliceTypeHint", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGenericNew, "genericNew", RuntimeHelperCategoryType),

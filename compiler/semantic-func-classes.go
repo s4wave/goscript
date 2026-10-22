@@ -132,7 +132,8 @@ func (index *funcValueClassIndex) classes(shape string) []*types.Func {
 //
 // In a library build every class is open, as a consumer may pass any
 // function. In a whole program a class is open when the program asserts a
-// matching func type from an interface value and uses a function that can
+// matching func type from an interface value, or has it as a func parameter
+// that escapes a function reflection can call, and uses a function that can
 // make a function value of any type by reflection. An override function or method value is async when
 // its metadata says so, and an interface method value when its interface is
 // open.
@@ -171,10 +172,17 @@ func buildFuncValueGraph(
 	if !programMakesFuncValues(model, overrideFacts, values) {
 		return graph
 	}
+	model.makesFuncValues = true
 	for _, semPkg := range model.packages {
 		for shape := range semPkg.assertedFuncShapes {
 			graph.open = appendUniqueFuncs(graph.open, index.classes(shape))
 		}
+	}
+
+	// So do the func parameters that reflect.Value.Call can pass such values
+	// to and that escape the call.
+	for shape := range escapingReflectParamShapes(model) {
+		graph.open = appendUniqueFuncs(graph.open, index.classes(shape))
 	}
 	return graph
 }

@@ -200,6 +200,11 @@ type loweredFunction struct {
 	// empty for a void function. Defer wrappers keep it for every deferred
 	// function so TypeScript sees a total return path after the catch.
 	recoverReturn string
+	// twin is the function's twin, which reflect.Value.Call calls (see
+	// lowering-reflect-twins.go), and attach the statement that follows a
+	// package function's twin and links the function to it.
+	twin   *loweredFunction
+	attach string
 }
 
 type loweredParam struct {

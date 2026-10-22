@@ -93,6 +93,17 @@ type summaryFunction struct {
 	paramsReadOnly   []valueReadOnlyKind
 	resultBorrows    []int
 	transient        []summaryTransient
+	// callbacks holds the callback parameter candidates (see
+	// callbackCandidates).
+	callbacks []summaryCallback
+}
+
+// summaryCallback is a callback parameter candidate by its parameter index,
+// with whether the function calls it and the parameters it depends on.
+type summaryCallback struct {
+	index  int
+	called bool
+	deps   []summarySlot
 }
 
 // summaryTransient is a transient pointer candidate by its parameter index,
@@ -532,6 +543,12 @@ func (s *bodySummary) addNode(k *summaryKeys, kind, key string, semFn *semanticF
 		return a.index - b.index
 	})
 
+	// And those of the callback parameter candidates.
+	callbacks, ok := summarizeCallbacks(k, semFn)
+	if !ok {
+		return false
+	}
+
 	// Record the node in a stable order.
 	slices.Sort(calls)
 	s.functions = append(s.functions, summaryFunction{
@@ -547,8 +564,27 @@ func (s *bodySummary) addNode(k *summaryKeys, kind, key string, semFn *semanticF
 		paramsReadOnly:   semFn.paramsReadOnly,
 		resultBorrows:    semFn.resultBorrows,
 		transient:        transient,
+		callbacks:        callbacks,
 	})
 	return true
+}
+
+// summarizeCallbacks names the dependencies of semFn's callback parameter
+// candidates. It reports false when a dependency has no key.
+func summarizeCallbacks(k *summaryKeys, semFn *semanticFunction) ([]summaryCallback, bool) {
+	var callbacks []summaryCallback
+	for _, candidate := range semFn.callbackCandidates {
+		record := summaryCallback{index: candidate.slot.index, called: candidate.called}
+		for _, dep := range candidate.deps {
+			fn, ok := k.key(dep.fn)
+			if !ok {
+				return nil, false
+			}
+			record.deps = append(record.deps, summarySlot{fn: fn, index: dep.index})
+		}
+		callbacks = append(callbacks, record)
+	}
+	return callbacks, true
 }
 
 // summarizeValueNodes records the package's literal and lazy initializer
@@ -1037,6 +1073,23 @@ func (a *bodyApplier) applyNode(semPkg *semanticPackage, semFn *semanticFunction
 		}
 		semFn.transientCandidates = append(semFn.transientCandidates, candidate)
 	}
+	return a.applyCallbacks(semFn, summaryFn)
+}
+
+// applyCallbacks adds a summary record's callback parameter candidates to its
+// node.
+func (a *bodyApplier) applyCallbacks(semFn *semanticFunction, summaryFn summaryFunction) bool {
+	for _, record := range summaryFn.callbacks {
+		candidate := &callbackCandidate{slot: callbackSlot{semFn.function, record.index}, called: record.called}
+		for _, dep := range record.deps {
+			fn := a.resolveFunc(dep.fn)
+			if fn == nil {
+				return false
+			}
+			candidate.deps = append(candidate.deps, callbackSlot{fn, dep.index})
+		}
+		semFn.callbackCandidates = append(semFn.callbackCandidates, candidate)
+	}
 	return true
 }
 
@@ -1124,6 +1177,7 @@ const (
 	summaryRecordMutex        = "section-mutex"
 	summaryRecordCallFacts    = "call-facts"
 	summaryRecordTransient    = "transient"
+	summaryRecordCallback     = "callback"
 	summaryRecordMutexEscape  = "mutex-escape"
 	summaryRecordChangedVar   = "changed-var"
 	summaryRecordEffectFree   = "effect-free"
@@ -1169,6 +1223,13 @@ func (s *bodySummary) encode() ([]byte, bool) {
 		}
 		for _, record := range fn.transient {
 			fields := []string{summaryRecordTransient, strconv.Itoa(record.index)}
+			for _, dep := range record.deps {
+				fields = append(fields, dep.fn, strconv.Itoa(dep.index))
+			}
+			line(fields...)
+		}
+		for _, record := range fn.callbacks {
+			fields := []string{summaryRecordCallback, strconv.Itoa(record.index), strconv.FormatBool(record.called)}
 			for _, dep := range record.deps {
 				fields = append(fields, dep.fn, strconv.Itoa(dep.index))
 			}
@@ -1290,6 +1351,13 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 			}
 			fn := &s.functions[len(s.functions)-1]
 			fn.transient = append(fn.transient, record)
+		case summaryRecordCallback:
+			record, ok := decodeSummaryCallback(fields)
+			if !ok || len(s.functions) == 0 {
+				return nil, false
+			}
+			fn := &s.functions[len(s.functions)-1]
+			fn.callbacks = append(fn.callbacks, record)
 		case summaryRecordFuncValue:
 			if len(fields) != 3 {
 				return nil, false
@@ -1362,6 +1430,31 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 		}
 	}
 	return s, true
+}
+
+// decodeSummaryCallback parses a callback record: the parameter index,
+// whether it is called, and the function key and index of each dependency.
+func decodeSummaryCallback(fields []string) (summaryCallback, bool) {
+	// The index and the called flag come first.
+	if len(fields) < 3 || len(fields)%2 != 1 {
+		return summaryCallback{}, false
+	}
+	index, indexErr := strconv.Atoi(fields[1])
+	called, calledErr := strconv.ParseBool(fields[2])
+	if indexErr != nil || calledErr != nil {
+		return summaryCallback{}, false
+	}
+
+	// Each dependency is a key and an index.
+	record := summaryCallback{index: index, called: called}
+	for idx := 3; idx < len(fields); idx += 2 {
+		depIndex, err := strconv.Atoi(fields[idx+1])
+		if err != nil {
+			return summaryCallback{}, false
+		}
+		record.deps = append(record.deps, summarySlot{fn: fields[idx], index: depIndex})
+	}
+	return record, true
 }
 
 // formatInts joins values with commas.

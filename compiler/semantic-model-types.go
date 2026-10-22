@@ -87,6 +87,12 @@ type SemanticModel struct {
 	// with dead code elimination, or nil when every function is kept (see
 	// semantic-dead-code.go).
 	liveCode *liveCode
+	// makesFuncValues reports whether the program is whole and makes
+	// function values by reflection, and reflectTwins holds the functions
+	// and methods that get a twin for reflect.Value.Call (see
+	// semantic-reflect-twins.go).
+	makesFuncValues bool
+	reflectTwins    map[*types.Func]bool
 	// asyncReport holds the async report the build was asked for, or nil.
 	asyncReport *AsyncReport
 }
@@ -154,11 +160,9 @@ type semanticPackage struct {
 	lazyInits map[types.Object]*semanticFunction
 	// funcValues holds the function values the package takes.
 	funcValues []funcValue
-	// assertedFuncShapes holds the shapes of the func types through which
-	// values that reflection made can reach the package's code: the func
-	// types it asserts from interface values, and those of the parameters of
-	// its exported functions and methods, to which reflect.Value.Call passes
-	// such values.
+	// assertedFuncShapes holds the shapes of the func types the package
+	// asserts from interface values, through which values that reflection
+	// made can reach the package's code.
 	assertedFuncShapes map[string]bool
 	// topValueCalls holds the shapes of the function values called outside
 	// function bodies, by package initialization.
@@ -266,7 +270,13 @@ type semanticFunction struct {
 	// uses all may be transient, with the parameters they depend on (see
 	// transientCandidates).
 	transientCandidates []*transientCandidate
-	async               bool
+	// callbackCandidates holds the func parameters whose uses all may be
+	// callback uses, with the parameters they depend on, and paramsCallback
+	// the candidates that are callback parameters by index, or nil when no
+	// parameter is (see semantic-reflect-twins.go).
+	callbackCandidates []*callbackCandidate
+	paramsCallback     []*callbackCandidate
+	async              bool
 	// asyncCause records why the node's own code suspends, when the fact
 	// walk found it.
 	asyncCause *asyncCause

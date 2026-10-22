@@ -75,6 +75,7 @@ func (m *SemanticModel) packageFactDigests() map[string]string {
 			facts[pkgPath] = append(facts[pkgPath], semPkg.localFacts...)
 		}
 		facts[pkgPath] = append(facts[pkgPath], m.funcValueShapeFacts(semPkg)...)
+		facts[pkgPath] = append(facts[pkgPath], m.reflectTwinFacts(semPkg)...)
 		for obj := range semPkg.deferredVars {
 			add("deferred-var", obj, "")
 		}

@@ -300,6 +300,7 @@ func (o *TypeScriptEmitOwner) renderLoweredFileBody(pkg *loweredPackage, file *l
 		if decl.function != nil {
 			writeSeparator()
 			renderFunction(&b, decl.function)
+			renderFunctionTwin(&b, decl.function.twin)
 			if decl.function.name == "main" {
 				hasMain = true
 			}
@@ -465,7 +466,7 @@ func estimateLoweredFunctionSize(fn *loweredFunction) int {
 	}
 	size += estimateLoweredStmtsSize(fn.paramBindings)
 	size += estimateLoweredStmtsSize(fn.body)
-	return size
+	return size + estimateLoweredFunctionSize(fn.twin)
 }
 
 // estimateLoweredStmtsSize accounts for nested control flow and source comments.
@@ -865,6 +866,10 @@ func renderStructBody(b *strings.Builder, structType *loweredStruct, runtimeOwne
 		}
 		b.WriteString("\n")
 		renderMethod(b, &method)
+		if method.twin != nil {
+			b.WriteString("\n")
+			renderMethod(b, method.twin)
+		}
 	}
 
 	// A static block sets up the prototype.
@@ -1024,6 +1029,18 @@ func renderFunction(b *strings.Builder, fn *loweredFunction) {
 		renderUnreachableReturn(b, fn, 1)
 	}
 	b.WriteString("}\n")
+}
+
+// renderFunctionTwin emits the twin of a package function and the statement
+// that links the function to it.
+func renderFunctionTwin(b *strings.Builder, twin *loweredFunction) {
+	if twin == nil {
+		return
+	}
+	b.WriteString("\n")
+	renderFunction(b, twin)
+	b.WriteString(twin.attach)
+	b.WriteString("\n")
 }
 
 // renderMethod emits a class method with its lowered receiver and return contract.

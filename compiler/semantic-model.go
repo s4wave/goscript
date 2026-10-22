@@ -182,12 +182,18 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 		return model, diagnostics
 	}
 
+	// Func parameters that stay in the call are callback parameters.
+	markCallbackParams(model, programFuncValues(model))
+
 	// Color the functions that may suspend.
 	var report *asyncReporter
 	if opts.ReportAsync {
 		report = newAsyncReporter(model, newOverrideBoundary(overridePkgs, overrideFacts), opts.WholeProgram)
 	}
 	diagnostics = append(diagnostics, o.colorAsync(ctx, model, overrideFacts, overridePkgs, opts.WholeProgram, report)...)
+
+	// Functions that reflection calls with callbacks get twins.
+	markReflectTwins(model)
 	model.freeze()
 	return model, diagnostics
 }
@@ -2599,6 +2605,7 @@ func collectCallFacts(model *SemanticModel, semPkg *semanticPackage, pkg *packag
 		semFn.paramsReadOnly = funcParamsReadOnly(pkg, decl, model.effectFreeFuncs)
 		semFn.resultBorrows = funcResultBorrows(pkg, decl, fn, semFn.paramsReadOnly)
 		semFn.transientCandidates = transientCandidates(pkg, fn, decl, overrideFacts)
+		semFn.callbackCandidates = callbackCandidates(pkg, fn, decl)
 	}
 }
 

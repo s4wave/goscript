@@ -1608,7 +1608,7 @@ export class Value {
         (receiver as Record<string, unknown>)[name]
       : undefined
     if (typeof method === 'function') {
-      return method.bind(receiver)
+      return $.bindReflectMethod(receiver as object, name, method)
     }
 
     // A named non-struct type, such as a named int or slice, has its methods
@@ -3191,9 +3191,11 @@ async function callReflectFunction(
   inArgs: $.Slice<Value>,
   op: ReflectCallOp,
 ): Promise<$.Slice<Value>> {
+  // A function with a twin is called through it, which awaits the function
+  // values that reflection made among the arguments.
   const args = $.asArray(inArgs)
   const rawArgs = reflectCallRawArgs(fnType, args, op)
-  const result = await fn(...rawArgs)
+  const result = await $.reflectTwin(fn)(...rawArgs)
   return normalizeReflectCallResults(fnType, result)
 }
 

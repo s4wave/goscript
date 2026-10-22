@@ -122,6 +122,25 @@ program takes (`compiler/semantic-func-values.go`,
   the program uses a function that override metadata lists in
   `funcValueMakers` (`reflect.MakeFunc`, `reflect.Value.MethodByName`),
   since reflection can make a function of any type.
+- In such a program, `reflect.Value.Call` may also pass made functions to the
+  func parameters of the exported, non-generic functions and methods it
+  calls (`compiler/semantic-reflect-twins.go`). A callback parameter, which
+  the function only calls, compares with nil and passes to callback
+  parameters of other functions or of methods of their receivers' own struct
+  types, all during the call, does not open its type: the function gets a
+  twin (`F$reflect`, an async copy of its body that awaits the parameter's
+  calls and calls the twins of the functions it passes it to), which
+  `reflect.Value.Call` calls instead of the function. A package function is
+  linked to its twin by `$.setReflectTwin`; a method's twin is the class
+  member of that name, which `Value.Method` binds, and a promoted method's
+  forwarder has a twin too. Any other func parameter, one that the function
+  keeps, returns, converts, captures in a literal, uses in a go or defer
+  statement, or passes to an interface method, a function value or a generic
+  function, opens its type as an asserted one does, and so does every func
+  parameter of a deferred function, a method of a named non-struct type and a
+  method whose value the program takes. Generic functions and methods of
+  generic types are skipped: reflection cannot call a generic function, and
+  an interpreter names no instance of a generic type.
 - The iteration reaches one fixed point with the interface coloring: an async
   implementation can make a function value async and the reverse.
 

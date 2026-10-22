@@ -3679,9 +3679,15 @@ function typedFunction(
     __goTypeName: name,
     __typeInfo: typeInfo,
   })
+
+  // The wrapper keeps the Go name and the twin of fn.
   const goName: string | undefined = Reflect.get(fn, '__goFuncName')
   if (goName !== undefined) {
     Reflect.set(wrapper, '__goFuncName', goName)
+  }
+  const twin: unknown = Reflect.get(fn, '__goReflectTwin')
+  if (typeof twin === 'function') {
+    setReflectTwin(wrapper, twin)
   }
   return wrapper
 }
@@ -3717,6 +3723,57 @@ export function goFunc<T>(fn: T, goName: string): T {
     Reflect.set(fn, '__goFuncName', goName)
   }
   return fn
+}
+
+// reflectTwinSuffix ends the member name of the twin of a method. A twin is
+// an async copy of a function or method that reflect.Value.Call calls: it
+// awaits the calls of the function values that reflection made and passed to
+// it, which the function itself, called by compiled code with compiled
+// functions, does not.
+export const reflectTwinSuffix = '$reflect'
+
+// setReflectTwin links fn, a package function or a bound method, to its twin.
+export function setReflectTwin(fn: Function, twin: Function): void {
+  Reflect.set(fn, '__goReflectTwin', twin)
+}
+
+// reflectTwin returns the twin of fn, or fn itself when it has none.
+export function reflectTwin<F extends Function>(fn: F): F {
+  const twin: unknown = Reflect.get(fn, '__goReflectTwin')
+  return typeof twin === 'function' ? (twin as F) : fn
+}
+
+// bindReflectMethod returns method, the method name of receiver, bound to
+// receiver and linked to the twin of the method, bound too, if it has one.
+export function bindReflectMethod(
+  receiver: object,
+  name: string,
+  method: Function,
+): (...args: any[]) => any {
+  // The bound method is called as usual.
+  const bound = method.bind(receiver)
+  const twin: unknown = Reflect.get(receiver, name + reflectTwinSuffix)
+
+  // Its twin, if any, is linked for reflect.Value.Call.
+  if (typeof twin === 'function') {
+    setReflectTwin(bound, twin.bind(receiver))
+  }
+  return bound
+}
+
+// callReflectTwin calls the method name of receiver with args through its
+// twin, or the method itself when it has none. The twin of a method promoted
+// from an embedded interface calls the twin of its dynamic value this way.
+export function callReflectTwin(
+  receiver: any,
+  name: string,
+  ...args: unknown[]
+): unknown {
+  const twin: unknown = receiver[name + reflectTwinSuffix]
+  if (typeof twin === 'function') {
+    return twin.apply(receiver, args)
+  }
+  return receiver[name](...args)
 }
 
 // goFunctionName returns the Go name of the function value fn: the name

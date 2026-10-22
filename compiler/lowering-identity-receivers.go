@@ -97,7 +97,7 @@ func (o *LoweringOwner) lowerIdentityReceiverMethodCall(
 	}
 
 	// The method of the struct is called with the address as its receiver.
-	callArgs := append([]string{address, strconv.Quote(method.Name())}, args...)
+	callArgs := append([]string{address, strconv.Quote(reflectTwinCallName(ctx, selector, method.Name()))}, args...)
 	call := o.runtimeOwner.QualifiedHelper(RuntimeHelperCallPointerMethod) + "(" + strings.Join(callArgs, ", ") + ")"
 	return call, diagnostics, true
 }
