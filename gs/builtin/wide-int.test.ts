@@ -91,16 +91,18 @@ describe('uint conversion widths', () => {
     }
   })
 
-  it('preserves uncommon widths, encoded integers, and non-finite values', () => {
+  it('preserves uncommon widths and encoded integers, and zeroes non-finite values', () => {
     expect(uint(-1, 7)).toBe(127)
     expect(uint(-1n, 16)).toBe(65535)
     expect(uint('4294967296', 32)).toBe(0)
     expect(uint('18446744073709551615')).toBe(18446744073709551615n)
     expect(() => uint('invalid', 8)).toThrow(SyntaxError)
+    // NaN and the infinities have no integer value; they convert to 0, as
+    // with Go on arm64 and wasm, so the result is a valid integer.
     for (const bits of [8, 16, 32, 64]) {
-      expect(uint(NaN, bits)).toBeNaN()
-      expect(uint(Infinity, bits)).toBe(Infinity)
-      expect(uint(-Infinity, bits)).toBe(-Infinity)
+      expect(uint(NaN, bits)).toBe(0)
+      expect(uint(Infinity, bits)).toBe(0)
+      expect(uint(-Infinity, bits)).toBe(0)
     }
   })
 

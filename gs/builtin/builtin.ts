@@ -666,13 +666,15 @@ export function int(value: number | bigint | string, bits = 0): number {
     }
     return Number(value)
   }
+  // NaN and the infinities have no integer value: Go leaves their conversion
+  // to the implementation, and arm64 and wasm give 0, which code relies on.
+  if (!Number.isFinite(value)) {
+    return 0
+  }
   if (bits > 0 && bits < 64) {
     const modulo = 2 ** bits
     const sign = 2 ** (bits - 1)
     let truncated = Math.trunc(value)
-    if (!Number.isFinite(truncated)) {
-      return truncated
-    }
     truncated %= modulo
     if (truncated < 0) {
       truncated += modulo
@@ -812,8 +814,9 @@ function uintGeneral(
     }
     return Number(normalized)
   }
+  // NaN and the infinities convert to 0, as for int.
   if (!Number.isFinite(value)) {
-    return value
+    return 0
   }
   if (bits >= 64) {
     const truncated = Math.trunc(value)
