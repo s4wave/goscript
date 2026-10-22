@@ -1961,26 +1961,21 @@ export class Value {
     }
   }
 
-  // SetBytes sets v's underlying value to x
+  // SetBytes sets v's underlying value to x, a byte slice it then shares
+  // storage with, as in Go.
   public SetBytes(x: $.Slice<number>): void {
+    // Only a settable slice of bytes can be set from bytes.
     if (!this.CanSet()) {
       throw new Error(
         'reflect: call of reflect.Value.SetBytes on unaddressable value',
       )
     }
-    if (this.Kind() !== Slice) {
-      throw new Error(
-        'reflect: call of reflect.Value.SetBytes on ' + this.Kind() + ' Value',
-      )
+    if (this.Kind() !== Slice || this._type.Elem().Kind() !== Uint8) {
+      throw new Error('reflect.Value.SetBytes of non-byte slice')
     }
-    // Convert Uint8Array or slice to array
-    if (x instanceof Uint8Array) {
-      this._value = globalThis.Array.from(x)
-    } else if (globalThis.Array.isArray(x)) {
-      this._value = x
-    } else {
-      this._value = x
-    }
+
+    // Write the slice to the value and the storage it came from.
+    this.storeValue(x)
   }
 
   // SetZero sets v to be the zero value of v's type
