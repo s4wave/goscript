@@ -169,6 +169,18 @@ export function assignStruct<T>(
   return target
 }
 
+// isPlainElementType reports whether the values of a type are copied by
+// assigning them: any type but a struct, an array, an interface (which may
+// hold either) or an unresolved one.
+function isPlainElementType(info: TypeInfo | undefined): boolean {
+  return (
+    info !== undefined &&
+    info.kind !== TypeKind.Struct &&
+    info.kind !== TypeKind.Array &&
+    info.kind !== TypeKind.Interface
+  )
+}
+
 /** assignFieldValue preserves aggregate storage while replacing reference values. */
 export function assignFieldValue(
   target: any,
@@ -186,8 +198,18 @@ export function assignFieldValue(
     if (target === null || target === undefined) {
       return cloneArrayValue(source, info)
     }
+    // Elements of a known type other than structs, arrays and interfaces
+    // are copied as they are; the others are assigned in place, with their
+    // type resolved once.
+    const elem = resolveTypeInfo(info.elemType)
+    if (isPlainElementType(elem)) {
+      for (let i = 0; i < info.length; i++) {
+        target[i] = source[i]
+      }
+      return target
+    }
     for (let i = 0; i < info.length; i++) {
-      target[i] = assignFieldValue(target[i], source[i], info.elemType)
+      target[i] = assignFieldValue(target[i], source[i], elem)
     }
     return target
   }
