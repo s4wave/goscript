@@ -213,7 +213,7 @@ export function typeName(v: any): string {
 export async function main(): globalThis.Promise<void> {
 	// Values returned by functions called through reflect, as interpreters
 	// such as yaegi call them, have the methods of their instantiated types.
-	for (let __goscriptRangeTarget3 = $.arrayToSlice<any>([$.interfaceValue($.goFunc(NewFloat32, "main.NewFloat32"), "func() *main.Number[float32]", ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.Number")] } as $.FunctionTypeInfo)), $.interfaceValue($.functionValue((): Number | $.VarRef<Number> | null => NewNumber(__goscriptStatic2()), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.Number")] } as $.FunctionTypeInfo)), "func() *main.Number[int]", ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.Number")] } as $.FunctionTypeInfo))]), __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget3), i = 0; i < __goscriptRangeWindow3.length; i++) {
+	for (let __goscriptRangeTarget3 = $.arrayToSlice<any>([$.interfaceValue($.goFunc(NewFloat32, "main.NewFloat32"), "func() *main.Number[float32]", ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Number", "main.Number[float32]", () => [/* @__PURE__ */ $.structField("Base", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Base", "main.Base[float32]", () => [/* @__PURE__ */ $.structField("Vals", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float32")), [0], 0, true)])), [0], 0, true, { anonymous: true })]))] } as $.FunctionTypeInfo)), $.interfaceValue($.functionValue((): Number | $.VarRef<Number> | null => NewNumber(__goscriptStatic2()), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.Number")] } as $.FunctionTypeInfo)), "func() *main.Number[int]", ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Number", "main.Number[int]", () => [/* @__PURE__ */ $.structField("Base", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Base", "main.Base[int]", () => [/* @__PURE__ */ $.structField("Vals", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), [0], 0, true)])), [0], 0, true, { anonymous: true })]))] } as $.FunctionTypeInfo))]), __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget3), i = 0; i < __goscriptRangeWindow3.length; i++) {
 		let f = (__goscriptRangeWindow3.backing[__goscriptRangeWindow3.offset + i] as any)
 		let r = $.markAsStructValue($.cloneStructValue($.arrayIndex((await $.markAsStructValue($.cloneStructValue(reflect.ValueOf(f))).Call(null))!, 0)))
 		await $.println($.markAsStructValue($.cloneStructValue($.arrayIndex((await $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(r)).MethodByName("Kind"))).Call(null))!, 0))).String())
@@ -250,7 +250,7 @@ export async function main(): globalThis.Promise<void> {
 			() => new holder(),
 			() => [],
 			holder,
-			() => [/* @__PURE__ */ $.structField("N", /* @__PURE__ */ $.pointerType("main.Number"), [0], 0, true)]
+			() => [/* @__PURE__ */ $.structField("N", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Number", "main.Number[float32]", () => [/* @__PURE__ */ $.structField("Base", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Base", "main.Base[float32]", () => [/* @__PURE__ */ $.structField("Vals", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float32")), [0], 0, true)])), [0], 0, true, { anonymous: true })])), [0], 0, true)]
 		)
 	}
 	let h = (() => { const __goscriptLiteralField0 = NewNumber(__goscriptStatic0()); return $.markAsStructValue(new holder({N: __goscriptLiteralField0})) })()
@@ -291,7 +291,7 @@ function __goscriptStatic4(): any {
 
 var __goscriptStatic5$value: any
 function __goscriptStatic5(): any {
-	return __goscriptStatic5$value ??= ("main.Pair")
+	return __goscriptStatic5$value ??= (/* @__PURE__ */ $.genericStructType("main.Pair", "main.Pair[float32]", () => [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("float32"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("float32"), [1], 4, true)]))
 }
 
 var __goscriptStatic6$value: any
@@ -301,7 +301,7 @@ function __goscriptStatic6(): any {
 
 var __goscriptStatic7$value: any
 function __goscriptStatic7(): any {
-	return __goscriptStatic7$value ??= (/* @__PURE__ */ $.pointerType("main.Pair"))
+	return __goscriptStatic7$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Pair", "main.Pair[float32]", () => [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("float32"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("float32"), [1], 4, true)])))
 }
 
 var __goscriptAwait: any

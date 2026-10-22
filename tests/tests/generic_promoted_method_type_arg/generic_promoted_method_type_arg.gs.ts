@@ -117,7 +117,7 @@ export class Window {
 		() => new Window(),
 		() => [{ name: "Is", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }, { name: "Set", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		Window,
-		() => [{ name: "Base", key: "Base", type: "main.Base", anonymous: true }, { name: "Title", key: "Title", type: /* @__PURE__ */ $.basicType("string") }]
+		() => [{ name: "Base", key: "Base", type: /* @__PURE__ */ $.genericStructType("main.Base", "main.Base[*main.App]", () => [/* @__PURE__ */ $.structField("App", /* @__PURE__ */ $.pointerType("main.App"), [0], 0, true), /* @__PURE__ */ $.structField("flags", /* @__PURE__ */ $.basicType("int64", "main.Flags"), [1], 8, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/generic_promoted_method_type_arg" })]), anonymous: true }, { name: "Title", key: "Title", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
@@ -197,7 +197,7 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.Single"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(__goscriptStatic0(), ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Single", "main.Single[*main.App]", () => [/* @__PURE__ */ $.structField("Base", /* @__PURE__ */ $.genericStructType("main.Base", "main.Base[*main.App]", () => [/* @__PURE__ */ $.structField("App", /* @__PURE__ */ $.pointerType("main.App"), [0], 0, true), /* @__PURE__ */ $.structField("flags", /* @__PURE__ */ $.basicType("int64", "main.Flags"), [1], 8, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/generic_promoted_method_type_arg" })]), [0], 0, true, { anonymous: true }), /* @__PURE__ */ $.structField("Count", /* @__PURE__ */ $.basicType("int"), [1], 16, true)])), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(__goscriptStatic0(), ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))} }})
 }
 
 var __goscriptStatic4$value: any
@@ -212,7 +212,7 @@ function __goscriptStatic5(): any {
 
 var __goscriptStatic6$value: any
 function __goscriptStatic6(): any {
-	return __goscriptStatic6$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.Single"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(__goscriptStatic4(), ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set(__goscriptStatic4(), ...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic6$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Single", "main.Single[string]", () => [/* @__PURE__ */ $.structField("Base", /* @__PURE__ */ $.genericStructType("main.Base", "main.Base[string]", () => [/* @__PURE__ */ $.structField("App", /* @__PURE__ */ $.basicType("string"), [0], 0, true), /* @__PURE__ */ $.structField("flags", /* @__PURE__ */ $.basicType("int64", "main.Flags"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/generic_promoted_method_type_arg" })]), [0], 0, true, { anonymous: true }), /* @__PURE__ */ $.structField("Count", /* @__PURE__ */ $.basicType("int"), [1], 24, true)])), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(__goscriptStatic4(), ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set(__goscriptStatic4(), ...$.stripGenericTypeArgs(args))} }})
 }
 
 var __goscriptAwait: any

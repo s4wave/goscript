@@ -149,7 +149,7 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType("main.genericBox"))
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.genericBox", "main.genericBox[int]", () => [])))
 }
 
 var __goscriptStatic4$value: any

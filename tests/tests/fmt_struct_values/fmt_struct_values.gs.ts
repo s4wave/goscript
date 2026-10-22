@@ -199,7 +199,7 @@ export class App {
 		() => new App(),
 		() => [],
 		App,
-		() => [/* @__PURE__ */ $.structField("Base", "main.Base", [0], 0, true, { anonymous: true }), /* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [1], 32, true)]
+		() => [/* @__PURE__ */ $.structField("Base", /* @__PURE__ */ $.genericStructType("main.Base", "main.Base[*main.Win]", () => [/* @__PURE__ */ $.structField("Windows", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.Win")), [0], 0, true), /* @__PURE__ */ $.structField("Active", /* @__PURE__ */ $.pointerType("main.Win"), [1], 24, true)]), [0], 0, true, { anonymous: true }), /* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [1], 32, true)]
 	)
 }
 

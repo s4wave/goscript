@@ -16461,6 +16461,9 @@ func (o *LoweringOwner) runtimeTypeAssertInfoExprWithSeen(ctx lowerFileContext, 
 	if typ == nil {
 		return "{ kind: " + typeKind + ".Basic, name: \"unknown\" }"
 	}
+	if named := o.genericStructInstanceInScope(ctx, typ); named != nil {
+		return o.runtimeGenericStructTypeAssertExpr(ctx, named, seen)
+	}
 	typeKey := types.Unalias(typ)
 	if typeKey != nil {
 		if seen[typeKey] {
@@ -16516,6 +16519,9 @@ func (o *LoweringOwner) runtimeTypeInfoExprWithSeen(typ types.Type, seen map[typ
 	if typ == nil {
 		return "{ kind: " + typeKind + ".Basic, name: \"unknown\" }"
 	}
+	if named := o.genericStructInstance(typ); named != nil {
+		return o.runtimeGenericStructTypeExpr(named, seen)
+	}
 	typeKey := types.Unalias(typ)
 	if typeKey != nil {
 		if seen[typeKey] {
@@ -16562,6 +16568,121 @@ func (o *LoweringOwner) runtimeTypeInfoExprWithSeen(typ types.Type, seen map[typ
 	default:
 		return "{ kind: " + typeKind + ".Basic, name: \"unknown\" }"
 	}
+}
+
+// genericStructInstance returns typ if it is a named struct type
+// instantiated with type arguments that have no type parameters, whose field
+// types are known statically, or nil otherwise.
+func (o *LoweringOwner) genericStructInstance(typ types.Type) *types.Named {
+	// Only a generated generic struct type with concrete type arguments is one.
+	named := namedStructType(typ)
+	if named == nil || named.TypeArgs().Len() == 0 || o.typeUsesOverride(named.Origin()) {
+		return nil
+	}
+	if _, ok := genericInstanceTypeName(named); !ok {
+		return nil
+	}
+	return named
+}
+
+// runtimeGenericStructTypeExpr renders the type information of named, an
+// instantiated generic struct type, with its instantiated field types, so
+// that reflect sees the types of its type arguments. A use of named inside
+// its own fields refers to it by its instantiated name.
+func (o *LoweringOwner) runtimeGenericStructTypeExpr(named *types.Named, seen map[types.Type]bool) string {
+	// A use of the type inside its own fields is its registered name.
+	instanceName, _ := genericInstanceTypeName(named)
+	name := strconv.Quote(instanceName)
+	if seen[named] {
+		return name
+	}
+	seen[named] = true
+	defer delete(seen, named)
+
+	// The fields are described lazily, as the registered fields of a struct are.
+	fields := o.runtimeStructFieldsExpr(named.Underlying().(*types.Struct), seen)
+	return o.runtimeDescriptorExpr(RuntimeHelperGenericStructType, strconv.Quote(runtimeNamedTypeName(named)), name, "() => "+fields)
+}
+
+// genericStructInstanceInScope returns typ if it is a named struct type
+// instantiated with type arguments whose type parameters, if any, are in
+// scope, so that its field types are known at run time, or nil otherwise.
+func (o *LoweringOwner) genericStructInstanceInScope(ctx lowerFileContext, typ types.Type) *types.Named {
+	// Only a generated generic struct type with type arguments is one.
+	named := namedStructType(typ)
+	if named == nil || named.TypeArgs().Len() == 0 || o.typeUsesOverride(named.Origin()) {
+		return nil
+	}
+	for arg := range named.TypeArgs().Types() {
+		if !typeArgResolvable(ctx, arg) {
+			return nil
+		}
+	}
+	return named
+}
+
+// typeArgResolvable reports whether the runtime type information of typ, a
+// type argument, spells it as instanceTypeString does: its type parameters
+// are in scope, and it is built from them only as pointer, slice, array,
+// map and generic struct types are.
+func typeArgResolvable(ctx lowerFileContext, typ types.Type) bool {
+	// A type without type parameters is spelled statically.
+	if !typeContainsTypeParam(typ) {
+		_, ok := instanceTypeString(typ)
+		return ok
+	}
+
+	// A type parameter resolves from the runtime type arguments.
+	switch typed := types.Unalias(typ).(type) {
+	case *types.TypeParam:
+		return typeParamInScope(ctx, typed)
+	case *types.Pointer:
+		return typeArgResolvable(ctx, typed.Elem())
+	case *types.Slice:
+		return typeArgResolvable(ctx, typed.Elem())
+	case *types.Array:
+		return typeArgResolvable(ctx, typed.Elem())
+	case *types.Map:
+		return typeArgResolvable(ctx, typed.Key()) && typeArgResolvable(ctx, typed.Elem())
+	case *types.Named:
+		for arg := range typed.TypeArgs().Types() {
+			if !typeArgResolvable(ctx, arg) {
+				return false
+			}
+		}
+		return namedStructType(typed) != nil
+	}
+	return false
+}
+
+// runtimeGenericStructTypeAssertExpr renders the type information of named
+// as runtimeGenericStructTypeExpr does, resolving the type parameters in
+// scope from the runtime type arguments, so that its name and field types
+// are those of the instantiation in use.
+func (o *LoweringOwner) runtimeGenericStructTypeAssertExpr(ctx lowerFileContext, named *types.Named, seen map[types.Type]bool) string {
+	// A type without type parameters is described statically.
+	if !typeContainsTypeParam(named) {
+		return o.runtimeGenericStructTypeExpr(named, seen)
+	}
+
+	// The name is spelled at run time from the type arguments.
+	args := make([]string, 0, named.TypeArgs().Len())
+	for arg := range named.TypeArgs().Types() {
+		args = append(args, o.runtimeTypeAssertInfoExprWithSeen(ctx, arg, seen))
+	}
+	baseName := strconv.Quote(runtimeNamedTypeName(named))
+	name := o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericTypeName) + "(" + baseName + ", [" + strings.Join(args, ", ") + "])"
+
+	// A use of the type inside its own fields is its name.
+	if seen[named] {
+		return name
+	}
+	seen[named] = true
+	defer delete(seen, named)
+
+	// The fields are described lazily, as the registered fields of a struct are.
+	fields := o.runtimeStructAssertFieldsExpr(ctx, named.Underlying().(*types.Struct), seen)
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericStructType) + "(" + baseName + ", " + name + ", () => " + fields + ")"
 }
 
 // runtimeDescriptorExpr keeps pure descriptor construction removable by bundlers.
@@ -19155,6 +19276,64 @@ func goRuntimeTypeString(typ types.Type) string {
 	default:
 		return types.TypeString(typ, runtimePackageName)
 	}
+}
+
+// genericInstanceTypeName returns the runtime name of named, an
+// instantiated generic type, followed by its type arguments, as reflect
+// spells it, such as "main.Pair[int,[]main.Item]". It reports false if a
+// type argument has no spelling that the runtime gives it too (see
+// typeInfoGoString), so that the name could stand for other instantiations.
+func genericInstanceTypeName(named *types.Named) (string, bool) {
+	// The type arguments follow the name in brackets.
+	args := make([]string, 0, named.TypeArgs().Len())
+	for arg := range named.TypeArgs().Types() {
+		text, ok := instanceTypeString(arg)
+		if !ok {
+			return "", false
+		}
+		args = append(args, text)
+	}
+	return runtimeNamedTypeName(named) + "[" + strings.Join(args, ",") + "]", true
+}
+
+// instanceTypeString returns the runtime spelling of typ, a type argument,
+// naming the instantiated generic struct types in it with their type
+// arguments, or false if the runtime cannot spell it: an interface,
+// unnamed struct, function or channel type, or another generic type.
+func instanceTypeString(typ types.Type) (string, bool) {
+	// Composite types spell their element types.
+	switch typed := types.Unalias(typ).(type) {
+	case *types.Basic:
+		return basicRuntimeName(typed), typed.Info()&types.IsUntyped == 0
+	case *types.Named:
+		if typed.TypeArgs().Len() == 0 {
+			return runtimeNamedTypeName(typed), true
+		}
+		if namedStructType(typed) == nil {
+			return "", false
+		}
+		return genericInstanceTypeName(typed)
+	case *types.Pointer:
+		return prefixInstanceTypeString("*", typed.Elem())
+	case *types.Slice:
+		return prefixInstanceTypeString("[]", typed.Elem())
+	case *types.Array:
+		return prefixInstanceTypeString("["+strconv.FormatInt(typed.Len(), 10)+"]", typed.Elem())
+	case *types.Map:
+		key, ok := instanceTypeString(typed.Key())
+		if !ok {
+			return "", false
+		}
+		return prefixInstanceTypeString("map["+key+"]", typed.Elem())
+	}
+	return "", false
+}
+
+// prefixInstanceTypeString returns the runtime spelling of elem after
+// prefix, or false if elem has none (see instanceTypeString).
+func prefixInstanceTypeString(prefix string, elem types.Type) (string, bool) {
+	text, ok := instanceTypeString(elem)
+	return prefix + text, ok
 }
 
 func basicRuntimeName(basic *types.Basic) string {

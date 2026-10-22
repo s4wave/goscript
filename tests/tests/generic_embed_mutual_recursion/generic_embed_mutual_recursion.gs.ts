@@ -139,7 +139,7 @@ export class MyApp {
 		() => new MyApp(),
 		() => [{ name: "FirstName", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "Window", args: [], returns: [{ type: "main.Window" }], pointerReceiver: true }],
 		MyApp,
-		() => [{ name: "AppBase", key: "AppBase", type: "main.AppBase", anonymous: true }]
+		() => [{ name: "AppBase", key: "AppBase", type: /* @__PURE__ */ $.genericStructType("main.AppBase", "main.AppBase[*main.MyWindow]", () => [/* @__PURE__ */ $.structField("Windows", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.MyWindow")), [0], 0, true)]), anonymous: true }]
 	)
 }
 
@@ -173,7 +173,7 @@ export class MyWindow {
 		() => new MyWindow(),
 		() => [{ name: "AppWindowName", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		MyWindow,
-		() => [{ name: "WindowBase", key: "WindowBase", type: "main.WindowBase", anonymous: true }]
+		() => [{ name: "WindowBase", key: "WindowBase", type: /* @__PURE__ */ $.genericStructType("main.WindowBase", "main.WindowBase[*main.MyApp]", () => [/* @__PURE__ */ $.structField("App", /* @__PURE__ */ $.pointerType("main.MyApp"), [0], 0, true), /* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [1], 8, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/generic_embed_mutual_recursion" })]), anonymous: true }]
 	)
 }
 

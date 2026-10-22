@@ -93,7 +93,7 @@ export class Values {
 		() => new Values(),
 		() => [],
 		Values,
-		() => [{ name: "Sides", key: "Sides", type: "main.Sides", anonymous: true }]
+		() => [{ name: "Sides", key: "Sides", type: /* @__PURE__ */ $.genericStructType("main.Sides", "main.Sides[main.Value]", () => [/* @__PURE__ */ $.structField("Top", "main.Value", [0], 0, true), /* @__PURE__ */ $.structField("Right", "main.Value", [1], 16, true), /* @__PURE__ */ $.structField("Bottom", "main.Value", [2], 32, true), /* @__PURE__ */ $.structField("Left", "main.Value", [3], 48, true)]), anonymous: true }]
 	)
 }
 

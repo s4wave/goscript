@@ -115,7 +115,7 @@ export class outer {
 		() => new outer(),
 		() => [],
 		outer,
-		() => [{ name: "P", key: "P", type: "main.pair" }]
+		() => [{ name: "P", key: "P", type: /* @__PURE__ */ $.genericStructType("main.pair", "main.pair[[2]int]", () => [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), [1], 16, true)]) }]
 	)
 }
 

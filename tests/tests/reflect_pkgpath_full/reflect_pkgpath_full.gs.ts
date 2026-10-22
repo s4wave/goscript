@@ -38,7 +38,7 @@ export async function main(): globalThis.Promise<void> {
 	await show("interface", reflect.TypeFor(__goscriptStatic0()))
 	await show("local", dep.LocalType())
 	await show("main", reflect.TypeOf($.structInterfaceValue(new mainType(true), "main.mainType", "main.mainType")))
-	await $.println("generic:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.structInterfaceValue(new dep.Box(true, 0), "dep.Box", "dep.Box"))).PkgPath(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("generic:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.structInterfaceValue(new dep.Box(true, 0), "dep.Box", /* @__PURE__ */ $.genericStructType("dep.Box", "dep.Box[int]", () => [/* @__PURE__ */ $.structField("Value", /* @__PURE__ */ $.basicType("int"), [0], 0, true)])))).PkgPath(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println("unnamed:", $.stringEqual((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue($.arrayToSlice<dep.Node>([]), "[]dep.Node", /* @__PURE__ */ $.sliceType("dep.Node")))).PkgPath(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), ""))
 }
 

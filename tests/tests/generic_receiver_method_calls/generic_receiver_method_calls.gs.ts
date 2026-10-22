@@ -116,7 +116,7 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType("main.box"))
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.box", "main.box[int]", () => [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/generic_receiver_method_calls" })])))
 }
 
 var __goscriptStatic4$value: any

@@ -103,7 +103,7 @@ function __goscriptStatic5(): any {
 
 var __goscriptStatic6$value: any
 function __goscriptStatic6(): any {
-	return __goscriptStatic6$value ??= (/* @__PURE__ */ $.pointerType("main.wrapper"))
+	return __goscriptStatic6$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.wrapper", "main.wrapper[int,string]", () => [/* @__PURE__ */ $.structField("Impl", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("dep.Impl", "dep.Impl[int]", () => [/* @__PURE__ */ $.structField("Item", /* @__PURE__ */ $.basicType("int"), [0], 0, true)])), [0], 0, true, { anonymous: true })])))
 }
 
 var __goscriptStatic7$value: any

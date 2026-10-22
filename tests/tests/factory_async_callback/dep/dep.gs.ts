@@ -88,7 +88,7 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType("dep.factory"))
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("dep.factory", "dep.factory[dep.Bus]", () => [])))
 }
 
 var __goscriptStatic4$value: any

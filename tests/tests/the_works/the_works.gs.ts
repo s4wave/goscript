@@ -245,7 +245,7 @@ export class VM {
 		() => new VM(),
 		() => [{ name: "Step", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }],
 		VM,
-		() => [{ name: "pc", key: "pc", type: /* @__PURE__ */ $.basicType("int") }, { name: "steps", key: "steps", type: /* @__PURE__ */ $.basicType("int") }, { name: "stack", key: "stack", type: "main.Stack" }]
+		() => [{ name: "pc", key: "pc", type: /* @__PURE__ */ $.basicType("int") }, { name: "steps", key: "steps", type: /* @__PURE__ */ $.basicType("int") }, { name: "stack", key: "stack", type: /* @__PURE__ */ $.genericStructType("main.Stack", "main.Stack[int64]", () => [/* @__PURE__ */ $.structField("items", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int64")), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/the_works" })]) }]
 	)
 }
 

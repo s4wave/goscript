@@ -128,7 +128,7 @@ export class Outer {
 		() => new Outer(),
 		() => [{ name: "Get", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }], pointerReceiver: true }, { name: "Name", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "Label", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		Outer,
-		() => [{ name: "Meta", key: "Meta", type: "main.Meta", anonymous: true }, { name: "Inner", key: "Inner", type: /* @__PURE__ */ $.pointerType("main.Inner"), anonymous: true }, { name: "v", key: "v", type: { kind: $.TypeKind.Interface, methods: [] } }]
+		() => [{ name: "Meta", key: "Meta", type: "main.Meta", anonymous: true }, { name: "Inner", key: "Inner", type: /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Inner", "main.Inner[int]", () => [/* @__PURE__ */ $.structField("v", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/generic_promoted_plain_method" })])), anonymous: true }, { name: "v", key: "v", type: { kind: $.TypeKind.Interface, methods: [] } }]
 	)
 }
 
@@ -181,7 +181,7 @@ function __goscriptStatic4(): any {
 
 var __goscriptStatic5$value: any
 function __goscriptStatic5(): any {
-	return __goscriptStatic5$value ??= (/* @__PURE__ */ $.pointerType("main.Outer"))
+	return __goscriptStatic5$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Outer", "main.Outer[float64]", () => [/* @__PURE__ */ $.structField("Meta", "main.Meta", [0], 0, true, { anonymous: true }), /* @__PURE__ */ $.structField("Inner", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Inner", "main.Inner[int]", () => [/* @__PURE__ */ $.structField("v", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/generic_promoted_plain_method" })])), [1], 16, true, { anonymous: true }), /* @__PURE__ */ $.structField("v", /* @__PURE__ */ $.basicType("float64"), [2], 24, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/generic_promoted_plain_method" })])))
 }
 
 var __goscriptStatic6$value: any
@@ -191,7 +191,7 @@ function __goscriptStatic6(): any {
 
 var __goscriptStatic7$value: any
 function __goscriptStatic7(): any {
-	return __goscriptStatic7$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, P: { type: /* @__PURE__ */ $.pointerType("main.Outer"), zero: () => null, methods: {Get: (receiver: any) => $.pointerValue(receiver).Get(__goscriptStatic2()), Label: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Label(...$.stripGenericTypeArgs(args)), Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic7$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, P: { type: /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Outer", "main.Outer[float64]", () => [/* @__PURE__ */ $.structField("Meta", "main.Meta", [0], 0, true, { anonymous: true }), /* @__PURE__ */ $.structField("Inner", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Inner", "main.Inner[int]", () => [/* @__PURE__ */ $.structField("v", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/generic_promoted_plain_method" })])), [1], 16, true, { anonymous: true }), /* @__PURE__ */ $.structField("v", /* @__PURE__ */ $.basicType("float64"), [2], 24, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/generic_promoted_plain_method" })])), zero: () => null, methods: {Get: (receiver: any) => $.pointerValue(receiver).Get(__goscriptStatic2()), Label: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Label(...$.stripGenericTypeArgs(args)), Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args))} }})
 }
 
 var __goscriptAwait: any

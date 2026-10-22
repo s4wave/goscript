@@ -168,7 +168,7 @@ export class Pair {
 
 	public Swap(__typeArgs: $.GenericTypeArgs | undefined): Pair {
 		const p = this;
-		return $.genericInstance(new Pair(true, $.copyElement(p.Second), $.copyElement(p.First)), () => [{Swap: (receiver: any) => $.pointerValue(receiver).Swap({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})}, [$.methodSignature("Swap", [], ["main.Pair"], false, false)]])
+		return $.genericInstance(new Pair(true, $.copyElement(p.Second), $.copyElement(p.First)), () => [{Swap: (receiver: any) => $.pointerValue(receiver).Swap({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})}, [$.methodSignature("Swap", [], [$.genericStructType("main.Pair", $.genericTypeName("main.Pair", [__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }]), () => [/* @__PURE__ */ $.structField("First", __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }, [0], 0, true), /* @__PURE__ */ $.structField("Second", __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }, [1], 0, true)])], false, false)]])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -301,7 +301,7 @@ function __goscriptStatic5(): any {
 
 var __goscriptStatic6$value: any
 function __goscriptStatic6(): any {
-	return __goscriptStatic6$value ??= ([{Swap: (receiver: any) => $.pointerValue(receiver).Swap(__goscriptStatic2())}, [$.methodSignature("Swap", [], ["main.Pair"], false, false)]])
+	return __goscriptStatic6$value ??= ([{Swap: (receiver: any) => $.pointerValue(receiver).Swap(__goscriptStatic2())}, [$.methodSignature("Swap", [], [/* @__PURE__ */ $.genericStructType("main.Pair", "main.Pair[string]", () => [/* @__PURE__ */ $.structField("First", /* @__PURE__ */ $.basicType("string"), [0], 0, true), /* @__PURE__ */ $.structField("Second", /* @__PURE__ */ $.basicType("string"), [1], 16, true)])], false, false)]])
 }
 
 var __goscriptAwait: any

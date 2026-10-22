@@ -3289,6 +3289,104 @@ export function copyGenericInstance<T>(source: object, target: T): T {
   return target
 }
 
+// genericStructType returns the type information of name, an instantiation
+// of the generic struct type registered as baseName, with the given fields,
+// whose types are those of its type arguments. The first use registers it
+// under name with the constructor and methods of the generic type, so that
+// reflect finds it by name as it finds other struct types.
+export function genericStructType(
+  baseName: string,
+  name: string,
+  fields: () => StructFieldInfo[],
+): StructTypeInfo | string {
+  // An instantiation that cannot be named is described by its generic type.
+  if (name === baseName) {
+    return baseName
+  }
+
+  // An instantiation is registered once.
+  const registered = typeRegistry.get(name)
+  if (registered !== undefined && isStructTypeInfo(registered)) {
+    return registered
+  }
+
+  // It shares the constructor and methods of its generic type, if registered.
+  const base = typeRegistry.get(baseName)
+  if (base === undefined || !isStructTypeInfo(base) || !base.ctor) {
+    return baseName
+  }
+  return registerStructType(
+    name,
+    base.zeroValue,
+    () => base.methods,
+    base.ctor,
+    fields,
+  )
+}
+
+// genericTypeName returns the name of the instantiation of the generic type
+// baseName with type arguments of the given types, such as main.Pair[int,
+// []main.Item], or baseName if one of them cannot be spelled.
+export function genericTypeName(
+  baseName: string,
+  typeArgs: (TypeInfo | string)[],
+): string {
+  // The type arguments follow the name in brackets.
+  const args: string[] = []
+  for (const arg of typeArgs) {
+    const text = typeArgGoString(arg)
+    if (text === undefined) {
+      return baseName
+    }
+    args.push(text)
+  }
+  return baseName + '[' + args.join(',') + ']'
+}
+
+// typeArgGoString returns the Go type string of info, a type argument, as
+// the compiler spells the type arguments of an instantiation it names, or
+// undefined for a type it leaves unnamed: an unnamed interface, struct or
+// function type, or a channel type.
+function typeArgGoString(
+  info: string | TypeInfo | undefined,
+): string | undefined {
+  // A registered type is spelled by its name, as is a named type.
+  if (info === undefined || typeof info === 'string') {
+    return info
+  }
+  const name = info.typeName || info.name
+  if (name) {
+    return name
+  }
+
+  // Composite types spell their element types.
+  switch (info.kind) {
+    case TypeKind.Pointer:
+      return prefixTypeArgString('*', info.elemType)
+    case TypeKind.Slice:
+      return prefixTypeArgString('[]', info.elemType)
+    case TypeKind.Array:
+      return prefixTypeArgString(`[${info.length}]`, info.elemType)
+    case TypeKind.Map: {
+      const key = typeArgGoString(info.keyType)
+      return key === undefined ? undefined : (
+          prefixTypeArgString(`map[${key}]`, info.elemType)
+        )
+    }
+  }
+  return undefined
+}
+
+// prefixTypeArgString returns the Go type string of elem after prefix, or
+// undefined if elem cannot be spelled (see typeArgGoString).
+function prefixTypeArgString(
+  prefix: string,
+  elem: string | TypeInfo | undefined,
+): string | undefined {
+  const text = typeArgGoString(elem)
+  return text === undefined ? undefined : prefix + text
+}
+
 // GenericInstanceMethodSets are the method sets of an instantiated generic
 // struct type, for boxing a pointer to it or a value of it.
 export interface GenericInstanceMethodSets {

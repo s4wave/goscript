@@ -114,7 +114,7 @@ export class values {
 		() => new values(),
 		() => [{ name: "setAll", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		values,
-		() => [{ name: "sides", key: "sides", type: "main.sides", anonymous: true }, { name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }]
+		() => [{ name: "sides", key: "sides", type: /* @__PURE__ */ $.genericStructType("main.sides", "main.sides[main.unit]", () => [/* @__PURE__ */ $.structField("Top", "main.unit", [0], 0, true), /* @__PURE__ */ $.structField("Right", "main.unit", [1], 24, true), /* @__PURE__ */ $.structField("Bottom", "main.unit", [2], 48, true), /* @__PURE__ */ $.structField("Left", "main.unit", [3], 72, true)]), anonymous: true }, { name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 

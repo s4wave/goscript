@@ -1,0 +1,23 @@
+Opt.Value: []main.Item slice
+Opt.Valid: bool bool
+List.Values: []*main.Item slice
+List.Keys: []string slice
+List.index: map[string]int map
+Pair.First: int int
+Pair.Second: *main.Item ptr
+Pair.Both: map[string]int map
+OptP.Value: float64 float64
+OptP.Valid: bool bool
+opt: 1 x
+list: 3
+value: int 4
+name: main.Option[[]main.Item] Option[[]main.Item] main
+identical: true true false
+new: 1.5
+assert: true 1.5
+set: true 0
+switch: 0
+generic: main.Option[float64] float64
+generic set: 2.5
+boxed: main.Option[float64]
+boxed set: 3.5

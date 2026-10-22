@@ -66,16 +66,16 @@ export class Sides {
 		{
 			const __goscriptTypeSwitchValue = a
 			switch (true) {
-				case $.typeAssert<Sides>(__goscriptTypeSwitchValue, "main.Sides").ok:
+				case $.typeAssert<Sides>(__goscriptTypeSwitchValue, $.genericStructType("main.Sides", $.genericTypeName("main.Sides", [__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }]), () => [/* @__PURE__ */ $.structField("Top", __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }, [0], 0, true), /* @__PURE__ */ $.structField("Right", __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }, [1], 0, true)])).ok:
 					{
-						let val: Sides = $.markAsStructValue($.cloneStructValue($.typeAssert<Sides>(__goscriptTypeSwitchValue, "main.Sides").value))
+						let val: Sides = $.markAsStructValue($.cloneStructValue($.typeAssert<Sides>(__goscriptTypeSwitchValue, $.genericStructType("main.Sides", $.genericTypeName("main.Sides", [__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }]), () => [/* @__PURE__ */ $.structField("Top", __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }, [0], 0, true), /* @__PURE__ */ $.structField("Right", __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }, [1], 0, true)])).value))
 						$.assignStruct((s$ as Sides), val)
 						return "Sides[T]"
 					}
 					break
-				case $.typeAssert<Sides | $.VarRef<Sides> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.Sides")).ok:
+				case $.typeAssert<Sides | $.VarRef<Sides> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType($.genericStructType("main.Sides", $.genericTypeName("main.Sides", [__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }]), () => [/* @__PURE__ */ $.structField("Top", __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }, [0], 0, true), /* @__PURE__ */ $.structField("Right", __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }, [1], 0, true)]))).ok:
 					{
-						let val: Sides | $.VarRef<Sides> | null = $.typeAssert<Sides | $.VarRef<Sides> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.Sides")).value
+						let val: Sides | $.VarRef<Sides> | null = $.typeAssert<Sides | $.VarRef<Sides> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType($.genericStructType("main.Sides", $.genericTypeName("main.Sides", [__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }]), () => [/* @__PURE__ */ $.structField("Top", __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }, [0], 0, true), /* @__PURE__ */ $.structField("Right", __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }, [1], 0, true)]))).value
 						$.assignStruct((s$ as Sides), ($.pointerValue<Sides>(val)).clone())
 						return "*Sides[T]"
 					}
@@ -142,7 +142,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(s.value.SetAny(__goscriptStatic0(), $.structInterfaceValue(new Value(true, 1, "px"), "main.Value", "main.Value")), $.markAsStructValue($.cloneStructValue(s.value.Top)).String())
 	await $.println(s.value.SetAny(__goscriptStatic0(), $.interfaceValue(new Value(false, 2, "em"), "*main.Value", /* @__PURE__ */ $.pointerType("main.Value"))), $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
 	await $.println(s.value.SetAny(__goscriptStatic0(), $.interfaceValue($.arrayToSlice<Value>([new Value(true, 3, "a"), new Value(true, 4, "b")]), "[]main.Value", /* @__PURE__ */ $.sliceType("main.Value"))), $.markAsStructValue($.cloneStructValue(s.value.Top)).String(), $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
-	await $.println(s.value.SetAny(__goscriptStatic0(), $.structInterfaceValue($.genericInstance(new Sides(true, new Value(true, 5, "c"), new Value(true)), __goscriptStatic1), "main.Sides", "main.Sides")), $.markAsStructValue($.cloneStructValue(s.value.Top)).String())
+	await $.println(s.value.SetAny(__goscriptStatic0(), $.structInterfaceValue($.genericInstance(new Sides(true, new Value(true, 5, "c"), new Value(true)), __goscriptStatic1), "main.Sides", /* @__PURE__ */ $.genericStructType("main.Sides", "main.Sides[main.Value]", () => [/* @__PURE__ */ $.structField("Top", "main.Value", [0], 0, true), /* @__PURE__ */ $.structField("Right", "main.Value", [1], 24, true)]))), $.markAsStructValue($.cloneStructValue(s.value.Top)).String())
 	await $.println(s.value.SetAny(__goscriptStatic0(), $.namedValueInterfaceValue<any>($.genericInstance(new Sides(false, new Value(true), new Value(true, 6, "d")), __goscriptStatic1), "*main.Sides", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())), $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
 	await $.println(s.value.SetAny(__goscriptStatic0(), $.basicInterfaceValue(7, "int")))
 
@@ -174,7 +174,7 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType("main.Sides"))
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Sides", "main.Sides[main.Value]", () => [/* @__PURE__ */ $.structField("Top", "main.Value", [0], 0, true), /* @__PURE__ */ $.structField("Right", "main.Value", [1], 24, true)])))
 }
 
 var __goscriptStatic4$value: any
