@@ -12,3 +12,8 @@ tuple: 20
 receive: 21
 map: 24 23
 basic: 2.5 b
+fresh literal: 4 5 6
+fresh call: 7 8 9
+sliced: 25 26
+captured: 28
+kept receiver: 30 31

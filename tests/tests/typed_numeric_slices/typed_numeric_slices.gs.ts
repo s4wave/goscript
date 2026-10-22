@@ -214,7 +214,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("copy to plain:", n, $.arrayIndex(plain!, 0), $.sliceLen(plain), $.arrayIndex(plain!, 1) == 2.0999999046325684)
 
 	// Arrays stay arrays, and a slice of an array shares its elements.
-	let arr = $.arrayValue([1, 2, 3, 4], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4))
+	let arr = $.arrayValue([1, 2, 3, 4], __goscriptStatic2())
 	let _as: $.Slice<number> = $.goSlice(arr, 1, 3)
 	$.sliceElems(_as!)[$.sliceSlot(_as!, 0)] = 20
 	await $.println("array slice:", arr[1], $.sliceLen(_as), $.cap(_as))
@@ -257,6 +257,11 @@ function __goscriptStatic0(): any {
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
 	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("float32"), zero: () => 0 }})
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4))
 }
 
 if ($.isMainScript(import.meta)) {

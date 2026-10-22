@@ -183,11 +183,11 @@ export class withArray {
 	}
 
 	public clone(): withArray {
-		return new withArray(true, $.cloneArrayValue(this.Vals, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)))
+		return new withArray(true, $.cloneArrayValue(this.Vals, __goscriptStatic0()))
 	}
 
 	public __goscriptAssign(source: withArray): this {
-		this.Vals = $.assignFieldValue(this.Vals, source.Vals, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
+		this.Vals = $.assignFieldValue(this.Vals, source.Vals, __goscriptStatic0())
 		return this
 	}
 
@@ -246,6 +246,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("array:", $.structEqual(w1, w2))
 	w2.Vals[1] = 3
 	await $.println("array differs:", $.structEqual(w1, w2))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
 }
 
 if ($.isMainScript(import.meta)) {

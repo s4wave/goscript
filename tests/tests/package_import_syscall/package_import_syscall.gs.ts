@@ -75,11 +75,11 @@ export async function main(): globalThis.Promise<void> {
 
 	let sa4 = $.markAsStructValue(new syscall.SockaddrInet4())
 	let addr4 = netip.AddrFrom4($.cloneArrayValue(sa4.Addr, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)))
-	$.assignFieldValue(sa4.Addr, addr4.As4(), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
+	$.assignFieldValue(sa4.Addr, addr4.As4(), __goscriptStatic3())
 
 	let sa6 = $.markAsStructValue(new syscall.SockaddrInet6())
 	let addr6 = netip.AddrFrom16($.cloneArrayValue(sa6.Addr, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 16)))
-	$.assignFieldValue(sa6.Addr, addr6.As16(), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 16))
+	$.assignFieldValue(sa6.Addr, addr6.As16(), __goscriptStatic4())
 
 	fmt.Println("set nonblock ok")
 }
@@ -97,6 +97,16 @@ function __goscriptStatic1(): any {
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
 	return __goscriptStatic2$value ??= ([$.methodSignature("Signal"), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 16))
 }
 
 var __goscriptAwait: any

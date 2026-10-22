@@ -41,12 +41,12 @@ export class arrays {
 	}
 
 	public clone(): arrays {
-		return new arrays(true, $.cloneArrayValue(this.slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1)), $.cloneArrayValue(this.items, /* @__PURE__ */ $.arrayType("main.item", 1)))
+		return new arrays(true, $.cloneArrayValue(this.slices, __goscriptStatic0()), $.cloneArrayValue(this.items, __goscriptStatic1()))
 	}
 
 	public __goscriptAssign(source: arrays): this {
-		this.slices = $.assignFieldValue(this.slices, source.slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1))
-		this.items = $.assignFieldValue(this.items, source.items, /* @__PURE__ */ $.arrayType("main.item", 1))
+		this.slices = $.assignFieldValue(this.slices, source.slices, __goscriptStatic0())
+		this.items = $.assignFieldValue(this.items, source.items, __goscriptStatic1())
 		return this
 	}
 
@@ -90,7 +90,7 @@ export async function main(): globalThis.Promise<void> {
 	$.sliceElems(slicesCopy[0]!)[$.sliceSlot(slicesCopy[0]!, 0)] = 7
 	await $.println("slice sharing:", $.arrayIndex(slices[0]!, 0))
 
-	let structs = $.arrayValue([new item(true, 1)], /* @__PURE__ */ $.arrayType("main.item", 1))
+	let structs = $.arrayValue([new item(true, 1)], __goscriptStatic1())
 	let structsCopy = $.cloneArrayValue(structs, /* @__PURE__ */ $.arrayType("main.item", 1))
 	structsCopy[0].value = 7
 	await $.println("struct copy:", structs[0].value, structsCopy[0].value)
@@ -107,8 +107,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("array fields:", $.arrayIndex(original.slices[0]!, 0), original.items[0].value, copied.items[0].value)
 
 	// Assigning an array element copies its value instead of aliasing the row.
-	let rows = $.arrayValue([$.arrayValue([1, 2]), $.arrayValue([3, 4])], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int32"), 2), 2))
-	$.assignFieldValue(rows[1], rows[0], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int32"), 2))
+	let rows = $.arrayValue([$.arrayValue([1, 2]), $.arrayValue([3, 4])], __goscriptStatic2())
+	$.assignFieldValue(rows[1], rows[0], __goscriptStatic3())
 	rows[1][0] = 9
 	await $.println("row copy:", (rows[0])[0], (rows[0])[1], (rows[1])[0], (rows[1])[1])
 
@@ -139,6 +139,26 @@ export async function main(): globalThis.Promise<void> {
 	fillArray(literal)
 	await $.println("literal filled:", $.arrayIndex($.pointerValue<Uint8Array>(literal), 0), $.arrayIndex($.pointerValue<Uint8Array>(literal), 1), $.arrayIndex($.pointerValue<Uint8Array>(literal), 2), $.arrayIndex($.pointerValue<Uint8Array>(literal), 3))
 	await $.println("closure ptr:", closureArrayAddress())
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1))
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.arrayType("main.item", 1))
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int32"), 2), 2))
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int32"), 2))
 }
 
 if ($.isMainScript(import.meta)) {

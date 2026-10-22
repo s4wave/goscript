@@ -45,12 +45,12 @@ export class holder {
 	}
 
 	public clone(): holder {
-		return new holder(true, $.cloneArrayValue(this.points, /* @__PURE__ */ $.arrayType("main.point", 2)), $.cloneArrayValue(this.names, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("string"), 3)))
+		return new holder(true, $.cloneArrayValue(this.points, __goscriptStatic2()), $.cloneArrayValue(this.names, __goscriptStatic3()))
 	}
 
 	public __goscriptAssign(source: holder): this {
-		this.points = $.assignFieldValue(this.points, source.points, /* @__PURE__ */ $.arrayType("main.point", 2))
-		this.names = $.assignFieldValue(this.names, source.names, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("string"), 3))
+		this.points = $.assignFieldValue(this.points, source.points, __goscriptStatic2())
+		this.names = $.assignFieldValue(this.names, source.names, __goscriptStatic3())
 		return this
 	}
 
@@ -66,13 +66,13 @@ export class holder {
 export let table: Uint8Array = $.arrayValue(new Uint8Array([10, 11, 12, 13, 14, 15, 16, 17]))
 
 export function __goscript_set_table(__goscriptValue: Uint8Array): void {
-	table = $.assignFieldValue(table, __goscriptValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 8))
+	table = $.assignFieldValue(table, __goscriptValue, __goscriptStatic0())
 }
 
-export let grid: number[][] = $.arrayValue([$.arrayValue([1, 2, 3]), $.arrayValue([4, 5, 6])], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), 2))
+export let grid: number[][] = $.arrayValue([$.arrayValue([1, 2, 3]), $.arrayValue([4, 5, 6])], __goscriptStatic1())
 
 export function __goscript_set_grid(__goscriptValue: number[][]): void {
-	grid = $.assignFieldValue(grid, __goscriptValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), 2))
+	grid = $.assignFieldValue(grid, __goscriptValue, __goscriptStatic1())
 }
 
 export function lookup(i: number): number {
@@ -114,11 +114,11 @@ export async function main(): globalThis.Promise<void> {
 		sum += lookup(i)
 	}
 	await $.println("sum", sum)
-	let local = $.arrayValue([0.5, 1.5, 2.5, 3.5], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float64"), 4))
+	let local = $.arrayValue([0.5, 1.5, 2.5, 3.5], __goscriptStatic4())
 	let j = 2
 	await $.println("local", local[$.checkArrayIndex(j, 4)], local[$.checkArrayIndex(j + 1, 4)])
 	await $.println("grid", (grid[1])[$.checkArrayIndex(j, 3)], (grid[$.checkArrayIndex(j - 1, 2)])[0])
-	let h = new holder(true, $.arrayValue([new point(true, 1, 2), new point(true, 3, 4)], /* @__PURE__ */ $.arrayType("main.point", 2)), $.arrayValue(["a", "b", "c"]))
+	let h = new holder(true, $.arrayValue([new point(true, 1, 2), new point(true, 3, 4)], __goscriptStatic2()), $.arrayValue(["a", "b", "c"]))
 	let k = 1
 	let p = (h.points[$.checkArrayIndex(k, 2)]).clone()
 	p.x = 100
@@ -138,6 +138,31 @@ export async function main(): globalThis.Promise<void> {
 		await $.println(local[$.checkArrayIndex(j - 3, 4)])
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await $.println("done")
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 8))
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), 2))
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= (/* @__PURE__ */ $.arrayType("main.point", 2))
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("string"), 3))
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float64"), 4))
 }
 
 var __goscriptAwait: any

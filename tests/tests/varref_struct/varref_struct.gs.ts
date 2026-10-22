@@ -49,12 +49,12 @@ export class Outer {
 	}
 
 	public clone(): Outer {
-		return new Outer(true, this.Child.clone(), $.cloneArrayValue(this.Items, /* @__PURE__ */ $.arrayType("main.MyStruct", 2)), this.Ptr)
+		return new Outer(true, this.Child.clone(), $.cloneArrayValue(this.Items, __goscriptStatic0()), this.Ptr)
 	}
 
 	public __goscriptAssign(source: Outer): this {
 		this.Child.__goscriptAssign(source.Child)
-		this.Items = $.assignFieldValue(this.Items, source.Items, /* @__PURE__ */ $.arrayType("main.MyStruct", 2))
+		this.Items = $.assignFieldValue(this.Items, source.Items, __goscriptStatic0())
 		this.Ptr = source.Ptr
 		return this
 	}
@@ -111,7 +111,7 @@ export async function main(): globalThis.Promise<void> {
 	let child = $.fieldRef(outer.Child, "MyInt")
 	let item = $.fieldRef(outer.Items[0], "MyInt")
 	let ptrField = $.fieldRef(outer, "Ptr")
-	outer = outer.__goscriptAssign(new Outer(true, new MyStruct(true, 50), $.arrayValue([new MyStruct(true, 60), new MyStruct(true)], /* @__PURE__ */ $.arrayType("main.MyStruct", 2)), second))
+	outer = outer.__goscriptAssign(new Outer(true, new MyStruct(true, 50), $.arrayValue([new MyStruct(true, 60), new MyStruct(true)], __goscriptStatic0()), second))
 	await $.println("nested:", $.pointerValue<number>(child), $.pointerValue<number>(item), ($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(ptrField) === second || ($.pointerAliasesMade || ($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(ptrField) as any)?.__goElementBacking !== undefined) && $.pointerEqual($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(ptrField), second)), $.pointerValue<MyStruct>(first).MyInt)
 	await $.println("nested identity:", $.pointerEqual(child, $.fieldRef(outer.Child, "MyInt")), $.pointerEqual(item, $.fieldRef(outer.Items[0], "MyInt")), $.pointerEqual(ptrField, $.fieldRef(outer, "Ptr")))
 
@@ -134,6 +134,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("reflect:", $.pointerValue<number>(field), $.pointerEqual(field, $.fieldRef(val.value, "MyInt")))
 	let reflected = $.mustTypeAssert<$.VarRef<number> | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(val, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))))).Elem())).FieldByName("MyInt"))).Addr())).Interface(), /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))
 	await $.println("reflect address:", (reflected === field || ($.pointerAliasesMade || (reflected as any)?.__goElementBacking !== undefined) && $.pointerEqual(reflected, field)))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType("main.MyStruct", 2))
 }
 
 if ($.isMainScript(import.meta)) {

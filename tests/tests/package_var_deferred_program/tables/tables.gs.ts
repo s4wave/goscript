@@ -17,12 +17,12 @@ export class Codec {
 	}
 
 	public clone(): Codec {
-		return new Codec(true, this.Name, $.cloneArrayValue(this.Decode, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 256)))
+		return new Codec(true, this.Name, $.cloneArrayValue(this.Decode, __goscriptStatic0()))
 	}
 
 	public __goscriptAssign(source: Codec): this {
 		this.Name = source.Name
-		this.Decode = $.assignFieldValue(this.Decode, source.Decode, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 256))
+		this.Decode = $.assignFieldValue(this.Decode, source.Decode, __goscriptStatic0())
 		return this
 	}
 
@@ -256,10 +256,10 @@ export function __goscript_set_WithCount(__goscriptValue: $.Slice<any>): void {
 	WithCount = __goscriptValue
 }
 
-export let masks: string[][] = $.arrayValue([$.arrayValue(globalThis.Array.from({ length: 4 }, () => "")), $.arrayValue(["zero", "one", "two", "three"])], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("string"), 4), 2))
+export let masks: string[][] = $.arrayValue([$.arrayValue(globalThis.Array.from({ length: 4 }, () => "")), $.arrayValue(["zero", "one", "two", "three"])], __goscriptStatic1())
 
 export function __goscript_set_masks(__goscriptValue: string[][]): void {
-	masks = $.assignFieldValue(masks, __goscriptValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("string"), 4), 2))
+	masks = $.assignFieldValue(masks, __goscriptValue, __goscriptStatic1())
 }
 
 export function name(s: string, n: number): string {
@@ -288,6 +288,16 @@ function __goscriptInit0(): void {
 
 export function kindName(n: number): string {
 	return $.mapGet<number, string, string>(kinds, n, "")[0]
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 256))
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("string"), 4), 2))
 }
 
 __goscriptInit0()

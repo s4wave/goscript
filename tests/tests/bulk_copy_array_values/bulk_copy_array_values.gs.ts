@@ -63,13 +63,13 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("values:", ($.arrayIndex(src!, 0))[0])
 
-	let points = $.arrayToSlice<point[]>([$.arrayValue([new point(true, 1)], /* @__PURE__ */ $.arrayType("main.point", 1))])
+	let points = $.arrayToSlice<point[]>([$.arrayValue([new point(true, 1)], __goscriptStatic0())])
 	let pointCopies = $.makeSlice<point[]>(1, undefined, undefined, () => $.arrayValue(globalThis.Array.from({ length: 1 }, () => new point(true)), /* @__PURE__ */ $.arrayType("main.point", 1)))
 	$.copy(pointCopies, points);
 	;($.arrayIndex(pointCopies!, 0))[0].x = 9
 	await $.println("struct array:", ($.arrayIndex(points!, 0))[0].x)
 
-	let nested = $.arrayToSlice<number[][]>([$.arrayValue([$.arrayValue([1])], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 1), 1))])
+	let nested = $.arrayToSlice<number[][]>([$.arrayValue([$.arrayValue([1])], __goscriptStatic1())])
 	let nestedCopies = (slices.Clone(nested) as $.Slice<number[][]>);
 	;($.arrayIndex(nestedCopies!, 0))[0][0] = 9
 	await $.println("nested:", (($.arrayIndex(nested!, 0))[0])[0])
@@ -78,6 +78,16 @@ export async function main(): globalThis.Promise<void> {
 	let sharedCopies = (slices.Clone(shared) as $.Slice<$.Slice<number>>)
 	$.sliceElems($.arrayIndex(sharedCopies!, 0)!)[$.sliceSlot($.arrayIndex(sharedCopies!, 0)!, 0)] = 9
 	await $.println("slice elements share:", $.arrayIndex($.arrayIndex(shared!, 0)!, 0))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType("main.point", 1))
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 1), 1))
 }
 
 if ($.isMainScript(import.meta)) {

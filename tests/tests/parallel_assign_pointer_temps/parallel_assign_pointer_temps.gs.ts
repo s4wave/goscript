@@ -64,7 +64,7 @@ export async function main(): globalThis.Promise<void> {
 	right = __goscriptAssign0_1
 	await $.println($.pointerValue<queue>(left).value, $.pointerValue<queue>(right).value)
 
-	let nodes = $.arrayValue([new node(true, 1), new node(true, 0)], /* @__PURE__ */ $.arrayType("main.node", 2))
+	let nodes = $.arrayValue([new node(true, 1), new node(true, 0)], __goscriptStatic0())
 	let pc = 0
 	let inst: node | $.VarRef<node> | null = $.indexRef(nodes, pc)
 	let __goscriptAssign1_0: number = $.pointerValue<node>(inst).next
@@ -72,6 +72,11 @@ export async function main(): globalThis.Promise<void> {
 	pc = __goscriptAssign1_0
 	inst = __goscriptAssign1_1
 	await $.println(pc, $.pointerValue<node>(inst).next)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType("main.node", 2))
 }
 
 if ($.isMainScript(import.meta)) {

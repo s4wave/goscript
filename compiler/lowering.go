@@ -2187,7 +2187,7 @@ func (o *LoweringOwner) lowerGenDecl(ctx lowerFileContext, decl *ast.GenDecl) ([
 						assignment = o.lowerStructAssignment(setterTarget, setterValue)
 					}
 					if isArrayValueType(obj.Type()) {
-						assignment = setterTarget + " = " + o.lowerArrayAssignment(setterTarget, setterValue, obj.Type())
+						assignment = setterTarget + " = " + o.lowerArrayAssignment(ctx, setterTarget, setterValue, obj.Type())
 					}
 					setterCode := "export function " + setterName + "(" + setterValue + ": " + setterType + "): void {\n\t" + assignment + "\n}"
 					setterIndexExport := ""
@@ -3891,12 +3891,20 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 		if fieldName != field.name {
 			runtimeName = field.name
 		}
+
+		// Copies of an array field pass its descriptor, made once.
+		runtimeType := o.runtimeTypeInfoExpr(field.typ)
+		copyType := runtimeType
+		if isArrayType(field.typ) {
+			copyType = o.lowerArrayTypeInfo(ctx, field.typ)
+		}
 		lowered.fields = append(lowered.fields, loweredStructField{
 			name:           fieldName,
 			runtimeName:    runtimeName,
 			typ:            o.tsStructFieldTypeFor(ctx, field.typ),
 			zero:           o.lowerZeroValueExprFor(ctx, field.typ),
-			runtimeType:    o.runtimeTypeInfoExpr(field.typ),
+			runtimeType:    runtimeType,
+			copyType:       copyType,
 			messageType:    protobufTypeScriptBindingMessageType(field.typ),
 			doc:            field.doc,
 			tag:            field.tag,
@@ -6230,6 +6238,12 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 			continue
 		}
 		if !isShortDecl && isArrayValueType(targetType) {
+			// A new array replaces that of a local whose elements nothing
+			// refers to; any other is copied into the existing array.
+			if o.freshArrayReplacesLocal(ctx, lhs, stmt.Rhs[idx]) {
+				stmts = append(stmts, loweredStmt{text: left + " = " + right})
+				continue
+			}
 			stmts = append(stmts, loweredStmt{text: o.lowerArrayAssignmentTo(ctx, lhs, left, uncopied, targetType)})
 			continue
 		}
@@ -7024,7 +7038,7 @@ func (o *LoweringOwner) lowerStarTargetAssignmentStmt(
 	}
 	if targetType := ctx.semPkg.source.TypesInfo.TypeOf(lhs); isArrayValueType(targetType) {
 		pointer, diagnostics := o.lowerPointerValueExpr(ctx, star.X)
-		return loweredStmt{text: o.lowerArrayAssignment(pointer, right, targetType)}, diagnostics, true
+		return loweredStmt{text: o.lowerArrayAssignment(ctx, pointer, right, targetType)}, diagnostics, true
 	}
 	pointer, diagnostics := o.lowerPointerStorageExpr(ctx, star.X)
 	return loweredStmt{text: pointer + " = " + right}, diagnostics, true
@@ -7102,8 +7116,33 @@ func isArrayValueType(typ types.Type) bool {
 // lowerArrayAssignment copies the array value into the existing array
 // target element by element, assigning struct and array elements in place,
 // as Go assigns an array, so that pointers to its elements stay valid.
-func (o *LoweringOwner) lowerArrayAssignment(target, value string, typ types.Type) string {
-	return o.runtimeOwner.QualifiedHelper(RuntimeHelperAssignFieldValue) + "(" + target + ", " + value + ", " + o.runtimeTypeInfoExpr(typ) + ")"
+func (o *LoweringOwner) lowerArrayAssignment(ctx lowerFileContext, target, value string, typ types.Type) string {
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperAssignFieldValue) + "(" + target + ", " + value + ", " + o.lowerArrayTypeInfo(ctx, typ) + ")"
+}
+
+// lowerArrayTypeInfo returns the runtime type info of the array type typ
+// for a copy of an array value, which runs each time the code does. A
+// descriptor that no type parameter or local type changes is created once
+// for the file (see hoistStatic); a type name is looked up as it is.
+func (o *LoweringOwner) lowerArrayTypeInfo(ctx lowerFileContext, typ types.Type) string {
+	info := o.runtimeTypeInfoExpr(typ)
+	if strings.HasPrefix(info, "\"") || !typeIsHoistable(typ) {
+		return info
+	}
+	return o.hoistStatic(ctx, info)
+}
+
+// freshArrayReplacesLocal reports whether the array value assigned to lhs
+// can replace the array of the local variable that lhs names, as before
+// arrays were copied into their storage: value is an array that nothing
+// else refers to, a composite literal, the result of a call compiled from
+// Go or a moved local (see shouldCloneStructValue), and nothing refers to
+// the variable's array or its elements, by their addresses, a slice of it,
+// a pointer method or a function literal (see isUnaliasedLocalValue), so no
+// pointer can see the elements the assignment replaces.
+func (o *LoweringOwner) freshArrayReplacesLocal(ctx lowerFileContext, lhs, value ast.Expr) bool {
+	ident, ok := unwrapParenExpr(lhs).(*ast.Ident)
+	return ok && !o.shouldCloneStructValue(ctx, value) && isUnaliasedLocalValue(ctx, ident)
 }
 
 // lowerArrayAssignmentTo copies value into the existing array that lhs
@@ -7111,7 +7150,7 @@ func (o *LoweringOwner) lowerArrayAssignment(target, value string, typ types.Typ
 // array.
 func (o *LoweringOwner) lowerArrayAssignmentTo(ctx lowerFileContext, lhs ast.Expr, left, value string, typ types.Type) string {
 	// The array is copied into its storage.
-	assignment := o.lowerArrayAssignment(left, value, typ)
+	assignment := o.lowerArrayAssignment(ctx, left, value, typ)
 
 	// A local variable is assigned the result.
 	ident, ok := unwrapParenExpr(lhs).(*ast.Ident)
@@ -15085,7 +15124,7 @@ func (o *LoweringOwner) lowerArrayCompositeLit(
 		}
 		return o.lowerArrayValue("new Uint8Array(["+strings.Join(values, ", ")+"])", array), diagnostics
 	}
-	return o.lowerArrayValue("["+strings.Join(values, ", ")+"]", array), diagnostics
+	return o.lowerArrayLiteralValue(ctx, "["+strings.Join(values, ", ")+"]", array), diagnostics
 }
 
 // lowerArrayValue marks array storage as a Go array value, so bulk slice copies
@@ -15094,13 +15133,30 @@ func (o *LoweringOwner) lowerArrayCompositeLit(
 // fmt formats the elements at their precision.
 func (o *LoweringOwner) lowerArrayValue(storage string, array *types.Array) string {
 	helper := o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayValue)
-	elem := types.Unalias(array.Elem()).Underlying()
-	_, isStruct := elem.(*types.Struct)
-	_, isArray := elem.(*types.Array)
-	if !isStruct && !isArray && !isFloatType(elem) {
+	if !arrayValueCarriesType(array) {
 		return helper + "(" + storage + ")"
 	}
 	return helper + "(" + storage + ", " + o.runtimeTypeInfoExpr(array) + ")"
+}
+
+// lowerArrayLiteralValue marks the storage of an array composite literal as
+// lowerArrayValue does, with a descriptor created once for the file, since
+// the literal makes a new array each time the code runs.
+func (o *LoweringOwner) lowerArrayLiteralValue(ctx lowerFileContext, storage string, array *types.Array) string {
+	helper := o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayValue)
+	if !arrayValueCarriesType(array) {
+		return helper + "(" + storage + ")"
+	}
+	return helper + "(" + storage + ", " + o.lowerArrayTypeInfo(ctx, array) + ")"
+}
+
+// arrayValueCarriesType reports whether an array value carries its
+// descriptor: one of struct, array or float elements (see lowerArrayValue).
+func arrayValueCarriesType(array *types.Array) bool {
+	elem := types.Unalias(array.Elem()).Underlying()
+	_, isStruct := elem.(*types.Struct)
+	_, isArray := elem.(*types.Array)
+	return isStruct || isArray || isFloatType(elem)
 }
 
 func (o *LoweringOwner) lowerSliceCompositeLit(

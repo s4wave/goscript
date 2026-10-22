@@ -27,13 +27,13 @@ export class Grid {
 	}
 
 	public clone(): Grid {
-		return new Grid(true, $.cloneArrayValue(this.N, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), $.cloneArrayValue(this.F, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3)), $.cloneArrayValue(this.B, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("bool"), 2)))
+		return new Grid(true, $.cloneArrayValue(this.N, __goscriptStatic0()), $.cloneArrayValue(this.F, __goscriptStatic1()), $.cloneArrayValue(this.B, __goscriptStatic2()))
 	}
 
 	public __goscriptAssign(source: Grid): this {
-		this.N = $.assignFieldValue(this.N, source.N, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
-		this.F = $.assignFieldValue(this.F, source.F, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))
-		this.B = $.assignFieldValue(this.B, source.B, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("bool"), 2))
+		this.N = $.assignFieldValue(this.N, source.N, __goscriptStatic0())
+		this.F = $.assignFieldValue(this.F, source.F, __goscriptStatic1())
+		this.B = $.assignFieldValue(this.B, source.B, __goscriptStatic2())
 		return this
 	}
 
@@ -51,7 +51,7 @@ export async function main(): globalThis.Promise<void> {
 	let g: $.VarRef<Grid> = $.varRef(new Grid(true))
 	let v = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(g, "*main.Grid", /* @__PURE__ */ $.pointerType("main.Grid"))))).Elem()))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Field(0))).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayValue([3, 4]), "[2]int", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))))))
-	let f = $.arrayValue([1, 2, 3], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))
+	let f = $.arrayValue([1, 2, 3], __goscriptStatic1())
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Field(1))).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.cloneArrayValue(f, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3)), "[3]float32", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))))))
 	let b: any = $.interfaceValue($.arrayValue([true, false]), "[2]bool", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("bool"), 2))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Field(2))).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf(b))))
@@ -77,7 +77,7 @@ export async function main(): globalThis.Promise<void> {
 	// Type assertions and switches see the array type.
 	{
 		const __goscriptTypeSwitchValue = x
-		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0())) {
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic3())) {
 			case 0:
 				{
 					let y: number[] = $.cloneArrayValue($.typeAssert<number[]>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3)).value, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3))
@@ -100,7 +100,22 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)]))
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("bool"), 2))
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)]))
 }
 
 var __goscriptAwait: any

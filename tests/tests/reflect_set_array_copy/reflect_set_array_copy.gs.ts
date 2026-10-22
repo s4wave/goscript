@@ -19,12 +19,12 @@ export class Pose {
 	}
 
 	public clone(): Pose {
-		return new Pose(true, $.cloneArrayValue(this.M, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)), $.cloneArrayValue(this.A, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), $.markAsStructValue($.cloneStructValue(this.Inner)))
+		return new Pose(true, $.cloneArrayValue(this.M, __goscriptStatic0()), $.cloneArrayValue(this.A, __goscriptStatic1()), $.markAsStructValue($.cloneStructValue(this.Inner)))
 	}
 
 	public __goscriptAssign(source: Pose): this {
-		this.M = $.assignFieldValue(this.M, source.M, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4))
-		this.A = $.assignFieldValue(this.A, source.A, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
+		this.M = $.assignFieldValue(this.M, source.M, __goscriptStatic0())
+		this.A = $.assignFieldValue(this.A, source.A, __goscriptStatic1())
 		$.assignStruct(this.Inner, source.Inner)
 		return this
 	}
@@ -39,8 +39,8 @@ export class Pose {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a = $.varRef(new Pose(true, $.arrayValue([1, 2, 3, 4], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)), $.arrayValue([5, 6])))
-	$.assignFieldValue(a.value.Inner.B, $.arrayValue([7, 8]), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
+	let a = $.varRef(new Pose(true, $.arrayValue([1, 2, 3, 4], __goscriptStatic0()), $.arrayValue([5, 6])))
+	$.assignFieldValue(a.value.Inner.B, $.arrayValue([7, 8]), __goscriptStatic1())
 	let b: $.VarRef<Pose> = $.varRef(new Pose(true))
 	let c: $.VarRef<Pose> = $.varRef(new Pose(true))
 	let d: $.VarRef<Pose> = $.varRef(new Pose(true))
@@ -81,6 +81,16 @@ export async function main(): globalThis.Promise<void> {
 	let x = $.cloneArrayValue($.mustTypeAssert<number[]>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(av)).Field(1))).Interface(), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
 	a.value.A[1] = 500
 	await $.println("interface:", x[1])
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4))
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
 }
 
 if ($.isMainScript(import.meta)) {

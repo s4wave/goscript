@@ -15,12 +15,12 @@ export class node {
 	}
 
 	public clone(): node {
-		return new node(true, this.sub, $.cloneArrayValue(this.sub0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.node"), 1)))
+		return new node(true, this.sub, $.cloneArrayValue(this.sub0, __goscriptStatic0()))
 	}
 
 	public __goscriptAssign(source: node): this {
 		this.sub = source.sub
-		this.sub0 = $.assignFieldValue(this.sub0, source.sub0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.node"), 1))
+		this.sub0 = $.assignFieldValue(this.sub0, source.sub0, __goscriptStatic0())
 		return this
 	}
 
@@ -40,6 +40,11 @@ export async function main(): globalThis.Promise<void> {
 	;(root$ as node).sub = $.appendOne($.goSlice((root$ as node).sub0, undefined, 0), child, $.appendZeros.nil)
 
 	await $.println($.sliceLen((root$ as node).sub), ($.arrayIndex((root$ as node).sub!, 0) === child || ($.pointerAliasesMade || ($.arrayIndex((root$ as node).sub!, 0) as any)?.__goElementBacking !== undefined) && $.pointerEqual($.arrayIndex((root$ as node).sub!, 0), child)))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.node"), 1))
 }
 
 if ($.isMainScript(import.meta)) {

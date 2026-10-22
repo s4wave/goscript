@@ -85,7 +85,7 @@ export class Item {
 	}
 
 	public clone(): Item {
-		return new Item(true, this.Node.clone(), this.Child.clone(), $.markAsStructValue($.cloneStructValue(this.Group)), this.List, $.cloneArrayValue(this.Pair, /* @__PURE__ */ $.arrayType("main.Node", 2)))
+		return new Item(true, this.Node.clone(), this.Child.clone(), $.markAsStructValue($.cloneStructValue(this.Group)), this.List, $.cloneArrayValue(this.Pair, __goscriptStatic0()))
 	}
 
 	public __goscriptAssign(source: Item): this {
@@ -93,7 +93,7 @@ export class Item {
 		this.Child.__goscriptAssign(source.Child)
 		$.assignStruct(this.Group, source.Group)
 		this.List = source.List
-		this.Pair = $.assignFieldValue(this.Pair, source.Pair, /* @__PURE__ */ $.arrayType("main.Node", 2))
+		this.Pair = $.assignFieldValue(this.Pair, source.Pair, __goscriptStatic0())
 		return this
 	}
 
@@ -221,22 +221,27 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("method value:", (_is!($.fieldRef(item.value, "Child")) as boolean))
 
 	// Generic code and slices keep the pointers rather than copies.
-	let box: $.VarRef<Box> = $.varRef($.genericInstance(new Box(true), __goscriptStatic1))
-	box.value.Add(__goscriptStatic0(), item.value.Child.self)
-	$.pointerValue<Node>(box.value.Get(__goscriptStatic0(), 0)).name = "boxed"
+	let box: $.VarRef<Box> = $.varRef($.genericInstance(new Box(true), __goscriptStatic2))
+	box.value.Add(__goscriptStatic1(), item.value.Child.self)
+	$.pointerValue<Node>(box.value.Get(__goscriptStatic1(), 0)).name = "boxed"
 	let clone = (slices.Clone(registry) as $.Slice<Node | $.VarRef<Node> | null>)
 	$.pointerValue<Node>($.arrayIndex(clone!, 0)).name += "+cloned"
-	await $.println("generic:", item.value.Child.name, $.pointerEqual(box.value.Get(__goscriptStatic0(), 0), $.fieldRef(item.value, "Child")))
+	await $.println("generic:", item.value.Child.name, $.pointerEqual(box.value.Get(__goscriptStatic1(), 0), $.fieldRef(item.value, "Child")))
 }
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.Node"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(...$.stripGenericTypeArgs(args)), Register: (receiver: any) => $.pointerValue(receiver).Register(), Rename: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Rename(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType("main.Node", 2))
 }
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ([{Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(__goscriptStatic0(), ...$.stripGenericTypeArgs(args)), Get: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Get(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Add", [/* @__PURE__ */ $.pointerType("main.Node")], [], true, false), $.methodSignature("Get", [/* @__PURE__ */ $.basicType("int")], [/* @__PURE__ */ $.pointerType("main.Node")], true, false)]])
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.Node"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(...$.stripGenericTypeArgs(args)), Register: (receiver: any) => $.pointerValue(receiver).Register(), Rename: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Rename(...$.stripGenericTypeArgs(args))} }})
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ([{Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(__goscriptStatic1(), ...$.stripGenericTypeArgs(args)), Get: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Get(__goscriptStatic1(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Add", [/* @__PURE__ */ $.pointerType("main.Node")], [], true, false), $.methodSignature("Get", [/* @__PURE__ */ $.basicType("int")], [/* @__PURE__ */ $.pointerType("main.Node")], true, false)]])
 }
 
 var __goscriptAwait: any

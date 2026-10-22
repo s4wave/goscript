@@ -53,12 +53,12 @@ export class Outer {
 	}
 
 	public clone(): Outer {
-		return new Outer(true, this.In.clone(), $.cloneArrayValue(this.Arr, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), this.Ptr, this.N)
+		return new Outer(true, this.In.clone(), $.cloneArrayValue(this.Arr, __goscriptStatic0()), this.Ptr, this.N)
 	}
 
 	public __goscriptAssign(source: Outer): this {
 		this.In.__goscriptAssign(source.In)
-		this.Arr = $.assignFieldValue(this.Arr, source.Arr, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
+		this.Arr = $.assignFieldValue(this.Arr, source.Arr, __goscriptStatic0())
 		this.Ptr = source.Ptr
 		this.N = source.N
 		return this
@@ -216,7 +216,7 @@ export async function main(): globalThis.Promise<void> {
 	g1.Val.X = 11
 	await $.println(g2.Val.X, g1.Val.X)
 	let g3: $.VarRef<Pair> = $.varRef(new Pair(true, undefined, new Inner(true)))
-	assignGeneric(__goscriptStatic0(), g3, g1)
+	assignGeneric(__goscriptStatic1(), g3, g1)
 	g1.Val.Y = 22
 	await $.println(g3.value.Val.Y, g1.Val.Y)
 	let h1 = new Holder(true, g1)
@@ -257,7 +257,12 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Inner", zero: () => new Inner(true) }})
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Inner", zero: () => new Inner(true) }})
 }
 
 if ($.isMainScript(import.meta)) {

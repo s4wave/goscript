@@ -612,7 +612,7 @@ func renderStructAssign(b *strings.Builder, structType *loweredStruct, runtimeOw
 			b.WriteString("this." + field.name + " = " + runtimeOwner.QualifiedHelper(RuntimeHelperAssignFieldValue))
 			b.WriteString("(this." + field.name + ", source." + field.name)
 			if !field.interfaceValue {
-				b.WriteString(", " + field.runtimeType)
+				b.WriteString(", " + field.copyType)
 			}
 			b.WriteString(")")
 		}
@@ -692,7 +692,7 @@ func positionalFieldCopy(field loweredStructField, value string, runtimeOwner *R
 		return runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue) + "(" +
 			runtimeOwner.QualifiedHelper(RuntimeHelperCloneStructValue) + "(" + value + "))"
 	case field.arrayValue:
-		return runtimeOwner.QualifiedHelper(RuntimeHelperCloneArrayValue) + "(" + value + ", " + field.runtimeType + ")"
+		return runtimeOwner.QualifiedHelper(RuntimeHelperCloneArrayValue) + "(" + value + ", " + field.copyType + ")"
 	case field.typeParamValue:
 		return runtimeOwner.QualifiedHelper(RuntimeHelperCopyElement) + "(" + value + ")"
 	default:
@@ -788,7 +788,7 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 			b.WriteString("(init.")
 			b.WriteString(field.name)
 			b.WriteString(", ")
-			b.WriteString(field.runtimeType)
+			b.WriteString(field.copyType)
 			b.WriteString(") : ")
 			b.WriteString(field.zero)
 		} else if field.typeParamValue {

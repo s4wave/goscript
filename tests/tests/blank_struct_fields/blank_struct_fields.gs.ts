@@ -18,13 +18,13 @@ export class padded {
 	}
 
 	public clone(): padded {
-		return new padded(true, $.cloneArrayValue(this._blank0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)), this.Value, $.cloneArrayValue(this._blank2, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 3)))
+		return new padded(true, $.cloneArrayValue(this._blank0, __goscriptStatic0()), this.Value, $.cloneArrayValue(this._blank2, __goscriptStatic1()))
 	}
 
 	public __goscriptAssign(source: padded): this {
-		this._blank0 = $.assignFieldValue(this._blank0, source._blank0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2))
+		this._blank0 = $.assignFieldValue(this._blank0, source._blank0, __goscriptStatic0())
 		this.Value = source.Value
-		this._blank2 = $.assignFieldValue(this._blank2, source._blank2, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 3))
+		this._blank2 = $.assignFieldValue(this._blank2, source._blank2, __goscriptStatic1())
 		return this
 	}
 
@@ -51,6 +51,16 @@ export async function main(): globalThis.Promise<void> {
 	let copy = (original).clone()
 	copy.Value = 8
 	await $.println(original.Value, copy.Value)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2))
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 3))
 }
 
 if ($.isMainScript(import.meta)) {

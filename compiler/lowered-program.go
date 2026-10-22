@@ -144,6 +144,10 @@ type loweredStructField struct {
 	typ         string
 	zero        string
 	runtimeType string
+	// copyType is the runtime type info that copies of the field's values
+	// pass: for an array, a descriptor created once for the file when it
+	// can be (see lowerArrayTypeInfo), and otherwise runtimeType.
+	copyType    string
 	messageType string // Canonical named message reached through field containers.
 	doc         string
 	tag         string

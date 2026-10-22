@@ -80,13 +80,13 @@ export class Outer {
 	}
 
 	public clone(): Outer {
-		return new Outer(true, this.N, this.In.clone(), $.cloneArrayValue(this.Ts, /* @__PURE__ */ $.arrayType("main.T", 2)))
+		return new Outer(true, this.N, this.In.clone(), $.cloneArrayValue(this.Ts, __goscriptStatic0()))
 	}
 
 	public __goscriptAssign(source: Outer): this {
 		this.N = source.N
 		this.In.__goscriptAssign(source.In)
-		this.Ts = $.assignFieldValue(this.Ts, source.Ts, /* @__PURE__ */ $.arrayType("main.T", 2))
+		this.Ts = $.assignFieldValue(this.Ts, source.Ts, __goscriptStatic0())
 		return this
 	}
 
@@ -185,7 +185,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("struct field", $.pointerEqual(h.p, $.indexRef(_in!, 1)), $.pointerEqual(h.p, elemPtr(_in, 1)), $.pointerEqual(elemPtr(_in, 0), elemPtr(_in, 0)))
 	let sub = $.goSlice(_in, 1, undefined)
 	await $.println("struct subslice", $.indexAddress(sub!, 0) == $.indexAddress(_in!, 1), $.indexAddress(sub!, 0) == $.indexAddress(_in!, 0))
-	await $.println("struct generic", same(__goscriptStatic0(), $.arrayIndex(dst!, 1), $.indexRef(_in!, 1)), index(__goscriptStatic0(), dst, $.indexRef(_in!, 1)), which($.arrayIndex(dst!, 1), _in), which($.indexRef(_in!, 1), $.goSlice(_in, 1, undefined)), which($.indexRef(_in!, 0), _in))
+	await $.println("struct generic", same(__goscriptStatic1(), $.arrayIndex(dst!, 1), $.indexRef(_in!, 1)), index(__goscriptStatic1(), dst, $.indexRef(_in!, 1)), which($.arrayIndex(dst!, 1), _in), which($.indexRef(_in!, 1), $.goSlice(_in, 1, undefined)), which($.indexRef(_in!, 0), _in))
 	let keys = $.makeMap<T | $.VarRef<T> | null, number>([[$.indexRef(_in!, 0), 10]], /* @__PURE__ */ $.pointerType("main.T"))
 	$.mapSet(keys, $.indexRef(_in!, 1), 11)
 	await $.println("struct key", $.mapGet<T | $.VarRef<T> | null, number, number>(keys, $.indexRef(_in!, 0), 0)[0], $.mapGet<T | $.VarRef<T> | null, number, number>(keys, elemPtr(_in, 1), 0)[0], $.len(keys))
@@ -232,7 +232,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("int slice", $.pointerEqual($.arrayIndex(ips!, 0), $.indexRef(ints!, 0)))
 
 	// Pointers to array elements.
-	let arr = $.arrayValue([new T(true, 1, 1), new T(true, 2, 2), new T(true, 3, 3)], /* @__PURE__ */ $.arrayType("main.T", 3))
+	let arr = $.arrayValue([new T(true, 1, 1), new T(true, 2, 2), new T(true, 3, 3)], __goscriptStatic2())
 	let ap = $.indexRef(arr, 1)
 	let aps = $.arrayToSlice<T | $.VarRef<T> | null>([$.indexRef(arr, 1)])
 	await $.println("array struct", $.pointerEqual(ap, $.indexRef(arr, 1)), ($.arrayIndex(aps!, 0) === ap || ($.pointerAliasesMade || ($.arrayIndex(aps!, 0) as any)?.__goElementBacking !== undefined) && $.pointerEqual($.arrayIndex(aps!, 0), ap)), $.pointerEqual($.indexRef(arr, 0), ap))
@@ -274,12 +274,22 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, P: { type: /* @__PURE__ */ $.pointerType("main.T"), zero: () => null }})
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType("main.T", 2))
 }
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.T", zero: () => new T(true) }})
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, P: { type: /* @__PURE__ */ $.pointerType("main.T"), zero: () => null }})
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= (/* @__PURE__ */ $.arrayType("main.T", 3))
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.T", zero: () => new T(true) }})
 }
 
 if ($.isMainScript(import.meta)) {

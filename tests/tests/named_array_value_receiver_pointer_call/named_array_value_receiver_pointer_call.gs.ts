@@ -77,7 +77,7 @@ export async function main(): globalThis.Promise<void> {
 }
 
 export async function receiverCopies(): globalThis.Promise<void> {
-	let m = $.varRef($.arrayValue([1, 2, 3, 4], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)))
+	let m = $.varRef($.arrayValue([1, 2, 3, 4], __goscriptStatic0()))
 	let original = $.cloneArrayValue(m.value, "main.Matrix")
 	let r = Matrix_Scaled(m.value, 2)
 	await $.println("m:", m.value[0], m.value[1], m.value[2], m.value[3])
@@ -86,6 +86,11 @@ export async function receiverCopies(): globalThis.Promise<void> {
 	await $.println("sum:", Matrix_Sum(m.value), m.value[0])
 	let p = m
 	await $.println("ptr sum:", Matrix_Sum($.pointerValue<Matrix>(p)), $.arrayIndex($.pointerValue<number[]>(p), 0))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4))
 }
 
 if ($.isMainScript(import.meta)) {

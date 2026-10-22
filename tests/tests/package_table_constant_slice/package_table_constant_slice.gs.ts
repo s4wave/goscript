@@ -19,7 +19,7 @@ export function __goscript_get_nibbles(): Uint8Array {
 }
 
 export function __goscript_set_nibbles(__goscriptValue: Uint8Array): void {
-	nibbles = $.assignFieldValue(nibbles, __goscriptValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 300))
+	nibbles = $.assignFieldValue(nibbles, __goscriptValue, __goscriptStatic0())
 }
 
 export function bits4(a: $.Slice<number>, i: number): number {
@@ -27,13 +27,13 @@ export function bits4(a: $.Slice<number>, i: number): number {
 }
 
 export function lookup(u: number): number {
-	return bits4(__goscriptStatic0(), ($.intShl(bits4(__goscriptStatic1(), u & 63), 2)) + (u & 3))
+	return bits4(__goscriptStatic1(), ($.intShl(bits4(__goscriptStatic2(), u & 63), 2)) + (u & 3))
 }
 
 export let small: number[] = $.arrayValue([10, 20, 30, 40, 50, 60])
 
 export function __goscript_set_small(__goscriptValue: number[]): void {
-	small = $.assignFieldValue(small, __goscriptValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 6))
+	small = $.assignFieldValue(small, __goscriptValue, __goscriptStatic3())
 }
 
 export function sum(a: $.Slice<number>): number {
@@ -61,7 +61,7 @@ export function __goscript_set_computed(__goscriptValue: $.Slice<number>): void 
 	computed = __goscriptValue
 }
 
-export let derived: number = sum(__goscriptStatic2())
+export let derived: number = sum(__goscriptStatic4())
 
 export function __goscript_set_derived(__goscriptValue: number): void {
 	derived = __goscriptValue
@@ -88,7 +88,7 @@ export function replace(): void {
 export let written: number[] = $.arrayValue([1, 2, 3, 4])
 
 export function __goscript_set_written(__goscriptValue: number[]): void {
-	written = $.assignFieldValue(written, __goscriptValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 4))
+	written = $.assignFieldValue(written, __goscriptValue, __goscriptStatic5())
 }
 
 export function clobber(a: $.Slice<number>): void {
@@ -102,11 +102,11 @@ export function __goscript_set_short(__goscriptValue: $.Slice<number>): void {
 }
 
 export function shortLen(): number {
-	return $.sliceLen(__goscriptStatic3())
+	return $.sliceLen(__goscriptStatic6())
 }
 
 export function neverCalled(): number {
-	return $.sliceLen(__goscriptStatic4())
+	return $.sliceLen(__goscriptStatic7())
 }
 
 export async function tryShortLen(): globalThis.Promise<void> {
@@ -136,13 +136,13 @@ export async function main(): globalThis.Promise<void> {
 
 	// The [lo:hi], [:hi], [lo:] and [:] forms of a table that is not
 	// deferred.
-	await $.println("small:", sum(__goscriptStatic5()), sum(__goscriptStatic6()), sum(__goscriptStatic7()), sum(__goscriptStatic8()))
-	await $.println("small len/cap:", $.sliceLen(__goscriptStatic9()), $.cap(__goscriptStatic9()), $.sliceLen(__goscriptStatic10()), $.cap(__goscriptStatic10()))
-	await $.println("small first:", first(__goscriptStatic11()), $.arrayIndex(__goscriptStatic12()!, 2))
-	await $.println("word:", $.bytesToString(__goscriptStatic13()), $.bytesToString(__goscriptStatic14()))
+	await $.println("small:", sum(__goscriptStatic8()), sum(__goscriptStatic9()), sum(__goscriptStatic10()), sum(__goscriptStatic11()))
+	await $.println("small len/cap:", $.sliceLen(__goscriptStatic12()), $.cap(__goscriptStatic12()), $.sliceLen(__goscriptStatic13()), $.cap(__goscriptStatic13()))
+	await $.println("small first:", first(__goscriptStatic14()), $.arrayIndex(__goscriptStatic15()!, 2))
+	await $.println("word:", $.bytesToString(__goscriptStatic16()), $.bytesToString(__goscriptStatic17()))
 
 	// A table read during initialization.
-	await $.println("derived:", derived, sum(__goscriptStatic2()), $.arrayIndex(__goscriptStatic15()!, 2))
+	await $.println("derived:", derived, sum(__goscriptStatic4()), $.arrayIndex(__goscriptStatic18()!, 2))
 
 	// A reassigned table gives the new elements.
 	await $.println("replaced before:", sum($.goSlice(replaced, 1, undefined)))
@@ -164,82 +164,97 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ($.goSlice(__goscript_get_nibbles(), 200, undefined))
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 300))
 }
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ($.goSlice(__goscript_get_nibbles(), undefined, undefined))
+	return __goscriptStatic1$value ??= ($.goSlice(__goscript_get_nibbles(), 200, undefined))
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ($.goSlice(computed, 1, 3))
+	return __goscriptStatic2$value ??= ($.goSlice(__goscript_get_nibbles(), undefined, undefined))
 }
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ($.goSlice(short, 1, 5))
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 6))
 }
 
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= ($.goSlice(short, undefined, 9))
+	return __goscriptStatic4$value ??= ($.goSlice(computed, 1, 3))
 }
 
 var __goscriptStatic5$value: any
 function __goscriptStatic5(): any {
-	return __goscriptStatic5$value ??= ($.goSlice(small, 1, 4))
+	return __goscriptStatic5$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 4))
 }
 
 var __goscriptStatic6$value: any
 function __goscriptStatic6(): any {
-	return __goscriptStatic6$value ??= ($.goSlice(small, undefined, 2))
+	return __goscriptStatic6$value ??= ($.goSlice(short, 1, 5))
 }
 
 var __goscriptStatic7$value: any
 function __goscriptStatic7(): any {
-	return __goscriptStatic7$value ??= ($.goSlice(small, 3, undefined))
+	return __goscriptStatic7$value ??= ($.goSlice(short, undefined, 9))
 }
 
 var __goscriptStatic8$value: any
 function __goscriptStatic8(): any {
-	return __goscriptStatic8$value ??= ($.goSlice(small, undefined, undefined))
+	return __goscriptStatic8$value ??= ($.goSlice(small, 1, 4))
 }
 
 var __goscriptStatic9$value: any
 function __goscriptStatic9(): any {
-	return __goscriptStatic9$value ??= ($.goSlice(small, 2, 4))
+	return __goscriptStatic9$value ??= ($.goSlice(small, undefined, 2))
 }
 
 var __goscriptStatic10$value: any
 function __goscriptStatic10(): any {
-	return __goscriptStatic10$value ??= ($.goSlice(small, undefined, 3, 4))
+	return __goscriptStatic10$value ??= ($.goSlice(small, 3, undefined))
 }
 
 var __goscriptStatic11$value: any
 function __goscriptStatic11(): any {
-	return __goscriptStatic11$value ??= ($.goSlice(small, 2, undefined))
+	return __goscriptStatic11$value ??= ($.goSlice(small, undefined, undefined))
 }
 
 var __goscriptStatic12$value: any
 function __goscriptStatic12(): any {
-	return __goscriptStatic12$value ??= ($.goSlice(small, 1, 5))
+	return __goscriptStatic12$value ??= ($.goSlice(small, 2, 4))
 }
 
 var __goscriptStatic13$value: any
 function __goscriptStatic13(): any {
-	return __goscriptStatic13$value ??= ($.goSlice(word, undefined, 8))
+	return __goscriptStatic13$value ??= ($.goSlice(small, undefined, 3, 4))
 }
 
 var __goscriptStatic14$value: any
 function __goscriptStatic14(): any {
-	return __goscriptStatic14$value ??= ($.goSlice(word, 9, undefined))
+	return __goscriptStatic14$value ??= ($.goSlice(small, 2, undefined))
 }
 
 var __goscriptStatic15$value: any
 function __goscriptStatic15(): any {
-	return __goscriptStatic15$value ??= ($.goSlice(computed, 1, undefined))
+	return __goscriptStatic15$value ??= ($.goSlice(small, 1, 5))
+}
+
+var __goscriptStatic16$value: any
+function __goscriptStatic16(): any {
+	return __goscriptStatic16$value ??= ($.goSlice(word, undefined, 8))
+}
+
+var __goscriptStatic17$value: any
+function __goscriptStatic17(): any {
+	return __goscriptStatic17$value ??= ($.goSlice(word, 9, undefined))
+}
+
+var __goscriptStatic18$value: any
+function __goscriptStatic18(): any {
+	return __goscriptStatic18$value ??= ($.goSlice(computed, 1, undefined))
 }
 
 if ($.isMainScript(import.meta)) {

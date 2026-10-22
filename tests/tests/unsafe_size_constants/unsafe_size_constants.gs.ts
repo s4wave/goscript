@@ -58,13 +58,13 @@ export class Mixed {
 	}
 
 	public clone(): Mixed {
-		return new Mixed(true, this.Flag, this.N, $.cloneArrayValue(this.V, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3)))
+		return new Mixed(true, this.Flag, this.N, $.cloneArrayValue(this.V, __goscriptStatic0()))
 	}
 
 	public __goscriptAssign(source: Mixed): this {
 		this.Flag = source.Flag
 		this.N = source.N
-		this.V = $.assignFieldValue(this.V, source.V, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))
+		this.V = $.assignFieldValue(this.V, source.V, __goscriptStatic0())
 		return this
 	}
 
@@ -89,6 +89,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("float32 size:", 4, 4)
 	await $.println("mixed size:", 20, 4)
 	await $.println("mixed offsets:", 4, 8)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))
 }
 
 if ($.isMainScript(import.meta)) {

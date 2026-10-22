@@ -17,11 +17,11 @@ export class ObjectID {
 	}
 
 	public clone(): ObjectID {
-		return new ObjectID(true, $.cloneArrayValue(this.hash, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)), this.format)
+		return new ObjectID(true, $.cloneArrayValue(this.hash, __goscriptStatic0()), this.format)
 	}
 
 	public __goscriptAssign(source: ObjectID): this {
-		this.hash = $.assignFieldValue(this.hash, source.hash, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
+		this.hash = $.assignFieldValue(this.hash, source.hash, __goscriptStatic0())
 		this.format = source.format
 		return this
 	}
@@ -108,7 +108,7 @@ export class Outer {
 export function take(x: any): void {
 	{
 		const __goscriptTypeSwitchValue = x
-		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0())) {
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic1())) {
 			case 0:
 				{
 				}
@@ -165,7 +165,12 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.pointerType("main.S")]))
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.pointerType("main.S")]))
 }
 
 if ($.isMainScript(import.meta)) {

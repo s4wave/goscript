@@ -126,7 +126,7 @@ export function arr(): $.VarRef<number[]> | null {
 export let backing: $.VarRef<number[]> = $.varRef($.arrayValue(globalThis.Array.from({ length: 3 }, () => 0)))
 
 export function __goscript_set_backing(__goscriptValue: number[]): void {
-	backing.value = $.assignFieldValue(backing.value, __goscriptValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3))
+	backing.value = $.assignFieldValue(backing.value, __goscriptValue, __goscriptStatic0())
 }
 
 export async function fill(ch: $.Channel<number> | null): globalThis.Promise<void> {
@@ -304,6 +304,11 @@ export async function main(): globalThis.Promise<void> {
 	const __goscriptOperand20 = (__goscriptAwait = (c !== null && (c as any).__isVarRef !== true && ((c as any).__goValue === undefined || (c as any).__goType?.charCodeAt(0) !== 42) ? (c as Exclude<counter, null>) : $.pointerValue<Exclude<counter, null>>(c)).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	$.sliceElems(vals!)[$.sliceSlot(vals!, __goscriptOperand20)] += 6
 	await $.println("async index +=", $.arrayIndex(vals!, 0), $.arrayIndex(vals!, 1), $.arrayIndex(vals!, 2), calls)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3))
 }
 
 var __goscriptAwait: any

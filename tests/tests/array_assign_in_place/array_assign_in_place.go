@@ -11,7 +11,15 @@ type S struct {
 
 var global [2]T
 
+// kept is the receiver that keep kept.
+var kept *T
+
+// keep keeps its receiver.
+func (t *T) keep() { kept = t }
+
 func pair(a, b int) [2]T { return [2]T{{a}, {b}} }
+
+func triple(a int) [3]int { return [3]int{a, a + 1, a + 2} }
 
 func main() {
 	// A local array keeps its elements when assigned.
@@ -78,4 +86,25 @@ func main() {
 	wp := &words[1]
 	words = [2]string{"a", "b"}
 	println("basic:", *fp, *wp)
+
+	// A local array that nothing refers to takes a new array; one that a
+	// slice, a function literal or a kept receiver refers to is copied into.
+	fresh := [3]int{1, 2, 3}
+	fresh = [3]int{4, 5, 6}
+	println("fresh literal:", fresh[0], fresh[1], fresh[2])
+	fresh = triple(7)
+	println("fresh call:", fresh[0], fresh[1], fresh[2])
+	sliced := [2]T{}
+	view := sliced[:]
+	sliced = pair(25, 26)
+	println("sliced:", view[0].v, view[1].v)
+	captured := [2]int{}
+	read := func() int { return captured[1] }
+	captured = [2]int{27, 28}
+	println("captured:", read())
+	elems := [2]T{}
+	elems[1].keep()
+	elems = pair(29, 30)
+	elems[0].v = 31
+	println("kept receiver:", kept.v, elems[0].v)
 }

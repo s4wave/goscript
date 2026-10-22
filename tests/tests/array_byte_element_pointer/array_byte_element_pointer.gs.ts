@@ -12,11 +12,11 @@ export class bitset {
 	}
 
 	public clone(): bitset {
-		return new bitset(true, $.cloneArrayValue(this.bits, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)))
+		return new bitset(true, $.cloneArrayValue(this.bits, __goscriptStatic0()))
 	}
 
 	public __goscriptAssign(source: bitset): this {
-		this.bits = $.assignFieldValue(this.bits, source.bits, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
+		this.bits = $.assignFieldValue(this.bits, source.bits, __goscriptStatic0())
 		return this
 	}
 
@@ -48,6 +48,11 @@ export async function main(): globalThis.Promise<void> {
 	b.value.set(3)
 	b.value.set(30)
 	await $.println(b.value.has(3), b.value.has(4), b.value.has(30), b.value.bits[0], b.value.bits[3])
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
 }
 
 if ($.isMainScript(import.meta)) {

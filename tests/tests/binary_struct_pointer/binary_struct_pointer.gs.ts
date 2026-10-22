@@ -18,12 +18,12 @@ export class inner {
 	}
 
 	public clone(): inner {
-		return new inner(true, this.A, $.cloneArrayValue(this.B, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)))
+		return new inner(true, this.A, $.cloneArrayValue(this.B, __goscriptStatic0()))
 	}
 
 	public __goscriptAssign(source: inner): this {
 		this.A = source.A
-		this.B = $.assignFieldValue(this.B, source.B, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2))
+		this.B = $.assignFieldValue(this.B, source.B, __goscriptStatic0())
 		return this
 	}
 
@@ -95,15 +95,15 @@ export class item {
 	}
 
 	public clone(): item {
-		return new item(true, $.cloneArrayValue(this.Matrix, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)), $.cloneArrayValue(this.Colors, /* @__PURE__ */ $.arrayType("main.vec4", 2)), this.Index, this.Flags, $.cloneArrayValue(this._blank4, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 2)))
+		return new item(true, $.cloneArrayValue(this.Matrix, __goscriptStatic1()), $.cloneArrayValue(this.Colors, __goscriptStatic2()), this.Index, this.Flags, $.cloneArrayValue(this._blank4, __goscriptStatic3()))
 	}
 
 	public __goscriptAssign(source: item): this {
-		this.Matrix = $.assignFieldValue(this.Matrix, source.Matrix, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4))
-		this.Colors = $.assignFieldValue(this.Colors, source.Colors, /* @__PURE__ */ $.arrayType("main.vec4", 2))
+		this.Matrix = $.assignFieldValue(this.Matrix, source.Matrix, __goscriptStatic1())
+		this.Colors = $.assignFieldValue(this.Colors, source.Colors, __goscriptStatic2())
 		this.Index = source.Index
 		this.Flags = source.Flags
-		this._blank4 = $.assignFieldValue(this._blank4, source._blank4, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 2))
+		this._blank4 = $.assignFieldValue(this._blank4, source._blank4, __goscriptStatic3())
 		return this
 	}
 
@@ -137,13 +137,13 @@ export class header {
 	}
 
 	public clone(): header {
-		return new header(true, $.cloneArrayValue(this.Sig, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)), this.Size, $.cloneArrayValue(this.Res, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint16"), 2)), this.In.clone(), this.Width)
+		return new header(true, $.cloneArrayValue(this.Sig, __goscriptStatic0()), this.Size, $.cloneArrayValue(this.Res, __goscriptStatic4()), this.In.clone(), this.Width)
 	}
 
 	public __goscriptAssign(source: header): this {
-		this.Sig = $.assignFieldValue(this.Sig, source.Sig, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2))
+		this.Sig = $.assignFieldValue(this.Sig, source.Sig, __goscriptStatic0())
 		this.Size = source.Size
-		this.Res = $.assignFieldValue(this.Res, source.Res, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint16"), 2))
+		this.Res = $.assignFieldValue(this.Res, source.Res, __goscriptStatic4())
 		this.In.__goscriptAssign(source.In)
 		this.Width = source.Width
 		return this
@@ -163,7 +163,7 @@ export async function main(): globalThis.Promise<void> {
 	let h = new header(false, $.arrayValue(new Uint8Array([66, 77])), 70, $.arrayValue([1, 2]), new inner(true, 0x0102, $.arrayValue(new Uint8Array([3, 4]))), -5)
 	let buf = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	{
-		let err = await binary.Write($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", __goscriptStatic0()))!, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic1())!, $.interfaceValue(h, "*main.header", /* @__PURE__ */ $.pointerType("main.header")))
+		let err = await binary.Write($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", __goscriptStatic5()))!, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic6())!, $.interfaceValue(h, "*main.header", /* @__PURE__ */ $.pointerType("main.header")))
 		if (err != null) {
 			await $.println("write error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
@@ -175,7 +175,7 @@ export async function main(): globalThis.Promise<void> {
 	// Reading into a pointer to a struct fills its fields.
 	let r: $.VarRef<header> = $.varRef(new header(true))
 	{
-		let err = await binary.Read($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(buf.value.Bytes()), "*bytes.Reader", __goscriptStatic2()))!, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic1())!, $.interfaceValue(r, "*main.header", /* @__PURE__ */ $.pointerType("main.header")))
+		let err = await binary.Read($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(buf.value.Bytes()), "*bytes.Reader", __goscriptStatic7()))!, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic6())!, $.interfaceValue(r, "*main.header", /* @__PURE__ */ $.pointerType("main.header")))
 		if (err != null) {
 			await $.println("read error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
@@ -194,45 +194,70 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let ob = $.makeSlice<number>(binary.Size($.interfaceValue(objs, "[]main.item", /* @__PURE__ */ $.sliceType("main.item"))) + 1, undefined, "byte")
 	$.sliceElems(ob!)[$.sliceSlot(ob!, $.sliceLen(ob) - 1)] = 9
-	let [n, err] = binary.Encode(ob, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic1())!, $.interfaceValue($.goSlice(objs, 1, undefined), "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
+	let [n, err] = binary.Encode(ob, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic6())!, $.interfaceValue($.goSlice(objs, 1, undefined), "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
 	await $.println("objects:", binary.Size($.interfaceValue(objs, "[]main.item", /* @__PURE__ */ $.sliceType("main.item"))), n, err == null, $.arrayIndex(ob!, 12), $.arrayIndex(ob!, 13), $.arrayIndex(ob!, 14), $.arrayIndex(ob!, 15), $.arrayIndex(ob!, 48), $.arrayIndex(ob!, 52), $.arrayIndex(ob!, 64), $.arrayIndex(ob!, $.sliceLen(ob) - 1))
 	let back = $.makeSlice<item>(2, undefined, undefined, () => new item(true))
-	let __goscriptTuple0: any = binary.Decode(ob, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic1())!, $.interfaceValue(back, "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
+	let __goscriptTuple0: any = binary.Decode(ob, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic6())!, $.interfaceValue(back, "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
 	n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
 	await $.println("decoded:", n, err == null, $.structEqual($.arrayIndex(back!, 0), $.arrayIndex(objs!, 1)), $.structEqual($.arrayIndex(back!, 1), $.arrayIndex(objs!, 2)), ($.arrayIndex(back!, 1).Colors)[1].Y, $.arrayIndex(back!, 1).Index)
 
 	// Big-endian order and arrays of structs work the same way.
-	let __goscriptTuple1: any = binary.Append(null, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.BigEndian))), "binary.bigEndian", __goscriptStatic3())!, $.interfaceValue($.goSlice(objs, 2, undefined), "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
+	let __goscriptTuple1: any = binary.Append(null, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.BigEndian))), "binary.bigEndian", __goscriptStatic8())!, $.interfaceValue($.goSlice(objs, 2, undefined), "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
 	let be: $.Slice<number> = __goscriptTuple1[0]
 	let arr: vec4[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new vec4(true)), /* @__PURE__ */ $.arrayType("main.vec4", 2))
 	arr[1].W = 3
-	let __goscriptTuple2: any = binary.Append(null, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic1())!, $.interfaceValue(arr, "[2]main.vec4", /* @__PURE__ */ $.arrayType("main.vec4", 2)))
+	let __goscriptTuple2: any = binary.Append(null, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic6())!, $.interfaceValue(arr, "[2]main.vec4", /* @__PURE__ */ $.arrayType("main.vec4", 2)))
 	let ab: $.Slice<number> = __goscriptTuple2[0]
 	let arr2: $.VarRef<vec4[]> = $.varRef($.arrayValue(globalThis.Array.from({ length: 2 }, () => new vec4(true)), /* @__PURE__ */ $.arrayType("main.vec4", 2)))
-	let __goscriptTuple3: any = binary.Decode(ab, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic1())!, $.interfaceValue(arr2, "*[2]main.vec4", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.arrayType("main.vec4", 2))))
+	let __goscriptTuple3: any = binary.Decode(ab, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic6())!, $.interfaceValue(arr2, "*[2]main.vec4", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.arrayType("main.vec4", 2))))
 	err = __goscriptTuple3[1]
 	await $.println("big-endian:", $.sliceLen(be), $.arrayIndex(be!, 12), $.arrayIndex(be!, 13), "array:", $.sliceLen(ab), err == null, arr2.value[1].W)
 }
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("bytes.Buffer"), "bytes.Buffer", () => [$.methodSignature("Available", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("AvailableBuffer", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], true), $.methodSignature("Bytes", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], true), $.methodSignature("Cap", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Grow", [["n", /* @__PURE__ */ $.basicType("int")]], [], true), $.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Next", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], true), $.methodSignature("Peek", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"], true), $.methodSignature("Read", [["p", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadByte", [], [/* @__PURE__ */ $.basicType("uint8"), "error"], true), $.methodSignature("ReadBytes", [["delim", /* @__PURE__ */ $.basicType("uint8")]], [["line", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["err", "error"]], true), $.methodSignature("ReadFrom", [["r", "io.Reader"]], [["n", /* @__PURE__ */ $.basicType("int64")], ["err", "error"]], true), $.methodSignature("ReadRune", [], [["r", /* @__PURE__ */ $.basicType("int32")], ["size", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadString", [["delim", /* @__PURE__ */ $.basicType("uint8")]], [["line", /* @__PURE__ */ $.basicType("string")], ["err", "error"]], true), $.methodSignature("Reset", [], [], true), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")], true), $.methodSignature("Truncate", [["n", /* @__PURE__ */ $.basicType("int")]], [], true), $.methodSignature("UnreadByte", [], ["error"], true), $.methodSignature("UnreadRune", [], ["error"], true), $.methodSignature("Write", [["p", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("WriteByte", [["c", /* @__PURE__ */ $.basicType("uint8")]], ["error"], true), $.methodSignature("WriteRune", [["r", /* @__PURE__ */ $.basicType("int32")]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("WriteString", [["s", /* @__PURE__ */ $.basicType("string")]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("WriteTo", [["w", "io.Writer"]], [["n", /* @__PURE__ */ $.basicType("int64")], ["err", "error"]], true)]))
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2))
 }
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ($.overrideTypeMethods("binary.littleEndian", "binary.littleEndian", () => [$.methodSignature("AppendUint16", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint16")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]), $.methodSignature("AppendUint32", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint32")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]), $.methodSignature("AppendUint64", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint64")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]), $.methodSignature("GoString", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("PutUint16", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint16")]]), $.methodSignature("PutUint32", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint32")]]), $.methodSignature("PutUint64", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint64")]]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Uint16", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("uint16")]), $.methodSignature("Uint32", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("uint32")]), $.methodSignature("Uint64", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("uint64")])]))
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4))
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("bytes.Reader"), "bytes.Reader", () => [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Read", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadAt", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["off", /* @__PURE__ */ $.basicType("int64")]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadByte", [], [/* @__PURE__ */ $.basicType("uint8"), "error"], true), $.methodSignature("ReadRune", [], [["ch", /* @__PURE__ */ $.basicType("int32")], ["size", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("Reset", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [], true), $.methodSignature("Seek", [["offset", /* @__PURE__ */ $.basicType("int64")], ["whence", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int64"), "error"], true), $.methodSignature("Size", [], [/* @__PURE__ */ $.basicType("int64")], true), $.methodSignature("UnreadByte", [], ["error"], true), $.methodSignature("UnreadRune", [], ["error"], true), $.methodSignature("WriteTo", [["w", "io.Writer"]], [["n", /* @__PURE__ */ $.basicType("int64")], ["err", "error"]], true)]))
+	return __goscriptStatic2$value ??= (/* @__PURE__ */ $.arrayType("main.vec4", 2))
 }
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ($.overrideTypeMethods("binary.bigEndian", "binary.bigEndian", () => [$.methodSignature("AppendUint16", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint16")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]), $.methodSignature("AppendUint32", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint32")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]), $.methodSignature("AppendUint64", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint64")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]), $.methodSignature("GoString", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("PutUint16", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint16")]]), $.methodSignature("PutUint32", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint32")]]), $.methodSignature("PutUint64", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint64")]]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Uint16", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("uint16")]), $.methodSignature("Uint32", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("uint32")]), $.methodSignature("Uint64", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("uint64")])]))
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 2))
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint16"), 2))
+}
+
+var __goscriptStatic5$value: any
+function __goscriptStatic5(): any {
+	return __goscriptStatic5$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("bytes.Buffer"), "bytes.Buffer", () => [$.methodSignature("Available", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("AvailableBuffer", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], true), $.methodSignature("Bytes", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], true), $.methodSignature("Cap", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Grow", [["n", /* @__PURE__ */ $.basicType("int")]], [], true), $.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Next", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], true), $.methodSignature("Peek", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"], true), $.methodSignature("Read", [["p", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadByte", [], [/* @__PURE__ */ $.basicType("uint8"), "error"], true), $.methodSignature("ReadBytes", [["delim", /* @__PURE__ */ $.basicType("uint8")]], [["line", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["err", "error"]], true), $.methodSignature("ReadFrom", [["r", "io.Reader"]], [["n", /* @__PURE__ */ $.basicType("int64")], ["err", "error"]], true), $.methodSignature("ReadRune", [], [["r", /* @__PURE__ */ $.basicType("int32")], ["size", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadString", [["delim", /* @__PURE__ */ $.basicType("uint8")]], [["line", /* @__PURE__ */ $.basicType("string")], ["err", "error"]], true), $.methodSignature("Reset", [], [], true), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")], true), $.methodSignature("Truncate", [["n", /* @__PURE__ */ $.basicType("int")]], [], true), $.methodSignature("UnreadByte", [], ["error"], true), $.methodSignature("UnreadRune", [], ["error"], true), $.methodSignature("Write", [["p", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("WriteByte", [["c", /* @__PURE__ */ $.basicType("uint8")]], ["error"], true), $.methodSignature("WriteRune", [["r", /* @__PURE__ */ $.basicType("int32")]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("WriteString", [["s", /* @__PURE__ */ $.basicType("string")]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("WriteTo", [["w", "io.Writer"]], [["n", /* @__PURE__ */ $.basicType("int64")], ["err", "error"]], true)]))
+}
+
+var __goscriptStatic6$value: any
+function __goscriptStatic6(): any {
+	return __goscriptStatic6$value ??= ($.overrideTypeMethods("binary.littleEndian", "binary.littleEndian", () => [$.methodSignature("AppendUint16", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint16")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]), $.methodSignature("AppendUint32", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint32")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]), $.methodSignature("AppendUint64", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint64")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]), $.methodSignature("GoString", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("PutUint16", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint16")]]), $.methodSignature("PutUint32", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint32")]]), $.methodSignature("PutUint64", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint64")]]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Uint16", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("uint16")]), $.methodSignature("Uint32", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("uint32")]), $.methodSignature("Uint64", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("uint64")])]))
+}
+
+var __goscriptStatic7$value: any
+function __goscriptStatic7(): any {
+	return __goscriptStatic7$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("bytes.Reader"), "bytes.Reader", () => [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Read", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadAt", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["off", /* @__PURE__ */ $.basicType("int64")]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadByte", [], [/* @__PURE__ */ $.basicType("uint8"), "error"], true), $.methodSignature("ReadRune", [], [["ch", /* @__PURE__ */ $.basicType("int32")], ["size", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("Reset", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [], true), $.methodSignature("Seek", [["offset", /* @__PURE__ */ $.basicType("int64")], ["whence", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int64"), "error"], true), $.methodSignature("Size", [], [/* @__PURE__ */ $.basicType("int64")], true), $.methodSignature("UnreadByte", [], ["error"], true), $.methodSignature("UnreadRune", [], ["error"], true), $.methodSignature("WriteTo", [["w", "io.Writer"]], [["n", /* @__PURE__ */ $.basicType("int64")], ["err", "error"]], true)]))
+}
+
+var __goscriptStatic8$value: any
+function __goscriptStatic8(): any {
+	return __goscriptStatic8$value ??= ($.overrideTypeMethods("binary.bigEndian", "binary.bigEndian", () => [$.methodSignature("AppendUint16", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint16")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]), $.methodSignature("AppendUint32", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint32")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]), $.methodSignature("AppendUint64", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint64")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]), $.methodSignature("GoString", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("PutUint16", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint16")]]), $.methodSignature("PutUint32", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint32")]]), $.methodSignature("PutUint64", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["v", /* @__PURE__ */ $.basicType("uint64")]]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Uint16", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("uint16")]), $.methodSignature("Uint32", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("uint32")]), $.methodSignature("Uint64", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("uint64")])]))
 }
 
 var __goscriptAwait: any

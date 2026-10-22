@@ -14,11 +14,11 @@ export class word {
 	}
 
 	public clone(): word {
-		return new word(true, $.cloneArrayValue(this.data, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)))
+		return new word(true, $.cloneArrayValue(this.data, __goscriptStatic0()))
 	}
 
 	public __goscriptAssign(source: word): this {
-		this.data = $.assignFieldValue(this.data, source.data, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
+		this.data = $.assignFieldValue(this.data, source.data, __goscriptStatic0())
 		return this
 	}
 
@@ -50,6 +50,11 @@ export function writeBytes(words: $.Slice<bigint>, bytes: $.Slice<number>): void
 
 export async function main(): globalThis.Promise<void> {
 	await $.println("unsafe pointer storage compiles")
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
 }
 
 if ($.isMainScript(import.meta)) {

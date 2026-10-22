@@ -126,13 +126,13 @@ export async function main(): globalThis.Promise<void> {
 	let ptr = new point(false, 1, 2)
 	let made = $.makeSlice<point>(2, undefined, undefined, () => new point(true))
 	$.sliceElems(made!)[$.sliceSlot(made!, 1)].__goscriptAssign(lit)
-	let arr = $.arrayValue([new point(true, 1, 2), new point(true, 3, 4)], /* @__PURE__ */ $.arrayType("main.point", 2))
+	let arr = $.arrayValue([new point(true, 1, 2), new point(true, 3, 4)], __goscriptStatic1())
 	let m = $.makeMap<string, point>([["k", new point(true, 1, 2)]])
 	let p = new pair(true, new point(true, 1, 2))
-	await $.println("zero:", eq(__goscriptStatic1(), (zero).clone(), new point(true)), eq(__goscriptStatic1(), (zero).clone(), ($.arrayIndex(made!, 0)).clone()))
-	await $.println("deref:", eq(__goscriptStatic1(), (lit).clone(), ($.pointerValue<point>(ptr)).clone()), "slice:", eq(__goscriptStatic1(), (lit).clone(), ($.arrayIndex(made!, 1)).clone()), "array:", eq(__goscriptStatic1(), (lit).clone(), (arr[0]).clone()))
-	await $.println("map:", eq(__goscriptStatic1(), (lit).clone(), ($.mapGet<string, point, point>(m, "k", new point(true))[0]).clone()), "field:", eq(__goscriptStatic1(), (lit).clone(), (p.a).clone()), "return:", eq(__goscriptStatic1(), (lit).clone(), newPoint(1, 2)))
-	await $.println("differ:", eq(__goscriptStatic1(), (lit).clone(), (arr[1]).clone()), "pair:", eq(__goscriptStatic2(), p, new pair(true, (lit).clone())))
+	await $.println("zero:", eq(__goscriptStatic2(), (zero).clone(), new point(true)), eq(__goscriptStatic2(), (zero).clone(), ($.arrayIndex(made!, 0)).clone()))
+	await $.println("deref:", eq(__goscriptStatic2(), (lit).clone(), ($.pointerValue<point>(ptr)).clone()), "slice:", eq(__goscriptStatic2(), (lit).clone(), ($.arrayIndex(made!, 1)).clone()), "array:", eq(__goscriptStatic2(), (lit).clone(), (arr[0]).clone()))
+	await $.println("map:", eq(__goscriptStatic2(), (lit).clone(), ($.mapGet<string, point, point>(m, "k", new point(true))[0]).clone()), "field:", eq(__goscriptStatic2(), (lit).clone(), (p.a).clone()), "return:", eq(__goscriptStatic2(), (lit).clone(), newPoint(1, 2)))
+	await $.println("differ:", eq(__goscriptStatic2(), (lit).clone(), (arr[1]).clone()), "pair:", eq(__goscriptStatic3(), p, new pair(true, (lit).clone())))
 	await $.println("index values:", slices.Index($.arrayToSlice<point>([new point(true, 3, 4), new point(true, 1, 2)]), ($.pointerValue<point>(ptr)).clone()))
 	await $.println("any values:", $.comparableEqual($.structInterfaceValue((lit).clone(), "main.point", "main.point"), $.structInterfaceValue(($.pointerValue<point>(ptr)).clone(), "main.point", "main.point")), $.comparableEqual($.structInterfaceValue((lit).clone(), "main.point", "main.point"), $.structInterfaceValue((arr[1]).clone(), "main.point", "main.point")))
 }
@@ -144,12 +144,17 @@ function __goscriptStatic0(): any {
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.point", zero: () => new point(true) }})
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.arrayType("main.point", 2))
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.pair", zero: () => new pair(true) }})
+	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.point", zero: () => new point(true) }})
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.pair", zero: () => new pair(true) }})
 }
 
 if ($.isMainScript(import.meta)) {
