@@ -6023,7 +6023,13 @@ function functionTypeInfoFromType(typ: Type): $.FunctionTypeInfo {
 export function typeInfoFromReflectType(typ: Type): string | $.TypeInfo {
   const typeName =
     typ.PkgPath() !== '' && typ.Name() !== '' ? runtimeTypeString(typ) : ''
-  if (typeName !== '' && typ.Kind() === Struct) {
+  // A named struct, or another registered named type, is described by its
+  // name, as the compiler describes it, so that the types made of it keep
+  // its name.
+  if (
+    typeName !== '' &&
+    (typ.Kind() === Struct || $.getTypeByName(typeName) !== undefined)
+  ) {
     return typeName
   }
   switch (typ.Kind()) {

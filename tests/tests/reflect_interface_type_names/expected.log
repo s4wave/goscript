@@ -1,0 +1,10 @@
+[]main.Node Node main.Node
+*[]main.Node Node
+*main.Node Node main.Node
+**main.Node Node
+map[string]main.Node Node main.Node
+*map[string]main.Node Node
+[]main.Props Props main.Props
+*[]main.Props Props
+[]main.Grid Grid main.Grid
+*[]main.Grid Grid
