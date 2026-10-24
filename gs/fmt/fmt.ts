@@ -524,6 +524,16 @@ function defaultFormatMaybe(
       ']',
     )
   }
+  if (typeof value === 'function') {
+    // A func prints as its address, as %p prints it, rather than as its
+    // JavaScript source; %#v also spells its type, as in Go.
+    const address = '0x' + $.functionAddress(value).toString(16)
+    const name =
+      flags.includes('#') ?
+        ($.typeInfoGoString(typeInfo) ?? TypeOf(value)?.String())
+      : undefined
+    return name !== undefined ? '(' + name + ')(' + address + ')' : address
+  }
   if (typeof value === 'object') {
     // Go consults methods on exported fields, with GoString reserved for %#v.
     const methodValue = $.isVarRef(value) ? value.value : value

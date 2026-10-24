@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "*": [
+        "./*"
+      ],
+      "@go/github.com/s4wave/goscript/*": [
+        "../../../*"
+      ],
+      "@goscript/*": [
+        "../../../tests/tests/fmt_func_values/run/output/@goscript/*",
+        "../../../gs/*",
+        "../../../tests/deps/*"
+      ],
+      "@goscript/github.com/s4wave/goscript/tests/tests/fmt_func_values/*": [
+        "./*"
+      ]
+    }
+  },
+  "extends": "../../../tests/tsconfig.base.json",
+  "include": [
+    "fmt_func_values.gs.ts",
+    "index.ts"
+  ]
+}

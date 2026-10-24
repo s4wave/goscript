@@ -5,7 +5,7 @@ import {
   typedSliceHintOfBasic,
   type TypedSlice,
 } from './slice.js'
-import { isVarRef, varRef, type VarRef } from './varRef.js'
+import { isVarRef, pointerAddress, varRef, type VarRef } from './varRef.js'
 import { runtimePanic } from './panic.js'
 
 /**
@@ -3776,6 +3776,7 @@ function typedFunction(
   const wrapper = Object.assign(fn.bind(null), {
     __goTypeName: name,
     __typeInfo: typeInfo,
+    __goTarget: Reflect.get(fn, '__goTarget') ?? fn,
   })
 
   // The wrapper keeps the Go name and the twin of fn.
@@ -3872,6 +3873,15 @@ export function callReflectTwin(
     return twin.apply(receiver, args)
   }
   return receiver[name](...args)
+}
+
+// functionAddress returns the address of the function value fn, which is that
+// of the function it was made from, so that the wrappers that typedFunction
+// makes when a function is converted have the address of the function, as a
+// Go function has the address of its code however it is converted.
+export function functionAddress(fn: object): number {
+  const target: unknown = Reflect.get(fn, '__goTarget')
+  return pointerAddress(typeof target === 'function' ? target : fn)
 }
 
 // goFunctionName returns the Go name of the function value fn: the name
