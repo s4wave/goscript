@@ -946,17 +946,15 @@ func (o *compilerCacheKeyOwner) keyedGoMod(file string, data []byte) []byte {
 
 // sharedIdentity digests the schema, the compiler identity and the request.
 // Override directories count by content, which decides the override facts the
-// parity check reads.
+// parity check reads. Protobuf binding roots count only through the bindings
+// each package reads (protobufSideInputs): a root outside every module would
+// key by its path from the request directory, which differs per build
+// directory, so programs that share packages would share no artifact.
 func (o *compilerCacheKeyOwner) sharedIdentity() string {
 	var b strings.Builder
 	writeKeyField(&b, "schema", compilerCacheSchema)
 	writeCompilerIdentity(&b)
 	req := o.req
-	if req.ProtobufTypeScriptBinding {
-		for _, root := range req.AdditionalBindingRoots {
-			writeKeyField(&b, "protobuf-binding-root", o.keyPath(root))
-		}
-	}
 	for _, flag := range goScriptBuildFlags(req.BuildFlags) {
 		writeKeyField(&b, "build-flag", flag)
 	}
