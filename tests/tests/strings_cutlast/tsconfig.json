@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "*": [
+        "./*"
+      ],
+      "@go/github.com/s4wave/goscript/*": [
+        "../../../*"
+      ],
+      "@goscript/*": [
+        "../../../tests/tests/strings_cutlast/run/output/@goscript/*",
+        "../../../gs/*",
+        "../../../tests/deps/*"
+      ],
+      "@goscript/github.com/s4wave/goscript/tests/tests/strings_cutlast/*": [
+        "./*"
+      ]
+    }
+  },
+  "extends": "../../../tests/tsconfig.base.json",
+  "include": [
+    "index.ts",
+    "strings_cutlast.gs.ts"
+  ]
+}

@@ -662,6 +662,15 @@ export function Cut(s: string, sep: string): [string, string, boolean] {
   return [s.slice(0, index), s.slice(index + sep.length), true]
 }
 
+// CutLast slices s around the last instance of sep, returning the text before and after sep.
+export function CutLast(s: string, sep: string): [string, string, boolean] {
+  const index = s.lastIndexOf(sep)
+  if (index === -1) {
+    return [s, '', false]
+  }
+  return [s.slice(0, index), s.slice(index + sep.length), true]
+}
+
 // CutPrefix returns s without the provided leading prefix string and reports whether it found the prefix.
 export function CutPrefix(s: string, prefix: string): [string, boolean] {
   if (s.startsWith(prefix)) {

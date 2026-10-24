@@ -1,0 +1,4 @@
+CutLast: a/b c true
+Cut: a b/c true
+missing: abc true false
+multi: héllo::wörld end true

@@ -10,6 +10,7 @@ import {
   ContainsRune,
   Count,
   Cut,
+  CutLast,
   CutPrefix,
   CutSuffix,
   EqualFold,
@@ -125,6 +126,16 @@ describe('strings', () => {
       expect(Cut('hello', '-')).toEqual(['hello', '', false])
       expect(Cut('', '-')).toEqual(['', '', false])
       expect(Cut('a-b-c', '-')).toEqual(['a', 'b-c', true])
+    })
+  })
+
+  describe('CutLast', () => {
+    it('should cut around the last separator', () => {
+      expect(CutLast('a-b-c', '-')).toEqual(['a-b', 'c', true])
+      expect(CutLast('hello', '-')).toEqual(['hello', '', false])
+      expect(CutLast('', '-')).toEqual(['', '', false])
+      expect(CutLast('a--b', '--')).toEqual(['a', 'b', true])
+      expect(CutLast('abc', '')).toEqual(['abc', '', true])
     })
   })
 
