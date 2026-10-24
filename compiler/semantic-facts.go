@@ -108,12 +108,12 @@ func (m *SemanticModel) fileSet() *token.FileSet {
 }
 
 // objectFactID names obj stably across compiles of the same package source:
-// its name and its declaring file and offset. Generic instances share their
-// origin's ID.
+// its name and its declaring file and offset, ignoring //line directives.
+// Generic instances share their origin's ID.
 func objectFactID(fset *token.FileSet, obj types.Object) string {
 	if fset == nil || !obj.Pos().IsValid() {
 		return obj.Name()
 	}
-	pos := fset.Position(obj.Pos())
+	pos := fset.PositionFor(obj.Pos(), false)
 	return obj.Name() + "@" + filepath.Base(pos.Filename) + ":" + strconv.Itoa(pos.Offset)
 }

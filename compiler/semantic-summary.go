@@ -399,7 +399,7 @@ func summarizeBody(shard *SemanticModel, semPkg *semanticPackage, objects *summa
 			}
 			return true
 		})
-		position := fset.Position(literal.Pos())
+		position := fset.PositionFor(literal.Pos(), false)
 		summary.literals = append(summary.literals, summaryLiteral{file: baseName(position.Filename), offset: position.Offset})
 		literalTypes[pkg.TypesInfo.TypeOf(literal)] = idx
 	}
@@ -646,9 +646,11 @@ func compareObjectPos(a, b types.Object) int {
 	return int(a.Pos()) - int(b.Pos())
 }
 
-// summaryPosKey names a position by its file and offset.
+// summaryPosKey names a position by its file and offset. The file is the one
+// the position is in, not one a //line directive names: generated parsers
+// name a grammar file that the package does not hold.
 func summaryPosKey(fset *token.FileSet, pos token.Pos) string {
-	position := fset.Position(pos)
+	position := fset.PositionFor(pos, false)
 	return baseName(position.Filename) + ":" + strconv.Itoa(position.Offset)
 }
 
@@ -658,8 +660,7 @@ func summaryPosKey(fset *token.FileSet, pos token.Pos) string {
 func (k *summaryKeys) ref(fn *types.Func) (string, bool) {
 	// A synthetic node is named by its position.
 	if fn.Name() == funcLitNodeName && fn.Pkg() != nil {
-		position := k.objects.fset.Position(fn.Pos())
-		return summaryLiteralRefPrefix + baseName(position.Filename) + ":" + strconv.Itoa(position.Offset), true
+		return summaryLiteralRefPrefix + summaryPosKey(k.objects.fset, fn.Pos()), true
 	}
 	if varName, ok := strings.CutPrefix(fn.Name(), lazyInitNodeName); ok && fn.Pkg() != nil {
 		obj := fn.Pkg().Scope().Lookup(varName)
@@ -771,7 +772,7 @@ func newBodyApplier(summary *bodySummary, pkg *packages.Package, objects *summar
 	}
 	files := make(map[string]*ast.File, len(pkg.Syntax))
 	for _, file := range pkg.Syntax {
-		files[baseName(pkg.Fset.Position(file.Pos()).Filename)] = file
+		files[baseName(pkg.Fset.PositionFor(file.Pos(), false).Filename)] = file
 	}
 	a.pkg, a.files = pkg, files
 	for _, ref := range summary.literals {

@@ -11,24 +11,34 @@ import (
 // TestBodySummaryRoundTrip checks that packages built from their body
 // summaries after a check without bodies give the same whole-program facts as
 // packages built from their bodies, in a library build and in a whole program,
-// where function values reach only the classes of calls they match.
+// where function values reach only the classes of calls they match. Besides
+// the compiler itself it builds a generated parser whose //line directives
+// name a grammar file the package does not hold.
 func TestBodySummaryRoundTrip(t *testing.T) {
+	lineDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/linedirective\n\ngo 1.25.3\n",
+		"parse.go": "package linedirective\n\n" +
+			"func Parse(f func() int) int { return f() }\n\n" +
+			"//line grammar.y:10\n" +
+			"func Rule() int { return Parse(func() int { return 1 }) }\n",
+	})
 	for _, wholeProgram := range []bool{false, true} {
 		t.Run(map[bool]string{false: "library", true: "program"}[wholeProgram], func(t *testing.T) {
-			testBodySummaryRoundTrip(t, wholeProgram)
+			testBodySummaryRoundTrip(t, "..", "./compiler", wholeProgram)
+			testBodySummaryRoundTrip(t, lineDir, ".", wholeProgram)
 		})
 	}
 }
 
 // testBodySummaryRoundTrip compares the facts of a build from bodies and a
-// build from summaries.
-func testBodySummaryRoundTrip(t *testing.T, wholeProgram bool) {
+// build from summaries of the packages pattern names in dir.
+func testBodySummaryRoundTrip(t *testing.T, dir, pattern string, wholeProgram bool) {
 	ctx := context.Background()
 	service := NewCompileService()
 	req := service.RequestOwner().NewRequest(Config{
-		Dir:        "..",
+		Dir:        dir,
 		OutputPath: t.TempDir(),
-	}, []string{"./compiler"})
+	}, []string{pattern})
 	graph, diagnostics := service.graphOwner.Load(ctx, req)
 	if diagnosticsHaveErrors(diagnostics) {
 		t.Fatalf("load: %v", diagnostics)
