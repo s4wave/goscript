@@ -255,20 +255,27 @@ export function genericPointerRef<T>(
  * variable's address.
  */
 export function pointerValue<T>(value: T | VarRef<T> | null | undefined): T {
+  // A variable reference holds its value, and a struct that is not a boxed
+  // pointer is its own target. These property reads are much faster than
+  // the type and 'in' checks of pointerValueSlow, on the many kinds of
+  // objects seen here, and keep this function small enough to be inlined.
+  if (value !== null && value !== undefined) {
+    if ((value as any).__isVarRef === true) {
+      return (value as VarRef<T>).value
+    }
+    if ((value as any).__goValue === undefined) {
+      return value as T
+    }
+  }
+  return pointerValueSlow(value)
+}
+
+// pointerValueSlow is pointerValue for nil and boxed pointers.
+function pointerValueSlow<T>(value: T | VarRef<T> | null | undefined): T {
   if (value === null || value === undefined) {
     runtimePanic(
       'runtime error: invalid memory address or nil pointer dereference',
     )
-  }
-
-  // A variable reference holds its value, and a struct that is not a boxed
-  // pointer is its own target. These property reads are much faster than
-  // the type and 'in' checks below, on the many kinds of objects seen here.
-  if ((value as any).__isVarRef === true) {
-    return (value as VarRef<T>).value
-  }
-  if ((value as any).__goValue === undefined) {
-    return value as T
   }
 
   // A boxed pointer is unwrapped to its target.

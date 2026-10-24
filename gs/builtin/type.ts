@@ -1948,10 +1948,16 @@ function markClonedStructValue<T>(copy: T): T {
 // value unchanged. A marked struct with no clone method is returned unchanged
 // rather than panicking.
 export function copyElement<T>(value: T): T {
-  // A value that is not an object is copied by value.
+  // A value that is not an object is copied by value, here in a function
+  // small enough for engines to inline; copyObjectElement copies the others.
   if (typeof value !== 'object' || value === null) {
     return value
   }
+  return copyObjectElement(value)
+}
+
+// copyObjectElement is copyElement for a value that is an object.
+function copyObjectElement<T>(value: T & object): T {
 
   // A struct value of a class is copied as its class copies it.
   if ((value as any)[structValueMarker] === true) {

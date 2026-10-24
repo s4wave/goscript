@@ -124,6 +124,22 @@ export function sliceRange(
 export function sliceRange<T>(
   slice: Slice<T> | TypedSlice | null | undefined,
 ): SliceRange<T> | SliceRange<number> {
+  // A window object is its own window, and a plain array is a window over
+  // itself. They are handled here, in a function small enough for engines
+  // to inline, which also lets them avoid allocating the window of an array.
+  if (slice instanceof GoSlice) {
+    return slice
+  }
+  if (Array.isArray(slice) && (slice as any).__meta__ === undefined) {
+    return { backing: slice, offset: 0, length: slice.length }
+  }
+  return sliceRangeSlow(slice)
+}
+
+// sliceRangeSlow is sliceRange for nil, typed and proxied slices.
+function sliceRangeSlow<T>(
+  slice: Slice<T> | TypedSlice | null | undefined,
+): SliceRange<T> | SliceRange<number> {
   // A nil slice has no elements.
   if (slice === null || slice === undefined) {
     return emptySliceRange
@@ -1325,25 +1341,29 @@ export function arrayToSlice<T>(
 export function sliceLen(
   slice: Slice<unknown> | unknown[] | TypedSlice | null | undefined,
 ): number {
-  // A nil slice has no elements.
-  if (slice === null || slice === undefined) {
-    return 0
-  }
-
-  // A window object and a plain array are the common cases, tested first
-  // without reading __meta__, which is slow on the many kinds of objects
-  // seen here. An array proxy (a window viewed as a Go array) has __meta__.
+  // A window object, a plain array and a typed slice are the common cases,
+  // tested here without reading __meta__, which is slow on the many kinds of
+  // objects seen here, in a function small enough for engines to inline. An
+  // array proxy (a window viewed as a Go array) has __meta__.
   if (slice instanceof GoSlice) {
     return slice.length
+  }
+  if (ArrayBuffer.isView(slice)) {
+    return (slice as TypedSlice).length
   }
   if (Array.isArray(slice) && (slice as any).__meta__ === undefined) {
     return slice.length
   }
+  return sliceLenSlow(slice)
+}
 
-  // A typed slice is a view of exactly its elements, whose window, if any,
-  // has the same length.
-  if (isTypedSlice(slice)) {
-    return slice.length
+// sliceLenSlow is sliceLen for nil slices, proxies and windowed arrays.
+function sliceLenSlow(
+  slice: Slice<unknown> | unknown[] | TypedSlice | null | undefined,
+): number {
+  // A nil slice has no elements.
+  if (slice === null || slice === undefined) {
+    return 0
   }
 
   // A slice proxy knows its length.
@@ -2325,6 +2345,36 @@ export function checkArrayIndex(index: number, length: number): number {
  * arrayIndex reads an array or slice element with Go bounds checks.
  */
 export function arrayIndex<
+  C extends
+    | Slice<unknown>
+    | SliceProxy<unknown>
+    | unknown[]
+    | TypedSlice
+    | null
+    | undefined,
+>(collection: C, index: number): ArrayIndexValue<C> {
+  // An index in range of a window object, a typed slice or a plain array is
+  // read here, in a function small enough for engines to inline into hot
+  // loops; arrayIndexSlow handles the other representations and panics.
+  if (collection instanceof GoSlice) {
+    if (index >= 0 && index < collection.length) {
+      return collection.backing[collection.offset + index] as ArrayIndexValue<C>
+    }
+  } else if (ArrayBuffer.isView(collection)) {
+    if (index >= 0 && index < (collection as TypedSlice).length) {
+      return (collection as TypedSlice)[index] as ArrayIndexValue<C>
+    }
+  } else if (Array.isArray(collection) && (collection as any).__meta__ === undefined) {
+    if (index >= 0 && index < collection.length) {
+      return collection[index] as ArrayIndexValue<C>
+    }
+  }
+  return arrayIndexSlow(collection, index)
+}
+
+// arrayIndexSlow is arrayIndex for the representations and indexes that its
+// fast path does not handle.
+function arrayIndexSlow<
   C extends
     | Slice<unknown>
     | SliceProxy<unknown>
