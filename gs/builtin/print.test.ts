@@ -4,27 +4,34 @@ import { formatPrintedArgs } from './print.js'
 import { fieldRef, varRef } from './varRef.js'
 
 describe('builtin println formatting', () => {
+  it('writes print operands with nothing between them', () => {
+    expect(formatPrintedArgs(['a ', 'b', 1, 2], '')).toBe('a b12')
+  })
+
   it('formats Uint8Array values with a stable inspect-style representation', () => {
     expect(
-      formatPrintedArgs(['b2:', new Uint8Array([72, 101, 108, 108, 111])]),
+      formatPrintedArgs(['b2:', new Uint8Array([72, 101, 108, 108, 111])], ' '),
     ).toBe('b2: Uint8Array(5) [ 72, 101, 108, 108, 111 ]')
   })
 
   it('quotes nested string array elements', () => {
-    expect(formatPrintedArgs(['strings.Split:', ['a', 'b', 'c']])).toBe(
+    expect(formatPrintedArgs(['strings.Split:', ['a', 'b', 'c']], ' ')).toBe(
       'strings.Split: [ "a", "b", "c" ]',
     )
   })
 
   it('formats plain objects across multiple lines', () => {
     expect(
-      formatPrintedArgs([
-        'out:',
-        {
-          exampleField: new Uint8Array([104, 101, 108, 108, 111]),
-          exampleText: 'world',
-        },
-      ]),
+      formatPrintedArgs(
+        [
+          'out:',
+          {
+            exampleField: new Uint8Array([104, 101, 108, 108, 111]),
+            exampleText: 'world',
+          },
+        ],
+        ' ',
+      ),
     ).toBe(`out: {
   exampleField: Uint8Array(5) [ 104, 101, 108, 108, 111 ],
   exampleText: "world",
@@ -33,12 +40,15 @@ describe('builtin println formatting', () => {
 
   it('formats goscript struct field bags using field values', () => {
     expect(
-      formatPrintedArgs([
-        {
-          Name: 'hello',
-          Count: 3,
-        },
-      ]),
+      formatPrintedArgs(
+        [
+          {
+            Name: 'hello',
+            Count: 3,
+          },
+        ],
+        ' ',
+      ),
     ).toBe(`{
   Name: "hello",
   Count: 3,
@@ -51,9 +61,9 @@ describe('builtin println formatting', () => {
     const field = fieldRef(storage, 'Count')
     const value = { Local: local, Field: field }
     const expected = '{\n  Local: 4,\n  Field: 3,\n}'
-    expect(formatPrintedArgs([value])).toBe(expected)
+    expect(formatPrintedArgs([value], ' ')).toBe(expected)
     void local.__goPointer
     void field.__goPointer
-    expect(formatPrintedArgs([value])).toBe(expected)
+    expect(formatPrintedArgs([value], ' ')).toBe(expected)
   })
 })

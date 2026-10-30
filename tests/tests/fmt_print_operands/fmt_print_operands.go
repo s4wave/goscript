@@ -113,4 +113,9 @@ func main() {
 	var b strings.Builder
 	write(&b, 6)
 	print(b.String())
+
+	// The builtin print writes its operands with nothing between them, and
+	// println separates them with spaces.
+	print("print: ", 1, 2, "\n")
+	println("println:", 1, 2)
 }
