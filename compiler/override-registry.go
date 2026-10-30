@@ -17,6 +17,12 @@ type OverrideMetadata struct {
 	// that reaches them through the override, such as a method call on a
 	// result, can import them.
 	NativeDependencies []string
+	// SourceWhenImported names packages whose import by a package the
+	// program compiles from Go source makes the program compile this package
+	// from its Go source too. An override that implements only part of a
+	// package family, such as encoding/json without encoding/json/v2, yields
+	// to the source of the whole family in a program that reaches the rest.
+	SourceWhenImported []string
 	// AsyncFunctions maps package-level function names to async status.
 	AsyncFunctions map[string]bool
 	// CallbackAsyncFunctions maps package-level function names, or

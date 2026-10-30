@@ -78,7 +78,10 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 		model.freeze()
 		return model, diagnostics
 	}
+	overrideFacts = graph.overrideFacts(overrideFacts)
+	model.overrideFacts = overrideFacts
 
+	// Separate the override packages from the packages the model compiles.
 	var nodes []*PackageGraphNode
 	var overridePkgs []*types.Package
 	for _, node := range graph.Nodes {

@@ -397,8 +397,8 @@ func TestPackageBlocklistIgnoresOverrideCandidateImports(t *testing.T) {
 
 func TestPackageGraphDetectsOverrideCandidates(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
-		"go.mod":  "module example.test/override\n\ngo 1.25.3\n",
-		"main.go": "package main\nimport \"fmt\"\nfunc main() { fmt.Println(\"ok\") }\n",
+		"go.mod":  "module example.test/override\n\ngo 1.27\n",
+		"main.go": "package main\nimport (\n\"encoding/json\"\n\"fmt\"\n)\nfunc main() { fmt.Println(json.Valid(nil)) }\n",
 	})
 	graph := loadPackageGraph(t, &CompileRequest{
 		Patterns:            []string{"."},
@@ -408,12 +408,46 @@ func TestPackageGraphDetectsOverrideCandidates(t *testing.T) {
 		RuntimeEmissionMode: RuntimeEmissionModeEmit,
 	})
 
-	node := graph.NodesByPackagePath["fmt"]
-	if node == nil {
-		t.Fatalf("expected fmt node in graph")
+	// A program that imports only encoding/json keeps its override.
+	for _, pkgPath := range []string{"fmt", "encoding/json"} {
+		node := graph.NodesByPackagePath[pkgPath]
+		if node == nil || !node.OverrideCandidate {
+			t.Fatalf("expected %s to be detected as an override candidate", pkgPath)
+		}
 	}
-	if !node.OverrideCandidate {
-		t.Fatalf("expected fmt to be detected as an override candidate")
+	if len(graph.SourceOverrides) != 0 {
+		t.Fatalf("expected no overrides compiled from source, got %v", graph.SourceOverrides)
+	}
+}
+
+// TestPackageGraphCompilesJSONFamilyFromSource checks that a program that
+// imports encoding/json/v2 compiles the encoding/json family from Go source,
+// since the encoding/json override cannot share options or types with v2
+// compiled from source.
+func TestPackageGraphCompilesJSONFamilyFromSource(t *testing.T) {
+	// Load a program that uses both encoding/json and encoding/json/v2.
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod":  "module example.test/jsonv2\n\ngo 1.27\n",
+		"main.go": "package main\nimport (\n\"encoding/json\"\njsonv2 \"encoding/json/v2\"\n)\nfunc main() { jsonv2.Marshal(json.Valid(nil)) }\n",
+	})
+	graph := loadPackageGraph(t, &CompileRequest{
+		Patterns:            []string{"."},
+		Dir:                 moduleDir,
+		OutputPath:          filepath.Join(t.TempDir(), "out"),
+		DependencyMode:      DependencyModeAll,
+		RuntimeEmissionMode: RuntimeEmissionModeEmit,
+	})
+
+	// Each package of the family lowers from source.
+	family := []string{"encoding/json", "encoding/json/jsontext", "encoding/json/v2"}
+	if !slices.Equal(graph.SourceOverrides, family) {
+		t.Fatalf("expected source overrides %v, got %v", family, graph.SourceOverrides)
+	}
+	for _, pkgPath := range family {
+		node := graph.NodesByPackagePath[pkgPath]
+		if node == nil || node.OverrideCandidate {
+			t.Fatalf("expected %s to be compiled from source", pkgPath)
+		}
 	}
 }
 

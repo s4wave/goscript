@@ -4,6 +4,10 @@
     "encoding/json/v2",
     "io"
   ],
+  "sourceWhenImported": [
+    "encoding/json/jsontext",
+    "encoding/json/v2"
+  ],
   "asyncMethods": {
     "Decoder.Decode": true,
     "Decoder.More": true,

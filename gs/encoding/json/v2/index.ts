@@ -1,11 +1,9 @@
-// encoding/json/v2 is not supported: its implementation uses the internals of
-// encoding/json/jsontext, which the jsontext override does not implement, so
-// compiling it from Go source fails when the package initializes. parity.json
-// blocks its exports, so a program that uses one fails to compile instead.
-//
-// Marshaler and Unmarshaler are the exceptions: encoding/json.Marshaler and
-// encoding/json.Unmarshaler are aliases of them since Go 1.27, so code that
-// uses those types refers to these, which have the same methods.
+// A program that imports encoding/json/v2 or encoding/json/jsontext compiles
+// all three encoding/json packages from Go source (see sourceWhenImported in
+// meta.json), so this override serves only programs that reach encoding/json/v2
+// through the encoding/json override. That override uses Marshaler and
+// Unmarshaler, which encoding/json.Marshaler and encoding/json.Unmarshaler
+// alias since Go 1.27; parity.json blocks every other export.
 import type * as $ from '@goscript/builtin/index.js'
 
 export interface Marshaler {

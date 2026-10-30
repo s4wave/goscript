@@ -14,6 +14,9 @@ type SemanticModel struct {
 	// runtimePackageNames are the runtime names of the packages that share
 	// their name with another package of the program (see sharedPackageNames).
 	runtimePackageNames map[string]string
+	// overrideFacts are the override facts of the program, without the
+	// overrides it compiles from source (see PackageGraph.SourceOverrides).
+	overrideFacts *OverrideFacts
 
 	packages     map[string]*semanticPackage
 	addressTaken map[types.Object]bool
