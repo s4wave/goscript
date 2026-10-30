@@ -58,6 +58,19 @@ func (f *OverrideFacts) HasPackage(pkgPath string) bool {
 	return ok
 }
 
+// withoutPackages returns the facts without the overrides of pkgPaths, for a
+// program that compiles those packages from their Go source.
+func (f *OverrideFacts) withoutPackages(pkgPaths []string) *OverrideFacts {
+	if f == nil || len(pkgPaths) == 0 {
+		return f
+	}
+	packages := maps.Clone(f.packages)
+	for _, pkgPath := range pkgPaths {
+		delete(packages, pkgPath)
+	}
+	return &OverrideFacts{packages: packages}
+}
+
 // Metadata returns compiler-visible override metadata for a package path.
 func (f *OverrideFacts) Metadata(pkgPath string) OverrideMetadata {
 	if f == nil {
@@ -443,6 +456,10 @@ func loadOverrideMetadata(root overridePackageRoot) (OverrideMetadata, error) {
 		case "nativeDependencies":
 			for iter.ReadArray() {
 				metadata.NativeDependencies = append(metadata.NativeDependencies, iter.ReadString())
+			}
+		case "sourceWhenImported":
+			for iter.ReadArray() {
+				metadata.SourceWhenImported = append(metadata.SourceWhenImported, iter.ReadString())
 			}
 		case "asyncMethods":
 			for method := iter.ReadObject(); method != ""; method = iter.ReadObject() {
@@ -910,6 +927,7 @@ func cloneOverrideMetadata(metadata OverrideMetadata) OverrideMetadata {
 	return OverrideMetadata{
 		Dependencies:              slices.Clone(metadata.Dependencies),
 		NativeDependencies:        slices.Clone(metadata.NativeDependencies),
+		SourceWhenImported:        slices.Clone(metadata.SourceWhenImported),
 		AsyncFunctions:            cloneBoolMap(metadata.AsyncFunctions),
 		CallbackAsyncFunctions:    cloneBoolMap(metadata.CallbackAsyncFunctions),
 		AsyncMethods:              cloneBoolMap(metadata.AsyncMethods),

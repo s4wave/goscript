@@ -122,7 +122,7 @@ func (o *LoweringOwner) callSiteArg(ctx lowerFileContext, call *ast.CallExpr) (s
 	// stack, which also names their functions.
 	fn := calledFunction(pkg, ast.Unparen(call.Fun))
 	marked := fn != nil && ctx.model != nil && ctx.model.callSiteFunctions[fn.Origin()]
-	if !marked && !(ctx.callSiteFunction && o.overrideFacts().TakesCallSite(fn)) {
+	if !marked && !(ctx.callSiteFunction && o.facts.TakesCallSite(fn)) {
 		return "", false
 	}
 

@@ -1009,33 +1009,6 @@ func TestOverrideParityVerifierReportsBlockedGoUse(t *testing.T) {
 	requireDiagnosticCode(t, result.Diagnostics, "goscript/overrides:parity-blocked-use")
 }
 
-// TestOverrideParityVerifierBlocksJSONV2 checks that a program that uses
-// encoding/json/v2, which compiled from Go source fails when it initializes,
-// fails to compile instead.
-func TestOverrideParityVerifierBlocksJSONV2(t *testing.T) {
-	moduleDir := writePackageGraphFixture(t, map[string]string{
-		"go.mod": "module example.test/jsonv2\n\ngo 1.27\n",
-		"main.go": strings.Join([]string{
-			"package main",
-			"import \"encoding/json/v2\"",
-			"func main() { json.Marshal(1) }",
-			"",
-		}, "\n"),
-	})
-	comp, err := NewCompiler(&Config{
-		Dir:        moduleDir,
-		OutputPath: filepath.Join(t.TempDir(), "out"),
-	}, nil, nil)
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	result, err := comp.CompilePackages(context.Background(), ".")
-	if err == nil {
-		t.Fatalf("expected compile to fail")
-	}
-	requireDiagnosticCode(t, result.Diagnostics, "goscript/overrides:parity-blocked-use")
-}
-
 func TestOverrideParityVerifierAllowsDeferredMissingExports(t *testing.T) {
 	result, err := compileParityFixture(t, map[string]overrideParityEntry{
 		"Present": {Status: overrideParityStatusReal},

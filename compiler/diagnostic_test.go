@@ -111,6 +111,7 @@ func TestLoweringUnsupportedDiagnosticIncludesSourcePosition(t *testing.T) {
 }
 
 func TestLowerNewExprMissingTypeInformationReturnsDiagnostic(t *testing.T) {
+	// Find the new call in a fixture the type checker never saw.
 	fset := token.NewFileSet()
 	file, err := parser.ParseFile(fset, "main.go", "package main\n\nfunc main() {\n\tnew(missing)\n}\n", 0)
 	if err != nil {
@@ -128,7 +129,8 @@ func TestLowerNewExprMissingTypeInformationReturnsDiagnostic(t *testing.T) {
 		t.Fatal("missing new call")
 	}
 
-	owner := NewLoweringOwner(nil, nil)
+	// Lower it without type information.
+	owner := NewLoweringOwner(nil)
 	ctx := lowerFileContext{
 		semPkg: &semanticPackage{
 			pkgPath: "example.test/missing",
@@ -140,6 +142,8 @@ func TestLowerNewExprMissingTypeInformationReturnsDiagnostic(t *testing.T) {
 		displayRoot: ".",
 	}
 	value, diagnostics := owner.lowerNewExpr(ctx, call)
+
+	// Expect one positioned unsupported diagnostic.
 	if value != "undefined" {
 		t.Fatalf("lowered value = %q, want undefined", value)
 	}

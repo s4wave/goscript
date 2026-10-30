@@ -32,8 +32,9 @@ import (
 
 // LoweringOwner owns conversion from the semantic model to compiler IR.
 type LoweringOwner struct {
-	runtimeOwner  *RuntimeContractOwner
-	overrideOwner *OverrideRegistryOwner
+	runtimeOwner *RuntimeContractOwner
+	// facts are the override facts of the program Build lowers.
+	facts *OverrideFacts
 }
 
 // LoweringOptions are request-scoped lowering switches.
@@ -55,17 +56,11 @@ type LoweringOptions struct {
 }
 
 // NewLoweringOwner creates the lowering owner.
-func NewLoweringOwner(runtimeOwner *RuntimeContractOwner, overrideOwner *OverrideRegistryOwner) *LoweringOwner {
+func NewLoweringOwner(runtimeOwner *RuntimeContractOwner) *LoweringOwner {
 	if runtimeOwner == nil {
 		runtimeOwner = NewRuntimeContractOwner()
 	}
-	if overrideOwner == nil {
-		overrideOwner = NewOverrideRegistryOwner()
-	}
-	return &LoweringOwner{
-		runtimeOwner:  runtimeOwner,
-		overrideOwner: overrideOwner,
-	}
+	return &LoweringOwner{runtimeOwner: runtimeOwner}
 }
 
 // Build converts the semantic model into the compiler IR.
@@ -90,9 +85,14 @@ func (o *LoweringOwner) Build(ctx context.Context, model *SemanticModel, opts ..
 		options = opts[0]
 	}
 
+	// Lower with the override facts of the model's program, which leave out
+	// the overrides it compiles from source.
+	o = &LoweringOwner{runtimeOwner: o.runtimeOwner, facts: model.overrideFacts}
 	program := &LoweredProgram{trimTypeInfo: options.TrimTypeInfo}
 	defer setRuntimePackageNames(model)()
 	defer setLocalTypeNames(model)()
+
+	// Share the caches across package workers and list the packages to lower.
 	asyncLazyCache := newAsyncLazyCache()
 	runtimeMethodSets := newRuntimeMethodSetCache()
 	semPkgs := make([]*semanticPackage, 0, len(model.packages))
@@ -907,7 +907,7 @@ func (o *LoweringOwner) hasGeneratedImportPackage(model *SemanticModel, pkgPath 
 	if model != nil && model.packages[pkgPath] != nil {
 		return true
 	}
-	return o.overrideFacts().HasPackage(pkgPath)
+	return o.facts.HasPackage(pkgPath)
 }
 
 func generatedImportAlias(model *SemanticModel, pkgPath string) string {
@@ -6925,11 +6925,6 @@ func (o *LoweringOwner) shortDeclTypeAnnotation(ctx lowerFileContext, lhs ast.Ex
 // variable declared from the call needs the Go type's nullable annotation
 // to be assigned a nil-able value later.
 func (o *LoweringOwner) callsOverridePackage(ctx lowerFileContext, expr ast.Expr) bool {
-	// Without override packages, no call can reach one.
-	if o.overrideOwner == nil {
-		return false
-	}
-
 	// Only a call can reach an override package function.
 	call, _ := ast.Unparen(expr).(*ast.CallExpr)
 	if call == nil {
@@ -6945,7 +6940,7 @@ func (o *LoweringOwner) callsOverridePackage(ctx lowerFileContext, expr ast.Expr
 		return false
 	}
 	fn, _ := ctx.semPkg.source.TypesInfo.Uses[ident].(*types.Func)
-	return fn != nil && fn.Pkg() != nil && o.overrideFacts().HasPackage(fn.Pkg().Path())
+	return fn != nil && fn.Pkg() != nil && o.facts.HasPackage(fn.Pkg().Path())
 }
 
 // inferredValueType returns the type TypeScript infers for a let binding
@@ -11140,7 +11135,7 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 		selector, selectorDiagnostics := o.lowerSelectorExpr(ctx, fun)
 		selector = reflectTwinCallName(ctx, fun, selector)
 		if genericFunctionSignature(ctx, fun) != nil &&
-			(!o.callUsesOverridePackage(ctx, fun) || o.overrideFacts().TakesTypeArgs(calledFunction(ctx.semPkg.source, fun))) {
+			(!o.callUsesOverridePackage(ctx, fun) || o.facts.TakesTypeArgs(calledFunction(ctx.semPkg.source, fun))) {
 			args = append([]string{o.genericTypeArgsExpr(ctx, fun, nil)}, args...)
 		}
 		args = o.appendSlicesGrowZeroFactory(ctx, fun, expr, args)
@@ -11879,7 +11874,9 @@ func deferCallMayRecover(ctx lowerFileContext, call *ast.CallExpr) bool {
 }
 
 func (o *LoweringOwner) callUsesOverridePackage(ctx lowerFileContext, expr ast.Expr) bool {
-	if o.overrideOwner == nil || ctx.semPkg == nil || ctx.semPkg.source == nil {
+	// A call uses an override when it calls a function that no compiled
+	// package declares and an override package owns.
+	if ctx.semPkg == nil || ctx.semPkg.source == nil {
 		return false
 	}
 	fn := calledFunction(ctx.semPkg.source, expr)
@@ -11889,7 +11886,7 @@ func (o *LoweringOwner) callUsesOverridePackage(ctx lowerFileContext, expr ast.E
 	if ctx.model != nil && ctx.model.functions[fn] != nil {
 		return false
 	}
-	return o.overrideFacts().HasPackage(fn.Pkg().Path())
+	return o.facts.HasPackage(fn.Pkg().Path())
 }
 
 // callUsesSlicesOverride reports whether expr resolves to the handwritten
@@ -12707,10 +12704,10 @@ func (o *LoweringOwner) conversionValueNeedsAwait(ctx lowerFileContext, expr ast
 }
 
 func (o *LoweringOwner) typeUsesOverride(named *types.Named) bool {
-	if named == nil || named.Obj() == nil || named.Obj().Pkg() == nil || o.overrideOwner == nil {
+	if named == nil || named.Obj() == nil || named.Obj().Pkg() == nil {
 		return false
 	}
-	return o.overrideFacts().HasPackage(named.Obj().Pkg().Path())
+	return o.facts.HasPackage(named.Obj().Pkg().Path())
 }
 
 func (o *LoweringOwner) lowerNamedReceiverMethodCall(
@@ -13563,12 +13560,9 @@ var nilReceiverOverrideMethods = map[string]bool{
 }
 
 func (o *LoweringOwner) receiverUsesOverridePackage(typ types.Type) bool {
-	if o.overrideOwner == nil {
-		return false
-	}
 	named, _ := types.Unalias(derefPointerType(typ)).(*types.Named)
 	return named != nil && named.Obj() != nil && named.Obj().Pkg() != nil &&
-		o.overrideFacts().HasPackage(named.Obj().Pkg().Path())
+		o.facts.HasPackage(named.Obj().Pkg().Path())
 }
 
 func (o *LoweringOwner) lowerPromotedMethodReceiver(
@@ -13744,7 +13738,7 @@ func (o *LoweringOwner) lowerPackageVarAddressExpr(ctx lowerFileContext, expr as
 		}
 		// A hand-written override package exports its variables as plain
 		// values, so the address refers to the variable's current value.
-		if obj.Pkg() != nil && o.overrideFacts().HasPackage(obj.Pkg().Path()) {
+		if obj.Pkg() != nil && o.facts.HasPackage(obj.Pkg().Path()) {
 			return o.runtimeOwner.QualifiedHelper(RuntimeHelperVarRef) + "(" + alias + "." + typed.Sel.Name + ")", true
 		}
 		if !objectNeedsVarRef(ctx, obj) {
@@ -14887,7 +14881,7 @@ func (o *LoweringOwner) lowerGenericFunctionValue(
 	// An override function that takes no type arguments, such as those of
 	// the slices override, is its own value, as calls of it pass none.
 	calleeExpr, diagnostics := o.lowerExpr(ctx, callee)
-	if o.callUsesOverridePackage(ctx, callee) && !o.overrideFacts().TakesTypeArgs(calledFunction(ctx.semPkg.source, callee)) {
+	if o.callUsesOverridePackage(ctx, callee) && !o.facts.TakesTypeArgs(calledFunction(ctx.semPkg.source, callee)) {
 		return calleeExpr, diagnostics
 	}
 
@@ -16610,7 +16604,7 @@ func (o *LoweringOwner) hasGeneratedClassShape(named *types.Named) bool {
 		return false
 	}
 	pkg := named.Obj().Pkg()
-	if named.Obj().Parent() != pkg.Scope() || o.overrideFacts().HasPackage(pkg.Path()) {
+	if named.Obj().Parent() != pkg.Scope() || o.facts.HasPackage(pkg.Path()) {
 		return false
 	}
 
@@ -17357,10 +17351,11 @@ func (o *LoweringOwner) isFreshStructCallResult(ctx lowerFileContext, call *ast.
 	}
 
 	// Hand-written override packages may return stored values.
-	return !o.overrideFacts().HasPackage(fn.Pkg().Path())
+	return !o.facts.HasPackage(fn.Pkg().Path())
 }
 
 func constIntExpr(ctx lowerFileContext, expr ast.Expr) (int, bool) {
+	// Read the constant value the type checker recorded.
 	tv, ok := ctx.semPkg.source.TypesInfo.Types[expr]
 	if !ok || tv.Value == nil {
 		return 0, false
@@ -17986,7 +17981,9 @@ func (o *LoweringOwner) genericReceiverTypeArgsExpr(ctx lowerFileContext, select
 }
 
 func (o *LoweringOwner) methodSelectionUsesOverridePackage(ctx lowerFileContext, selection *types.Selection) bool {
-	if o.overrideOwner == nil || selection == nil || selection.Obj() == nil {
+	// The method uses an override when no compiled package declares it and an
+	// override package owns it.
+	if selection == nil || selection.Obj() == nil {
 		return false
 	}
 	method, _ := selection.Obj().(*types.Func)
@@ -17996,7 +17993,7 @@ func (o *LoweringOwner) methodSelectionUsesOverridePackage(ctx lowerFileContext,
 	if ctx.model != nil && ctx.model.functions[method] != nil {
 		return false
 	}
-	return o.overrideFacts().HasPackage(method.Pkg().Path())
+	return o.facts.HasPackage(method.Pkg().Path())
 }
 
 func signatureHasTypeParam(signature *types.Signature, target *types.TypeParam) bool {
@@ -18930,17 +18927,20 @@ func callUsesInterfaceMethod(pkg *packages.Package, fun ast.Expr) bool {
 }
 
 func (o *LoweringOwner) overrideCallNeedsAwait(ctx lowerFileContext, fun ast.Expr) bool {
-	if o.overrideOwner == nil || ctx.semPkg == nil || ctx.semPkg.source == nil {
+	// Override metadata marks a package function async.
+	if ctx.semPkg == nil || ctx.semPkg.source == nil {
 		return false
 	}
 	if fn := calledFunction(ctx.semPkg.source, fun); fn != nil && fn.Pkg() != nil {
 		if protobufGeneratedSyncMethod(ctx, fn) {
 			return false
 		}
-		if o.overrideFacts().IsFunctionAsync(fn.Pkg().Path(), fn.Name()) {
+		if o.facts.IsFunctionAsync(fn.Pkg().Path(), fn.Name()) {
 			return true
 		}
 	}
+
+	// Otherwise override metadata may mark the selected method async.
 	selector, ok := fun.(*ast.SelectorExpr)
 	if !ok {
 		return false
@@ -18956,11 +18956,13 @@ func (o *LoweringOwner) overrideCallNeedsAwait(ctx lowerFileContext, fun ast.Exp
 	if protobufGeneratedSyncMethod(ctx, method) {
 		return false
 	}
+
+	// Look the method up under its receiver's named type.
 	named := selectedReceiverNamedType(ctx.semPkg.source, selector, selection)
 	if named == nil || named.Obj() == nil || named.Obj().Pkg() == nil {
 		return false
 	}
-	return o.overrideFacts().IsMethodAsync(
+	return o.facts.IsMethodAsync(
 		named.Obj().Pkg().Path(),
 		named.Obj().Name()+"."+method.Name(),
 	)
@@ -18973,7 +18975,7 @@ func (o *LoweringOwner) overrideAwaitsCallback(ctx lowerFileContext, fun ast.Exp
 		return false
 	}
 	pkg := ctx.semPkg.source
-	facts := o.overrideFacts()
+	facts := o.facts
 	return facts.AwaitsCallback(overrideCallPackage(pkg, fun), overrideCallMethod(pkg, fun), param) ||
 		facts.AwaitsCallback(overrideFunctionCallPackage(pkg, fun), overrideFunctionCallName(pkg, fun), param)
 }
@@ -18984,7 +18986,7 @@ func (o *LoweringOwner) callbackOverrideCallNeedsAwait(ctx lowerFileContext, cal
 	if ctx.semPkg == nil || ctx.semPkg.source == nil {
 		return false
 	}
-	ok, deps, shapes := callbackOverrideCallFacts(ctx.semPkg.source, o.overrideFacts(), call, ctx.model.literalKey)
+	ok, deps, shapes := callbackOverrideCallFacts(ctx.semPkg.source, o.facts, call, ctx.model.literalKey)
 	if !ok {
 		return false
 	}
@@ -19005,7 +19007,7 @@ func (o *LoweringOwner) callExprNeedsAwait(ctx lowerFileContext, call *ast.CallE
 	if async, ok := ctx.model.mutexCallAsync(ctx.semPkg, call); ok {
 		return async
 	}
-	if shapes, ok := o.overrideFacts().AsyncWhenFieldShapes(calledFunction(ctx.semPkg.source, call.Fun)); ok {
+	if shapes, ok := o.facts.AsyncWhenFieldShapes(calledFunction(ctx.semPkg.source, call.Fun)); ok {
 		return ctx.model == nil || slices.ContainsFunc(shapes, ctx.model.shapeCallAsync)
 	}
 	return o.callNeedsAwait(ctx, call.Fun) || o.callbackOverrideCallNeedsAwait(ctx, call)
@@ -19021,10 +19023,10 @@ func (o *LoweringOwner) formatCallAsync(ctx lowerFileContext, call *ast.CallExpr
 	}
 	pkg := ctx.semPkg.source
 	called := calledFunction(pkg, call.Fun)
-	if !o.overrideFacts().IsAsyncWhenOperands(called) {
+	if !o.facts.IsAsyncWhenOperands(called) {
 		return false, false
 	}
-	return ctx.model.formatCallAsync(pkg, o.overrideFacts(), called, call), true
+	return ctx.model.formatCallAsync(pkg, o.facts, called, call), true
 }
 
 // awaitCallIfNeeded awaits the lowered call when it may suspend. A call
@@ -19076,7 +19078,7 @@ func (o *LoweringOwner) awaitCallIfNeeded(ctx lowerFileContext, call *ast.CallEx
 	called := calledFunction(pkg, fun)
 	if valueCall && !o.valueCallAsync(ctx, fun) ||
 		ctx.model != nil && (ctx.model.asyncWhenTargets[called] || ctx.model.syncOverrideInterfaceMethod(called) ||
-			o.overrideFacts().IsAsyncWhenOperands(called) ||
+			o.facts.IsAsyncWhenOperands(called) ||
 			ctx.model.syncDirective(called) && isInterfaceMethod(called)) {
 		return "(" + lowered + " as " + o.tsSignatureResultFor(ctx, signature) + ")"
 	}
@@ -19545,14 +19547,15 @@ func namedValueExpr(ctx lowerFileContext, named *types.Named) string {
 }
 
 func (o *LoweringOwner) overrideTypeArgsExpr(ctx lowerFileContext, named *types.Named) string {
-	if o.overrideOwner == nil || named == nil || named.Obj() == nil || named.Obj().Pkg() == nil {
+	// Only an instance of an override type passes its type arguments.
+	if named == nil || named.Obj() == nil || named.Obj().Pkg() == nil {
 		return ""
 	}
 	args := named.TypeArgs()
 	if args == nil || args.Len() == 0 {
 		return ""
 	}
-	if !o.overrideFacts().HasPackage(named.Obj().Pkg().Path()) {
+	if !o.facts.HasPackage(named.Obj().Pkg().Path()) {
 		return ""
 	}
 	parts := make([]string, 0, args.Len())
@@ -19560,17 +19563,6 @@ func (o *LoweringOwner) overrideTypeArgsExpr(ctx lowerFileContext, named *types.
 		parts = append(parts, o.tsTypeFor(ctx, typ))
 	}
 	return strings.Join(parts, ", ")
-}
-
-func (o *LoweringOwner) overrideFacts() *OverrideFacts {
-	if o.overrideOwner == nil {
-		return nil
-	}
-	facts, diagnostics := o.overrideOwner.Facts(context.Background())
-	if diagnosticsHaveErrors(diagnostics) {
-		return nil
-	}
-	return facts
 }
 
 func (o *LoweringOwner) tsReceiverTypeFor(ctx lowerFileContext, typ types.Type) string {

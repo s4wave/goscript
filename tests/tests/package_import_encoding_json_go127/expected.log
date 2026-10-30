@@ -9,3 +9,8 @@ RawMessage indent bytes: true true
 RawMessage invalid UTF8 replacement: true ["�"]
 RawMessage surrogate replacement: true "�"
 RawMessage duplicate ordering: true {"a":1,"a":2,"b":0}
+v2 Marshal: {"name":"tri","points":[[1,2],[3,-4]],"tags":{"a":2,"z":1}} true
+v2 Unmarshal: tri 2 -4 2 true
+v2 duplicate name: true
+v2 with v1 options: true true
+jsontext Encoder: {"k":0.5}

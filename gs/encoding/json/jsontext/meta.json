@@ -1,1 +1,6 @@
-{}
+{
+  "sourceWhenImported": [
+    "encoding/json/jsontext",
+    "encoding/json/v2"
+  ]
+}

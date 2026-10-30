@@ -22,6 +22,9 @@ type PackageGraph struct {
 	Nodes []*PackageGraphNode
 	// NodesByPackagePath maps package path to graph node.
 	NodesByPackagePath map[string]*PackageGraphNode
+	// SourceOverrides are the override packages this program compiles from
+	// their Go source, per their sourceWhenImported metadata.
+	SourceOverrides []string
 
 	packagesByPath map[string]*packages.Package
 	// checker holds the file set and parsed syntax Check shares across checks.
@@ -137,22 +140,17 @@ func (o *PackageGraphOwner) LoadIdentity(ctx context.Context, req *CompileReques
 	}
 
 	// Record the packages the patterns matched.
-	graph := &PackageGraph{
-		RequestedPatterns:     slices.Clone(req.Patterns),
-		NodesByPackagePath:    make(map[string]*PackageGraphNode),
-		packagesByPath:        make(map[string]*packages.Package),
-		RequestedPackagePaths: make([]string, 0, len(pkgs)),
-	}
 	requested := make(map[string]bool)
+	var requestedPaths []string
 	for _, pkg := range pkgs {
 		if isTestMainPackage(pkg) {
 			continue
 		}
 		path := packagePath(pkg)
 		requested[path] = true
-		graph.RequestedPackagePaths = append(graph.RequestedPackagePaths, path)
+		requestedPaths = append(requestedPaths, path)
 	}
-	slices.Sort(graph.RequestedPackagePaths)
+	slices.Sort(requestedPaths)
 
 	// With tests, a package's same-package test variant replaces it.
 	samePackageTestVariants := make(map[string]bool)
@@ -165,13 +163,34 @@ func (o *PackageGraphOwner) LoadIdentity(ctx context.Context, req *CompileReques
 		}
 	}
 
-	// Collect the nodes in a stable order.
-	seen := make(map[string]bool)
-	for _, pkg := range pkgs {
-		if isTestMainPackage(pkg) {
-			continue
+	// Collect the nodes until no compiled package imports a package that
+	// makes an override yield to its Go source. A yielded override only adds
+	// compiled packages, so each pass yields at least one more override or
+	// is the last.
+	var graph *PackageGraph
+	var sourceOverrides []string
+	for {
+		graph = &PackageGraph{
+			RequestedPatterns:     slices.Clone(req.Patterns),
+			RequestedPackagePaths: slices.Clone(requestedPaths),
+			NodesByPackagePath:    make(map[string]*PackageGraphNode),
+			SourceOverrides:       slices.Clone(sourceOverrides),
+			packagesByPath:        make(map[string]*packages.Package),
 		}
-		o.collect(graph, pkg, req.DependencyMode, requested, samePackageTestVariants, overrideFacts, seen)
+		facts := overrideFacts.withoutPackages(sourceOverrides)
+		seen := make(map[string]bool)
+		for _, pkg := range pkgs {
+			if isTestMainPackage(pkg) {
+				continue
+			}
+			o.collect(graph, pkg, req.DependencyMode, requested, samePackageTestVariants, facts, seen)
+		}
+		yielded := graph.yieldedOverrides(facts)
+		if len(yielded) == 0 {
+			break
+		}
+		sourceOverrides = append(sourceOverrides, yielded...)
+		slices.Sort(sourceOverrides)
 	}
 	slices.SortFunc(graph.Nodes, func(a, b *PackageGraphNode) int {
 		if a.PkgPath == b.PkgPath {
@@ -271,6 +290,43 @@ func (o *PackageGraphOwner) collect(
 	for _, importPath := range imports {
 		o.collect(graph, pkg.Imports[importPath], mode, requested, samePackageTestVariants, overrideFacts, seen)
 	}
+}
+
+// yieldedOverrides returns the override packages in facts whose
+// sourceWhenImported metadata names a package that a compiled node imports.
+func (g *PackageGraph) yieldedOverrides(facts *OverrideFacts) []string {
+	// Find the packages the compiled nodes import.
+	imported := make(map[string]bool)
+	for _, node := range g.Nodes {
+		if node.OverrideCandidate {
+			continue
+		}
+		for _, importPath := range node.Imports {
+			imported[importPath] = true
+		}
+	}
+
+	// Yield each override that one of them triggers.
+	var yielded []string
+	for pkgPath, pkg := range facts.packages {
+		for _, trigger := range pkg.metadata.SourceWhenImported {
+			if imported[trigger] {
+				yielded = append(yielded, pkgPath)
+				break
+			}
+		}
+	}
+	slices.Sort(yielded)
+	return yielded
+}
+
+// overrideFacts returns the override facts of the program the graph holds:
+// facts without the overrides it compiles from source.
+func (g *PackageGraph) overrideFacts(facts *OverrideFacts) *OverrideFacts {
+	if g == nil {
+		return facts
+	}
+	return facts.withoutPackages(g.SourceOverrides)
 }
 
 func newPackageGraphNode(pkg *packages.Package, requested bool, overrideFacts *OverrideFacts) *PackageGraphNode {

@@ -27,7 +27,7 @@ func NewCompileService(overrideDirs ...string) *CompileService {
 		requestOwner:  NewCompileRequestOwner(),
 		graphOwner:    NewPackageGraphOwner(overrideOwner),
 		semanticOwner: NewSemanticModelOwner(overrideOwner),
-		loweringOwner: NewLoweringOwner(runtimeOwner, overrideOwner),
+		loweringOwner: NewLoweringOwner(runtimeOwner),
 		emitterOwner:  NewTypeScriptEmitOwner(runtimeOwner),
 		cacheOwner:    NewCompilerCacheOwner(),
 		runtimeOwner:  runtimeOwner,
@@ -134,6 +134,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		result.Diagnostics = diagnostics
 		return result, NewCompileError(diagnostics)
 	}
+	overrideFacts = graph.overrideFacts(overrideFacts)
 
 	// A package with a stored body summary checks without bodies. When its
 	// summary does not apply, or its artifact misses so it must be lowered,
