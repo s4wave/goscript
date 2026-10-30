@@ -7,3 +7,5 @@ slow
 failed: code 7
 [5.0C]done
 (6.0C)
+print: 12
+println: 1 2

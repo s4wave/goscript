@@ -40,9 +40,13 @@ function surroundMaybeText(
 
 /**
  * formatPrintedArgs formats builtin print/println arguments deterministically.
+ * Go's print writes operands with nothing between them; println passes ' '.
  */
-export function formatPrintedArgs(args: readonly any[]): MaybeText {
-  return surroundMaybeText(args.map(formatPrintedValue), ' ', '', '')
+export function formatPrintedArgs(
+  args: readonly any[],
+  separator: string,
+): MaybeText {
+  return joinMaybeText(args.map(formatPrintedValue), separator)
 }
 
 /**

@@ -230,6 +230,11 @@ export async function main(): globalThis.Promise<void> {
 	let b = $.varRef($.markAsStructValue(new strings.Builder()))
 	await write($.interfaceValue<io.Writer | null>(b, "*strings.Builder", __goscriptStatic3()), 6)
 	await $.print(b.value.String())
+
+	// The builtin print writes its operands with nothing between them, and
+	// println separates them with spaces.
+	await $.print("print: ", 1, 2, "\n")
+	await $.println("println:", 1, 2)
 }
 
 var __goscriptStatic0$value: any

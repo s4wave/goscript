@@ -34,7 +34,9 @@ import { isVarRef, type VarRef } from './varRef.js'
  * print writes formatted operands, awaiting asynchronous string methods.
  */
 export async function print(...args: any[]): Promise<void> {
-  writeHostStdoutText(args.length === 0 ? '' : await formatPrintedArgs(args))
+  writeHostStdoutText(
+    args.length === 0 ? '' : await formatPrintedArgs(args, ''),
+  )
 }
 
 /**
@@ -42,7 +44,7 @@ export async function print(...args: any[]): Promise<void> {
  */
 export async function println(...args: any[]): Promise<void> {
   const message =
-    (args.length === 0 ? '' : await formatPrintedArgs(args)) + '\n'
+    (args.length === 0 ? '' : await formatPrintedArgs(args, ' ')) + '\n'
   writeHostStdoutText(message)
 }
 
