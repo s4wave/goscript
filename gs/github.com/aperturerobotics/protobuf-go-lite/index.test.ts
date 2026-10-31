@@ -12,8 +12,10 @@ import {
   AppendVarint,
   BindMessageMethods,
   CloneBoundMessage,
+  CountTag,
   DecodeBytes,
   DecodeBytesAppend,
+  DecodeBytesCapped,
   DecodeFloat32,
   DecodeFloat64,
   DecodeLengthDelimited,
@@ -977,6 +979,23 @@ describe('protobuf-go-lite encode helpers', () => {
     expect(err).toBeNull()
     expect(end).toBe(4)
     expect(Array.from(decoded as Uint8Array)).toEqual([9, 8, 7])
+  })
+
+  it('decodes capped shared bytes and counts tags', () => {
+    // Two length-delimited fields 1, then a varint field 2.
+    const buf = new Uint8Array([0x0a, 2, 9, 8, 0x0a, 1, 7, 0x10, 5])
+    const [capped, end, err] = DecodeBytesCapped(buf, 1)
+    expect(err).toBeNull()
+    expect(end).toBe(4)
+    expect(Array.from(capped as Uint8Array)).toEqual([9, 8])
+    expect($.cap(capped)).toBe(2)
+
+    // Appending to the capped slice copies rather than overwriting buf.
+    $.append(capped, 1)
+    expect(buf[4]).toBe(0x0a)
+
+    expect(CountTag(buf, 0x0an)).toEqual([2, null])
+    expect(CountTag(buf, 0x10n)).toEqual([1, null])
   })
 
   it('copies raw bytes between slice windows', () => {

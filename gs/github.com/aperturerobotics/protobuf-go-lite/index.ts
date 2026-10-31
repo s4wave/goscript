@@ -1717,6 +1717,42 @@ export function DecodeBytesAppend(
   return [out, end, null]
 }
 
+// DecodeBytesCapped decodes a length-prefixed byte slice that shares b, capped
+// at its length so an append copies instead of writing over the bytes after it.
+export function DecodeBytesCapped(
+  b: $.Slice<number>,
+  idx: number,
+): [$.Slice<number>, number, $.GoError] {
+  const [start, end, err] = DecodeLengthDelimited(b, idx)
+  if (err != null) {
+    return [null, 0, err]
+  }
+  return [$.goSlice(b, start, end, end), end, null]
+}
+
+// CountTag counts the fields in b whose tag is wire.
+export function CountTag(
+  b: $.Slice<number>,
+  wire: bigint,
+): [number, $.GoError] {
+  let n = 0
+  for (let idx = 0; idx < $.len(b); ) {
+    const [tag, , err] = DecodeVarint(b, idx)
+    if (err != null) {
+      return [0, err]
+    }
+    if (tag == wire) {
+      n++
+    }
+    const [skippy, skipErr] = Skip($.goSlice(b, idx))
+    if (skipErr != null) {
+      return [0, skipErr]
+    }
+    idx += skippy
+  }
+  return [n, null]
+}
+
 export function DecodeString(
   b: $.Slice<number>,
   idx: number,
