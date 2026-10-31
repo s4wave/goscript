@@ -836,6 +836,8 @@ func TestCompilePackagesRoutesUint64BinaryOpsThroughHelpers(t *testing.T) {
 }
 
 func TestCompilePackagesKeepsGeneratedProtobufVTMethodsSync(t *testing.T) {
+	// A generated file declares VT methods over a oneof and a String that
+	// suspends.
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod": "module example.test/protosync\n\ngo 1.25.3\n",
 		"message.pb.go": strings.Join([]string{
@@ -865,18 +867,27 @@ func TestCompilePackagesKeepsGeneratedProtobufVTMethodsSync(t *testing.T) {
 			"  o, ok := other.(*Msg_Int)",
 			"  return ok && m.Int == o.Int",
 			"}",
+			"func describe() string {",
+			"  ch := make(chan string, 1)",
+			"  ch <- \"msg\"",
+			"  return <-ch",
+			"}",
+			"func (m *Msg) String() string { return describe() }",
 			"",
 		}, "\n"),
 	})
+
+	// Compile the package.
 	outputDir := filepath.Join(t.TempDir(), "output")
 	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir}, nil, nil)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-
 	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
 		t.Fatal(err.Error())
 	}
+
+	// The VT methods stay synchronous.
 	content, err := os.ReadFile(filepath.Join(outputDir, "@goscript", "example.test", "protosync", "message.pb.gs.ts"))
 	if err != nil {
 		t.Fatal(err.Error())
@@ -891,6 +902,11 @@ func TestCompilePackagesKeepsGeneratedProtobufVTMethodsSync(t *testing.T) {
 		if strings.Contains(text, bad) {
 			t.Fatalf("generated protobuf VT method should stay synchronous; found %q in:\n%s", bad, text)
 		}
+	}
+
+	// A replaceable method whose body suspends keeps its async coloring.
+	if !strings.Contains(text, "public async String(): globalThis.Promise<string>") {
+		t.Fatalf("generated protobuf String calling a suspending function should be async in:\n%s", text)
 	}
 }
 

@@ -35,6 +35,9 @@ type LoweringOwner struct {
 	runtimeOwner *RuntimeContractOwner
 	// facts are the override facts of the program Build lowers.
 	facts *OverrideFacts
+	// protobufAsync holds the generated protobuf methods whose body suspends,
+	// which do not stay synchronous (see findProtobufAsyncMethods).
+	protobufAsync map[*types.Func]bool
 }
 
 // LoweringOptions are request-scoped lowering switches.
@@ -95,6 +98,7 @@ func (o *LoweringOwner) Build(ctx context.Context, model *SemanticModel, opts ..
 	// Share the caches across package workers and list the packages to lower.
 	asyncLazyCache := newAsyncLazyCache()
 	runtimeMethodSets := newRuntimeMethodSetCache()
+	o.findProtobufAsyncMethods(model, asyncLazyCache)
 	semPkgs := make([]*semanticPackage, 0, len(model.packages))
 	for _, semPkg := range model.packages {
 		if !options.SkipPackages[semPkg.pkgPath] {
@@ -3598,11 +3602,12 @@ func (o *LoweringOwner) lowerTypeSpec(ctx lowerFileContext, spec *ast.TypeSpec) 
 		if signature, ok := types.Unalias(alias.Rhs()).Underlying().(*types.Signature); ok {
 			loweredType = o.tsAsyncCompatibleFunctionTypeFor(ctx, signature)
 		}
-		code := "type " + obj.Name() + " = " + loweredType
+		typeName := safeIdentifier(obj.Name())
+		code := "type " + typeName + " = " + loweredType
 		typeIndexExport := ""
 		if ctx.topLevel {
 			code = "export " + code
-			typeIndexExport = obj.Name()
+			typeIndexExport = typeName
 		}
 		return loweredDecl{code: code, typeIndexExport: typeIndexExport}, nil
 	}
@@ -4553,7 +4558,7 @@ func (o *LoweringOwner) lowerNamedReceiverMethodDecl(
 	if signature == nil || signature.Recv() == nil {
 		return nil, nil
 	}
-	protobufSync := protobufGeneratedSyncDecl(ctx, decl)
+	protobufSync := o.protobufGeneratedSyncMethod(ctx, fnObj)
 	async := o.functionAsync(ctx, fnObj)
 	if protobufSync {
 		async = false
@@ -4723,7 +4728,7 @@ func (o *LoweringOwner) lowerFuncDeclBody(ctx lowerFileContext, decl *ast.FuncDe
 	if signature == nil {
 		return nil, nil
 	}
-	protobufSync := protobufGeneratedSyncDecl(ctx, decl)
+	protobufSync := o.protobufGeneratedSyncMethod(ctx, fnObj)
 	async := o.functionAsync(ctx, fnObj)
 	if protobufSync {
 		async = false
@@ -17651,7 +17656,9 @@ func (o *LoweringOwner) tsNonNilTypeFor(ctx lowerFileContext, typ types.Type) st
 	return strings.TrimSuffix(o.tsTypeFor(ctx, typ), " | null")
 }
 
+// aliasTypeExpr spells a reference to a Go type alias by its declared name.
 func (o *LoweringOwner) aliasTypeExpr(ctx lowerFileContext, alias *types.Alias) string {
+	// An alias the file cannot name lowers to its right-hand side or any.
 	if alias == nil || alias.Obj() == nil {
 		return "unknown"
 	}
@@ -17661,12 +17668,15 @@ func (o *LoweringOwner) aliasTypeExpr(ctx lowerFileContext, alias *types.Alias) 
 	if alias.Obj().Pkg() == nil {
 		return o.tsTypeFor(ctx, alias.Rhs())
 	}
-	baseName := alias.Obj().Name()
+
+	// Qualify the escaped name by the package it is imported from.
+	baseName := safeIdentifier(alias.Obj().Name())
 	if localAlias := ctx.localAliases[alias.Obj()]; localAlias != "" {
 		baseName = localAlias + "." + baseName
 	} else if importAlias := ctx.importPaths[alias.Obj().Pkg().Path()]; importAlias != "" {
 		baseName = importAlias + "." + baseName
 	}
+
 	// Override packages can export an interface shape for a Go alias. Keep
 	// its nil value in generated uses, just as for a named Go interface.
 	if _, ok := types.Unalias(alias).Underlying().(*types.Interface); ok {
@@ -18699,33 +18709,11 @@ func genericFunctionSignature(ctx lowerFileContext, expr ast.Expr) *types.Signat
 	return signature
 }
 
-func protobufGeneratedSyncDecl(ctx lowerFileContext, decl *ast.FuncDecl) bool {
-	if decl == nil || ctx.semPkg == nil || ctx.semPkg.source == nil || !protobufTypeScriptBindingReplacesMethodName(decl.Name.Name) {
-		return false
-	}
-	return strings.HasSuffix(sourcePos(ctx.semPkg.source, decl.Pos()).file, ".pb.go")
-}
-
-func protobufGeneratedSyncMethod(ctx lowerFileContext, fn *types.Func) bool {
-	if fn == nil || fn.Pkg() == nil || ctx.model == nil || !protobufTypeScriptBindingReplacesMethodName(fn.Name()) {
-		return false
-	}
-	semPkg := ctx.model.packages[fn.Pkg().Path()]
-	if semPkg == nil || semPkg.source == nil {
-		return false
-	}
-	decl := functionDeclForObject(semPkg, fn)
-	if decl == nil {
-		return false
-	}
-	return strings.HasSuffix(sourcePos(semPkg.source, decl.Pos()).file, ".pb.go")
-}
-
 func (o *LoweringOwner) functionAsync(ctx lowerFileContext, fn *types.Func) bool {
 	if fn == nil || ctx.model == nil {
 		return false
 	}
-	if protobufGeneratedSyncMethod(ctx, fn) {
+	if o.protobufGeneratedSyncMethod(ctx, fn) {
 		return false
 	}
 	if ctx.model.functionAsync(fn) {
@@ -18932,7 +18920,7 @@ func (o *LoweringOwner) overrideCallNeedsAwait(ctx lowerFileContext, fun ast.Exp
 		return false
 	}
 	if fn := calledFunction(ctx.semPkg.source, fun); fn != nil && fn.Pkg() != nil {
-		if protobufGeneratedSyncMethod(ctx, fn) {
+		if o.protobufGeneratedSyncMethod(ctx, fn) {
 			return false
 		}
 		if o.facts.IsFunctionAsync(fn.Pkg().Path(), fn.Name()) {
@@ -18953,7 +18941,7 @@ func (o *LoweringOwner) overrideCallNeedsAwait(ctx lowerFileContext, fun ast.Exp
 	if method == nil {
 		return false
 	}
-	if protobufGeneratedSyncMethod(ctx, method) {
+	if o.protobufGeneratedSyncMethod(ctx, method) {
 		return false
 	}
 

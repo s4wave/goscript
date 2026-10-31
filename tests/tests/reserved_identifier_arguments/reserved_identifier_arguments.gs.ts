@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+export type _enum = number
+
 export class Parser {
 	constructor(__goscriptValue?: boolean) {
 		;(this as any).__goStructValue = __goscriptValue === true
@@ -33,9 +35,14 @@ export function collect(_arguments: string): string {
 	return _arguments + "!"
 }
 
+export function double(e: _enum): _enum {
+	return e * 2
+}
+
 export async function main(): globalThis.Promise<void> {
 	await $.println(new Parser(true).Parse($.arrayToSlice<string>(["a", "b"])))
 	await $.println(collect("ok"))
+	await $.println(double(21))
 }
 
 if ($.isMainScript(import.meta)) {
