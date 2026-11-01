@@ -73,3 +73,4 @@ request resolve: http://example.com/x/y
 request join: http://example.com/p/z?
 request marshal: http://example.com/p? true
 bad target: true parse http://example.com/%zz invalid URL escape "%zz"
+writer interfaces: true false false

@@ -8,6 +8,50 @@ import * as http from "@goscript/net/http/index.js"
 import * as httptest from "@goscript/net/http/httptest/index.js"
 import * as url from "@goscript/net/url/index.js"
 
+export class streamWriter {
+	public declare header: http.Header
+
+	constructor(__goscriptValue?: boolean, header$?: http.Header) {
+		this.header = header$ ?? (null! as http.Header)
+		;(this as any).__goStructValue = __goscriptValue === true
+	}
+
+	public clone(): streamWriter {
+		return new streamWriter(true, this.header)
+	}
+
+	public __goscriptAssign(source: streamWriter): this {
+		this.header = source.header
+		return this
+	}
+
+	public Flush(): void {
+		const w: streamWriter | $.VarRef<streamWriter> | null = this;
+	}
+
+	public Header(): http.Header {
+		const w: streamWriter | $.VarRef<streamWriter> | null = this;
+		return $.pointerValue<streamWriter>(w).header
+	}
+
+	public Write(p: $.Slice<number>): [number, $.GoError] {
+		const w: streamWriter | $.VarRef<streamWriter> | null = this;
+		return [$.sliceLen(p), null]
+	}
+
+	public WriteHeader(_p0: number): void {
+		const w: streamWriter | $.VarRef<streamWriter> | null = this;
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.streamWriter",
+		() => new streamWriter(),
+		() => [{ name: "Flush", args: [], returns: [], pointerReceiver: true }, { name: "Header", args: [], returns: [{ type: "http.Header" }], pointerReceiver: true }, { name: "Write", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }], pointerReceiver: true }, { name: "WriteHeader", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
+		streamWriter,
+		() => [{ name: "header", key: "header", type: "http.Header" }]
+	)
+}
+
 export async function printURL(label: string, u: url.URL | $.VarRef<url.URL> | null): globalThis.Promise<void> {
 	const u$: url.URL = u == null ? $.pointerTarget<url.URL>(u) : (u as any).__isVarRef === true ? (u as any).value : (u as any).__goValue === undefined ? (u as any) : $.pointerTarget<url.URL>(u)
 	await $.println(label, "string:", (u !== null && (u as any).__isVarRef !== true && (u as any).__goValue === undefined ? ((u as any) as url.URL).String() : url.URL.prototype.String.call(u)))
@@ -103,6 +147,14 @@ export async function main(): globalThis.Promise<void> {
 	err = __goscriptTuple6[1]
 	let urlErr: $.VarRef<url.Error | $.VarRef<url.Error> | null> = $.varRef(null! as url.Error | $.VarRef<url.Error> | null)
 	await $.println("bad target:", errors.As($.pointerValueOrNil(err)!, $.interfaceValue(urlErr, "**url.Error", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.pointerType("url.Error")))), $.pointerValue<url.Error>(urlErr.value).Op, $.pointerValue<url.Error>(urlErr.value).URL, (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<url.Error>(urlErr.value).Err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+
+	// A handler asks its writer for the optional interfaces by name, as a
+	// watch asks for http.Flusher.
+	let w: http.ResponseWriter | null = $.interfaceValue<http.ResponseWriter | null>(new streamWriter(false, $.makeMap<string, $.Slice<string>>([])), "*main.streamWriter", /* @__PURE__ */ $.pointerType("main.streamWriter"))
+	let [, flusher] = $.typeAssertTuple<http.Flusher | null>(w, "http.Flusher")
+	let [, hijacker] = $.typeAssertTuple<http.Hijacker | null>(w, "http.Hijacker")
+	let [, notifier] = $.typeAssertTuple<http.CloseNotifier | null>(w, "http.CloseNotifier")
+	await $.println("writer interfaces:", flusher, hijacker, notifier)
 }
 
 var __goscriptStatic0$value: any

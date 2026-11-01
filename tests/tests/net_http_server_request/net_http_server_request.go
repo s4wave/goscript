@@ -30,6 +30,15 @@ func printURL(label string, u *url.URL) {
 	println(label, "marshal:", string(data), err == nil)
 }
 
+// streamWriter is a ResponseWriter that flushes, as a streaming transport's
+// writer does.
+type streamWriter struct{ header http.Header }
+
+func (w *streamWriter) Header() http.Header         { return w.header }
+func (w *streamWriter) Write(p []byte) (int, error) { return len(p), nil }
+func (w *streamWriter) WriteHeader(int)             {}
+func (w *streamWriter) Flush()                      {}
+
 func main() {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		data, err := io.ReadAll(r.Body)
@@ -88,4 +97,12 @@ func main() {
 	_, err = http.NewRequest(http.MethodGet, "http://example.com/%zz", nil)
 	var urlErr *url.Error
 	println("bad target:", errors.As(err, &urlErr), urlErr.Op, urlErr.URL, urlErr.Err.Error())
+
+	// A handler asks its writer for the optional interfaces by name, as a
+	// watch asks for http.Flusher.
+	var w http.ResponseWriter = &streamWriter{header: http.Header{}}
+	_, flusher := w.(http.Flusher)
+	_, hijacker := w.(http.Hijacker)
+	_, notifier := w.(http.CloseNotifier)
+	println("writer interfaces:", flusher, hijacker, notifier)
 }

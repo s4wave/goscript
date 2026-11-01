@@ -1926,6 +1926,83 @@ $.registerInterfaceType('http.Handler', null, [
   },
 ])
 
+// The other net/http interfaces are registered too, so that type assertions
+// know them by name, as a handler asking its writer for http.Flusher does.
+const byteSlice = $.sliceType($.basicType('uint8'))
+$.registerInterfaceType('http.ResponseWriter', null, [
+  $.methodSignature('Header', [], ['http.Header']),
+  $.methodSignature('Write', [['p', byteSlice]], [$.basicType('int'), 'error']),
+  $.methodSignature('WriteHeader', [['statusCode', $.basicType('int')]]),
+])
+$.registerInterfaceType('http.Flusher', null, [$.methodSignature('Flush')])
+$.registerInterfaceType('http.Hijacker', null, [
+  $.methodSignature(
+    'Hijack',
+    [],
+    ['net.Conn', $.pointerType('bufio.ReadWriter'), 'error'],
+  ),
+])
+$.registerInterfaceType('http.CloseNotifier', null, [
+  $.methodSignature(
+    'CloseNotify',
+    [],
+    [$.channelType($.basicType('bool'), 'receive')],
+  ),
+])
+$.registerInterfaceType('http.Pusher', null, [
+  $.methodSignature(
+    'Push',
+    [
+      ['target', $.basicType('string')],
+      ['opts', $.pointerType('http.PushOptions')],
+    ],
+    ['error'],
+  ),
+])
+$.registerInterfaceType('http.RoundTripper', null, [
+  $.methodSignature(
+    'RoundTrip',
+    [['req', $.pointerType('http.Request')]],
+    [$.pointerType('http.Response'), 'error'],
+  ),
+])
+$.registerInterfaceType('http.CookieJar', null, [
+  $.methodSignature('SetCookies', [
+    ['u', $.pointerType('url.URL')],
+    ['cookies', $.sliceType($.pointerType('http.Cookie'))],
+  ]),
+  $.methodSignature(
+    'Cookies',
+    [['u', $.pointerType('url.URL')]],
+    [$.sliceType($.pointerType('http.Cookie'))],
+  ),
+])
+$.registerInterfaceType('http.FileSystem', null, [
+  $.methodSignature(
+    'Open',
+    [['name', $.basicType('string')]],
+    ['http.File', 'error'],
+  ),
+])
+$.registerInterfaceType('http.File', null, [
+  $.methodSignature('Close', [], ['error']),
+  $.methodSignature('Read', [['p', byteSlice]], [$.basicType('int'), 'error']),
+  $.methodSignature(
+    'Seek',
+    [
+      ['offset', $.basicType('int64')],
+      ['whence', $.basicType('int')],
+    ],
+    [$.basicType('int64'), 'error'],
+  ),
+  $.methodSignature(
+    'Readdir',
+    [['count', $.basicType('int')]],
+    [$.sliceType('fs.FileInfo'), 'error'],
+  ),
+  $.methodSignature('Stat', [], ['fs.FileInfo', 'error']),
+])
+
 export type HandlerFunc = (
   w: ResponseWriter | null,
   r: Request | $.VarRef<Request> | null,
