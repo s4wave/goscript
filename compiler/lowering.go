@@ -3664,8 +3664,7 @@ func (o *LoweringOwner) lowerNamedCompositeTypeRegistration(ctx lowerFileContext
 	if !ctx.topLevel || named.TypeParams().Len() != 0 {
 		return ""
 	}
-	obj := named.Obj()
-	if obj == nil || obj.Pkg() == nil || obj.Parent() != obj.Pkg().Scope() {
+	if named.Obj() == nil || named.Obj().Pkg() == nil || localNamedType(named) {
 		return ""
 	}
 	switch named.Underlying().(type) {
@@ -16854,6 +16853,16 @@ func (o *LoweringOwner) runtimeTypeAssertInfoExprWithSeen(ctx lowerFileContext, 
 		if slice, ok := types.Unalias(named.Underlying()).(*types.Slice); ok {
 			return o.runtimeDescriptorExpr(RuntimeHelperSliceType, o.runtimeTypeAssertInfoExprWithSeen(ctx, slice.Elem(), seen), strconv.Quote(runtimeNamedTypeName(named)))
 		}
+		// A local map or array type is not registered by name, so its
+		// descriptor carries the underlying type with the name.
+		if localNamedType(named) {
+			switch underlying := types.Unalias(named.Underlying()).(type) {
+			case *types.Map:
+				return o.runtimeDescriptorExpr(RuntimeHelperMapType, o.runtimeTypeAssertInfoExprWithSeen(ctx, underlying.Key(), seen), o.runtimeTypeAssertInfoExprWithSeen(ctx, underlying.Elem(), seen), strconv.Quote(runtimeNamedTypeName(named)))
+			case *types.Array:
+				return o.runtimeDescriptorExpr(RuntimeHelperArrayType, o.runtimeTypeAssertInfoExprWithSeen(ctx, underlying.Elem(), seen), strconv.FormatInt(underlying.Len(), 10), strconv.Quote(runtimeNamedTypeName(named)))
+			}
+		}
 		return strconv.Quote(runtimeNamedTypeName(named))
 	}
 	switch typed := types.Unalias(typ).Underlying().(type) {
@@ -16911,6 +16920,16 @@ func (o *LoweringOwner) runtimeTypeInfoExprWithSeen(typ types.Type, seen map[typ
 		}
 		if slice, ok := types.Unalias(named.Underlying()).(*types.Slice); ok {
 			return o.runtimeDescriptorExpr(RuntimeHelperSliceType, o.runtimeTypeInfoExprWithSeen(slice.Elem(), seen), strconv.Quote(runtimeNamedTypeName(named)))
+		}
+		// A local map or array type is not registered by name, so its
+		// descriptor carries the underlying type with the name.
+		if localNamedType(named) {
+			switch underlying := types.Unalias(named.Underlying()).(type) {
+			case *types.Map:
+				return o.runtimeDescriptorExpr(RuntimeHelperMapType, o.runtimeTypeInfoExprWithSeen(underlying.Key(), seen), o.runtimeTypeInfoExprWithSeen(underlying.Elem(), seen), strconv.Quote(runtimeNamedTypeName(named)))
+			case *types.Array:
+				return o.runtimeDescriptorExpr(RuntimeHelperArrayType, o.runtimeTypeInfoExprWithSeen(underlying.Elem(), seen), strconv.FormatInt(underlying.Len(), 10), strconv.Quote(runtimeNamedTypeName(named)))
+			}
 		}
 		return strconv.Quote(runtimeNamedTypeName(named))
 	}
@@ -17838,6 +17857,13 @@ func namedNonStructType(typ types.Type) *types.Named {
 		return nil
 	}
 	return named
+}
+
+// localNamedType reports whether named is declared inside a function, where
+// its Go type string can name other types too, so it has no registration.
+func localNamedType(named *types.Named) bool {
+	obj := named.Obj()
+	return obj != nil && obj.Pkg() != nil && obj.Parent() != obj.Pkg().Scope()
 }
 
 func namedFunctionType(typ types.Type) *types.Named {

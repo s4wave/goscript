@@ -102,6 +102,26 @@ export function b(): any {
 	return $.interfaceValue(new person({Title: "Dr"}), "*main.person·qyqnq0", /* @__PURE__ */ $.pointerType("main.person·qyqnq0"))
 }
 
+export async function fieldKinds(v: any): globalThis.Promise<void> {
+	let t = reflect.TypeOf(v)
+	for (let i = 0; i < (__goscriptAwait = (t !== null && (t as any).__isVarRef !== true && ((t as any).__goValue === undefined || (t as any).__goType?.charCodeAt(0) !== 42) ? (t as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(t)).NumField(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); i++) {
+		let f = ((__goscriptAwait = (t !== null && (t as any).__isVarRef !== true && ((t as any).__goValue === undefined || (t as any).__goType?.charCodeAt(0) !== 42) ? (t as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(t)).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.StructField).Type
+		await $.println((__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && ((f as any).__goValue === undefined || (f as any).__goType?.charCodeAt(0) !== 42) ? (f as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(f)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), reflect.Kind_String((__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && ((f as any).__goValue === undefined || (f as any).__goType?.charCodeAt(0) !== 42) ? (f as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(f)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>((__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && ((f as any).__goValue === undefined || (f as any).__goType?.charCodeAt(0) !== 42) ? (f as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(f)).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	}
+}
+
+export function c(): any {
+	type keys = globalThis.Map<string, any> | null
+	let x: {"K": keys} = $.anonymousStructValue({"K": null}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("K", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }, "main.keys·94feae"), [0], 0, true, { tag: "json:\",embed\"" })] })
+	return $.interfaceValue(x, "struct{K main.keys \"json:\\\",embed\\\"\"}", { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("K", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }, "main.keys·94feae"), [0], 0, true, { tag: "json:\",embed\"" })] })
+}
+
+export function d(): any {
+	type keys = string[]
+	let x: {"K": keys} = $.anonymousStructValue({"K": $.arrayValue(globalThis.Array.from({ length: 2 }, () => ""))}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("K", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("string"), 2, "main.keys·lbbeg2"), [0], 0, true)] })
+	return $.interfaceValue(x, "struct{K main.keys}", { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("K", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("string"), 2, "main.keys·lbbeg2"), [0], 0, true)] })
+}
+
 export async function main(): globalThis.Promise<void> {
 	let pa = a()
 	let pb = b()
@@ -112,6 +132,10 @@ export async function main(): globalThis.Promise<void> {
 	// Local types of the same name are distinct types.
 	let [, ok] = $.typeAssertTuple<any>(pa, { kind: $.TypeKind.Interface, methods: [{ name: "unused", args: [], returns: [] }] })
 	await $.println(ok, $.comparableEqual(reflect.TypeOf(pa), reflect.TypeOf(pb)), $.comparableEqual(reflect.TypeOf(pa), reflect.TypeOf(a())))
+
+	// Local map and array types of the same name keep their own kinds.
+	await fieldKinds(c())
+	await fieldKinds(d())
 }
 
 var __goscriptAwait: any

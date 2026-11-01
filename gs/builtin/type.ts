@@ -242,16 +242,22 @@ export function sliceType(
 export function arrayType(
   elemType: TypeInfo | string,
   length: number,
+  typeName?: string,
 ): ArrayTypeInfo {
-  return { kind: TypeKind.Array, elemType, length }
+  const info: ArrayTypeInfo = { kind: TypeKind.Array, elemType, length }
+  if (typeName !== undefined) info.typeName = typeName
+  return info
 }
 
 /** Construct a fresh map descriptor with its key and element types. */
 export function mapType(
   keyType: TypeInfo | string,
   elemType: TypeInfo | string,
+  typeName?: string,
 ): MapTypeInfo {
-  return { kind: TypeKind.Map, keyType, elemType }
+  const info: MapTypeInfo = { kind: TypeKind.Map, keyType, elemType }
+  if (typeName !== undefined) info.typeName = typeName
+  return info
 }
 
 /** Construct a fresh channel descriptor with its declared direction. */

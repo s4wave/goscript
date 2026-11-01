@@ -9,3 +9,5 @@ person 1
 ID 7
 *main.person
 false false true
+main.keys map interface {}
+main.keys array string
