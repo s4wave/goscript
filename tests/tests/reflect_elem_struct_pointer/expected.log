@@ -19,3 +19,5 @@ addr: true true
 new: true true true true
 new widget: 7
 nil: true true
+indirect: ptr struct
+indirect types: true true

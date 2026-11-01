@@ -88,6 +88,15 @@ func structPointers() {
 	var np *body
 	iv := reflect.ValueOf(np).Interface()
 	println("nil:", iv != nil, iv.(*body) == nil)
+
+	// Taking the struct out of a pointer leaves the pointer a pointer, as an
+	// API installer reading a schema object and its value does.
+	var obj any = reflect.New(reflect.TypeOf(widget{})).Interface()
+	elem := reflect.Indirect(reflect.ValueOf(obj)).Interface()
+	println("indirect:", reflect.ValueOf(obj).Kind().String(), reflect.ValueOf(elem).Kind().String())
+	_, isPtr := obj.(*widget)
+	_, isElem := elem.(widget)
+	println("indirect types:", isPtr, isElem)
 }
 
 func main() {

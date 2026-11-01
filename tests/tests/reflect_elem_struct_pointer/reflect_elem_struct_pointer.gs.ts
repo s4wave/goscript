@@ -273,6 +273,15 @@ export async function structPointers(): globalThis.Promise<void> {
 	let np: body | $.VarRef<body> | null = null! as body | $.VarRef<body> | null
 	let iv = reflect.ValueOf($.interfaceValue(np, "*main.body", /* @__PURE__ */ $.pointerType("main.body"))).Interface()
 	await $.println("nil:", iv != null, ((iv as any)?.__goType === "*main.body" && (iv as any).__goValue === undefined && (iv as any).__isTypedNil !== true ? ((iv as any) as body | $.VarRef<body> | null) : $.mustTypeAssert<body | $.VarRef<body> | null>(iv, /* @__PURE__ */ $.pointerType("main.body"))) == null)
+
+	// Taking the struct out of a pointer leaves the pointer a pointer, as an
+	// API installer reading a schema object and its value does.
+	let obj: any = reflect.New($.pointerValueOrNil(reflect.TypeOf($.structInterfaceValue(new widget(true), "main.widget", "main.widget")))!).Interface()
+	let elem = reflect.Indirect(reflect.ValueOf(obj)).Interface()
+	await $.println("indirect:", reflect.Kind_String(reflect.ValueOf(obj).Kind()), reflect.Kind_String(reflect.ValueOf(elem).Kind()))
+	let [, isPtr] = $.typeAssertTuple<widget | $.VarRef<widget> | null>(obj, /* @__PURE__ */ $.pointerType("main.widget"))
+	let [, isElem] = $.typeAssertTuple<widget>(elem, "main.widget")
+	await $.println("indirect types:", isPtr, isElem)
 }
 
 export async function main(): globalThis.Promise<void> {

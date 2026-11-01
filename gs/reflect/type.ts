@@ -1616,9 +1616,14 @@ export class Value {
       )
     }
 
-    // Box a named value with its type.
+    // Box a copy of a named struct with its type, as the compiler does: the
+    // object itself may be what a pointer to it holds, and boxing tags it.
     if (this._type.Kind() === Struct && namedType) {
-      return $.interfaceValue<ReflectValue>(current, typeString, typeInfo)
+      const copy =
+        current !== null && typeof current === 'object' ?
+          $.cloneStructValue(current)
+        : current
+      return $.interfaceValue<ReflectValue>(copy, typeString, typeInfo)
     }
     if (
       (namedType && this._type.Kind() !== Struct) ||
