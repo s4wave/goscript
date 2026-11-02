@@ -7,12 +7,14 @@ import * as io from "@goscript/io/index.js"
 import "@goscript/io/index.js"
 
 export async function main(): globalThis.Promise<void> {
+	// Read from the public entropy adapter and its Reader interface.
 	let buf = $.makeSlice<number>(32, undefined, "byte")
 	let [n, err] = await rand.Read(buf)
 	await $.println("read len", n)
 	await $.println("read err nil", err == null)
 	await $.println("read has data", hasData(buf))
 
+	// The Reader fills a caller-owned Go byte slice.
 	let r: io.Reader | null = rand.Reader
 	let small = $.makeSlice<number>(4, undefined, "byte")
 	let __goscriptTuple0: any = await (r !== null && (r as any).__isVarRef !== true && ((r as any).__goValue === undefined || (r as any).__goType?.charCodeAt(0) !== 42) ? (r as Exclude<io.Reader, null>) : $.pointerValue<Exclude<io.Reader, null>>(r)).Read(small)
@@ -22,6 +24,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("reader err nil", err == null)
 	await $.println("reader has data", hasData(small))
 
+	// Text uses the same secure source for its token.
 	let token = await rand.Text()
 	await $.println("text len", $.stringLen(token))
 	await $.println("text alphabet", isBase32(token))

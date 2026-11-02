@@ -56,6 +56,8 @@ import "embed"
 //go:embed gs/crypto/internal/fips140/subtle/parity.json
 //go:embed gs/crypto/internal/fips140deps/byteorder/index.ts
 //go:embed gs/crypto/internal/fips140deps/godebug/index.ts
+//go:embed gs/crypto/internal/sysrand/index.ts
+//go:embed gs/crypto/internal/sysrand/secure.ts
 //go:embed gs/crypto/rand/index.ts
 //go:embed gs/crypto/rand/meta.json
 //go:embed gs/crypto/sha1/index.ts

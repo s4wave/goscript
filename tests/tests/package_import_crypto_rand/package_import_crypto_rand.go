@@ -6,12 +6,14 @@ import (
 )
 
 func main() {
+	// Read from the public entropy adapter and its Reader interface.
 	buf := make([]byte, 32)
 	n, err := rand.Read(buf)
 	println("read len", n)
 	println("read err nil", err == nil)
 	println("read has data", hasData(buf))
 
+	// The Reader fills a caller-owned Go byte slice.
 	var r io.Reader = rand.Reader
 	small := make([]byte, 4)
 	n, err = r.Read(small)
@@ -19,6 +21,7 @@ func main() {
 	println("reader err nil", err == nil)
 	println("reader has data", hasData(small))
 
+	// Text uses the same secure source for its token.
 	token := rand.Text()
 	println("text len", len(token))
 	println("text alphabet", isBase32(token))

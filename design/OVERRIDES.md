@@ -413,3 +413,12 @@ only adds `await` to direct calls such as `os.ReadFile`. `io/fs.ReadFile` and
 3. **Async Support**: Proper async/await integration for blocking operations
 4. **Maintainability**: Cleaner, more readable generated code
 5. **Extensibility**: Easy to add new packages without modifying core compiler
+
+## Secure Entropy
+
+`crypto/internal/sysrand.Read` fills bytes from Web Crypto rather than
+translating the Go js/wasm entropy import, which has no Go body. The public
+`crypto/rand` Reader and sysrand share the secure fill primitive, including
+the 65,536-byte Web Crypto quota. Sysrand bypasses the mutable public Reader
+so standard-library key generation receives host entropy. Missing Web Crypto
+fails the read; there is no deterministic fallback.
