@@ -681,7 +681,11 @@ describe('TypeFor', () => {
   })
 
   it('interns ValueOf types before comparable reflect use', () => {
-    class RegisteredType {}
+    class RegisteredType {
+      public clone(): RegisteredType {
+        return markAsStructValue(new RegisteredType())
+      }
+    }
     const typeInfo = registerStructType(
       'asn1.BitString',
       new RegisteredType(),

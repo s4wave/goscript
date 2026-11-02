@@ -3,6 +3,7 @@ import {
   arrayToSlice,
   asArray,
   functionValue,
+  markAsStructValue,
   namedFunction,
   registerStructType,
   typeAssertTuple,
@@ -515,6 +516,12 @@ describe('Function Type Detection', () => {
   it('should assign concrete values to interface parameters', async () => {
     class CallableStringer {
       public label = 'callable'
+
+      public clone(): CallableStringer {
+        const result = new CallableStringer()
+        result.label = this.label
+        return markAsStructValue(result)
+      }
 
       public String(): string {
         return this.label

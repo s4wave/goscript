@@ -14803,6 +14803,12 @@ func (o *LoweringOwner) lowerIndexExpr(ctx lowerFileContext, expr *ast.IndexExpr
 		return o.lowerMapGetValue(ctx, expr, target, index), diagnostics
 	}
 
+	// A type parameter that can be a string reads a byte of the string or
+	// the byte slice that it holds.
+	if typeParamHasString(targetType) {
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperIndexStringOrBytes) + "(" + target + ", " + o.lowerNumberIndexValue(ctx, expr.Index, index) + ")", diagnostics
+	}
+
 	// Array elements are read directly; slices and the rest need arrayIndex,
 	// or a version of it for the representations of a kind of slice.
 	if array, ok := types.Unalias(targetType).Underlying().(*types.Array); ok {
@@ -15037,7 +15043,7 @@ func (o *LoweringOwner) lowerSliceExpr(ctx lowerFileContext, expr *ast.SliceExpr
 	max = o.lowerNumberIndexValue(ctx, expr.Max, max)
 	helper := RuntimeHelperGoSlice
 	targetType := ctx.semPkg.source.TypesInfo.TypeOf(expr.X)
-	if isStringType(targetType) {
+	if isStringType(targetType) || typeParamHasString(targetType) {
 		helper = RuntimeHelperSliceStringOrBytes
 	} else {
 		target = o.lowerArrayPointerTarget(ctx, target, targetType)
@@ -18176,6 +18182,50 @@ func typeParamMayHoldValueType(typ types.Type) bool {
 		return true
 	}
 	return typeSetMayHoldValueType(iface)
+}
+
+// typeParamHasString reports whether typ is a type parameter whose type set
+// includes a string type, such as ~string | ~[]byte. Go indexes and slices
+// its values as strings or byte slices, which have their own helpers.
+func typeParamHasString(typ types.Type) bool {
+	// Only a type parameter with type terms can hold a string or a slice.
+	typeParam, ok := types.Unalias(typ).(*types.TypeParam)
+	if !ok {
+		return false
+	}
+
+	// Inspect the constraint terms, including embedded interfaces.
+	iface, ok := typeParam.Constraint().Underlying().(*types.Interface)
+	if !ok {
+		return false
+	}
+	return typeSetHasString(iface)
+}
+
+// typeSetHasString reports whether the type terms of iface include a string
+// type, including those of the interfaces that it embeds.
+func typeSetHasString(iface *types.Interface) bool {
+	for i := range iface.NumEmbeddeds() {
+		switch embedded := types.Unalias(iface.EmbeddedType(i)).(type) {
+		case *types.Union:
+			for j := range embedded.Len() {
+				if isStringType(embedded.Term(j).Type()) {
+					return true
+				}
+			}
+		default:
+			if inner, ok := embedded.Underlying().(*types.Interface); ok {
+				if typeSetHasString(inner) {
+					return true
+				}
+				continue
+			}
+			if isStringType(embedded) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // typeSetMayHoldValueType reports whether the type terms of iface may include

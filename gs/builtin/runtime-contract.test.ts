@@ -162,7 +162,7 @@ describe('builtin runtime contract helpers', () => {
     // print/println resolve async Error/String operands on the microtask
     // queue, so the awaited writes carry the fully rendered text.
     expect(writes).toEqual([
-      { fd: 1, text: 'value: 3' },
+      { fd: 1, text: 'value:3' },
       { fd: 1, text: 'done\n' },
     ])
   })
