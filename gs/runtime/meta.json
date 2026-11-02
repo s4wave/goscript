@@ -1,5 +1,8 @@
 {
   "callSiteFunctions": {
     "Caller": true
+  },
+  "asyncFunctions": {
+    "Gosched": true
   }
 }
