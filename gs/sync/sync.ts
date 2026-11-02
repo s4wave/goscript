@@ -4,6 +4,7 @@
 // channels and communication.
 
 import {
+  GoPanic,
   comparableEqual,
   methodSignature,
   pointerValue,
@@ -522,80 +523,67 @@ function callNil(): never {
 
 // OnceFunc returns a function that invokes f only once. A nil f panics on
 // the first call.
-export function OnceFunc(f: (() => void) | null): () => void {
-  const call = f ?? callNil
-  let called = false
-  let panicked = false
-  let panicValue: unknown
-  return () => {
-    if (called) {
-      if (panicked) {
-        throw panicValue
-      }
-      return
-    }
-    called = true
-    try {
-      call()
-    } catch (err) {
-      panicked = true
-      panicValue = err
-      throw err
-    }
-  }
+export function OnceFunc(
+  f: (() => void | Promise<void>) | null,
+): () => void | Promise<void> {
+  return OnceValue(f)
 }
 
 // OnceValue returns a function that invokes f only once and returns the value
 // returned by f. A nil f panics on the first call.
-export function OnceValue<T>(f: (() => T) | null): () => T {
+export function OnceValue<T>(
+  f: (() => T | Promise<T>) | null,
+): () => T | Promise<T> {
+  // Keep the result, including a pending call, for every later invocation.
   const call = f ?? callNil
-  let value: T
+  let value: T | Promise<T>
   let called = false
   let panicked = false
   let panicValue: unknown
   return () => {
+    // Replay a completed panic or share the first call's result.
     if (called) {
       if (panicked) {
-        throw panicValue
+        rethrowOncePanic(panicValue)
       }
-      return value
+      return value instanceof Promise ? value.catch(rethrowOncePanic) : value
     }
     called = true
     try {
       value = call()
+      if (value instanceof Promise) {
+        value = value.catch((err) => {
+          panicked = true
+          panicValue = err
+          throw err
+        })
+      }
     } catch (err) {
       panicked = true
       panicValue = err
       throw err
     }
-    return value
+    return value instanceof Promise ? value.catch(rethrowOncePanic) : value
   }
+}
+
+// rethrowOncePanic gives each caller its own recoverable Go panic carrier.
+function rethrowOncePanic(err: unknown): never {
+  throw err instanceof GoPanic ? new GoPanic(err.value) : err
 }
 
 // OnceValues returns a function that invokes f only once and returns the values
 // returned by f. A nil f panics on the first call.
-export function OnceValues<T1, T2>(f: (() => [T1, T2]) | null): () => [T1, T2] {
-  const call = f ?? callNil
-  let value1: T1
-  let value2: T2
-  let called = false
-  let panicked = false
-  let panicValue: unknown
+export function OnceValues<T1, T2>(
+  f: (() => [T1, T2] | Promise<[T1, T2]>) | null,
+): () => [T1, T2] | Promise<[T1, T2]> {
+  // Cache the computation while returning each tuple by value.
+  const call = OnceValue(f)
   return () => {
-    if (called) {
-      if (panicked) {
-        throw panicValue
-      }
-      return [value1, value2]
+    const value = call()
+    if (value instanceof Promise) {
+      return value.then(([first, second]) => [first, second])
     }
-    called = true
-    try {
-      ;[value1, value2] = call()
-    } catch (err) {
-      panicked = true
-      panicValue = err
-      throw err
-    }
-    return [value1, value2]
+    return [value[0], value[1]]
   }
 }

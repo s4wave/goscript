@@ -138,7 +138,8 @@ describe('sync.Once', () => {
     expect(valuesCalls).toBe(1)
   })
 
-  it('OnceValue helpers return the first successful result', () => {
+  it('OnceValue helpers return the first successful result', async () => {
+    // Synchronous callbacks retain their immediate return values.
     let valueCalls = 0
     const value = OnceValue(() => {
       valueCalls++
@@ -156,6 +157,42 @@ describe('sync.Once', () => {
     expect(values()).toEqual(['left', 'right'])
     expect(values()).toEqual(['left', 'right'])
     expect(valuesCalls).toBe(1)
+
+    // Concurrent callers wait for one pending computation.
+    let finish!: (value: number) => void
+    let pendingCalls = 0
+    const pending = OnceValue(() => {
+      pendingCalls++
+      return new Promise<number>((resolve) => {
+        finish = resolve
+      })
+    })
+    const first = pending()
+    const second = pending()
+    expect(pendingCalls).toBe(1)
+    finish(42)
+    expect(await first).toBe(42)
+    expect(await second).toBe(42)
+    expect(await pending()).toBe(42)
+
+    // Each waiter can recover the same panic value independently.
+    let fail!: (error: unknown) => void
+    const rejected = OnceValue(
+      () =>
+        new Promise<void>((_resolve, reject) => {
+          fail = reject
+        }),
+    )
+    const caught = [
+      Promise.resolve(rejected()).catch((err) => err),
+      Promise.resolve(rejected()).catch((err) => err),
+    ]
+    fail(new $.GoPanic('shared panic'))
+    const panics = await Promise.all(caught)
+    for (const err of panics) {
+      expect($.withRecoveringPanic(err, () => $.recover())).toBe('shared panic')
+    }
+    expect(panics[0]).not.toBe(panics[1])
   })
 })
 

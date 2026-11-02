@@ -177,15 +177,11 @@ export class Mutex {
 Package-level functions should be exported directly:
 
 ```typescript
-// Sync function
-export function OnceFunc(f: () => void): () => void {
-    let called = false
-    return () => {
-        if (!called) {
-            called = true
-            f()
-        }
-    }
+// The factory returns immediately; its result waits when the callback does.
+export function OnceFunc(
+    f: (() => void | Promise<void>) | null,
+): () => void | Promise<void> {
+    return OnceValue(f)
 }
 
 // Async function  
@@ -247,14 +243,18 @@ var mu mysync.Mutex
 **Key Features:**
 - Mutex with async Lock() and sync Unlock()
 - WaitGroup with async Wait() and sync Add()/Done()
-- Once with async Do() but sync OnceFunc()/OnceValue()
+- Once.Do() and the functions returned by OnceFunc()/OnceValue()/OnceValues()
+  return a promise when their callback does
 - Map with async operations for thread safety
 - Pool with sync Get()/Put() operations
 
 **Async Rationale:**
 - `Lock()` and `Wait()` can block, so they're async
 - `Unlock()`, `Add()`, `Done()` are immediate operations, so they're sync
-- `OnceFunc()`/`OnceValue()` return sync functions (not async functions)
+- `OnceFunc()`/`OnceValue()`/`OnceValues()` create their wrappers immediately.
+  Retained callbacks use the override's `asyncCallbacks` metadata so lowering
+  preserves their waits. Pending invocations share one computation; each caller
+  receives a separate recoverable carrier for the same cached Go panic value.
 
 ### unicode Package
 
