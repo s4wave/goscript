@@ -1,4 +1,5 @@
 import { runtimePanic } from './panic.js'
+import { byteLayoutFieldRef } from './byte-layout.js'
 
 export interface OwnedPointerHandle<T = unknown> {
   readonly __goOwnedPointer: true
@@ -156,7 +157,9 @@ function fieldRefLookup<T extends object, K extends keyof T>(
   }
   const existing = references.get(key)
   if (existing !== undefined) return existing as VarRef<T[K]>
-  const ref = new FieldReference(target, key)
+  const ref =
+    (byteLayoutFieldRef(target, key) as VarRef<T[K]> | undefined) ??
+    new FieldReference(target, key)
   references.set(key, ref)
   return ref
 }
@@ -171,7 +174,10 @@ export function transientFieldRef<T extends object, K extends keyof T>(
   target: T,
   key: K,
 ): VarRef<T[K]> {
-  return new FieldReference(target, key)
+  return (
+    (byteLayoutFieldRef(target, key) as VarRef<T[K]> | undefined) ??
+    new FieldReference(target, key)
+  )
 }
 
 /**

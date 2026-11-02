@@ -6,3 +6,6 @@ reader err nil true
 reader has data true
 text len 26
 text alphabet true
+p256 key err nil true
+p256 key has entropy true
+p256 point valid true

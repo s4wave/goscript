@@ -59,7 +59,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget2 = words, __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), i = 0; i < __goscriptRangeWindow2.length; i++) {
 		words[i] = $.uint(i * 7, 32)
 	}
-	let block = $.unsafePointerCast<$.VarRef<number[]> | null>($.arrayPointerFromIndexRef<number>($.indexRef(words, 16), 16, 4, 4))
+	let block = $.unsafeByteView<$.VarRef<number[]> | null>(($.indexRef(words, 16) as any), __goscriptStatic2(), undefined, 4)
 	await $.println("word0:", $.arrayIndex($.pointerValue<number[]>(block), 0), "word15:", $.arrayIndex($.pointerValue<number[]>(block), 15))
 
 	// Chain two compressions as a multi-block hash does.
@@ -83,6 +83,11 @@ function __goscriptStatic0(): any {
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
 	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint32"), 16))
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ({ size: 64, align: 4, kind: "array", length: 16, element: { size: 4, align: 4, kind: "scalar", scalar: "uint32" } })
 }
 
 if ($.isMainScript(import.meta)) {

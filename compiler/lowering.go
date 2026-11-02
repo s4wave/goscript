@@ -12121,6 +12121,9 @@ func (o *LoweringOwner) lowerConversionExpr(
 	if helper, addressDiagnostics, ok := o.lowerReflectHeaderPointerConversion(ctx, targetType, expr.Args[0]); ok {
 		return helper, append(diagnostics, addressDiagnostics...)
 	}
+	if helper, ok := o.lowerUnsafeByteView(ctx, targetType, expr.Args[0], value); ok {
+		return helper, diagnostics
+	}
 	if helper, addressDiagnostics, ok := o.lowerUnsafeArrayPointerConversion(ctx, targetType, expr.Args[0]); ok {
 		return helper, append(diagnostics, addressDiagnostics...)
 	}
@@ -14314,6 +14317,12 @@ func (o *LoweringOwner) lowerUnsafeArrayPointerConversion(
 	targetType types.Type,
 	expr ast.Expr,
 ) (string, []Diagnostic, bool) {
+	// Ordinary conversions between identical array layouts preserve their ref.
+	if !isUnsafePointerType(ctx.semPkg.source.TypesInfo.TypeOf(expr)) {
+		return "", nil, false
+	}
+
+	// Match the target array and the addressable source element.
 	if targetType == nil {
 		return "", nil, false
 	}
@@ -14329,6 +14338,8 @@ func (o *LoweringOwner) lowerUnsafeArrayPointerConversion(
 	if !ok {
 		return "", nil, false
 	}
+
+	// Preserve the source element widths when constructing its array view.
 	sourceElementSize := goScriptElementByteSize(ctx, sourceType)
 	targetElementSize := goScriptElementByteSize(ctx, array.Elem())
 	sourceTypeArg := o.tsTypeFor(ctx, array.Elem())

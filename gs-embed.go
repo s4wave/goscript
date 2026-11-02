@@ -10,6 +10,7 @@ import "embed"
 // tests stay out of every binary that embeds the compiler.
 //
 //go:embed gs/builtin/builtin.ts
+//go:embed gs/builtin/byte-layout.ts
 //go:embed gs/builtin/callback.ts
 //go:embed gs/builtin/channel.ts
 //go:embed gs/builtin/defer.ts

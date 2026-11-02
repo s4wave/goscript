@@ -1678,7 +1678,8 @@ export function canonicalPointerIdentity(value: object): object {
 // to an element, which has a __goElementBacking.
 export let pointerAliasesMade = false
 
-function markPointerAlias(source: object, view: object): void {
+// markPointerAlias gives a byte or method-set view its source's pointer identity.
+export function markPointerAlias(source: object, view: object): void {
   // The view shares the identity of the storage of its source.
   pointerAliasesMade = true
   pointerIdentities.set(view, canonicalPointerIdentity(source))
@@ -1984,7 +1985,6 @@ export function copyElement<T>(value: T): T {
 
 // copyObjectElement is copyElement for a value that is an object.
 function copyObjectElement<T>(value: T & object): T {
-
   // A struct value of a class is copied as its class copies it.
   if ((value as any)[structValueMarker] === true) {
     let copy = (value as any)[structCopy] as StructCopy | null | undefined

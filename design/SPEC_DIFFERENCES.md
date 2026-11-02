@@ -361,7 +361,7 @@ The opt-in `DeferredFunctions` compiler configuration replaces selected function
     -   **`nil` Value:** `$.VarRef<T>` can be `null` (or have an internal `null` value) to represent Go's `nil` pointer. Standard TypeScript reference types can also be `null`.
     -   **Dereferencing (`*p`):** Translated to `p.value` for `$.VarRef` or direct access if `p` is a direct reference.
     -   **Address-of (`&v`):** Translated to `new $.VarRef(v)` for values needing varRefing, or taking the reference directly if `v` is already a reference type suitable for Go's pointer semantics in that context.
-    -   **Divergence:** Fundamental. TypeScript lacks Go's explicit memory addresses and pointer arithmetic. GoScript simulates pointer semantics through varRefing and reference management. `unsafe.Pointer` is a significant challenge and generally unsupported or highly restricted.
+    -   **Unsafe byte layouts:** GoScript supports numeric reinterpretation and byte-backed arrays and structs through `ByteLayout`. The compiler supplies Go sizes, alignment, array strides and field offsets. Lazy views share the original bytes and pointer addresses; fixed integers, floats and booleans use the little-endian js/wasm target layout. Layouts containing managed references are rejected. Ordinary identity and method-set pointer conversions retain their existing representation; this is not a simulation of arbitrary Go heap memory.
 
 ### Function Types
 

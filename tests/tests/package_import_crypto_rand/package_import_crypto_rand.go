@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/ecdsa"
+	"crypto/elliptic"
 	"crypto/rand"
 	"io"
 )
@@ -25,6 +27,12 @@ func main() {
 	token := rand.Text()
 	println("text len", len(token))
 	println("text alphabet", isBase32(token))
+
+	// P256 key generation reaches the standard library's internal sysrand path.
+	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	println("p256 key err nil", err == nil)
+	println("p256 key has entropy", key != nil && key.D.Sign() != 0)
+	println("p256 point valid", key != nil && key.Curve.IsOnCurve(key.X, key.Y))
 }
 
 func hasData(buf []byte) bool {

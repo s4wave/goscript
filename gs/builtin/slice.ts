@@ -12,6 +12,7 @@ import {
   type StructTypeInfo,
 } from './type.js'
 import { runtimePanic } from './panic.js'
+import { byteLayoutPointer } from './byte-layout.js'
 import {
   isOwnedPointerHandle,
   isVarRef,
@@ -2402,7 +2403,10 @@ export function arrayIndex<
     if (index >= 0 && index < (collection as TypedSlice).length) {
       return (collection as TypedSlice)[index] as ArrayIndexValue<C>
     }
-  } else if (Array.isArray(collection) && (collection as any).__meta__ === undefined) {
+  } else if (
+    Array.isArray(collection) &&
+    (collection as any).__meta__ === undefined
+  ) {
     if (index >= 0 && index < collection.length) {
       return collection[index] as ArrayIndexValue<C>
     }
@@ -2693,6 +2697,8 @@ class SliceIndexReference<T> implements VarRef<T> {
 // elements share: the array itself, or the ArrayBuffer of a typed array,
 // which typed slices of the same memory view.
 function elementBacking(array: object): object {
+  const view = byteLayoutPointer(array, 0)
+  if (view !== undefined) return view.backing
   return ArrayBuffer.isView(array) ? array.buffer : array
 }
 
@@ -2700,6 +2706,8 @@ function elementBacking(array: object): object {
 // element of array at index: the index itself, or the byte offset of a typed
 // array element.
 function elementBackingIndex(array: object, index: number): number {
+  const view = byteLayoutPointer(array, index)
+  if (view !== undefined) return view.index
   // An array element is at its own index.
   if (!ArrayBuffer.isView(array)) {
     return index
@@ -2818,6 +2826,10 @@ export function indexAddress<T>(
   collection: Slice<T> | T[] | Uint8Array,
   index: number,
 ): number {
+  if (typeof collection === 'object' && collection !== null) {
+    const view = byteLayoutPointer(collection, index)
+    if (view !== undefined) return view.address
+  }
   if (collection === null || collection === undefined) {
     runtimePanic('runtime error: index on nil or undefined collection')
   }
@@ -2919,6 +2931,10 @@ export function indexByteAddress<T>(
   index: number,
   elementByteSize: number,
 ): number {
+  if (typeof collection === 'object' && collection !== null) {
+    const view = byteLayoutPointer(collection, index)
+    if (view !== undefined) return view.address
+  }
   if (collection === null || collection === undefined) {
     runtimePanic('runtime error: index on nil or undefined collection')
   }

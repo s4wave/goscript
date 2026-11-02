@@ -101,6 +101,7 @@ import {
   unref,
   unsupportedPointerRef,
   unsafePointerRef,
+  unsafeByteView,
   varRef,
   goString,
 } from './index.js'
@@ -821,6 +822,13 @@ describe('builtin runtime contract helpers', () => {
     expect(words[1]).toBe(0xaa)
     wordBytes.value = [1, 2, 3, 4]
     expect(words[0]).toBe(0x04030201)
+
+    // Byte-backed casts reject reference layouts and preserve ordinary pointers.
+    expect(() => unsafeByteView(new Uint8Array(8), null)).toThrow(
+      'managed reference',
+    )
+    const ordinary = { text: 'shared' }
+    expect(unsafeByteView(ordinary, null)).toBe(ordinary)
 
     sliceElems(shortBytes!)[sliceSlot(shortBytes!, 0)] = 14
     expect(bytesToUint8Array(shortBytes)).toEqual(new Uint8Array([14, 0]))

@@ -2,9 +2,13 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
+import * as ecdsa from "@goscript/crypto/ecdsa/index.js"
+import * as elliptic from "@goscript/crypto/elliptic/index.js"
 import * as rand from "@goscript/crypto/rand/index.js"
 import * as io from "@goscript/io/index.js"
+import * as big from "@goscript/math/big/index.js"
 import "@goscript/io/index.js"
+import "@goscript/math/big/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	// Read from the public entropy adapter and its Reader interface.
@@ -28,6 +32,15 @@ export async function main(): globalThis.Promise<void> {
 	let token = await rand.Text()
 	await $.println("text len", $.stringLen(token))
 	await $.println("text alphabet", isBase32(token))
+
+	// P256 key generation reaches the standard library's internal sysrand path.
+	let __goscriptTuple1: any = await ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	let key: ecdsa.PrivateKey | $.VarRef<ecdsa.PrivateKey> | null = __goscriptTuple1[0]
+	err = __goscriptTuple1[1]
+	let key$: ecdsa.PrivateKey = key == null ? $.pointerTarget<ecdsa.PrivateKey>(key) : (key as any).__isVarRef === true ? (key as any).value : (key as any).__goValue === undefined ? (key as any) : $.pointerTarget<ecdsa.PrivateKey>(key)
+	await $.println("p256 key err nil", err == null)
+	await $.println("p256 key has entropy", (key != null) && (big.Int.prototype.Sign.call($.pointerValue<big.Int>((key$ as ecdsa.PrivateKey).D)) != 0))
+	await $.println("p256 point valid", (key != null) && (__goscriptAwait = $.pointerValue<Exclude<elliptic.Curve, null>>((key$ as ecdsa.PrivateKey).PublicKey.Curve).IsOnCurve((key$ as ecdsa.PrivateKey).PublicKey.X, (key$ as ecdsa.PrivateKey).PublicKey.Y), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export function hasData(buf: $.Slice<number>): boolean {
@@ -49,6 +62,8 @@ export function isBase32(token: string): boolean {
 	}
 	return true
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

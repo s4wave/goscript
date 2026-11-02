@@ -122,10 +122,12 @@ const (
 	RuntimeHelperArrayEqual            RuntimeHelper = "value.arrayEqual"
 	RuntimeHelperNamedStructConversion RuntimeHelper = "value.namedStructConversion"
 	RuntimeHelperUnsafePointerCast     RuntimeHelper = "value.unsafePointerCast"
-	RuntimeHelperComparableEqual       RuntimeHelper = "value.comparableEqual"
-	RuntimeHelperStructEqual           RuntimeHelper = "value.structEqual"
-	RuntimeHelperPointerEqual          RuntimeHelper = "value.pointerEqual"
-	RuntimeHelperPointerAliasesMade    RuntimeHelper = "value.pointerAliasesMade"
+	// RuntimeHelperUnsafeByteView aliases fixed-layout values over byte storage.
+	RuntimeHelperUnsafeByteView     RuntimeHelper = "value.unsafeByteView"
+	RuntimeHelperComparableEqual    RuntimeHelper = "value.comparableEqual"
+	RuntimeHelperStructEqual        RuntimeHelper = "value.structEqual"
+	RuntimeHelperPointerEqual       RuntimeHelper = "value.pointerEqual"
+	RuntimeHelperPointerAliasesMade RuntimeHelper = "value.pointerAliasesMade"
 
 	RuntimeHelperVarRef                RuntimeHelper = "varref.varRef"
 	RuntimeHelperFieldRef              RuntimeHelper = "varref.fieldRef"
@@ -463,6 +465,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperPointerTarget, "pointerTarget", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperNamedStructConversion, "namedStructConversion", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperUnsafePointerCast, "unsafePointerCast", RuntimeHelperCategoryValue),
+		runtimeHelper(RuntimeHelperUnsafeByteView, "unsafeByteView", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperPointerValueOrNil, "pointerValueOrNil", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperArrayEqual, "arrayEqual", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperComparableEqual, "comparableEqual", RuntimeHelperCategoryValue),
