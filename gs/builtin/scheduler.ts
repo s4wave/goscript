@@ -11,8 +11,9 @@
 //
 // Preference order, resolved once and cached:
 //   1. scheduler.postTask (browsers): a first-class user-blocking task.
-//   2. MessageChannel port dispatch (Node, Bun): a task boundary with no clamp.
-//   3. setTimeout(fn, 0): last resort where neither of the above exists.
+//   2. setImmediate (Node, Bun): the next check phase, after timers and I/O.
+//   3. MessageChannel port dispatch: a browser task boundary with no clamp.
+//   4. setTimeout(fn, 0): last resort where none of the above exists.
 
 type PostTaskScheduler = {
   postTask(fn: () => void, options?: { priority?: string }): Promise<unknown>
@@ -31,6 +32,21 @@ function postTaskPoster(): ((fn: () => void) => void) | undefined {
   return (fn) => {
     void sched.postTask(fn, { priority: 'user-blocking' })
   }
+}
+
+// immediatePoster lets Node and Bun leave the current message-port phase.
+// Posting another port message from each yield can otherwise starve timers.
+function immediatePoster(): ((fn: () => void) => void) | undefined {
+  const immediate = (
+    globalThis as {
+      setImmediate?: (fn: () => void) => unknown
+    }
+  ).setImmediate
+  return immediate ?
+      (fn) => {
+        immediate(fn)
+      }
+    : undefined
 }
 
 function messageChannelPoster(): ((fn: () => void) => void) | undefined {
@@ -79,6 +95,7 @@ function taskPoster(): (fn: () => void) => void {
   if (poster === undefined) {
     poster =
       postTaskPoster() ??
+      immediatePoster() ??
       messageChannelPoster() ??
       ((fn) => {
         setTimeout(fn, 0)

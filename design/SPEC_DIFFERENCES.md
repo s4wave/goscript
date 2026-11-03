@@ -482,7 +482,7 @@ The opt-in `DeferredFunctions` compiler configuration replaces selected function
         -   `val, ok = <-ch` -> `[val, ok] = await ch.receiveWithOk()`.
     -   **Select Statement:** Go's `select` statement, which waits on multiple channel operations, is a complex construct. Translating it (`compiler.WriteStmtSelect`) requires a sophisticated mechanism in `$.Channel` or a helper (e.g., `$.selectStatement`) to manage multiple asynchronous operations and choose the first one ready, mimicking Go's selection rules (including randomization for multiple ready channels).
     -   **Directionality:** `chan<-` and `<-chan` are compile-time checks in Go. GoScript can enforce this at the TypeScript type level to some extent (e.g., by providing different interfaces or views of `$.Channel`).
-    -   **Limitations:** True goroutine preemption and scheduling are beyond GoScript's scope. The behavior of `$.Channel` will be an approximation within the JavaScript concurrency model. This means that code relying on fine-grained goroutine interleaving or specific scheduler behaviors may not translate perfectly.
+    -   **Limitations:** True goroutine preemption and scheduling are beyond GoScript's scope. Long CPU loops must call `runtime.Gosched` cooperatively. It crosses a host task boundary: `scheduler.postTask` in supporting browsers, `setImmediate` in Node and Bun, or a message-port/timer task elsewhere. Node and Bun use their check phase because repeatedly posting message-port callbacks can starve timers. The behavior of `$.Channel` remains an approximation within the JavaScript concurrency model, so code relying on fine-grained interleaving may not translate perfectly.
 
 ## Properties of Types and Values
 

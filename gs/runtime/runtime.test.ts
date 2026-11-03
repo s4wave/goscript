@@ -100,6 +100,23 @@ describe('runtime override', () => {
     await Gosched()
     order.push('after-gosched')
     expect(order).toEqual(['pending-task', 'after-gosched'])
+
+    // A host check-phase callback must also run when yields keep posting work.
+    // Reusing the message-port queue for both callbacks only proves FIFO there.
+    if (typeof setImmediate !== 'undefined') {
+      await new Promise<void>((resolve) => $.queueTask(resolve))
+      const hostOrder: string[] = []
+      const foreground = new Promise<void>((resolve) => {
+        setImmediate(() => {
+          hostOrder.push('foreground')
+          resolve()
+        })
+      })
+      await Gosched()
+      hostOrder.push('after-gosched')
+      await foreground
+      expect(hostOrder).toEqual(['foreground', 'after-gosched'])
+    }
   })
 
   it('keeps the profiling settings that have no effect', () => {
