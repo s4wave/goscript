@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "*": [
+        "./*"
+      ],
+      "@go/github.com/s4wave/goscript/*": [
+        "../../../*"
+      ],
+      "@goscript/*": [
+        "../../../tests/tests/package_import_encoding_json_unmarshal_type_errors/run/output/@goscript/*",
+        "../../../gs/*",
+        "../../../tests/deps/*"
+      ],
+      "@goscript/github.com/s4wave/goscript/tests/tests/package_import_encoding_json_unmarshal_type_errors/*": [
+        "./*"
+      ]
+    }
+  },
+  "extends": "../../../tests/tsconfig.base.json",
+  "include": [
+    "index.ts",
+    "package_import_encoding_json_unmarshal_type_errors.gs.ts"
+  ]
+}
