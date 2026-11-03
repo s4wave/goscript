@@ -2143,28 +2143,60 @@ function assignDecodedValue(
   }
 }
 
+// decodedFieldKey returns the key of the decoded object for the field with
+// the given JSON name, of the fields with the given names, or undefined if
+// it has none. As in Go, a key matches the name of a field without case,
+// unless another field has that exact name, and the last key that matches
+// is the one that is used, as the later keys overwrite the earlier ones.
+function decodedFieldKey(
+  decoded: Record<string, unknown>,
+  jsonName: string,
+  names: Set<string>,
+): string | undefined {
+  const folded = jsonName.toLowerCase()
+  let found: string | undefined
+  for (const key of Object.keys(decoded)) {
+    if (key === jsonName || (!names.has(key) && key.toLowerCase() === folded)) {
+      found = key
+    }
+  }
+  return found
+}
+
+// checkUnknownFields returns an error, for DisallowUnknownFields, if the
+// decoded object has a key that matches none of the given names of the
+// fields, without case.
+function checkUnknownFields(
+  decoded: Record<string, unknown>,
+  names: Set<string>,
+): void {
+  const folded = new Set([...names].map((name) => name.toLowerCase()))
+  for (const key of Object.keys(decoded)) {
+    if (!names.has(key) && !folded.has(key.toLowerCase())) {
+      throw $.newError(`json: unknown field "${key}"`)
+    }
+  }
+}
+
 function assignStructFields(
   target: Record<string, unknown>,
   decoded: Record<string, unknown>,
   opts: decodeOptions,
 ): void {
   const fields = jsonStructFields(target)
+  const names = new Set(fields.map((field) => field.jsonName))
   if (opts.disallowUnknownFields) {
-    const knownNames = new Set(fields.map((field) => field.jsonName))
-    for (const key of Object.keys(decoded)) {
-      if (!knownNames.has(key)) {
-        throw $.newError(`json: unknown field "${key}"`)
-      }
-    }
+    checkUnknownFields(decoded, names)
   }
   for (const { jsonName, owner, field } of fields) {
     if (!(field.key in owner)) {
       continue
     }
-    if (Object.prototype.hasOwnProperty.call(decoded, jsonName)) {
+    const key = decodedFieldKey(decoded, jsonName, names)
+    if (key !== undefined) {
       assignDecodedFieldValue(
         $.fieldRef(owner, field.key),
-        decoded[jsonName],
+        decoded[key],
         opts,
         field.type,
       )
@@ -2825,26 +2857,21 @@ function assignAnonymousStructFields(
   fields: fieldMetadata[],
   opts: decodeOptions,
 ): void {
+  const names = new Set<string>()
+  for (const field of fields) {
+    const jsonName = jsonFieldName(field.name, field.tag)
+    if (jsonName !== '') {
+      names.add(jsonName)
+    }
+  }
   if (opts.disallowUnknownFields) {
-    const knownNames = new Set<string>()
-    for (const field of fields) {
-      const jsonName = jsonFieldName(field.name, field.tag)
-      if (jsonName !== '') {
-        knownNames.add(jsonName)
-      }
-    }
-    for (const key of Object.keys(decoded)) {
-      if (!knownNames.has(key)) {
-        throw $.newError(`json: unknown field "${key}"`)
-      }
-    }
+    checkUnknownFields(decoded, names)
   }
   for (const field of fields) {
     const jsonName = jsonFieldName(field.name, field.tag)
-    if (
-      jsonName === '' ||
-      !Object.prototype.hasOwnProperty.call(decoded, jsonName)
-    ) {
+    const key =
+      jsonName === '' ? undefined : decodedFieldKey(decoded, jsonName, names)
+    if (key === undefined) {
       continue
     }
     // An anonymous struct's own fields start unset (the target object
@@ -2857,7 +2884,7 @@ function assignAnonymousStructFields(
     // type (a bare type-name spelling resolved through $.getTypeByName);
     // an inline TypeInfo with no ctor keeps the existing generic path
     // unchanged below.
-    const fieldValue = decoded[jsonName]
+    const fieldValue = decoded[key]
     const fieldTypeInfo = resolveTypeInfo(field.type)
     if (
       fieldTypeInfo !== null &&
