@@ -2168,7 +2168,7 @@ func tupleTypesIdentical(a *types.Tuple, b *types.Tuple) bool {
 		return false
 	}
 	for idx := range a.Len() {
-		if !types.IdenticalIgnoreTags(a.At(idx).Type(), b.At(idx).Type()) {
+		if !identicalVariantTypes(a.At(idx).Type(), b.At(idx).Type()) {
 			return false
 		}
 	}
