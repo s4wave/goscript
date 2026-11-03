@@ -18,6 +18,52 @@ export async function main(): globalThis.Promise<void> {
 	let name = $.varRef("")
 	err = (json.Unmarshal($.mapGet<string, json.RawMessage, json.RawMessage>(fields.value, "name", null)[0], $.interfaceValue(name, "*string", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("string")))) as $.GoError)
 	await $.println("name:", err == null, name.value)
+
+	await marshalElements()
+}
+
+export async function marshalElements(): globalThis.Promise<void> {
+	let __goscriptTuple0: any = (json.Marshal($.interfaceValue($.makeMap<string, json.RawMessage>([["b", (new Uint8Array([34, 120, 34]) as json.RawMessage)], ["a", (new Uint8Array([91, 49, 44, 32, 50, 93]) as json.RawMessage)]]), "map[string]jsontext.Value", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "jsontext.Value")))) as [$.Slice<number>, $.GoError])
+	let out: $.Slice<number> = __goscriptTuple0[0]
+	let err: $.GoError = __goscriptTuple0[1]
+	await $.println("marshal map:", err == null, $.bytesToString(out))
+	let __goscriptTuple1: any = (json.Marshal($.interfaceValue($.arrayToSlice<json.RawMessage>([(new Uint8Array([123, 34, 120, 34, 58, 32, 49, 125]) as json.RawMessage), (new Uint8Array([116, 114, 117, 101]) as json.RawMessage)]), "[]jsontext.Value", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "jsontext.Value")))) as [$.Slice<number>, $.GoError])
+	out = __goscriptTuple1[0]
+	err = __goscriptTuple1[1]
+	await $.println("marshal slice:", err == null, $.bytesToString(out))
+	class item {
+		public declare Values: globalThis.Map<string, json.RawMessage> | null
+
+		public declare Items: $.Slice<item | $.VarRef<item> | null>
+
+		constructor(init?: Partial<{Values?: globalThis.Map<string, json.RawMessage> | null, Items?: $.Slice<item | $.VarRef<item> | null>}>, __goscriptValue?: boolean) {
+			this.Values = init?.Values ?? (null! as globalThis.Map<string, json.RawMessage> | null)
+			this.Items = init?.Items ?? (null! as $.Slice<item | $.VarRef<item> | null>)
+			;(this as any).__goStructValue = __goscriptValue === true
+		}
+
+		public clone(): item {
+			return new item(this, true)
+		}
+
+		public __goscriptAssign(source: item): this {
+			this.Values = source.Values
+			this.Items = source.Items
+			return this
+		}
+
+		static __typeInfo = $.registerStructType(
+			"main.item",
+			() => new item(),
+			() => [],
+			item,
+			() => [{ name: "Values", key: "Values", type: /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "jsontext.Value")) }, { name: "Items", key: "Items", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.item")), tag: "json:\",omitempty\"" }]
+		)
+	}
+	let __goscriptTuple2: any = (json.MarshalIndent($.interfaceValue(new item({Values: $.makeMap<string, json.RawMessage>([["Name", (new Uint8Array([34, 97, 34]) as json.RawMessage)]]), Items: $.arrayToSlice<item | $.VarRef<item> | null>([new item({Values: $.makeMap<string, json.RawMessage>([["N", (new Uint8Array([51]) as json.RawMessage)]])})])}), "*main.item", /* @__PURE__ */ $.pointerType("main.item")), "", " ") as [$.Slice<number>, $.GoError])
+	out = __goscriptTuple2[0]
+	err = __goscriptTuple2[1]
+	await $.println("marshal nested:", err == null, $.bytesToString(out))
 }
 
 if ($.isMainScript(import.meta)) {

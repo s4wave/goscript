@@ -1,3 +1,17 @@
 map: true "a" [{"x":1},"b"] 3
 slice: true 2 {"x":1} "b"
 name: true a
+marshal map: true {"a":[1,2],"b":"x"}
+marshal slice: true [{"x":1},true]
+marshal nested: true {
+ "Values": {
+  "Name": "a"
+ },
+ "Items": [
+  {
+   "Values": {
+    "N": 3
+   }
+  }
+ ]
+}
