@@ -121,7 +121,7 @@ export function unsafeByteView<T>(
     (typeof value === 'object' && value !== null ?
       byteViews.get(value)
     : undefined)
-  let bytes: any = value
+  let bytes: Uint8Array
   if (prior !== undefined) {
     bytes = prior.bytes
     offset =
