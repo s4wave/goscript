@@ -3,6 +3,7 @@
 
 import * as $ from "@goscript/builtin/index.js"
 import * as context from "@goscript/context/index.js"
+import * as errors from "@goscript/errors/index.js"
 import * as time from "@goscript/time/index.js"
 
 export async function run(ctx: context.Context | null): globalThis.Promise<void> {
@@ -61,6 +62,35 @@ export async function main(): globalThis.Promise<void> {
 	let [deadline, ok] = await (deadlineCtx !== null && (deadlineCtx as any).__isVarRef !== true && ((deadlineCtx as any).__goValue === undefined || (deadlineCtx as any).__goType?.charCodeAt(0) !== 42) ? (deadlineCtx as Exclude<context.Context, null>) : $.pointerValue<Exclude<context.Context, null>>(deadlineCtx)).Deadline()
 	await $.println("deadline ok:", ok)
 	await $.println("deadline zero:", $.markAsStructValue($.cloneStructValue(deadline)).IsZero())
+
+	// A deadline is an absolute lower bound, including fractional milliseconds.
+	let cause = errors.New("deadline cause")
+	for (let __rangeIndex = 0; __rangeIndex < 8; __rangeIndex++) {
+		let end = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(time.Now())).Add(10250000n)))
+		let [child, stop] = context.WithDeadlineCause($.pointerValueOrNil(ctx)!, $.markAsStructValue($.cloneStructValue(end)), $.pointerValueOrNil(cause)!)
+		await $.chanRecv(((__goscriptAwait = (child !== null && (child as any).__isVarRef !== true && ((child as any).__goValue === undefined || (child as any).__goType?.charCodeAt(0) !== 42) ? (child as Exclude<context.Context, null>) : $.pointerValue<Exclude<context.Context, null>>(child)).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Channel<{}> | null))
+		if (($.markAsStructValue($.cloneStructValue(time.Now())).Before($.markAsStructValue($.cloneStructValue(end))) || (!$.comparableEqual((__goscriptAwait = (child !== null && (child as any).__isVarRef !== true && ((child as any).__goValue === undefined || (child as any).__goType?.charCodeAt(0) !== 42) ? (child as Exclude<context.Context, null>) : $.pointerValue<Exclude<context.Context, null>>(child)).Err(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), context.DeadlineExceeded))) || (!$.comparableEqual(context.Cause($.pointerValueOrNil(child)!), cause))) {
+			$.panic("deadline fired early or lost its cause")
+		}
+		stop!()
+	}
+	await $.println("deadline timing and cause: true")
+
+	// Manual cancellation keeps its own cause and stops the pending timer.
+	let [manual, stop] = context.WithDeadlineCause($.pointerValueOrNil(ctx)!, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(time.Now())).Add(3600000000000n))), $.pointerValueOrNil(cause)!)
+	stop!()
+	if ((!$.comparableEqual((__goscriptAwait = (manual !== null && (manual as any).__isVarRef !== true && ((manual as any).__goValue === undefined || (manual as any).__goType?.charCodeAt(0) !== 42) ? (manual as Exclude<context.Context, null>) : $.pointerValue<Exclude<context.Context, null>>(manual)).Err(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), context.Canceled)) || (!$.comparableEqual(context.Cause($.pointerValueOrNil(manual)!), context.Canceled))) {
+		$.panic("manual cancellation used the deadline cause")
+	}
+	let __goscriptTuple0: any = context.WithDeadlineCause($.pointerValueOrNil(manual)!, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(time.Now())).Add(3600000000000n))), $.pointerValueOrNil(cause)!)
+	let child: context.Context | null = __goscriptTuple0[0]
+	stop = __goscriptTuple0[1]
+	const __goscriptDeferCallee2 = stop
+	__defer.defer(() => { __goscriptDeferCallee2!() })
+	if ((!$.comparableEqual((__goscriptAwait = (child !== null && (child as any).__isVarRef !== true && ((child as any).__goValue === undefined || (child as any).__goType?.charCodeAt(0) !== 42) ? (child as Exclude<context.Context, null>) : $.pointerValue<Exclude<context.Context, null>>(child)).Err(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), context.Canceled)) || (!$.comparableEqual(context.Cause($.pointerValueOrNil(child)!), context.Canceled))) {
+		$.panic("canceled parent did not cancel its deadline child")
+	}
+	await $.println("deadline cancellation: true")
 
 	await $.println("test finished")
 }

@@ -1,12 +1,16 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import * as $ from '@goscript/builtin/index.js'
+import * as time from '@goscript/time/index.js'
 
 import {
   AfterFunc,
   Background,
   Canceled,
+  Cause,
+  DeadlineExceeded,
   WithCancel,
+  WithDeadlineCause,
   WithValue,
   WithoutCancel,
 } from './index.js'
@@ -36,6 +40,33 @@ function foreignContext(): [Context, $.Channel<{}>, () => void] {
 }
 
 describe('context override', () => {
+  it('waits out an early host timer and preserves the deadline cause', async () => {
+    // Hold the monotonic clock just before expiry while the host timer fires.
+    let clock = 0
+    const now = vi.spyOn(performance, 'now').mockImplementation(() => clock)
+    const cause = $.newError('deadline cause')
+    const [ctx, cancel] = WithDeadlineCause(
+      Background(),
+      time.Now().Add(time.Millisecond),
+      cause,
+    )
+    try {
+      const done = ctx!.Done()!.receive()
+      clock = 0.95
+      await new Promise((resolve) => setTimeout(resolve, 5))
+      expect(ctx!.Err()).toBeNull()
+
+      // The same deadline expires once its monotonic duration has elapsed.
+      clock = 1
+      await done
+      expect(ctx!.Err()).toBe(DeadlineExceeded)
+      expect(Cause(ctx)).toBe(cause)
+    } finally {
+      cancel?.()
+      now.mockRestore()
+    }
+  })
+
   it('matches generated struct keys by Go comparable value', () => {
     class Key {
       static __typeInfo = $.registerStructType('example.key', null, [], Key, [])

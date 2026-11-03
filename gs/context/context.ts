@@ -196,7 +196,7 @@ class cancelContext extends baseContext {
 // Timer context with deadline
 class timerContext extends cancelContext {
   private deadline: time.Time
-  private timer: any
+  private timer: time.Timer | null = null
 
   constructor(parent: ContextNonNil, deadline: time.Time) {
     super(parent)
@@ -207,26 +207,29 @@ class timerContext extends cancelContext {
     return [this.deadline.clone(), true]
   }
 
-  startTimer(): void {
-    const duration = Number(this.deadline.Sub(time.Now())) / 1000000
-
-    if (duration <= 0) {
-      // Already expired
-      this.cancel(true, DeadlineExceeded, null)
+  startTimer(cause: $.GoError): void {
+    // Keep an already canceled parent from leaving a deadline timer behind.
+    if (this.Err() !== null) {
       return
     }
 
-    this.timer = setTimeout(() => {
-      this.cancel(true, DeadlineExceeded, null)
-    }, duration)
+    // An elapsed deadline cancels the returned context immediately.
+    const duration = this.deadline.Sub(time.Now())
+    if (duration <= 0n) {
+      this.cancel(true, DeadlineExceeded, cause)
+      return
+    }
+
+    // Go timers wait out an early host callback before reporting expiry.
+    this.timer = time.AfterFunc(duration, () => {
+      this.cancel(true, DeadlineExceeded, cause)
+    })
   }
 
   cancel(removeFromParent: boolean, err: $.GoError, cause: $.GoError): void {
     super.cancel(removeFromParent, err, cause)
-    if (this.timer) {
-      clearTimeout(this.timer)
-      this.timer = null
-    }
+    this.timer?.Stop()
+    this.timer = null
   }
 }
 
@@ -325,12 +328,12 @@ export function WithDeadlineCause(
 
   const ctx = new timerContext(parent, d)
   ctx.propagateCancel()
-  ctx.startTimer()
+  ctx.startTimer(cause)
 
   return [
     ctx,
     () => {
-      ctx.cancel(true, Canceled, cause)
+      ctx.cancel(true, Canceled, null)
     },
   ]
 }
