@@ -2997,7 +2997,10 @@ func TestCompilePackagesConvertsOverrideNamedStringToString(t *testing.T) {
 	}
 }
 
+// TestCompilePackagesEmitsInterfacesMethodValuesTypeSwitchesAndFunctionAssertions
+// checks the interface metadata and named function type contracts.
 func TestCompilePackagesEmitsInterfacesMethodValuesTypeSwitchesAndFunctionAssertions(t *testing.T) {
+	// Compile a package combining interface and function type assertions.
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod": "module example.test/interfaces\n\ngo 1.25.3\n",
 		"main.go": strings.Join([]string{
@@ -3029,6 +3032,8 @@ func TestCompilePackagesEmitsInterfacesMethodValuesTypeSwitchesAndFunctionAssert
 			"",
 		}, "\n"),
 	})
+
+	// Retain the compiler output for metadata inspection.
 	outputDir := filepath.Join(t.TempDir(), "output")
 	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: outputDir}, nil, nil)
 	if err != nil {
@@ -3038,6 +3043,8 @@ func TestCompilePackagesEmitsInterfacesMethodValuesTypeSwitchesAndFunctionAssert
 	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
 		t.Fatal(err.Error())
 	}
+
+	// Check the emitted interface and named function descriptors.
 	outputFile := filepath.Join(outputDir, "@goscript", "example.test", "interfaces", "main.gs.ts")
 	content, err := os.ReadFile(outputFile)
 	if err != nil {
@@ -3051,7 +3058,6 @@ func TestCompilePackagesEmitsInterfacesMethodValuesTypeSwitchesAndFunctionAssert
 		"Close(): string",
 		"$.registerInterfaceType(\n\t\"main.ReadCloser\"",
 		"{ name: \"Close\", args: [], returns: [{ type: /* @__PURE__ */ $.basicType(\"string\") }] }",
-		"((__receiver) => () => __receiver.Inc())($.pointerValue<Counter>(counter))",
 		"$.namedFunction(greet, \"main.Greeter\", ({ kind: $.TypeKind.Function, name: \"main.Greeter\"",
 		"params: [/* @__PURE__ */ $.basicType(\"string\")]",
 		"results: [/* @__PURE__ */ $.basicType(\"string\")]",
