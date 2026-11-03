@@ -8,3 +8,5 @@ recorder: 403 feature not supported
 servecontent: 200 served
 servecontent head: 200 0
 server: true true 1.2.3.4
+tcp4: true
+tcp6: true

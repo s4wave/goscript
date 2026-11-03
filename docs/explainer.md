@@ -404,6 +404,10 @@ imports as `$`:
 Handwritten overrides for standard-library and third-party packages live
 beside it under `gs/`; [gs/README.md](../gs/README.md) describes their layout.
 
+The compiler loads Go's js/wasm standard library, so network constants in
+`gs/syscall` use its fake-socket values. Generated constant expressions and
+runtime selector references must agree, including IPv6 address-family checks.
+
 ### Call sites
 
 `runtime.Caller` reads its frames from the JavaScript stack, whose files and

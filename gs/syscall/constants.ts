@@ -16,18 +16,19 @@ export const SIGINT: number = 2
 export const SIGKILL: number = 9
 export const SIGTERM: number = 15
 
+// AF_UNIX and the network constants below match Go's js/wasm fake sockets.
 export const AF_UNIX: number = 1
 export const AF_INET: number = 2
-export const AF_INET6: number = 10
+export const AF_INET6: number = 3
 
 export const SOCK_STREAM: number = 1
 export const SOCK_DGRAM: number = 2
 export const SOCK_RAW: number = 3
-export const SOCK_SEQPACKET: number = 5
+export const SOCK_SEQPACKET: number = 4
 
 export const IPPROTO_IPV6: number = 0x29
 export const IPPROTO_TCP: number = 6
-export const IPV6_V6ONLY: number = 0x1a
+export const IPV6_V6ONLY: number = 1
 export const SOMAXCONN: number = 0x80
 export const F_DUPFD_CLOEXEC: number = 1
 
