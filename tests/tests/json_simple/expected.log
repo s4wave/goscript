@@ -1,1 +1,6 @@
 Result: {"x":42}
+named: true abc commit main
+anonymous: true def
+both cases: true y t
+unknown: true
+known: true w
