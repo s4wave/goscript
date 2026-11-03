@@ -14,4 +14,21 @@ func main() {
 	var name string
 	err = json.Unmarshal(fields["name"], &name)
 	println("name:", err == nil, name)
+
+	marshalElements()
+}
+
+// marshalElements tests that Marshal writes the RawMessage elements of
+// maps and slices as their JSON, not as base64.
+func marshalElements() {
+	out, err := json.Marshal(map[string]json.RawMessage{"b": json.RawMessage(`"x"`), "a": json.RawMessage(`[1, 2]`)})
+	println("marshal map:", err == nil, string(out))
+	out, err = json.Marshal([]json.RawMessage{json.RawMessage(`{"x": 1}`), json.RawMessage(`true`)})
+	println("marshal slice:", err == nil, string(out))
+	type item struct {
+		Values map[string]json.RawMessage
+		Items  []*item `json:",omitempty"`
+	}
+	out, err = json.MarshalIndent(&item{Values: map[string]json.RawMessage{"Name": json.RawMessage(`"a"`)}, Items: []*item{{Values: map[string]json.RawMessage{"N": json.RawMessage(`3`)}}}}, "", " ")
+	println("marshal nested:", err == nil, string(out))
 }

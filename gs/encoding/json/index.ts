@@ -1575,7 +1575,17 @@ function marshalValue(
   addressable = false,
 ): unknown {
   // A value with MarshalJSON encodes itself, awaiting it if it suspends.
+  // The type of a map or slice passed as an interface can be the spelling
+  // of an unnamed type, such as map[string]json.RawMessage, which is parsed
+  // for the types of its elements.
   typeInfo ??= goTypeInfoOf(v) ?? undefined
+  if (
+    typeof typeInfo === 'string' &&
+    (typeInfo.startsWith('map[') || typeInfo.startsWith('[]')) &&
+    $.getTypeByName(typeInfo) === undefined
+  ) {
+    typeInfo = goTypeDescriptor(typeInfo) ?? undefined
+  }
   const marshaler = marshalJSONTarget(v, typeInfo, addressable)
   if (marshaler !== null) {
     const result = marshaler.MarshalJSON()
@@ -1586,6 +1596,11 @@ function marshalValue(
     }
     const [data, err] = result
     return marshalerResult(data, err)
+  }
+
+  // A json.RawMessage, such as an element of a map or slice, is its JSON.
+  if (isRawMessageType(typeInfo)) {
+    return marshalRawMessage(v)
   }
 
   // A pointer encodes the value it points to, which is addressable.
@@ -1804,26 +1819,32 @@ function isPointerOrInterfaceFieldType(fieldType: unknown): boolean {
   return kind === $.TypeKind.Pointer || kind === $.TypeKind.Interface
 }
 
+// marshalRawMessage returns the JSON of a json.RawMessage value, which is
+// that JSON itself, compacted, or null for an empty or nil message.
+function marshalRawMessage(value: unknown): unknown {
+  const target = $.isVarRef(value) ? value.value : value
+  if (target === null || target === undefined) {
+    return null
+  }
+  const raw = $.bytesToString(target as $.Slice<number>)
+  if (raw === '') {
+    return null
+  }
+  try {
+    JSON.parse(raw) // validate; preserve exact token spelling below
+  } catch (err) {
+    throw new MarshalerError({ Err: goError(err) })
+  }
+  return new RawJSON(stripJSONWhitespace(raw))
+}
+
 function marshalFieldValue(
   value: unknown,
   fieldType: unknown,
   addressable: boolean,
 ): unknown {
   if (isRawMessageType(fieldType)) {
-    const target = $.isVarRef(value) ? value.value : value
-    if (target === null || target === undefined) {
-      return null
-    }
-    const raw = $.bytesToString(target as $.Slice<number>)
-    if (raw === '') {
-      return null
-    }
-    try {
-      JSON.parse(raw) // validate; preserve exact token spelling below
-    } catch (err) {
-      throw new MarshalerError({ Err: goError(err) })
-    }
-    return new RawJSON(stripJSONWhitespace(raw))
+    return marshalRawMessage(value)
   }
   // Go encodes a float32 with the shortest digits that round trip at 32 bits;
   // the float64 nearest those digits serializes with the same digits.
