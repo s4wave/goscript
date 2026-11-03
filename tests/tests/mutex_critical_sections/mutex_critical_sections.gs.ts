@@ -38,7 +38,7 @@ export class counter {
 		using __defer = new $.DisposableStack()
 		const c$: counter = c == null ? $.pointerTarget<counter>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<counter>(c)
 		void (c$ as counter).mu.Lock()
-		const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Unlock())((c$ as counter).mu), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
+		const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as sync.Mutex).Unlock() : sync.Mutex.prototype.Unlock.call($.pointerValue<sync.Mutex>(__receiver))))($.fieldRef((c$ as counter), "mu")), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 		__defer.defer(() => { __goscriptDeferCallee0() })
 		return (c$ as counter).n
 	}
@@ -91,7 +91,7 @@ export class queue {
 		using __defer = new $.DisposableStack()
 		const q$: queue = q == null ? $.pointerTarget<queue>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<queue>(q)
 		await (q$ as queue).mu.Lock()
-		const __goscriptDeferCallee1 = $.functionValue(((__receiver) => () => __receiver.Unlock())((q$ as queue).mu), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
+		const __goscriptDeferCallee1 = $.functionValue(((__receiver) => () => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as sync.Mutex).Unlock() : sync.Mutex.prototype.Unlock.call($.pointerValue<sync.Mutex>(__receiver))))($.fieldRef((q$ as queue), "mu")), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 		__defer.defer(() => { __goscriptDeferCallee1() })
 		return $.sliceLen((q$ as queue).items)
 	}
@@ -291,7 +291,7 @@ export function __goscript_set_registry(__goscriptValue: globalThis.Map<string, 
 export function register(name: string, v: number): void {
 	using __defer = new $.DisposableStack()
 	registryMu.value.Lock()
-	const __goscriptDeferCallee2 = $.functionValue(((__receiver) => () => __receiver.Unlock())(registryMu.value), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*RWMutex).Unlock-fm")
+	const __goscriptDeferCallee2 = $.functionValue(((__receiver) => () => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as sync.RWMutex).Unlock() : sync.RWMutex.prototype.Unlock.call($.pointerValue<sync.RWMutex>(__receiver))))(registryMu), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*RWMutex).Unlock-fm")
 	__defer.defer(() => { __goscriptDeferCallee2() })
 	$.mapSet(registry, name, v)
 }
@@ -306,7 +306,7 @@ export function lookup(name: string): number {
 export async function lockWith(mu: sync.Mutex | $.VarRef<sync.Mutex> | null, f: (() => void) | null): globalThis.Promise<void> {
 	using __defer = new $.DisposableStack()
 	await (mu !== null && (mu as any).__isVarRef !== true && (mu as any).__goValue === undefined ? ((mu as any) as sync.Mutex).Lock() : sync.Mutex.prototype.Lock.call($.pointerValue<sync.Mutex>(mu)))
-	const __goscriptDeferCallee3 = $.functionValue(((__receiver) => () => __receiver.Unlock())($.pointerValue<sync.Mutex>(mu)), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
+	const __goscriptDeferCallee3 = $.functionValue(((__receiver) => () => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as sync.Mutex).Unlock() : sync.Mutex.prototype.Unlock.call($.pointerValue<sync.Mutex>(__receiver))))(mu), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 	__defer.defer(() => { __goscriptDeferCallee3() })
 	f!()
 }
@@ -365,7 +365,7 @@ export function __goscript_set_total(__goscriptValue: number): void {
 export async function sumAll(ch: $.Channel<number> | null, wg: sync.WaitGroup | $.VarRef<sync.WaitGroup> | null): globalThis.Promise<void> {
 	queueMicrotask(async () => {
 		using __defer = new $.DisposableStack()
-		const __goscriptDeferCallee4 = $.functionValue(((__receiver) => () => __receiver.Done())($.pointerValue<sync.WaitGroup>(wg)), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*WaitGroup).Done-fm")
+		const __goscriptDeferCallee4 = $.functionValue(((__receiver) => () => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as sync.WaitGroup).Done() : sync.WaitGroup.prototype.Done.call($.pointerValue<sync.WaitGroup>(__receiver))))(wg), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*WaitGroup).Done-fm")
 		__defer.defer(() => { __goscriptDeferCallee4() })
 		while (true) {
 			let __goscriptRange0 = await $.chanRecvWithOk(ch)

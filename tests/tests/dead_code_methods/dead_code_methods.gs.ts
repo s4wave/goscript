@@ -374,10 +374,10 @@ export async function main(): globalThis.Promise<void> {
 	fmt.Println($.structInterfaceValue($.plainSliceIndex((await reflect.ValueOf($.interfaceValue(d, "*main.Dog", /* @__PURE__ */ $.pointerType("main.Dog"))).MethodByName("Ping").Call(null))!, 0), "reflect.Value", __goscriptStatic0()))
 
 	let c = new Counter()
-	let inc: (() => void) | null = $.functionValue(((__receiver) => () => __receiver.Inc())($.pointerValue<Counter>(c)), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "main.(*Counter).Inc-fm")
+	let inc: (() => void) | null = $.functionValue(((__receiver) => () => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as Counter).Inc() : Counter.prototype.Inc.call(__receiver)))(c), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "main.(*Counter).Inc-fm")
 	inc!()
 	inc!()
-	$.functionValue((c: Counter | $.VarRef<Counter> | null): void => $.pointerValue<Counter>(c).Dec(), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Counter")], results: [] } as $.FunctionTypeInfo))(c)
+	$.functionValue((c: Counter | $.VarRef<Counter> | null): void => (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as Counter).Dec() : Counter.prototype.Dec.call(c)), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Counter")], results: [] } as $.FunctionTypeInfo))(c)
 	fmt.Println("counter:", $.basicInterfaceValue((c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as Counter).Value() : Counter.prototype.Value.call(c)), "int"))
 
 	let o = $.varRef(new Outer(true, new Inner(), $.interfaceValue<Speaker | null>(new Dog(false, "max"), "*main.Dog", /* @__PURE__ */ $.pointerType("main.Dog"))))

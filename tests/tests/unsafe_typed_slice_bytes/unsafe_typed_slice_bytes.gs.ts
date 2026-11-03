@@ -9,11 +9,11 @@ export function floatBytes(s: $.Slice<number>): $.Slice<number> {
 	if ($.sliceLen(s) == 0) {
 		return null
 	}
-	return (unsafe.Slice!(($.indexRef(s!, 0) as any), $.sliceLen(s) * $.int(4), "byte") as $.Slice<number>)
+	return (unsafe.Slice!($.unsafeByteView<$.VarRef<number> | null>(($.indexRef(s!, 0) as any), __goscriptStatic0()), $.sliceLen(s) * $.int(4), "byte") as $.Slice<number>)
 }
 
 export function uintBytes(s: $.Slice<number>): $.Slice<number> {
-	return (unsafe.Slice!((unsafe.SliceData!(s) as any), $.sliceLen(s) * 4, "byte") as $.Slice<number>)
+	return (unsafe.Slice!($.unsafeByteView<$.VarRef<number> | null>((unsafe.SliceData!(s) as any), __goscriptStatic0()), $.sliceLen(s) * 4, "byte") as $.Slice<number>)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -41,9 +41,14 @@ export async function main(): globalThis.Promise<void> {
 
 	// The bytes of an int16 slice, and back from bytes to elements.
 	let i = $.typedSliceOf(Int16Array, [-1, 256]) as $.Slice<number>
-	let ib = (unsafe.Slice!(($.indexRef(i!, 0) as any), 4, "byte") as $.Slice<number>)
+	let ib = (unsafe.Slice!($.unsafeByteView<$.VarRef<number> | null>(($.indexRef(i!, 0) as any), __goscriptStatic0()), 4, "byte") as $.Slice<number>)
 	await $.println("int16 bytes:", $.typedSliceIndex(ib!, 0), $.typedSliceIndex(ib!, 1), $.typedSliceIndex(ib!, 2), $.typedSliceIndex(ib!, 3))
 	await $.println("nil:", floatBytes(null) == null)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({ size: 1, align: 1, kind: "scalar", scalar: "uint8" })
 }
 
 if ($.isMainScript(import.meta)) {

@@ -29,7 +29,7 @@ export class Image {
 		using __defer = new $.DisposableStack()
 		const im$: Image = im == null ? $.pointerTarget<Image>(im) : (im as any).__isVarRef === true ? (im as any).value : (im as any).__goValue === undefined ? (im as any) : $.pointerTarget<Image>(im)
 		mu.value.Lock()
-		const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Unlock())(mu.value), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
+		const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as sync.Mutex).Unlock() : sync.Mutex.prototype.Unlock.call($.pointerValue<sync.Mutex>(__receiver))))(mu), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 		__defer.defer(() => { __goscriptDeferCallee0() })
 		if ($.stringEqual((im$ as Image).Name, "bad")) {
 			return [null, errors.New("cannot marshal bad image")]
@@ -41,7 +41,7 @@ export class Image {
 		const im: Image | $.VarRef<Image> | null = this;
 		using __defer = new $.DisposableStack()
 		mu.value.Lock()
-		const __goscriptDeferCallee1 = $.functionValue(((__receiver) => () => __receiver.Unlock())(mu.value), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
+		const __goscriptDeferCallee1 = $.functionValue(((__receiver) => () => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as sync.Mutex).Unlock() : sync.Mutex.prototype.Unlock.call($.pointerValue<sync.Mutex>(__receiver))))(mu), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 		__defer.defer(() => { __goscriptDeferCallee1() })
 		let m: $.VarRef<globalThis.Map<string, string> | null> = $.varRef(null! as globalThis.Map<string, string> | null)
 		{

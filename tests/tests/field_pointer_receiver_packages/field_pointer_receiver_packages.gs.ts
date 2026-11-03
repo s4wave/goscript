@@ -68,7 +68,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// A field that embeds a struct of this package.
 	__goscript_types.Base.prototype.Keep.call($.fieldRef(o.value.Local, "Base"))
-	let keep: (() => void) | null = $.functionValue(((__receiver) => () => __goscript_types.Base.prototype.Keep.call(__receiver))($.fieldRef(o.value.Local, "Base")), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "main.(*Base).Keep-fm")
+	let keep: (() => void) | null = $.functionValue(((__receiver) => () => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as __goscript_types.Base).Keep() : __goscript_types.Base.prototype.Keep.call(__receiver)))($.fieldRef(o.value.Local, "Base")), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "main.(*Base).Keep-fm")
 	keep!()
 	await $.println("field:", $.pointerEqual(o.value.Local.Base.self, $.fieldRef(o.value.Local, "Base")), __goscript_types.Base.prototype.Is.call($.fieldRef(o.value.Local, "Base"), $.fieldRef(o.value.Local, "Base")), o.value.Local.Base.n)
 }

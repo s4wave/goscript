@@ -70,7 +70,7 @@ export function firstEven(values: $.Slice<number>): number {
 }
 
 export async function anyExited(procs: $.Slice<Process | $.VarRef<Process> | null>): globalThis.Promise<boolean> {
-	return slices.ContainsFunc(procs, $.functionValue(async (p: Process | $.VarRef<Process> | null): globalThis.Promise<boolean> => await $.pointerValue<Process>(p).exited(), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Process")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
+	return slices.ContainsFunc(procs, $.functionValue(async (p: Process | $.VarRef<Process> | null): globalThis.Promise<boolean> => await (p !== null && (p as any).__isVarRef !== true && (p as any).__goValue === undefined ? ((p as any) as Process).exited() : Process.prototype.exited.call(p)), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Process")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 }
 
 export async function main(): globalThis.Promise<void> {

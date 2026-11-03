@@ -96,7 +96,7 @@ export class lexer {
 		const l: lexer | $.VarRef<lexer> | null = this;
 		return $.functionValue(async (_yield: ((_p0: number) => boolean | globalThis.Promise<boolean>) | null) => {
 			await using __defer = new $.AsyncDisposableStack()
-			const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.stopAll())($.pointerValue<lexer>(l)), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "main.(*lexer).stopAll-fm")
+			const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as lexer).stopAll() : lexer.prototype.stopAll.call(__receiver)))(l), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "main.(*lexer).stopAll-fm")
 			__defer.defer(async () => { await __goscriptDeferCallee0() })
 			await lexer.prototype.push.call(l, $.functionValue(async (_yield: ((_p0: number) => boolean | globalThis.Promise<boolean>) | null) => {
 				for (let __goscriptRangeTarget1 = $.arrayToSlice<number>([1, 10, 2]), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {

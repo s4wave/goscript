@@ -90,7 +90,7 @@ export async function deferred(): globalThis.Promise<void> {
 	__defer.defer(async () => { await show("arg", __goscriptDeferArg0) })
 	const __goscriptDeferCallee0 = $.functionValue(((__receiver) => (tag: string) => __receiver.Show(tag))($.markAsStructValue($.cloneStructValue(r))), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [] } as $.FunctionTypeInfo), "main.R.Show-fm")
 	__defer.defer(async () => { await __goscriptDeferCallee0("receiver") })
-	const __goscriptDeferCallee1 = $.functionValue(((__receiver) => (tag: string) => __receiver.ShowPtr(tag))($.pointerValue<R>(p)), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [] } as $.FunctionTypeInfo), "main.(*R).ShowPtr-fm")
+	const __goscriptDeferCallee1 = $.functionValue(((__receiver) => (tag: string) => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as R).ShowPtr(tag) : R.prototype.ShowPtr.call(__receiver, tag)))(p), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [] } as $.FunctionTypeInfo), "main.(*R).ShowPtr-fm")
 	__defer.defer(async () => { await __goscriptDeferCallee1("pointer") })
 	const __goscriptDeferCallee2 = f
 	__defer.defer(async () => { (__goscriptAwait = __goscriptDeferCallee2!("function"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })

@@ -68,7 +68,7 @@ export async function main(): globalThis.Promise<void> {
 	let w = new wrapper(false, new base(true, 3))
 	await $.println($.pointerValue<wrapper>(w).base.Add(4))
 
-	let add: ((n: number) => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => (n: number) => __receiver.Add(n))($.pointerValue<wrapper>(w).base), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*base).Add-fm")
+	let add: ((n: number) => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => (n: number) => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as base).Add(n) : base.prototype.Add.call(__receiver, n)))($.fieldRef($.pointerValue<wrapper>(w), "base")), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*base).Add-fm")
 	await $.println((add!(5) as number))
 }
 

@@ -91,8 +91,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("distinct:", (a === other || ($.pointerAliasesMade || (a as any)?.__goElementBacking !== undefined) && $.pointerEqual(a, other)), (a !== other && !(($.pointerAliasesMade || (a as any)?.__goElementBacking !== undefined) && $.pointerEqual(a, other))))
 
 	// A view of another type, converted back, is the same pointer.
-	let view = $.unsafeByteView<second | $.VarRef<second> | null>((a as any), null)
-	let back = $.unsafeByteView<first | $.VarRef<first> | null>((view as any), null)
+	let view = $.unsafeByteView<second | $.VarRef<second> | null>((a as any), __goscriptStatic0())
+	let back = $.unsafeByteView<first | $.VarRef<first> | null>((view as any), __goscriptStatic1())
 	await $.println("back:", (a === back || ($.pointerAliasesMade || (a as any)?.__goElementBacking !== undefined) && $.pointerEqual(a, back)), (a !== back && !(($.pointerAliasesMade || (a as any)?.__goElementBacking !== undefined) && $.pointerEqual(a, back))), (back === a || ($.pointerAliasesMade || (back as any)?.__goElementBacking !== undefined) && $.pointerEqual(back, a)))
 	await $.println("still distinct:", (a === other || ($.pointerAliasesMade || (a as any)?.__goElementBacking !== undefined) && $.pointerEqual(a, other)), (back !== other && !(($.pointerAliasesMade || (back as any)?.__goElementBacking !== undefined) && $.pointerEqual(back, other))))
 
@@ -112,50 +112,60 @@ export async function main(): globalThis.Promise<void> {
 	// Interface pointer keys include both the address and the dynamic type.
 	let n = $.varRef(3)
 	let alias = n
-	let keys = $.makeMap<any, string>([[$.namedValueInterfaceValue<any>(n, "*main.count", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), "first"], [$.namedValueInterfaceValue<any>(alias, "*main.otherCount", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic2()), "second"]])
-	await $.println("typed keys:", $.len(keys), $.mapGet<any, string, string>(keys, $.namedValueInterfaceValue<any>(n, "*main.count", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), "")[0], $.mapGet<any, string, string>(keys, $.namedValueInterfaceValue<any>(alias, "*main.otherCount", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic2()), "")[0], $.comparableEqual($.namedValueInterfaceValue<any>(n, "*main.count", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.namedValueInterfaceValue<any>(alias, "*main.otherCount", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic2())))
+	let keys = $.makeMap<any, string>([[$.namedValueInterfaceValue<any>(n, "*main.count", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4()), "first"], [$.namedValueInterfaceValue<any>(alias, "*main.otherCount", __goscriptStatic5(), __goscriptStatic6(), __goscriptStatic4()), "second"]])
+	await $.println("typed keys:", $.len(keys), $.mapGet<any, string, string>(keys, $.namedValueInterfaceValue<any>(n, "*main.count", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4()), "")[0], $.mapGet<any, string, string>(keys, $.namedValueInterfaceValue<any>(alias, "*main.otherCount", __goscriptStatic5(), __goscriptStatic6(), __goscriptStatic4()), "")[0], $.comparableEqual($.namedValueInterfaceValue<any>(n, "*main.count", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4()), $.namedValueInterfaceValue<any>(alias, "*main.otherCount", __goscriptStatic5(), __goscriptStatic6(), __goscriptStatic4())))
 
 	// Overwriting one dynamic type keeps the other key's entry.
-	$.mapSet(keys, $.namedValueInterfaceValue<any>(n, "*main.count", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), "updated")
-	await $.println("overwrite:", $.len(keys), $.mapGet<any, string, string>(keys, $.namedValueInterfaceValue<any>(n, "*main.count", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), "")[0], $.mapGet<any, string, string>(keys, $.namedValueInterfaceValue<any>(alias, "*main.otherCount", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic2()), "")[0])
+	$.mapSet(keys, $.namedValueInterfaceValue<any>(n, "*main.count", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4()), "updated")
+	await $.println("overwrite:", $.len(keys), $.mapGet<any, string, string>(keys, $.namedValueInterfaceValue<any>(n, "*main.count", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4()), "")[0], $.mapGet<any, string, string>(keys, $.namedValueInterfaceValue<any>(alias, "*main.otherCount", __goscriptStatic5(), __goscriptStatic6(), __goscriptStatic4()), "")[0])
 
 	// Iteration preserves the actual interface keys of both types.
 	let firstSeen = false
 	let secondSeen = false
 	for (const [key, __rangeValue] of keys?.entries() ?? []) {
-		firstSeen = firstSeen || ($.comparableEqual(key, $.namedValueInterfaceValue<any>(n, "*main.count", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
-		secondSeen = secondSeen || ($.comparableEqual(key, $.namedValueInterfaceValue<any>(alias, "*main.otherCount", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic2())))
+		firstSeen = firstSeen || ($.comparableEqual(key, $.namedValueInterfaceValue<any>(n, "*main.count", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())))
+		secondSeen = secondSeen || ($.comparableEqual(key, $.namedValueInterfaceValue<any>(alias, "*main.otherCount", __goscriptStatic5(), __goscriptStatic6(), __goscriptStatic4())))
 	}
 	await $.println("iteration:", firstSeen, secondSeen)
 
 	// Deleting one dynamic type leaves the other address match intact.
-	$.deleteMapEntry(keys, $.namedValueInterfaceValue<any>(n, "*main.count", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
-	await $.println("delete:", $.len(keys), $.mapGet<any, string, string>(keys, $.namedValueInterfaceValue<any>(alias, "*main.otherCount", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic2()), "")[0])
+	$.deleteMapEntry(keys, $.namedValueInterfaceValue<any>(n, "*main.count", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4()))
+	await $.println("delete:", $.len(keys), $.mapGet<any, string, string>(keys, $.namedValueInterfaceValue<any>(alias, "*main.otherCount", __goscriptStatic5(), __goscriptStatic6(), __goscriptStatic4()), "")[0])
 }
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({Value: (receiver: any) => (count_Value as any)(receiver)})
+	return __goscriptStatic0$value ??= ({ size: 8, align: 8, kind: "struct", create: () => new second(), fields: [{ key: "X", offset: 0, layout: { size: 8, align: 8, kind: "scalar", scalar: "int" } }] })
 }
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int32", "main.count")))
+	return __goscriptStatic1$value ??= ({ size: 8, align: 8, kind: "struct", create: () => new first(), fields: [{ key: "X", offset: 0, layout: { size: 8, align: 8, kind: "scalar", scalar: "int" } }] })
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ([$.methodSignature("Value", [], [/* @__PURE__ */ $.basicType("int32")])])
+	return __goscriptStatic2$value ??= ({Value: (receiver: any) => (count_Value as any)(receiver)})
 }
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({Value: (receiver: any) => (otherCount_Value as any)(receiver)})
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int32", "main.count")))
 }
 
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int32", "main.otherCount")))
+	return __goscriptStatic4$value ??= ([$.methodSignature("Value", [], [/* @__PURE__ */ $.basicType("int32")])])
+}
+
+var __goscriptStatic5$value: any
+function __goscriptStatic5(): any {
+	return __goscriptStatic5$value ??= ({Value: (receiver: any) => (otherCount_Value as any)(receiver)})
+}
+
+var __goscriptStatic6$value: any
+function __goscriptStatic6(): any {
+	return __goscriptStatic6$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int32", "main.otherCount")))
 }
 
 if ($.isMainScript(import.meta)) {

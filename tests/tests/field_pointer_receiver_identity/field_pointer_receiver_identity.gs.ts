@@ -306,7 +306,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("any:", $.comparableEqual(a, b))
 
 	// A method value is bound to the field's address.
-	let _is: ((p: Node | $.VarRef<Node> | null) => boolean | globalThis.Promise<boolean>) | null = $.functionValue(((__receiver) => (p: Node | $.VarRef<Node> | null) => Node.prototype.Is.call(__receiver, p))($.fieldRef(item.value, "Child")), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Node")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo), "main.(*Node).Is-fm")
+	let _is: ((p: Node | $.VarRef<Node> | null) => boolean | globalThis.Promise<boolean>) | null = $.functionValue(((__receiver) => (p: Node | $.VarRef<Node> | null) => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as Node).Is(p) : Node.prototype.Is.call(__receiver, p)))($.fieldRef(item.value, "Child")), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Node")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo), "main.(*Node).Is-fm")
 	await $.println("method value:", (_is!($.fieldRef(item.value, "Child")) as boolean))
 
 	// Generic code and slices keep the pointers rather than copies.
@@ -321,7 +321,7 @@ export async function main(): globalThis.Promise<void> {
 	let outer: $.VarRef<Outer> = $.varRef(new Outer(true))
 	Node.prototype.Register.call($.fieldRef(outer.value.Item, "Node"))
 	await $.println("two levels:", $.pointerEqual(outer.value.Item.Node.self, $.fieldRef(outer.value.Item, "Node")), $.pointerEqual($.plainSliceIndex(registry!, $.sliceLen(registry) - 1), $.fieldRef(outer.value.Item, "Node")))
-	let register: (() => void) | null = $.functionValue(((__receiver) => () => Node.prototype.Register.call(__receiver))($.fieldRef(outer.value.Item, "Node")), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "main.(*Node).Register-fm")
+	let register: (() => void) | null = $.functionValue(((__receiver) => () => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as Node).Register() : Node.prototype.Register.call(__receiver)))($.fieldRef(outer.value.Item, "Node")), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "main.(*Node).Register-fm")
 	register!()
 	await $.println("promoted method value:", $.pointerEqual($.plainSliceIndex(registry!, $.sliceLen(registry) - 1), $.fieldRef(outer.value.Item, "Node")), $.mapGet<Node | $.VarRef<Node> | null, number, number>(counts, $.fieldRef(outer.value.Item, "Node"), 0)[0])
 

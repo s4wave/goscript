@@ -205,8 +205,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("rules:", applyRules(rules, 1))
 
 	let c = new counter()
-	each($.arrayToSlice<number>([1, 2, 3]), $.functionValue(((__receiver) => (k: number) => __receiver.add(k))($.pointerValue<counter>(c)), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo), "main.(*counter).add-fm"))
-	addTo(c, $.functionValue((c: counter | $.VarRef<counter> | null, k: number): void => $.pointerValue<counter>(c).add(k), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.counter"), /* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo)))
+	each($.arrayToSlice<number>([1, 2, 3]), $.functionValue(((__receiver) => (k: number) => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as counter).add(k) : counter.prototype.add.call(__receiver, k)))(c), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo), "main.(*counter).add-fm"))
+	addTo(c, $.functionValue((c: counter | $.VarRef<counter> | null, k: number): void => (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as counter).add(k) : counter.prototype.add.call(c, k)), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.counter"), /* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo)))
 	await $.println("counter:", $.pointerValue<counter>(c).total)
 
 	let ch = $.makeChannel<number>(1, 0, "both")

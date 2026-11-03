@@ -24,12 +24,12 @@ export class word {
 
 	public half(): $.VarRef<number> | null {
 		const w: word | $.VarRef<word> | null = this;
-		return (unsafe.Add!(($.fieldRef($.pointerValue<word>(w), "data") as any), 2) as $.VarRef<number> | null)
+		return $.unsafeByteView<$.VarRef<number> | null>(unsafe.Add!(($.fieldRef($.pointerValue<word>(w), "data") as any), 2), __goscriptStatic1())
 	}
 
 	public real(): $.VarRef<number> | null {
 		const w: word | $.VarRef<word> | null = this;
-		return (unsafe.Add!(($.fieldRef($.pointerValue<word>(w), "data") as any), 0) as $.VarRef<number> | null)
+		return $.unsafeByteView<$.VarRef<number> | null>(unsafe.Add!(($.fieldRef($.pointerValue<word>(w), "data") as any), 0), __goscriptStatic2())
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -55,6 +55,16 @@ export async function main(): globalThis.Promise<void> {
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
 	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({ size: 2, align: 2, kind: "scalar", scalar: "uint16" })
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ({ size: 4, align: 4, kind: "scalar", scalar: "float32" })
 }
 
 if ($.isMainScript(import.meta)) {

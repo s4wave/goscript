@@ -143,7 +143,7 @@ export class queue {
 		using __defer = new $.DisposableStack()
 		const q$: queue = q == null ? $.pointerTarget<queue>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<queue>(q)
 		await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? ((q as any) as queue).lockAndInit() : queue.prototype.lockAndInit.call(q))
-		const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Unlock())((q$ as queue).Mu), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
+		const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as sync.Mutex).Unlock() : sync.Mutex.prototype.Unlock.call($.pointerValue<sync.Mutex>(__receiver))))($.fieldRef((q$ as queue), "Mu")), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 		__defer.defer(() => { __goscriptDeferCallee0() })
 		while ($.sliceLen((q$ as queue).items) == 0) {
 			await (q$ as queue).Cond.Wait()

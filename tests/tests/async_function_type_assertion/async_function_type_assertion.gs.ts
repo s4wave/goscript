@@ -45,7 +45,7 @@ export function syncLookup(network: string): number {
 }
 
 export function chooseLookup(value: any, worker: Worker | $.VarRef<Worker> | null): number {
-	let resolver: ((network: string) => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => (network: string) => __receiver.lookup(network))($.pointerValue<Worker>(worker)), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*Worker).lookup-fm")
+	let resolver: ((network: string) => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => (network: string) => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as Worker).lookup(network) : Worker.prototype.lookup.call(__receiver, network)))(worker), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*Worker).lookup-fm")
 	{
 		let [alt, ] = $.typeAssertTuple<((_p0: string) => number | globalThis.Promise<number>) | null>(value, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 		if (alt != null) {
@@ -63,7 +63,7 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.chanSend((worker$ as Worker).ch, 1)
 	await $.chanRecv((worker$ as Worker).ch)
-	await $.println("call:", await callLookup($.functionValue(((__receiver) => (network: string) => __receiver.lookup(network))((worker$ as Worker)), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*Worker).lookup-fm"), "tcp"))
+	await $.println("call:", await callLookup($.functionValue(((__receiver) => (network: string) => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as Worker).lookup(network) : Worker.prototype.lookup.call(__receiver, network)))(worker), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*Worker).lookup-fm"), "tcp"))
 
 	let hook = $.functionValue(async (fn: ((_p0: string) => number | globalThis.Promise<number>) | null, network: string): globalThis.Promise<number> => {
 		return fn!(network)

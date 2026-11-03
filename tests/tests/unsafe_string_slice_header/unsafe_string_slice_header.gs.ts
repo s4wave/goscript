@@ -40,6 +40,7 @@ export class localSliceHeader {
 export function stringBytes(__goscriptParam0: string): $.Slice<number> {
 	let s: $.VarRef<string> = $.varRef(__goscriptParam0)
 	let b: $.VarRef<$.Slice<number>> = $.varRef(null! as $.Slice<number>)
+	// Copy the string's data and length into the empty slice header.
 	let strh = $.unsafePointerCast<reflect.StringHeader | $.VarRef<reflect.StringHeader> | null>($.stringHeaderRef(s))
 	let strh$: reflect.StringHeader = strh == null ? $.pointerTarget<reflect.StringHeader>(strh) : (strh as any).__isVarRef === true ? (strh as any).value : (strh as any).__goValue === undefined ? (strh as any) : $.pointerTarget<reflect.StringHeader>(strh)
 	let sh = $.unsafePointerCast<reflect.SliceHeader | $.VarRef<reflect.SliceHeader> | null>($.sliceHeaderRef(b))

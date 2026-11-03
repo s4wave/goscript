@@ -84,7 +84,6 @@ export async function main(): globalThis.Promise<void> {
 	let values = $.arrayToSlice<number>([1, 2])
 	let p = ($.indexRef(values!, 1) as any)
 	let q = noescape(p)
-
 	await $.println("same:", (q === p || ($.pointerAliasesMade || (q as any)?.__goElementBacking !== undefined) && $.pointerEqual(q, p)))
 	await $.println("nil:", q == null)
 
@@ -100,9 +99,13 @@ export async function main(): globalThis.Promise<void> {
 	$.pointerValue<number[]>(words)[0] = 7
 	bytes[8] = 9
 	await $.println("byte words:", $.arrayIndex($.pointerValue<number[]>(words), 0), $.arrayIndex($.pointerValue<number[]>(words), 1), bytes[0])
+
+	// Signed words preserve their two's-complement bytes and number value.
 	let signed = $.unsafeByteView<$.VarRef<number> | null>(($.indexRef(bytes, 0) as any), __goscriptStatic1())
 	signed!.value = -3
 	await $.println("signed word:", $.pointerValue<number>(signed), bytes[0])
+
+	// Address-sized values share the unsigned word's original storage.
 	let address = $.unsafeByteView<$.VarRef<number> | null>(($.indexRef(bytes, 8) as any), __goscriptStatic2())
 	address!.value = 10
 	await $.println("address word:", $.pointerValue<number>(address), $.arrayIndex($.pointerValue<number[]>(words), 1))

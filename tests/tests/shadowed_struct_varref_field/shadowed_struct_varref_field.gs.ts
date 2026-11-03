@@ -61,7 +61,7 @@ export function __goscript_set_named(__goscriptValue: table): void {
 export function lookup(addr: string): $.Slice<string> {
 	using __defer = new $.DisposableStack()
 	hosts.value.Mutex.Lock()
-	const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Unlock())(hosts.value.Mutex), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
+	const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as sync.Mutex).Unlock() : sync.Mutex.prototype.Unlock.call($.pointerValue<sync.Mutex>(__receiver))))($.fieldRef(hosts.value, "Mutex")), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 	__defer.defer(() => { __goscriptDeferCallee0() })
 	if ($.len(hosts.value.byAddr) != 0) {
 		let __goscriptShadow0 = hosts.value
@@ -80,7 +80,7 @@ export function lookup(addr: string): $.Slice<string> {
 export function lookupNamed(addr: string): $.Slice<string> {
 	using __defer = new $.DisposableStack()
 	named.value.Mutex.Lock()
-	const __goscriptDeferCallee1 = $.functionValue(((__receiver) => () => __receiver.Unlock())(named.value.Mutex), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
+	const __goscriptDeferCallee1 = $.functionValue(((__receiver) => () => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as sync.Mutex).Unlock() : sync.Mutex.prototype.Unlock.call($.pointerValue<sync.Mutex>(__receiver))))($.fieldRef(named.value, "Mutex")), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 	__defer.defer(() => { __goscriptDeferCallee1() })
 	if ($.len(named.value.byAddr) != 0) {
 		let __goscriptShadow2 = named.value
@@ -102,7 +102,7 @@ export function lookupLocal(addr: string): $.Slice<string> {
 	local.value.byAddr = $.makeMap<string, $.Slice<string>>([[addr, $.arrayToSlice<string>(["local"])]])
 	let ptr = local
 	$.pointerValue<table>(ptr).Mutex.Lock()
-	const __goscriptDeferCallee2 = $.functionValue(((__receiver) => () => __receiver.Unlock())($.pointerValue<table>(ptr).Mutex), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
+	const __goscriptDeferCallee2 = $.functionValue(((__receiver) => () => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as sync.Mutex).Unlock() : sync.Mutex.prototype.Unlock.call($.pointerValue<sync.Mutex>(__receiver))))($.fieldRef($.pointerValue<table>(ptr), "Mutex")), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 	__defer.defer(() => { __goscriptDeferCallee2() })
 	let __goscriptShadow4 = local.value
 	{
