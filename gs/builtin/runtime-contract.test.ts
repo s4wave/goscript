@@ -647,6 +647,52 @@ describe('builtin runtime contract helpers', () => {
     expect(comparableEqual(first, second)).toBe(false)
     expect(comparableEqual(first, first)).toBe(true)
 
+    // Fresh interface boxes of one pointer retain that pointer's identity.
+    for (const signatures of [undefined, []]) {
+      // Cached and individual method wrappers preserve the same pointer relation.
+      const methods = {}
+      const box = (value: Node, name = '*example.Node') =>
+        namedValueInterfaceValue(value, name, methods, undefined, signatures)
+      expect(comparableEqual(box(first), box(first))).toBe(true)
+      expect(comparableEqual(box(first), box(second))).toBe(false)
+      expect(comparableEqual(box(first), box(first, '*example.Other'))).toBe(
+        false,
+      )
+
+      // Interface keys retain each dynamic type at one backing address.
+      const pointers = makeMap<unknown, string>()
+      mapSet(pointers, box(first), 'pointer')
+      expect(mapGet(pointers, box(first), '')).toEqual(['pointer', true])
+      expect(mapGet(pointers, box(second), '')).toEqual(['', false])
+      expect(mapGet(pointers, box(first, '*example.Other'), '')).toEqual([
+        '',
+        false,
+      ])
+      mapSet(pointers, box(first, '*example.Other'), 'other')
+      expect(mapGet(pointers, box(first), '')).toEqual(['pointer', true])
+      expect(mapGet(pointers, box(first, '*example.Other'), '')).toEqual([
+        'other',
+        true,
+      ])
+
+      // Overwriting or deleting one dynamic type preserves the other's entry.
+      mapSet(pointers, box(first), 'updated')
+      expect(pointers.size).toBe(2)
+      expect(mapGet(pointers, box(first, '*example.Other'), '')).toEqual([
+        'other',
+        true,
+      ])
+      expect(
+        new Set([...pointers.keys()].map((key: any) => key.__goType)),
+      ).toEqual(new Set(['*example.Node', '*example.Other']))
+      expect(pointers.delete(box(first))).toBe(true)
+      expect(pointers.size).toBe(1)
+      expect(mapGet(pointers, box(first, '*example.Other'), '')).toEqual([
+        'other',
+        true,
+      ])
+    }
+
     // Struct values with the same fields are equal.
     const root = new Node('root', null)
     expect(

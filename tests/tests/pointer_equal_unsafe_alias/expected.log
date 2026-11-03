@@ -4,3 +4,7 @@ back: true false true
 still distinct: false true
 shared: 7 7
 found: 1
+typed keys: 2 first second false
+overwrite: 2 updated second
+iteration: true true
+delete: 1 second

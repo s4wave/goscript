@@ -21,6 +21,8 @@ import {
 class GoMap<K, V> extends Map<K, V> {
   readonly pointerKeys: boolean
   private pointerIndex?: Map<object, K>
+  // interfacePointers indexes each dynamic type separately at a shared address.
+  private interfacePointers?: Map<string, Map<object, K>>
   private structKeys?: Map<string, K[]>
   // typedNilKeys holds the stored typed nil key of each Go type. All typed
   // nils of a type are equal, so the map holds at most one of them.
@@ -33,12 +35,23 @@ class GoMap<K, V> extends Map<K, V> {
   }
 
   override set(key: K, value: V): this {
-    if (this.pointerKeys || isInterfacePointerKey(key)) {
+    if (this.pointerKeys) {
       key = this.storedKey(key)
       if (typeof key === 'object' && key !== null) {
         this.pointerIndex ??= new Map<object, K>()
         this.pointerIndex.set(canonicalPointerIdentity(key), key)
       }
+    } else if (isInterfacePointerKey(key)) {
+      // Equal backing of different dynamic types occupies different index slots.
+      const stored = this.storedKey(key)
+      this.interfacePointers ??= new Map<string, Map<object, K>>()
+      let index = this.interfacePointers.get(key.__goType)
+      if (index === undefined) {
+        index = new Map<object, K>()
+        this.interfacePointers.set(key.__goType, index)
+      }
+      index.set(canonicalPointerIdentity(key), stored)
+      key = stored
     } else if (isTypedNilKey(key)) {
       const stored = this.storedKey(key)
       this.typedNilKeys ??= new Map<string, K>()
@@ -65,9 +78,13 @@ class GoMap<K, V> extends Map<K, V> {
 
   override delete(key: K): boolean {
     const stored = this.storedKey(key)
-    if (this.pointerKeys || isInterfacePointerKey(key)) {
+    if (this.pointerKeys) {
       if (typeof key === 'object' && key !== null)
         this.pointerIndex?.delete(canonicalPointerIdentity(key))
+    } else if (isInterfacePointerKey(key)) {
+      const index = this.interfacePointers?.get(key.__goType)
+      index?.delete(canonicalPointerIdentity(key))
+      if (index?.size === 0) this.interfacePointers?.delete(key.__goType)
     } else if (isTypedNilKey(key)) {
       if (stored === this.typedNilKeys?.get(key.__goType))
         this.typedNilKeys?.delete(key.__goType)
@@ -77,6 +94,7 @@ class GoMap<K, V> extends Map<K, V> {
 
   override clear(): void {
     this.pointerIndex?.clear()
+    this.interfacePointers?.clear()
     this.structKeys?.clear()
     this.typedNilKeys?.clear()
     super.clear()
@@ -114,7 +132,9 @@ class GoMap<K, V> extends Map<K, V> {
     // and is the stored key only if Go also compares them equal, which
     // takes the same dynamic type.
     if (isInterfacePointerKey(key)) {
-      const stored = this.pointerIndex?.get(canonicalPointerIdentity(key))
+      const stored = this.interfacePointers
+        ?.get(key.__goType)
+        ?.get(canonicalPointerIdentity(key))
       return (
           stored !== undefined &&
             (stored === key || comparableEqual(stored, key))
@@ -184,7 +204,9 @@ class GoMap<K, V> extends Map<K, V> {
 // comparing them with every key of the map, and never by the fields they
 // point to, which may change. A typed nil pointer equals any other of its
 // type, so it is not one.
-function isInterfacePointerKey(key: unknown): key is object {
+function isInterfacePointerKey(
+  key: unknown,
+): key is object & { __goType: string } {
   if (typeof key !== 'object' || key === null) return false
   const boxed = key as { __goType?: unknown; __isTypedNil?: unknown }
   return (

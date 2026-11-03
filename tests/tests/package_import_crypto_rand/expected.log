@@ -9,3 +9,6 @@ text alphabet true
 p256 key err nil true
 p256 key has entropy true
 p256 point valid true
+p256 curve identity true
+p256 marshal err nil true
+p256 roundtrip true

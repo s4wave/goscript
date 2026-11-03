@@ -4,6 +4,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/x509"
 	"io"
 )
 
@@ -33,6 +34,13 @@ func main() {
 	println("p256 key err nil", err == nil)
 	println("p256 key has entropy", key != nil && key.D.Sign() != 0)
 	println("p256 point valid", key != nil && key.Curve.IsOnCurve(key.X, key.Y))
+
+	// Standard-library encoding recognizes the same curve through fresh interfaces.
+	println("p256 curve identity", key.Curve == elliptic.P256())
+	der, err := x509.MarshalECPrivateKey(key)
+	println("p256 marshal err nil", err == nil)
+	restored, err := x509.ParseECPrivateKey(der)
+	println("p256 roundtrip", err == nil && restored != nil && restored.Curve == elliptic.P256() && restored.D.Cmp(key.D) == 0)
 }
 
 func hasData(buf []byte) bool {

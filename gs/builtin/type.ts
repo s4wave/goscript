@@ -3544,6 +3544,7 @@ export function typeParamPointerInterfaceValue<T>(
   )
 }
 
+/** namedValueInterfaceValue boxes methods while preserving pointer identity. */
 export function namedValueInterfaceValue<T>(
   value: unknown,
   typeName: string,
@@ -3556,34 +3557,38 @@ export function namedValueInterfaceValue<T>(
   // value only creates the box.
   const proto =
     methodSignatures !== undefined ? namedValueBoxPrototype(methods) : undefined
-  if (proto !== undefined) {
-    const box = Object.create(proto)
-    box.__goType = typeName
-    box.__goValue = value
-    box.__goTypeInfo = typeInfo
-    return box as T
-  }
-  const boxed: any = {
-    __goType: typeName,
-    __goValue: value,
-    __goTypeInfo: typeInfo,
-    valueOf: () => value,
-    toString: () => String(value),
-    [Symbol.toPrimitive]: () => value as any,
-  }
-  for (const entry of namedValueMethodEntries(
-    methods,
-    typeInfo,
-    methodSignatures,
-  )) {
-    const method = entry.method
-    const wrapper: any = (...args: any[]) => method(value, ...args)
-    wrapper.__goscriptMethodWrapper = true
-    if (entry.signature) {
-      wrapper.__goscriptMethodSignature = entry.signature
+  const boxed: any =
+    proto !== undefined ?
+      Object.create(proto)
+    : {
+        valueOf: () => value,
+        toString: () => String(value),
+        [Symbol.toPrimitive]: () => value as any,
+      }
+  boxed.__goType = typeName
+  boxed.__goValue = value
+  boxed.__goTypeInfo = typeInfo
+
+  // Uncached method tables keep their wrappers on the individual box.
+  if (proto === undefined) {
+    for (const entry of namedValueMethodEntries(
+      methods,
+      typeInfo,
+      methodSignatures,
+    )) {
+      const method = entry.method
+      const wrapper: any = (...args: any[]) => method(value, ...args)
+      wrapper.__goscriptMethodWrapper = true
+      if (entry.signature) {
+        wrapper.__goscriptMethodSignature = entry.signature
+      }
+      boxed[entry.name] = wrapper
     }
-    boxed[entry.name] = wrapper
   }
+
+  // A pointer's interface box shares its identity, not merely its method table.
+  if (typeName.startsWith('*') && typeof value === 'object' && value !== null)
+    markPointerAlias(value, boxed)
   return boxed as T
 }
 
