@@ -1,6 +1,14 @@
 6
 -1
 8 -1 2
+nil pointer capture: 1 -1
+bound pointer: 12 30
+nil pointer expression: -1
+nil value capture: false true
+nil inner capture: -1
+nil inner expression: -1
+nil outer capture: false true
+value copy: 5 9
 101 101
 18
 recovered: true

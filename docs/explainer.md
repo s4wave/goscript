@@ -259,6 +259,12 @@ A pointer to a struct can be the struct object itself or a `VarRef` holding it,
 which is why `*T` translates to `T | $.VarRef<T> | null`. `$.pointerValue`
 reads through either shape.
 
+A pointer method value captures that pointer once, including nil, and uses
+the same dispatch as a direct pointer method call. A value-receiver method
+selected through a pointer instead dereferences and copies its receiver when
+captured; a nil pointer therefore panics at capture. Method expressions pass
+their receiver through the same call rules when invoked.
+
 ## Concurrency
 
 Async functions use `async`/`await`. Channels, `select`, and goroutines map

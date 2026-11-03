@@ -109,29 +109,6 @@ func (o *LoweringOwner) lowerIdentityReceiverMethodCall(
 	return call, diagnostics, true
 }
 
-// lowerIdentityReceiverMethodValue lowers the method value x.M of a pointer
-// method that observes its receiver on an addressable struct value, which is
-// bound to the address of that struct.
-func (o *LoweringOwner) lowerIdentityReceiverMethodValue(ctx lowerFileContext, expr *ast.SelectorExpr, selection *types.Selection) (string, []Diagnostic, bool) {
-	// Only a method that observes its receiver, on a struct value.
-	method, _ := selection.Obj().(*types.Func)
-	if !o.observesReceiver(ctx, method) {
-		return "", nil, false
-	}
-	address, diagnostics, ok := o.lowerIdentityReceiverAddress(ctx, expr.X, selection)
-	if !ok {
-		return "", nil, false
-	}
-
-	// The bound address is the receiver of the method of the struct's
-	// class.
-	callee := identityReceiverCallee("__receiver", method.Name())
-	if prototype, ok := o.pointerMethodPrototype(ctx, method, method.Name()); ok {
-		callee = prototype + ".call"
-	}
-	return o.lowerMethodValueClosure(ctx, selection, address, callee, true), diagnostics, true
-}
-
 // pointerMethodPrototype returns the pointer method of a struct type, or
 // the member name of its twin, read from the prototype of the struct's
 // class, as in T.prototype.M, through

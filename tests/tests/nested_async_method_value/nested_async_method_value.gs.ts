@@ -58,7 +58,7 @@ export async function run(fn: (() => $.GoError | globalThis.Promise<$.GoError>) 
 
 export async function main(): globalThis.Promise<void> {
 	let w = new Worker(false, $.makeChannel<number>(1, 0, "both"))
-	await run($.functionValue(((__receiver) => () => __receiver.Spawn())($.pointerValue<Worker>(w)), ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo), "main.(*Worker).Spawn-fm"))
+	await run($.functionValue(((__receiver) => () => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as Worker).Spawn() : Worker.prototype.Spawn.call(__receiver)))(w), ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo), "main.(*Worker).Spawn-fm"))
 
 	let s: Spawner | null = $.interfaceValue<Spawner | null>(w, "*main.Worker", /* @__PURE__ */ $.pointerType("main.Worker"))
 	let err = (__goscriptAwait = (s !== null && (s as any).__isVarRef !== true && ((s as any).__goValue === undefined || (s as any).__goType?.charCodeAt(0) !== 42) ? (s as Exclude<Spawner, null>) : $.pointerValue<Exclude<Spawner, null>>(s)).Spawn(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)

@@ -10872,6 +10872,7 @@ func objectNeedsVarRef(ctx lowerFileContext, obj types.Object) bool {
 }
 
 func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) (string, []Diagnostic) {
+	// Lower built-in constructors and explicit conversions before ordinary calls.
 	if ident, ok := expr.Fun.(*ast.Ident); ok && isBuiltinCallTarget(ctx, ident) {
 		switch ident.Name {
 		case "make":
@@ -10903,6 +10904,7 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 		return call, append(diagnostics, calleeDiagnostics...)
 	}
 
+	// Dispatch the remaining calls according to their callee's syntax.
 	switch fun := expr.Fun.(type) {
 	case *ast.Ident:
 		if isBuiltinCallTarget(ctx, fun) {
@@ -11123,7 +11125,7 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 			if namedNonInterfaceNonStructType(receiver) {
 				return o.lowerNamedReceiverMethodCall(ctx, expr, args, diagnostics)
 			}
-			if call, callDiagnostics, ok := o.lowerPointerReceiverMethodCall(ctx, fun, selection, args); ok {
+			if call, callDiagnostics, ok := o.lowerPointerReceiverMethodCall(ctx, fun, selection, args, ""); ok {
 				return o.awaitCallIfNeeded(ctx, expr, call), append(diagnostics, callDiagnostics...)
 			}
 			// A method that observes its receiver takes the address of a
@@ -12746,15 +12748,18 @@ func (o *LoweringOwner) lowerNamedReceiverMethodCall(
 	return o.awaitCallIfNeeded(ctx, expr, call), diagnostics
 }
 
+// lowerPointerReceiverMethodCall dispatches a direct pointer method. An empty
+// receiverExpr lowers selector.X; a closure supplies its captured receiver.
 func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 	ctx lowerFileContext,
 	selector *ast.SelectorExpr,
 	selection *types.Selection,
 	args []string,
+	receiverExpr string,
 ) (string, []Diagnostic, bool) {
-	// Only a method declared on a pointer to a named struct, called on such
-	// a pointer, is called this way.
-	if len(selection.Index()) != 1 || !isPointerToStructType(ctx.semPkg.source.TypesInfo.TypeOf(selector.X)) {
+	// Ordinary calls use a direct struct pointer. Bound closures already
+	// resolved any embedded fields and may supply their final pointer here.
+	if receiverExpr == "" && (len(selection.Index()) != 1 || !isPointerToStructType(ctx.semPkg.source.TypesInfo.TypeOf(selector.X))) {
 		return "", nil, false
 	}
 	method, _ := selection.Obj().(*types.Func)
@@ -12776,9 +12781,14 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 	}
 	name := reflectTwinCallName(ctx, selector, selector.Sel.Name)
 
+	// Lower an ordinary call's receiver once, preserving a bound closure's value.
+	var diagnostics []Diagnostic
+	if receiverExpr == "" {
+		receiverExpr, diagnostics = o.lowerExpr(ctx, selector.X)
+	}
+
 	// An override method takes its receiver unwrapped, since hand-written
 	// methods do not unwrap a variable reference or a boxed pointer.
-	receiverExpr, diagnostics := o.lowerExpr(ctx, selector.X)
 	localReceiver := receiverExpr
 	override := o.receiverUsesOverridePackage(signature.Recv().Type())
 	if override {
@@ -12817,6 +12827,7 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 			return call, diagnostics, true
 		}
 	}
+
 	// A cross-package unexported receiver keeps a dynamic dispatch: never import
 	// the foreign package's prototype for an unexported type, even though its
 	// barrel re-exports the type name. The imported class identity must not leak
@@ -12827,6 +12838,7 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 			"(" + strings.Join(args, ", ") + ")"
 		return call, diagnostics, true
 	}
+
 	// The method is called directly on a plain receiver, and otherwise
 	// through its prototype. The guard reads the local receiver itself, which
 	// an override receiver's $.pointerValue returns unchanged when the guard
@@ -12946,20 +12958,27 @@ func (o *LoweringOwner) lowerPromotedFieldAddress(ctx lowerFileContext, expr ast
 		base, diagnostics = o.lowerExpr(ctx, expr)
 		base = parenthesizeAwaitedExpr(base)
 	}
+	return o.lowerPromotedFieldAddressValue(ctx, base, exprType, fields), diagnostics
+}
+
+// lowerPromotedFieldAddressValue resolves an embedded field's address from
+// an already evaluated struct, preserving a final embedded pointer as-is.
+func (o *LoweringOwner) lowerPromotedFieldAddressValue(ctx lowerFileContext, base string, exprType types.Type, fields []int) string {
+	// Traverse intermediate structs before selecting the final receiver field.
 	parent, parentType := o.lowerPromotedMethodReceiver(ctx, base, exprType, fields[:len(fields)-1])
 
 	// An embedded pointer is the reference; a value field is referenced.
 	structType := structUnderlyingType(derefPointerType(parentType))
 	last := fields[len(fields)-1]
 	if structType == nil || last < 0 || last >= structType.NumFields() {
-		return base, diagnostics
+		return base
 	}
 	field := structType.Field(last)
 	name := tsStructFieldName(field.Name(), last)
 	if isPointerType(field.Type()) {
-		return parent + "." + name, diagnostics
+		return parent + "." + name
 	}
-	return o.runtimeOwner.QualifiedHelper(RuntimeHelperFieldRef) + "(" + parent + ", " + strconv.Quote(name) + ")", diagnostics
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperFieldRef) + "(" + parent + ", " + strconv.Quote(name) + ")"
 }
 
 // lowerSelectorExpr resolves package exports, methods, and field selections.
@@ -13003,24 +13022,25 @@ func (o *LoweringOwner) lowerSelectorExpr(ctx lowerFileContext, expr *ast.Select
 			if namedNonInterfaceNonStructType(namedReceiver) {
 				receiverExpr, diagnostics := o.lowerNamedReceiverForMethod(ctx, expr.X, selection)
 				methodExpr := o.methodFunctionExpr(ctx, namedReceiver, selection.Obj(), expr.Sel.Name)
-				return o.lowerMethodValueClosure(ctx, selection, receiverExpr, methodExpr, true), diagnostics
+				return o.lowerMethodValueClosure(ctx, expr, selection, receiverExpr, methodExpr, true), diagnostics
 			}
-			// A method that observes its receiver is bound to the address
-			// of a struct value.
-			if value, diagnostics, ok := o.lowerIdentityReceiverMethodValue(ctx, expr, selection); ok {
-				return value, diagnostics
+			// Pointer methods retain their resolved address, including a nil
+			// final embedded pointer, rather than dereferencing it at capture.
+			if methodHasPointerReceiver(selection.Obj()) {
+				receiver, diagnostics := o.lowerNamedReceiverForMethod(ctx, expr.X, selection)
+				return o.lowerMethodValueClosure(ctx, expr, selection, receiver, "__receiver."+expr.Sel.Name, false), diagnostics
 			}
 			// The method value is called later, so it gets a copy of a value
 			// receiver even for a method that only reads it.
 			receiverCtx := ctx
 			receiverCtx.copyValues = true
 			receiver, diagnostics := o.lowerMethodReceiverExpr(receiverCtx, expr.X, selection)
-			return o.lowerMethodValueClosure(ctx, selection, receiver, "__receiver."+expr.Sel.Name, false), diagnostics
+			return o.lowerMethodValueClosure(ctx, expr, selection, receiver, "__receiver."+expr.Sel.Name, false), diagnostics
 		case types.MethodExpr:
 			if receiver := receiverNamedType(selection.Recv()); namedNonInterfaceNonStructType(receiver) {
 				return o.methodFunctionExpr(ctx, receiver, selection.Obj(), expr.Sel.Name), nil
 			}
-			return o.lowerMethodExpressionClosure(ctx, selection), nil
+			return o.lowerMethodExpressionClosure(ctx, expr, selection), nil
 		case types.FieldVal:
 			return o.lowerFieldSelectionExpr(ctx, expr, selection, false)
 		}
@@ -13294,6 +13314,7 @@ func unsafeFieldTypeLayoutCompatible(left types.Type, right types.Type) bool {
 // that binds receiver once and calls callee with the method's arguments.
 func (o *LoweringOwner) lowerMethodValueClosure(
 	ctx lowerFileContext,
+	selector *ast.SelectorExpr,
 	selection *types.Selection,
 	receiver string,
 	callee string,
@@ -13333,12 +13354,19 @@ func (o *LoweringOwner) lowerMethodValueClosure(
 			callArgs = append(callArgs, genericArgs)
 		}
 	}
+
 	// An override method takes its variadic arguments as a rest parameter.
 	if len(args) != 0 && signature.Variadic() && o.methodSelectionUsesOverridePackage(ctx, selection) {
 		args[len(args)-1] = "...(" + args[len(args)-1] + " ?? [])"
 	}
 	callArgs = append(callArgs, args...)
-	closure := "((__receiver) => (" + strings.Join(params, ", ") + ") => " + callee + "(" + strings.Join(callArgs, ", ") + "))(" + receiver + ")"
+
+	// Bound pointer methods use the same dispatch as an immediate call.
+	call := callee + "(" + strings.Join(callArgs, ", ") + ")"
+	if pointerCall, _, ok := o.lowerPointerReceiverMethodCall(ctx, selector, selection, callArgs, "__receiver"); ok {
+		call = pointerCall
+	}
+	closure := "((__receiver) => (" + strings.Join(params, ", ") + ") => " + call + ")(" + receiver + ")"
 	if signature == nil {
 		return closure
 	}
@@ -13354,7 +13382,10 @@ func (o *LoweringOwner) lowerMethodValueClosure(
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperFunctionValue) + "(" + closure + ", " + valueInfo + ")"
 }
 
-func (o *LoweringOwner) lowerMethodExpressionClosure(ctx lowerFileContext, selection *types.Selection) string {
+// lowerMethodExpressionClosure passes its explicit receiver through the same
+// dispatch rules as a direct call when the resulting function is invoked.
+func (o *LoweringOwner) lowerMethodExpressionClosure(ctx lowerFileContext, selector *ast.SelectorExpr, selection *types.Selection) string {
+	// Read the method expression's signature and declaration.
 	signature, _ := selection.Type().(*types.Signature)
 	if signature == nil || signature.Params() == nil || signature.Params().Len() == 0 {
 		return "undefined"
@@ -13363,17 +13394,23 @@ func (o *LoweringOwner) lowerMethodExpressionClosure(ctx lowerFileContext, selec
 	if method == nil {
 		return "undefined"
 	}
+
+	// The first parameter supplies the receiver; the rest are method arguments.
 	receiver := receiverNamedType(selection.Recv())
 	receiverName := safeParamName(signature.Params().At(0), 0)
 	args := make([]string, 0, signature.Params().Len()-1)
 	for idx := 1; idx < signature.Params().Len(); idx++ {
 		args = append(args, safeParamName(signature.Params().At(idx), idx))
 	}
+
+	// Preserve the receiver's generic type arguments.
 	methodArgs := args
 	genericArgs := ""
 	if !o.methodSelectionUsesOverridePackage(ctx, selection) {
 		genericArgs = o.genericReceiverTypeArgsExpr(ctx, selection)
 	}
+
+	// Interface generics retain dynamic dispatch; concrete methods use the class.
 	call := ""
 	if genericArgs != "" && isInterfaceType(selection.Recv()) {
 		methodArgs = append([]string{receiverName, strconv.Quote(method.Name()), genericArgs}, methodArgs...)
@@ -13387,6 +13424,22 @@ func (o *LoweringOwner) lowerMethodExpressionClosure(ctx lowerFileContext, selec
 			"<" + o.namedTypeExpr(ctx, receiver) + ">(" + receiverName + ")." +
 			method.Name() + "(" + strings.Join(methodArgs, ", ") + ")"
 	}
+
+	// Resolve promoted pointer receivers when the expression is invoked. Only
+	// outer and intermediate pointers are dereferenced; the final one may be nil.
+	boundReceiver := receiverName
+	if methodHasPointerReceiver(method) && len(selection.Index()) > 1 {
+		if isPointerToStructType(selection.Recv()) {
+			boundReceiver = o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) + "<" + o.tsNonNilTypeFor(ctx, selection.Recv()) + ">(" + boundReceiver + ")"
+		}
+		index := selection.Index()
+		boundReceiver = o.lowerPromotedFieldAddressValue(ctx, boundReceiver, selection.Recv(), index[:len(index)-1])
+	}
+	if pointerCall, _, ok := o.lowerPointerReceiverMethodCall(ctx, selector, selection, methodArgs, boundReceiver); ok {
+		call = pointerCall
+	}
+
+	// Preserve the method's asynchronous result in the function value.
 	async := o.functionAsync(ctx, method)
 	prefix := ""
 	if async {
