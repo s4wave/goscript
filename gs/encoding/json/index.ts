@@ -89,6 +89,9 @@ class jsonError extends Error {
 type decodeOptions = {
   disallowUnknownFields?: boolean
   useNumber?: boolean
+  // typeError is the first JSON value of another type than its target
+  // (see skipBasicValue), which decode returns after the other values.
+  typeError?: UnmarshalTypeError
 }
 
 type fieldMetadata = {
@@ -210,6 +213,43 @@ export class UnmarshalTypeError extends jsonError {
     this.Field = init?.Field ?? ''
   }
 }
+
+// Register *json.UnmarshalTypeError, as *json.SyntaxError is above, for a
+// Go `err.(*json.UnmarshalTypeError)` assertion in compiled code.
+$.registerStructType(
+  'json.UnmarshalTypeError',
+  () => new UnmarshalTypeError(),
+  [
+    {
+      name: 'Error',
+      args: [],
+      returns: [{ type: { kind: $.TypeKind.Basic, name: 'string' } }],
+    },
+  ],
+  UnmarshalTypeError,
+  [
+    {
+      name: 'Value',
+      key: 'Value',
+      type: { kind: $.TypeKind.Basic, name: 'string' },
+    },
+    {
+      name: 'Offset',
+      key: 'Offset',
+      type: { kind: $.TypeKind.Basic, name: 'int64' },
+    },
+    {
+      name: 'Struct',
+      key: 'Struct',
+      type: { kind: $.TypeKind.Basic, name: 'string' },
+    },
+    {
+      name: 'Field',
+      key: 'Field',
+      type: { kind: $.TypeKind.Basic, name: 'string' },
+    },
+  ],
+)
 
 export class UnsupportedTypeError extends jsonError {
   public Type: unknown
@@ -1129,11 +1169,15 @@ function decode(
       return $.toGoError(new InvalidUnmarshalError())
     }
     const unmarshaler = unmarshalJSONTarget(v)
+    opts.typeError = undefined
     if (unmarshaler !== null) {
       callUnmarshalJSON(unmarshaler, data)
     } else {
       const value = parsed !== null ? parsed[0] : parseJSON(data, opts)
       assignDecodedValue(v, value, opts)
+    }
+    if (opts.typeError !== undefined && pending.length === 0) {
+      throw opts.typeError
     }
   } catch (err) {
     return goError(err)
@@ -2131,6 +2175,9 @@ function assignDecodedValue(
         }
       }
     }
+    if (skipBasicValue(decoded, basicTypeName(spelling), opts)) {
+      return
+    }
     if (isPlainObject(decoded) || $.isArrayOrGoSlice(decoded)) {
       storeDecodedValue(target, decodeInterfaceValue(decoded))
       return
@@ -2199,6 +2246,7 @@ function assignStructFields(
         decoded[key],
         opts,
         field.type,
+        field.tag,
       )
     }
   }
@@ -2364,9 +2412,15 @@ function assignDecodedFieldValue(
   decoded: unknown,
   opts: decodeOptions,
   fieldType: unknown,
+  fieldTag?: string,
 ): void {
   if (isRawMessageType(fieldType)) {
     target.value = $.stringToBytes(decodedJSONText(decoded))
+    return
+  }
+  // A field with the string option, which is not supported, keeps its value.
+  const stringOption = (fieldTag ?? '').includes(',string')
+  if (!stringOption && skipBasicValue(decoded, basicTypeName(fieldType), opts)) {
     return
   }
   // Decode Map/Slice-typed fields (including nested combinations, e.g.
@@ -2523,6 +2577,13 @@ function decodeValueForType(
   if (isRawMessageType(typeInfo) && decoded !== undefined) {
     return $.stringToBytes(decodedJSONText(decoded))
   }
+  // An element of a basic type is the zero value for a null, or for a value
+  // of another type, as in Go, which also records the error (see
+  // skipBasicValue).
+  const basic = basicTypeName(typeInfo)
+  if (skipBasicValue(decoded, basic, opts)) {
+    return basicZero(basic)
+  }
   if (decoded === null || decoded === undefined) {
     return decoded
   }
@@ -2647,6 +2708,117 @@ function decodeValueForType(
   // Basic / other kinds: passthrough (RawMessage and []byte-as-base64 are
   // handled by the caller before reaching the generic decoder).
   return decoded
+}
+
+// basicTypeNames are the names of the Go basic types that are decoded from
+// the JSON values of one kind (see skipBasicValue).
+const basicTypeNames = new Set([
+  'bool',
+  'string',
+  'int',
+  'int8',
+  'int16',
+  'int32',
+  'int64',
+  'uint',
+  'uint8',
+  'uint16',
+  'uint32',
+  'uint64',
+  'uintptr',
+  'float32',
+  'float64',
+])
+
+// basicTypeName returns the name of the unnamed Go basic type that the
+// given type descriptor is, as its spelling or type info, or '' for another
+// type. A named type, which can decode with its methods, such as
+// UnmarshalText, is not one.
+function basicTypeName(t: unknown): string {
+  const name =
+    typeof t === 'string' ? t
+    : (
+      typeof t === 'object' &&
+      t !== null &&
+      Reflect.get(t, 'kind') === $.TypeKind.Basic &&
+      !Reflect.get(t, 'typeName')
+    ) ?
+      Reflect.get(t, 'name')
+    : ''
+  return typeof name === 'string' && basicTypeNames.has(name) ? name : ''
+}
+
+// basicZero returns the zero value of the Go basic type with the given name.
+function basicZero(name: string): unknown {
+  switch (name) {
+    case 'bool':
+      return false
+    case 'string':
+      return ''
+  }
+  return 0
+}
+
+// jsonKind returns the kind of a decoded JSON value, as an
+// UnmarshalTypeError names it.
+function jsonKind(v: unknown): string {
+  switch (typeof v) {
+    case 'boolean':
+      return 'bool'
+    case 'string':
+      return 'string'
+    case 'number':
+    case 'bigint':
+      return 'number'
+  }
+  return $.isArrayOrGoSlice(v) ? 'array' : 'object'
+}
+
+// basicValueFits reports whether a decoded JSON value that is not null can
+// be a value of the Go basic type with the given name. A number decoded with
+// UseNumber is the text of its literal, which can be that of a string.
+function basicValueFits(
+  decoded: unknown,
+  name: string,
+  opts: decodeOptions,
+): boolean {
+  switch (name) {
+    case 'bool':
+      return typeof decoded === 'boolean'
+    case 'string':
+      return typeof decoded === 'string'
+  }
+  return (
+    typeof decoded === 'number' ||
+    typeof decoded === 'bigint' ||
+    (!!opts.useNumber && typeof decoded === 'string')
+  )
+}
+
+// skipBasicValue reports whether a decoded JSON value is skipped for a
+// target of the Go basic type with the given name, if any, which keeps its
+// value, as in Go: a null, and a value of another kind, for which the first
+// UnmarshalTypeError is recorded in opts, to be returned after decoding the
+// other values.
+function skipBasicValue(
+  decoded: unknown,
+  name: string,
+  opts: decodeOptions,
+): boolean {
+  if (name === '') {
+    return false
+  }
+  if (decoded === null || decoded === undefined) {
+    return true
+  }
+  if (basicValueFits(decoded, name, opts)) {
+    return false
+  }
+  opts.typeError ??= new UnmarshalTypeError({
+    Value: jsonKind(decoded),
+    Type: name,
+  })
+  return true
 }
 
 // decodeInterfaceValue recursively decodes a raw JSON-parsed JS value the way
@@ -2911,7 +3083,7 @@ function assignAnonymousStructFields(
       continue
     }
     const ref = $.varRef(target[field.name])
-    assignDecodedFieldValue(ref, fieldValue, opts, field.type)
+    assignDecodedFieldValue(ref, fieldValue, opts, field.type, field.tag)
     target[field.name] = ref.value
   }
 }

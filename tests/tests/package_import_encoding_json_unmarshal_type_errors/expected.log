@@ -1,0 +1,9 @@
+bool from string: true true true
+bool from null: true true
+int from bool: true 3
+string from number: true s
+string from null: true s
+struct fields: true b true 4
+struct nulls: true b true 4
+slice elements: true 3 true false false
+reflect field: true false
