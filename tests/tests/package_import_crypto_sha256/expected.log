@@ -8,3 +8,33 @@ stream prefix 1 2
 stream digest 186 173
 backed len 32 32
 backed digest 186 173 186 173
+sha224 cloner true
+sha224 clone err nil true
+sha224 fork true true
+sha224 reset true true
+sha224 branch reset true true
+sha256 cloner true
+sha256 clone err nil true
+sha256 fork true true
+sha256 reset true true
+sha256 branch reset true true
+sha384 cloner true
+sha384 clone err nil true
+sha384 fork true true
+sha384 reset true true
+sha384 branch reset true true
+sha512 cloner true
+sha512 clone err nil true
+sha512 fork true true
+sha512 reset true true
+sha512 branch reset true true
+sha512/224 cloner true
+sha512/224 clone err nil true
+sha512/224 fork true true
+sha512/224 reset true true
+sha512/224 branch reset true true
+sha512/256 cloner true
+sha512/256 clone err nil true
+sha512/256 fork true true
+sha512/256 reset true true
+sha512/256 branch reset true true

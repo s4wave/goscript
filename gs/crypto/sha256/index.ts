@@ -1,4 +1,4 @@
-import { sha224 } from '@noble/hashes/sha2.js'
+import { sha224, sha256 } from '@noble/hashes/sha2.js'
 
 import * as $ from '@goscript/builtin/index.js'
 import {
@@ -22,39 +22,45 @@ class Sha256Error {
 }
 
 class Digest {
-  private chunks: Uint8Array[] = []
-  private dataLength = 0
-  private hash: NodeCryptoHash | null
-  private canCopyHash: boolean
+  // hash owns only incremental digest state; copies never retain prior input.
+  private hash: NodeCryptoHash | ReturnType<typeof sha256.create>
 
-  constructor(private readonly algorithm: ShaAlgorithm) {
-    this.hash = createNodeHash(algorithm)
-    this.canCopyHash = typeof this.hash?.copy === 'function'
+  constructor(
+    private readonly algorithm: ShaAlgorithm,
+    state?: Digest['hash'],
+  ) {
+    this.hash = state ?? this.newState()
   }
 
   Write(p: $.Bytes): [number, $.GoError] {
     const bytes = $.bytesToUint8Array(p)
-    this.hash?.update(bytes)
-    if (!this.canCopyHash) {
-      this.chunks.push(new Uint8Array(bytes))
-      this.dataLength += bytes.length
-    }
+    this.hash.update(bytes)
     return [bytes.length, null]
   }
 
   async Sum(b: $.Bytes): Promise<$.Bytes> {
-    const digest =
-      this.canCopyHash ?
-        new Uint8Array(this.hash!.copy!().digest())
-      : await sum(this.algorithm, this.snapshotBytes())
-    return appendDigest(b, digest)
+    return appendDigest(b, new Uint8Array(this.copyState().digest()))
   }
 
   Reset(): void {
-    this.chunks = []
-    this.dataLength = 0
-    this.hash = createNodeHash(this.algorithm)
-    this.canCopyHash = typeof this.hash?.copy === 'function'
+    this.hash = this.newState()
+  }
+
+  // Clone forks the current state; writes, Sum and Reset stay independent.
+  Clone(): [Digest, $.GoError] {
+    return [new Digest(this.algorithm, this.copyState()), null]
+  }
+
+  // newState keeps native acceleration when the host can copy its state.
+  private newState(): Digest['hash'] {
+    const native = createNodeHash(this.algorithm)
+    if (typeof native?.copy === 'function') return native
+    return (this.algorithm === 'sha224' ? sha224 : sha256).create()
+  }
+
+  // copyState copies fixed-size compression state and its partial block only.
+  private copyState(): Digest['hash'] {
+    return 'clone' in this.hash ? this.hash.clone() : this.hash.copy!()
   }
 
   Size(): number {
@@ -63,10 +69,6 @@ class Digest {
 
   BlockSize(): number {
     return BlockSize
-  }
-
-  private snapshotBytes(): Uint8Array {
-    return concatChunks(this.chunks, this.dataLength)
   }
 }
 
@@ -130,16 +132,6 @@ function createNodeHash(algorithm: ShaAlgorithm): NodeCryptoHash | null {
   } catch {
     return null
   }
-}
-
-function concatChunks(chunks: Uint8Array[], length: number): Uint8Array {
-  const out = new Uint8Array(length)
-  let offset = 0
-  for (const chunk of chunks) {
-    out.set(chunk, offset)
-    offset += chunk.length
-  }
-  return out
 }
 
 function subtleCrypto(): SubtleCrypto | null {

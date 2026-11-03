@@ -23,8 +23,9 @@ export interface XOF {
   BlockSize(): number
 }
 
-export interface Cloner {
-  Clone(): [Hash, $.GoError]
+/** Cloner is a hash whose current state can be copied independently. */
+export interface Cloner extends Hash {
+  Clone(): [Cloner, $.GoError]
 }
 
 const bytesType: $.SliceTypeInfo = {
@@ -46,7 +47,8 @@ const errorType: $.InterfaceTypeInfo = {
   methods: [],
 }
 
-$.registerInterfaceType('hash.Hash', null, [
+// hashMethods is the inherited Hash contract, also required by Cloner.
+const hashMethods: $.MethodSignature[] = [
   {
     name: 'Write',
     args: [{ name: 'p', type: bytesType }],
@@ -63,7 +65,9 @@ $.registerInterfaceType('hash.Hash', null, [
   { name: 'Reset', args: [], returns: [] },
   { name: 'Size', args: [], returns: [{ name: '_r0', type: intType }] },
   { name: 'BlockSize', args: [], returns: [{ name: '_r0', type: intType }] },
-])
+]
+
+$.registerInterfaceType('hash.Hash', null, hashMethods)
 
 $.registerInterfaceType('hash.Hash32', null, [
   {
@@ -114,11 +118,12 @@ $.registerInterfaceType('hash.Hash64', null, [
 ])
 
 $.registerInterfaceType('hash.Cloner', null, [
+  ...hashMethods,
   {
     name: 'Clone',
     args: [],
     returns: [
-      { name: '_r0', type: 'hash.Hash' },
+      { name: '_r0', type: 'hash.Cloner' },
       { name: 'err', type: errorType },
     ],
   },
