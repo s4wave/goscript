@@ -71,7 +71,7 @@ export function noescape(p: any): any {
 }
 
 export function inlineSlice(values: $.Slice<number>): $.Slice<number> {
-	return $.goSlice($.pointerValue<number[]>($.unsafePointerCast<$.VarRef<number[]> | null>($.arrayPointerFromIndexRef<number>($.indexRef(values!, 0), 2, 8, 8))), undefined, undefined)
+	return $.goSlice($.pointerValue<number[]>($.unsafeByteView<$.VarRef<number[]> | null>(noescape(($.indexRef(values!, 0) as any)), __goscriptStatic0(), undefined, 8)), undefined, undefined)
 }
 
 export function markThroughView(src: sourceStruct | $.VarRef<sourceStruct> | null): boolean {
@@ -80,6 +80,7 @@ export function markThroughView(src: sourceStruct | $.VarRef<sourceStruct> | nul
 }
 
 export async function main(): globalThis.Promise<void> {
+	// An identity round-trip preserves the indexed pointer token.
 	let values = $.arrayToSlice<number>([1, 2])
 	let p = ($.indexRef(values!, 1) as any)
 	let q = noescape(p)
@@ -87,13 +88,43 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("same:", (q === p || ($.pointerAliasesMade || (q as any)?.__goElementBacking !== undefined) && $.pointerEqual(q, p)))
 	await $.println("nil:", q == null)
 
+	// The array pointer keeps the original numeric backing and aliases.
 	let inline = inlineSlice(values)
 	await $.println("inline:", $.plainSliceIndex(inline!, 0), $.plainSliceIndex(inline!, 1))
 	$.sliceElems(inline!)[$.sliceSlot(inline!, 0)] = 9
 	await $.println("updated:", $.plainSliceIndex(values!, 0))
 
+	// Target-sized words retain their number representation over byte storage.
+	let bytes: Uint8Array = $.arrayValue(new Uint8Array(16))
+	let words = $.unsafeByteView<$.VarRef<number[]> | null>(($.indexRef(bytes, 0) as any), __goscriptStatic0())
+	$.pointerValue<number[]>(words)[0] = 7
+	bytes[8] = 9
+	await $.println("byte words:", $.arrayIndex($.pointerValue<number[]>(words), 0), $.arrayIndex($.pointerValue<number[]>(words), 1), bytes[0])
+	let signed = $.unsafeByteView<$.VarRef<number> | null>(($.indexRef(bytes, 0) as any), __goscriptStatic1())
+	signed!.value = -3
+	await $.println("signed word:", $.pointerValue<number>(signed), bytes[0])
+	let address = $.unsafeByteView<$.VarRef<number> | null>(($.indexRef(bytes, 8) as any), __goscriptStatic2())
+	address!.value = 10
+	await $.println("address word:", $.pointerValue<number>(address), $.arrayIndex($.pointerValue<number[]>(words), 1))
+
+	// Ordinary reference-bearing struct casts keep their existing identity.
 	let src: $.VarRef<sourceStruct> = $.varRef(new sourceStruct(true))
 	await $.println("struct:", markThroughView(src), src.value.flag)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({ size: 16, align: 8, kind: "array", length: 2, element: { size: 8, align: 8, kind: "scalar", scalar: "uint" } })
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({ size: 8, align: 8, kind: "scalar", scalar: "int" })
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ({ size: 8, align: 8, kind: "scalar", scalar: "uintptr" })
 }
 
 if ($.isMainScript(import.meta)) {

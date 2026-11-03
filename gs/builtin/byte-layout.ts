@@ -17,7 +17,10 @@ import { markPointerAlias } from './type.js'
 
 /** ByteLayout describes the Go layout of data with no managed references. */
 export type ByteLayout = { size: number; align: number } & (
-  | { kind: 'scalar'; scalar: NumericKind | 'bool' }
+  | {
+      kind: 'scalar'
+      scalar: NumericKind | 'bool' | 'int' | 'uint' | 'uintptr'
+    }
   | { kind: 'array'; length: number; element: ByteLayout }
   | {
       kind: 'struct'
@@ -156,6 +159,9 @@ export function unsafeByteView<T>(
         sourceScalar !== undefined &&
         layout?.kind === 'scalar' &&
         layout.scalar !== 'bool' &&
+        layout.scalar !== 'int' &&
+        layout.scalar !== 'uint' &&
+        layout.scalar !== 'uintptr' &&
         isVarRef(pointer)
       ) {
         return unsafeNumericRef(pointer, sourceScalar, layout.scalar) as T
@@ -214,6 +220,15 @@ function readByteValue(bytes: any, offset: number, layout: ByteLayout): any {
     for (let i = 0; i < layout.size; i++)
       byteScratch.setUint8(i, arrayIndex(bytes, offset + i))
     switch (layout.scalar) {
+      case 'int':
+        return layout.size === 4 ?
+            byteScratch.getInt32(0, true)
+          : Number(byteScratch.getBigInt64(0, true))
+      case 'uint':
+      case 'uintptr':
+        return layout.size === 4 ?
+            byteScratch.getUint32(0, true)
+          : Number(byteScratch.getBigUint64(0, true))
       case 'bool':
         return byteScratch.getUint8(0) !== 0
       case 'int8':
@@ -335,6 +350,15 @@ function writeByteValue(
   }
   // Encode a scalar without allocating a temporary buffer for every field.
   switch (layout.scalar) {
+    case 'int':
+      if (layout.size === 4) byteScratch.setInt32(0, value, true)
+      else byteScratch.setBigInt64(0, BigInt(value), true)
+      break
+    case 'uint':
+    case 'uintptr':
+      if (layout.size === 4) byteScratch.setUint32(0, value, true)
+      else byteScratch.setBigUint64(0, BigInt(value), true)
+      break
     case 'bool':
       byteScratch.setUint8(0, value ? 1 : 0)
       break

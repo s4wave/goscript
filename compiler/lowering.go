@@ -15091,9 +15091,21 @@ func (o *LoweringOwner) lowerArrayPointerTarget(ctx lowerFileContext, target str
 		"<" + o.tsTypeFor(ctx, array) + ">(" + target + ")"
 }
 
+// lowerSliceExpr evaluates the operand before its bounds and preserves capacity.
 func (o *LoweringOwner) lowerSliceExpr(ctx lowerFileContext, expr *ast.SliceExpr) (string, []Diagnostic) {
-	// The operand and the bounds are lowered in order.
-	target, diagnostics := o.lowerExpr(ctx, expr.X)
+	// Evaluate the operand once, bounding a string view by its declared array.
+	var target string
+	var diagnostics []Diagnostic
+	targetType := ctx.semPkg.source.TypesInfo.TypeOf(expr.X)
+	if source, length, ok := unsafeStringArraySource(ctx, expr.X); ok && expr.Slice3 {
+		target, diagnostics = o.lowerExpr(ctx, source)
+		target = o.runtimeOwner.QualifiedHelper(RuntimeHelperStringToBytes) + "(" + target + ").subarray(0, " + strconv.FormatInt(length, 10) + ")"
+		targetType = types.NewSlice(types.Typ[types.Uint8])
+	} else {
+		target, diagnostics = o.lowerExpr(ctx, expr.X)
+	}
+
+	// Evaluate the slice bounds after its operand, in source order.
 	low, lowDiagnostics := o.lowerOptionalExpr(ctx, expr.Low)
 	high, highDiagnostics := o.lowerOptionalExpr(ctx, expr.High)
 	max, maxDiagnostics := o.lowerOptionalExpr(ctx, expr.Max)
@@ -15106,7 +15118,6 @@ func (o *LoweringOwner) lowerSliceExpr(ctx lowerFileContext, expr *ast.SliceExpr
 	high = o.lowerNumberIndexValue(ctx, expr.High, high)
 	max = o.lowerNumberIndexValue(ctx, expr.Max, max)
 	helper := RuntimeHelperGoSlice
-	targetType := ctx.semPkg.source.TypesInfo.TypeOf(expr.X)
 	if isStringType(targetType) || typeParamHasString(targetType) {
 		helper = RuntimeHelperSliceStringOrBytes
 	} else {

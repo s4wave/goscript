@@ -1,3 +1,5 @@
 3 3 97 98 99
 4 4 119 122
 pointer 2
+array: 5 5 97 121
+array bounds: true

@@ -2,4 +2,7 @@ same: true
 nil: false
 inline: 1 2
 updated: 9
+byte words: 7 9 7
+signed word: -3 253
+address word: 10 10
 struct: true true

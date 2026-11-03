@@ -54,19 +54,49 @@ export function localStringBytes(s: string): $.Slice<number> {
 	return $.stringToBytes(s)
 }
 
+export function arrayStringBytes(__goscriptParam1: string): $.Slice<number> {
+	let s: $.VarRef<string> = $.varRef(__goscriptParam1)
+	return $.goSlice($.stringToBytes(s.value).subarray(0, 2147418112), undefined, $.stringLen(s.value), $.stringLen(s.value))
+}
+
+export async function arrayStringBounds(__goscriptParam2: string): globalThis.Promise<void> {
+	let s: $.VarRef<string> = $.varRef(__goscriptParam2)
+	const __defer = new $.AsyncDisposableStack()
+	try {
+		__defer.defer(async () => { await (async () => {
+			await $.println("array bounds:", $.recover() != null)
+		})() })
+		$.goSlice($.stringToBytes(s.value).subarray(0, 2), undefined, $.stringLen(s.value), $.stringLen(s.value))
+		await __defer.dispose()
+	} catch (e) {
+		await __defer.disposePanic(e)
+		if (!$.recovered(e)) {
+			throw e
+		}
+	}
+}
+
 export function samePointers(s: $.VarRef<string> | null, b: $.VarRef<$.Slice<number>> | null): [$.VarRef<string> | null, $.VarRef<$.Slice<number>> | null] {
 	return [s, b]
 }
 
 export async function main(): globalThis.Promise<void> {
+	// Read byte views produced from both standard and local string headers.
 	let b = stringBytes("abc")
 	await $.println($.sliceLen(b), $.cap(b), $.typedSliceIndex(b!, 0), $.typedSliceIndex(b!, 1), $.typedSliceIndex(b!, 2))
 	let local = localStringBytes("wxyz")
 	await $.println($.sliceLen(local), $.cap(local), $.typedSliceIndex(local!, 0), $.typedSliceIndex(local!, 3))
+
+	// Identity casts retain the original string and slice pointer storage.
 	let str = $.varRef("pointer")
 	let bytes: $.VarRef<$.Slice<number>> = $.varRef(new Uint8Array([103, 111]))
 	let [sp, bp] = samePointers(str, bytes)
 	await $.println($.pointerValue<string>(sp), $.sliceLen($.pointerValue<$.Slice<number>>(bp)))
+
+	// The large array declaration does not enlarge the actual string slice.
+	let array = arrayStringBytes("array")
+	await $.println("array:", $.sliceLen(array), $.cap(array), $.typedSliceIndex(array!, 0), $.typedSliceIndex(array!, 4))
+	await arrayStringBounds("array")
 }
 
 if ($.isMainScript(import.meta)) {
