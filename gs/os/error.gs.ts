@@ -117,7 +117,7 @@ export function NewSyscallError(syscall: string, err: $.GoError): $.GoError {
 	if (err == null) {
 		return null
 	}
-	return new SyscallError({})
+	return new SyscallError({ Syscall: syscall, Err: err })
 }
 
 // IsExist returns a boolean indicating whether its argument is known to report
@@ -174,6 +174,7 @@ export function underlyingErrorIs(err: $.GoError, target: $.GoError): boolean {
 	if (err !== null && typeof (err as any).Is === "function") {
 		return (err as any).Is(target) === true
 	}
+
 	// To preserve prior behavior, only examine syscall errors.
 	let { value: e, ok: ok } = $.typeAssert<any>(err, 'syscallErrorType')
 	return ok && e.Is(target)
