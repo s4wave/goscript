@@ -2767,7 +2767,44 @@ function failedTypeAssert<T>(
   } else if (normalizedType.zeroValue !== undefined) {
     return { value: resolveZeroValue<T>(normalizedType.zeroValue), ok: false }
   }
+  if (normalizedType.kind === TypeKind.Basic) {
+    // a basic type (as string, also named) has no registered zero value
+    return { value: basicZeroValue(normalizedType.name) as T, ok: false }
+  }
   return { value: null as T, ok: false }
+}
+
+// basicZeroValue returns the zero value of the Go basic type with the given
+// name, as it is represented at run time.
+function basicZeroValue(name: string | undefined): unknown {
+  switch (name) {
+    case 'string':
+      return ''
+    case 'bool':
+      return false
+    case 'int64':
+    case 'uint64':
+      return 0n
+    case 'complex64':
+    case 'complex128':
+      return { real: 0, imag: 0 }
+    case 'int':
+    case 'int8':
+    case 'int16':
+    case 'int32':
+    case 'uint':
+    case 'uint8':
+    case 'uint16':
+    case 'uint32':
+    case 'uintptr':
+    case 'byte':
+    case 'rune':
+    case 'float32':
+    case 'float64':
+    case 'number':
+      return 0
+  }
+  return null
 }
 
 export function typeAssertTuple<T>(
