@@ -1613,6 +1613,13 @@ func TestCompilePackagesEmitsTypeOnlyLocalImports(t *testing.T) {
 			"}",
 			"",
 		}, "\n"),
+		"result.go": strings.Join([]string{
+			"package main",
+			"func zero() (p Payload) {",
+			"  return",
+			"}",
+			"",
+		}, "\n"),
 	})
 	outputDir := filepath.Join(t.TempDir(), "output")
 	comp, err := NewCompiler(&Config{
@@ -1636,6 +1643,16 @@ func TestCompilePackagesEmitsTypeOnlyLocalImports(t *testing.T) {
 	}
 	if strings.Contains(text, "import \"./payload.gs.ts\"") {
 		t.Fatalf("type-only same-package import should not force sibling module execution:\n%s", text)
+	}
+
+	// A named result starts at its type's zero value, which constructs it.
+	content, err = os.ReadFile(filepath.Join(outputDir, "@goscript", "example.test", "typeonlylocal", "result.gs.ts"))
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	text = string(content)
+	if !strings.Contains(text, "import * as __goscript_payload from \"./payload.gs.ts\"") {
+		t.Fatalf("named result zero value needs a runtime same-package import:\n%s", text)
 	}
 }
 

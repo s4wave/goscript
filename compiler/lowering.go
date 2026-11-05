@@ -1396,12 +1396,30 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 			addRuntimeTypeOwnerDeps(typed.Elem())
 		}
 	}
+	// A named result starts at its type's zero value, as a var without a
+	// value does, so the function body constructs the type.
+	addNamedResultDeps := func(fn *ast.FuncType) {
+		if fn == nil || fn.Results == nil {
+			return
+		}
+		for _, field := range fn.Results.List {
+			if len(field.Names) != 0 {
+				addRuntimeTypeDeps(semPkg.source.TypesInfo.TypeOf(field.Type))
+			}
+		}
+	}
 	inspect := func(node ast.Node) bool {
 		switch typed := node.(type) {
 		case *ast.ValueSpec:
 			if len(typed.Values) == 0 && typed.Type != nil {
 				addRuntimeTypeDeps(semPkg.source.TypesInfo.TypeOf(typed.Type))
 			}
+		case *ast.FuncDecl:
+			if typed.Body != nil {
+				addNamedResultDeps(typed.Type)
+			}
+		case *ast.FuncLit:
+			addNamedResultDeps(typed.Type)
 		case *ast.Ident:
 			obj := semPkg.source.TypesInfo.Defs[typed]
 			if obj != nil {
