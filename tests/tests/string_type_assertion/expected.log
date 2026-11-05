@@ -1,1 +1,8 @@
 value is test
+nil string: 0 true false
+int string: 0 true false
+missing string: 0 x false
+nil label: 0 true false
+nil float64: true false
+nil int: 1 false
+nil bool: false false
