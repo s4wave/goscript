@@ -1,5 +1,6 @@
 import * as $ from '@goscript/builtin/index.js'
 import * as io from '@goscript/io/index.js'
+import { ed25519 as pureEd25519 } from '@noble/curves/ed25519.js'
 
 export type PublicKey = $.Bytes
 export type PrivateKey = $.Bytes
@@ -155,24 +156,20 @@ export async function NewKeyFromSeed(seed: $.Bytes): Promise<PrivateKey> {
   }
 
   const subtle = requireSubtle()
-  const pkcs8 = pkcs8FromSeed(seedBytes)
-  const key = await named('importKey pkcs8', pkcs8.length, () =>
-    subtle.importKey(
-      'pkcs8',
-      pkcs8 as BufferSource,
-      { name: 'Ed25519' },
-      true,
-      ['sign'],
-    ),
-  )
-  const jwk = await named('exportKey jwk', 0, () =>
-    subtle.exportKey('jwk', key),
-  )
-  if (typeof jwk.x !== 'string') {
-    throw new Error('crypto/ed25519: imported key did not expose public key')
+  const key = await importSigningKey(subtle, seedBytes, true)
+  let publicKey: Uint8Array
+  if (key == null) {
+    publicKey = pureEd25519.getPublicKey(seedBytes)
+  } else {
+    const jwk = await named('exportKey jwk', 0, () =>
+      subtle.exportKey('jwk', key),
+    )
+    if (typeof jwk.x !== 'string') {
+      throw new Error('crypto/ed25519: imported key did not expose public key')
+    }
+    publicKey = base64URLDecode(jwk.x)
   }
 
-  const publicKey = base64URLDecode(jwk.x)
   const privateKey = new Uint8Array(PrivateKeySize)
   privateKey.set(seedBytes, 0)
   privateKey.set(publicKey, SeedSize)
@@ -189,17 +186,12 @@ export async function Sign(
   }
 
   const subtle = requireSubtle()
-  const pkcs8 = pkcs8FromSeed(priv.subarray(0, SeedSize))
-  const key = await named('importKey pkcs8', pkcs8.length, () =>
-    subtle.importKey(
-      'pkcs8',
-      pkcs8 as BufferSource,
-      { name: 'Ed25519' },
-      false,
-      ['sign'],
-    ),
-  )
+  const seed = priv.subarray(0, SeedSize)
   const msg = $.bytesToUint8Array(message)
+  const key = await importSigningKey(subtle, seed, false)
+  if (key == null) {
+    return pureEd25519.sign(msg, seed)
+  }
   const sig = await named('sign', msg.length, () =>
     subtle.sign('Ed25519', key, msg as BufferSource),
   )
@@ -265,6 +257,29 @@ class Ed25519Error {
 
   Error(): string {
     return this.message
+  }
+}
+
+// importSigningKey imports seed as a WebCrypto Ed25519 signing key, or returns
+// null when the engine refuses it. Every 32-byte seed is a valid Ed25519
+// private key, but WebKit's libgcrypt backend rejects a pkcs8 seed whose first
+// byte is zero, one key in 256, with DataError. Callers then use the pure
+// implementation, which gives the same keys and signatures.
+async function importSigningKey(
+  subtle: SubtleCrypto,
+  seed: Uint8Array,
+  extractable: boolean,
+): Promise<CryptoKey | null> {
+  try {
+    return await subtle.importKey(
+      'pkcs8',
+      pkcs8FromSeed(seed) as BufferSource,
+      { name: 'Ed25519' },
+      extractable,
+      ['sign'],
+    )
+  } catch {
+    return null
   }
 }
 
