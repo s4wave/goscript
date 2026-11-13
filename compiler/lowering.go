@@ -4297,14 +4297,23 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 		return nil
 	}
 	var methods []loweredFunction
+	promoted := make(map[string]bool)
 	for selection := range methodSet.Methods() {
 		method, _ := selection.Obj().(*types.Func)
 		if method == nil || explicitMethods[method.Name()] {
 			continue
 		}
-		if !ast.IsExported(method.Name()) && method.Pkg() != nil && method.Pkg().Path() != ctx.semPkg.pkgPath {
+
+		// An unexported method of another compiled package is promoted too,
+		// so that the outer type implements interfaces with unexported
+		// methods (as ast.BlockNode). An override package has only its
+		// exported methods, and runtime member names are not package
+		// qualified, so only the first method of a name is promoted.
+		external := !ast.IsExported(method.Name()) && method.Pkg() != nil && method.Pkg().Path() != ctx.semPkg.pkgPath
+		if external && o.facts.HasPackage(method.Pkg().Path()) || promoted[method.Name()] {
 			continue
 		}
+		promoted[method.Name()] = true
 		signature, _ := method.Type().(*types.Signature)
 		if signature == nil {
 			continue
