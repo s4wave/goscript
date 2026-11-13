@@ -3,6 +3,7 @@ import * as $ from '@goscript/builtin/index.js'
 
 import {
   GenerateKey,
+  NewKeyFromSeed,
   PrivateKeySize,
   PrivateKey_Public,
   PublicKeySize,
@@ -17,18 +18,46 @@ describe('crypto/ed25519 override', () => {
     vi.restoreAllMocks()
   })
 
-  test('returns WebCrypto rejections as errors naming the call', async () => {
-    const [pub, priv, genErr] = await GenerateKey(null)
-    expect(genErr).toBeNull()
+  test('signs with the pure implementation when WebCrypto refuses a seed', async () => {
+    // WebKit's libgcrypt backend refuses pkcs8 seeds whose first byte is zero.
+    const seed = new Uint8Array(32).fill(7)
+    seed[0] = 0
+    const message = $.stringToBytes('goscript')
+    const want = await NewKeyFromSeed(seed)
+    const wantSig = await Sign(want, message)
+
+    const importKey = globalThis.crypto.subtle.importKey.bind(
+      globalThis.crypto.subtle,
+    )
+    vi.spyOn(globalThis.crypto.subtle, 'importKey').mockImplementation(
+      (format, ...rest) =>
+        format === 'pkcs8' ?
+          Promise.reject(new DOMException('rejected', 'DataError'))
+        : importKey(
+            format as 'raw',
+            ...(rest as [
+              BufferSource,
+              AlgorithmIdentifier,
+              boolean,
+              KeyUsage[],
+            ]),
+          ),
+    )
+    const got = await NewKeyFromSeed(seed)
+    expect(Array.from(got)).toEqual(Array.from(want))
+    const sig = await Sign(got, message)
+    expect(Array.from(sig)).toEqual(Array.from(wantSig))
+    expect(await Verify(want.subarray(32), message, sig)).toBe(true)
+  })
+
+  test('reports a refused public key as an invalid signature', async () => {
+    const [pub, priv, err] = await GenerateKey(null)
+    expect(err).toBeNull()
     const message = $.stringToBytes('goscript')
     const sig = await Sign(priv, message)
 
     vi.spyOn(globalThis.crypto.subtle, 'importKey').mockRejectedValue(
       new DOMException('rejected', 'DataError'),
-    )
-    const [, , err] = await GenerateKey(null)
-    expect(err?.Error()).toBe(
-      'crypto/ed25519: WebCrypto importKey pkcs8 (48 bytes): DataError: rejected',
     )
     expect((await VerifyWithOptions(pub, message, sig, null))?.Error()).toBe(
       'ed25519: invalid signature: crypto/ed25519: WebCrypto importKey raw (32 bytes): DataError: rejected',
