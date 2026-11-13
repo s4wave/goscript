@@ -41,7 +41,7 @@ export function NewFoo(): Foo | $.VarRef<Foo> | null {
 
 export async function main(): globalThis.Promise<void> {
 	let f = NewFoo()
-	queueMicrotask(async () => { await (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? ((f as any) as Foo).Bar() : Foo.prototype.Bar.call(f)) })
+	$.go(async () => { await (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? ((f as any) as Foo).Bar() : Foo.prototype.Bar.call(f)) })
 	await $.chanRecv($.pointerValue<Foo>(f).done)
 	await $.println("main done")
 }

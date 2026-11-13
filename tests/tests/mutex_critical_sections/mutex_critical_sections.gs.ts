@@ -363,7 +363,7 @@ export function __goscript_set_total(__goscriptValue: number): void {
 }
 
 export async function sumAll(ch: $.Channel<number> | null, wg: sync.WaitGroup | $.VarRef<sync.WaitGroup> | null): globalThis.Promise<void> {
-	queueMicrotask(async () => {
+	$.go(async () => {
 		using __defer = new $.DisposableStack()
 		const __goscriptDeferCallee4 = $.functionValue(((__receiver) => () => (__receiver !== null && (__receiver as any).__isVarRef !== true && (__receiver as any).__goValue === undefined ? ((__receiver as any) as sync.WaitGroup).Done() : sync.WaitGroup.prototype.Done.call($.pointerValue<sync.WaitGroup>(__receiver))))(wg), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*WaitGroup).Done-fm")
 		__defer.defer(() => { __goscriptDeferCallee4() })
@@ -387,7 +387,7 @@ export async function main(): globalThis.Promise<void> {
 	let q = new queue(false, undefined, undefined, $.makeChannel<number>(1, 0, "both"))
 	let wg = $.varRef($.markAsStructValue(new sync.WaitGroup()))
 	wg.value.Add(1)
-	queueMicrotask(async () => {
+	$.go(async () => {
 		await using __defer = new $.AsyncDisposableStack()
 		__defer.defer(() => { wg.value.Done() })
 		await $.println("received:", await $.chanRecv($.pointerValue<queue>(q).ready))
@@ -410,9 +410,9 @@ export async function main(): globalThis.Promise<void> {
 
 	let g = new gate(false, undefined, $.makeChannel<number>(0, 0, "both"), $.makeChannel<number>(0, 0, "both"))
 	let g$: gate = g == null ? $.pointerTarget<gate>(g) : (g as any).__isVarRef === true ? (g as any).value : (g as any).__goValue === undefined ? (g as any) : $.pointerTarget<gate>(g)
-	queueMicrotask(async () => { await (g !== null && (g as any).__isVarRef !== true && (g as any).__goValue === undefined ? ((g as any) as gate).poll() : gate.prototype.poll.call(g)) })
+	$.go(async () => { await (g !== null && (g as any).__isVarRef !== true && (g as any).__goValue === undefined ? ((g as any) as gate).poll() : gate.prototype.poll.call(g)) })
 	await $.chanRecv((g$ as gate).started)
-	queueMicrotask(async () => {
+	$.go(async () => {
 		await $.chanSend((g$ as gate).wake, 1)
 	})
 	await (g !== null && (g as any).__isVarRef !== true && (g as any).__goValue === undefined ? ((g as any) as gate).open() : gate.prototype.open.call(g))
@@ -423,9 +423,9 @@ export async function main(): globalThis.Promise<void> {
 
 	let r = new relay(false, undefined, $.makeChannel<number>(0, 0, "both"), $.makeChannel<number>(0, 0, "both"))
 	let r$: relay = r == null ? $.pointerTarget<relay>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<relay>(r)
-	queueMicrotask(async () => { await (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as relay).run() : relay.prototype.run.call(r)) })
+	$.go(async () => { await (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as relay).run() : relay.prototype.run.call(r)) })
 	await $.chanRecv((r$ as relay).started)
-	queueMicrotask(async () => {
+	$.go(async () => {
 		await $.chanSend((r$ as relay).wake, 1)
 	})
 	await (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as relay).open() : relay.prototype.open.call(r))

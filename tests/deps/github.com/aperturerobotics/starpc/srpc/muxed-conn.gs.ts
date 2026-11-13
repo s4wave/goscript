@@ -121,7 +121,7 @@ export function NewOpenStreamWithMuxedConn(conn: __goscript_muxed.MuxedConn | nu
 			return [null, err]
 		}
 		let rw: __goscript_packet_rw.PacketReadWriter | $.VarRef<__goscript_packet_rw.PacketReadWriter> | null = __goscript_packet_rw.NewPacketReadWriter((mstrm as io.ReadWriteCloser | null))
-		queueMicrotask(async () => { await __goscript_packet_rw.PacketReadWriter.prototype.ReadPump.call(rw, msgHandler, closeHandler) })
+		$.go(async () => { await __goscript_packet_rw.PacketReadWriter.prototype.ReadPump.call(rw, msgHandler, closeHandler) })
 		return [$.interfaceValue<__goscript_writer.PacketWriter | null>(rw, "*srpc.PacketReadWriter", { kind: $.TypeKind.Pointer, elemType: "srpc.PacketReadWriter" }), null]
 	}, ({ kind: $.TypeKind.Function, params: ["context.Context", ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }], results: ["error"] } as $.FunctionTypeInfo), ({ kind: $.TypeKind.Function, params: ["error"], results: [] } as $.FunctionTypeInfo)], results: ["srpc.PacketWriter", "error"] } as $.FunctionTypeInfo))
 }

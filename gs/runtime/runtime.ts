@@ -118,23 +118,8 @@ export function Goexit(): never {
 }
 
 // NumGoroutine returns the number of goroutines that currently exist.
-// In goscript, this is informational only
-let goroutineCount = 1 // Start with main goroutine
-
 export function NumGoroutine(): number {
-  return goroutineCount
-}
-
-// _incrementGoroutineCount Internal function to track goroutine creation (called by goscript runtime).
-export function _incrementGoroutineCount(): void {
-  goroutineCount++
-}
-
-// _decrementGoroutineCount Internal function to track goroutine completion (called by goscript runtime).
-export function _decrementGoroutineCount(): void {
-  if (goroutineCount > 0) {
-    goroutineCount--
-  }
+  return $.numGoroutine()
 }
 
 // stackFrame is a call frame parsed from a JavaScript stack trace.

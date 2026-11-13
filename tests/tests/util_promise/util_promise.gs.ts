@@ -129,7 +129,7 @@ export async function main(): Promise<void> {
 	let ctx = context.Background()
 	$.println("Test 1: Basic Promise with string")
 	let p1 = NewPromise({T: { zero: () => "" }})
-	queueMicrotask(async () => { ((): void => {
+	$.go(async () => { ((): void => {
 	$.pointerValue(p1).SetResult("hello world", null)
 })() })
 	let [result1, err1] = $.pointerValue(p1).Await(ctx)

@@ -93,7 +93,7 @@ export class ConcurrentQueue {
 					let job = __goscriptRangeTarget0![__rangeIndex]
 					if (($.pointerValue<ConcurrentQueue>(s).maxConcurrency <= 0) || ($.pointerValue<ConcurrentQueue>(s).running < $.pointerValue<ConcurrentQueue>(s).maxConcurrency)) {
 						$.pointerValue<ConcurrentQueue>(s).running++
-						queueMicrotask(async () => { await ConcurrentQueue.prototype.executeJob.call(s, job) })
+						$.go(async () => { await ConcurrentQueue.prototype.executeJob.call(s, job) })
 					} else {
 						$.pointerValue<ConcurrentQueue>(s).jobQueueSize++
 						await linkedlist.LinkedList.prototype.Push.call($.pointerValue<ConcurrentQueue>(s).jobQueue, {[$.genericTypeArgsMarker]: true, T: { type: ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), zero: () => null }}, job)
@@ -252,7 +252,7 @@ export class ConcurrentQueue {
 			$.pointerValue<ConcurrentQueue>(s).jobQueueSize--
 			$.pointerValue<ConcurrentQueue>(s).running++
 			dirty = true
-			queueMicrotask(async () => { await ConcurrentQueue.prototype.executeJob.call(s, job) })
+			$.go(async () => { await ConcurrentQueue.prototype.executeJob.call(s, job) })
 		}
 		if (dirty) {
 			await broadcast!()

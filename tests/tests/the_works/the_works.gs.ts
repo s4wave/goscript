@@ -408,7 +408,7 @@ export async function main(): globalThis.Promise<void> {
 		const __goscriptDeferArg0 = (p).clone()
 		const __goscriptDeferArg1 = answers
 		const __goscriptDeferArg2 = faults
-		queueMicrotask(async () => { await run(__goscriptDeferArg0, __goscriptDeferArg1, __goscriptDeferArg2) })
+		$.go(async () => { await run(__goscriptDeferArg0, __goscriptDeferArg1, __goscriptDeferArg2) })
 	}
 
 	let reports = $.makeMap<string, Report | null>()

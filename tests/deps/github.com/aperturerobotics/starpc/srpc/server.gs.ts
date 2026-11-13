@@ -102,7 +102,7 @@ export class Server {
 			if (err != null) {
 				return err
 			}
-			queueMicrotask(async () => { await Server.prototype.HandleStream.call(s, ctx, (muxedStream as io.ReadWriteCloser | null)) })
+			$.go(async () => { await Server.prototype.HandleStream.call(s, ctx, (muxedStream as io.ReadWriteCloser | null)) })
 		}
 		throw new globalThis.Error("goscript: unreachable return")
 	}

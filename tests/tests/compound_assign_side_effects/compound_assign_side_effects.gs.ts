@@ -295,7 +295,7 @@ export async function main(): globalThis.Promise<void> {
 	// An index from an async interface method.
 	let ch = $.makeChannel<number>(3, 0, "both")
 	const __goscriptDeferArg0 = ch
-	queueMicrotask(async () => { await fill(__goscriptDeferArg0) })
+	$.go(async () => { await fill(__goscriptDeferArg0) })
 	let c: counter | null = $.interfaceValue<counter | null>(new chanCounter(false, ch), "*main.chanCounter", /* @__PURE__ */ $.pointerType("main.chanCounter"))
 	let vals = $.arrayToSlice<number>([0, 0, 0])
 	calls = 0

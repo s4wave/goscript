@@ -100,7 +100,7 @@ export async function transfer(network: string, address: string): globalThis.Pro
 
 	// Read one payload through the accepted connection.
 	let done = $.makeChannel<boolean>(1, false, "both")
-	queueMicrotask(async () => {
+	$.go(async () => {
 		await using __defer = new $.AsyncDisposableStack()
 		// Close the accepted connection after reading the client's payload.
 		let [conn, __goscriptShadow0] = await (listener !== null && (listener as any).__isVarRef !== true && ((listener as any).__goValue === undefined || (listener as any).__goType?.charCodeAt(0) !== 42) ? (listener as Exclude<net.Listener, null>) : $.pointerValue<Exclude<net.Listener, null>>(listener)).Accept()

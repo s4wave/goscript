@@ -484,7 +484,7 @@ export class Dialer {
 			let oldCancel: $.Channel<{}> | null = $.pointerValue<Dialer>(d).Cancel
 			if (oldCancel != null) {
 				let [subCtx, __goscriptShadow2] = context.WithCancel($.pointerValueOrNil(ctx)!)
-				queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
+				$.go(async () => { await (async (): globalThis.Promise<void> => {
 					const [__goscriptSelect0HasReturn, __goscriptSelect0Value] = await $.selectStatement<any, void>([
 						{
 							id: 0,
@@ -798,7 +798,7 @@ export class sysDialer {
 		// Start the main racer.
 		let [primaryCtx, primaryCancel] = context.WithCancel($.pointerValueOrNil(ctx)!)
 		__defer.defer(async () => { await primaryCancel!() })
-		queueMicrotask(async () => { await startRacer!(primaryCtx, true) })
+		$.go(async () => { await startRacer!(primaryCtx, true) })
 
 		// Start the timer for the fallback racer.
 		let fallbackTimer: time.Timer | $.VarRef<time.Timer> | null = time.NewTimer($.pointerValue<sysDialer>(sd).Dialer.fallbackDelay())
@@ -813,7 +813,7 @@ export class sysDialer {
 					onSelected: async (__goscriptSelect2Result) => {
 						let [fallbackCtx, fallbackCancel] = context.WithCancel($.pointerValueOrNil(ctx)!)
 						__defer.defer(async () => { await fallbackCancel!() })
-						queueMicrotask(async () => { await startRacer!(fallbackCtx, false) })
+						$.go(async () => { await startRacer!(fallbackCtx, false) })
 					}
 				},
 				{

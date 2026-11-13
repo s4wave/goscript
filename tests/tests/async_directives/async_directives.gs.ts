@@ -230,7 +230,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("fill:", fill($.interfaceValue<Sink | null>(sink, "*main.addSink", /* @__PURE__ */ $.pointerType("main.addSink")), 4))
 
 	let ch = $.makeChannel<number>(0, 0, "both")
-	queueMicrotask(async () => {
+	$.go(async () => {
 		let n: number = await $.chanRecv(ch)
 		await $.chanSend(ch, n * 10)
 	})

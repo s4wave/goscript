@@ -334,8 +334,14 @@ above are shortened.
 
 ### Goroutines
 
-A `go` statement queues the call as a microtask and does not wait for it. A
-function literal called without arguments is the task itself:
+A `go` statement starts the call through `$.go`, which queues it as a microtask
+and does not wait for it. A function literal called without arguments is the
+task itself. A panic or rejection that escapes the goroutine after its deferred
+calls had their chance to recover ends the program, as in Go: the runtime
+prints `panic: <text>` with the goroutine and its stack, starts no further
+goroutine, and hands the failure to the handler set with `$.setFatalHandler`.
+By default Node and Bun exit with status 2, and a browser raises an uncaught
+error.
 
 ```go
 go func() {
@@ -344,7 +350,7 @@ go func() {
 ```
 
 ```ts
-queueMicrotask(async () => {
+$.go(async () => {
 	await $.chanSend(ch, 1)
 })
 ```

@@ -4106,7 +4106,7 @@ func TestCompilePackagesEmitsAsyncChannelsSelectAndDefer(t *testing.T) {
 		"await $.chanSend((w$ as Worker).ch, v)",
 		"return await $.chanRecv((w$ as Worker).ch)",
 		"await using __defer = new $.AsyncDisposableStack()",
-		"queueMicrotask(async () => {",
+		"$.go(async () => {",
 		"$.selectStatement<any, void>([",
 		"let v = __goscriptSelect1Result.value",
 		"return $.selectVoidReturn()",

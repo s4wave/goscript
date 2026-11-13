@@ -13,7 +13,7 @@ export async function main(): globalThis.Promise<void> {
 
 	for (let w = 0; w < 16; w++) {
 		const __goscriptDeferArg0 = w
-		queueMicrotask(async () => { await (async (id: number) => {
+		$.go(async () => { await (async (id: number) => {
 			// Await-free CPU span: a tight loop with no I/O or channel op, the
 			// starvation shape from issue_118 scaled across 16 goroutines.
 			let sum = 0

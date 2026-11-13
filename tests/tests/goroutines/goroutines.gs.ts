@@ -63,14 +63,14 @@ export async function main(): globalThis.Promise<void> {
 	// Start 3 worker goroutines
 	for (let i = 0; i < 3; i++) {
 		const __goscriptDeferArg0 = i
-		queueMicrotask(async () => { await worker(__goscriptDeferArg0) })
+		$.go(async () => { await worker(__goscriptDeferArg0) })
 	}
 
 	// Start another worker goroutine
-	queueMicrotask(async () => { await anotherWorker("test") })
+	$.go(async () => { await anotherWorker("test") })
 
 	// Start an anonymous function worker
-	queueMicrotask(async () => {
+	$.go(async () => {
 		await $.chanSend(messages, new Message(true, 50, "Anonymous function worker"))
 	})
 

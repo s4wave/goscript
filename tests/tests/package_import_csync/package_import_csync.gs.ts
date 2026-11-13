@@ -46,12 +46,12 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeCount0 = numWorkers, i = 0; i < __goscriptRangeCount0; i++) {
 		const __goscriptDeferCallee2 = worker
 		const __goscriptDeferArg0 = i
-		queueMicrotask(async () => { await __goscriptDeferCallee2(__goscriptDeferArg0) })
+		$.go(async () => { await __goscriptDeferCallee2(__goscriptDeferArg0) })
 	}
 
 	// Wait for all workers to complete or context timeout
 	let done = $.makeChannel<{}>(0, {}, "both")
-	queueMicrotask(async () => {
+	$.go(async () => {
 		await wg.value.Wait()
 		done.close()
 	})

@@ -754,7 +754,7 @@ export class Resolver {
 		} else {
 			queryFn = $.functionValue(async (fqdn: string, qtype: dnsmessage.Type): globalThis.Promise<void> => {
 				dnsWaitGroup.value.Add(1)
-				queueMicrotask(async () => { await (async (qtype: dnsmessage.Type): globalThis.Promise<void> => {
+				$.go(async () => { await (async (qtype: dnsmessage.Type): globalThis.Promise<void> => {
 					let [p, server, __goscriptShadow10] = await Resolver.prototype.tryOneName.call(r, ctx, conf, fqdn, $.uint(qtype, 16))
 					await $.chanSend(lane, $.markAsStructValue(new result({p: $.markAsStructValue($.cloneStructValue(p)), server: server, error: __goscriptShadow10})))
 					dnsWaitGroup.value.Done()
@@ -1409,10 +1409,10 @@ export class Resolver {
 				onSelected: async (__goscriptSelect0Result) => {
 					if (await singleflight.Group.prototype.ForgetUnshared.call(Resolver.prototype.getLookupGroup.call(r), lookupKey)) {
 						await lookupGroupCancel!()
-						queueMicrotask(async () => { await dnsWaitGroupDone!(ch, $.functionValue((): void => {
+						$.go(async () => { await dnsWaitGroupDone!(ch, $.functionValue((): void => {
 						}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))) })
 					} else {
-						queueMicrotask(async () => { await dnsWaitGroupDone!(ch, lookupGroupCancel) })
+						$.go(async () => { await dnsWaitGroupDone!(ch, lookupGroupCancel) })
 					}
 					let err: __goscript_net.DNSError | $.VarRef<__goscript_net.DNSError> | null = await __goscript_net.newDNSError(__goscript_net.mapErr(await $.pointerValue<Exclude<context.Context, null>>(ctx).Err()), host, "")
 					if ((trace != null) && ($.pointerValue<nettrace.Trace>(trace).DNSDone != null)) {

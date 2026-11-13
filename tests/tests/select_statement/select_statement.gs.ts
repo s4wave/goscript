@@ -336,11 +336,11 @@ export async function main(): globalThis.Promise<void> {
 		let first = $.makeChannel<number>(1, 0, "both")
 		let second = $.makeChannel<number>(1, 0, "both")
 		let sent = $.makeChannel<{}>(2, {}, "both")
-		queueMicrotask(async () => {
+		$.go(async () => {
 			await $.chanSend(first, 7)
 			await $.chanSend(sent, {})
 		})
-		queueMicrotask(async () => {
+		$.go(async () => {
 			await $.chanSend(second, 9)
 			await $.chanSend(sent, {})
 		})

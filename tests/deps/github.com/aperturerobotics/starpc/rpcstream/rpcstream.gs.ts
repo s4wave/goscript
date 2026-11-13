@@ -112,7 +112,7 @@ export function NewRpcStreamOpenStream(__typeArgs: $.GenericTypeArgs | undefined
 		}
 
 		// start the read pump
-		queueMicrotask(async () => { await __goscript_read_writer.ReadPump(rw, msgHandler, closeHandler) })
+		$.go(async () => { await __goscript_read_writer.ReadPump(rw, msgHandler, closeHandler) })
 		// return the writer
 		return [$.interfaceValue<srpc.PacketWriter | null>(__goscript_writer.NewRpcStreamWriter(rw), "*rpcstream.RpcStreamWriter", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamWriter" }), null]
 	}, ({ kind: $.TypeKind.Function, params: ["context.Context", ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }], results: ["error"] } as $.FunctionTypeInfo), ({ kind: $.TypeKind.Function, params: ["error"], results: [] } as $.FunctionTypeInfo)], results: ["srpc.PacketWriter", "error"] } as $.FunctionTypeInfo))
@@ -173,7 +173,7 @@ export async function HandleRpcStream(stream: RpcStream | null, getter: ((ctx: c
 
 	// handle the rpc
 	let serverRPC: srpc.ServerRPC | $.VarRef<srpc.ServerRPC> | null = srpc.NewServerRPC(ctx, mux, $.interfaceValue<srpc.PacketWriter | null>(__goscript_writer.NewRpcStreamWriter(stream), "*rpcstream.RpcStreamWriter", { kind: $.TypeKind.Pointer, elemType: "rpcstream.RpcStreamWriter" }))
-	queueMicrotask(async () => { await __goscript_read_writer.ReadPump(stream, $.functionValue(((__receiver) => (data: $.Slice<number>) => __receiver.HandlePacketData(data))($.pointerValue<srpc.ServerRPC>(serverRPC)), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }], results: ["error"] } as $.FunctionTypeInfo)), $.functionValue(((__receiver) => (closeErr: $.GoError) => __receiver.HandleStreamClose(closeErr))($.pointerValue<srpc.ServerRPC>(serverRPC).commonRPC), ({ kind: $.TypeKind.Function, params: ["error"], results: [] } as $.FunctionTypeInfo))) })
+	$.go(async () => { await __goscript_read_writer.ReadPump(stream, $.functionValue(((__receiver) => (data: $.Slice<number>) => __receiver.HandlePacketData(data))($.pointerValue<srpc.ServerRPC>(serverRPC)), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Slice, elemType: { kind: $.TypeKind.Basic, name: "uint8" } }], results: ["error"] } as $.FunctionTypeInfo)), $.functionValue(((__receiver) => (closeErr: $.GoError) => __receiver.HandleStreamClose(closeErr))($.pointerValue<srpc.ServerRPC>(serverRPC).commonRPC), ({ kind: $.TypeKind.Function, params: ["error"], results: [] } as $.FunctionTypeInfo))) })
 	err = await $.pointerValue<srpc.ServerRPC>(serverRPC).commonRPC.Wait(ctx)
 	if (($.comparableEqual(err, context.Canceled)) && (await $.pointerValue<Exclude<context.Context, null>>(ctx).Err() == null)) {
 		return null

@@ -115,7 +115,7 @@ export class ServerRPC {
 
 		// invoke the rpc
 		await locked.value.Broadcast()
-		queueMicrotask(async () => { await ServerRPC.prototype.invokeRPC.call(r, service, method) })
+		$.go(async () => { await ServerRPC.prototype.invokeRPC.call(r, service, method) })
 		locked.value.Unlock()
 
 		return err

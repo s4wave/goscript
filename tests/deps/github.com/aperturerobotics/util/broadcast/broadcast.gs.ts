@@ -78,7 +78,7 @@ export class Broadcast {
 			await holdBroadcastLock!(false)
 			return
 		}
-		queueMicrotask(async () => { await holdBroadcastLock!(true) })
+		$.go(async () => { await holdBroadcastLock!(true) })
 	}
 
 	public async Lock(): globalThis.Promise<__goscript_locked.Locked> {

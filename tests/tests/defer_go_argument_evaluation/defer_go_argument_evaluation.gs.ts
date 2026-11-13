@@ -128,7 +128,7 @@ export async function main(): globalThis.Promise<void> {
 	wg.value.Add(1)
 	let r = new R(true, 1, 2)
 	const __goscriptDeferArg5 = (r).clone()
-	queueMicrotask(async () => { await (async (r: R) => {
+	$.go(async () => { await (async (r: R) => {
 		await show("go", (r).clone())
 		wg.value.Done()
 	})(__goscriptDeferArg5) })

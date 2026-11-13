@@ -32,7 +32,7 @@ export class Worker {
 
 	public async Spawn(): globalThis.Promise<$.GoError> {
 		const w: Worker | $.VarRef<Worker> | null = this;
-		queueMicrotask(async () => {
+		$.go(async () => {
 			await $.chanRecv($.pointerValue<Worker>(w).ch)
 		})
 		return null
