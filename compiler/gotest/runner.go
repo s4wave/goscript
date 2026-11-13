@@ -1484,6 +1484,7 @@ func renderTypeScriptProject(req *normalizedRequest, runnerFile string, projectF
 	b.WriteString("    \"moduleResolution\": \"Bundler\",\n")
 	b.WriteString("    \"lib\": [\"ESNext\", \"DOM\"],\n")
 	b.WriteString("    \"strict\": true,\n")
+	b.WriteString("    \"skipLibCheck\": true,\n")
 	b.WriteString("    \"allowImportingTsExtensions\": true,\n")
 	if req.IncrementalTypeCheck {
 		b.WriteString("    \"incremental\": true,\n")
@@ -1533,6 +1534,7 @@ func renderRuntimeTypeScriptProject(req *normalizedRequest, nodeTypesAvailable b
 	b.WriteString("    \"moduleResolution\": \"Bundler\",\n")
 	b.WriteString("    \"lib\": [\"ESNext\", \"DOM\"],\n")
 	b.WriteString("    \"strict\": true,\n")
+	b.WriteString("    \"skipLibCheck\": true,\n")
 	b.WriteString("    \"allowImportingTsExtensions\": true,\n")
 	if req.IncrementalTypeCheck {
 		b.WriteString("    \"incremental\": true,\n")
