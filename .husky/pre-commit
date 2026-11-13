@@ -1,0 +1,15 @@
+#!/bin/sh
+# pre-commit: keep gs-embed.go naming exactly the compiler inputs under gs/.
+# A file added, removed or renamed under gs/ changes that list, and a stale
+# list ships a compiler that cannot find the file. TestGsEmbedCurrent compares
+# the two; go test -run TestGsEmbedCurrent -update rewrites gs-embed.go.
+
+if [ -z "$(git diff --cached --name-only --diff-filter=ADR -- gs)" ]; then
+	exit 0
+fi
+
+if ! go test -count=1 -run '^TestGsEmbedCurrent$' . >/dev/null; then
+	printf 'pre-commit: gs-embed.go is stale for the files staged under gs/.\n' >&2
+	printf 'Run: go test -run TestGsEmbedCurrent -update . && git add gs-embed.go\n' >&2
+	exit 1
+fi
