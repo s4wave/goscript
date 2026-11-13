@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 import * as $ from '@goscript/builtin/index.js'
 
 import {
@@ -9,9 +9,33 @@ import {
   SignatureSize,
   Sign,
   Verify,
+  VerifyWithOptions,
 } from './index.js'
 
 describe('crypto/ed25519 override', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  test('returns WebCrypto rejections as errors naming the call', async () => {
+    const [pub, priv, genErr] = await GenerateKey(null)
+    expect(genErr).toBeNull()
+    const message = $.stringToBytes('goscript')
+    const sig = await Sign(priv, message)
+
+    vi.spyOn(globalThis.crypto.subtle, 'importKey').mockRejectedValue(
+      new DOMException('rejected', 'DataError'),
+    )
+    const [, , err] = await GenerateKey(null)
+    expect(err?.Error()).toBe(
+      'crypto/ed25519: WebCrypto importKey pkcs8 (48 bytes): DataError: rejected',
+    )
+    expect((await VerifyWithOptions(pub, message, sig, null))?.Error()).toBe(
+      'ed25519: invalid signature: crypto/ed25519: WebCrypto importKey raw (32 bytes): DataError: rejected',
+    )
+    expect(await Verify(pub, message, sig)).toBe(false)
+  })
+
   test('generates keys and verifies signatures', async () => {
     const [pub, priv, err] = await GenerateKey(null)
     expect(err).toBeNull()

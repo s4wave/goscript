@@ -87,13 +87,16 @@ export async function PrivateKey_Sign(
     return [null, new Ed25519Error('ed25519: expected opts.HashFunc() zero')]
   }
   // An interface box may expose HashFunc without exposing the concrete fields.
-  const boxed = options as (SignerOpts & {
-    __goType?: string
-    __goValue?: Options | $.VarRef<Options>
-  }) | null
-  const concrete = boxed?.__goType === '*ed25519.Options' ?
-    $.pointerValueOrNil(boxed.__goValue)
-  : options
+  const boxed = options as
+    | (SignerOpts & {
+        __goType?: string
+        __goValue?: Options | $.VarRef<Options>
+      })
+    | null
+  const concrete =
+    boxed?.__goType === '*ed25519.Options' ?
+      $.pointerValueOrNil(boxed.__goValue)
+    : options
   if (concrete instanceof Options && concrete.Context !== '') {
     // The WebCrypto backend only implements pure Ed25519. Silently signing
     // without Context would remove the caller's requested domain separation.
@@ -123,7 +126,18 @@ export async function GenerateKey(
     }
   }
 
-  const privateKey = await NewKeyFromSeed(seed)
+  let privateKey: PrivateKey
+  try {
+    privateKey = await NewKeyFromSeed(seed)
+  } catch (err) {
+    // Go's GenerateKey reports failure through its error result. A WebCrypto
+    // rejection thrown from here would escape the caller's error handling.
+    return [
+      null as PublicKey,
+      null as PrivateKey,
+      new Ed25519Error(errorText(err)),
+    ]
+  }
   return [
     $.mustTypeAssert<PublicKey>(
       PrivateKey_Public(privateKey),
@@ -141,14 +155,19 @@ export async function NewKeyFromSeed(seed: $.Bytes): Promise<PrivateKey> {
   }
 
   const subtle = requireSubtle()
-  const key = await subtle.importKey(
-    'pkcs8',
-    pkcs8FromSeed(seedBytes) as BufferSource,
-    { name: 'Ed25519' },
-    true,
-    ['sign'],
+  const pkcs8 = pkcs8FromSeed(seedBytes)
+  const key = await named('importKey pkcs8', pkcs8.length, () =>
+    subtle.importKey(
+      'pkcs8',
+      pkcs8 as BufferSource,
+      { name: 'Ed25519' },
+      true,
+      ['sign'],
+    ),
   )
-  const jwk = await subtle.exportKey('jwk', key)
+  const jwk = await named('exportKey jwk', 0, () =>
+    subtle.exportKey('jwk', key),
+  )
   if (typeof jwk.x !== 'string') {
     throw new Error('crypto/ed25519: imported key did not expose public key')
   }
@@ -169,17 +188,20 @@ export async function Sign(
     throw new Error(`ed25519: bad private key length: ${priv.length}`)
   }
 
-  const key = await requireSubtle().importKey(
-    'pkcs8',
-    pkcs8FromSeed(priv.subarray(0, SeedSize)) as BufferSource,
-    { name: 'Ed25519' },
-    false,
-    ['sign'],
+  const subtle = requireSubtle()
+  const pkcs8 = pkcs8FromSeed(priv.subarray(0, SeedSize))
+  const key = await named('importKey pkcs8', pkcs8.length, () =>
+    subtle.importKey(
+      'pkcs8',
+      pkcs8 as BufferSource,
+      { name: 'Ed25519' },
+      false,
+      ['sign'],
+    ),
   )
-  const sig = await requireSubtle().sign(
-    'Ed25519',
-    key,
-    $.bytesToUint8Array(message) as BufferSource,
+  const msg = $.bytesToUint8Array(message)
+  const sig = await named('sign', msg.length, () =>
+    subtle.sign('Ed25519', key, msg as BufferSource),
   )
   return new Uint8Array(sig)
 }
@@ -212,19 +234,29 @@ export async function VerifyWithOptions(
     return new Ed25519Error('ed25519: only pure Ed25519 is supported')
   }
 
-  const key = await requireSubtle().importKey(
-    'raw',
-    $.bytesToUint8Array(publicKey) as BufferSource,
-    { name: 'Ed25519' },
-    false,
-    ['verify'],
-  )
-  const ok = await requireSubtle().verify(
-    'Ed25519',
-    key,
-    $.bytesToUint8Array(sig) as BufferSource,
-    $.bytesToUint8Array(message) as BufferSource,
-  )
+  // Go reports an unusable public key as an invalid signature, so a WebCrypto
+  // rejection here is a verification failure rather than a panic.
+  const subtle = requireSubtle()
+  const pub = $.bytesToUint8Array(publicKey)
+  const msg = $.bytesToUint8Array(message)
+  let ok: boolean
+  try {
+    const key = await named('importKey raw', pub.length, () =>
+      subtle.importKey('raw', pub as BufferSource, { name: 'Ed25519' }, false, [
+        'verify',
+      ]),
+    )
+    ok = await named('verify', msg.length, () =>
+      subtle.verify(
+        'Ed25519',
+        key,
+        $.bytesToUint8Array(sig) as BufferSource,
+        msg as BufferSource,
+      ),
+    )
+  } catch (err) {
+    return new Ed25519Error(`ed25519: invalid signature: ${errorText(err)}`)
+  }
   return ok ? null : new Ed25519Error('ed25519: invalid signature')
 }
 
@@ -234,6 +266,30 @@ class Ed25519Error {
   Error(): string {
     return this.message
   }
+}
+
+// named runs one WebCrypto call and, on rejection, throws an error naming the
+// call and its input length. The message never carries key or input bytes.
+async function named<T>(
+  call: string,
+  inputLen: number,
+  run: () => Promise<T>,
+): Promise<T> {
+  try {
+    return await run()
+  } catch (err) {
+    throw new Error(
+      `crypto/ed25519: WebCrypto ${call} (${inputLen} bytes): ${errorText(err)}`,
+      { cause: err },
+    )
+  }
+}
+
+function errorText(err: unknown): string {
+  if (err instanceof Error) {
+    return err.name === 'Error' ? err.message : `${err.name}: ${err.message}`
+  }
+  return String(err)
 }
 
 function requireSubtle(): SubtleCrypto {
