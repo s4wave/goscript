@@ -4307,10 +4307,18 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 
 		// An unexported method of another compiled package is promoted too,
 		// so that the outer type implements interfaces with unexported
-		// methods. An override package has only its exported methods.
+		// methods. An override package has only its exported methods. A
+		// member of the outer type's package with the same name wins, from
+		// whichever field it is promoted, because that is the one the
+		// package's own code names.
 		external := !ast.IsExported(method.Name()) && method.Pkg() != nil && method.Pkg().Path() != ctx.semPkg.pkgPath
-		if external && o.facts.HasPackage(method.Pkg().Path()) {
-			continue
+		if external {
+			if o.facts.HasPackage(method.Pkg().Path()) {
+				continue
+			}
+			if own, _, _ := types.LookupFieldOrMethod(outer, true, ctx.semPkg.source.Types, method.Name()); own != nil {
+				continue
+			}
 		}
 		signature, _ := method.Type().(*types.Signature)
 		if signature == nil {

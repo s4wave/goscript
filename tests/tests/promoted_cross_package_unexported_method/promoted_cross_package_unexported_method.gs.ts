@@ -4,6 +4,16 @@
 import * as $ from "@goscript/builtin/index.js"
 import * as dep from "@goscript/github.com/s4wave/goscript/tests/tests/promoted_cross_package_unexported_method/dep/index.js"
 
+export type blocker = {
+	block(): string
+}
+
+$.registerInterfaceType(
+	"main.blocker",
+	null,
+	[{ name: "block", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
+);
+
 export class cell {
 	public declare Base: dep.Base
 
@@ -84,6 +94,74 @@ export class wrapped {
 	)
 }
 
+export class local {
+	constructor(__goscriptValue?: boolean) {
+		;(this as any).__goStructValue = __goscriptValue === true
+	}
+
+	public clone(): local {
+		return new local(true)
+	}
+
+	public __goscriptAssign(source: local): this {
+		return this
+	}
+
+	public block(): string {
+		return "local block"
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.local",
+		() => new local(),
+		() => [{ name: "block", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		local,
+		() => []
+	)
+}
+
+export class both {
+	public declare Base: dep.Base
+
+	public declare local: local
+
+	constructor(__goscriptValue?: boolean, Base$?: dep.Base, local$?: local) {
+		this.Base = Base$ ?? new dep.Base(true)
+		this.local = local$ ?? new local(true)
+		;(this as any).__goStructValue = __goscriptValue === true
+	}
+
+	public clone(): both {
+		return new both(true, this.Base.clone(), this.local.clone())
+	}
+
+	public __goscriptAssign(source: both): this {
+		this.Base.__goscriptAssign(source.Base)
+		this.local.__goscriptAssign(source.local)
+		return this
+	}
+
+	public Name(): any {
+		return $.pointerValue<dep.Base>(this.Base).Name()
+	}
+
+	public SetName(name: any): any {
+		return $.pointerValue<dep.Base>(this.Base).SetName(name)
+	}
+
+	public block(): any {
+		return $.pointerValue<local>(this.local).block()
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.both",
+		() => new both(),
+		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "SetName", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }, { name: "block", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		both,
+		() => [{ name: "Base", key: "Base", type: "dep.Base", anonymous: true }, { name: "local", key: "local", type: "main.local", anonymous: true }]
+	)
+}
+
 export async function main(): globalThis.Promise<void> {
 	let c = new cell(false, undefined, 1)
 	$.pointerValue<cell>(c).Base.SetName("cell")
@@ -97,6 +175,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println((__goscriptAwait = (b !== null && (b as any).__isVarRef !== true && ((b as any).__goValue === undefined || (b as any).__goType?.charCodeAt(0) !== 42) ? (b as Exclude<dep.Block, null>) : $.pointerValue<Exclude<dep.Block, null>>(b)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	await $.println(await dep.Describe($.basicInterfaceValue($.pointerValue<cell>(c).align, "int")))
+
+	let bb = new both()
+	await $.println($.pointerValue<both>(bb).local.block())
+	let bl: blocker | null = $.interfaceValue<blocker | null>(bb, "*main.both", /* @__PURE__ */ $.pointerType("main.both"))
+	await $.println((__goscriptAwait = (bl !== null && (bl as any).__isVarRef !== true && ((bl as any).__goValue === undefined || (bl as any).__goType?.charCodeAt(0) !== 42) ? (bl as Exclude<blocker, null>) : $.pointerValue<Exclude<blocker, null>>(bl)).block(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 var __goscriptAwait: any
