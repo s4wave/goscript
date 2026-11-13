@@ -17,6 +17,7 @@ import "embed"
 //go:embed gs/builtin/deferred-package.ts
 //go:embed gs/builtin/errors.ts
 //go:embed gs/builtin/float.ts
+//go:embed gs/builtin/goroutine.ts
 //go:embed gs/builtin/hostio.ts
 //go:embed gs/builtin/index.ts
 //go:embed gs/builtin/map.ts
