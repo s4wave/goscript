@@ -6,7 +6,7 @@ import * as $ from "@goscript/builtin/index.js"
 export async function main(): globalThis.Promise<void> {
 	let messages = $.makeChannel<string>(0, "", "both")
 
-	queueMicrotask(async () => {
+	$.go(async () => {
 		await $.chanSend(messages, "ping")
 	})
 

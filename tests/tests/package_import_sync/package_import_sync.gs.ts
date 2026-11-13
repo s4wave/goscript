@@ -323,7 +323,7 @@ export async function condZeroValue(): globalThis.Promise<void> {
 	let q = new queue()
 	let started = $.makeChannel<boolean>(0, false, "both")
 	let results = $.makeChannel<number>(0, 0, "both")
-	queueMicrotask(async () => {
+	$.go(async () => {
 		await $.chanSend(started, true)
 		for (let __rangeIndex = 0; __rangeIndex < 3; __rangeIndex++) {
 			await $.chanSend(results, await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? ((q as any) as queue).pop() : queue.prototype.pop.call(q)))

@@ -32,7 +32,7 @@ export class Thing {
 	public async callIt(x: number): Promise<void> {
 		const t = this
 		let done = $.makeChannel<(_p0: Thing | $.VarRef<Thing> | null, _p1: number) => void>(0, null, "both")
-		queueMicrotask(async () => { await (async (): Promise<void> => {
+		$.go(async () => { await (async (): Promise<void> => {
 	await $.chanSend(done, getFunc())
 	done.close()
 })() })

@@ -32,7 +32,7 @@ export class Thing {
 	public async callIt(x: number): Promise<void> {
 		const t = this
 		let done = $.makeChannel<Record<string, unknown>>(0, null, "both")
-		queueMicrotask(async () => { ((): void => {
+		$.go(async () => { ((): void => {
 	getFunc()(t, x)
 	done.close()
 })() })

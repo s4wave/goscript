@@ -305,7 +305,7 @@ export class Conn {
 		$.pointerValue<Conn>(c).closeReadCtx = ctx
 		$.pointerValue<Conn>(c).closeReadMu.Unlock()
 
-		queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
+		$.go(async () => { await (async (): globalThis.Promise<void> => {
 			await using __defer = new $.AsyncDisposableStack()
 			__defer.defer(async () => { await cancel!() })
 			__defer.defer(async () => { await Conn.prototype.CloseNow.call(c) })

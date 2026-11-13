@@ -1734,9 +1734,9 @@ export async function newSession(config: __goscript_mux.Config | $.VarRef<__gosc
 	if ($.pointerValue<__goscript_mux.Config>(config).EnableKeepAlive) {
 		await Session.prototype.startKeepalive.call(s)
 	}
-	queueMicrotask(async () => { await Session.prototype.recv.call(s) })
-	queueMicrotask(async () => { await Session.prototype.send.call(s) })
-	queueMicrotask(async () => { await Session.prototype.startMeasureRTT.call(s) })
+	$.go(async () => { await Session.prototype.recv.call(s) })
+	$.go(async () => { await Session.prototype.send.call(s) })
+	$.go(async () => { await Session.prototype.startMeasureRTT.call(s) })
 	return s
 }
 

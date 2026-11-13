@@ -67,8 +67,8 @@ export class ClientInvoker {
 
 		// Proxy data between the streams
 		let errCh: $.Channel<$.GoError> | null = $.makeChannel<$.GoError>(2, null! as $.GoError, "both")
-		queueMicrotask(async () => { await proxyStreamTo(strm, remoteStrm, errCh) })
-		queueMicrotask(async () => { await proxyStreamTo(remoteStrm, strm, errCh) })
+		$.go(async () => { await proxyStreamTo(strm, remoteStrm, errCh) })
+		$.go(async () => { await proxyStreamTo(remoteStrm, strm, errCh) })
 
 		// Wait for both directions to complete
 		let outErr: $.GoError = null! as $.GoError

@@ -167,7 +167,7 @@ export async function funcValueNames(): globalThis.Promise<void> {
 
 export async function lockOSThread(): globalThis.Promise<void> {
 	let done = $.makeChannel<boolean>(0, false, "both")
-	queueMicrotask(async () => {
+	$.go(async () => {
 		await using __defer = new $.AsyncDisposableStack()
 		runtime.LockOSThread()
 		__defer.defer(() => { runtime.UnlockOSThread() })

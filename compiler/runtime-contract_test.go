@@ -11,6 +11,7 @@ func TestRuntimeContractOwnsBuiltinImportAndHelpers(t *testing.T) {
 	}
 
 	wantHelpers := map[RuntimeHelper]RuntimeHelperCategory{
+		RuntimeHelperGo:                             RuntimeHelperCategoryBuiltin,
 		RuntimeHelperPrintln:                        RuntimeHelperCategoryBuiltin,
 		RuntimeHelperPrint:                          RuntimeHelperCategoryBuiltin,
 		RuntimeHelperInt:                            RuntimeHelperCategoryBuiltin,

@@ -6161,16 +6161,18 @@ func (o *LoweringOwner) lowerSendStmt(ctx lowerFileContext, stmt *ast.SendStmt) 
 	return "await " + o.runtimeOwner.QualifiedHelper(RuntimeHelperChanSend) + "(" + channel + ", " + value + ")", diagnostics
 }
 
-// lowerGoStmt lowers a go statement to a microtask. A function literal
-// called without arguments is the task itself; any other call is wrapped in
-// a task that makes the call.
+// lowerGoStmt lowers a go statement to a task the runtime's go helper starts
+// as a goroutine, which ends the program if a panic escapes the task. A
+// function literal called without arguments is the task itself; any other
+// call is wrapped in a task that makes the call.
 func (o *LoweringOwner) lowerGoStmt(ctx lowerFileContext, stmt *ast.GoStmt) (string, []Diagnostic) {
 	// The task runs outside the deferring function.
 	goCtx := ctx
 	goCtx.deferState = nil
+	start := o.runtimeOwner.QualifiedHelper(RuntimeHelperGo)
 	if lit, ok := ast.Unparen(stmt.Call.Fun).(*ast.FuncLit); ok && len(stmt.Call.Args) == 0 {
 		task, _, diagnostics := o.lowerFuncLitCallCallee(goCtx, lit)
-		return "queueMicrotask(" + task + ")", diagnostics
+		return start + "(" + task + ")", diagnostics
 	}
 
 	// Any other call is made by a task, async only when the call awaits.
@@ -6179,7 +6181,7 @@ func (o *LoweringOwner) lowerGoStmt(ctx lowerFileContext, stmt *ast.GoStmt) (str
 	if strings.Contains(call, "await ") {
 		prefix = "async "
 	}
-	return prelude + "queueMicrotask(" + prefix + "() => { " + call + " })", diagnostics
+	return prelude + start + "(" + prefix + "() => { " + call + " })", diagnostics
 }
 
 // lowerStatementCall lowers the call of a defer or go statement, which

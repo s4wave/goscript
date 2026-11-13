@@ -14,7 +14,7 @@ export async function run(ctx: context.Context | null): globalThis.Promise<void>
 
 	let myCh = $.makeChannel<{}>(0, {}, "both")
 
-	queueMicrotask(async () => {
+	$.go(async () => {
 		await $.chanRecv(((__goscriptAwait = (sctx !== null && (sctx as any).__isVarRef !== true && ((sctx as any).__goValue === undefined || (sctx as any).__goType?.charCodeAt(0) !== 42) ? (sctx as Exclude<context.Context, null>) : $.pointerValue<Exclude<context.Context, null>>(sctx)).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Channel<{}> | null))
 		await $.chanSend(myCh, {})
 	})

@@ -174,7 +174,7 @@ export class Group {
 		$.mapSet($.pointerValue<Group>(g).m, key, c)
 		$.pointerValue<Group>(g).mu.Unlock()
 
-		queueMicrotask(async () => { await Group.prototype.doCall.call(g, c, key, fn) })
+		$.go(async () => { await Group.prototype.doCall.call(g, c, key, fn) })
 
 		return ch
 	}

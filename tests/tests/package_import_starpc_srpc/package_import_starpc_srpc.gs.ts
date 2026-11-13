@@ -468,7 +468,7 @@ export async function openHeldStreams(ctx: context.Context | null, client: srpc.
 	let resultCh = $.makeChannel<streamOpenResult>(count, new streamOpenResult(true), "both")
 	for (let __goscriptRangeCount0 = count, i = 0; i < __goscriptRangeCount0; i++) {
 		const __goscriptDeferArg0 = i
-		queueMicrotask(async () => { await (async (idx: number) => {
+		$.go(async () => { await (async (idx: number) => {
 			let [strm, err] = await (client !== null && (client as any).__isVarRef !== true && ((client as any).__goValue === undefined || (client as any).__goType?.charCodeAt(0) !== 42) ? (client as Exclude<srpc.Client, null>) : $.pointerValue<Exclude<srpc.Client, null>>(client)).NewStream(ctx, "svc", "hold", null)
 			if (err == null) {
 				err = (__goscriptAwait = (strm !== null && (strm as any).__isVarRef !== true && ((strm as any).__goValue === undefined || (strm as any).__goType?.charCodeAt(0) !== 42) ? (strm as Exclude<srpc.Stream, null>) : $.pointerValue<Exclude<srpc.Stream, null>>(strm)).MsgSend($.interfaceValue<srpc.Message | null>(srpc.NewRawMessage(new Uint8Array([$.uint(idx, 8)]) as $.Slice<number>, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage"))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
@@ -541,7 +541,7 @@ export async function probeConcurrentStreams(ctx: context.Context | null, client
 	let resultCh = $.makeChannel<streamProbeResult>(count, new streamProbeResult(true), "both")
 	for (let __goscriptRangeCount2 = count, i = 0; i < __goscriptRangeCount2; i++) {
 		const __goscriptDeferArg1 = i
-		queueMicrotask(async () => { await (async (idx: number) => {
+		$.go(async () => { await (async (idx: number) => {
 			let [total, err] = await probeStream(ctx, client, $.uint(idx + 1, 8), $.uint(idx + 2, 8))
 			if (err != null) {
 				await $.chanSend(resultCh, (await (async () => { const __goscriptLiteralField0 = (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); return new streamProbeResult(true, undefined, __goscriptLiteralField0) })()))
@@ -628,7 +628,7 @@ export async function newRoutedRpcStreamClient(ctx: context.Context | null, comp
 		let __goscriptTuple4: any = newMemoryRpcStreamPair()
 		let client: memoryRpcStream | $.VarRef<memoryRpcStream> | null = __goscriptTuple4[0]
 		let server: memoryRpcStream | $.VarRef<memoryRpcStream> | null = __goscriptTuple4[1]
-		queueMicrotask(async () => {
+		$.go(async () => {
 			let err = await rpcstream.HandleRpcStream($.interfaceValue<rpcstream.RpcStream | null>(server, "*main.memoryRpcStream", /* @__PURE__ */ $.pointerType("main.memoryRpcStream")), getter)
 			if (((err != null) && (!$.comparableEqual(err, context.Canceled))) && (!$.comparableEqual(err, io.EOF))) {
 				const [__goscriptSelect5HasReturn, __goscriptSelect5Value] = await $.selectStatement<any, void>([
@@ -649,7 +649,7 @@ export async function newRoutedRpcStreamClient(ctx: context.Context | null, comp
 				}
 			}
 		})
-		queueMicrotask(async () => {
+		$.go(async () => {
 			const [__goscriptSelect6HasReturn, __goscriptSelect6Value] = await $.selectStatement<any, void>([
 				{
 					id: 0,
@@ -745,7 +745,7 @@ export async function exerciseRpcStreamHandle(): globalThis.Promise<boolean> {
 
 	let invoked = $.makeChannel<boolean>(1, false, "both")
 	let done = $.makeChannel<$.GoError>(1, null! as $.GoError, "both")
-	queueMicrotask(async () => {
+	$.go(async () => {
 		await $.chanSend(done, await rpcstream.HandleRpcStream($.interfaceValue<rpcstream.RpcStream | null>(server, "*main.memoryRpcStream", /* @__PURE__ */ $.pointerType("main.memoryRpcStream")), $.functionValue(async (ctx: context.Context | null, componentID: string, released: (() => void) | null): globalThis.Promise<[srpc.Invoker | null, (() => void) | null, $.GoError]> => {
 			if (!$.stringEqual(componentID, "component-a")) {
 				await $.chanSend(invoked, false)

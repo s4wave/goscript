@@ -37,11 +37,15 @@ interface HostGlobal {
   require?: (name: string) => unknown
 }
 
+// TestControl ends the goroutine that calls FailNow or SkipNow. Go implements
+// both with runtime.Goexit, so it carries Goexit's name: recover does not stop
+// it, and a goroutine it ends does not end the program.
 class TestControl extends Error {
   public readonly kind: 'fatal' | 'skip'
 
   constructor(kind: 'fatal' | 'skip', message: string) {
     super(message)
+    this.name = 'GoexitError'
     this.kind = kind
   }
 }

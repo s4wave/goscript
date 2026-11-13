@@ -497,6 +497,6 @@ export async function NewRwcConn(ctx: context.Context | null, rwc: io.ReadWriteC
 	}
 
 	let c: RwcConn | $.VarRef<RwcConn> | null = (() => { const __goscriptLiteralField0 = newBufPool(bufferPacketN, 2048); return new RwcConn({ctx: ctx, ctxCancel: ctxCancel, rwc: rwc, laddr: laddr, raddr: raddr, pool: __goscriptLiteralField0, packetCh: $.makeChannel<$.Slice<number>>(bufferPacketN, null! as $.Slice<number>, "both")}) })()
-	queueMicrotask(async () => { await RwcConn.prototype.rxPump.call(c) })
+	$.go(async () => { await RwcConn.prototype.rxPump.call(c) })
 	return c
 }

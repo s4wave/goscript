@@ -6,7 +6,7 @@ import * as $ from "@goscript/builtin/index.js"
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
 	let messages = $.makeChannel<string>(0, "", "both")
-	queueMicrotask(async () => {
+	$.go(async () => {
 		await $.chanSend(messages, "go")
 	})
 	await $.println(await $.chanRecv(messages))

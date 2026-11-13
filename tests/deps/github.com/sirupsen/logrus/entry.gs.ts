@@ -492,7 +492,7 @@ export class Entry {
 			}
 		}
 
-		queueMicrotask(async () => { await Entry.prototype.writerScanner.call(entry, reader, printFunc) })
+		$.go(async () => { await Entry.prototype.writerScanner.call(entry, reader, printFunc) })
 
 		runtime.SetFinalizer($.interfaceValue(writer, "*io.PipeWriter", { kind: $.TypeKind.Pointer, elemType: "io.PipeWriter" }), $.interfaceValue(__goscript_writer.writerFinalizer, "func(writer *io.PipeWriter)", ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Pointer, elemType: "io.PipeWriter" }], results: [] } as $.FunctionTypeInfo)))
 
