@@ -4298,11 +4298,18 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 	}
 	var methods []loweredFunction
 	for selection := range methodSet.Methods() {
+		// Runtime member names are not package qualified, so the first
+		// method of a name wins: explicitMethods records every forwarder.
 		method, _ := selection.Obj().(*types.Func)
 		if method == nil || explicitMethods[method.Name()] {
 			continue
 		}
-		if !ast.IsExported(method.Name()) && method.Pkg() != nil && method.Pkg().Path() != ctx.semPkg.pkgPath {
+
+		// An unexported method of another compiled package is promoted too,
+		// so that the outer type implements interfaces with unexported
+		// methods. An override package has only its exported methods.
+		external := !ast.IsExported(method.Name()) && method.Pkg() != nil && method.Pkg().Path() != ctx.semPkg.pkgPath
+		if external && o.facts.HasPackage(method.Pkg().Path()) {
 			continue
 		}
 		signature, _ := method.Type().(*types.Signature)
