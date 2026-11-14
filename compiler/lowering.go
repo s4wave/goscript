@@ -66,32 +66,63 @@ func NewLoweringOwner(runtimeOwner *RuntimeContractOwner) *LoweringOwner {
 	return &LoweringOwner{runtimeOwner: runtimeOwner}
 }
 
-// Build converts the semantic model into the compiler IR.
+// Build converts the semantic model into the compiler IR, collecting every
+// lowered package in package path order. It releases each package's sources
+// as [LoweringOwner.Lower] does, so a model lowers once.
 func (o *LoweringOwner) Build(ctx context.Context, model *SemanticModel, opts ...LoweringOptions) (*LoweredProgram, []Diagnostic) {
+	// Collect each package the workers lower.
+	var options LoweringOptions
+	if len(opts) != 0 {
+		options = opts[0]
+	}
+	var mu sync.Mutex
+	program := &LoweredProgram{trimTypeInfo: options.TrimTypeInfo}
+	diagnostics := o.Lower(ctx, model, options, func(pkg *loweredPackage) {
+		mu.Lock()
+		program.packages = append(program.packages, pkg)
+		mu.Unlock()
+	})
+
+	// Return the packages in path order, or only the diagnostics on failure.
+	if diagnosticsHaveErrors(diagnostics) {
+		return nil, diagnostics
+	}
+	slices.SortFunc(program.packages, func(a, b *loweredPackage) int {
+		return cmp.Compare(a.pkgPath, b.pkgPath)
+	})
+	return program, nil
+}
+
+// Lower converts the semantic model into the compiler IR one package at a
+// time and hands each lowered package to sink as soon as it is lowered, from
+// several goroutines at once. Packages lower importers first: a package
+// starts once every lowered package that imports it is lowered, because an
+// importer reads the syntax of its imports' package variable initializers.
+// Once a package is lowered nothing later reads its syntax or type
+// information, so Lower releases them then, and the program's live sources
+// shrink as lowering proceeds. Diagnostics are returned in package path
+// order; a package lowered with errors is not handed to sink.
+func (o *LoweringOwner) Lower(
+	ctx context.Context,
+	model *SemanticModel,
+	options LoweringOptions,
+	sink func(pkg *loweredPackage),
+) []Diagnostic {
+	// Refuse a canceled context or a missing model.
 	if err := ctx.Err(); err != nil {
-		return nil, []Diagnostic{{
-			Severity: DiagnosticSeverityError,
-			Code:     "goscript/context:canceled",
-			Message:  err.Error(),
-		}}
+		return []Diagnostic{contextCanceledDiagnostic(err)}
 	}
 	if model == nil {
-		return nil, []Diagnostic{{
+		return []Diagnostic{{
 			Severity: DiagnosticSeverityError,
 			Code:     "goscript/lowering:no-model",
 			Message:  "lowering requires a semantic model",
 		}}
 	}
 
-	var options LoweringOptions
-	if len(opts) != 0 {
-		options = opts[0]
-	}
-
 	// Lower with the override facts of the model's program, which leave out
 	// the overrides it compiles from source.
 	o = &LoweringOwner{runtimeOwner: o.runtimeOwner, facts: model.overrideFacts}
-	program := &LoweredProgram{trimTypeInfo: options.TrimTypeInfo}
 	defer setRuntimePackageNames(model)()
 	defer setLocalTypeNames(model)()
 
@@ -108,58 +139,151 @@ func (o *LoweringOwner) Build(ctx context.Context, model *SemanticModel, opts ..
 	slices.SortFunc(semPkgs, func(a, b *semanticPackage) int {
 		return cmp.Compare(a.pkgPath, b.pkgPath)
 	})
+	order := newLowerOrder(semPkgs)
 
 	// Lowering reads the semantic model without changing it and writes only
 	// into the per-package result below, so packages lower independently. Each
 	// worker keeps its own call-graph traversal state and shares only the
 	// caches above, which are guarded and hold entry-independent answers.
-	// Results are collected by index and assembled in sorted package order
-	// afterwards, so diagnostics and emitted packages stay deterministic.
-	type packageResult struct {
-		pkg         *loweredPackage
-		diagnostics []Diagnostic
-	}
-	results := make([]packageResult, len(semPkgs))
-	group := errgroup.Group{}
-	group.SetLimit(runtime.GOMAXPROCS(0))
-	for idx, semPkg := range semPkgs {
+	results := make([][]Diagnostic, len(semPkgs))
+	lowerOne := func(idx int) {
+		// Report a package without sources instead of lowering it.
+		semPkg := semPkgs[idx]
 		if semPkg.source == nil {
-			results[idx].diagnostics = []Diagnostic{
+			results[idx] = []Diagnostic{
 				loweringUnsupported("package", semPkg.pkgPath, "missing semantic source package"),
 			}
-			continue
+			return
 		}
-		group.Go(func() error {
-			loweredPkg, pkgDiagnostics := o.lowerPackage(
-				model,
-				semPkg,
-				newAsyncLazyState(asyncLazyCache),
-				runtimeMethodSets,
-				options,
-			)
-			results[idx] = packageResult{pkg: loweredPkg, diagnostics: pkgDiagnostics}
-			return nil
-		})
+
+		// Lower the package, release its sources, and hand it on.
+		loweredPkg, pkgDiagnostics := o.lowerPackage(
+			model,
+			semPkg,
+			newAsyncLazyState(asyncLazyCache),
+			runtimeMethodSets,
+			options,
+		)
+		semPkg.releaseSources()
+		results[idx] = pkgDiagnostics
+		if loweredPkg != nil && !diagnosticsHaveErrors(pkgDiagnostics) {
+			sink(loweredPkg)
+		}
 	}
-	if err := group.Wait(); err != nil {
-		return nil, []Diagnostic{{
-			Severity: DiagnosticSeverityError,
-			Code:     "goscript/lowering:failed",
-			Message:  err.Error(),
-		}}
+	if err := order.run(ctx, runtime.GOMAXPROCS(0), lowerOne); err != nil {
+		return []Diagnostic{contextCanceledDiagnostic(err)}
 	}
 
+	// Concatenate the diagnostics in package path order.
 	var diagnostics []Diagnostic
 	for _, result := range results {
-		diagnostics = append(diagnostics, result.diagnostics...)
-		if result.pkg != nil {
-			program.packages = append(program.packages, result.pkg)
+		diagnostics = append(diagnostics, result...)
+	}
+	return diagnostics
+}
+
+// lowerOrder schedules packages importers first: a package is ready once
+// every package of the set that imports it is done.
+type lowerOrder struct {
+	// imports lists, by index, the indexes of the set's packages each package
+	// imports.
+	imports [][]int
+	// importers counts, by index, the set's packages that import each package
+	// and are not yet done.
+	importers []int
+}
+
+// newLowerOrder builds the import edges among semPkgs. A package imports the
+// set's packages it reaches through packages outside the set too, since
+// lowering it can read their initializers through those packages.
+func newLowerOrder(semPkgs []*semanticPackage) *lowerOrder {
+	// Index the set's packages by path.
+	index := make(map[string]int, len(semPkgs))
+	for idx, semPkg := range semPkgs {
+		index[semPkg.pkgPath] = idx
+	}
+
+	// Record each edge from a package to an import in the set, walking
+	// through the imports outside it.
+	order := &lowerOrder{
+		imports:   make([][]int, len(semPkgs)),
+		importers: make([]int, len(semPkgs)),
+	}
+	for idx, semPkg := range semPkgs {
+		if semPkg.source == nil {
+			continue
+		}
+		seen := make(map[*packages.Package]bool)
+		var walk func(pkg *packages.Package)
+		walk = func(pkg *packages.Package) {
+			for _, imp := range pkg.Imports {
+				if seen[imp] {
+					continue
+				}
+				seen[imp] = true
+				dep, ok := index[imp.PkgPath]
+				if !ok {
+					walk(imp)
+					continue
+				}
+				if dep != idx {
+					order.imports[idx] = append(order.imports[idx], dep)
+					order.importers[dep]++
+				}
+			}
+		}
+		walk(semPkg.source)
+	}
+	return order
+}
+
+// run calls fn for each package index on at most workers goroutines, each
+// once every importer of the package has returned.
+func (r *lowerOrder) run(ctx context.Context, workers int, fn func(idx int)) error {
+	// Queue the packages no package of the set imports.
+	remaining := len(r.importers)
+	if remaining == 0 {
+		return nil
+	}
+	ready := make(chan int, remaining)
+	for idx, count := range r.importers {
+		if count == 0 {
+			ready <- idx
 		}
 	}
-	if diagnosticsHaveErrors(diagnostics) {
-		return nil, diagnostics
+
+	// Each worker runs a ready package, then queues the imports whose last
+	// importer it was, until every package is done or the context ends.
+	var mu sync.Mutex
+	done := make(chan struct{})
+	group, groupCtx := errgroup.WithContext(ctx)
+	for range max(workers, 1) {
+		group.Go(func() error {
+			for {
+				select {
+				case <-groupCtx.Done():
+					return groupCtx.Err()
+				case <-done:
+					return nil
+				case idx := <-ready:
+					fn(idx)
+					mu.Lock()
+					for _, dep := range r.imports[idx] {
+						r.importers[dep]--
+						if r.importers[dep] == 0 {
+							ready <- dep
+						}
+					}
+					remaining--
+					if remaining == 0 {
+						close(done)
+					}
+					mu.Unlock()
+				}
+			}
+		})
 	}
-	return program, nil
+	return group.Wait()
 }
 
 func (o *LoweringOwner) lowerPackage(
