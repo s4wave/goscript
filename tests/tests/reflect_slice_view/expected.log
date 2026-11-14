@@ -1,0 +1,5 @@
+set through slice: c b c 
+delete first: 2 2 b c 
+insert first: c a b 
+strings: y z z
+array: p Q r true
