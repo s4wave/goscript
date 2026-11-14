@@ -135,6 +135,19 @@ func (g *PackageGraph) reachablePackages() []*packages.Package {
 	return pkgs
 }
 
+// ReleaseSyntax drops the syntax and type information of every package the
+// graph reaches except the packages keep reports, and the parsed files the
+// checker keeps between checks, so the collector can free them. The types of
+// every package stay. A later Check parses and checks every package again.
+func (g *PackageGraph) ReleaseSyntax(keep func(pkg *packages.Package) bool) {
+	g.checker = nil
+	for _, pkg := range g.reachablePackages() {
+		if keep == nil || !keep(pkg) {
+			pkg.Syntax, pkg.TypesInfo = nil, nil
+		}
+	}
+}
+
 // packageChecker parses and type-checks packages into one file set.
 type packageChecker struct {
 	fset  *token.FileSet

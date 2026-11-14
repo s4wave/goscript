@@ -4,6 +4,8 @@ import (
 	"context"
 	"maps"
 	"slices"
+
+	"golang.org/x/tools/go/packages"
 )
 
 // CompileService owns the v2 compiler pipeline.
@@ -216,6 +218,8 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 				delete(summaries, pkgPath)
 				summarize[pkgPath] = true
 			}
+			// The next pass builds a new model; free this one first.
+			semanticModel = nil
 			continue
 		}
 
@@ -240,7 +244,15 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		if !unreplayed {
 			break
 		}
+		semanticModel = nil
 	}
+
+	// Only the lowered packages' syntax is read from here on, and only
+	// until lowering ends.
+	graph.ReleaseSyntax(func(pkg *packages.Package) bool {
+		node := graph.NodesByPackagePath[pkg.PkgPath]
+		return node != nil && !node.OverrideCandidate && graph.packagesByPath[pkg.PkgPath] == pkg
+	})
 	loweredProgram, loweringDiagnostics := s.loweringOwner.Build(ctx, semanticModel, LoweringOptions{
 		SourceRoot:                protobufTypeScriptBindingRoot(req.Dir),
 		DisplayRoot:               req.Dir,
@@ -256,6 +268,12 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		return result, NewCompileError(diagnostics)
 	}
 
+	// The lowered program holds what emit needs, so the syntax and the
+	// model are freed before the output is rendered.
+	graph.ReleaseSyntax(nil)
+	asyncReport, bodySummaries := semanticModel.asyncReport, semanticModel.summaries
+	semanticModel = nil
+
 	files, emitDiagnostics := s.emitterOwner.EmitToMemory(ctx, loweredProgram)
 	diagnostics = append(diagnostics, emitDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
@@ -269,7 +287,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		return result, NewCompileError(diagnostics)
 	}
 	result.CompiledPackages = append(result.CompiledPackages, compiledPackages...)
-	result.AsyncReport = semanticModel.asyncReport.relativeTo(req.Dir)
+	result.AsyncReport = asyncReport.relativeTo(req.Dir)
 	result.CompiledPackages = slices.AppendSeq(result.CompiledPackages, maps.Keys(replayed))
 	slices.Sort(result.CompiledPackages)
 	artifactEntries = s.cacheOwner.StoreGenerated(req, artifactEntries, loweredProgram, files)
@@ -283,7 +301,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 	}
 	s.cacheOwner.StoreCopied(req, artifactEntries, overridePlan)
 	s.cacheOwner.StoreProgram(req, sources, artifactEntries)
-	s.cacheOwner.StoreSummaries(req, sources, semanticModel.summaries)
+	s.cacheOwner.StoreSummaries(req, sources, bodySummaries)
 
 	result.Diagnostics = diagnostics
 	return result, nil
