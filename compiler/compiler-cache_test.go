@@ -3,7 +3,10 @@ package compiler
 import (
 	"context"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime/debug"
+	"slices"
 	"strings"
 	"sync"
 	"testing"
@@ -50,6 +53,7 @@ func TestCompilePackagesCacheReplaysOutput(t *testing.T) {
 	})
 	cacheRoot := filepath.Join(t.TempDir(), "cache")
 	firstOut := filepath.Join(t.TempDir(), "first")
+	t.Setenv("GOFLAGS", "-p=1")
 	result := compileCacheFixture(t, moduleDir, firstOut, cacheRoot)
 	if len(result.CompiledPackages) != 1 || result.CompiledPackages[0] != "example.test/cachereplay" {
 		t.Fatalf("compiled packages = %#v", result.CompiledPackages)
@@ -60,6 +64,8 @@ func TestCompilePackagesCacheReplaysOutput(t *testing.T) {
 	}
 	firstManifestCount := countCacheManifests(t, cacheRoot)
 
+	// A build at another parallelism replays the same entries.
+	t.Setenv("GOFLAGS", "-p=4")
 	secondOut := filepath.Join(t.TempDir(), "second")
 	second := compileCacheFixture(t, moduleDir, secondOut, cacheRoot)
 	if len(second.CompiledPackages) != 1 || second.CompiledPackages[0] != "example.test/cachereplay" {
@@ -473,7 +479,26 @@ func TestCompilerCacheKeyInvalidatesRequestAndModuleInputs(t *testing.T) {
 		RuntimeEmissionMode: RuntimeEmissionModeEmit,
 	}
 	graph := singleNodeCacheGraph(moduleDir, "example.test/cachekey")
+	t.Setenv("GOFLAGS", "-mod=mod -p=1")
 	baseKey := generatedCacheKey(t, baseReq, graph)
+
+	// Parallelism and logging flags leave the loaded sources unchanged.
+	t.Setenv("GOFLAGS", "-p=8 -mod=mod -v")
+	if key := generatedCacheKey(t, baseReq, graph); key != baseKey {
+		t.Fatal("GOFLAGS -p or -v changed generated package key")
+	}
+	t.Setenv("GOFLAGS", "-mod=mod -p=1 -tags=cachetest")
+	if key := generatedCacheKey(t, baseReq, graph); key == baseKey {
+		t.Fatal("GOFLAGS -tags did not change generated package key")
+	}
+	// The go command reads a quoted entry as one flag.
+	t.Setenv("GOFLAGS", "-mod=mod -p=1 '-tags=cachetest other'")
+	quotedKey := generatedCacheKey(t, baseReq, graph)
+	t.Setenv("GOFLAGS", "-mod=mod -p=1 '-tags=cachetest'")
+	if key := generatedCacheKey(t, baseReq, graph); key == quotedKey || key == baseKey {
+		t.Fatal("quoted GOFLAGS -tags did not change generated package key")
+	}
+	t.Setenv("GOFLAGS", "-mod=mod -p=1")
 
 	cases := []struct {
 		name string
@@ -507,18 +532,85 @@ func TestCompilerCacheKeyInvalidatesRequestAndModuleInputs(t *testing.T) {
 // version participates in the compiler identity, so bumping
 // compilerSemanticsVersion invalidates every cache entry.
 func TestCompilerCacheKeyChangesWithSemanticsVersion(t *testing.T) {
+	info, _ := debug.ReadBuildInfo()
 	var previous, bumped strings.Builder
-	writeCompilerIdentityWithSemantics(&previous, "0")
-	writeCompilerIdentityWithSemantics(&bumped, "1")
+	writeCompilerIdentityFrom(&previous, "0", info)
+	writeCompilerIdentityFrom(&bumped, "1", info)
 	if previous.String() == bumped.String() {
 		t.Fatal("semantics version did not change compiler identity")
 	}
 
 	var live, current strings.Builder
 	writeCompilerIdentity(&live)
-	writeCompilerIdentityWithSemantics(&current, compilerSemanticsVersion)
+	writeCompilerIdentityFrom(&current, compilerSemanticsVersion, info)
 	if live.String() != current.String() {
 		t.Fatal("writeCompilerIdentity does not embed compilerSemanticsVersion")
+	}
+}
+
+// TestCompilerIdentityKeysOnlyCompilerModules pins that a released compiler
+// linked into a host program keys the versions of the compiler's own modules:
+// a bump of the host or of a host-only dependency keeps the cache, and a
+// version change of a module the compiler imports does not.
+func TestCompilerIdentityKeysOnlyCompilerModules(t *testing.T) {
+	hostInfo := func(hostVersion, hostDep, tools string) *debug.BuildInfo {
+		return &debug.BuildInfo{
+			Main: debug.Module{Path: "example.test/host", Version: hostVersion},
+			Deps: []*debug.Module{
+				{Path: "example.test/hostdep", Version: hostDep},
+				{Path: "github.com/s4wave/goscript", Version: "v0.6.1"},
+				{Path: "golang.org/x/tools", Version: tools},
+			},
+		}
+	}
+	identity := func(info *debug.BuildInfo) string {
+		var b strings.Builder
+		writeCompilerIdentityFrom(&b, compilerSemanticsVersion, info)
+		return b.String()
+	}
+	base := identity(hostInfo("v1.0.0", "v1.0.0", "v0.50.0"))
+	if identity(hostInfo("v1.1.0", "v1.0.0", "v0.50.0")) != base {
+		t.Fatal("host module version changed compiler identity")
+	}
+	if identity(hostInfo("v1.0.0", "v1.2.0", "v0.50.0")) != base {
+		t.Fatal("host-only dependency version changed compiler identity")
+	}
+	if identity(hostInfo("v1.0.0", "v1.0.0", "v0.51.0")) == base {
+		t.Fatal("golang.org/x/tools version did not change compiler identity")
+	}
+	replaced := hostInfo("v1.0.0", "v1.0.0", "v0.50.0")
+	replaced.Deps[2].Replace = &debug.Module{Path: "example.test/tools-fork", Version: "v0.50.0"}
+	if identity(replaced) == base {
+		t.Fatal("golang.org/x/tools replacement did not change compiler identity")
+	}
+	// A directory has no version to name its edits, so the executable does.
+	replaced.Deps[2].Replace = &debug.Module{Path: "../tools"}
+	if !strings.Contains(identity(replaced), "executable-sha256") {
+		t.Fatal("golang.org/x/tools directory replacement did not key the executable")
+	}
+	if strings.Contains(base, "executable-sha256") {
+		t.Fatal("released compiler keyed the executable")
+	}
+}
+
+// TestCompilerModulesCurrent pins compilerModules to the modules that hold the
+// compiler package and its imports, so a new dependency of the compiler joins
+// the cache key.
+func TestCompilerModulesCurrent(t *testing.T) {
+	cmd := exec.Command("go", "list", "-deps", "-f", "{{with .Module}}{{.Path}}{{end}}", ".")
+	out, err := cmd.Output()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var modules []string
+	for line := range strings.Lines(string(out)) {
+		if line = strings.TrimSpace(line); line != "" && !slices.Contains(modules, line) {
+			modules = append(modules, line)
+		}
+	}
+	slices.Sort(modules)
+	if !slices.Equal(modules, compilerModules) {
+		t.Fatalf("compilerModules = %q, want %q", compilerModules, modules)
 	}
 }
 
