@@ -196,6 +196,18 @@ type localAssignments struct {
 	values map[types.Object]ast.Expr
 }
 
+// releaseSources drops the package's syntax, type information and the tables
+// lowering built from them, once the package is lowered. Lowering reads a
+// package's sources only while lowering it or a package that imports it, and
+// lowers every importer first, so nothing reads them afterwards. The package's
+// types and facts stay: other packages' types refer to them.
+func (p *semanticPackage) releaseSources() {
+	p.source.Syntax, p.source.TypesInfo = nil, nil
+	p.functionDecls = nil
+	p.assignments = nil
+	p.readOnlyTables = nil
+}
+
 // literalKey returns the key of lit's node, or nil.
 func (p *semanticPackage) literalKey(lit *ast.FuncLit) *types.Func {
 	if node := p.funcLits[lit.Pos()]; node != nil {
