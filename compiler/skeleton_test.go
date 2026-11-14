@@ -6331,7 +6331,7 @@ func TestTypeScriptEmitOwnerEmitsToMemoryOnDiskPath(t *testing.T) {
 	if !strings.Contains(files[path], "$.println(\"memory\")") {
 		t.Fatalf("missing in-memory output: %#v", files)
 	}
-	if _, diagnostics := service.TypeScriptEmitOwner().Emit(context.Background(), req, program); diagnosticsHaveErrors(diagnostics) {
+	if _, diagnostics := service.TypeScriptEmitOwner().Emit(context.Background(), req, program, nil); diagnosticsHaveErrors(diagnostics) {
 		t.Fatalf("disk emit diagnostics: %#v", diagnostics)
 	}
 	content, err := os.ReadFile(filepath.Join(outputDir, filepath.FromSlash(path)))

@@ -28,11 +28,18 @@ func NewTypeScriptEmitOwner(runtimeOwners ...*RuntimeContractOwner) *TypeScriptE
 	return &TypeScriptEmitOwner{runtimeOwner: runtimeOwner}
 }
 
-// Emit writes a lowered program to the configured TypeScript output tree.
+// Emit renders each package of a lowered program and writes it to the
+// request's output tree as soon as it is rendered, so the output of the whole
+// program is never held at once. When stored is not nil it receives each
+// package written without errors and its files, called from several
+// goroutines at once. Emit consumes the program: a package's lowered files are
+// dropped once it is written. It returns the written packages in program
+// order.
 func (o *TypeScriptEmitOwner) Emit(
 	ctx context.Context,
 	req *CompileRequest,
 	program *LoweredProgram,
+	stored func(pkg *loweredPackage, files map[string]string),
 ) ([]string, []Diagnostic) {
 	if err := ctx.Err(); err != nil {
 		return nil, []Diagnostic{{
@@ -56,70 +63,63 @@ func (o *TypeScriptEmitOwner) Emit(
 		}}
 	}
 
-	files, diagnostics := o.EmitToMemory(ctx, program)
-	if diagnosticsHaveErrors(diagnostics) {
-		return nil, diagnostics
+	// Each worker renders, writes and stores one package at a time, and
+	// records its result in the package's own slot.
+	written := make([]bool, len(program.packages))
+	results := make([][]Diagnostic, len(program.packages))
+	group, groupCtx := errgroup.WithContext(ctx)
+	group.SetLimit(runtime.GOMAXPROCS(0))
+	for idx, pkg := range program.packages {
+		group.Go(func() error {
+			if err := groupCtx.Err(); err != nil {
+				return err
+			}
+			files := o.renderPackage(pkg, program.trimTypeInfo)
+			written[idx], results[idx] = writePackage(req, pkg, files)
+			if stored != nil && len(results[idx]) == 0 {
+				stored(pkg, files)
+			}
+			pkg.files = nil
+			return nil
+		})
 	}
-	return o.WriteFiles(ctx, req, program, files)
-}
-
-// WriteFiles writes an in-memory emitted file tree to the request output root.
-func (o *TypeScriptEmitOwner) WriteFiles(
-	ctx context.Context,
-	req *CompileRequest,
-	program *LoweredProgram,
-	files map[string]string,
-) ([]string, []Diagnostic) {
-	if err := ctx.Err(); err != nil {
+	if err := group.Wait(); err != nil {
 		return nil, []Diagnostic{contextCanceledDiagnostic(err)}
 	}
-	if req == nil {
-		return nil, []Diagnostic{{
-			Severity: DiagnosticSeverityError,
-			Code:     "goscript/emitter:no-request",
-			Message:  "TypeScript emission requires a compile request",
-		}}
-	}
-	if program == nil {
-		return nil, []Diagnostic{{
-			Severity: DiagnosticSeverityError,
-			Code:     "goscript/emitter:no-program",
-			Message:  "TypeScript emission requires a lowered program",
-		}}
-	}
 
+	// Report in program order.
 	var compiled []string
 	var diagnostics []Diagnostic
-	for _, pkg := range program.packages {
-		if err := ctx.Err(); err != nil {
-			diagnostics = append(diagnostics, Diagnostic{
-				Severity: DiagnosticSeverityError,
-				Code:     "goscript/context:canceled",
-				Message:  err.Error(),
-			})
-			break
+	for idx, pkg := range program.packages {
+		diagnostics = append(diagnostics, results[idx]...)
+		if written[idx] {
+			compiled = append(compiled, pkg.pkgPath)
 		}
-		pkgDir := filepath.Join(req.OutputPath, "@goscript", filepath.FromSlash(pkg.pkgPath))
-		if err := os.MkdirAll(pkgDir, 0o755); err != nil {
-			diagnostics = append(diagnostics, emitError("create package output", pkg.pkgPath, err))
-			continue
-		}
-		for _, file := range pkg.files {
-			filePath := "@goscript/" + pkg.pkgPath + "/" + file.outputName
-			path := filepath.Join(req.OutputPath, filepath.FromSlash(filePath))
-			if err := writeOutputFile(path, files[filePath]); err != nil {
-				diagnostics = append(diagnostics, emitError("write TypeScript file", path, err))
-			}
-			diagnostics = append(diagnostics, writeAssets(pkgDir, file.assets)...)
-		}
-		indexPath := "@goscript/" + pkg.pkgPath + "/index.ts"
-		if err := writeOutputFile(filepath.Join(pkgDir, "index.ts"), files[indexPath]); err != nil {
-			diagnostics = append(diagnostics, emitError("write package index", pkg.pkgPath, err))
-			continue
-		}
-		compiled = append(compiled, pkg.pkgPath)
 	}
 	return compiled, diagnostics
+}
+
+// writePackage writes the rendered files of one package to the request
+// output root. It reports whether the package's index was written.
+func writePackage(req *CompileRequest, pkg *loweredPackage, files map[string]string) (bool, []Diagnostic) {
+	pkgDir := filepath.Join(req.OutputPath, "@goscript", filepath.FromSlash(pkg.pkgPath))
+	if err := os.MkdirAll(pkgDir, 0o755); err != nil {
+		return false, []Diagnostic{emitError("create package output", pkg.pkgPath, err)}
+	}
+	var diagnostics []Diagnostic
+	for _, file := range pkg.files {
+		filePath := "@goscript/" + pkg.pkgPath + "/" + file.outputName
+		path := filepath.Join(req.OutputPath, filepath.FromSlash(filePath))
+		if err := writeOutputFile(path, files[filePath]); err != nil {
+			diagnostics = append(diagnostics, emitError("write TypeScript file", path, err))
+		}
+		diagnostics = append(diagnostics, writeAssets(pkgDir, file.assets)...)
+	}
+	indexPath := "@goscript/" + pkg.pkgPath + "/index.ts"
+	if err := writeOutputFile(filepath.Join(pkgDir, "index.ts"), files[indexPath]); err != nil {
+		return false, append(diagnostics, emitError("write package index", pkg.pkgPath, err))
+	}
+	return true, diagnostics
 }
 
 // writeAssets writes the external embedded files of a lowered file (see
@@ -186,15 +186,7 @@ func (o *TypeScriptEmitOwner) EmitToMemory(
 			if err := groupCtx.Err(); err != nil {
 				return err
 			}
-			pkgFiles := make(map[string]string, len(pkg.files)+1)
-			for _, file := range pkg.files {
-				pkgFiles["@goscript/"+pkg.pkgPath+"/"+file.outputName] = o.renderLoweredFile(pkg, file, program.trimTypeInfo)
-				for name, data := range file.assets {
-					pkgFiles["@goscript/"+pkg.pkgPath+"/"+name] = string(data)
-				}
-			}
-			pkgFiles["@goscript/"+pkg.pkgPath+"/index.ts"] = renderIndex(pkg)
-			rendered[idx] = pkgFiles
+			rendered[idx] = o.renderPackage(pkg, program.trimTypeInfo)
 			return nil
 		})
 	}
@@ -207,6 +199,20 @@ func (o *TypeScriptEmitOwner) EmitToMemory(
 		maps.Copy(files, pkgFiles)
 	}
 	return files, nil
+}
+
+// renderPackage renders the files of one lowered package, its external
+// embedded files and its index, by slash path.
+func (o *TypeScriptEmitOwner) renderPackage(pkg *loweredPackage, trimTypeInfo bool) map[string]string {
+	files := make(map[string]string, len(pkg.files)+1)
+	for _, file := range pkg.files {
+		files["@goscript/"+pkg.pkgPath+"/"+file.outputName] = o.renderLoweredFile(pkg, file, trimTypeInfo)
+		for name, data := range file.assets {
+			files["@goscript/"+pkg.pkgPath+"/"+name] = string(data)
+		}
+	}
+	files["@goscript/"+pkg.pkgPath+"/index.ts"] = renderIndex(pkg)
+	return files
 }
 
 // renderLoweredFile orders imports, declarations, and the optional main invocation.

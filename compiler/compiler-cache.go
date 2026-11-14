@@ -464,74 +464,72 @@ func (o *CompilerCacheOwner) markSummaryUsed(req *CompileRequest, request string
 	}
 }
 
-// StoreGenerated stores the artifacts of the lowered packages, each in the
-// first variant of its entry that holds the same reachability answers or is
-// free. It returns the artifact entries with each stored package's entry
-// replaced by its variant.
-func (o *CompilerCacheOwner) StoreGenerated(
-	req *CompileRequest,
-	entries []compilerCacheEntry,
-	program *LoweredProgram,
-	files map[string]string,
-) []compilerCacheEntry {
-	// Without a cache or output nothing is stored.
-	if !o.Enabled(req) || program == nil || len(files) == 0 {
-		return entries
-	}
+// generatedStore stores the artifacts of one compile's lowered packages as
+// they are written. Each package is stored in the first variant of its entry
+// that holds the same reachability answers or is free.
+type generatedStore struct {
+	owner *CompilerCacheOwner
+	req   *CompileRequest
+	// entries are the artifact entries, with each stored package's entry
+	// replaced by its variant. Each store writes only its package's entry.
+	entries []compilerCacheEntry
+	// index locates each generated package's entry, or is nil when nothing
+	// is stored.
+	index map[string]int
+}
 
-	// Index the generated entries by package.
-	entries = slices.Clone(entries)
-	entryIndex := make(map[string]int, len(entries))
+// StoreGenerated returns the store for the artifacts of the lowered packages
+// whose entries are among entries.
+func (o *CompilerCacheOwner) StoreGenerated(req *CompileRequest, entries []compilerCacheEntry) *generatedStore {
+	store := &generatedStore{owner: o, req: req, entries: slices.Clone(entries)}
+	if !o.Enabled(req) {
+		return store
+	}
+	store.index = make(map[string]int, len(entries))
 	for idx, entry := range entries {
 		if entry.kind == compilerCacheEntryGenerated {
-			entryIndex[entry.packagePath] = idx
+			store.index[entry.packagePath] = idx
 		}
 	}
+	return store
+}
 
-	// Store each lowered package in its variant.
-	for _, pkg := range program.packages {
-		idx, ok := entryIndex[pkg.pkgPath]
-		if !ok {
-			continue
-		}
-		variant, ok := o.generatedSlot(req, entries[idx], pkg.liveness)
-		if !ok {
-			// No key names the artifact, so the program manifest misses.
-			entries[idx].key = ""
-			continue
-		}
-		entries[idx] = variant
-		prefix := "@goscript/" + pkg.pkgPath + "/"
-		manifest := compilerCacheManifest{
-			schema:           compilerCacheSchema,
-			key:              variant.key,
-			kind:             compilerCacheEntryGenerated,
-			packagePath:      pkg.pkgPath,
-			compiledPackages: []string{pkg.pkgPath},
-			liveness:         pkg.liveness,
-		}
-		for filePath, contents := range files {
-			// A nested package's files share the prefix but belong to its
-			// own entry, keyed by its own sources. The external embedded
-			// files of the package are in its own directory for them.
-			name, ok := strings.CutPrefix(filePath, prefix)
-			if !ok || (strings.Contains(name, "/") && !strings.HasPrefix(name, externalEmbedDir+"/")) {
-				continue
-			}
-			manifest.files = append(manifest.files, compilerCacheManifestFile{
-				path:   filePath,
-				kind:   generatedArtifactKind(filePath),
-				sha256: sha256Hex([]byte(contents)),
-				size:   uint64(len(contents)),
-				blob:   o.storeBlob(req, []byte(contents)),
-			})
-		}
-		slices.SortFunc(manifest.files, func(a, b compilerCacheManifestFile) int {
-			return strings.Compare(a.path, b.path)
-		})
-		o.storeManifest(req, manifest)
+// store stores the artifact of one lowered package from its rendered files.
+// Packages may be stored concurrently.
+func (s *generatedStore) store(pkg *loweredPackage, files map[string]string) {
+	idx, ok := s.index[pkg.pkgPath]
+	if !ok {
+		return
 	}
-	return entries
+	o, req := s.owner, s.req
+	variant, ok := o.generatedSlot(req, s.entries[idx], pkg.liveness)
+	if !ok {
+		// No key names the artifact, so the program manifest misses.
+		s.entries[idx].key = ""
+		return
+	}
+	s.entries[idx] = variant
+	manifest := compilerCacheManifest{
+		schema:           compilerCacheSchema,
+		key:              variant.key,
+		kind:             compilerCacheEntryGenerated,
+		packagePath:      pkg.pkgPath,
+		compiledPackages: []string{pkg.pkgPath},
+		liveness:         pkg.liveness,
+	}
+	for filePath, contents := range files {
+		manifest.files = append(manifest.files, compilerCacheManifestFile{
+			path:   filePath,
+			kind:   generatedArtifactKind(filePath),
+			sha256: sha256Hex([]byte(contents)),
+			size:   uint64(len(contents)),
+			blob:   o.storeBlob(req, []byte(contents)),
+		})
+	}
+	slices.SortFunc(manifest.files, func(a, b compilerCacheManifestFile) int {
+		return strings.Compare(a.path, b.path)
+	})
+	o.storeManifest(req, manifest)
 }
 
 // generatedSlot returns the variant of a generated entry that an artifact
