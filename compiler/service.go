@@ -274,13 +274,9 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 	asyncReport, bodySummaries := semanticModel.asyncReport, semanticModel.summaries
 	semanticModel = nil
 
-	files, emitDiagnostics := s.emitterOwner.EmitToMemory(ctx, loweredProgram)
-	diagnostics = append(diagnostics, emitDiagnostics...)
-	if diagnosticsHaveErrors(diagnostics) {
-		result.Diagnostics = diagnostics
-		return result, NewCompileError(diagnostics)
-	}
-	compiledPackages, writeDiagnostics := s.emitterOwner.WriteFiles(ctx, req, loweredProgram, files)
+	// Each package is stored in the cache as it is written.
+	generated := s.cacheOwner.StoreGenerated(req, artifactEntries)
+	compiledPackages, writeDiagnostics := s.emitterOwner.Emit(ctx, req, loweredProgram, generated.store)
 	diagnostics = append(diagnostics, writeDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
 		result.Diagnostics = diagnostics
@@ -290,7 +286,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 	result.AsyncReport = asyncReport.relativeTo(req.Dir)
 	result.CompiledPackages = slices.AppendSeq(result.CompiledPackages, maps.Keys(replayed))
 	slices.Sort(result.CompiledPackages)
-	artifactEntries = s.cacheOwner.StoreGenerated(req, artifactEntries, loweredProgram, files)
+	artifactEntries = generated.entries
 
 	copiedPackages, copyDiagnostics := s.overrideOwner.CopyPackages(ctx, req, overridePlan)
 	result.CopiedPackages = append(result.CopiedPackages, copiedPackages...)
