@@ -974,7 +974,11 @@ func (o *compilerCacheKeyOwner) sharedIdentity() string {
 	writeKeyField(&b, "tests", strconv.FormatBool(req.Tests))
 	writeKeyField(&b, "eliminate-dead-code", strconv.FormatBool(req.EliminateDeadCode))
 	for _, key := range goLoaderEnvKeys() {
-		writeKeyField(&b, "env-"+key, os.Getenv(key))
+		value := os.Getenv(key)
+		if key == "GOFLAGS" {
+			value = strings.Join(goLoaderFlags(value), "\x00")
+		}
+		writeKeyField(&b, "env-"+key, value)
 	}
 	return sha256String(b.String())
 }
@@ -1096,30 +1100,63 @@ func (o *compilerCacheKeyOwner) nodeOwnDigest(node *PackageGraphNode, moduleIden
 // writeCompilerIdentity writes the producing-binary identity fields of a
 // cache key.
 func writeCompilerIdentity(b *strings.Builder) {
-	writeCompilerIdentityWithSemantics(b, compilerSemanticsVersion)
+	info, _ := debug.ReadBuildInfo()
+	writeCompilerIdentityFrom(b, compilerSemanticsVersion, info)
 }
 
-// writeCompilerIdentityWithSemantics writes the identity fields with an
-// explicit semantics version so tests can pin that a bump invalidates keys.
-// A released compiler is named by its module version. A development build
-// carries no trustworthy version, so its executable's content names it.
-func writeCompilerIdentityWithSemantics(b *strings.Builder, semanticsVersion string) {
+// compilerModules lists the modules that hold the compiler package and every
+// package it imports: go list -deps of ./compiler, by module. Only their code
+// in the running binary decides the output; a host program's other modules do
+// not, and every input the host supplies (sources, override directories,
+// bindings, embeds) is keyed by content. TestCompilerModulesCurrent keeps the
+// list current.
+var compilerModules = []string{
+	"github.com/aperturerobotics/json-iterator-lite",
+	"github.com/pkg/errors",
+	"github.com/s4wave/goscript",
+	"github.com/sirupsen/logrus",
+	"golang.org/x/mod",
+	"golang.org/x/sync",
+	"golang.org/x/sys",
+	"golang.org/x/tools",
+}
+
+// writeCompilerIdentityFrom writes the identity fields of a compiler built as
+// info describes, nil when the binary carries no build information. A
+// released compiler is named by the versions the binary resolved for
+// compilerModules, so bumping a host program's own dependency keeps its
+// cache. A development build, or one that replaces any of compilerModules
+// with a directory, carries no trustworthy version, so its executable's
+// content names it.
+func writeCompilerIdentityFrom(b *strings.Builder, semanticsVersion string, info *debug.BuildInfo) {
 	writeKeyField(b, "semantics-version", semanticsVersion)
 	writeKeyField(b, "go-version", runtime.Version())
-	info, ok := debug.ReadBuildInfo()
-	if !ok || !compilerModuleVersioned(info) {
+	if info == nil || !compilerModuleVersioned(info) || compilerModuleInDirectory(info) {
 		writeKeyField(b, "executable-sha256", executableDigest())
 	}
-	if !ok {
+	if info == nil {
 		return
 	}
-	writeKeyField(b, "module", info.Main.Path+"@"+info.Main.Version)
-	for _, dep := range info.Deps {
-		writeKeyField(b, "dep", dep.Path+"@"+dep.Version)
-		if dep.Replace != nil {
-			writeKeyField(b, "dep-replace", dep.Replace.Path+"@"+dep.Replace.Version)
+	for _, mod := range append([]*debug.Module{&info.Main}, info.Deps...) {
+		if !slices.Contains(compilerModules, mod.Path) {
+			continue
+		}
+		writeKeyField(b, "module", mod.Path+"@"+mod.Version)
+		if mod.Replace != nil {
+			writeKeyField(b, "module-replace", mod.Replace.Path+"@"+mod.Replace.Version)
 		}
 	}
+}
+
+// compilerModuleInDirectory reports whether the build replaces any of
+// compilerModules with a directory, whose edits no version names.
+func compilerModuleInDirectory(info *debug.BuildInfo) bool {
+	for _, mod := range append([]*debug.Module{&info.Main}, info.Deps...) {
+		if mod.Replace != nil && mod.Replace.Version == "" && slices.Contains(compilerModules, mod.Path) {
+			return true
+		}
+	}
+	return false
 }
 
 // compilerModuleVersioned reports whether the build names a released version
@@ -1166,6 +1203,69 @@ func writeKeyField(b *strings.Builder, key, value string) {
 	b.WriteByte('=')
 	b.WriteString(strconv.Quote(value))
 	b.WriteByte('\n')
+}
+
+// goLoaderFlagNames names the go command flags that change which packages and
+// files the loader reports. The others, such as -p, -v or -trimpath, change
+// only how the go command builds or logs.
+var goLoaderFlagNames = []string{
+	"asan",
+	"compiler",
+	"cover",
+	"covermode",
+	"coverpkg",
+	"mod",
+	"modfile",
+	"msan",
+	"overlay",
+	"race",
+	"tags",
+}
+
+// goLoaderFlags returns the GOFLAGS entries named in goLoaderFlagNames, in
+// their given order, so a parallelism change keeps the cache. It splits
+// GOFLAGS as the go command does, so a quoted entry such as '-tags=a b' is one
+// flag. A value the go command rejects is kept whole.
+func goLoaderFlags(goflags string) []string {
+	fields, ok := splitGoFlags(goflags)
+	if !ok {
+		return []string{goflags}
+	}
+	var flags []string
+	for _, flag := range fields {
+		name, _, _ := strings.Cut(strings.TrimLeft(flag, "-"), "=")
+		if slices.Contains(goLoaderFlagNames, name) {
+			flags = append(flags, flag)
+		}
+	}
+	return flags
+}
+
+// splitGoFlags splits GOFLAGS into fields as cmd/internal/quoted.Split does:
+// fields are separated by spaces, and a field that starts with a single or
+// double quote runs to the matching quote, without unescaping. It reports
+// false for an unterminated quote.
+func splitGoFlags(s string) ([]string, bool) {
+	var fields []string
+	for {
+		s = strings.TrimLeft(s, " \t\n\r")
+		if s == "" {
+			return fields, true
+		}
+		if quote := s[0]; quote == '"' || quote == '\'' {
+			field, rest, ok := strings.Cut(s[1:], string(quote))
+			if !ok {
+				return nil, false
+			}
+			fields, s = append(fields, field), rest
+			continue
+		}
+		end := strings.IndexAny(s, " \t\n\r")
+		if end < 0 {
+			end = len(s)
+		}
+		fields, s = append(fields, s[:end]), s[end:]
+	}
 }
 
 func goLoaderEnvKeys() []string {
