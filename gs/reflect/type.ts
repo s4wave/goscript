@@ -1170,14 +1170,17 @@ export class Value {
       )
     }
     const value = this.currentValue()
+    // A slice of a slice or an array shares its elements, as in Go, so that
+    // writes through it (as by reflect.Copy) are seen in the original:
+    // slicing a plain array copied it. Slicing an array yields a slice of
+    // its element type.
+    const typ = this.Kind() === Array ? SliceOf(this._type.Elem()) : this._type
     if (
       (value && typeof value === 'object' && '__meta__' in value) ||
-      $.isTypedSlice(value)
+      $.isTypedSlice(value) ||
+      globalThis.Array.isArray(value)
     ) {
-      return new Value($.goSlice(value as $.Slice<unknown>, i, j), this._type)
-    }
-    if (globalThis.Array.isArray(value)) {
-      return new Value(value.slice(i, j), this._type)
+      return new Value($.goSlice(value as $.Slice<unknown>, i, j), typ)
     }
     if (typeof value === 'string') {
       return new Value(value.slice(i, j), this._type)
