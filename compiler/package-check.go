@@ -26,7 +26,9 @@ import (
 // Only lowered nodes outside bodiless have their function bodies checked.
 // Every other package contributes only its declarations: override candidates
 // and their dependencies are never lowered, and a bodiless node's body facts
-// come from its stored summary.
+// come from its stored summary. Only lowered nodes keep their comments and
+// function bodies in the syntax, since the summary of a bodiless node is
+// applied to its bodies and nothing reads those of any other package.
 //
 // Checking the graph again keeps each package checked in the same mode whose
 // imports were all kept, so its types and objects stay those of the first
@@ -46,7 +48,7 @@ func (o *PackageGraphOwner) Check(ctx context.Context, graph *PackageGraph, bodi
 			fset:   token.NewFileSet(),
 			sizes:  goScriptTypeSizes(),
 			work:   make(chan struct{}, runtime.GOMAXPROCS(0)),
-			parsed: make(map[string]*parsedFile),
+			parsed: make(map[parsedKey]*parsedFile),
 			modes:  make(map[*packages.Package]bool),
 		}
 	}
@@ -57,9 +59,11 @@ func (o *PackageGraphOwner) Check(ctx context.Context, graph *PackageGraph, bodi
 	passes := make(map[*packages.Package]*packagePass, len(pkgs))
 	for _, pkg := range pkgs {
 		node := graph.NodesByPackagePath[pkg.PkgPath]
+		lowered := node != nil && !node.OverrideCandidate
 		passes[pkg] = &packagePass{
-			done:   make(chan struct{}),
-			bodies: node != nil && !node.OverrideCandidate && !bodiless[pkg.PkgPath],
+			done:    make(chan struct{}),
+			lowered: lowered,
+			bodies:  lowered && !bodiless[pkg.PkgPath],
 		}
 	}
 	var wg sync.WaitGroup
@@ -83,7 +87,7 @@ func (o *PackageGraphOwner) Check(ctx context.Context, graph *PackageGraph, bodi
 				return
 			}
 			pass.checked = true
-			checker.check(ctx, pkg, pass.bodies, func() { waitImports() })
+			checker.check(ctx, pkg, pass.lowered, pass.bodies, func() { waitImports() })
 		})
 	}
 	wg.Wait()
@@ -157,7 +161,7 @@ type packageChecker struct {
 
 	mu sync.Mutex
 	// parsed shares each file's syntax between the test variants that list it.
-	parsed map[string]*parsedFile
+	parsed map[parsedKey]*parsedFile
 
 	// modes records whether each checked package's bodies were checked. The
 	// package goroutines read it, and Check writes it after they finish.
@@ -168,10 +172,20 @@ type packageChecker struct {
 type packagePass struct {
 	// done closes once the package is checked or kept.
 	done chan struct{}
+	// lowered is set when the package is a lowered node, whose syntax keeps
+	// its comments and function bodies.
+	lowered bool
 	// bodies is set when this pass checks the package's function bodies.
 	bodies bool
 	// checked is set when this pass checked the package instead of keeping it.
 	checked bool
+}
+
+// parsedKey names one file parsed with or without its comments and function
+// bodies.
+type parsedKey struct {
+	name string
+	full bool
 }
 
 // parsedFile holds one file's syntax once ready is closed.
@@ -182,9 +196,10 @@ type parsedFile struct {
 }
 
 // check parses pkg, calls waitImports, and type-checks pkg against its
-// imports, with function bodies when bodies is set. Errors land in pkg.Errors
-// as go/packages reports them.
-func (c *packageChecker) check(ctx context.Context, pkg *packages.Package, bodies bool, waitImports func()) {
+// imports, with function bodies when bodies is set. The syntax keeps comments
+// and function bodies only when full is set. Errors land in pkg.Errors as
+// go/packages reports them.
+func (c *packageChecker) check(ctx context.Context, pkg *packages.Package, full, bodies bool, waitImports func()) {
 	// Reset the package's results. unsafe has no source to check.
 	pkg.Errors, pkg.TypeErrors = nil, nil
 	pkg.Fset = c.fset
@@ -211,7 +226,7 @@ func (c *packageChecker) check(ctx context.Context, pkg *packages.Package, bodie
 	errs := make([]error, len(pkg.CompiledGoFiles))
 	var wg sync.WaitGroup
 	for i, name := range pkg.CompiledGoFiles {
-		wg.Go(func() { files[i], errs[i] = c.parse(ctx, name) })
+		wg.Go(func() { files[i], errs[i] = c.parse(ctx, name, full) })
 	}
 	wg.Wait()
 	pkg.Syntax = make([]*ast.File, 0, len(files))
@@ -252,18 +267,21 @@ func (c *packageChecker) check(ctx context.Context, pkg *packages.Package, bodie
 	}
 }
 
-// parse returns the syntax of one file, parsing it on first use.
-func (c *packageChecker) parse(ctx context.Context, name string) (*ast.File, error) {
+// parse returns the syntax of one file, parsing it on first use. Unless full
+// is set, the syntax has no comments and each declared function's body is
+// empty, keeping its braces' positions.
+func (c *packageChecker) parse(ctx context.Context, name string, full bool) (*ast.File, error) {
 	// Wait for a parse another package started, or claim the file.
+	key := parsedKey{name: name, full: full}
 	c.mu.Lock()
-	parsed := c.parsed[name]
+	parsed := c.parsed[key]
 	if parsed != nil {
 		c.mu.Unlock()
 		<-parsed.ready
 		return parsed.file, parsed.err
 	}
 	parsed = &parsedFile{ready: make(chan struct{})}
-	c.parsed[name] = parsed
+	c.parsed[key] = parsed
 	c.mu.Unlock()
 
 	// Read and parse the file within the work bound.
@@ -278,7 +296,18 @@ func (c *packageChecker) parse(ctx context.Context, name string) (*ast.File, err
 		parsed.err = err
 		return nil, err
 	}
-	parsed.file, parsed.err = parser.ParseFile(c.fset, name, src, parser.AllErrors|parser.ParseComments|parser.SkipObjectResolution)
+	mode := parser.AllErrors | parser.SkipObjectResolution
+	if full {
+		mode |= parser.ParseComments
+	}
+	parsed.file, parsed.err = parser.ParseFile(c.fset, name, src, mode)
+	if parsed.file != nil && !full {
+		for _, decl := range parsed.file.Decls {
+			if fn, ok := decl.(*ast.FuncDecl); ok && fn.Body != nil {
+				fn.Body = &ast.BlockStmt{Lbrace: fn.Body.Lbrace, Rbrace: fn.Body.Rbrace}
+			}
+		}
+	}
 	return parsed.file, parsed.err
 }
 
