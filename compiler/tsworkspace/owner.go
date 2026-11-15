@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"slices"
 	"strings"
 	"time"
@@ -62,12 +61,15 @@ func (o *Owner) EnsureNodeAmbientTypes() Result {
 
 // WriteFile writes a workspace-relative file.
 func (o *Owner) WriteFile(phase Phase, name string, data string) Result {
+	// Create the workspace directory.
 	if o == nil || o.workDir == "" {
 		return Result{Phase: phase, Error: "TypeScript workspace directory is empty"}
 	}
 	if err := os.MkdirAll(o.workDir, 0o755); err != nil {
 		return Result{Phase: phase, Error: errors.Wrap(err, "create TypeScript workspace").Error()}
 	}
+
+	// Write the file under its workspace path.
 	path, err := o.workspacePath(name)
 	if err != nil {
 		return Result{Phase: phase, Error: err.Error()}
@@ -92,6 +94,7 @@ func (o *Owner) WriteJSON(phase Phase, name string, value any) Result {
 
 // RunTool finds and executes a TypeScript workspace tool.
 func (o *Owner) RunTool(ctx context.Context, phase Phase, dir string, name string, args ...string) Result {
+	// Locate the tool, running a node script with bun when it is present.
 	tool, err := o.FindTool(name)
 	if err != nil {
 		return Result{Phase: phase, Error: err.Error()}
@@ -105,6 +108,8 @@ func (o *Owner) RunTool(ctx context.Context, phase Phase, dir string, name strin
 			command = append([]string{bun}, command...)
 		}
 	}
+
+	// Run the tool in its own process group, killed with it on cancel.
 	start := time.Now()
 	cmd := exec.CommandContext(ctx, command[0], command[1:]...)
 	configureToolCommand(cmd)
@@ -113,11 +118,15 @@ func (o *Owner) RunTool(ctx context.Context, phase Phase, dir string, name strin
 		return nil
 	}
 	cmd.WaitDelay = 5 * time.Second
+
+	// Capture stdout and stderr together and run it in dir.
 	cmd.Dir = dir
 	var output bytes.Buffer
 	cmd.Stdout = &output
 	cmd.Stderr = &output
 	err = cmd.Run()
+
+	// Report the command, its output and how long it ran.
 	result := Result{
 		Phase:   phase,
 		Command: command,
@@ -132,10 +141,14 @@ func (o *Owner) RunTool(ctx context.Context, phase Phase, dir string, name strin
 
 // FindTool locates a TypeScript workspace tool.
 func (o *Owner) FindTool(name string) (string, error) {
+	// Use an absolute name as given.
 	if filepath.IsAbs(name) {
 		return name, nil
 	}
-	starts := []string{o.toolDir, o.workDir, sourceDirectory(), currentWorkingDirectory()}
+
+	// Search node_modules/.bin above the tool, work and current directories,
+	// then PATH.
+	starts := []string{o.toolDir, o.workDir, currentWorkingDirectory()}
 	for _, start := range starts {
 		if start == "" {
 			continue
@@ -161,6 +174,7 @@ func (o *Owner) FindTool(name string) (string, error) {
 // RunTool runs such scripts with Bun, which the workspace already requires, so
 // hosts without Node can type check.
 func nodeScript(tool string) bool {
+	// Read the first line of the tool.
 	f, err := os.Open(tool)
 	if err != nil {
 		return false
@@ -169,6 +183,8 @@ func nodeScript(tool string) bool {
 	head := make([]byte, 128)
 	n, _ := f.Read(head)
 	line, _, _ := bytes.Cut(head[:n], []byte("\n"))
+
+	// Match a shebang whose interpreter or argument is node.
 	if !bytes.HasPrefix(line, []byte("#!")) {
 		return false
 	}
@@ -179,6 +195,7 @@ func nodeScript(tool string) bool {
 }
 
 func (o *Owner) workspacePath(name string) (string, error) {
+	// Accept only a relative path that stays inside the workspace.
 	if filepath.IsAbs(name) {
 		return "", errors.Errorf("TypeScript workspace path must be relative: %s", name)
 	}
@@ -191,6 +208,7 @@ func (o *Owner) workspacePath(name string) (string, error) {
 
 // NodeTypeRoots returns existing @types roots visible from the provided dirs.
 func NodeTypeRoots(dirs ...string) []string {
+	// Take the nearest @types above each directory, once each, sorted.
 	seen := make(map[string]bool)
 	var roots []string
 	for _, start := range append(dirs, currentWorkingDirectory()) {
@@ -250,14 +268,6 @@ func currentWorkingDirectory() string {
 	return wd
 }
 
-func sourceDirectory() string {
-	_, file, _, ok := runtime.Caller(0)
-	if !ok {
-		return ""
-	}
-	return filepath.Dir(file)
-}
-
 const nodeAmbientTypes = `declare const process: {
   env?: Record<string, string | undefined>
   chdir?: (directory: string) => void
@@ -285,6 +295,7 @@ declare module 'node:path' {
 `
 
 func renderJSON(value any) (string, error) {
+	// Write the value with two-space indent and a trailing newline.
 	stream := jsoniter.NewStream(nil, 512, 2)
 	if err := writeJSONValue(stream, value); err != nil {
 		return "", errors.Wrap(err, "marshal TypeScript workspace JSON")
@@ -344,6 +355,7 @@ func writeJSONValue(stream *jsoniter.Stream, value any) error {
 }
 
 func writeJSONObject[T any](stream *jsoniter.Stream, fields map[string]T, writeValue func(T) error) error {
+	// Write the fields in sorted key order.
 	stream.WriteObjectStart()
 	keys := make([]string, 0, len(fields))
 	for key := range fields {
