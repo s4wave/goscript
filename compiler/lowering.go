@@ -6482,7 +6482,10 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 			right, diagnostics := o.lowerTupleExpr(ctx, stmt.Rhs[0])
 			return []loweredStmt{{text: right}}, diagnostics
 		}
-		right, diagnostics := o.lowerTupleExpr(ctx, stmt.Rhs[0])
+		// The target operands that need it are evaluated before the call.
+		ctx, prelude, diagnostics := o.stableTupleTargets(ctx, stmt.Lhs)
+		right, rightDiagnostics := o.lowerTupleExpr(ctx, stmt.Rhs[0])
+		diagnostics = append(diagnostics, rightDiagnostics...)
 		lefts := make([]string, 0, len(stmt.Lhs))
 		for _, lhs := range stmt.Lhs {
 			if ident, ok := lhs.(*ast.Ident); ok && ident.Name == "_" {
@@ -6498,11 +6501,13 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 			prefix = declarationKeyword(ctx)
 			if !allShortAssignTargetsNew(ctx, stmt.Lhs) || o.tupleDeclarationNeedsElementStatements(ctx, stmt) ||
 				gotoHoistsAny(ctx, stmt.Lhs) {
-				return o.lowerTupleReassignmentStmt(ctx, stmt, right, diagnostics)
+				stmts, diagnostics := o.lowerTupleReassignmentStmt(ctx, stmt, right, diagnostics)
+				return append(prelude, stmts...), diagnostics
 			}
-			return []loweredStmt{{text: prefix + "[" + strings.Join(lefts, ", ") + "] = " + right}}, diagnostics
+			return append(prelude, loweredStmt{text: prefix + "[" + strings.Join(lefts, ", ") + "] = " + right}), diagnostics
 		}
-		return o.lowerTupleReassignmentStmt(ctx, stmt, right, diagnostics)
+		stmts, diagnostics := o.lowerTupleReassignmentStmt(ctx, stmt, right, diagnostics)
+		return append(prelude, stmts...), diagnostics
 	}
 	if len(stmt.Rhs) > 1 && len(stmt.Lhs) == len(stmt.Rhs) && stmt.Tok == token.ASSIGN {
 		return o.lowerParallelAssignStmt(ctx, stmt)
@@ -7771,9 +7776,12 @@ func (o *LoweringOwner) lowerDeclaredValue(ctx lowerFileContext, lhs ast.Expr, v
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperVarRef) + "(" + value + ")"
 }
 
+// lowerParallelAssignStmt lowers a tuple assignment of several values: the
+// target operands that need it (see stableTupleTargets), then each value
+// into a temporary, then each target in turn.
 func (o *LoweringOwner) lowerParallelAssignStmt(ctx lowerFileContext, stmt *ast.AssignStmt) ([]loweredStmt, []Diagnostic) {
-	stmts := make([]loweredStmt, 0, len(stmt.Rhs)*2)
-	var diagnostics []Diagnostic
+	// The target operands go first, then the values.
+	ctx, stmts, diagnostics := o.stableTupleTargets(ctx, stmt.Lhs)
 	tempPrefix := ctx.tempName("Assign") + "_"
 	for idx, rhs := range stmt.Rhs {
 		right, rightDiagnostics := o.lowerExpr(ctx, rhs)

@@ -1,2 +1,9 @@
 2 1
 1 0
+index: 9 0 0
+deref: 2 1 true
+pointer: 0 7
+element: 2 5 0
+order: iivv 3 4
+tuple: ip 2 9
+tuple index: 9 4 7 2
