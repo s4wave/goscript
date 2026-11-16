@@ -70,6 +70,11 @@ const (
 	RuntimeHelperUint64Bit      RuntimeHelper = "builtin.uint64Bit"
 	RuntimeHelperInt64Bit       RuntimeHelper = "builtin.int64Bit"
 	RuntimeHelperUintShr        RuntimeHelper = "builtin.uintShr"
+	// RuntimeHelperIntQuo divides integers that are numbers, panicking on zero.
+	RuntimeHelperIntQuo RuntimeHelper = "builtin.intQuo"
+	// RuntimeHelperIntRem is the remainder of integers that are numbers,
+	// panicking on zero.
+	RuntimeHelperIntRem         RuntimeHelper = "builtin.intRem"
 	RuntimeHelperIntAnd         RuntimeHelper = "builtin.intAnd"
 	RuntimeHelperIntOr          RuntimeHelper = "builtin.intOr"
 	RuntimeHelperIntXor         RuntimeHelper = "builtin.intXor"
@@ -417,6 +422,8 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperUint64Bit, "uint64Bit", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperInt64Bit, "int64Bit", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperUintShr, "uintShr", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperIntQuo, "intQuo", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperIntRem, "intRem", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperIntAnd, "intAnd", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperIntOr, "intOr", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperIntXor, "intXor", RuntimeHelperCategoryBuiltin),

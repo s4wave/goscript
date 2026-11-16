@@ -77,7 +77,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let bs = new Uint8Array([250, 251]) as $.Slice<number>
 	for (let __goscriptRangeTarget6 = bs, __goscriptRangeWindow6 = $.sliceRange(__goscriptRangeTarget6), i = 0; i < __goscriptRangeWindow6.length; i++) {
-		;(__goscriptRangeWindow6.backing as any[])[__goscriptRangeWindow6.offset + i] = $.uint((__goscriptRangeWindow6.backing as any[])[__goscriptRangeWindow6.offset + i] + (10), 8)
+		;(__goscriptRangeWindow6.backing as any[])[__goscriptRangeWindow6.offset + i] = (((__goscriptRangeWindow6.backing as any[])[__goscriptRangeWindow6.offset + i] + 10) & 0xff)
 	}
 	await $.println($.typedSliceIndex(bs!, 0), $.typedSliceIndex(bs!, 1))
 

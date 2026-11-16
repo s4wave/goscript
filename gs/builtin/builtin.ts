@@ -1215,6 +1215,24 @@ export function uintShr(
   return Number(uint(value, width)) >>> amount
 }
 
+// intQuo returns left / right truncated toward zero, for the integers that
+// are numbers. A zero divisor panics, as it does in Go.
+export function intQuo(left: number, right: number): number {
+  if (right === 0) {
+    runtimePanic('runtime error: integer divide by zero')
+  }
+  return Math.trunc(left / right)
+}
+
+// intRem returns left % right, for the integers that are numbers. A zero
+// divisor panics, as it does in Go.
+export function intRem(left: number, right: number): number {
+  if (right === 0) {
+    runtimePanic('runtime error: integer divide by zero')
+  }
+  return left % right
+}
+
 // intAnd returns left & right for Go ints, which are numbers exact to 2^53.
 // The JavaScript & keeps only 32 bits, so it applies only to two int32s.
 export function intAnd(left: number, right: number): number {

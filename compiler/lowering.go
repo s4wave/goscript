@@ -5550,59 +5550,47 @@ func (o *LoweringOwner) lowerStmtInto(ctx lowerFileContext, stmt ast.Stmt, out [
 		}
 		return append(out, lowered...), diagnostics
 	case *ast.IncDecStmt:
-		// A bigint-backed operand (int64/uint64) needs a bigint step literal so
-		// the generated +/- does not mix bigint and number.
-		oneLiteral := "1"
-		if isBigIntBackedType(ctx.semPkg.source.TypesInfo.TypeOf(typed.X)) {
-			oneLiteral = "1n"
+		// x++ and x-- are x += 1 and x -= 1, with a one of the operand's
+		// representation.
+		targetType := ctx.semPkg.source.TypesInfo.TypeOf(typed.X)
+		tok := token.ADD_ASSIGN
+		if typed.Tok == token.DEC {
+			tok = token.SUB_ASSIGN
 		}
+		one := "1"
+		if isBigIntBackedType(targetType) {
+			one = "1n"
+		}
+
+		// A map element and a package variable of another package are
+		// updated through their runtime operations.
 		if index, ok := unwrapParenExpr(typed.X).(*ast.IndexExpr); ok && isMapType(ctx.semPkg.source.TypesInfo.TypeOf(index.X)) {
-			tok := token.ADD_ASSIGN
-			if typed.Tok == token.DEC {
-				tok = token.SUB_ASSIGN
-			}
-			stmts, diagnostics := o.lowerMapIndexUpdateStmts(ctx, index, tok, oneLiteral, ctx.semPkg.source.TypesInfo.TypeOf(typed.X), false)
+			stmts, diagnostics := o.lowerMapIndexUpdateStmts(ctx, index, tok, one, targetType, true)
 			return append(out, stmts...), diagnostics
 		}
 		if setter, ok := o.packageVarSetterForAssignment(ctx, typed.X); ok {
-			expr, diagnostics := o.lowerExpr(ctx, typed.X)
-			op := "+"
-			if typed.Tok == token.DEC {
-				op = "-"
+			value, ok := o.packageVarAssignmentValue(ctx, typed.X, targetType, one, tok, true)
+			if !ok {
+				_, diagnostics := o.lowerExpr(ctx, typed.X)
+				return out, diagnostics
 			}
-			return append(out, loweredStmt{text: setter + "(" + expr + " " + op + " " + oneLiteral + ")"}), diagnostics
-		}
-		op := token.ADD
-		if typed.Tok == token.DEC {
-			op = token.SUB
+			return append(out, loweredStmt{text: setter + "(" + value + ")"}), nil
 		}
 
-		// A narrow integer wraps and a float32 rounds, also an element of a
-		// slice held in an array rather than a typed array, reading the
-		// target twice, so the operands of the target are evaluated once
+		// A step that JavaScript computes as Go does stays in place.
+		if lowerCompoundAssignStmt(o.runtimeOwner, targetType, "x", one, tok, true) == "x "+tok.String()+" "+one {
+			expr, diagnostics := o.lowerIncDecTarget(ctx, typed.X)
+			return append(out, loweredStmt{text: expr + typed.Tok.String()}), diagnostics
+		}
+
+		// Any other step, such as one that wraps, rounds or calls a wide
+		// helper, reads the target twice, so its operands are evaluated once
 		// first.
-		targetType := ctx.semPkg.source.TypesInfo.TypeOf(typed.X)
-		if _, ok := incDecStepValue(targetType, "x", op); ok {
-			targetCtx, prelude, diagnostics := o.stableCompoundTarget(ctx, typed.X)
-			expr, exprDiagnostics := o.lowerIncDecTarget(targetCtx, typed.X)
-			value, _ := incDecStepValue(targetType, expr+" "+op.String()+" 1", op)
-			out = append(append(out, prelude...), loweredStmt{text: expr + " = " + value})
-			return out, append(diagnostics, exprDiagnostics...)
-		}
-
-		// Other pointer and element targets step in place.
-		if _, ok := unwrapParenExpr(typed.X).(*ast.StarExpr); ok {
-			expr, diagnostics := o.lowerIncDecTarget(ctx, typed.X)
-			return append(out, loweredStmt{text: expr + typed.Tok.String()}), diagnostics
-		}
-		if _, ok := unwrapParenExpr(typed.X).(*ast.IndexExpr); ok {
-			expr, diagnostics := o.lowerIncDecTarget(ctx, typed.X)
-			return append(out, loweredStmt{text: expr + typed.Tok.String()}), diagnostics
-		}
-
-		// Any other operand steps in place.
-		expr, diagnostics := o.lowerExpr(ctx, typed.X)
-		return append(out, loweredStmt{text: expr + typed.Tok.String()}), diagnostics
+		targetCtx, prelude, diagnostics := o.stableCompoundTarget(ctx, typed.X)
+		expr, exprDiagnostics := o.lowerIncDecTarget(targetCtx, typed.X)
+		value := lowerCompoundAssignValue(o.runtimeOwner, targetType, expr, one, tok, true)
+		out = append(append(out, prelude...), loweredStmt{text: expr + " = " + value})
+		return out, append(diagnostics, exprDiagnostics...)
 	case *ast.BranchStmt:
 		if typed.Label != nil {
 			switch typed.Tok {
@@ -6550,7 +6538,7 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 		right, rightDiagnostics := o.lowerExpr(ctx, stmt.Rhs[idx])
 		diagnostics = append(diagnostics, rightDiagnostics...)
 		targetType := assignmentTargetType(ctx, lhs)
-		mask := isInt32Mask(ctx, stmt.Rhs[idx])
+		smallConst := isInt32Mask(ctx, stmt.Rhs[idx])
 		// A struct assigned to existing storage is copied into it field by
 		// field, so a value of the same type is not copied first.
 		uncopied := right
@@ -6571,7 +6559,7 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 			uncopied = right
 		}
 		if setter, ok := o.packageVarSetterForAssignment(ctx, lhs); ok {
-			value, ok := o.packageVarAssignmentValue(ctx, lhs, targetType, right, stmt.Tok)
+			value, ok := o.packageVarAssignmentValue(ctx, lhs, targetType, right, stmt.Tok, smallConst)
 			if !ok {
 				value = right
 			}
@@ -6579,7 +6567,7 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 			continue
 		}
 		if index, ok := lhs.(*ast.IndexExpr); ok && isMapType(ctx.semPkg.source.TypesInfo.TypeOf(index.X)) && stmt.Tok != token.DEFINE {
-			update, updateDiagnostics := o.lowerMapIndexUpdateStmts(ctx, index, stmt.Tok, right, targetType, mask)
+			update, updateDiagnostics := o.lowerMapIndexUpdateStmts(ctx, index, stmt.Tok, right, targetType, smallConst)
 			diagnostics = append(diagnostics, updateDiagnostics...)
 			stmts = append(stmts, update...)
 			continue
@@ -6610,11 +6598,7 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 		if starTarget && stmt.Tok != token.DEFINE {
 			pointer, pointerDiagnostics := o.lowerPointerStorageExpr(ctx, star.X)
 			diagnostics = append(diagnostics, pointerDiagnostics...)
-			if value, ok := integerQuotientAssignExpr(targetType, pointer, right, stmt.Tok); ok {
-				stmts = append(stmts, loweredStmt{text: value})
-				continue
-			}
-			stmts = append(stmts, loweredStmt{text: lowerCompoundAssignStmt(o.runtimeOwner, targetType, pointer, right, stmt.Tok, mask)})
+			stmts = append(stmts, loweredStmt{text: lowerCompoundAssignStmt(o.runtimeOwner, targetType, pointer, right, stmt.Tok, smallConst)})
 			continue
 		}
 		if isShortDecl {
@@ -6633,16 +6617,12 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 			stmts = append(stmts, loweredStmt{text: left + " = " + call})
 			continue
 		}
-		if value, ok := integerQuotientAssignExpr(targetType, left, right, stmt.Tok); ok {
-			stmts = append(stmts, loweredStmt{text: value})
-			continue
-		}
 		op := stmt.Tok.String()
 		if stmt.Tok == token.DEFINE {
 			op = "="
 		}
 		if stmt.Tok != token.ASSIGN && stmt.Tok != token.DEFINE {
-			stmts = append(stmts, loweredStmt{text: lowerCompoundAssignStmt(o.runtimeOwner, targetType, left, right, stmt.Tok, mask)})
+			stmts = append(stmts, loweredStmt{text: lowerCompoundAssignStmt(o.runtimeOwner, targetType, left, right, stmt.Tok, smallConst)})
 			continue
 		}
 		stmts = append(stmts, loweredStmt{text: left + " " + op + " " + right})
@@ -6656,7 +6636,7 @@ func (o *LoweringOwner) lowerMapIndexUpdateStmts(
 	tok token.Token,
 	right string,
 	targetType types.Type,
-	mask bool,
+	smallConst bool,
 ) ([]loweredStmt, []Diagnostic) {
 	mapExpr, mapDiagnostics := o.lowerExpr(ctx, index.X)
 	keyExpr, keyDiagnostics := o.lowerExpr(ctx, index.Index)
@@ -6670,7 +6650,7 @@ func (o *LoweringOwner) lowerMapIndexUpdateStmts(
 	mapTemp := ctx.tempName("Map")
 	keyTemp := ctx.tempName("MapKey")
 	current := o.lowerMapGetValue(ctx, index, mapTemp, keyTemp)
-	value := lowerCompoundAssignValue(o.runtimeOwner, targetType, current, right, tok, mask)
+	value := lowerCompoundAssignValue(o.runtimeOwner, targetType, current, right, tok, smallConst)
 	return []loweredStmt{
 		{text: "const " + mapTemp + " = " + mapExpr},
 		{text: "const " + keyTemp + " = " + keyExpr},
@@ -6680,41 +6660,51 @@ func (o *LoweringOwner) lowerMapIndexUpdateStmts(
 
 // lowerCompoundAssignStmt lowers the compound assignment left op= right. An
 // operation that JavaScript computes as Go does keeps its compound operator.
-// mask reports whether right is a constant in [0, 2^31).
+// smallConst reports whether right is a constant in [0, 2^31).
 func lowerCompoundAssignStmt(
 	runtimeOwner *RuntimeContractOwner,
 	targetType types.Type,
 	left string,
 	right string,
 	tok token.Token,
-	mask bool,
+	smallConst bool,
 ) string {
-	value := lowerCompoundAssignValue(runtimeOwner, targetType, left, right, tok, mask)
-	if value == left+" "+strings.TrimSuffix(tok.String(), "=")+" ("+right+")" {
+	value := lowerCompoundAssignValue(runtimeOwner, targetType, left, right, tok, smallConst)
+	if value == left+" "+strings.TrimSuffix(tok.String(), "=")+" "+compoundOperand(right) {
 		return left + " " + tok.String() + " " + right
 	}
 	return left + " = " + value
 }
 
+// compoundOperand returns the right operand of a compound assignment as the
+// operand of a binary operator: parenthesized, unless it is a number.
+func compoundOperand(right string) string {
+	if numericLiteralPattern.MatchString(right) {
+		return right
+	}
+	return "(" + right + ")"
+}
+
 // lowerCompoundAssignValue returns the value that left op= right assigns to
-// left. mask reports whether right is a constant in [0, 2^31).
+// left. smallConst reports whether right is a constant in [0, 2^31), which
+// is a mask for the bitwise operators and a nonzero divisor for quotients.
 func lowerCompoundAssignValue(
 	runtimeOwner *RuntimeContractOwner,
 	targetType types.Type,
 	left string,
 	right string,
 	tok token.Token,
-	mask bool,
+	smallConst bool,
 ) string {
-	// Complex numbers, wide integers, int bitwise operations, 32-bit
-	// products and integer quotients have helpers.
+	// Complex numbers, wide integers, int bitwise operations and 32-bit
+	// products have helpers.
 	if helper, ok := complexArithmeticHelper(targetType, tok); ok {
 		return complexHelperCall(runtimeOwner, targetType, helper, left, right)
 	}
 	if helper, ok := wideIntegerAssignHelper(targetType, tok); ok {
 		return wideIntegerHelperCall(runtimeOwner, targetType, helper, left, right)
 	}
-	if value, ok := lowerIntBitwiseValue(runtimeOwner, targetType, tok, left, right, mask); ok {
+	if value, ok := lowerIntBitwiseValue(runtimeOwner, targetType, tok, left, right, smallConst); ok {
 		return value
 	}
 	if tok == token.MUL_ASSIGN {
@@ -6722,16 +6712,22 @@ func lowerCompoundAssignValue(
 			return value
 		}
 	}
-	if value, ok := integerQuotientAssignValueExpr(targetType, left, right, tok); ok {
+
+	// Other operators apply to the operand and wrap to the target's width.
+	right = compoundOperand(right)
+	if value, ok := lowerIntegerQuotientValue(runtimeOwner, targetType, tok, left, right, smallConst); ok {
 		return value
 	}
-
-	// Other operators apply to the parenthesized operand, wrapped to the
-	// target's width.
-	right = "(" + right + ")"
 	wrapNarrow := func(value string) string {
 		if targetType == nil || isFloatType(targetType) {
 			return value
+		}
+		op := token.ADD
+		if tok == token.SHL_ASSIGN {
+			op = token.SHL
+		}
+		if wrapped, ok := wrapNarrowIntegerValue(targetType, value, op); ok {
+			return wrapped
 		}
 		if bits, ok := unsignedIntegerBits(targetType); ok && bits < 64 {
 			return runtimeOwner.QualifiedHelper(RuntimeHelperUint) + "(" + value + ", " + strconv.Itoa(bits) + ")"
@@ -6775,8 +6771,6 @@ func lowerCompoundAssignValue(
 			return "globalThis.Math.fround(" + value + ")"
 		}
 		return value
-	case token.REM_ASSIGN:
-		return left + " % " + right
 	case token.AND_ASSIGN:
 		return wrapUint32(left + " & " + right)
 	case token.OR_ASSIGN:
@@ -6803,12 +6797,43 @@ func lowerCompoundAssignValue(
 	}
 }
 
-func integerQuotientAssignExpr(targetType types.Type, left string, right string, tok token.Token) (string, bool) {
-	value, ok := integerQuotientAssignValueExpr(targetType, left, right, tok)
-	if !ok {
+// lowerIntegerQuotientValue returns left op right for the integer quotient or
+// remainder operator op, or its assignment form, on integers of type typ that
+// are numbers, and whether it applies to them.
+// A divisor that is not a small constant goes through a runtime helper, which
+// panics on zero as Go does.
+// A signed narrow quotient by a variable wraps, since its minimum divided by
+// -1 overflows.
+func lowerIntegerQuotientValue(
+	runtimeOwner *RuntimeContractOwner,
+	typ types.Type,
+	op token.Token,
+	left string,
+	right string,
+	smallConst bool,
+) (string, bool) {
+	// Wide integers have their own helpers.
+	if !isIntegerType(typ) || isRuntimeWideIntegerType(typ) {
 		return "", false
 	}
-	return left + " = " + value, true
+	switch op {
+	case token.QUO, token.QUO_ASSIGN:
+		value := "globalThis.Math.trunc(" + left + " / " + right + ")"
+		if !smallConst {
+			value = runtimeOwner.QualifiedHelper(RuntimeHelperIntQuo) + "(" + left + ", " + right + ")"
+		}
+		if bits, ok := signedIntegerBits(typ); ok && bits < 64 && !smallConst {
+			value, _ = wrapNarrowIntegerValue(typ, value, op)
+		}
+		return value, true
+	case token.REM, token.REM_ASSIGN:
+		if smallConst {
+			return left + " % " + right, true
+		}
+		return runtimeOwner.QualifiedHelper(RuntimeHelperIntRem) + "(" + left + ", " + right + ")", true
+	default:
+		return "", false
+	}
 }
 
 func assignmentTargetType(ctx lowerFileContext, lhs ast.Expr) types.Type {
@@ -6818,26 +6843,6 @@ func assignmentTargetType(ctx lowerFileContext, lhs ast.Expr) types.Type {
 		}
 	}
 	return ctx.semPkg.source.TypesInfo.TypeOf(lhs)
-}
-
-func integerQuotientAssignValueExpr(targetType types.Type, left string, right string, tok token.Token) (string, bool) {
-	if tok != token.QUO_ASSIGN || !isIntegerType(targetType) {
-		return "", false
-	}
-	if bits, ok := unsignedIntegerBits(targetType); ok && bits <= 32 {
-		return "(" + left + " / " + right + ") >>> 0", true
-	}
-	return "globalThis.Math.trunc(" + left + " / " + right + ")", true
-}
-
-// incDecStepValue returns value, the stepped value of an increment or
-// decrement of a variable of type typ, wrapped to a narrow integer type or
-// rounded to float32, and whether typ is such a type.
-func incDecStepValue(typ types.Type, value string, op token.Token) (string, bool) {
-	if isFloat32Type(typ) {
-		return "globalThis.Math.fround(" + value + ")", true
-	}
-	return wrapNarrowIntegerValue(typ, value, op)
 }
 
 // lowerIncDecTarget lowers the assignable target of an increment or
@@ -6912,11 +6917,34 @@ func isInt32Mask(ctx lowerFileContext, expr ast.Expr) bool {
 	return exact && bits >= 0 && bits <= math.MaxInt32
 }
 
-// wrapNarrowIntegerValue wraps the result of an addition, subtraction or
-// left shift of integers narrower than 64 bits, which JavaScript computes
-// without overflow, to the width of its type, as Go does. A JavaScript left
-// shift already wraps to a signed 32-bit result, so it needs no wrapping for
-// int32.
+// wrapNarrowIntegerResult wraps value, the JavaScript result of the binary or
+// unary operator op in expr, to the width of the type of expr, and reports
+// whether that result can leave its range.
+// Sums, differences, products, negations and left shifts can overflow any
+// narrow width.
+// The bitwise operators return signed 32-bit numbers, outside the range of
+// uint32.
+// A constant expr is always in range, since Go rejects constant overflow.
+func wrapNarrowIntegerResult(info *types.Info, expr ast.Expr, op token.Token, value string) (string, bool) {
+	if info.Types[expr].Value != nil {
+		return "", false
+	}
+	typ := info.TypeOf(expr)
+	switch op {
+	case token.ADD, token.SUB, token.MUL, token.SHL:
+		return wrapNarrowIntegerValue(typ, value, op)
+	case token.AND, token.OR, token.XOR, token.AND_NOT:
+		if bits, ok := unsignedIntegerBits(typ); ok && bits == 32 {
+			return wrapNarrowIntegerValue(typ, value, op)
+		}
+	}
+	return "", false
+}
+
+// wrapNarrowIntegerValue wraps value, an integer that JavaScript computed
+// without overflow, to the width of typ when typ is narrower than 64 bits, as
+// Go does. A JavaScript left shift already wraps to a signed 32-bit result,
+// so it needs no wrapping for int32.
 func wrapNarrowIntegerValue(typ types.Type, value string, op token.Token) (string, bool) {
 	if bits, ok := unsignedIntegerBits(typ); ok {
 		switch bits {
@@ -10510,7 +10538,11 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 			if value, ok := lowerIntBitwiseValue(o.runtimeOwner, ctx.semPkg.source.TypesInfo.TypeOf(typed), typed.Op, left, right, false); ok {
 				return value, append(leftDiagnostics, rightDiagnostics...)
 			}
-			return left + " & ~(" + right + ")", append(leftDiagnostics, rightDiagnostics...)
+			value := left + " & ~(" + right + ")"
+			if wrapped, ok := wrapNarrowIntegerResult(ctx.semPkg.source.TypesInfo, typed, typed.Op, value); ok {
+				value = wrapped
+			}
+			return value, append(leftDiagnostics, rightDiagnostics...)
 		}
 		if isEqualityOperator(typed.Op) {
 			if value, ok := o.lowerTypedEqualityExpr(ctx, typed, left, right); ok {
@@ -10528,8 +10560,8 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 		if value, ok := o.lowerWideIntegerBinaryExpr(ctx, typed, left, right); ok {
 			return value, append(leftDiagnostics, rightDiagnostics...)
 		}
-		if typed.Op == token.QUO && isIntegerType(ctx.semPkg.source.TypesInfo.TypeOf(typed)) {
-			return "globalThis.Math.trunc(" + left + " / " + right + ")", append(leftDiagnostics, rightDiagnostics...)
+		if value, ok := lowerIntegerQuotientValue(o.runtimeOwner, ctx.semPkg.source.TypesInfo.TypeOf(typed), typed.Op, left, right, isInt32Mask(ctx, typed.Y)); ok {
+			return value, append(leftDiagnostics, rightDiagnostics...)
 		}
 		if typed.Op == token.SHR {
 			if bits, ok := unsignedIntegerBits(ctx.semPkg.source.TypesInfo.TypeOf(typed.X)); ok && bits <= 32 {
@@ -10557,10 +10589,8 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 		if value, ok := o.lowerNarrowShiftExpr(ctx, typed, left, right); ok {
 			return value, append(leftDiagnostics, rightDiagnostics...)
 		}
-		if typed.Op == token.ADD || typed.Op == token.SUB || typed.Op == token.SHL {
-			if value, ok := wrapNarrowIntegerValue(ctx.semPkg.source.TypesInfo.TypeOf(typed), left+" "+typed.Op.String()+" "+right, typed.Op); ok {
-				return value, append(leftDiagnostics, rightDiagnostics...)
-			}
+		if value, ok := wrapNarrowIntegerResult(ctx.semPkg.source.TypesInfo, typed, typed.Op, left+" "+typed.Op.String()+" "+right); ok {
+			return value, append(leftDiagnostics, rightDiagnostics...)
 		}
 		if value, diagnostics, ok := o.lowerStringOrderExpr(ctx, typed, left, right, leftDiagnostics, rightDiagnostics); ok {
 			return value, diagnostics
@@ -10591,7 +10621,14 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 			}
 		}
 		if typed.Op == token.NOT || typed.Op == token.SUB || typed.Op == token.ADD {
-			return lowerPrefixUnaryExpr(typed.Op, value), diagnostics
+			value = lowerPrefixUnaryExpr(typed.Op, value)
+			if typed.Op != token.SUB {
+				return value, diagnostics
+			}
+			if wrapped, ok := wrapNarrowIntegerResult(ctx.semPkg.source.TypesInfo, typed, typed.Op, value); ok {
+				value = wrapped
+			}
+			return value, diagnostics
 		}
 		if typed.Op == token.XOR {
 			resultType := ctx.semPkg.source.TypesInfo.TypeOf(typed)
@@ -13281,12 +13318,17 @@ func (o *LoweringOwner) packageVarSetterForAssignment(ctx lowerFileContext, expr
 	return alias + "." + packageVarSetterName(selector.Sel.Name), true
 }
 
+// packageVarAssignmentValue returns the value that the assignment lhs tok
+// right gives the package variable lhs of another package, which is set
+// through its setter, and whether lhs lowers.
+// A compound assignment computes its value as one to any other target does.
 func (o *LoweringOwner) packageVarAssignmentValue(
 	ctx lowerFileContext,
 	lhs ast.Expr,
 	targetType types.Type,
 	right string,
 	tok token.Token,
+	smallConst bool,
 ) (string, bool) {
 	if tok == token.ASSIGN {
 		return right, true
@@ -13295,23 +13337,7 @@ func (o *LoweringOwner) packageVarAssignmentValue(
 	if len(diagnostics) != 0 {
 		return "", false
 	}
-	if helper, ok := wideIntegerAssignHelper(targetType, tok); ok {
-		return wideIntegerHelperCall(o.runtimeOwner, targetType, helper, left, right), true
-	}
-	if value, ok := lowerIntBitwiseValue(o.runtimeOwner, targetType, tok, left, right, false); ok {
-		return value, true
-	}
-	if tok == token.AND_NOT_ASSIGN {
-		return left + " & ~(" + right + ")", true
-	}
-	if value, ok := integerQuotientAssignValueExpr(targetType, left, right, tok); ok {
-		return value, true
-	}
-	op := tok.String()
-	if before, ok := strings.CutSuffix(op, "="); ok {
-		op = before
-	}
-	return left + " " + op + " " + right, true
+	return lowerCompoundAssignValue(o.runtimeOwner, targetType, left, right, tok, smallConst), true
 }
 
 func (o *LoweringOwner) tsPackageVarSetterValueTypeFor(ctx lowerFileContext, typ types.Type) string {

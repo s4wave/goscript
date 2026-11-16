@@ -1,0 +1,9 @@
+int /: runtime error: integer divide by zero
+int %: runtime error: integer divide by zero
+uint8 /: runtime error: integer divide by zero
+int32 %: runtime error: integer divide by zero
+int64 /: runtime error: integer divide by zero
+uint /: runtime error: integer divide by zero
+int /=: runtime error: integer divide by zero
+int %=: runtime error: integer divide by zero
+-4 -3 1 -3 1 1 -2

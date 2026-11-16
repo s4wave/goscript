@@ -1,7 +1,7 @@
 package main
 
-// Increments and decrements wrap narrow integers and round float32 values as
-// Go stores them, in variables, struct fields, through pointers, and in
+// Increments and decrements wrap integers and round float32 values as Go
+// stores them, in variables, struct fields, through pointers, and in
 // slice and array elements, also of slices held in plain arrays, as generic
 // code makes them.
 
@@ -33,6 +33,15 @@ func main() {
 	c.U16--
 	c.F++
 	println("vars:", vf == 16777216, vu, vi, c.I8, c.U16, c.F == 16777216)
+
+	// 64-bit integers, which are bigints or wide numbers.
+	var i64 int64 = 9223372036854775807
+	i64++
+	var u64 uint64
+	u64--
+	var u uint
+	u--
+	println("wide:", i64, u64, u)
 
 	// Elements of slices held in plain and in typed arrays, and of arrays.
 	gi := appendOf[int32](nil, 2147483647)

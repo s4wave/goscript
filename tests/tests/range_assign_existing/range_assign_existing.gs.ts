@@ -85,7 +85,7 @@ export async function main(): globalThis.Promise<void> {
 			c.Y = __goscriptRangeKey1
 			for (let __goscriptRangeCount0 = sz.X, __goscriptRangeKey2 = 0; __goscriptRangeKey2 < __goscriptRangeCount0; __goscriptRangeKey2++) {
 				c.X = __goscriptRangeKey2
-				sum = $.int(sum + ($.int((((((c.X + (globalThis.Math.imul(10, c.Y))) | 0)) + (globalThis.Math.imul(100, c.Z))) | 0), 32)), 32)
+				sum = ((sum + ($.int((((((c.X + (globalThis.Math.imul(10, c.Y))) | 0)) + (globalThis.Math.imul(100, c.Z))) | 0), 32))) | 0)
 			}
 		}
 	}

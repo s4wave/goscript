@@ -26,6 +26,16 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(u16, $.uint((((((one << 15) & 0xffff)) << 1) & 0xffff), 16))
 	let u8 = 200
 	await $.println($.uint(((u8 + 100) & 0xff), 8), $.uint(((u8 << 1) & 0xff), 8))
+
+	// Products, negations, quotients and uint32 bitwise results wrap before
+	// an outer operation reads them.
+	let s8 = 127
+	let m8 = -128
+	let neg = -1
+	let m32 = -2147483648
+	let w: number = 0xf0f0f0f0
+	await $.println($.int(globalThis.Math.trunc((((s8 * s8) << 24 >> 24)) / 2), 8), $.uint(globalThis.Math.trunc((((u8 * u8) & 0xff)) / 2), 8), $.int(globalThis.Math.trunc((((-m32) | 0)) / 2), 32), $.int(((-m8) << 24 >> 24), 8), $.int((($.intQuo(m8, neg)) << 24 >> 24), 8))
+	await $.println($.uint(globalThis.Math.trunc((((w | 1) >>> 0)) / 2), 32), $.uint(globalThis.Math.trunc((((w ^ 1) >>> 0)) / 2), 32), $.uint(globalThis.Math.trunc((((w & w) >>> 0)) / 2), 32), $.uint(globalThis.Math.trunc((((w & ~(1)) >>> 0)) / 2), 32), $.uint((((w | 1) >>> 0)), 32) > 5)
 }
 
 if ($.isMainScript(import.meta)) {

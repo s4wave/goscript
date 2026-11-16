@@ -22,4 +22,13 @@ func main() {
 	println(u16, one<<15<<1)
 	var u8 uint8 = 200
 	println(u8+100, u8<<1)
+
+	// Products, negations, quotients and uint32 bitwise results wrap before
+	// an outer operation reads them.
+	var s8, m8 int8 = 127, -128
+	var neg int8 = -1
+	var m32 int32 = -2147483648
+	var w uint32 = 0xf0f0f0f0
+	println((s8*s8)/2, (u8*u8)/2, (-m32)/2, -m8, m8/neg)
+	println((w|1)/2, (w^1)/2, (w&w)/2, (w&^1)/2, (w|1) > 5)
 }

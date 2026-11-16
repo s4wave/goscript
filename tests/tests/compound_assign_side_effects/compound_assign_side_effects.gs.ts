@@ -169,13 +169,13 @@ export async function main(): globalThis.Promise<void> {
 	calls = 0
 	const __goscriptMap0 = m
 	const __goscriptMapKey0 = key()
-	$.mapSet(__goscriptMap0, __goscriptMapKey0, $.mapGet<string, number, number>(__goscriptMap0, __goscriptMapKey0, 0)[0] + (4))
+	$.mapSet(__goscriptMap0, __goscriptMapKey0, $.mapGet<string, number, number>(__goscriptMap0, __goscriptMapKey0, 0)[0] + 4)
 	await $.println("map +=", $.mapGet<string, number, number>(m, "k", 0)[0], calls)
 
 	calls = 0
 	const __goscriptMap1 = m
 	const __goscriptMapKey1 = key()
-	$.mapSet(__goscriptMap1, __goscriptMapKey1, $.mapGet<string, number, number>(__goscriptMap1, __goscriptMapKey1, 0)[0] + (1))
+	$.mapSet(__goscriptMap1, __goscriptMapKey1, $.mapGet<string, number, number>(__goscriptMap1, __goscriptMapKey1, 0)[0] + 1)
 	await $.println("map ++", $.mapGet<string, number, number>(m, "k", 0)[0], calls)
 
 	// Field of a pointer returned by a call.
@@ -204,7 +204,7 @@ export async function main(): globalThis.Promise<void> {
 	let b = new Uint8Array([250, 251, 252]) as $.Slice<number>
 	calls = 0
 	const __goscriptOperand7 = idx()
-	$.sliceElems(b!)[$.sliceSlot(b!, __goscriptOperand7)] = $.uint($.sliceElems(b!)[$.sliceSlot(b!, __goscriptOperand7)] + (10), 8)
+	$.sliceElems(b!)[$.sliceSlot(b!, __goscriptOperand7)] = (($.sliceElems(b!)[$.sliceSlot(b!, __goscriptOperand7)] + 10) & 0xff)
 	await $.println("byte +=", $.typedSliceIndex(b!, 0), $.typedSliceIndex(b!, 1), $.typedSliceIndex(b!, 2), calls)
 
 	// String element.
@@ -235,13 +235,13 @@ export async function main(): globalThis.Promise<void> {
 	$.pointerValue<point>(pt).U32 = 2147483648
 	calls = 0
 	const __goscriptOperand12 = ptr()
-	$.pointerValue<point>(__goscriptOperand12).U32 = ($.pointerValue<point>(__goscriptOperand12).U32 >>> (3)) >>> 0
+	$.pointerValue<point>(__goscriptOperand12).U32 = ($.pointerValue<point>(__goscriptOperand12).U32 >>> 3) >>> 0
 	await $.println("uint32 field >>=", $.pointerValue<point>(pt).U32, calls)
 
 	$.pointerValue<point>(pt).F32 = 1.5
 	calls = 0
 	const __goscriptOperand13 = ptr()
-	$.pointerValue<point>(__goscriptOperand13).F32 = globalThis.Math.fround($.pointerValue<point>(__goscriptOperand13).F32 * (3))
+	$.pointerValue<point>(__goscriptOperand13).F32 = globalThis.Math.fround($.pointerValue<point>(__goscriptOperand13).F32 * 3)
 	await $.println("float32 field *=", $.pointerValue<point>(pt).F32, calls)
 
 	// Integer division.
@@ -268,7 +268,7 @@ export async function main(): globalThis.Promise<void> {
 	calls = 0
 	for (let n = 0; n < 3; (() => { const __goscriptMap2 = m
 	const __goscriptMapKey2 = key()
-	$.mapSet(__goscriptMap2, __goscriptMapKey2, $.mapGet<string, number, number>(__goscriptMap2, __goscriptMapKey2, 0)[0] + (1)) })()) {
+	$.mapSet(__goscriptMap2, __goscriptMapKey2, $.mapGet<string, number, number>(__goscriptMap2, __goscriptMapKey2, 0)[0] + 1) })()) {
 		n++
 	}
 	await $.println("for post map", $.mapGet<string, number, number>(m, "k", 0)[0], calls)

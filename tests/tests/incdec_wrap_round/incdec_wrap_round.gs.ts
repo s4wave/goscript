@@ -60,6 +60,15 @@ export async function main(): globalThis.Promise<void> {
 	c.F = globalThis.Math.fround(c.F + 1)
 	await $.println("vars:", vf.value == 1.6777216e+07, vu, vi, c.I8, c.U16, c.F == 1.6777216e+07)
 
+	// 64-bit integers, which are bigints or wide numbers.
+	let i64 = 9223372036854775807n
+	i64 = $.int64Add(i64, 1n)
+	let u64 = 0n
+	u64 = $.uint64Sub(u64, 1n)
+	let u = 0
+	u = $.wideUintSub(u, 1)
+	await $.println("wide:", i64, u64, u)
+
 	// Elements of slices held in plain and in typed arrays, and of arrays.
 	let gi = (appendOf(__goscriptStatic0(), null, ($.typedSliceOf(Int32Array, [2147483647]) as $.Slice<number>)) as $.Slice<number>)
 	$.sliceElems(gi!)[$.sliceSlot(gi!, 0)] = (($.sliceElems(gi!)[$.sliceSlot(gi!, 0)] + 1) | 0)

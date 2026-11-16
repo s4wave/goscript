@@ -97,7 +97,7 @@ export async function main(): globalThis.Promise<void> {
 	$.mapSet(n, $.interfaceValue<namer | null>(b, "*main.node", /* @__PURE__ */ $.pointerType("main.node")), 2)
 	const __goscriptMap0 = n
 	const __goscriptMapKey0 = $.interfaceValue<namer | null>(a, "*main.node", /* @__PURE__ */ $.pointerType("main.node"))
-	$.mapSet(__goscriptMap0, __goscriptMapKey0, $.mapGet<namer | null, number, number>(__goscriptMap0, $.interfaceValue<namer | null>(__goscriptMapKey0, "*main.node", /* @__PURE__ */ $.pointerType("main.node")), 0)[0] + (1))
+	$.mapSet(__goscriptMap0, __goscriptMapKey0, $.mapGet<namer | null, number, number>(__goscriptMap0, $.interfaceValue<namer | null>(__goscriptMapKey0, "*main.node", /* @__PURE__ */ $.pointerType("main.node")), 0)[0] + 1)
 	await $.println("namer keys:", $.len(n), $.mapGet<namer | null, number, number>(n, $.interfaceValue<namer | null>(a, "*main.node", /* @__PURE__ */ $.pointerType("main.node")), 0)[0], $.mapGet<namer | null, number, number>(n, $.interfaceValue<namer | null>(b, "*main.node", /* @__PURE__ */ $.pointerType("main.node")), 0)[0])
 	$.deleteMapEntry(n, $.interfaceValue<namer | null>(a, "*main.node", /* @__PURE__ */ $.pointerType("main.node")))
 	let [, okA] = $.mapGet<namer | null, number, number>(n, $.interfaceValue<namer | null>(a, "*main.node", /* @__PURE__ */ $.pointerType("main.node")), 0)
