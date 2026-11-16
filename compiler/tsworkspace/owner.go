@@ -53,7 +53,8 @@ func (o *Owner) WorkDir() string {
 
 // EnsureNodeAmbientTypes writes host runtime declarations needed by emitted tests.
 func (o *Owner) EnsureNodeAmbientTypes() Result {
-	if NodeTypesPresent(o.workDir, o.toolDir) {
+	// Tool discovery can use another checkout; its types are not workspace-visible.
+	if NodeTypesPresent(o.workDir) {
 		return o.WriteFile(PhaseWorkspace, NodeAmbientTypesFile, "")
 	}
 	return o.WriteFile(PhaseWorkspace, NodeAmbientTypesFile, nodeAmbientTypes)

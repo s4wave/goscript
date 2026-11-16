@@ -59,9 +59,16 @@ func TestRunnerRunsOrdinaryPackageTest(t *testing.T) {
 		}, "\n"),
 	})
 
-	// Run the fixture's tests.
+	// A checkout's Node types are not visible from an unrelated scratch directory.
+	if err := os.MkdirAll(filepath.Join(moduleDir, "node_modules", "@types", "node"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	workDir := t.TempDir()
+
+	// Run the real compiler, typechecker and runtime outside that checkout.
 	result, err := NewRunner().Run(context.Background(), &Request{
 		Dir:      moduleDir,
+		WorkDir:  workDir,
 		Patterns: []string{"."},
 		Timeout:  30 * time.Second,
 		Verbose:  true,

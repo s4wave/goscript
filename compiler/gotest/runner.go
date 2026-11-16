@@ -42,6 +42,7 @@ func NewRunner() *Runner {
 
 // Run executes package tests through the GoScript compiler and TypeScript runtime.
 func (r *Runner) Run(ctx context.Context, req *Request) (*Result, error) {
+	// Normalize the request and create its compiler and workspace directories.
 	if r == nil {
 		r = NewRunner()
 	}
@@ -72,12 +73,14 @@ func (r *Runner) Run(ctx context.Context, req *Request) (*Result, error) {
 		norm.OutputRoot = filepath.Join(norm.WorkDir, "output")
 	}
 
+	// Keep the output roots with the result and workspace owner.
 	result := &Result{
 		WorkDir:    norm.WorkDir,
 		OutputRoot: norm.OutputRoot,
 	}
 	workspace := tsworkspace.NewOwner(norm.WorkDir, norm.Dir)
 
+	// Reject an invalid test selector before loading packages.
 	runPattern, err := compileRunPattern(norm.Run)
 	if err != nil {
 		diag := compiler.Diagnostic{
@@ -108,6 +111,7 @@ func (r *Runner) Run(ctx context.Context, req *Request) (*Result, error) {
 		}
 	}
 
+	// Load the selected package tests for the requested target.
 	testGraphReq := &compiler.CompileRequest{
 		Patterns:                  slices.Clone(norm.Patterns),
 		Dir:                       norm.Dir,
@@ -159,7 +163,8 @@ func (r *Runner) Run(ctx context.Context, req *Request) (*Result, error) {
 	}
 
 	// Write the ambient types and project for the runtime backend.
-	nodeTypesAvailable := tsworkspace.NodeTypesPresent(norm.WorkDir, norm.Dir)
+	// TypeScript resolves ambient packages from the generated project directory.
+	nodeTypesAvailable := tsworkspace.NodeTypesPresent(norm.WorkDir)
 	if norm.RuntimeBackend == RuntimeBackendBrowser {
 		nodeTypesAvailable = false
 	}
@@ -193,6 +198,7 @@ func (r *Runner) runPackageTools(
 	result *Result,
 	nodeTypesAvailable bool,
 ) {
+	// Prepare each runnable package before choosing a typecheck strategy.
 	indexes := r.preparePackageWorkspaces(req, workspace, result, nodeTypesAvailable)
 	if len(indexes) == 0 {
 		return
@@ -245,6 +251,7 @@ func (r *Runner) preparePackageWorkspace(
 	nodeTypesAvailable bool,
 	idx int,
 ) bool {
+	// Write the package runner and its TypeScript project together.
 	result.Packages[idx].Phases.Workspace = PhaseStatusPass
 	runnerFile := packageRunnerFile(idx)
 	if phase := workspace.WriteFile(tsworkspace.PhaseWorkspace, runnerFile, renderPackageRunner(result.Packages[idx], req)); phase.Failed() {
@@ -254,7 +261,11 @@ func (r *Runner) preparePackageWorkspace(
 		return false
 	}
 	tsconfigFile := packageTSConfigFile(idx)
-	if phase := workspace.WriteFile(tsworkspace.PhaseWorkspace, tsconfigFile, renderTypeScriptProject(req, runnerFile, tsconfigFile, nodeTypesAvailable)); phase.Failed() {
+	if phase := workspace.WriteFile(
+		tsworkspace.PhaseWorkspace,
+		tsconfigFile,
+		renderTypeScriptProject(req, runnerFile, tsconfigFile, nodeTypesAvailable),
+	); phase.Failed() {
 		result.Packages[idx].Owner = OwnerTestRunner
 		result.Packages[idx].Phases.Workspace = PhaseStatusFail
 		result.Packages[idx].Error = phase.Error
@@ -452,6 +463,7 @@ func (r *Runner) runCombinedPackageRuntimes(
 	result *Result,
 	indexes []int,
 ) bool {
+	// Spread runnable packages across the permitted runtime processes.
 	ordered := packageExecutionIndexes(result, indexes)
 	chunks := packageRuntimeChunks(ordered, max(req.Parallelism, 1))
 	if len(chunks) == 0 {
@@ -461,6 +473,7 @@ func (r *Runner) runCombinedPackageRuntimes(
 		return r.runCombinedPackageRuntime(ctx, req, workspace, result, "runner-all.ts", chunks[0])
 	}
 
+	// Track whether every concurrently executed chunk succeeds.
 	var mu sync.Mutex
 	ok := true
 	var group errgroup.Group
@@ -468,6 +481,7 @@ func (r *Runner) runCombinedPackageRuntimes(
 	for chunkIdx, chunk := range chunks {
 		runnerFile := "runner-all-" + strconv.Itoa(chunkIdx) + ".ts"
 		group.Go(func() error {
+			// Run this chunk and retain any failure in the shared result.
 			if r.runCombinedPackageRuntime(ctx, req, workspace, result, runnerFile, chunk) {
 				return nil
 			}
@@ -482,6 +496,7 @@ func (r *Runner) runCombinedPackageRuntimes(
 }
 
 func packageRuntimeChunks(indexes []int, parallelism int) [][]int {
+	// Bound the number of chunks by the number of packages.
 	if len(indexes) == 0 {
 		return nil
 	}
@@ -506,6 +521,7 @@ func (r *Runner) runCombinedPackageRuntime(
 	runnerFile string,
 	indexes []int,
 ) bool {
+	// Run the combined runner and index its package result records.
 	if phase := workspace.WriteFile(tsworkspace.PhaseWorkspace, runnerFile, renderCombinedRunner(result, indexes, req)); phase.Failed() {
 		return false
 	}
@@ -521,6 +537,8 @@ func (r *Runner) runCombinedPackageRuntime(
 	for _, record := range records {
 		byPath[record.PackagePath] = record
 	}
+
+	// Apply each decoded result to its package.
 	for _, idx := range indexes {
 		record, ok := byPath[result.Packages[idx].PackagePath]
 		if !ok {
@@ -551,6 +569,7 @@ func (r *Runner) runPackageRuntime(
 	result *Result,
 	idx int,
 ) {
+	// Select the browser runner or execute this package with Bun.
 	if req.RuntimeBackend == RuntimeBackendBrowser {
 		r.runPackageBrowserRuntime(ctx, req, workspace, result, idx)
 		return
@@ -576,6 +595,7 @@ func (r *Runner) runPackageBrowserRuntime(
 	result *Result,
 	idx int,
 ) {
+	// Prepare the browser configuration and capture its runtime report.
 	configFile := browserVitestConfigFile(idx)
 	if phase := workspace.WriteFile(
 		tsworkspace.PhaseWorkspace,
@@ -591,6 +611,8 @@ func (r *Runner) runPackageBrowserRuntime(
 	runtime := workspace.RunTool(ctx, tsworkspace.PhaseRuntime, req.WorkDir, "vitest", "run", "--config", configFile, "--reporter", "verbose")
 	result.Packages[idx].Elapsed = runtime.Elapsed
 	result.Packages[idx].Output = strings.TrimSpace(runtime.Output)
+
+	// Match the browser report to the requested package.
 	records, ok := parseCombinedRuntimeRecords(runtime.Output)
 	if !ok {
 		result.Packages[idx].Action = ActionFail
@@ -833,6 +855,7 @@ func newSkippedPackageResult(packagePath string) PackageResult {
 }
 
 func packageTestImports(pkg *compiler.PackageTestGraphPackage) []string {
+	// Collect the imports of both internal and external test variants.
 	importSet := make(map[string]bool)
 	for _, variant := range []*compiler.PackageTestGraphVariant{pkg.SamePackageTests, pkg.ExternalPackageTests} {
 		if variant == nil {
@@ -854,6 +877,7 @@ func packageTestImports(pkg *compiler.PackageTestGraphPackage) []string {
 // (all if it is nil), and the benchmarks matching benchPattern (none if it
 // is nil).
 func packageVariantTests(variant *compiler.PackageTestGraphVariant, runPattern, benchPattern *regexp.Regexp) []Test {
+	// Select the test and benchmark names requested by the caller.
 	if variant == nil {
 		return nil
 	}
@@ -888,6 +912,7 @@ func shouldCompilePackage(result PackageResult) bool {
 }
 
 func runnablePackagePaths(results []PackageResult) []string {
+	// Order unique runnable package paths for one compilation request.
 	seen := make(map[string]bool)
 	paths := make([]string, 0, len(results))
 	for _, result := range results {
@@ -1009,6 +1034,7 @@ func renderPackageRunner(result PackageResult, req *normalizedRequest) string {
 }
 
 func renderRunner(result PackageResult, req *normalizedRequest) string {
+	// Import the test modules and emit the Bun runner.
 	var b strings.Builder
 	b.WriteString("import { runTests } from \"@goscript/testing/runner.js\"\n")
 	imports := runnerImports(result.Tests)
@@ -1020,6 +1046,8 @@ func renderRunner(result PackageResult, req *normalizedRequest) string {
 		b.WriteString("\n")
 	}
 	b.WriteString("\n")
+
+	// Run the selected tests from their package source directory.
 	writeProcessChdir(&b, result.SourceDir)
 	b.WriteString("const result = await runTests(")
 	b.WriteString(strconv.Quote(result.PackagePath))
@@ -1033,6 +1061,8 @@ func renderRunner(result PackageResult, req *normalizedRequest) string {
 	} else {
 		b.WriteString("false")
 	}
+
+	// Finish the options and propagate a failed test outcome.
 	writeRunOptions(&b, req)
 	b.WriteString(" })\n")
 	b.WriteString("if (!result.ok) {\n\tthrow new Error(\"goscript test failed\")\n}\n")
@@ -1041,6 +1071,7 @@ func renderRunner(result PackageResult, req *normalizedRequest) string {
 }
 
 func renderBrowserRunner(result PackageResult, req *normalizedRequest) string {
+	// Import the browser test API and compiled package modules.
 	var b strings.Builder
 	b.WriteString("import { hostFSReady } from \"./" + browserHostFSClientFile + "\"\n")
 	b.WriteString("import { test } from \"vitest\"\n")
@@ -1054,12 +1085,16 @@ func renderBrowserRunner(result PackageResult, req *normalizedRequest) string {
 		b.WriteString("\n")
 	}
 	b.WriteString("\n")
+
+	// Register one browser test for the Go package.
 	b.WriteString("test(")
 	b.WriteString(strconv.Quote(result.PackagePath))
 	b.WriteString(", async () => {\n")
 	b.WriteString("\tconst __goscriptResultPrefix = ")
 	b.WriteString(strconv.Quote(combinedRuntimeResultPrefix))
 	b.WriteString("\n")
+
+	// Capture logs and timing for the browser result record.
 	b.WriteString("\tconst __goscriptOriginalLog = console.log\n")
 	b.WriteString("\tconst __goscriptLogs: string[] = []\n")
 	b.WriteString("\tconst __goscriptStartedAt = Date.now()\n")
@@ -1067,6 +1102,8 @@ func renderBrowserRunner(result PackageResult, req *normalizedRequest) string {
 	b.WriteString("\tlet __goscriptError: unknown = null\n")
 	b.WriteString("\tconsole.log = (...args) => __goscriptLogs.push(args.map((arg) => String(arg)).join(' '))\n")
 	writeRuntimeRecordFunction(&b, "\t")
+
+	// Wait for host filesystem access before running the package tests.
 	b.WriteString("\ttry {\n")
 	b.WriteString("\t\tawait hostFSReady()\n")
 	b.WriteString("\t\tconst result = await runTests(")
@@ -1075,6 +1112,8 @@ func renderBrowserRunner(result PackageResult, req *normalizedRequest) string {
 	writeRunnerTests(&b, "\t\t\t", result.Tests, func(test Test) string {
 		return "pkg" + strconv.Itoa(slices.Index(imports, test.PackagePath))
 	})
+
+	// Apply the requested test options.
 	b.WriteString("\t\t], { verbose: ")
 	if req.Verbose {
 		b.WriteString("true")
@@ -1083,10 +1122,14 @@ func renderBrowserRunner(result PackageResult, req *normalizedRequest) string {
 	}
 	writeRunOptions(&b, req)
 	b.WriteString(" })\n")
+
+	// Retain the test result or synthesize its failure.
 	b.WriteString("\t\t__goscriptOK = result.ok\n")
 	b.WriteString("\t\tif (!result.ok) {\n")
 	b.WriteString("\t\t\t__goscriptError = new Error(\"goscript test failed\")\n")
 	b.WriteString("\t\t}\n")
+
+	// Recognize process-exit exceptions separately from ordinary failures.
 	b.WriteString("\t} catch (err) {\n")
 	b.WriteString("\t\tconst exitCode = __goscriptProcessExitCode(err)\n")
 	b.WriteString("\t\tif (exitCode !== null) {\n")
@@ -1097,31 +1140,43 @@ func renderBrowserRunner(result PackageResult, req *normalizedRequest) string {
 	} else {
 		b.WriteString("false")
 	}
+
+	// Apply the panic-on-exit-zero rule to recognized process exits.
 	b.WriteString(") {\n")
 	b.WriteString("\t\t\t\t__goscriptOK = false\n")
 	b.WriteString("\t\t\t\t__goscriptError = new Error(\"unexpected os.Exit(0) during test\")\n")
 	b.WriteString("\t\t\t} else {\n")
 	b.WriteString("\t\t\t\t__goscriptOK = exitCode === 0\n")
+
+	// Retain a nonzero process exit as the browser failure.
 	b.WriteString("\t\t\t\tif (exitCode !== 0) {\n")
 	b.WriteString("\t\t\t\t__goscriptError = new Error(\"goscript process exited with code \" + String(exitCode))\n")
 	b.WriteString("\t\t\t\t}\n")
 	b.WriteString("\t\t\t}\n")
+
+	// Capture an ordinary exception and its stack.
 	b.WriteString("\t\t} else {\n")
 	b.WriteString("\t\t\t__goscriptOK = false\n")
 	b.WriteString("\t\t\t__goscriptError = err\n")
 	b.WriteString("\t\t\t__goscriptLogs.push(err && (err as Error).stack ? String((err as Error).stack) : String(err))\n")
 	b.WriteString("\t\t}\n")
+
+	// Restore logging and publish the final package result.
 	b.WriteString("\t} finally {\n")
 	b.WriteString("\t\tconsole.log = __goscriptOriginalLog\n")
 	b.WriteString("\t\t__goscriptOriginalLog(__goscriptRuntimeRecord(")
 	b.WriteString(strconv.Quote(result.PackagePath))
 	b.WriteString(", __goscriptOK, Date.now() - __goscriptStartedAt, __goscriptLogs.join('\\n')))\n")
 	b.WriteString("\t}\n")
+
+	// Let Vitest report any retained package failure.
 	b.WriteString("\tif (__goscriptError) {\n")
 	b.WriteString("\t\tthrow __goscriptError\n")
 	b.WriteString("\t}\n")
 	b.WriteString("})\n")
 	b.WriteString("\n")
+
+	// Emit the helper that recognizes GoScript process exits.
 	b.WriteString("function __goscriptProcessExitCode(err: unknown): number | null {\n")
 	b.WriteString("\tif (err === null || typeof err !== \"object\") {\n")
 	b.WriteString("\t\treturn null\n")
@@ -1134,10 +1189,14 @@ func renderBrowserRunner(result PackageResult, req *normalizedRequest) string {
 
 // combinedRuntimeRecord is one package result emitted by a grouped runtime process.
 type combinedRuntimeRecord struct {
+	// PackagePath identifies the package that produced this result.
 	PackagePath string
-	OK          bool
-	ElapsedMS   int64
-	Output      string
+	// OK reports whether its tests passed.
+	OK bool
+	// ElapsedMS measures its runtime in milliseconds.
+	ElapsedMS int64
+	// Output holds its captured log text.
+	Output string
 }
 
 func parseCombinedRuntimeRecords(output string) ([]combinedRuntimeRecord, bool) {
@@ -1163,6 +1222,7 @@ func parseCombinedRuntimeRecords(output string) ([]combinedRuntimeRecord, bool) 
 }
 
 func parseCombinedRuntimeRecord(line string) (combinedRuntimeRecord, bool) {
+	// Decode the package identity, outcome, duration and captured output.
 	packagePath, rest, ok := strings.Cut(line, "\t")
 	if !ok {
 		return combinedRuntimeRecord{}, false
@@ -1175,6 +1235,8 @@ func parseCombinedRuntimeRecord(line string) (combinedRuntimeRecord, bool) {
 	if !ok {
 		return combinedRuntimeRecord{}, false
 	}
+
+	// Decode escaped text only after all protocol fields are present.
 	packagePath, err := url.PathUnescape(packagePath)
 	if err != nil || packagePath == "" {
 		return combinedRuntimeRecord{}, false
@@ -1183,6 +1245,8 @@ func parseCombinedRuntimeRecord(line string) (combinedRuntimeRecord, bool) {
 	if err != nil {
 		return combinedRuntimeRecord{}, false
 	}
+
+	// Read the duration and map the success field to its result.
 	elapsedMS, err := strconv.ParseInt(elapsedField, 10, 64)
 	if err != nil {
 		return combinedRuntimeRecord{}, false
@@ -1207,6 +1271,7 @@ func parseCombinedRuntimeRecord(line string) (combinedRuntimeRecord, bool) {
 }
 
 func renderCombinedRunner(result *Result, indexes []int, req *normalizedRequest) string {
+	// Assign stable aliases to the combined runner imports.
 	aliases := runnerImportAliases(result, indexes)
 	var imports []string
 	for packagePath := range aliases {
@@ -1214,6 +1279,7 @@ func renderCombinedRunner(result *Result, indexes []int, req *normalizedRequest)
 	}
 	slices.Sort(imports)
 
+	// Import the test runtime and every participating package.
 	var b strings.Builder
 	b.WriteString("import { runTests } from \"@goscript/testing/runner.js\"\n")
 	for _, packagePath := range imports {
@@ -1224,20 +1290,28 @@ func renderCombinedRunner(result *Result, indexes []int, req *normalizedRequest)
 		b.WriteString("\n")
 	}
 	b.WriteString("\n")
+
+	// Define the result protocol and retain the original logger.
 	b.WriteString("const __goscriptResultPrefix = ")
 	b.WriteString(strconv.Quote(combinedRuntimeResultPrefix))
 	b.WriteString("\n")
 	b.WriteString("const __goscriptOriginalLog = console.log\n")
 	writeRuntimeRecordFunction(&b, "")
+
+	// Emit a package runner that switches to its source directory.
 	b.WriteString("async function __goscriptRunPackage(packagePath, packageDir, tests) {\n")
 	b.WriteString("\tif (packageDir && typeof process !== \"undefined\" && process.chdir) {\n")
 	b.WriteString("\t\tprocess.chdir(packageDir)\n")
 	b.WriteString("\t}\n")
+
+	// Capture the package output and start time.
 	b.WriteString("\tconst logs = []\n")
 	b.WriteString("\tconst startedAt = Date.now()\n")
 	b.WriteString("\tlet ok = false\n")
 	b.WriteString("\tconsole.log = (...args) => logs.push(args.map((arg) => String(arg)).join(' '))\n")
 	b.WriteString("\ttry {\n")
+
+	// Pass the requested options to the package tests.
 	b.WriteString("\t\tconst result = await runTests(packagePath, tests, { verbose: ")
 	if req.Verbose {
 		b.WriteString("true")
@@ -1247,14 +1321,20 @@ func renderCombinedRunner(result *Result, indexes []int, req *normalizedRequest)
 	writeRunOptions(&b, req)
 	b.WriteString(" })\n")
 	b.WriteString("\t\tok = result.ok\n")
+
+	// Turn thrown failures into package output and restore logging.
 	b.WriteString("\t} catch (err) {\n")
 	b.WriteString("\t\tok = false\n")
 	b.WriteString("\t\tlogs.push(err && err.stack ? String(err.stack) : String(err))\n")
 	b.WriteString("\t} finally {\n")
 	b.WriteString("\t\tconsole.log = __goscriptOriginalLog\n")
 	b.WriteString("\t}\n")
+
+	// Publish each package result before starting the next package.
 	b.WriteString("\t__goscriptOriginalLog(__goscriptRuntimeRecord(packagePath, ok, Date.now() - startedAt, logs.join('\\n')))\n")
 	b.WriteString("}\n\n")
+
+	// Run the selected packages with their compiled test entries.
 	for _, idx := range indexes {
 		pkg := result.Packages[idx]
 		b.WriteString("await __goscriptRunPackage(")
@@ -1309,15 +1389,18 @@ func writeRunOptions(b *strings.Builder, req *normalizedRequest) {
 }
 
 func writeRuntimeRecordFunction(b *strings.Builder, indent string) {
+	// Write the shared package-result line protocol function.
 	b.WriteString(indent)
 	b.WriteString("function __goscriptRuntimeRecord(packagePath: string, ok: boolean, elapsedMs: number, output: string): string {\n")
 	b.WriteString(indent)
-	b.WriteString("\treturn __goscriptResultPrefix + encodeURIComponent(packagePath) + \"\\t\" + (ok ? \"1\" : \"0\") + \"\\t\" + String(elapsedMs) + \"\\t\" + encodeURIComponent(output)\n")
+	b.WriteString("\treturn __goscriptResultPrefix + encodeURIComponent(packagePath) + \"\\t\" + (ok ? \"1\" : \"0\")" +
+		" + \"\\t\" + String(elapsedMs) + \"\\t\" + encodeURIComponent(output)\n")
 	b.WriteString(indent)
 	b.WriteString("}\n")
 }
 
 func writeProcessChdir(b *strings.Builder, dir string) {
+	// Change the runtime directory only when a package source is known.
 	if dir == "" {
 		return
 	}
@@ -1329,6 +1412,7 @@ func writeProcessChdir(b *strings.Builder, dir string) {
 }
 
 func runnerImportAliases(result *Result, indexes []int) map[string]string {
+	// Collect every distinct test module before assigning aliases.
 	seen := make(map[string]bool)
 	var imports []string
 	for _, idx := range indexes {
@@ -1352,6 +1436,7 @@ func runnerImportAliases(result *Result, indexes []int) map[string]string {
 }
 
 func runnerImports(tests []Test) []string {
+	// Return each imported test module once, in stable order.
 	seen := make(map[string]bool)
 	var imports []string
 	for _, test := range tests {
@@ -1422,6 +1507,8 @@ func renderBrowserVitestConfig(req *normalizedRequest, runnerFile string, source
 	b.WriteString("import { defineConfig } from \"vitest/config\"\n")
 	b.WriteString("import { playwright } from \"@vitest/browser-playwright\"\n")
 	b.WriteString("import { hostFS } from \"./" + browserHostFSServerFile + "\"\n\n")
+
+	// Open the test configuration and select the package runner.
 	b.WriteString("export default defineConfig({\n")
 	b.WriteString("  test: {\n")
 	b.WriteString("    include: [")
@@ -1476,15 +1563,20 @@ func renderBrowserVitestConfig(req *normalizedRequest, runnerFile string, source
 }
 
 func renderTypeScriptProject(req *normalizedRequest, runnerFile string, projectFile string, nodeTypesAvailable bool) string {
+	// Write the compiler target and ambient type selection for one runner.
 	var b strings.Builder
 	b.WriteString("{\n")
 	b.WriteString("  \"compilerOptions\": {\n")
 	b.WriteString("    \"target\": \"ES2022\",\n")
 	b.WriteString("    \"module\": \"ESNext\",\n")
 	b.WriteString("    \"moduleResolution\": \"Bundler\",\n")
+
+	// Select the standard libraries and strictness for emitted runtime code.
 	b.WriteString("    \"lib\": [\"ESNext\", \"DOM\"],\n")
 	b.WriteString("    \"strict\": true,\n")
 	b.WriteString("    \"skipLibCheck\": true,\n")
+
+	// Configure source imports and optional incremental checking.
 	b.WriteString("    \"allowImportingTsExtensions\": true,\n")
 	if req.IncrementalTypeCheck {
 		b.WriteString("    \"incremental\": true,\n")
@@ -1498,6 +1590,8 @@ func renderTypeScriptProject(req *normalizedRequest, runnerFile string, projectF
 	} else {
 		b.WriteString("    \"types\": [],\n")
 	}
+
+	// Resolve runtime modules and browser test API imports.
 	b.WriteString("    \"paths\": {\n")
 	if req.RuntimeBackend == RuntimeBackendBrowser {
 		b.WriteString("      \"vitest\": [\"./" + browserAmbientTypesFile + "\"],\n")
@@ -1508,6 +1602,8 @@ func renderTypeScriptProject(req *normalizedRequest, runnerFile string, projectF
 	b.WriteString(strconv.Quote(typeScriptOutputAlias(req)))
 	b.WriteString("]\n")
 	b.WriteString("    }\n")
+
+	// Include the runner roots and the runtime ambient declarations.
 	b.WriteString("  },\n")
 	if req.RuntimeBackend == RuntimeBackendBrowser {
 		b.WriteString("  \"include\": [")
@@ -1526,15 +1622,20 @@ func renderTypeScriptProject(req *normalizedRequest, runnerFile string, projectF
 }
 
 func renderRuntimeTypeScriptProject(req *normalizedRequest, nodeTypesAvailable bool) string {
+	// Write the compiler target and ambient type selection for the aggregate runner.
 	var b strings.Builder
 	b.WriteString("{\n")
 	b.WriteString("  \"compilerOptions\": {\n")
 	b.WriteString("    \"target\": \"ES2022\",\n")
 	b.WriteString("    \"module\": \"ESNext\",\n")
 	b.WriteString("    \"moduleResolution\": \"Bundler\",\n")
+
+	// Select the standard libraries and strictness for emitted runtime code.
 	b.WriteString("    \"lib\": [\"ESNext\", \"DOM\"],\n")
 	b.WriteString("    \"strict\": true,\n")
 	b.WriteString("    \"skipLibCheck\": true,\n")
+
+	// Configure source imports and optional incremental checking.
 	b.WriteString("    \"allowImportingTsExtensions\": true,\n")
 	if req.IncrementalTypeCheck {
 		b.WriteString("    \"incremental\": true,\n")
@@ -1548,6 +1649,8 @@ func renderRuntimeTypeScriptProject(req *normalizedRequest, nodeTypesAvailable b
 	} else {
 		b.WriteString("    \"types\": [],\n")
 	}
+
+	// Resolve runtime modules and browser test API imports.
 	b.WriteString("    \"paths\": {\n")
 	if req.RuntimeBackend == RuntimeBackendBrowser {
 		b.WriteString("      \"vitest\": [\"./" + browserAmbientTypesFile + "\"],\n")
@@ -1558,6 +1661,8 @@ func renderRuntimeTypeScriptProject(req *normalizedRequest, nodeTypesAvailable b
 	b.WriteString(strconv.Quote(typeScriptOutputAlias(req)))
 	b.WriteString("]\n")
 	b.WriteString("    }\n")
+
+	// Include the runner roots and the runtime ambient declarations.
 	b.WriteString("  },\n")
 	if req.RuntimeBackend == RuntimeBackendBrowser {
 		b.WriteString("  \"include\": [\"runner-*.ts\", ")
@@ -1590,6 +1695,7 @@ func typeScriptOutputAlias(req *normalizedRequest) string {
 }
 
 func markCompilePhase(pkg *PackageResult, result *compiler.CompilationResult, passed bool) {
+	// Set the compile and emit phases from the compiler result.
 	if pkg == nil {
 		return
 	}

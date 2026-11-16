@@ -73,7 +73,7 @@ func TestOwnerWritesNodeAmbientTypes(t *testing.T) {
 	}
 }
 
-func TestOwnerSkipsNodeAmbientTypesWhenNodeTypesExist(t *testing.T) {
+func TestOwnerUsesOnlyWorkspaceVisibleNodeTypes(t *testing.T) {
 	dir := t.TempDir()
 	if err := os.MkdirAll(filepath.Join(dir, "node_modules", "@types", "node"), 0o755); err != nil {
 		t.Fatal(err.Error())
@@ -89,5 +89,19 @@ func TestOwnerSkipsNodeAmbientTypesWhenNodeTypesExist(t *testing.T) {
 	}
 	if strings.TrimSpace(string(data)) != "" {
 		t.Fatalf("node ambient types should be empty when @types/node is already visible: %s", data)
+	}
+
+	// Types found only beside the tool must not suppress the workspace declarations.
+	outside := t.TempDir()
+	owner = NewOwner(outside, dir)
+	if result := owner.EnsureNodeAmbientTypes(); result.Failed() {
+		t.Fatalf("write external workspace ambient types: %s", result.Error)
+	}
+	data, err = os.ReadFile(filepath.Join(outside, NodeAmbientTypesFile))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(data), "declare module 'node:fs'") {
+		t.Fatalf("external workspace lost runtime declarations: %s", data)
 	}
 }
