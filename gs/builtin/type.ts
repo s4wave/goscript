@@ -596,7 +596,21 @@ function normalizeTypeInfo(info: string | TypeInfo): TypeInfo {
  * @returns True when values of the type may be compared.
  */
 export function isTypeInfoComparable(info: string | TypeInfo): boolean {
+  // The answer walks element and field types, so it is cached per type.
   const normalized = normalizeTypeInfo(info)
+  let comparable = typeInfoComparable.get(normalized)
+  if (comparable === undefined) {
+    comparable = typeInfoKindComparable(normalized)
+    typeInfoComparable.set(normalized, comparable)
+  }
+  return comparable
+}
+
+const typeInfoComparable = new WeakMap<TypeInfo, boolean>()
+
+// typeInfoKindComparable reports whether values of the normalized type info
+// support equality, from its kind and its element and field types.
+function typeInfoKindComparable(normalized: TypeInfo): boolean {
   switch (normalized.kind) {
     case TypeKind.Map:
     case TypeKind.Slice:

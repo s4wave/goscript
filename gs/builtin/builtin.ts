@@ -393,13 +393,9 @@ export function arrayEqual(a: unknown, b: unknown): boolean {
 }
 
 export function comparableEqual(a: unknown, b: unknown): boolean {
-  if (
-    hasGoType(a) &&
-    hasGoType(b) &&
-    a.__isTypedNil === true &&
-    b.__isTypedNil === true &&
-    a.__goType === b.__goType
-  ) {
+  // Go panics when both operands hold the same uncomparable dynamic type,
+  // even when they hold the same value.
+  if (hasGoType(a) && hasGoType(b) && a.__goType === b.__goType) {
     const typeInfo = a.__goTypeInfo ?? b.__goTypeInfo
     if (typeInfo !== undefined && !isTypeInfoComparable(typeInfo)) {
       runtimePanic(`runtime error: comparing uncomparable type ${a.__goType}`)

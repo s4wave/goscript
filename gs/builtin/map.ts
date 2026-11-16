@@ -3,6 +3,7 @@ import { runtimePanic } from './panic.js'
 import {
   canonicalPointerIdentity,
   isStructObject,
+  isTypeInfoComparable,
   isStructTypeInfo,
   ownKeys,
   resolveTypeInfo,
@@ -226,6 +227,22 @@ function isTypedNilKey(key: unknown): key is { __goType: string } {
   return typeof boxed.__goType === 'string' && boxed.__isTypedNil === true
 }
 
+// unhashableKeyType returns the dynamic type of key when key is an
+// interface value of a type that cannot be hashed, such as a slice, map or
+// function, or undefined when key can be hashed.
+function unhashableKeyType(key: unknown): string | undefined {
+  if (typeof key !== 'object' || key === null) return undefined
+  const boxed = key as { __goType?: unknown; __goTypeInfo?: TypeInfo | string }
+  if (
+    typeof boxed.__goType !== 'string' ||
+    boxed.__goTypeInfo === undefined ||
+    isTypeInfoComparable(boxed.__goTypeInfo)
+  ) {
+    return undefined
+  }
+  return boxed.__goType
+}
+
 // makeMap receives pointer or generic key metadata from the compiler; other
 // key types use Go value equality and the available value indexes.
 export function makeMap<K, V>(
@@ -255,6 +272,10 @@ export function mapGet<K, V, D>(
 export const mapSet = <K, V>(map: Map<K, V> | null, key: K, value: V): void => {
   if (!map) {
     runtimePanic('assignment to entry in nil map')
+  }
+  const unhashable = unhashableKeyType(key)
+  if (unhashable !== undefined) {
+    runtimePanic(`runtime error: hash of unhashable type ${unhashable}`)
   }
   const canonical = goMapStructKey(map, key)
   if (canonical !== undefined) {
@@ -296,6 +317,11 @@ function findMapEntry<K, V>(
   map: Map<K, V> | null,
   key: K,
 ): { found: false } | { found: true; key: K; value: V } {
+  // Go words a lookup's panic differently from an assignment's.
+  const unhashable = unhashableKeyType(key)
+  if (unhashable !== undefined) {
+    runtimePanic(`hash of unhashable type: ${unhashable}`)
+  }
   if (!map) {
     return { found: false }
   }

@@ -1,2 +1,11 @@
 same: true
 different: true
+self: runtime error: comparing uncomparable type []int
+false
+mixed: none
+array: runtime error: comparing uncomparable type []int
+map set: runtime error: hash of unhashable type []int
+map get: hash of unhashable type: []int
+map delete: hash of unhashable type: []int
+nil map get: hash of unhashable type: []int
+map len: 0
