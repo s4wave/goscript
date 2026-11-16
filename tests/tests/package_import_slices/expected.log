@@ -5,6 +5,12 @@ index: 3 value: 4
 index: 4 value: 5
 backward: 4 5
 backward: 3 4
+collected chunks: 3 1 5
+collected backward: 5 1 5
+collected all: 5 1 5
+chunk: 2 2 1
+chunk: 2 2 3
+chunk: 1 1 5
 clone first: 99 original first: 1 same len: true
 nil clone: true
 equal: true false

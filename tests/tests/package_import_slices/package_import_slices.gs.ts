@@ -7,10 +7,10 @@ import * as slices from "@goscript/slices/index.js"
 import type * as iter from "@goscript/iter/index.js"
 
 export async function main(): globalThis.Promise<void> {
+	// Use one source for ordered traversal and iterator composition.
 	let s = $.arrayToSlice<number>([1, 2, 3, 4, 5])
 
-	// This should trigger the interface range issue
-	// slices.All returns an iterator interface that can be ranged over
+	// Traverse forward, then stop a backward traversal before the prefix.
 	let __goscriptRangeReturn0 = false
 	;await (async () => {
 		await slices.All(s)!(async (i, v) => {
@@ -35,12 +35,32 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 
+	// Iterator producers compose with consumers of the shared Seq types.
+	let chunks = (slices.Collect(slices.Chunk(s, 2)) as $.Slice<$.Slice<number>>)
+	await $.println("collected chunks:", $.sliceLen(chunks), $.plainSliceIndex($.plainSliceIndex(chunks!, 0)!, 0), $.plainSliceIndex($.plainSliceIndex(chunks!, 2)!, 0))
+	let pairs = (maps.Collect(slices.Backward(s)) as globalThis.Map<number, number> | null)
+	await $.println("collected backward:", $.len(pairs), $.mapGet<number, number, number>(pairs, 0, 0)[0], $.mapGet<number, number, number>(pairs, 4, 0)[0])
+	let all = (maps.Collect(slices.All(s)) as globalThis.Map<number, number> | null)
+	await $.println("collected all:", $.len(all), $.mapGet<number, number, number>(all, 0, 0)[0], $.mapGet<number, number, number>(all, 4, 0)[0])
+	let __goscriptRangeReturn2 = false
+	;await (async () => {
+		await slices.Chunk(s, 2)!(async (chunk) => {
+			await $.println("chunk:", $.sliceLen(chunk), $.cap(chunk), $.plainSliceIndex(chunk!, 0))
+			return true
+		})
+	})()
+	if (__goscriptRangeReturn2) {
+		return
+	}
+
+	// Clones own their backing storage and preserve a nil slice.
 	let cloned = (slices.Clone(s) as $.Slice<number>)
 	$.sliceElems(cloned!)[$.sliceSlot(cloned!, 0)] = 99
 	await $.println("clone first:", $.plainSliceIndex(cloned!, 0), "original first:", $.plainSliceIndex(s!, 0), "same len:", $.sliceLen(cloned) == $.sliceLen(s))
 	let nilSlice: $.Slice<number> = null! as $.Slice<number>
 	await $.println("nil clone:", slices.Clone(nilSlice) == null)
 
+	// Equality, membership and edits preserve the slice values.
 	await $.println("equal:", slices.Equal($.arrayToSlice<number>([1, 2]), $.arrayToSlice<number>([1, 2])), slices.Equal($.arrayToSlice<number>([1]), $.arrayToSlice<number>([2])))
 	await $.println("equal func:", slices.EqualFunc($.arrayToSlice<number>([1, 3]), $.arrayToSlice<number>([5, 7]), $.functionValue((a: number, b: number): boolean => {
 		return (a % 2) == (b % 2)
@@ -54,6 +74,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("reverse:", $.plainSliceIndex(inserted!, 0), $.plainSliceIndex(inserted!, 1), $.plainSliceIndex(inserted!, 2), $.plainSliceIndex(inserted!, 3))
 	await $.println("is sorted:", slices.IsSorted($.arrayToSlice<number>([1, 2, 3])), slices.IsSorted($.arrayToSlice<number>([1, 3, 2])))
 
+	// Stable sorts preserve the original order within each group.
 	class item {
 		public declare group: number
 
@@ -92,25 +113,28 @@ export async function main(): globalThis.Promise<void> {
 		return a.group - b.group
 	}, ({ kind: $.TypeKind.Function, params: ["main.item", "main.item"], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))
 
+	// Delete only the elements the predicate selects.
 	let filtered = (slices.DeleteFunc($.arrayToSlice<number>([1, 2, 3, 4, 5]), $.functionValue((v: number): boolean => {
 		return (v % 2) == 0
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)), () => (0 as number)) as $.Slice<number>)
 	await $.println("delete func:", $.plainSliceIndex(filtered!, 0), $.plainSliceIndex(filtered!, 1), $.plainSliceIndex(filtered!, 2), $.sliceLen(filtered))
 
+	// Collect map keys into a sorted slice.
 	let sortedKeys = (slices.Sorted(maps.Keys($.makeMap<string, number>([["c", 3], ["a", 1], ["b", 2]]))) as $.Slice<string>)
 	await $.println("sorted:", $.plainSliceIndex(sortedKeys!, 0), $.plainSliceIndex(sortedKeys!, 1), $.plainSliceIndex(sortedKeys!, 2))
 
-	let __goscriptRangeReturn2 = false
+	// Values traverses in order, stops early and accepts a nil slice.
+	let __goscriptRangeReturn3 = false
 	;await (async () => {
 		await slices.Values(s)!(async (v) => {
 			await $.println("value:", v)
 			return true
 		})
 	})()
-	if (__goscriptRangeReturn2) {
+	if (__goscriptRangeReturn3) {
 		return
 	}
-	let __goscriptRangeReturn3 = false
+	let __goscriptRangeReturn4 = false
 	;await (async () => {
 		await slices.Values(s)!(async (v) => {
 			if (v > 2) {
@@ -120,27 +144,29 @@ export async function main(): globalThis.Promise<void> {
 			return true
 		})
 	})()
-	if (__goscriptRangeReturn3) {
+	if (__goscriptRangeReturn4) {
 		return
 	}
 	let valueCount = 0
-	let __goscriptRangeReturn4 = false
+	let __goscriptRangeReturn5 = false
 	;await (async () => {
-		await slices.Values(nilSlice)!(async (__goscriptRange4_0) => {
+		await slices.Values(nilSlice)!(async (__goscriptRange5_0) => {
 			valueCount++
 			return true
 		})
 	})()
-	if (__goscriptRangeReturn4) {
+	if (__goscriptRangeReturn5) {
 		return
 	}
 	await $.println("nil values:", valueCount)
 	let sortedValues = (slices.Sorted(slices.Values($.arrayToSlice<string>(["c", "a", "b"]))) as $.Slice<string>)
 	await $.println("sorted values:", $.plainSliceIndex(sortedValues!, 0), $.plainSliceIndex(sortedValues!, 1), $.plainSliceIndex(sortedValues!, 2))
 
+	// Repeat allocates independent repeated backing and preserves empty cases.
 	let repeated = (slices.Repeat($.arrayToSlice<number>([7, 8]), 3) as $.Slice<number>)
 	await $.println("repeat:", $.sliceLen(repeated), $.cap(repeated), $.plainSliceIndex(repeated!, 0), $.plainSliceIndex(repeated!, 5), slices.Repeat(null, 2) == null, $.sliceLen(slices.Repeat($.arrayToSlice<number>([1]), 0)))
 
+	// Sort a value sequence using its comparison function.
 	let sortedFunc = (await slices.SortedFunc(slices.Values($.arrayToSlice<number>([1, 3, 2])), $.functionValue((a: number, b: number): number => {
 		return b - a
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))) as $.Slice<number>)
@@ -148,6 +174,7 @@ export async function main(): globalThis.Promise<void> {
 		return a - b
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))) == null)
 
+	// Stable sequence sorting keeps equal elements in their input order.
 	let stableSeq = (await slices.SortedStableFunc(slices.Values($.arrayToSlice<item>([$.markAsStructValue(new item({group: 2, label: "a"})), $.markAsStructValue(new item({group: 1, label: "b"})), $.markAsStructValue(new item({group: 2, label: "c"})), $.markAsStructValue(new item({group: 1, label: "d"}))])), $.functionValue((a: item, b: item): number => {
 		return a.group - b.group
 	}, ({ kind: $.TypeKind.Function, params: ["main.item", "main.item"], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))) as $.Slice<item>)
@@ -186,45 +213,50 @@ export async function main(): globalThis.Promise<void> {
 	$.plainSliceIndex(copyDst!, 0).n = 9
 	await $.println("copy struct:", $.plainSliceIndex(copySrc!, 0).n, $.plainSliceIndex(copySrc!, 1).n, $.plainSliceIndex(copyDst!, 0).n, $.plainSliceIndex(copyDst!, 1).n)
 
+	// Cloning copies each struct rather than sharing its fields.
 	let cloneSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
 	let clonedCells = (slices.Clone(cloneSrc) as $.Slice<cell>)
 	$.plainSliceIndex(clonedCells!, 0).n = 8
 	await $.println("clone struct:", $.plainSliceIndex(cloneSrc!, 0).n, $.plainSliceIndex(cloneSrc!, 1).n, $.plainSliceIndex(clonedCells!, 0).n, $.plainSliceIndex(clonedCells!, 1).n)
 
+	// Repeated struct values are independent of the source and each other.
 	let repeatSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
 	let repeatedCells = (slices.Repeat(repeatSrc, 2) as $.Slice<cell>)
 	$.plainSliceIndex(repeatedCells!, 0).n = 7
 	$.plainSliceIndex(repeatedCells!, 2).n = 6
 	await $.println("repeat struct:", $.plainSliceIndex(repeatSrc!, 0).n, $.plainSliceIndex(repeatSrc!, 1).n, $.plainSliceIndex(repeatedCells!, 0).n, $.plainSliceIndex(repeatedCells!, 1).n, $.plainSliceIndex(repeatedCells!, 2).n, $.plainSliceIndex(repeatedCells!, 3).n)
 
+	// Concatenation copies structs from every input.
 	let concatSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
 	let concated = (slices.Concat(concatSrc, $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 3}))])) as $.Slice<cell>)
 	$.plainSliceIndex(concated!, 0).n = 5
 	$.plainSliceIndex(concated!, 2).n = 4
 	await $.println("concat struct:", $.plainSliceIndex(concatSrc!, 0).n, $.plainSliceIndex(concatSrc!, 1).n, $.plainSliceIndex(concated!, 0).n, $.plainSliceIndex(concated!, 1).n, $.plainSliceIndex(concated!, 2).n)
 
+	// Values yields copies of struct elements.
 	let valuesSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
-	let __goscriptRangeReturn5 = false
+	let __goscriptRangeReturn6 = false
 	;await (async () => {
 		await slices.Values(valuesSrc)!(async (v) => {
 			v.n = 100
 			return true
 		})
 	})()
-	if (__goscriptRangeReturn5) {
+	if (__goscriptRangeReturn6) {
 		return
 	}
 	await $.println("values struct:", $.plainSliceIndex(valuesSrc!, 0).n, $.plainSliceIndex(valuesSrc!, 1).n)
 
+	// All yields copies of struct elements along with their indices.
 	let allSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
-	let __goscriptRangeReturn6 = false
+	let __goscriptRangeReturn7 = false
 	;await (async () => {
-		await slices.All(allSrc)!(async (__goscriptRange6_0, v) => {
+		await slices.All(allSrc)!(async (__goscriptRange7_0, v) => {
 			v.n = 200
 			return true
 		})
 	})()
-	if (__goscriptRangeReturn6) {
+	if (__goscriptRangeReturn7) {
 		return
 	}
 	await $.println("all struct:", $.plainSliceIndex(allSrc!, 0).n, $.plainSliceIndex(allSrc!, 1).n)
@@ -247,34 +279,39 @@ export async function main(): globalThis.Promise<void> {
 	let overlapped = $.appendSlice($.goSlice(overlap, undefined, 1), overlap)
 	await $.println("append overlap:", $.plainSliceIndex(overlapped!, 0), $.plainSliceIndex(overlapped!, 1), $.plainSliceIndex(overlapped!, 2))
 
+	// Backward yields struct values rather than references into its source.
 	let backwardSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
-	let __goscriptRangeReturn7 = false
+	let __goscriptRangeReturn8 = false
 	;await (async () => {
-		await slices.Backward(backwardSrc)!(async (__goscriptRange7_0, v) => {
+		await slices.Backward(backwardSrc)!(async (__goscriptRange8_0, v) => {
 			v.n = 9
 			return true
 		})
 	})()
-	if (__goscriptRangeReturn7) {
+	if (__goscriptRangeReturn8) {
 		return
 	}
 	await $.println("backward struct:", $.plainSliceIndex(backwardSrc!, 0).n)
 
+	// Insertion copies the source structs into the result.
 	let insertSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
 	let insertedCells = (slices.Insert(insertSrc, 0, $.markAsStructValue(new cell())) as $.Slice<cell>)
 	$.plainSliceIndex(insertedCells!, 1).n = 7
 	await $.println("insert struct:", $.plainSliceIndex(insertSrc!, 0).n)
 
+	// Replacement copies the remaining source structs.
 	let replaceSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
 	let replaced = (slices.Replace(replaceSrc, 0, 0, $.markAsStructValue(new cell())) as $.Slice<cell>)
 	$.plainSliceIndex(replaced!, 1).n = 8
 	await $.println("replace struct:", $.plainSliceIndex(replaceSrc!, 0).n)
 
+	// Growing past capacity copies struct values into the new backing.
 	let growSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
 	let grown = (slices.Grow(growSrc, 1, () => ($.markAsStructValue(new cell()) as cell)) as $.Slice<cell>)
 	$.plainSliceIndex(grown!, 0).n = 9
 	await $.println("grow struct:", $.plainSliceIndex(growSrc!, 0).n)
 
+	// Collect copies the struct values a map iterator yields.
 	let collectedMap = $.makeMap<number, cell>([[0, $.markAsStructValue(new cell({n: 1}))]])
 	let collected = (slices.Collect(maps.Values(collectedMap)) as $.Slice<cell>)
 	$.plainSliceIndex(collected!, 0).n = 9
@@ -306,6 +343,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("interface struct:", $.mustTypeAssert<cell>($.plainSliceIndex(source!, 1), "main.cell").n, $.mustTypeAssert<cell>($.plainSliceIndex(__goscriptShadow0!, 1), "main.cell").n, $.mustTypeAssert<cell>($.plainSliceIndex(copied!, 1), "main.cell").n, $.mustTypeAssert<cell>($.plainSliceIndex(__goscriptShadow1!, 1), "main.cell").n)
 	}
 
+	// AppendSeq copies yielded structs into its result.
 	let appendSeqSource = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
 	let appendSeq = $.functionValue(async (_yield: ((_p0: cell) => boolean | globalThis.Promise<boolean>) | null) => {
 		void (__goscriptAwait = _yield!($.markAsStructValue($.cloneStructValue($.plainSliceIndex(appendSeqSource!, 0)))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
@@ -314,6 +352,7 @@ export async function main(): globalThis.Promise<void> {
 	$.plainSliceIndex(appendSeqResult!, 0).n = 9
 	await $.println("append seq struct:", $.plainSliceIndex(appendSeqSource!, 0).n, $.plainSliceIndex(appendSeqResult!, 0).n)
 
+	// SortedFunc returns struct values independent of the source.
 	let sortedFuncSource = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 2})), $.markAsStructValue(new cell({n: 1}))])
 	let sortedFuncResult = (await slices.SortedFunc(slices.Values(sortedFuncSource), $.functionValue((a: cell, b: cell): number => {
 		return a.n - b.n
@@ -329,6 +368,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("byte clone:", $.bytesToString(byteClone), $.bytesToString(src), $.typedSliceIndex(byteClone!, 1))
 	await $.println("byte results:", $.bytesToString(slices.Clip($.goSlice(src, undefined, 2))), $.bytesToString(slices.Insert(src, 1, 121)), $.bytesToString(slices.Replace(slices.Clone(src), 0, 2, 113)), $.bytesToString(slices.Repeat(src, 2)), $.bytesToString(slices.Concat(src, new Uint8Array([100, 101]))))
 
+	// Report that every comparison reached the end.
 	await $.println("test finished")
 }
 

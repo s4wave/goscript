@@ -161,20 +161,16 @@ export function Repeat<T>(x: $.Slice<T>, count: number): $.Slice<T> {
  * @param s The slice to iterate over
  * @returns An iterator function that yields index-value pairs
  */
-export function All<T>(
-  s: $.Slice<T>,
-): (
-  yieldFunc: (index: number, value: T) => iter.YieldResult,
-) => void | globalThis.Promise<void> {
+export function All<T>(s: $.Slice<T>): iter.Seq2<number, T> {
   return function (
-    _yield: (index: number, value: T) => iter.YieldResult,
+    _yield: ((index: number, value: T) => iter.YieldResult) | null,
   ): void | globalThis.Promise<void> {
     const length = $.len(s)
     const walk = (i: number): void | globalThis.Promise<void> => {
       for (; i < length; i++) {
         const stored = $.arrayIndex(s as any, i) as T // Use proper indexing to avoid type issues
         const value = $.copyElement(stored)
-        const keepGoing = _yield(i, value)
+        const keepGoing = _yield!(i, value)
         if (keepGoing instanceof Promise) {
           return keepGoing.then((next) => {
             if (next) {
@@ -191,19 +187,16 @@ export function All<T>(
   }
 }
 
-export function Backward<T>(
-  s: $.Slice<T>,
-): (
-  _yield: (index: number, value: T) => boolean | globalThis.Promise<boolean>,
-) => void | globalThis.Promise<void> {
+/** Backward yields index-value pairs from the last element to the first. */
+export function Backward<T>(s: $.Slice<T>): iter.Seq2<number, T> {
   return function (
-    _yield: (index: number, value: T) => boolean | globalThis.Promise<boolean>,
+    _yield: ((index: number, value: T) => iter.YieldResult) | null,
   ): void | globalThis.Promise<void> {
     const walk = (i: number): void | globalThis.Promise<void> => {
       for (; i >= 0; i--) {
         const stored = $.arrayIndex(s as any, i) as T
         const value = $.copyElement(stored)
-        const keepGoing = _yield(i, value)
+        const keepGoing = _yield!(i, value)
         if (keepGoing instanceof Promise) {
           return keepGoing.then((next) => {
             if (next) {
@@ -261,23 +254,18 @@ export function Values<T>(s: $.Slice<T>): iter.Seq<T> {
  * @param n The chunk length
  * @returns An iterator function that yields the subslices
  */
-export function Chunk<T>(
-  s: $.Slice<T>,
-  n: number,
-): (
-  _yield: (chunk: $.Slice<T>) => iter.YieldResult,
-) => void | globalThis.Promise<void> {
+export function Chunk<T>(s: $.Slice<T>, n: number): iter.Seq<$.Slice<T>> {
   if (n < 1) {
     $.panic('cannot be less than 1')
   }
   return function (
-    _yield: (chunk: $.Slice<T>) => iter.YieldResult,
+    _yield: ((chunk: $.Slice<T>) => iter.YieldResult) | null,
   ): void | globalThis.Promise<void> {
     const length = $.len(s)
     const walk = (i: number): void | globalThis.Promise<void> => {
       for (; i < length; i += n) {
         const end = Math.min(i + n, length)
-        const keepGoing = _yield($.goSlice(s, i, end, end))
+        const keepGoing = _yield!($.goSlice(s, i, end, end))
         if (keepGoing instanceof Promise) {
           return keepGoing.then((next) => {
             if (next) {
