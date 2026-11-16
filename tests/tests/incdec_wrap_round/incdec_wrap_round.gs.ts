@@ -61,12 +61,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("vars:", vf.value == 1.6777216e+07, vu, vi, c.I8, c.U16, c.F == 1.6777216e+07)
 
 	// Elements of slices held in plain and in typed arrays, and of arrays.
-	let gi = (appendOf(__goscriptStatic0(), null, $.typedSliceOf(Int32Array, [2147483647]) as $.Slice<number>) as $.Slice<number>)
+	let gi = (appendOf(__goscriptStatic0(), null, ($.typedSliceOf(Int32Array, [2147483647]) as $.Slice<number>)) as $.Slice<number>)
 	$.sliceElems(gi!)[$.sliceSlot(gi!, 0)] = (($.sliceElems(gi!)[$.sliceSlot(gi!, 0)] + 1) | 0)
 	let gb = (appendOf(__goscriptStatic1(), null, $.arrayToSlice<number>([255, 0])) as $.Slice<number>)
 	$.sliceElems(gb!)[$.sliceSlot(gb!, 0)] = (($.sliceElems(gb!)[$.sliceSlot(gb!, 0)] + 1) & 0xff)
 	$.sliceElems(gb!)[$.sliceSlot(gb!, 1)] = (($.sliceElems(gb!)[$.sliceSlot(gb!, 1)] - 1) & 0xff)
-	let gf = (appendOf(__goscriptStatic2(), null, $.typedSliceOf(Float32Array, [1.6777216e+07]) as $.Slice<number>) as $.Slice<number>)
+	let gf = (appendOf(__goscriptStatic2(), null, ($.typedSliceOf(Float32Array, [1.6777216e+07]) as $.Slice<number>)) as $.Slice<number>)
 	$.sliceElems(gf!)[$.sliceSlot(gf!, 0)] = globalThis.Math.fround($.sliceElems(gf!)[$.sliceSlot(gf!, 0)] + 1)
 	let ti = $.arrayToSlice<number>([32767])
 	$.sliceElems(ti!)[$.sliceSlot(ti!, 0)] = (($.sliceElems(ti!)[$.sliceSlot(ti!, 0)] + 1) << 16 >> 16)
@@ -82,7 +82,7 @@ export async function main(): globalThis.Promise<void> {
 	pf!.value = globalThis.Math.fround(pf!.value + 1)
 	let pu = $.fieldRef(c, "U16")
 	pu!.value = ((pu!.value + 1) & 0xffff)
-	let gu = (appendOf(__goscriptStatic3(), null, $.typedSliceOf(Uint32Array, [0]) as $.Slice<number>) as $.Slice<number>)
+	let gu = (appendOf(__goscriptStatic3(), null, ($.typedSliceOf(Uint32Array, [0]) as $.Slice<number>)) as $.Slice<number>)
 	const __goscriptOperand0 = await index()
 	$.sliceElems(gu!)[$.sliceSlot(gu!, __goscriptOperand0)] = (($.sliceElems(gu!)[$.sliceSlot(gu!, __goscriptOperand0)] - 1) >>> 0)
 	await $.println("pointers:", $.typedSliceIndex(gi!, 0), vf.value == 1.6777216e+07, c.U16, $.typedSliceIndex(gu!, 0))

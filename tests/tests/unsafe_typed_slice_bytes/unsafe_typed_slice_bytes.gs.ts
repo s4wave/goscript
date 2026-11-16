@@ -18,7 +18,7 @@ export function uintBytes(s: $.Slice<number>): $.Slice<number> {
 
 export async function main(): globalThis.Promise<void> {
 	// The bytes are the little-endian encoding of the elements.
-	let f = $.typedSliceOf(Float32Array, [1, -2, 0.5]) as $.Slice<number>
+	let f = ($.typedSliceOf(Float32Array, [1, -2, 0.5]) as $.Slice<number>)
 	let b = floatBytes(f)
 	await $.println("float bytes:", $.sliceLen(b), $.typedSliceIndex(b!, 2), $.typedSliceIndex(b!, 3), $.typedSliceIndex(b!, 7), $.typedSliceIndex(b!, 11))
 
@@ -28,7 +28,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("shared:", $.typedSliceIndex(f!, 0), $.typedSliceIndex(b!, 11))
 
 	// A window views only its own elements.
-	let u = $.typedSliceOf(Uint32Array, [0x01020304, 0x05060708, 0x090a0b0c]) as $.Slice<number>
+	let u = ($.typedSliceOf(Uint32Array, [0x01020304, 0x05060708, 0x090a0b0c]) as $.Slice<number>)
 	let w = uintBytes($.goSlice(u, 1, undefined))
 	await $.println("window:", $.sliceLen(w), $.typedSliceIndex(w!, 0), $.typedSliceIndex(w!, 4))
 	$.sliceElems(w!)[$.sliceSlot(w!, 0)] = 0xff
@@ -40,7 +40,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("same kind:", $.typedSliceIndex(u!, 2), $.sliceLen(e), $.cap(e))
 
 	// The bytes of an int16 slice, and back from bytes to elements.
-	let i = $.typedSliceOf(Int16Array, [-1, 256]) as $.Slice<number>
+	let i = ($.typedSliceOf(Int16Array, [-1, 256]) as $.Slice<number>)
 	let ib = (unsafe.Slice!($.unsafeByteView<$.VarRef<number> | null>(($.indexRef(i!, 0) as any), __goscriptStatic0()), 4, "byte") as $.Slice<number>)
 	await $.println("int16 bytes:", $.typedSliceIndex(ib!, 0), $.typedSliceIndex(ib!, 1), $.typedSliceIndex(ib!, 2), $.typedSliceIndex(ib!, 3))
 	await $.println("nil:", floatBytes(null) == null)

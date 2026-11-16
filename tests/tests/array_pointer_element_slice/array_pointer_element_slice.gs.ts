@@ -10,7 +10,7 @@ export class node {
 
 	constructor(__goscriptValue?: boolean, sub$?: $.Slice<node | $.VarRef<node> | null>, sub0$?: (node | $.VarRef<node> | null)[]) {
 		this.sub = sub$ ?? (null! as $.Slice<node | $.VarRef<node> | null>)
-		this.sub0 = sub0$ ?? $.arrayValue(globalThis.Array.from({ length: 1 }, () => null))
+		this.sub0 = sub0$ ?? $.arrayValue(globalThis.Array.from({ length: 1 }, (): node | $.VarRef<node> | null => null))
 		;(this as any).__goStructValue = __goscriptValue === true
 	}
 

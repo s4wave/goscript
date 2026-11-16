@@ -148,7 +148,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let __goscriptRangeReturn2 = false
 	;await (async () => {
-		await (await seq($.interfaceValue($.typedSliceOf(Float64Array, [1, 2]) as $.Slice<number>, "[]float64", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float64")))))!(async (i, f) => {
+		await (await seq($.interfaceValue(($.typedSliceOf(Float64Array, [1, 2]) as $.Slice<number>), "[]float64", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float64")))))!(async (i, f) => {
 			await $.println("pair:", i, f)
 			return true
 		})

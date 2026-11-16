@@ -121,7 +121,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("comment:", $.mapGet<Tokens, string, string>($.mapGet<string, Style, Style>(d.value.Styles, "x", null)[0], 2, "")[0])
 	await $.println("kind:", Tokens_String(d.value.Kind), "kinds:", $.sliceLen(d.value.Kinds), Tokens_String($.typedSliceIndex(d.value.Kinds!, 0)), Tokens_String($.typedSliceIndex(d.value.Kinds!, 1)))
-	let __goscriptTuple0: any = (json.Marshal($.structInterfaceValue(new Doc(true, 1, $.typedSliceOf(Int32Array, [2]) as $.Slice<Tokens>), "main.Doc", "main.Doc")) as [$.Slice<number>, $.GoError])
+	let __goscriptTuple0: any = (json.Marshal($.structInterfaceValue(new Doc(true, 1, ($.typedSliceOf(Int32Array, [2]) as $.Slice<Tokens>)), "main.Doc", "main.Doc")) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	await $.println("marshal doc:", $.bytesToString(b))
 	await $.println("counts:", $.mapGet<number, number, number>(d.value.Counts, 1, 0)[0], $.mapGet<number, number, number>(d.value.Counts, -3, 0)[0])

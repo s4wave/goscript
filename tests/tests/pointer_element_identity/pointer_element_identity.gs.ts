@@ -224,7 +224,7 @@ export async function main(): globalThis.Promise<void> {
 	let ints = $.arrayToSlice<number>([5, 6, 7])
 	let ip = $.indexRef(ints!, 1)
 	await $.println("int", $.pointerEqual(ip, $.indexRef(ints!, 1)), $.pointerEqual(intPtr(ints, 2), $.indexRef(ints!, 2)), $.pointerEqual($.indexRef($.goSlice(ints, 1, undefined)!, 0), ip), $.pointerEqual(ip, $.indexRef(ints!, 0)))
-	let fs = $.typedSliceOf(Float32Array, [1, 2, 3, 4]) as $.Slice<number>
+	let fs = ($.typedSliceOf(Float32Array, [1, 2, 3, 4]) as $.Slice<number>)
 	let fp = $.indexRef(fs!, 2)
 	let fsub = $.goSlice(fs, 1, 3)
 	await $.println("float32", $.pointerEqual(fp, $.indexRef(fs!, 2)), $.pointerEqual($.indexRef(fsub!, 1), fp), $.pointerEqual($.indexRef(fsub!, 0), fp))

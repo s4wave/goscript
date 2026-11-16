@@ -205,7 +205,7 @@ export async function main(): globalThis.Promise<void> {
 			() => [/* @__PURE__ */ $.structField("N", /* @__PURE__ */ $.basicType("string", "main.Name"), [0], 0, true), /* @__PURE__ */ $.structField("Is", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int32", "main.MyInt")), [1], 16, true)]
 		)
 	}
-	let hv = reflect.ValueOf($.structInterfaceValue($.markAsStructValue(new holder({N: "h", Is: $.typedSliceOf(Int32Array, [9]) as $.Slice<MyInt>})), "main.holder", "main.holder"))
+	let hv = reflect.ValueOf($.structInterfaceValue($.markAsStructValue(new holder({N: "h", Is: ($.typedSliceOf(Int32Array, [9]) as $.Slice<MyInt>)})), "main.holder", "main.holder"))
 	await $.println("reflect field:", kind(hv.Field(0).Interface()), kind(hv.Field(1).Index(0).Interface()))
 
 	await $.println("equal:", $.comparableEqual(a, $.namedValueInterfaceValue<any>(5, "main.MyInt", {}, /* @__PURE__ */ $.basicType("int32", "main.MyInt"))), $.comparableEqual(a, b), $.comparableEqual(a, $.namedValueInterfaceValue<any>(6, "main.MyInt", {}, /* @__PURE__ */ $.basicType("int32", "main.MyInt"))))

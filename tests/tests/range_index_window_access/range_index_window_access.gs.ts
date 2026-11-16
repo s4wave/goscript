@@ -34,7 +34,7 @@ export class P {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let xs = $.typedSliceOf(Float64Array, [1, 2, 3, 4]) as $.Slice<number>
+	let xs = ($.typedSliceOf(Float64Array, [1, 2, 3, 4]) as $.Slice<number>)
 	for (let __goscriptRangeTarget0 = xs, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		;(__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] = (((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] as number) * 2) + 1
 	}

@@ -124,7 +124,7 @@ export function fromConst(__typeArgs: $.GenericTypeArgs | undefined, i: number):
 }
 
 export async function main(): globalThis.Promise<void> {
-	let res = (valuesExtended(__goscriptStatic0(), $.typedSliceOf(Int32Array, [0, 1]) as $.Slice<Base>, $.typedSliceOf(Int32Array, [2, 3, 4]) as $.Slice<Extended>) as $.Slice<Base>)
+	let res = (valuesExtended(__goscriptStatic0(), ($.typedSliceOf(Int32Array, [0, 1]) as $.Slice<Base>), ($.typedSliceOf(Int32Array, [2, 3, 4]) as $.Slice<Extended>)) as $.Slice<Base>)
 	for (let __goscriptRangeTarget1 = res, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
 		let v = $.int((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as Base), 32)
 		await $.println(v, Base_String(v))

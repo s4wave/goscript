@@ -158,7 +158,7 @@ export async function main(): globalThis.Promise<void> {
 		let end = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as scanner).readScript() : scanner.prototype.readScript.call(s))
 		await $.println($.sliceStringOrBytes(src, undefined, end))
 	}
-	await $.println(encode($.typedSliceOf(Int32Array, [97, 0xa5, 0x85, 0x300, 98]) as $.Slice<number>))
+	await $.println(encode(($.typedSliceOf(Int32Array, [97, 0xa5, 0x85, 0x300, 98]) as $.Slice<number>)))
 }
 
 export function encode(rs: $.Slice<number>): string {

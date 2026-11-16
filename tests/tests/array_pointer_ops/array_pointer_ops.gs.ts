@@ -35,7 +35,7 @@ export class arrays {
 	public declare items: item[]
 
 	constructor(__goscriptValue?: boolean, slices$?: $.Slice<number>[], items$?: item[]) {
-		this.slices = slices$ ?? $.arrayValue(globalThis.Array.from({ length: 1 }, () => null))
+		this.slices = slices$ ?? $.arrayValue(globalThis.Array.from({ length: 1 }, (): $.Slice<number> => null))
 		this.items = items$ ?? $.arrayValue(globalThis.Array.from({ length: 1 }, () => new item(true)), /* @__PURE__ */ $.arrayType("main.item", 1))
 		;(this as any).__goStructValue = __goscriptValue === true
 	}

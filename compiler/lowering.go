@@ -11520,11 +11520,12 @@ func (o *LoweringOwner) lowerCallArgValues(
 
 // packedSliceExpr returns a new slice of the lowered values, of elements of
 // type elem spelled elemType, held in the typed array of such elements other
-// than bytes if there is one, as a slice literal is.
+// than bytes if there is one, as a slice literal is. The typed array's cast is
+// parenthesized, so an index or a non-null assertion applies to the slice.
 func (o *LoweringOwner) packedSliceExpr(elem types.Type, elemType string, values []string) string {
 	if typedArray, hint := typedSliceArray(elem); typedArray != "" && hint != "byte" {
-		return o.runtimeOwner.QualifiedHelper(RuntimeHelperTypedSliceOf) +
-			"(" + typedArray + ", [" + strings.Join(values, ", ") + "]) as $.Slice<" + elemType + ">"
+		return "(" + o.runtimeOwner.QualifiedHelper(RuntimeHelperTypedSliceOf) +
+			"(" + typedArray + ", [" + strings.Join(values, ", ") + "]) as $.Slice<" + elemType + ">)"
 	}
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayToSlice) +
 		"<" + elemType + ">([" + strings.Join(values, ", ") + "])"
@@ -17006,8 +17007,13 @@ func (o *LoweringOwner) lowerZeroValueExprFor(ctx lowerFileContext, typ types.Ty
 		if isByteType(typed.Elem()) {
 			return o.lowerArrayValue("new Uint8Array("+strconv.FormatInt(typed.Len(), 10)+")", typed)
 		}
+		// A null zero element infers null[], so the fill names the element type.
 		elem := o.lowerZeroValueExprFor(ctx, typed.Elem())
-		return o.lowerArrayValue("globalThis.Array.from({ length: "+strconv.FormatInt(typed.Len(), 10)+" }, () => "+arrowBodyExpr(elem)+")", typed)
+		fill := "()"
+		if elem == "null" {
+			fill += ": " + o.tsTypeFor(ctx, typed.Elem())
+		}
+		return o.lowerArrayValue("globalThis.Array.from({ length: "+strconv.FormatInt(typed.Len(), 10)+" }, "+fill+" => "+arrowBodyExpr(elem)+")", typed)
 	case *types.Struct:
 		return o.lowerAnonymousStructValue(anonymousStructZeroValueExpr(typed, func(fieldType types.Type) string {
 			return o.lowerZeroValueExprFor(ctx, fieldType)

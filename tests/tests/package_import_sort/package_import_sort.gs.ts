@@ -124,7 +124,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Strings are sorted:", stringSorted)
 
 	// Test float64 sorting
-	let floats = $.typedSliceOf(Float64Array, [3.14, 2.71, 1.41]) as $.Slice<number>
+	let floats = ($.typedSliceOf(Float64Array, [3.14, 2.71, 1.41]) as $.Slice<number>)
 	await $.println("Original floats:", $.typedSliceIndex(floats!, 0), $.typedSliceIndex(floats!, 1), $.typedSliceIndex(floats!, 2))
 	sort2.Float64s(floats)
 	await $.println("Sorted floats:", $.typedSliceIndex(floats!, 0), $.typedSliceIndex(floats!, 1), $.typedSliceIndex(floats!, 2))
@@ -215,7 +215,7 @@ export async function main(): globalThis.Promise<void> {
 	let wordSlice = $.arrayToSlice<string>(["c", "a", "b"])
 	sort2.StringSlice_Sort((wordSlice as sort2.StringSlice))
 	await $.println("StringSlice sort:", $.plainSliceIndex(wordSlice!, 0), $.plainSliceIndex(wordSlice!, 1), $.plainSliceIndex(wordSlice!, 2), sort2.StringSlice_Search((wordSlice as sort2.StringSlice), "b"))
-	let floatSlice = ($.typedSliceOf(Float64Array, [2.5, 1.5]) as $.Slice<number> as sort2.Float64Slice)
+	let floatSlice = (($.typedSliceOf(Float64Array, [2.5, 1.5]) as $.Slice<number>) as sort2.Float64Slice)
 	sort2.Float64Slice_Sort(floatSlice)
 	await $.println("Float64Slice sort:", sort2.Float64Slice_Len(floatSlice), sort2.Float64Slice_Less(floatSlice, 0, 1), sort2.Float64Slice_Search(floatSlice, 2.5))
 	let sorter: sort2.Interface | null = $.namedValueInterfaceValue<sort2.Interface | null>(($.arrayToSlice<number>([3, 1, 2]) as sort2.IntSlice), "sort.IntSlice", __goscriptStatic6(), __goscriptStatic7(), __goscriptStatic8())

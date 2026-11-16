@@ -22,11 +22,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(s3)
 
 	// === string([]rune) Conversion ===
-	let myRunes = $.typedSliceOf(Int32Array, [71, 111, 83, 99, 114, 105, 112, 116]) as $.Slice<number>
+	let myRunes = ($.typedSliceOf(Int32Array, [71, 111, 83, 99, 114, 105, 112, 116]) as $.Slice<number>)
 	let myStringFromRunes = $.runesToString(myRunes)
 	await $.println(myStringFromRunes)
 
-	let emptyRunes = $.typedSliceOf(Int32Array, []) as $.Slice<number>
+	let emptyRunes = ($.typedSliceOf(Int32Array, []) as $.Slice<number>)
 	let emptyStringFromRunes = $.runesToString(emptyRunes)
 	await $.println(emptyStringFromRunes)
 
