@@ -1444,10 +1444,15 @@ export class Value {
     return 0
   }
 
+  // UnsafeAddr returns the address of the value's storage, preserving an
+  // owned pointer handle when its field or variable reference supplies one.
   public UnsafeAddr(): number | $.OwnedPointerHandle<ReflectValue> {
+    // Reject values without storage to address.
     if (!this.canTakeAddress()) {
       throw new ValueError({ Kind: this.Kind(), Method: 'UnsafeAddr' })
     }
+
+    // Preserve the field's canonical mutable reference.
     if (this._parentStruct && this._fieldName) {
       const target = this._parentStruct
       const key = this._fieldName
@@ -1457,11 +1462,16 @@ export class Value {
       ) as $.VarRef<ReflectValue>
       return $.ownedPointerFromRef(ref)!
     }
+
+    // Reuse the variable's existing pointer handle.
     if (this._parentVarRef?.__goPointer) {
       return this._parentVarRef
         .__goPointer as $.OwnedPointerHandle<ReflectValue>
     }
-    return this.Pointer()
+
+    // Take the address of the storage, rather than treating its contents as a
+    // pointer: an addressable struct, array or scalar has no Pointer method.
+    return this.Addr().Pointer()
   }
 
   public pointer(): unknown {

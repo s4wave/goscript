@@ -25,8 +25,10 @@ $.registerInterfaceType(
 );
 
 export class T {
+	// A is the string field.
 	public declare A: string
 
+	// B is the floating point field.
 	public declare B: number
 
 	constructor(__goscriptValue?: boolean, A$?: string, B$?: number) {
@@ -55,6 +57,7 @@ export class T {
 }
 
 export class square {
+	// Side is the length of an edge.
 	public declare Side: number
 
 	constructor(__goscriptValue?: boolean, Side$?: number) {
@@ -86,8 +89,10 @@ export class square {
 }
 
 export class holder {
+	// S holds a shape interface.
 	public declare S: shape | null
 
+	// A holds any dynamic value.
 	public declare A: any
 
 	constructor(__goscriptValue?: boolean, S$?: shape | null, A$?: any) {
@@ -116,8 +121,10 @@ export class holder {
 }
 
 export class base {
+	// This points at the concrete node.
 	public declare This: node | null
 
+	// Name identifies the node.
 	public declare Name: string
 
 	constructor(__goscriptValue?: boolean, This$?: node | null, Name$?: string) {
@@ -158,6 +165,7 @@ export class base {
 export class widget {
 	public declare base: base
 
+	// X is a writable widget field.
 	public declare X: number
 
 	constructor(__goscriptValue?: boolean, base$?: base, X$?: number) {
@@ -196,6 +204,7 @@ export class widget {
 export class body {
 	public declare widget: widget
 
+	// Title names the body.
 	public declare Title: string
 
 	constructor(__goscriptValue?: boolean, widget$?: widget, Title$?: string) {
@@ -253,6 +262,7 @@ export function underlying(v: reflect.Value): reflect.Value {
 }
 
 export async function structPointers(): globalThis.Promise<void> {
+	// Preserve pointer identity through Interface and Addr.
 	let b = new body(false, undefined, "body")
 	$.pointerValue<body>(b).widget.base.This = $.interfaceValue<node | null>(b, "*main.body", /* @__PURE__ */ $.pointerType("main.body"))
 	let [n, ok] = $.typeAssertTuple<node | null>(reflect.ValueOf($.interfaceValue(b, "*main.body", /* @__PURE__ */ $.pointerType("main.body"))).Interface(), "main.node")
@@ -262,6 +272,7 @@ export async function structPointers(): globalThis.Promise<void> {
 	ok = __goscriptTuple0[1]
 	await $.println("addr:", ok, (a === b || ($.pointerAliasesMade || (a as any)?.__goElementBacking !== undefined) && $.pointerEqual(a, b)))
 
+	// Make a fresh instance with the same embedded methods.
 	let __goscriptTuple1: any = $.typeAssertTuple<body | $.VarRef<body> | null>($.pointerValue<body>(b).widget.base.NewInstance(), /* @__PURE__ */ $.pointerType("main.body"))
 	let nb: body | $.VarRef<body> | null = __goscriptTuple1[0]
 	ok = __goscriptTuple1[1]
@@ -270,6 +281,7 @@ export async function structPointers(): globalThis.Promise<void> {
 	nv.Elem().FieldByName("X").SetInt(7n)
 	await $.println("new widget:", $.pointerValue<widget>($.mustTypeAssert<widget | $.VarRef<widget> | null>(nv.Interface(), /* @__PURE__ */ $.pointerType("main.widget"))).X)
 
+	// A typed nil pointer remains a non-nil interface.
 	let np: body | $.VarRef<body> | null = null! as body | $.VarRef<body> | null
 	let iv = reflect.ValueOf($.interfaceValue(np, "*main.body", /* @__PURE__ */ $.pointerType("main.body"))).Interface()
 	await $.println("nil:", iv != null, ((iv as any)?.__goType === "*main.body" && (iv as any).__goValue === undefined && (iv as any).__isTypedNil !== true ? ((iv as any) as body | $.VarRef<body> | null) : $.mustTypeAssert<body | $.VarRef<body> | null>(iv, /* @__PURE__ */ $.pointerType("main.body"))) == null)
@@ -285,15 +297,24 @@ export async function structPointers(): globalThis.Promise<void> {
 }
 
 export async function main(): globalThis.Promise<void> {
+	// Follow ordinary pointers and pointers to pointers.
 	let s: $.VarRef<T | $.VarRef<T> | null> = $.varRef(new T(false, "aaa", 3.140000104904175))
 	let v = reflect.ValueOf($.interfaceValue(s.value, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))
 	await $.println(reflect.Kind_String(v.Kind()), reflect.Kind_String(v.Elem().Kind()), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(v.Elem().Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println(walk(v), walk(reflect.ValueOf($.interfaceValue(s, "**main.T", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.pointerType("main.T"))))))
 
+	// A nil pointer has no reflected element.
 	let np: T | $.VarRef<T> | null = null! as T | $.VarRef<T> | null
 	await $.println(walk(reflect.ValueOf($.interfaceValue(np, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))), reflect.ValueOf($.interfaceValue(np, "*main.T", /* @__PURE__ */ $.pointerType("main.T"))).Elem().IsValid())
 
+	// Equality walkers use UnsafeAddr to identify addressable structs before
+	// comparing their fields. The address is the same as the original pointer.
 	let e = v.Elem()
+	await $.println("struct address:", e.UnsafeAddr() == v.Pointer(), e.UnsafeAddr() == e.UnsafeAddr())
+	let fresh = reflect.New($.pointerValueOrNil(v.Elem().Type())!)
+	await $.println("new struct address:", fresh.Elem().UnsafeAddr() == fresh.Pointer(), fresh.Pointer() != v.Pointer())
+
+	// Writes through struct fields reach the original pointer.
 	await $.println(e.NumField(), e.Field(0).String(), e.CanSet())
 	e.Field(0).SetString("bbb")
 	e.FieldByName("B").SetFloat(2.5)
@@ -313,18 +334,21 @@ export async function main(): globalThis.Promise<void> {
 	name.SetString("\xc3\xa9")
 	await $.println(name.Len())
 
+	// Reflected integer writes preserve their width.
 	let n = reflect.New($.pointerValueOrNil(reflect.TypeOf($.basicInterfaceValue(0, "int")))!).Elem()
 	n.SetInt(7n)
 	let big = reflect.New($.pointerValueOrNil(reflect.TypeOf($.basicInterfaceValue(0n, "int64")))!).Elem()
 	big.SetInt(1099511627776n)
 	await $.println(n.Int(), big.Int())
 
+	// Reflected floats and booleans read back their new values.
 	let f = reflect.New($.pointerValueOrNil(reflect.TypeOf($.basicInterfaceValue(0.0, "float64")))!).Elem()
 	f.SetFloat(2.5)
 	let b = reflect.New($.pointerValueOrNil(reflect.TypeOf(false))!).Elem()
 	b.SetBool(true)
 	await $.println(f.Float(), b.Bool())
 
+	// Assign a slice through its reflected storage.
 	let sl = reflect.New($.pointerValueOrNil(reflect.TypeOf($.interfaceValue($.arrayToSlice<string>([]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")))))!).Elem()
 	sl.Set(reflect.ValueOf($.interfaceValue($.arrayToSlice<string>(["x", "y"]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")))))
 	await $.println(sl.Len())
@@ -336,6 +360,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(reflect.Kind_String(sf.Kind()), sf.IsNil(), sf.Elem().IsValid())
 	await $.println(reflect.Kind_String(underlying(sf).Kind()), reflect.Kind_String(underlying(ev.Field(1)).Kind()))
 
+	// Unwrap both interface kinds to their concrete values.
 	let full = $.varRef(new holder(true, $.structInterfaceValue<shape | null>(new square(true, 3), "main.square", "main.square"), $.interfaceValue(new square(false, 2), "*main.square", /* @__PURE__ */ $.pointerType("main.square"))))
 	let fv = reflect.ValueOf($.interfaceValue(full, "*main.holder", /* @__PURE__ */ $.pointerType("main.holder"))).Elem()
 	let u = underlying(fv.Field(0))
@@ -343,9 +368,11 @@ export async function main(): globalThis.Promise<void> {
 	u = underlying(fv.Field(1))
 	await $.println(reflect.Kind_String(u.Kind()), u.Field(0).Int())
 
+	// A nil empty interface also has no reflected element.
 	let nilAny: $.VarRef<any> = $.varRef(null! as any)
 	await $.println(reflect.ValueOf($.interfaceValue(nilAny, "*interface{}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] }))).Elem().Elem().IsValid())
 
+	// Check embedded interfaces and dynamically allocated structs.
 	await structPointers()
 }
 

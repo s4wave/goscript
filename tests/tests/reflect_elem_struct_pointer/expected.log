@@ -1,6 +1,8 @@
 ptr struct main.T
 *struct **struct
 nil false
+struct address: true true
+new struct address: true true
 2 aaa true
 bbb 2.5
 ccc 1.5 ccc 1.5

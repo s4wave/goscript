@@ -189,6 +189,8 @@ Generated classes store each field as an own property of the struct instance, as
 
 Standalone variable references retain distinct mutable cells. Variable and field references share their accessors through class prototypes. Pointer handles and their address/ref closures are allocated on the first pointer access and retained on that reference; ordinary field reads and writes do not allocate pointer machinery.
 
+`reflect.Value.UnsafeAddr` returns the address of the value's storage, including a root struct reached through a pointer or `reflect.New`. It obtains the address through `Addr().Pointer()` when no field or variable reference already provides an owned pointer handle; `Value.Pointer` applies to pointer values, not to the struct they point at.
+
 ByteLayout describes byte-backed numeric arrays and structs using the loaded Go target's sizes, alignment and field offsets. Target-sized `int`, `uint` and `uintptr` views preserve GoScript's JavaScript number representation; fixed `int64` and `uint64` views use bigint. Word views inherit the number representation's precision limit. A three-index byte slice over string data respects its declared array and explicit slice bounds without constructing an oversized array.
 
 The `io.Copy` and `io.CopyN` fallback starts with a 32 KiB buffer and grows it after full reads to a 256 KiB ceiling. This bounds memory while reducing asynchronous reader/writer transitions for bulk transfers. `CopyBuffer` preserves a caller-supplied buffer, and `WriterTo` or `ReaderFrom` still owns copying when available.
