@@ -1,2 +1,8 @@
 calls: 1
 sum: 9
+array: 123 9
+struct array: 12 9
+package array: 123 4
+array pointer: 129
+assigned: 1 2 3
+read only: 456

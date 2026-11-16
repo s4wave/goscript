@@ -13,8 +13,8 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-// readOnlyTablesSource declares tables named ro* that only reads use and
-// tables named rw* that some use may change.
+// readOnlyTablesSource declares package tables and local arrays named ro*
+// that only reads use, and ones named rw* that some use may change.
 const readOnlyTablesSource = `package p
 
 import (
@@ -65,7 +65,7 @@ func keep(a []int) []int    { return a }
 func variadic(a ...[]int)   {}
 func assignParam(a []int)   { a = nil; _ = a }
 func closure(a []int)       { func() { a[0] = 2 }() }
-func byValue(a [2]int) int  { return a[0] }
+func byValue(roParam [2]int) int { return roParam[0] }
 
 func uses() {
 	_ = roArray[1] + roArray[:][0] + roArray[1:3][0] + uint8(len(roArray[:2]))
@@ -76,6 +76,14 @@ func uses() {
 	for _, v := range roRange[1:] {
 		_ = v
 	}
+	roLocal := [2]int{1, 2}
+	for _, v := range roLocal {
+		_ = v + roLocal[0]
+	}
+	rwLocalArray := [2]int{1, 2}
+	rwLocalArray[1] = 3
+	rwLocalSlice := rwLocalArray[:]
+	_ = rwLocalSlice
 	dst := make([]int, 2)
 	copy(dst, roCopy[1:])
 	dst = append(dst, roCopy[1:]...)
@@ -132,11 +140,12 @@ func TestCollectReadOnlyTables(t *testing.T) {
 	}
 	slices.Sort(got)
 	var want []string
-	for _, name := range typesPkg.Scope().Names() {
-		if strings.HasPrefix(name, "ro") {
-			want = append(want, name)
+	for _, obj := range info.Defs {
+		if obj != nil && strings.HasPrefix(obj.Name(), "ro") {
+			want = append(want, obj.Name())
 		}
 	}
+	slices.Sort(want)
 	if !slices.Equal(got, want) {
 		t.Fatalf("read-only tables = %v, want %v", got, want)
 	}

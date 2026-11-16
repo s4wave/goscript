@@ -8953,6 +8953,9 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	diagnostics = append(diagnostics, bodyDiagnostics...)
 	rangeTarget := ctx.tempName("RangeTarget")
 	rangeTargetValue := o.lowerArrayPointerTarget(ctx, rangeValue, rangeType)
+	if rangeCopiesArray(ctx, stmt, rangeType) {
+		rangeTargetValue = o.lowerValueForTargetTypes(ctx, rangeType, rangeType, rangeTargetValue, true)
+	}
 	counter, children := o.rangeCounter(ctx, stmt, indexName, body)
 	if valueName != "" {
 		// The value variable holds a copy of the element, so struct and array

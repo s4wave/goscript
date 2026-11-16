@@ -32,6 +32,35 @@ func rangeValueSharesElement(ctx lowerFileContext, stmt *ast.RangeStmt, rangeTyp
 	return !rangeValueBindingMayChange(ctx, obj, stmt.Body) && rangeBodyChangesOnlyLocals(ctx, stmt.Body)
 }
 
+// rangeCopiesArray reports whether a range loop over an array value reads a
+// copy of it. Go evaluates the range expression once, so the loop reads the
+// values the array held when it started, and the copy is observable only when
+// the loop reads values and the array may change while it runs. A composite
+// literal, which nothing else holds, a read-only array (see
+// collectReadOnlyTables) and a loop that changes only locals (see
+// rangeBodyChangesOnlyLocals) need no copy.
+func rangeCopiesArray(ctx lowerFileContext, stmt *ast.RangeStmt, rangeType types.Type) bool {
+	// The loop reads the values of an array.
+	if _, ok := types.Unalias(rangeType).Underlying().(*types.Array); !ok || stmt.Body == nil {
+		return false
+	}
+	if value, ok := stmt.Value.(*ast.Ident); stmt.Value == nil || ok && value.Name == "_" {
+		return false
+	}
+
+	// The array may change while the loop runs.
+	info := ctx.semPkg.source.TypesInfo
+	switch operand := ast.Unparen(stmt.X).(type) {
+	case *ast.CompositeLit:
+		return false
+	case *ast.Ident:
+		if readOnlyTablesFor(ctx)[info.Uses[operand]] {
+			return false
+		}
+	}
+	return !rangeOverValues(info, stmt.Body, stmt) || !rangeBodyChangesOnlyLocals(ctx, stmt.Body)
+}
+
 // rangeBodyChangesOnlyLocals reports whether body changes no storage but
 // local variables that hold no struct or array, which cannot share storage
 // with a slice element. It must not call functions other than conversions

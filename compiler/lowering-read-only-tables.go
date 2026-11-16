@@ -9,7 +9,8 @@ import (
 )
 
 // A read-only table is an unexported package variable of an array or slice
-// type whose elements no code ever changes: every use of it reads an element,
+// type, or a local variable of an array type, whose elements no code ever
+// changes: every use of it reads an element,
 // its length or capacity, ranges over it or slices it, and every slice of it
 // is used the same way or passed to a parameter of a function of the package
 // that only reads it. Such a variable is never assigned and its address and
@@ -23,6 +24,9 @@ import (
 // lowerSliceExpr). Go code generated for lookups, such as the Unicode property
 // tables of go-text, slices the same table on every call, and each slice of a
 // byte array is a new typed array view.
+//
+// A range loop over a read-only array reads the array itself instead of the
+// copy Go ranges over (see rangeCopiesArray), since nothing can change it.
 
 // readOnlyTablesFor returns the read-only tables of ctx's package, collected
 // once, on first use, from the package syntax.
@@ -128,7 +132,7 @@ func collectReadOnlyTables(pkg *packages.Package) map[types.Object]bool {
 }
 
 // tableCandidates returns the unexported package variables of pkg of array
-// or slice types.
+// or slice types, and its local variables of array types.
 func tableCandidates(pkg *packages.Package) []*types.Var {
 	scope := pkg.Types.Scope()
 	var tables []*types.Var
@@ -140,6 +144,17 @@ func tableCandidates(pkg *packages.Package) []*types.Var {
 		}
 		switch types.Unalias(v.Type()).Underlying().(type) {
 		case *types.Array, *types.Slice:
+			tables = append(tables, v)
+		}
+	}
+
+	// A local array holds its own elements; a local slice shares them.
+	for _, obj := range pkg.TypesInfo.Defs {
+		v, ok := obj.(*types.Var)
+		if !ok || v.IsField() || v.Parent() == nil || v.Parent() == scope {
+			continue
+		}
+		if _, ok := types.Unalias(v.Type()).Underlying().(*types.Array); ok {
 			tables = append(tables, v)
 		}
 	}
