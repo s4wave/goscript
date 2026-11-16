@@ -114,14 +114,14 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget2 = seeds, __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), i = 0; i < __goscriptRangeWindow2.length; i++) {
 		let seed = (__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + i] as bigint)
 		await $.println("pcg", seed)
-		await show(rand.New($.pointerValueOrNil($.interfaceValue<rand.Source | null>(rand.NewPCG(seed, ((__goscriptRangeWindow2.backing as any[])[$.windowSlot(__goscriptRangeWindow2, (i + 1) % __goscriptRangeWindow2.length)] as bigint)), "*rand.PCG", __goscriptStatic0()))!))
+		await show(rand.New($.pointerValueOrNil($.interfaceValue<rand.Source | null>(rand.NewPCG(seed, ((__goscriptRangeWindow2.backing as any[])[$.windowSlot(__goscriptRangeWindow2, $.intRem((i + 1), __goscriptRangeWindow2.length))] as bigint)), "*rand.PCG", __goscriptStatic0()))!))
 	}
 
 	for (let __goscriptRangeTarget4 = new Uint8Array([0, 1, 7, 255]) as $.Slice<number>, __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget4), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow3.length; __rangeIndex++) {
 		let b = $.uint((__goscriptRangeWindow3.backing[__goscriptRangeWindow3.offset + __rangeIndex] as number), 8)
 		let seed: Uint8Array = $.arrayValue(new Uint8Array(32))
 		for (let __goscriptRangeTarget3 = seed, __goscriptRangeWindow4 = $.sliceRange(__goscriptRangeTarget3), i = 0; i < __goscriptRangeWindow4.length; i++) {
-			seed[i] = $.uint(((b + ($.uint(i, 8) * b)) & 0xff), 8)
+			seed[i] = $.uint(((b + ((($.uint(i, 8) * b) & 0xff))) & 0xff), 8)
 		}
 		await $.println("chacha8", b)
 		await show(rand.New($.pointerValueOrNil($.interfaceValue<rand.Source | null>(rand.NewChaCha8(seed), "*rand.ChaCha8", __goscriptStatic1()))!))

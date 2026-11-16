@@ -44,7 +44,7 @@ export async function main(): globalThis.Promise<void> {
 	let sum32 = 0
 	let sum64 = 0
 	for (let __rangeIndex = 0; __rangeIndex < 10; __rangeIndex++) {
-		sum32 = globalThis.Math.fround(sum32 + (0.10000000149011612))
+		sum32 = globalThis.Math.fround(sum32 + 0.10000000149011612)
 		sum64 += 0.1
 	}
 	fmt.Println("sum32:", $.basicInterfaceValue(sum32, "float64"))

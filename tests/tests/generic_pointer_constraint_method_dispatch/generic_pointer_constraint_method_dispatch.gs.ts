@@ -103,7 +103,7 @@ export function countFlags(__typeArgs: $.GenericTypeArgs | undefined, __goscript
 	for (let __goscriptRangeTarget0 = values, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let v = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as bigint)
 		if ((p !== null && (p as any).__isVarRef !== true && ((p as any).__goValue === undefined || (p as any).__goType?.charCodeAt(0) !== 42) ? (p as Exclude<setter, null>) : $.pointerValue<Exclude<setter, null>>(p)).Has(v)) {
-			n++
+			n = $.int64Add(n, 1n)
 		}
 	}
 	void (p !== null && (p as any).__isVarRef !== true && ((p as any).__goValue === undefined || (p as any).__goType?.charCodeAt(0) !== 42) ? (p as Exclude<setter, null>) : $.pointerValue<Exclude<setter, null>>(p)).Set(8n)

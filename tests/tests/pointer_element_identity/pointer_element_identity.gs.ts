@@ -217,7 +217,7 @@ export async function main(): globalThis.Promise<void> {
 	let pairs = $.makeMap<pair, number>([[$.markAsStructValue(new pair({p: $.indexRef(_in!, 0)})), 1]])
 	const __goscriptMap0 = pairs
 	const __goscriptMapKey0 = $.markAsStructValue(new pair({p: $.indexRef(_in!, 0)}))
-	$.mapSet(__goscriptMap0, __goscriptMapKey0, $.mapGet<pair, number, number>(__goscriptMap0, __goscriptMapKey0, 0)[0] + (1))
+	$.mapSet(__goscriptMap0, __goscriptMapKey0, $.mapGet<pair, number, number>(__goscriptMap0, __goscriptMapKey0, 0)[0] + 1)
 	await $.println("struct pair key", $.mapGet<pair, number, number>(pairs, (() => { const __goscriptLiteralField0 = elemPtr(_in, 0); return $.markAsStructValue(new pair({p: __goscriptLiteralField0})) })(), 0)[0], $.len(pairs), $.arrayEqual($.arrayValue([$.indexRef(_in!, 0)]), $.arrayValue([p])))
 
 	// Pointers to numeric elements of slices, also typed slices.

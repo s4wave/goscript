@@ -58,7 +58,7 @@ export async function main(): globalThis.Promise<void> {
 		// A slice of structs indexed in a range loop over an integer.
 		let ps = $.makeSlice<pos>(4, undefined, undefined, () => new pos(true))
 		for (let __goscriptSliceWindow1 = $.sliceRange(ps), i = 0; i < 10; i++) {
-			let j = i % __goscriptSliceWindow1.length;
+			let j = $.intRem(i, __goscriptSliceWindow1.length);
 			;((__goscriptSliceWindow1.backing as any[])[$.windowSlot(__goscriptSliceWindow1, j)] as pos).Line += i;
 			;((__goscriptSliceWindow1.backing as any[])[$.windowSlot(__goscriptSliceWindow1, j)] as pos).Char = ((__goscriptSliceWindow1.backing as any[])[$.windowSlot(__goscriptSliceWindow1, j)] as pos).Line * 2
 		}
@@ -105,7 +105,7 @@ export async function main(): globalThis.Promise<void> {
 		// Bytes are read and written in place.
 		let b = new Uint8Array([104, 101, 108, 108, 111])
 		for (let __goscriptSliceWindow4 = $.sliceRange(b), __goscriptRangeCount0 = $.sliceLen(b), i = 0; i < __goscriptRangeCount0; i++) {
-			;(__goscriptSliceWindow4.backing as any[])[$.windowSlot(__goscriptSliceWindow4, i)] = $.uint((__goscriptSliceWindow4.backing as any[])[$.windowSlot(__goscriptSliceWindow4, i)] - (32), 8)
+			;(__goscriptSliceWindow4.backing as any[])[$.windowSlot(__goscriptSliceWindow4, i)] = (((__goscriptSliceWindow4.backing as any[])[$.windowSlot(__goscriptSliceWindow4, i)] - 32) & 0xff)
 		}
 		await $.println($.bytesToString(b))
 

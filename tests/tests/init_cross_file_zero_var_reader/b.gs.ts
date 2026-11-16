@@ -65,7 +65,7 @@ export function __goscript_set_shared(__goscriptValue: number): void {
 }
 
 export async function readTable(): globalThis.Promise<void> {
-	__goscript_set_counter(__goscript_get_counter() + 1n)
+	__goscript_set_counter($.uint64Add(__goscript_get_counter(), 1n))
 	__goscript_a.__goscript_set_remoteCounter(__goscript_a.__goscript_get_remoteCounter() + 1)
 	__goscript_set_shared(7)
 	let ptr = __goscript_get_shared()

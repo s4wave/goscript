@@ -25,15 +25,15 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Bob's updated score: Expected: 88, Actual:", $.mapGet<string, number, number>(scores, "Bob", 0)[0])
 	const __goscriptMap0 = scores
 	const __goscriptMapKey0 = "Bob"
-	$.mapSet(__goscriptMap0, __goscriptMapKey0, $.mapGet<string, number, number>(__goscriptMap0, __goscriptMapKey0, 0)[0] + (1))
+	$.mapSet(__goscriptMap0, __goscriptMapKey0, $.mapGet<string, number, number>(__goscriptMap0, __goscriptMapKey0, 0)[0] + 1)
 	await $.println("Bob's incremented score: Expected: 89, Actual:", $.mapGet<string, number, number>(scores, "Bob", 0)[0])
 	const __goscriptMap1 = scores
 	const __goscriptMapKey1 = "Bob"
-	$.mapSet(__goscriptMap1, __goscriptMapKey1, $.mapGet<string, number, number>(__goscriptMap1, __goscriptMapKey1, 0)[0] + (3))
+	$.mapSet(__goscriptMap1, __goscriptMapKey1, $.mapGet<string, number, number>(__goscriptMap1, __goscriptMapKey1, 0)[0] + 3)
 	await $.println("Bob's compound score: Expected: 92, Actual:", $.mapGet<string, number, number>(scores, "Bob", 0)[0])
 	const __goscriptMap2 = scores
 	const __goscriptMapKey2 = "Bob"
-	$.mapSet(__goscriptMap2, __goscriptMapKey2, $.mapGet<string, number, number>(__goscriptMap2, __goscriptMapKey2, 0)[0] - (1))
+	$.mapSet(__goscriptMap2, __goscriptMapKey2, $.mapGet<string, number, number>(__goscriptMap2, __goscriptMapKey2, 0)[0] - 1)
 	await $.println("Bob's decremented score: Expected: 91, Actual:", $.mapGet<string, number, number>(scores, "Bob", 0)[0])
 
 	// Check if key exists (comma-ok idiom)

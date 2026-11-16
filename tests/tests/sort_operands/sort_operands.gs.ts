@@ -56,10 +56,11 @@ export class slowInts {
 	public Swap(i: number, j: number): void {
 		const s: slowInts | $.VarRef<slowInts> | null = this;
 		const s$: slowInts = s == null ? $.pointerTarget<slowInts>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<slowInts>(s)
+		const __goscriptOperand0 = (s$ as slowInts).xs
 		let __goscriptAssign1_0: number = $.plainSliceIndex((s$ as slowInts).xs!, j)
 		let __goscriptAssign1_1: number = $.plainSliceIndex((s$ as slowInts).xs!, i)
 		$.sliceElems((s$ as slowInts).xs!)[$.sliceSlot((s$ as slowInts).xs!, i)] = __goscriptAssign1_0
-		$.sliceElems((s$ as slowInts).xs!)[$.sliceSlot((s$ as slowInts).xs!, j)] = __goscriptAssign1_1
+		$.sliceElems(__goscriptOperand0!)[$.sliceSlot(__goscriptOperand0!, j)] = __goscriptAssign1_1
 	}
 
 	static __typeInfo = $.registerStructType(

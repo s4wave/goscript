@@ -67,10 +67,11 @@ export class descending {
 
 	public Swap(i: number, j: number): void {
 		const d = this;
+		const __goscriptOperand0 = d.values
 		let __goscriptAssign0_0: number = $.plainSliceIndex(d.values!, j)
 		let __goscriptAssign0_1: number = $.plainSliceIndex(d.values!, i)
 		$.sliceElems(d.values!)[$.sliceSlot(d.values!, i)] = __goscriptAssign0_0
-		$.sliceElems(d.values!)[$.sliceSlot(d.values!, j)] = __goscriptAssign0_1
+		$.sliceElems(__goscriptOperand0!)[$.sliceSlot(__goscriptOperand0!, j)] = __goscriptAssign0_1
 	}
 
 	static __typeInfo = $.registerStructType(

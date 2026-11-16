@@ -73,7 +73,7 @@ export async function main(): globalThis.Promise<void> {
 	$.mapSet(seen, $.markAsStructValue($.cloneStructValue(b)), 2)
 	const __goscriptMap0 = seen
 	const __goscriptMapKey0 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(time.Unix(1n, 0n))).UTC()))
-	$.mapSet(__goscriptMap0, __goscriptMapKey0, $.mapGet<time.Time, number, number>(__goscriptMap0, __goscriptMapKey0, 0)[0] + (1))
+	$.mapSet(__goscriptMap0, __goscriptMapKey0, $.mapGet<time.Time, number, number>(__goscriptMap0, __goscriptMapKey0, 0)[0] + 1)
 	await $.println("map", $.len(seen), $.mapGet<time.Time, number, number>(seen, a, 0)[0], $.mapGet<time.Time, number, number>(seen, b, 0)[0], $.mapGet<time.Time, number, number>(seen, $.markAsStructValue($.cloneStructValue(a)).Add(1n), 0)[0])
 	let zero = $.markAsStructValue(new time.Time())
 	await $.println("zero", $.structEqual(zero, $.markAsStructValue(new time.Time())), $.markAsStructValue($.cloneStructValue(zero)).IsZero(), $.structEqual(a, $.markAsStructValue(new time.Time())), reflect.ValueOf($.structInterfaceValue($.markAsStructValue($.cloneStructValue(zero)), "time.Time", __goscriptStatic0())).IsZero(), reflect.ValueOf($.structInterfaceValue($.markAsStructValue($.cloneStructValue(a)), "time.Time", __goscriptStatic0())).IsZero())

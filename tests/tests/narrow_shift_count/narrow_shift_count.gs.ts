@@ -33,14 +33,14 @@ export async function main(): globalThis.Promise<void> {
 	let b = i32
 	let c = neg
 	let d = u16
-	a = $.uint($.narrowShl(a, ($.uint(n, 32))), 32)
+	a = (($.narrowShl(a, ($.uint(n, 32)))) >>> 0)
 	b = $.int($.narrowShl(b, ($.int(n, 32))), 32)
 	c = $.narrowShr(c, ($.int(n, 32)))
-	d = $.uint($.narrowShl(d, ($.uint(n, 16))), 16)
+	d = (($.narrowShl(d, ($.uint(n, 16)))) & 0xffff)
 	await $.println("assign", a, b, c, d)
 	let e = u32
 	let f = neg
-	e = $.uint($.narrowShl(e, ($.uint(count(), 32))), 32)
+	e = (($.narrowShl(e, ($.uint(count(), 32)))) >>> 0)
 	f = $.narrowShr(f, ($.int(count(), 32)))
 	await $.println("assign call", e, f)
 	await $.println("bit", bit(32), bit(97), bit(0x3f))

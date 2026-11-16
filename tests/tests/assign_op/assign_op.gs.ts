@@ -21,7 +21,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(quotient)
 
 	let unsignedQuotient = 5
-	unsignedQuotient = (unsignedQuotient / 2) >>> 0
+	unsignedQuotient = globalThis.Math.trunc(unsignedQuotient / 2)
 	await $.println(unsignedQuotient)
 
 	let d = 3
@@ -65,15 +65,15 @@ export async function main(): globalThis.Promise<void> {
 	let n = 1
 	n = (n ^ (0x80000000)) >>> 0
 	await $.println(n)
-	n = (n | (2)) >>> 0
+	n = (n | 2) >>> 0
 	await $.println(n)
 	n = (n & (0xfffffffe)) >>> 0
 	await $.println(n)
-	n = (n & ~((2))) >>> 0
+	n = (n & ~(2)) >>> 0
 	await $.println(n)
 	let flags: {"bits": number} = $.anonymousStructValue({"bits": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("bits", /* @__PURE__ */ $.basicType("uint32"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/assign_op" })] })
 	flags.bits = 0xf0000000
-	flags.bits = (flags.bits | (1)) >>> 0
+	flags.bits = (flags.bits | 1) >>> 0
 	await $.println(flags.bits)
 }
 

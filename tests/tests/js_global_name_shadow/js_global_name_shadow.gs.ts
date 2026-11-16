@@ -87,7 +87,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("multiply:", a * b, $.int(globalThis.Math.imul(w, $.int(b, 32)), 32))
 	let u = 4000000000
 	await $.println("unsigned multiply:", $.uint(globalThis.Math.imul(u, 3) >>> 0, 32))
-	await $.println("divide:", globalThis.Math.trunc(a / b), globalThis.Math.trunc(-a / b))
+	await $.println("divide:", $.intQuo(a, b), $.intQuo(-a, b))
 
 	let r = 128512
 	await $.println("rune string:", $.stringEqual($.runeToString(r), "\xf0\x9f\x98\x80"))

@@ -36,6 +36,6 @@ export function trie_insert(tr: trie, __typeArgs: $.GenericTypeArgs | undefined,
 export function names_add(n: names, name: string): number {
 	const __goscriptMap0 = n
 	const __goscriptMapKey0 = name
-	$.mapSet(__goscriptMap0, __goscriptMapKey0, $.mapGet<string, number, number>(__goscriptMap0, __goscriptMapKey0, 0)[0] + (1))
+	$.mapSet(__goscriptMap0, __goscriptMapKey0, $.mapGet<string, number, number>(__goscriptMap0, __goscriptMapKey0, 0)[0] + 1)
 	return $.mapGet<string, number, number>(n, name, 0)[0]
 }

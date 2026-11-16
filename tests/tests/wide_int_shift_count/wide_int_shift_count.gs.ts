@@ -8,14 +8,14 @@ export async function main(): globalThis.Promise<void> {
 	let s = $.uint64Mul(($.uint64And(n, 1n)), 4n)
 
 	let b = 1
-	b = $.uint(b + ($.uint(($.uint64ToNumber(s) < 32 ? ((1 << $.uint64ToNumber(s)) & 0xff) : 0), 8)), 8)
+	b = ((b + ($.uint(($.uint64ToNumber(s) < 32 ? ((1 << $.uint64ToNumber(s)) & 0xff) : 0), 8))) & 0xff)
 	await $.println("byte-shl-by-uint64", b)
 
 	let v = $.uint(($.uintShr(b, s, 8)) & 0x0f, 8)
 	await $.println("byte-shr-by-uint64", v)
 
 	let w = 1
-	w = $.uint($.narrowShl(w, ($.uintFromWide(s, 16))), 16)
+	w = (($.narrowShl(w, ($.uintFromWide(s, 16)))) & 0xffff)
 	await $.println("uint16-shlassign", w)
 
 	// A compound shift of a number by a 64-bit count takes the count as a

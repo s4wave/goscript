@@ -20,7 +20,7 @@ export function safeDivide(a: number, b: number): [number, boolean] {
 		if (b == 0) {
 			$.panic("division by zero")
 		}
-		const __goscriptReturn0: [number, boolean] = [globalThis.Math.trunc(a / b), true]
+		const __goscriptReturn0: [number, boolean] = [$.intQuo(a, b), true]
 		result = __goscriptReturn0[0]
 		ok = __goscriptReturn0[1]
 		__defer.dispose()

@@ -47,7 +47,7 @@ export class Node {
 		registry = $.appendOne(registry, n, $.appendZeros.nil)
 		const __goscriptMap0 = counts
 		const __goscriptMapKey0 = n
-		$.mapSet(__goscriptMap0, __goscriptMapKey0, $.mapGet<Node | $.VarRef<Node> | null, number, number>(__goscriptMap0, __goscriptMapKey0, 0)[0] + (1))
+		$.mapSet(__goscriptMap0, __goscriptMapKey0, $.mapGet<Node | $.VarRef<Node> | null, number, number>(__goscriptMap0, __goscriptMapKey0, 0)[0] + 1)
 	}
 
 	public Rename(name: string): void {
