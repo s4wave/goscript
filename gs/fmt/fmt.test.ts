@@ -179,6 +179,26 @@ describe('fmt basic value formatting', () => {
     expect(await fmt.Sprint(goStringer)).not.toBe('<go stringer>')
   })
 
+  it('%q, %x and %X format an error or Stringer by its method result', async () => {
+    const hash = {
+      String() {
+        return '4d4b'
+      },
+    }
+    expect(await fmt.Sprintf('%q', hash)).toBe('"4d4b"')
+    expect(await fmt.Sprintf('%x', hash)).toBe('34643462')
+    expect(await fmt.Sprintf('%X', hash)).toBe('34643462')
+    const err = {
+      Error() {
+        return 'bad'
+      },
+      String() {
+        return 'unused'
+      },
+    }
+    expect(await fmt.Sprintf('%q', err)).toBe('"bad"')
+  })
+
   it('applies # base prefixes and +/space sign flags (Go parity)', async () => {
     expect(await fmt.Sprintf('%#x', 15)).toBe('0xf')
     expect(await fmt.Sprintf('%#X', 15)).toBe('0XF')

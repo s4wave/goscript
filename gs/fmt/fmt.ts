@@ -912,9 +912,40 @@ function formatValueMaybe(value: any, verb: string, flags = ''): MaybeString {
       if (typeof value === 'string') return value
       if (value instanceof Uint8Array) return $.bytesToString(value)
       return defaultFormatMaybe(value)
+    case 'q':
+    case 'x':
+    case 'X': {
+      // Go formats an error or Stringer operand of these string verbs by its
+      // Error or String result.
+      const str = methodString(value)
+      if (str !== undefined) {
+        return thenMaybe(str, (s) => formatValue(s, verb, flags))
+      }
+      return formatValue(value, verb, flags)
+    }
     default:
       return formatValue(value, verb, flags)
   }
+}
+
+// methodString returns the Error or String result of an object operand, in
+// Go's order, or undefined when it has neither or the method panics.
+function methodString(value: any): MaybeString | undefined {
+  if (value === null || typeof value !== 'object') return undefined
+  const receiver = $.isVarRef(value) ? value.value : value
+  for (const name of ['Error', 'String']) {
+    if (
+      typeof receiver?.[name] === 'function' &&
+      !pointerReceiverOnly(receiver, undefined, name)
+    ) {
+      try {
+        return toMaybeString(receiver[name]())
+      } catch {
+        return undefined
+      }
+    }
+  }
+  return undefined
 }
 
 function applyFormatOptions(
