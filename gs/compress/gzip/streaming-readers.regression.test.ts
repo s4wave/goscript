@@ -2,6 +2,7 @@ import { Buffer } from 'node:buffer'
 import { deflateSync, gzipSync } from 'node:zlib'
 import { describe, expect, it } from 'vitest'
 import * as $ from '@goscript/builtin/index.js'
+import * as bytes from '@goscript/bytes/index.js'
 import * as io from '@goscript/io/index.js'
 import * as gzip from './index.js'
 import * as zlib from '../zlib/index.js'
@@ -31,16 +32,26 @@ function exactSource(data: Uint8Array) {
     ReadByte(): io.IOResult { return position === data.length ? [0, io.EOF] : [data[position++], null] },
   }
 }
-function seekableSource(data: Uint8Array) {
+// teeSource is a ByteReader and Seeker that counts every byte it hands out,
+// as go-git's pack scanner hashes them. A Seek back does not take bytes out
+// of the tee, so the inflater must not overread and rewind it.
+function teeSource(data: Uint8Array) {
   let position = 0
+  let teed = 0
   return {
     get position() { return position },
+    get teed() { return teed },
     Read(p: $.Bytes): io.IOResult {
       const n = $.copy(p, data.subarray(position))
       position += n
+      teed += n
       return [n, n === 0 ? io.EOF : null]
     },
-    ReadByte(): io.IOResult { throw new Error('must read seekable input in bulk') },
+    ReadByte(): io.IOResult {
+      if (position === data.length) return [0, io.EOF]
+      teed++
+      return [data[position++], null]
+    },
     Seek(offset: bigint, whence: number): [bigint, $.GoError] {
       if (whence !== io.SeekCurrent) throw new Error('unexpected whence')
       position += Number(offset)
@@ -100,9 +111,9 @@ for (const [name, codec, encode] of [['gzip', gzip, gzipSync], ['zlib', zlib, de
       expect(await reader!.Close()).toBeNull()
       expect(input.ReadByte()).toEqual([116, null])
     })
-    it('reads a seekable ByteReader in bulk and rewinds to the frame boundary', async () => {
+    it('consumes from a seekable ByteReader only the bytes of the frame', async () => {
       const encoded = encode(Buffer.from('one frame'))
-      const input = seekableSource(Buffer.concat([encoded, Buffer.from('trailing')]))
+      const input = teeSource(Buffer.concat([encoded, Buffer.from('trailing')]))
       const [reader, err] = await codec.NewReader(input)
       expect(err).toBeNull()
       if (reader instanceof gzip.Reader) reader.Multistream(false)
@@ -110,6 +121,22 @@ for (const [name, codec, encode] of [['gzip', gzip, gzipSync], ['zlib', zlib, de
       expect(readErr).toBeNull()
       expect(Buffer.from(asBytes(out)).toString()).toBe('one frame')
       expect(input.position).toBe(encoded.length)
+      expect(input.teed).toBe(encoded.length)
+    })
+    it('reads a bytes.Reader in bulk and rewinds to the frame boundary', async () => {
+      const encoded = encode(Buffer.from('one frame'))
+      const input = bytes.NewReader(Buffer.concat([encoded, Buffer.from('trailing')]))
+      const readByte = input.ReadByte.bind(input)
+      let byteCalls = 0
+      input.ReadByte = () => { byteCalls++; return readByte() }
+      const [reader, err] = await codec.NewReader(input)
+      expect(err).toBeNull()
+      if (reader instanceof gzip.Reader) reader.Multistream(false)
+      const [out, readErr] = await io.ReadAll(reader!)
+      expect(readErr).toBeNull()
+      expect(Buffer.from(asBytes(out)).toString()).toBe('one frame')
+      expect(byteCalls).toBe(0)
+      expect(input.Len()).toBe('trailing'.length)
     })
     it('keeps checksum failures sticky and preserves delivered data', async () => {
       const encoded = encode(Buffer.from('payload'))

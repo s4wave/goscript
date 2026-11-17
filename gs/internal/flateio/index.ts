@@ -21,7 +21,9 @@ import {
 } from 'pako'
 
 import * as $ from '@goscript/builtin/index.js'
+import * as bytes from '@goscript/bytes/index.js'
 import * as io from '@goscript/io/index.js'
+import * as strings from '@goscript/strings/index.js'
 
 import { adler32, crc32 } from './checksum.js'
 
@@ -259,11 +261,17 @@ export class Deflater {
   }
 }
 
-// A Reader may overread into its bounded scratch buffer. A ByteReader is used
-// byte-exactly so framed protocols can retain bytes following a member, unless
-// it is also a Seeker: then it is read in bulk and rewind returns the unread
-// bytes. This never emulates ReadByte with one-byte Reader.Read calls. The
-// buffer is kept across resets.
+// Input feeds the codec from a Go reader. Invariant: the inflater consumes from
+// its source exactly the bytes Go's would, because a tee or a counter on the
+// source observes any difference. A plain Reader may overread into the bounded
+// scratch buffer, as Go's bufio wrapper does. A ByteReader is read byte by
+// byte, so framed protocols keep the bytes following a member. Only a
+// bytes.Reader or strings.Reader is read in bulk, and rewind seeks it back over
+// the unread bytes: their Seek only moves an index, so the bulk read is
+// invisible. Any other Seeker may observe its reads, as go-git's pack scanner
+// hashes them, so a Seek method alone never selects the bulk path. This never
+// emulates ReadByte with one-byte Reader.Read calls. The buffer is kept across
+// resets.
 class Input {
   readonly buffer = new Uint8Array(chunkSize)
   offset = 0
@@ -278,13 +286,13 @@ class Input {
     this.offset = 0
     this.available = 0
     this.terminal = null
-    const byteReader = reader != null && 'ReadByte' in reader && typeof reader.ReadByte === 'function'
-    const seeker = byteReader && 'Seek' in reader && typeof reader.Seek === 'function'
-    this.byteReader = byteReader && !seeker ? reader as io.Reader & io.ByteReader : null
-    this.seeker = seeker ? reader as io.Reader & io.Seeker : null
+    const seeker = reader instanceof bytes.Reader || reader instanceof strings.Reader
+    const byteReader = !seeker && reader != null && 'ReadByte' in reader && typeof reader.ReadByte === 'function'
+    this.byteReader = byteReader ? reader as io.Reader & io.ByteReader : null
+    this.seeker = seeker ? reader : null
   }
 
-  // rewind seeks a bulk-read ByteReader back over the unconsumed bytes.
+  // rewind seeks a bulk-read bytes or strings Reader back over the unconsumed bytes.
   rewind(): void {
     if (this.seeker == null || this.available === 0) return
     this.seeker.Seek(BigInt(-this.available), io.SeekCurrent)
