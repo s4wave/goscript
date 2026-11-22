@@ -10722,7 +10722,26 @@ func lowerBasicLit(lit *ast.BasicLit) string {
 		}
 		return "0o" + digits
 	}
+	if lit.Kind == token.FLOAT {
+		return lowerFloatLiteral(lit.Value)
+	}
 	return lit.Value
+}
+
+// lowerFloatLiteral returns the TypeScript form of the given Go floating-point
+// literal. Hexadecimal floats (0x1p-52) and decimal floats with leading zeros
+// (01.5) are not valid TypeScript, so they are written as decimal numbers.
+func lowerFloatLiteral(value string) string {
+	hex := len(value) > 1 && value[0] == '0' && (value[1] == 'x' || value[1] == 'X')
+	leadingZero := len(value) > 1 && value[0] == '0' && value[1] >= '0' && value[1] <= '9'
+	if !hex && !leadingZero {
+		return value
+	}
+	number, err := strconv.ParseFloat(value, 64)
+	if err != nil {
+		return value
+	}
+	return strconv.FormatFloat(number, 'g', -1, 64)
 }
 
 func isStringLiteralExpr(expr ast.Expr) bool {
