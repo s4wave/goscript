@@ -3,6 +3,7 @@
 
 import * as $ from "@goscript/builtin/index.js"
 import * as errors from "@goscript/errors/index.js"
+import * as fmt from "@goscript/fmt/index.js"
 import * as os from "@goscript/os/index.js"
 
 export type scalarErr = number
@@ -96,6 +97,27 @@ export function scalarErr_Error(recv: scalarErr): string {
 	return "scalar error"
 }
 
+export async function unwrapKind(err: $.GoError): globalThis.Promise<string> {
+	{
+		const __goscriptTypeSwitchValue = err
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0())) {
+			case 0:
+				{
+					let e: any = $.typeAssert<any>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Interface, methods: [{ name: "Unwrap", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.sliceType("error") }] }] }).value
+					return (fmt.Sprint("many ", $.basicInterfaceValue($.sliceLen(((__goscriptAwait = (e !== null && (e as any).__isVarRef !== true && ((e as any).__goValue === undefined || (e as any).__goType?.charCodeAt(0) !== 42) ? (e as any) : $.pointerValue<any>(e)).Unwrap(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Slice<$.GoError>)), "int")) as string)
+				}
+				break
+			case 1:
+				{
+					let e: any = $.typeAssert<any>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Interface, methods: [{ name: "Unwrap", args: [], returns: [{ name: "_r0", type: "error" }] }] }).value
+					return "one " + (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>((__goscriptAwait = (e !== null && (e as any).__isVarRef !== true && ((e as any).__goValue === undefined || (e as any).__goType?.charCodeAt(0) !== 42) ? (e as any) : $.pointerValue<any>(e)).Unwrap(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+				}
+				break
+		}
+	}
+	return "none"
+}
+
 export async function main(): globalThis.Promise<void> {
 	// Construct two independent errors.
 	let err1 = errors.New("first error")
@@ -115,21 +137,21 @@ export async function main(): globalThis.Promise<void> {
 
 	// Extract the concrete pointer through a wrapper's Unwrap method.
 	let typedErr = new customErr(false, "typed error")
-	let __goscriptTuple0: any = errors.AsType(__goscriptStatic0(), $.structInterfaceValue<$.GoError>(new wrappedErr(true, $.interfaceValue<$.GoError>(typedErr, "*main.customErr", /* @__PURE__ */ $.pointerType("main.customErr"))), "main.wrappedErr", "main.wrappedErr")!)
+	let __goscriptTuple0: any = errors.AsType(__goscriptStatic1(), $.structInterfaceValue<$.GoError>(new wrappedErr(true, $.interfaceValue<$.GoError>(typedErr, "*main.customErr", /* @__PURE__ */ $.pointerType("main.customErr"))), "main.wrappedErr", "main.wrappedErr")!)
 	let matched: customErr | $.VarRef<customErr> | null = (__goscriptTuple0[0] as customErr | $.VarRef<customErr> | null)
 	let ok: boolean = __goscriptTuple0[1]
 	await $.println("AsType matched:", ok)
 	if (ok) {
 		await $.println("AsType message:", $.pointerValue<customErr>(matched).msg)
 	}
-	let __goscriptTuple1: any = errors.AsType(__goscriptStatic0(), $.pointerValueOrNil(err1)!)
+	let __goscriptTuple1: any = errors.AsType(__goscriptStatic1(), $.pointerValueOrNil(err1)!)
 	ok = __goscriptTuple1[1]
 	await $.println("AsType missing:", ok)
 
 	// Type extraction also preserves a named scalar error's value.
 	let scalarTarget: $.VarRef<scalarErr> = $.varRef(0)
-	await $.println("As scalar missing:", errors.As($.pointerValueOrNil(err1)!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())), scalarTarget.value)
-	await $.println("As scalar matched:", errors.As($.namedValueInterfaceValue<$.GoError>(42, "main.scalarErr", {"Error": scalarErr_Error}, /* @__PURE__ */ $.basicType("uint8", "main.scalarErr"))!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())), scalarTarget.value)
+	await $.println("As scalar missing:", errors.As($.pointerValueOrNil(err1)!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())), scalarTarget.value)
+	await $.println("As scalar matched:", errors.As($.namedValueInterfaceValue<$.GoError>(42, "main.scalarErr", {"Error": scalarErr_Error}, /* @__PURE__ */ $.basicType("uint8", "main.scalarErr"))!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())), scalarTarget.value)
 
 	// A syscall wrapper preserves the operation and its underlying error.
 	let sysErr = os.NewSyscallError("connect", $.pointerValueOrNil($.interfaceValue<$.GoError>(typedErr, "*main.customErr", /* @__PURE__ */ $.pointerType("main.customErr")))!)
@@ -140,27 +162,39 @@ export async function main(): globalThis.Promise<void> {
 	let details$: os.SyscallError = details == null ? $.pointerTarget<os.SyscallError>(details) : (details as any).__isVarRef === true ? (details as any).value : (details as any).__goValue === undefined ? (details as any) : $.pointerTarget<os.SyscallError>(details)
 	await $.println("syscall details:", ok, (details$ as os.SyscallError).Syscall, $.comparableEqual((details$ as os.SyscallError).Err, $.interfaceValue<$.GoError>(typedErr, "*main.customErr", /* @__PURE__ */ $.pointerType("main.customErr"))))
 	await $.println("syscall nil:", os.NewSyscallError("connect", null!) == null)
+
+	// A wrapper the runtime builds has the Unwrap method set of its Go type:
+	// one %w unwraps to an error, two %w and Join to a slice.
+	await $.println("unwrap one %w:", await unwrapKind(fmt.Errorf("ctx: %w", (err1 as any))))
+	await $.println("unwrap two %w:", await unwrapKind(fmt.Errorf("%w: %w", (err1 as any), (err2 as any))))
+	await $.println("unwrap Join:", await unwrapKind(errors.Join($.pointerValueOrNil(err1)!, $.pointerValueOrNil(err2)!)))
+	await $.println("unwrap none:", await unwrapKind(err1))
 	await $.println("test finished")
 }
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.pointerType("main.customErr"), zero: () => null, methods: {Error: (receiver: any) => $.pointerValue(receiver).Error(), Timeout: (receiver: any) => $.pointerValue(receiver).Timeout()} }})
+	return __goscriptStatic0$value ??= ($.typeSwitchSite([{ kind: $.TypeKind.Interface, methods: [{ name: "Unwrap", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.sliceType("error") }] }] }, { kind: $.TypeKind.Interface, methods: [{ name: "Unwrap", args: [], returns: [{ name: "_r0", type: "error" }] }] }]))
 }
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({Error: (receiver: any) => (scalarErr_Error as any)($.pointerValue(receiver))})
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.pointerType("main.customErr"), zero: () => null, methods: {Error: (receiver: any) => $.pointerValue(receiver).Error(), Timeout: (receiver: any) => $.pointerValue(receiver).Timeout()} }})
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8", "main.scalarErr")))
+	return __goscriptStatic2$value ??= ({Error: (receiver: any) => (scalarErr_Error as any)($.pointerValue(receiver))})
 }
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ([$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])])
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8", "main.scalarErr")))
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= ([$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])])
 }
 
 var __goscriptAwait: any
