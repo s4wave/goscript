@@ -40,9 +40,9 @@ function wrapError(err: Exclude<$.GoError, null>, message: string): $.GoError {
       return Promise.resolve(inner).then((text) => `${message}: ${text}`)
     },
   }
-  ;(wrapped as any).Unwrap = function (): $.GoError {
+  ;(wrapped as any).Unwrap = $.withUnwrapSignature(function (): $.GoError {
     return err
-  }
+  }, false)
   return wrapped
 }
 
@@ -409,9 +409,12 @@ export function Join(...errs: $.GoError[]): $.GoError {
   }
 
   // Add Unwrap method that returns the array of errors
-  ;(joinedError as any).Unwrap = function (): $.GoError[] {
-    return nonNilErrs
-  }
+  ;(joinedError as any).Unwrap = $.withUnwrapSignature(
+    function (): $.GoError[] {
+      return nonNilErrs
+    },
+    true,
+  )
 
   return joinedError
 }

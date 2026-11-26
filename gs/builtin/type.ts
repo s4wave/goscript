@@ -1327,8 +1327,52 @@ function methodSignaturesMatch(
 ): boolean {
   return (
     actual.args.length === required.args.length &&
-    actual.returns.length === required.returns.length
+    actual.returns.length === required.returns.length &&
+    actual.returns.every(
+      (ret, i) => !errorAgainstSlice(ret.type, required.returns[i].type),
+    )
   )
+}
+
+// errorAgainstSlice reports whether one of two return types is error and the
+// other a slice, which never match. It tells Unwrap() error from Unwrap()
+// []error, the two method sets errors.Is walks, and leaves every other pair
+// to the arity check.
+function errorAgainstSlice(
+  a: TypeInfo | string,
+  b: TypeInfo | string,
+): boolean {
+  const isSlice = (t: TypeInfo | string) =>
+    typeof t !== 'string' && t.kind === TypeKind.Slice
+  return (a === 'error' && isSlice(b)) || (b === 'error' && isSlice(a))
+}
+
+// unwrapOneSignature and unwrapManySignature are the Go signatures of
+// Unwrap() error and Unwrap() []error.
+const unwrapOneSignature: MethodSignature = {
+  name: 'Unwrap',
+  args: [],
+  returns: [{ type: 'error' }],
+}
+const unwrapManySignature: MethodSignature = {
+  name: 'Unwrap',
+  args: [],
+  returns: [{ type: { kind: TypeKind.Slice, elemType: 'error' } }],
+}
+
+// withUnwrapSignature marks fn, the Unwrap of an error value the runtime builds
+// as a plain object, with its Go signature: Unwrap() []error when many is set,
+// and Unwrap() error otherwise. A plain object carries no Go type, so without
+// the mark an interface assertion sees only the method's name, and a single
+// wrapper satisfies interface{ Unwrap() []error }.
+export function withUnwrapSignature<F extends (...args: never[]) => unknown>(
+  fn: F,
+  many: boolean,
+): F {
+  ;(
+    fn as unknown as { __goscriptMethodSignature?: MethodSignature }
+  ).__goscriptMethodSignature = many ? unwrapManySignature : unwrapOneSignature
+  return fn
 }
 
 /**

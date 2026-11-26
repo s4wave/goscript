@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"os"
 )
 
@@ -40,6 +41,18 @@ func (e wrappedErr) Error() string {
 // Unwrap returns the original error.
 func (e wrappedErr) Unwrap() error {
 	return e.err
+}
+
+// unwrapKind names the Unwrap method set err has, as a walk of an error's
+// tree tells them apart.
+func unwrapKind(err error) string {
+	switch e := err.(type) {
+	case interface{ Unwrap() []error }:
+		return fmt.Sprint("many ", len(e.Unwrap()))
+	case interface{ Unwrap() error }:
+		return "one " + e.Unwrap().Error()
+	}
+	return "none"
 }
 
 func main() {
@@ -84,5 +97,12 @@ func main() {
 	details, ok := sysErr.(*os.SyscallError)
 	println("syscall details:", ok, details.Syscall, details.Err == typedErr)
 	println("syscall nil:", os.NewSyscallError("connect", nil) == nil)
+
+	// A wrapper the runtime builds has the Unwrap method set of its Go type:
+	// one %w unwraps to an error, two %w and Join to a slice.
+	println("unwrap one %w:", unwrapKind(fmt.Errorf("ctx: %w", err1)))
+	println("unwrap two %w:", unwrapKind(fmt.Errorf("%w: %w", err1, err2)))
+	println("unwrap Join:", unwrapKind(errors.Join(err1, err2)))
+	println("unwrap none:", unwrapKind(err1))
 	println("test finished")
 }

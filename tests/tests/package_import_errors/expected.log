@@ -11,4 +11,8 @@ As scalar matched: true 42
 syscall: connect: typed error true true
 syscall details: true connect true
 syscall nil: true
+unwrap one %w: one first error
+unwrap two %w: many 2
+unwrap Join: many 2
+unwrap none: none
 test finished

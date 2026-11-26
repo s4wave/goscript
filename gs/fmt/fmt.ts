@@ -645,8 +645,14 @@ function compareMapKeys(a: unknown, b: unknown): number {
   }
 
   // Arrays compare by element, and structs by field, in order.
-  const xs = $.isArrayOrGoSlice(a) ? sliceItems(a) : $.ownKeys(a as object).map((k) => (a as any)[k])
-  const ys = $.isArrayOrGoSlice(b) ? sliceItems(b) : $.ownKeys(b as object).map((k) => (b as any)[k])
+  const xs =
+    $.isArrayOrGoSlice(a) ?
+      sliceItems(a)
+    : $.ownKeys(a as object).map((k) => (a as any)[k])
+  const ys =
+    $.isArrayOrGoSlice(b) ?
+      sliceItems(b)
+    : $.ownKeys(b as object).map((k) => (b as any)[k])
   for (let i = 0; i < Math.min(xs.length, ys.length); i++) {
     const c = compareMapKeys(xs[i], ys[i])
     if (c !== 0) {
@@ -1388,9 +1394,15 @@ export function Errorf(format: string, ...a: any[]): any {
   // unwrap to an []error, matching the depth-first traversal in errors.Is.
   const wrapped = errorfWrappedArgs(format, a)
   if (wrapped.length === 1) {
-    ;(err as any).Unwrap = (): $.GoError => wrapped[0]
+    ;(err as any).Unwrap = $.withUnwrapSignature(
+      (): $.GoError => wrapped[0],
+      false,
+    )
   } else if (wrapped.length > 1) {
-    ;(err as any).Unwrap = (): $.GoError[] => wrapped
+    ;(err as any).Unwrap = $.withUnwrapSignature(
+      (): $.GoError[] => wrapped,
+      true,
+    )
   }
   return err
 }
