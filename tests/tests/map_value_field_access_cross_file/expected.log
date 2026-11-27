@@ -1,1 +1,5 @@
 bar
+missing: true false
+present: value true
+constructors: true literal true
+zeros: true true

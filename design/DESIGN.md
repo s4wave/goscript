@@ -197,6 +197,8 @@ The `io.Copy` and `io.CopyN` fallback starts with a 32 KiB buffer and grows it a
 
 Generated protobuf adapters declare their Go method types and install binary, JSON, clone, equality, and reset forwarding methods through the shared protobuf bridge. Installation occurs in the class static block, captures the declaring constructor for nil receiver calls, and preserves non-enumerable prototype methods. Handwritten methods and native proto-text bodies remain on their declaring classes.
 
+Sibling-file imports are classified after lowering. Type annotations only need a type import; emitted value references, including synthesized zero-value constructors, record their module alias and require a value import. The same value-name primitive covers constructors, prototypes, method tables, functions and package-variable access, independent of the Go syntax that caused the reference.
+
 ## Known Divergences
 
 *   **Integer Overflow:** Standard TypeScript numbers do not overflow like Go's fixed-size integers. GoScript uses `bigint` for `int64` and `uint64` values and helper functions for fixed-width normalization; smaller integer widths still use `number` and may diverge on overflow when a helper does not explicitly truncate.

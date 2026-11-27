@@ -400,7 +400,6 @@ var expectedV2ComplianceGaps = map[string]bool{
 	"json_typefields_flow":              true,
 	"linkname_alias":                    true,
 	"map_const_key":                     true,
-	"map_value_field_access_cross_file": true,
 	"method_async_dependency":           true,
 	"method_binding":                    true,
 	"method_receiver_async_paren":       true,

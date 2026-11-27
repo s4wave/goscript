@@ -1,41 +1,36 @@
 // Generated file based on types.go
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
-import * as $ from "@goscript/builtin/index.ts"
+import * as $ from "@goscript/builtin/index.js"
 
 export class Foo {
-	public get Value(): string {
-		return this._fields.Value.value
-	}
-	public set Value(value: string) {
-		this._fields.Value.value = value
-	}
+	public declare Value: string
 
-	public _fields: {
-		Value: $.VarRef<string>
-	}
-
-	constructor(init?: Partial<{Value?: string}>) {
-		this._fields = {
-			Value: $.varRef(init?.Value ?? "")
-		}
+	constructor(__goscriptValue?: boolean, Value$?: string) {
+		this.Value = Value$ ?? ""
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Foo {
-		const cloned = new Foo()
-		cloned._fields = {
-			Value: $.varRef(this._fields.Value.value)
-		}
-		return $.markAsStructValue(cloned)
+		return new Foo(true, this.Value)
+	}
+
+	public __goscriptAssign(source: Foo): this {
+		this.Value = source.Value
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
 		"main.Foo",
-		new Foo(),
-		[],
+		() => new Foo(),
+		() => [],
 		Foo,
-		{"Value": { kind: $.TypeKind.Basic, name: "string" }}
+		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
-export let Storage: Map<string, Foo> | null = new Map<string, Foo>([["foo", $.markAsStructValue(new Foo({Value: "bar"}))]])
+export let Storage: globalThis.Map<string, Foo> | null = $.makeMap<string, Foo>([["foo", new Foo(true, "bar")]])
+
+export function __goscript_set_Storage(__goscriptValue: globalThis.Map<string, Foo> | null): void {
+	Storage = __goscriptValue
+}

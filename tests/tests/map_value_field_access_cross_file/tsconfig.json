@@ -4,7 +4,11 @@
       "*": [
         "./*"
       ],
+      "@go/github.com/s4wave/goscript/*": [
+        "../../../*"
+      ],
       "@goscript/*": [
+        "../../../tests/tests/map_value_field_access_cross_file/run/output/@goscript/*",
         "../../../gs/*",
         "../../../tests/deps/*"
       ],
@@ -15,9 +19,15 @@
   },
   "extends": "../../../tests/tsconfig.base.json",
   "include": [
+    "allocate.gs.ts",
+    "array.gs.ts",
     "index.ts",
+    "literal.gs.ts",
+    "lookup.gs.ts",
     "map_value_field_access_cross_file.gs.ts",
     "read.gs.ts",
-    "types.gs.ts"
+    "result.gs.ts",
+    "types.gs.ts",
+    "zero.gs.ts"
   ]
 }

@@ -124,13 +124,9 @@ func (o *LoweringOwner) pointerMethodPrototype(ctx lowerFileContext, method *typ
 		return "", false
 	}
 
-	// A type of this package is declared in this file or in one that the
-	// file imports as a value.
+	// A type of this package can be referenced through its sibling module.
 	pkgPath := receiver.Obj().Pkg().Path()
 	local := pkgPath == ctx.semPkg.pkgPath
-	if alias := ctx.localAliases[receiver.Obj()]; local && alias != "" && !ctx.runtimeAliases[alias] {
-		return "", false
-	}
 
 	// Another package's type is exported by a package that the file
 	// imports and does not defer.

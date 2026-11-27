@@ -2,9 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-import * as __goscript_a from "./a.gs.ts"
+import type * as __goscript_a from "./a.gs.ts"
 import * as __goscript_b from "./b.gs.ts"
-import "./a.gs.ts"
 
 export var cTable: $.Slice<__goscript_b.bValue>
 

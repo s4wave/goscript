@@ -769,27 +769,8 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 	for _, importSourcePath := range importSourcePaths {
 		o.addGeneratedTypeImports(model, semPkg, importSourcePath, loweredFile, importAliases, importPaths, reservedImportAliases, seenImport)
 	}
-	localImports := make([]loweredImport, 0, len(localRefs.aliases))
-	seenLocalImport := make(map[string]bool)
-	for _, alias := range localRefs.aliases {
-		if seenLocalImport[alias] {
-			continue
-		}
-		seenLocalImport[alias] = true
-		source := localRefs.aliasSources[alias]
-		typeOnly := !localRefs.runtimeAliases[alias]
-		localImports = append(localImports, loweredImport{
-			alias:      alias,
-			source:     source,
-			sideEffect: !typeOnly,
-			typeOnly:   typeOnly,
-		})
-	}
-	slices.SortFunc(localImports, func(a, b loweredImport) int {
-		return cmp.Compare(a.alias, b.alias)
-	})
-	loweredFile.imports = append(loweredFile.imports, localImports...)
 
+	// Lower declarations while recording the sibling modules used as values.
 	ctx := lowerFileContext{
 		externalEmbeds:    req.externalEmbeds,
 		embedAssets:       loweredFile.assets,
@@ -804,7 +785,7 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 		importObjects:     importObjects,
 		sourcePath:        sourcePath,
 		localAliases:      localRefs.aliases,
-		runtimeAliases:    localRefs.runtimeAliases,
+		runtimeAliases:    make(map[string]bool),
 		lazyPackageVars:   lazyPackageVars,
 		asyncLazy:         asyncLazy,
 		tempNames:         newTempNameOwner(),
@@ -875,6 +856,29 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 	if *ctx.awaitTemp {
 		loweredFile.decls = append(loweredFile.decls, loweredDecl{code: "var " + conditionalAwaitTemp + ": any"})
 	}
+
+	// Classify sibling imports from the value references produced by lowering.
+	localImports := make([]loweredImport, 0, len(localRefs.aliases))
+	seenLocalImport := make(map[string]bool)
+	for _, alias := range localRefs.aliases {
+		if seenLocalImport[alias] {
+			continue
+		}
+		seenLocalImport[alias] = true
+		source := localRefs.aliasSources[alias]
+		typeOnly := !ctx.runtimeAliases[alias]
+		localImports = append(localImports, loweredImport{
+			alias:      alias,
+			source:     source,
+			sideEffect: !typeOnly,
+			typeOnly:   typeOnly,
+		})
+	}
+	slices.SortFunc(localImports, func(a, b loweredImport) int {
+		return cmp.Compare(a.alias, b.alias)
+	})
+	loweredFile.imports = append(loweredFile.imports, localImports...)
+
 	return loweredFile, diagnostics
 }
 
@@ -1188,7 +1192,6 @@ type localFileReferenceAnalysis struct {
 	reservedNames   map[string]bool
 	aliases         map[types.Object]string
 	aliasSources    map[string]string
-	runtimeAliases  map[string]bool
 	implicitImports map[string]bool
 	implicitRuntime map[string]bool
 }
@@ -1238,7 +1241,6 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 		reservedNames:   make(map[string]bool),
 		aliases:         make(map[types.Object]string),
 		aliasSources:    make(map[string]string),
-		runtimeAliases:  make(map[string]bool),
 		implicitImports: make(map[string]bool),
 		implicitRuntime: make(map[string]bool),
 	}
@@ -1272,14 +1274,9 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 			return
 		}
 
-		// Resolve each local object's alias and dependencies once, but allow a
-		// later value use to promote a type-only import to a runtime import.
+		// Resolve each local object's alias and dependencies once. Lowering
+		// records value references when it emits them.
 		if seenObjects[obj] {
-			if runtime {
-				if alias := analysis.aliases[obj]; alias != "" {
-					analysis.runtimeAliases[alias] = true
-				}
-			}
 			return
 		}
 		seenObjects[obj] = true
@@ -1297,9 +1294,6 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 				alias := "__goscript_" + safeIdentifier(strings.TrimSuffix(outputName, ".gs.ts"))
 				analysis.aliases[obj] = alias
 				analysis.aliasSources[alias] = "./" + outputName
-				if runtime {
-					analysis.runtimeAliases[alias] = true
-				}
 			}
 		}
 		switch typed := obj.(type) {
@@ -1979,8 +1973,8 @@ type lowerFileContext struct {
 	lazyPackageVars map[types.Object]bool
 	asyncLazy       *asyncLazyState
 	identAliases    map[types.Object]string
-	// runtimeAliases holds the local aliases that the file imports as
-	// values, not only as types.
+	// runtimeAliases records sibling module aliases referenced as values
+	// by lowering, including synthesized constructors and method tables.
 	runtimeAliases map[string]bool
 	// pointerTargets names the locals that hold the struct that a pointer
 	// receiver, parameter or local points to (see pointerTargetLocals).
@@ -10998,7 +10992,7 @@ func (o *LoweringOwner) lowerIdent(ctx lowerFileContext, ident *ast.Ident, raw b
 
 	// Read a variable declared in another file of this package through
 	// that file's module alias.
-	if alias := ctx.localAliases[obj]; alias != "" {
+	if alias := ctx.localValueAlias(obj); alias != "" {
 		qualified := alias + "." + value
 		if ctx.lazyPackageVars[obj] {
 			qualified = o.lazyPackageVarRead(ctx, alias+".", obj)
@@ -12448,7 +12442,7 @@ func (o *LoweringOwner) lowerConversionExpr(
 			types.IdenticalIgnoreTags(target.Underlying(), source.Underlying()) {
 			return o.runtimeOwner.QualifiedHelper(RuntimeHelperUnsafePointerCast) +
 				"<" + o.tsTypeFor(ctx, targetType) + ">(" + value + ", " +
-				o.namedTypeExpr(ctx, target) + ")", diagnostics
+				namedValueExpr(ctx, target) + ")", diagnostics
 		}
 	}
 	if conversion, ok := o.lowerNamedStructConversion(ctx, expr.Args[0], targetType, sourceType, value); ok {
@@ -12874,7 +12868,7 @@ func (o *LoweringOwner) lowerNamedStructConversion(
 			text:  value,
 			async: o.conversionValueNeedsAwait(ctx, sourceExpr),
 		},
-		target: o.namedTypeExpr(ctx, target),
+		target: namedValueExpr(ctx, target),
 		temp:   temp,
 		helper: o.runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue),
 		fields: fields,
@@ -13316,7 +13310,7 @@ func (o *LoweringOwner) packageVarSetterForAssignment(ctx lowerFileContext, expr
 		if obj == nil {
 			return "", false
 		}
-		alias := ctx.localAliases[obj]
+		alias := ctx.localValueAlias(obj)
 		if alias != "" {
 			return alias + "." + packageVarSetterName(ident.Name), true
 		}
@@ -15480,9 +15474,9 @@ func (o *LoweringOwner) lowerStructCompositeLit(
 			fields = append(fields, tsStructFieldName(structType.Field(idx).Name(), idx)+": "+value)
 		}
 	}
-	expr := "new " + o.namedTypeExpr(ctx, named) + "()"
+	expr := "new " + o.namedConstructorExpr(ctx, named) + "()"
 	if len(fields) != 0 {
-		expr = "new " + o.namedTypeExpr(ctx, named) + "({" + strings.Join(fields, ", ") + "})"
+		expr = "new " + o.namedConstructorExpr(ctx, named) + "({" + strings.Join(fields, ", ") + "})"
 	}
 	expr = o.lowerGenericInstance(ctx, named, expr)
 	if markStruct {
@@ -15551,7 +15545,7 @@ func (o *LoweringOwner) lowerPositionalStructExpr(ctx lowerFileContext, named *t
 	if !value && last == 0 {
 		args = args[:0]
 	}
-	return o.lowerGenericInstance(ctx, named, "new "+o.namedTypeExpr(ctx, named)+"("+strings.Join(args, ", ")+")")
+	return o.lowerGenericInstance(ctx, named, "new "+o.namedConstructorExpr(ctx, named)+"("+strings.Join(args, ", ")+")")
 }
 
 func compositeLiteralFieldNeedsPreEval(ctx lowerFileContext, expr ast.Expr) bool {
@@ -16854,7 +16848,7 @@ func (o *LoweringOwner) lowerUnnamedToNamedStruct(
 	}
 
 	// The class constructor copies the fields of its init value.
-	return o.lowerGenericInstance(ctx, target, "new "+o.namedTypeExpr(ctx, target)+"("+value+", true)"), true
+	return o.lowerGenericInstance(ctx, target, "new "+o.namedConstructorExpr(ctx, target)+"("+value+", true)"), true
 }
 
 func (o *LoweringOwner) lowerStructClone(value string) string {
@@ -16933,7 +16927,7 @@ func (o *LoweringOwner) hasGeneratedClassShape(named *types.Named) bool {
 // lowerNewStructValue returns the zero struct value of a generated struct
 // class.
 func (o *LoweringOwner) lowerNewStructValue(ctx lowerFileContext, named *types.Named) string {
-	return o.lowerGenericInstance(ctx, named, "new "+o.namedTypeExpr(ctx, named)+"(true)")
+	return o.lowerGenericInstance(ctx, named, "new "+o.namedConstructorExpr(ctx, named)+"(true)")
 }
 
 func (o *LoweringOwner) lowerNamedStructZeroValueExpr(
@@ -16941,7 +16935,7 @@ func (o *LoweringOwner) lowerNamedStructZeroValueExpr(
 	named *types.Named,
 ) string {
 	// A struct that is not an instance has its zero values already.
-	name := o.namedTypeExpr(ctx, named)
+	name := o.namedConstructorExpr(ctx, named)
 	if named.TypeArgs().Len() == 0 {
 		return "new " + name + "()"
 	}
@@ -19866,7 +19860,7 @@ func (o *LoweringOwner) methodFunctionExpr(
 	method string,
 ) string {
 	name := methodFunctionName(receiver, method)
-	if alias := ctx.localAliases[obj]; alias != "" {
+	if alias := ctx.localValueAlias(obj); alias != "" {
 		return alias + "." + name
 	}
 	if receiver != nil && receiver.Obj() != nil && receiver.Obj().Pkg() != nil {
@@ -19880,7 +19874,7 @@ func (o *LoweringOwner) methodFunctionExpr(
 // namedTypeExpr returns the type-position spelling of named, including type
 // arguments for instantiated override types.
 func (o *LoweringOwner) namedTypeExpr(ctx lowerFileContext, named *types.Named) string {
-	baseName := namedValueExpr(ctx, named)
+	baseName := namedTypeName(ctx, named)
 	if args := o.overrideTypeArgsExpr(ctx, named); args != "" {
 		return baseName + "<" + args + ">"
 	}
@@ -19891,6 +19885,32 @@ func (o *LoweringOwner) namedTypeExpr(ctx lowerFileContext, named *types.Named) 
 // class name without type arguments. TypeScript rejects a property access such
 // as .prototype after an instantiation expression.
 func namedValueExpr(ctx lowerFileContext, named *types.Named) string {
+	if named != nil {
+		ctx.localValueAlias(named.Obj())
+	}
+	return namedTypeName(ctx, named)
+}
+
+// namedConstructorExpr spells a constructor, retaining override type arguments.
+func (o *LoweringOwner) namedConstructorExpr(ctx lowerFileContext, named *types.Named) string {
+	baseName := namedValueExpr(ctx, named)
+	if args := o.overrideTypeArgsExpr(ctx, named); args != "" {
+		return baseName + "<" + args + ">"
+	}
+	return baseName
+}
+
+// localValueAlias records and returns the sibling module used to emit obj.
+func (ctx lowerFileContext) localValueAlias(obj types.Object) string {
+	alias := ctx.localAliases[obj]
+	if alias != "" && ctx.runtimeAliases != nil {
+		ctx.runtimeAliases[alias] = true
+	}
+	return alias
+}
+
+// namedTypeName spells a named type without recording a runtime dependency.
+func namedTypeName(ctx lowerFileContext, named *types.Named) string {
 	if named == nil || named.Obj() == nil {
 		return "unknown"
 	}
