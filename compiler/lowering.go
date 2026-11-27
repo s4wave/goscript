@@ -19911,13 +19911,18 @@ func (ctx lowerFileContext) localValueAlias(obj types.Object) string {
 
 // namedTypeName spells a named type without recording a runtime dependency.
 func namedTypeName(ctx lowerFileContext, named *types.Named) string {
+	// Require a type object before resolving its name.
 	if named == nil || named.Obj() == nil {
 		return "unknown"
 	}
+
+	// Prefer the namespace of the sibling file declaring the type.
 	baseName := safeIdentifier(named.Obj().Name())
 	if alias := ctx.localAliases[named.Obj()]; alias != "" {
 		return alias + "." + baseName
 	}
+
+	// Otherwise qualify the type through its imported package.
 	if named.Obj().Pkg() != nil {
 		if alias := ctx.importPaths[named.Obj().Pkg().Path()]; alias != "" {
 			return alias + "." + baseName

@@ -47,6 +47,7 @@ type protobufTypeScriptBindingSiblingImports struct {
 // first use. It reuses an import of the same module that lowering already
 // added so the emitted file never declares the same module twice.
 func (s *protobufTypeScriptBindingSiblingImports) wrapperAliasFor(outputName string) string {
+	// Reuse a namespace already resolved for this binding module.
 	importSource := "./" + outputName
 	if s.aliases == nil {
 		s.aliases = make(map[string]string)
@@ -54,14 +55,20 @@ func (s *protobufTypeScriptBindingSiblingImports) wrapperAliasFor(outputName str
 	if alias, ok := s.aliases[importSource]; ok {
 		return alias
 	}
-	// Reuse an import of the same module that lowering already added so the
-	// emitted file never declares the same module twice.
-	for _, imp := range s.file.imports {
-		if imp.source == importSource && imp.alias != "" && !imp.typeOnly {
+
+	// Constructor metadata uses the namespace as a value, even when
+	// lowering previously needed it only for field type annotations.
+	for idx := range s.file.imports {
+		imp := &s.file.imports[idx]
+		if imp.source == importSource && imp.alias != "" {
+			imp.typeOnly = false
+			imp.sideEffect = true
 			s.aliases[importSource] = imp.alias
 			return imp.alias
 		}
 	}
+
+	// Reserve existing namespaces before minting a new sibling import.
 	base := "__goscript_" + safeIdentifier(strings.TrimSuffix(outputName, ".ts"))
 	reserved := make(map[string]bool, len(s.file.imports))
 	for _, imp := range s.file.imports {
@@ -69,6 +76,8 @@ func (s *protobufTypeScriptBindingSiblingImports) wrapperAliasFor(outputName str
 			reserved[imp.alias] = true
 		}
 	}
+
+	// Keep the newly emitted value import for later constructor references.
 	alias := uniqueImportAlias(base, importSource, nil, reserved)
 	s.aliases[importSource] = alias
 	s.file.imports = append(s.file.imports, loweredImport{
