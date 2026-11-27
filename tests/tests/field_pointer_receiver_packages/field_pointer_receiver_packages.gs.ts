@@ -3,10 +3,9 @@
 
 import * as $ from "@goscript/builtin/index.js"
 import * as inner from "@goscript/github.com/s4wave/goscript/tests/tests/field_pointer_receiver_packages/inner/index.js"
-import * as __goscript_methods from "./methods.gs.ts"
+import type * as __goscript_methods from "./methods.gs.ts"
 import * as __goscript_types from "./types.gs.ts"
 import * as __goscript_widget from "./widget.gs.ts"
-import "./methods.gs.ts"
 import "./types.gs.ts"
 
 export class Outer {

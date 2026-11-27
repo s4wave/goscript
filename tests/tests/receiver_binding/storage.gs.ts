@@ -2,8 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-import * as __goscript_methods from "./methods.gs.ts"
-import "./methods.gs.ts"
+import type * as __goscript_methods from "./methods.gs.ts"
 
 export class storage {
 	public declare bytes: $.Slice<number>

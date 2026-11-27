@@ -2,8 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-import * as __goscript_consts from "./consts.gs.ts"
-import "./consts.gs.ts"
+import type * as __goscript_consts from "./consts.gs.ts"
 
 export class thing {
 	constructor(__goscriptValue?: boolean) {

@@ -2,8 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-import * as __goscript_memory from "./memory.gs.ts"
-import "./memory.gs.ts"
+import type * as __goscript_memory from "./memory.gs.ts"
 
 export class storage {
 	public declare files: globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null
